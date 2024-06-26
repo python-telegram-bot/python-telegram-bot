@@ -55,6 +55,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `ExalFabu <https://github.com/ExalFabu>`_
 - `franciscod <https://github.com/franciscod>`_
 - `gamgi <https://github.com/gamgi>`_
+- `Gabriel Mitelman Tkacz <https://github.com/gtkacz>`_
 - `Gauthamram Ravichandran <https://github.com/GauthamramRavichandran>`_
 - `Harshil <https://github.com/harshil21>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
