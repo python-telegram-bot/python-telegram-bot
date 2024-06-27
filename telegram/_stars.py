@@ -57,11 +57,11 @@ class RevenueWithdrawalState(TelegramObject):
     __slots__ = ("type",)
 
     PENDING: Final[str] = constants.RevenueWithdrawalStateType.PENDING
-    """:const:`telegram.constants.RevenueWithdrawalState.PENDING`"""
+    """:const:`telegram.constants.RevenueWithdrawalStateType.PENDING`"""
     SUCCEEDED: Final[str] = constants.RevenueWithdrawalStateType.SUCCEEDED
-    """:const:`telegram.constants.RevenueWithdrawalState.SUCCEEDED`"""
+    """:const:`telegram.constants.RevenueWithdrawalStateType.SUCCEEDED`"""
     FAILED: Final[str] = constants.RevenueWithdrawalStateType.FAILED
-    """:const:`telegram.constants.RevenueWithdrawalState.FAILED`"""
+    """:const:`telegram.constants.RevenueWithdrawalStateType.FAILED`"""
 
     def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
@@ -163,7 +163,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
 class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
     """The withdrawal failed and the transaction was refunded.
 
-    .. verisonadded:: NEXT.VERSION
+    .. versionadded:: NEXT.VERSION
 
     Attributes:
         type (:obj:`str`): The type of the state, always

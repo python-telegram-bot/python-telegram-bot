@@ -126,9 +126,9 @@ Available Types
     telegram.replykeyboardremove
     telegram.replyparameters
     telegram.revenuewithdrawalstate
-    telegram.reveneuewithdrawalstatefailed
-    telegram.reveneuewithdrawalstatepending
-    telegram.reveneuewithdrawalstatesucceeded
+    telegram.revenuewithdrawalstatefailed
+    telegram.revenuewithdrawalstatepending
+    telegram.revenuewithdrawalstatesucceeded
     telegram.sentwebappmessage
     telegram.shareduser
     telegram.startransaction

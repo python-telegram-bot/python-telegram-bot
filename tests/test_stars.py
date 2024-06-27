@@ -24,6 +24,7 @@ import pytest
 
 from telegram import (
     Dice,
+    RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
     RevenueWithdrawalStateSucceeded,
@@ -36,7 +37,7 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
-from telegram.constants import TransactionPartnerType
+from telegram.constants import RevenueWithdrawalStateType, TransactionPartnerType
 from tests.auxil.slots import mro_slots
 
 
@@ -148,6 +149,65 @@ def transaction_partner(tp_scope_class_and_type):
             "type": tp_scope_class_and_type[1],
             "withdrawal_state": TestTransactionPartnerBase.withdrawal_state.to_dict(),
             "user": TestTransactionPartnerBase.user.to_dict(),
+        },
+        bot=None,
+    )
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        RevenueWithdrawalState.FAILED,
+        RevenueWithdrawalState.SUCCEEDED,
+        RevenueWithdrawalState.PENDING,
+    ],
+)
+def rws_scope_type(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        RevenueWithdrawalStateFailed,
+        RevenueWithdrawalStateSucceeded,
+        RevenueWithdrawalStatePending,
+    ],
+    ids=[
+        RevenueWithdrawalState.FAILED,
+        RevenueWithdrawalState.SUCCEEDED,
+        RevenueWithdrawalState.PENDING,
+    ],
+)
+def rws_scope_class(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        (RevenueWithdrawalStateFailed, RevenueWithdrawalState.FAILED),
+        (RevenueWithdrawalStateSucceeded, RevenueWithdrawalState.SUCCEEDED),
+        (RevenueWithdrawalStatePending, RevenueWithdrawalState.PENDING),
+    ],
+    ids=[
+        RevenueWithdrawalState.FAILED,
+        RevenueWithdrawalState.SUCCEEDED,
+        RevenueWithdrawalState.PENDING,
+    ],
+)
+def rws_scope_class_and_type(request):
+    return request.param
+
+
+@pytest.fixture(scope="module")
+def revenue_withdrawal_state(rws_scope_class_and_type):
+    # We use de_json here so that we don't have to worry about which class gets which arguments
+    return rws_scope_class_and_type[0].de_json(
+        {
+            "type": rws_scope_class_and_type[1],
+            "date": to_timestamp(TestRevenueWithdrawalStateBase.date),
+            "url": TestRevenueWithdrawalStateBase.url,
         },
         bot=None,
     )
@@ -393,16 +453,124 @@ class TestTransactionPartner(TestTransactionPartnerBase):
 
         if hasattr(c, "user"):
             json_dict = c.to_dict()
-            json_dict["user"] = User(1, "something", True).to_dict()
+            json_dict["user"] = User(2, "something", True).to_dict()
             f = c.__class__.de_json(json_dict, bot)
 
             assert c != f
             assert hash(c) != hash(f)
 
-        if hasattr(c, "withdrawal_state"):
-            json_dict = c.to_dict()
-            json_dict["withdrawal_state"] = withdrawal_state_succeeded().to_dict()
-            g = c.__class__.de_json(json_dict, bot)
 
-            assert c != g
-            assert hash(c) != hash(g)
+class TestRevenueWithdrawalStateBase:
+    date = datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)
+    url = "url"
+
+
+class TestRevenueWithdrawalState(TestRevenueWithdrawalStateBase):
+    def test_slot_behaviour(self, revenue_withdrawal_state):
+        inst = revenue_withdrawal_state
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, bot, rws_scope_class_and_type):
+        cls = rws_scope_class_and_type[0]
+        type_ = rws_scope_class_and_type[1]
+
+        json_dict = {
+            "type": type_,
+            "date": to_timestamp(self.date),
+            "url": self.url,
+        }
+        rws = RevenueWithdrawalState.de_json(json_dict, bot)
+        assert set(rws.api_kwargs.keys()) == {"date", "url"} - set(cls.__slots__)
+
+        assert isinstance(rws, RevenueWithdrawalState)
+        assert type(rws) is cls
+        assert rws.type == type_
+        if "date" in cls.__slots__:
+            assert rws.date == self.date
+        if "url" in cls.__slots__:
+            assert rws.url == self.url
+
+        assert cls.de_json(None, bot) is None
+        assert RevenueWithdrawalState.de_json({}, bot) is None
+
+    def test_de_json_invalid_type(self, bot):
+        json_dict = {
+            "type": "invalid",
+            "date": to_timestamp(self.date),
+            "url": self.url,
+        }
+        rws = RevenueWithdrawalState.de_json(json_dict, bot)
+        assert rws.api_kwargs == {
+            "date": to_timestamp(self.date),
+            "url": self.url,
+        }
+
+        assert type(rws) is RevenueWithdrawalState
+        assert rws.type == "invalid"
+
+    def test_de_json_subclass(self, rws_scope_class, bot):
+        """This makes sure that e.g. RevenueWithdrawalState(data) never returns a
+        RevenueWithdrawalStateFailed instance."""
+        json_dict = {
+            "type": "invalid",
+            "date": to_timestamp(self.date),
+            "url": self.url,
+        }
+        assert type(rws_scope_class.de_json(json_dict, bot)) is rws_scope_class
+
+    def test_to_dict(self, revenue_withdrawal_state):
+        rws_dict = revenue_withdrawal_state.to_dict()
+
+        assert isinstance(rws_dict, dict)
+        assert rws_dict["type"] == revenue_withdrawal_state.type
+        if hasattr(revenue_withdrawal_state, "date"):
+            assert rws_dict["date"] == to_timestamp(revenue_withdrawal_state.date)
+        if hasattr(revenue_withdrawal_state, "url"):
+            assert rws_dict["url"] == revenue_withdrawal_state.url
+
+    def test_type_enum_conversion(self):
+        assert type(RevenueWithdrawalState("failed").type) is RevenueWithdrawalStateType
+        assert RevenueWithdrawalState("unknown").type == "unknown"
+
+    def test_equality(self, revenue_withdrawal_state, bot):
+        a = RevenueWithdrawalState("base_type")
+        b = RevenueWithdrawalState("base_type")
+        c = revenue_withdrawal_state
+        d = deepcopy(revenue_withdrawal_state)
+        e = Dice(4, "emoji")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert c == d
+        assert hash(c) == hash(d)
+
+        assert c != e
+        assert hash(c) != hash(e)
+
+        if hasattr(c, "url"):
+            json_dict = c.to_dict()
+            json_dict["url"] = "something"
+            f = c.__class__.de_json(json_dict, bot)
+
+            assert c == f
+            assert hash(c) == hash(f)
+
+        if hasattr(c, "date"):
+            json_dict = c.to_dict()
+            json_dict["date"] = to_timestamp(datetime.datetime.utcnow())
+            f = c.__class__.de_json(json_dict, bot)
+
+            assert c != f
+            assert hash(c) != hash(f)
