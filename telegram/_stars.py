@@ -228,6 +228,9 @@ class TransactionPartner(TelegramObject):
         """
         data = cls._parse_data(data)
 
+        if data is None:
+            return None
+
         if not data and cls is TransactionPartner:
             return None
 
@@ -421,7 +424,6 @@ class StarTransaction(TelegramObject):
         data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
 
         data["source"] = TransactionPartner.de_json(data.get("source"), bot)
-        print(data.get("receiver"))
         data["receiver"] = TransactionPartner.de_json(data.get("receiver"), bot)
 
         return super().de_json(data=data, bot=bot)
@@ -458,7 +460,7 @@ class StarTransactions(TelegramObject):
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StarTransactions"]:
         data = cls._parse_data(data)
 
-        if not data:
+        if data is None:
             return None
 
         data["transactions"] = StarTransaction.de_list(data.get("transactions"), bot)
