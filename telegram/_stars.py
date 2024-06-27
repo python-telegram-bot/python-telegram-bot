@@ -237,8 +237,8 @@ class TransactionPartner(TelegramObject):
             cls.OTHER: TransactionPartnerOther,
         }
 
-        if cls is TransactionPartner and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
+        if cls is TransactionPartner and data.get("type") in _class_mapping:  # type: ignore
+            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)  # type: ignore
 
         return super().de_json(data=data, bot=bot)
 
@@ -424,7 +424,7 @@ class StarTransaction(TelegramObject):
         print(data.get("receiver"))
         data["receiver"] = TransactionPartner.de_json(data.get("receiver"), bot)
 
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
+        return super().de_json(data=data, bot=bot)
 
 
 class StarTransactions(TelegramObject):
@@ -462,4 +462,4 @@ class StarTransactions(TelegramObject):
             return None
 
         data["transactions"] = StarTransaction.de_list(data.get("transactions"), bot)
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
+        return super().de_json(data=data, bot=bot)
