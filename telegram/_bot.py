@@ -88,6 +88,7 @@ from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
+from telegram._stars import StarTransactions
 from telegram._telegramobject import TelegramObject
 from telegram._update import Update
 from telegram._user import User
@@ -9070,6 +9071,50 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
+    async def get_star_transactions(
+        self,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> StarTransactions:
+        """Returns the bot's Telegram Star transactions in chronological order.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            offset (:obj:`int`, optional): Number of transactions to skip in the response.
+            limit (:obj:`int`, optional): The maximum number of transactions to be retrieved.
+                Values between :tg-const:`telegram.constants.StarTransactionsLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.StarTransactionsLimit.MAX_LIMIT` are accepted.
+                Defaults to :tg-const:`telegram.constants.StarTransactionsLimit.MAX_LIMIT`.
+
+        Returns:
+            :class:`telegram.StarTransactions`: On success.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+
+        data: JSONDict = {"offset": offset, "limit": limit}
+
+        return StarTransactions.de_json(  # type: ignore[return-value]
+            await self._post(
+                "getStarTransactions",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -9322,3 +9367,5 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`replace_sticker_in_set`"""
     refundStarPayment = refund_star_payment
     """Alias for :meth:`refund_star_payment`"""
+    getStarTransactions = get_star_transactions
+    """Alias for :meth:`get_star_transactions`"""

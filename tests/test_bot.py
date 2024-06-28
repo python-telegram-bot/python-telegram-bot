@@ -73,6 +73,7 @@ from telegram import (
     ReplyParameters,
     SentWebAppMessage,
     ShippingOption,
+    StarTransactions,
     Update,
     User,
     WebAppInfo,
@@ -4208,3 +4209,8 @@ class TestBotWithRequest:
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_bool_return_type(self, bot, chat_id, return_type):
         assert await bot.do_api_request("delete_my_commands", return_type=return_type) is True
+
+    async def test_get_star_transactions(self, bot):
+        transactions = await bot.get_star_transactions(limit=1)
+        assert isinstance(transactions, StarTransactions)
+        assert len(transactions.transactions) == 0

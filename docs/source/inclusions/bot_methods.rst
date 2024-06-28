@@ -369,6 +369,8 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
+    * - :meth:`~telegram.Bot.get_star_transactions`
+      - Used for obtaining the bot's Telegram Stars transactions
     * - :meth:`~telegram.Bot.refund_star_payment`
       - Used for refunding a payment in Telegram Stars
 
