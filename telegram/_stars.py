@@ -240,8 +240,8 @@ class TransactionPartner(TelegramObject):
             cls.OTHER: TransactionPartnerOther,
         }
 
-        if cls is TransactionPartner and data.get("type") in _class_mapping:  # type: ignore
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)  # type: ignore
+        if cls is TransactionPartner and data.get("type") in _class_mapping:
+            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
         return super().de_json(data=data, bot=bot)
 
