@@ -73,6 +73,7 @@ from telegram import (
     ReplyParameters,
     SentWebAppMessage,
     ShippingOption,
+    StarTransaction,
     StarTransactions,
     Update,
     User,
@@ -2221,6 +2222,21 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.refund_star_payment(42, "37")
+
+    async def test_get_star_transactions(self, bot, monkeypatch):
+        # we just want to test the offset parameter
+        st = StarTransactions([StarTransaction("1", 1, dtm.datetime.now())]).to_json()
+
+        async def do_request(url, request_data: RequestData, *args, **kwargs):
+            offset = request_data.parameters.get("offset") == 3
+            if offset:
+                print("here")
+                return 200, f'{{"ok": true, "result": {st}}}'.encode()
+            return 400, b'{"ok": false, "result": []}'
+
+        monkeypatch.setattr(bot.request, "do_request", do_request)
+        obj = await bot.get_star_transactions(offset=3)
+        assert isinstance(obj, StarTransactions)
 
 
 class TestBotWithRequest:
