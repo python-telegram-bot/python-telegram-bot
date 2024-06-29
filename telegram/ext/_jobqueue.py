@@ -106,7 +106,9 @@ class JobQueue(Generic[CCT]):
 
         self._application: Optional[weakref.ReferenceType[Application]] = None
         self._executor = AsyncIOExecutor()
-        self.scheduler: "AsyncIOScheduler" = AsyncIOScheduler(**self.scheduler_configuration)
+        self.scheduler: "AsyncIOScheduler" = AsyncIOScheduler(  # noqa: UP037
+            **self.scheduler_configuration
+        )
 
     def __repr__(self) -> str:
         """Give a string representation of the JobQueue in the form ``JobQueue[application=...]``.
