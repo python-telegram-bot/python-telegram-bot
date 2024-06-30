@@ -3592,7 +3592,7 @@ class Message(MaybeInaccessibleMessage):
             behaviour is undocumented and might be changed by Telegram.
 
         .. versionchanged:: NEXT.VERSION
-           New also passes :attr:`business_connection_id`.
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3649,7 +3649,7 @@ class Message(MaybeInaccessibleMessage):
             behaviour is undocumented and might be changed by Telegram.
 
         .. versionchanged:: NEXT.VERSION
-           New also passes :attr:`business_connection_id`.
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3702,7 +3702,7 @@ class Message(MaybeInaccessibleMessage):
             behaviour is undocumented and might be changed by Telegram.
 
         .. versionchanged:: NEXT.VERSION
-           New also passes :attr:`business_connection_id`.
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -3749,6 +3749,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: NEXT.VERSION
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3802,7 +3805,7 @@ class Message(MaybeInaccessibleMessage):
             behaviour is undocumented and might be changed by Telegram.
 
         .. versionchanged:: NEXT.VERSION
-           New also passes :attr:`business_connection_id`.
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3856,7 +3859,7 @@ class Message(MaybeInaccessibleMessage):
             behaviour is undocumented and might be changed by Telegram.
 
         .. versionchanged:: NEXT.VERSION
-           New also passes :attr:`business_connection_id`.
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -4012,7 +4015,7 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.stop_poll`.
 
         .. versionchanged:: NEXT.VERSION
-           New also passes :attr:`business_connection_id`.
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Poll`: On success, the stopped Poll with the final results is
