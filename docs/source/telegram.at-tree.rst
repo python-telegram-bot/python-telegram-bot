@@ -125,12 +125,22 @@ Available Types
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.replyparameters
+    telegram.revenuewithdrawalstate
+    telegram.revenuewithdrawalstatefailed
+    telegram.revenuewithdrawalstatepending
+    telegram.revenuewithdrawalstatesucceeded
     telegram.sentwebappmessage
     telegram.shareduser
+    telegram.startransaction
+    telegram.startransactions
     telegram.story
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.textquote
+    telegram.transactionpartner
+    telegram.transactionpartnerfragment
+    telegram.transactionpartnerother
+    telegram.transactionpartneruser
     telegram.update
     telegram.user
     telegram.userchatboosts

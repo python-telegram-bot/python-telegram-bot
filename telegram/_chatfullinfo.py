@@ -121,7 +121,8 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 20.0
         emoji_status_expiration_date (:class:`datetime.datetime`, optional): Expiration date of
-            emoji status of the chat or the other party in a private chat, in seconds.
+            emoji status of the chat or the other party in a private chat, as a datetime object,
+            if any.
 
             |datetime_localization|
 
@@ -270,7 +271,8 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 20.0
         emoji_status_expiration_date (:class:`datetime.datetime`): Optional. Expiration date of
-            emoji status of the chat or the other party in a private chat, in seconds.
+            emoji status of the chat or the other party in a private chat, as a datetime object,
+            if any.
 
             |datetime_localization|
 
