@@ -3578,7 +3578,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_text(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.edit_message_text`.
@@ -3587,6 +3590,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: NEXT.VERSION
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3608,6 +3614,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             entities=entities,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def edit_caption(
@@ -3627,7 +3634,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_caption(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3637,6 +3647,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: NEXT.VERSION
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3657,6 +3670,7 @@ class Message(MaybeInaccessibleMessage):
             caption_entities=caption_entities,
             inline_message_id=None,
             show_caption_above_media=show_caption_above_media,
+            business_connection_id=self.business_connection_id,
         )
 
     async def edit_media(
@@ -3673,7 +3687,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_media(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3683,6 +3700,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself(i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: NEXT.VERSION
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -3700,6 +3720,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def edit_reply_markup(
@@ -3715,7 +3736,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_reply_markup(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3725,6 +3749,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: NEXT.VERSION
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3740,6 +3767,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def edit_live_location(
@@ -3762,7 +3790,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_live_location(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3772,6 +3803,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: NEXT.VERSION
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3794,6 +3828,7 @@ class Message(MaybeInaccessibleMessage):
             proximity_alert_radius=proximity_alert_radius,
             live_period=live_period,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def stop_live_location(
@@ -3809,7 +3844,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.stop_message_live_location(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3819,6 +3857,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: NEXT.VERSION
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3834,6 +3875,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def set_game_score(
@@ -3964,10 +4006,16 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.stop_poll(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.stop_poll`.
+
+        .. versionchanged:: NEXT.VERSION
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Poll`: On success, the stopped Poll with the final results is
@@ -3983,6 +4031,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def pin(
