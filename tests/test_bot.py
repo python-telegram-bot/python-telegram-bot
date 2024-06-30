@@ -559,11 +559,11 @@ class TestBotWithoutRequest:
         copied_result = copy.copy(result)
 
         ext_bot = bot
-        for bot in (ext_bot, raw_bot):
+        for bot_type in (ext_bot, raw_bot):
             # We need to test 1) below both the bot and raw_bot and setting this up with
             # pytest.parametrize appears to be difficult ...
-            monkeypatch.setattr(bot.request, "post", make_assertion)
-            web_app_msg = await bot.answer_web_app_query("12345", result)
+            monkeypatch.setattr(bot_type.request, "post", make_assertion)
+            web_app_msg = await bot_type.answer_web_app_query("12345", result)
             assert params, "something went wrong with passing arguments to the request"
             assert isinstance(web_app_msg, SentWebAppMessage)
             assert web_app_msg.inline_message_id == "321"
@@ -761,11 +761,11 @@ class TestBotWithoutRequest:
 
         copied_results = copy.copy(results)
         ext_bot = bot
-        for bot in (ext_bot, raw_bot):
+        for bot_type in (ext_bot, raw_bot):
             # We need to test 1) below both the bot and raw_bot and setting this up with
             # pytest.parametrize appears to be difficult ...
-            monkeypatch.setattr(bot.request, "post", make_assertion)
-            assert await bot.answer_inline_query(
+            monkeypatch.setattr(bot_type.request, "post", make_assertion)
+            assert await bot_type.answer_inline_query(
                 1234,
                 results=results,
                 cache_time=300,
@@ -790,7 +790,7 @@ class TestBotWithoutRequest:
                         copied_results[idx].input_message_content, "disable_web_page_preview", None
                     )
 
-            monkeypatch.delattr(bot.request, "post")
+            monkeypatch.delattr(bot_type.request, "post")
 
     async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
