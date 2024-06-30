@@ -91,6 +91,7 @@ __all__ = [
     "ReactionType",
     "ReplyLimit",
     "RevenueWithdrawalStateType",
+    "StarTransactionsLimit",
     "StickerFormat",
     "StickerLimit",
     "StickerSetLimit",
@@ -2320,6 +2321,25 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal succeeded."""
     FAILED = "failed"
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
+
+
+class StarTransactionsLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
+    :meth:`telegram.Bot.get_star_transactions`."""
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
+    :meth:`telegram.Bot.get_star_transactions`."""
 
 
 class StickerFormat(StringEnum):

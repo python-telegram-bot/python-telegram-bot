@@ -73,6 +73,8 @@ from telegram import (
     ReplyParameters,
     SentWebAppMessage,
     ShippingOption,
+    StarTransaction,
+    StarTransactions,
     Update,
     User,
     WebAppInfo,
@@ -2224,6 +2226,20 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.refund_star_payment(42, "37")
 
+    async def test_get_star_transactions(self, bot, monkeypatch):
+        # we just want to test the offset parameter
+        st = StarTransactions([StarTransaction("1", 1, dtm.datetime.now())]).to_json()
+
+        async def do_request(url, request_data: RequestData, *args, **kwargs):
+            offset = request_data.parameters.get("offset") == 3
+            if offset:
+                return 200, f'{{"ok": true, "result": {st}}}'.encode()
+            return 400, b'{"ok": false, "result": []}'
+
+        monkeypatch.setattr(bot.request, "do_request", do_request)
+        obj = await bot.get_star_transactions(offset=3)
+        assert isinstance(obj, StarTransactions)
+
 
 class TestBotWithRequest:
     """
@@ -4211,3 +4227,8 @@ class TestBotWithRequest:
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_bool_return_type(self, bot, chat_id, return_type):
         assert await bot.do_api_request("delete_my_commands", return_type=return_type) is True
+
+    async def test_get_star_transactions(self, bot):
+        transactions = await bot.get_star_transactions(limit=1)
+        assert isinstance(transactions, StarTransactions)
+        assert len(transactions.transactions) == 0
