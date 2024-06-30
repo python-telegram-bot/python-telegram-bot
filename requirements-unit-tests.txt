@@ -13,7 +13,7 @@ pytest-asyncio==0.21.2
 pytest-xdist==3.6.1
 
 # Used for flaky tests (flaky decorator)
-flaky
+flaky>=3.8.1
 
 # used in test_official for parsing tg docs
 beautifulsoup4

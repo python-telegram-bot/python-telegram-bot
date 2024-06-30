@@ -124,17 +124,16 @@ show-fixes = true
 
 [tool.ruff.lint]
 preview = true
-explicit-preview-rules = true
+explicit-preview-rules = true  # TODO: Drop this when RUF022 and RUF023 are out of preview
 ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
           "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
-          "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG"]
-# Add "FURB" after it's out of preview
+          "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB"]
 # Add "A (flake8-builtins)" after we drop pylint
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["B018"]
-"tests/**.py" = ["RUF012", "ASYNC101", "DTZ", "ARG"]
+"tests/**.py" = ["RUF012", "ASYNC230", "DTZ", "ARG", "T201"]
 "docs/**.py" = ["INP001", "ARG"]
 "examples/**.py" = ["ARG"]
 
