@@ -2230,7 +2230,6 @@ class TestBotWithoutRequest:
         async def do_request(url, request_data: RequestData, *args, **kwargs):
             offset = request_data.parameters.get("offset") == 3
             if offset:
-                print("here")
                 return 200, f'{{"ok": true, "result": {st}}}'.encode()
             return 400, b'{"ok": false, "result": []}'
 
