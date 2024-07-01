@@ -78,7 +78,9 @@ class BackgroundFill(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BackgroundFill"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["BackgroundFill"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -267,7 +269,9 @@ class BackgroundType(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BackgroundType"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["BackgroundType"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -528,7 +532,9 @@ class ChatBackground(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatBackground"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ChatBackground"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

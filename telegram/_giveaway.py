@@ -123,7 +123,9 @@ class Giveaway(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Giveaway"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["Giveaway"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -257,7 +259,9 @@ class GiveawayWinners(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["GiveawayWinners"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["GiveawayWinners"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -323,7 +327,9 @@ class GiveawayCompleted(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["GiveawayCompleted"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["GiveawayCompleted"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

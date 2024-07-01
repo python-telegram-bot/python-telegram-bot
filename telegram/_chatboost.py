@@ -110,7 +110,9 @@ class ChatBoostSource(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatBoostSource"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ChatBoostSource"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -275,7 +277,9 @@ class ChatBoost(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatBoost"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ChatBoost"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -325,7 +329,9 @@ class ChatBoostUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatBoostUpdated"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ChatBoostUpdated"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -382,7 +388,9 @@ class ChatBoostRemoved(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatBoostRemoved"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ChatBoostRemoved"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -429,7 +437,9 @@ class UserChatBoosts(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["UserChatBoosts"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["UserChatBoosts"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

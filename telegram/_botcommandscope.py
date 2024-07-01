@@ -84,13 +84,19 @@ class BotCommandScope(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BotCommandScope"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["BotCommandScope"]:
         """Converts JSON data to the appropriate :class:`BotCommandScope` object, i.e. takes
         care of selecting the correct subclass.
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
+            bot (:class:`telegram.Bot`, optional): The bot associated with this object. Defaults to
+                :obj:`None`, in which case shortcut methods will not be available.
+
+                .. versionchanged:: NEXT.VERSION
+                   :paramref:`bot` is now optional and defaults to :obj:`None`
 
         Returns:
             The Telegram object.

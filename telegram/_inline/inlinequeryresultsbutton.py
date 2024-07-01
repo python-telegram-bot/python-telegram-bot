@@ -97,7 +97,9 @@ class InlineQueryResultsButton(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineQueryResultsButton"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["InlineQueryResultsButton"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         if not data:
             return None

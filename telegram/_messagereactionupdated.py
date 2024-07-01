@@ -86,7 +86,7 @@ class MessageReactionCountUpdated(TelegramObject):
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: "Bot"
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["MessageReactionCountUpdated"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
@@ -186,7 +186,9 @@ class MessageReactionUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MessageReactionUpdated"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["MessageReactionUpdated"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

@@ -118,14 +118,21 @@ class PassportFile(TelegramObject):
 
     @classmethod
     def de_json_decrypted(
-        cls, data: Optional[JSONDict], bot: "Bot", credentials: "FileCredentials"
+        cls, data: Optional[JSONDict], bot: Optional["Bot"], credentials: "FileCredentials"
     ) -> Optional["PassportFile"]:
         """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
         passport credentials.
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
+            bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
+                May be :obj:`None`, in which case shortcut methods will not be available.
+
+                .. versionchanged:: NEXT.VERSION
+                   :paramref:`bot` is now optional and defaults to :obj:`None`
+
+                .. deprecated:: NEXT.VERSION
+                   This argument will be converted to an optional argument in future versions.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
         Returns:
@@ -143,7 +150,10 @@ class PassportFile(TelegramObject):
 
     @classmethod
     def de_list_decrypted(
-        cls, data: Optional[List[JSONDict]], bot: "Bot", credentials: List["FileCredentials"]
+        cls,
+        data: Optional[List[JSONDict]],
+        bot: Optional["Bot"],
+        credentials: List["FileCredentials"],
     ) -> Tuple[Optional["PassportFile"], ...]:
         """Variant of :meth:`telegram.TelegramObject.de_list` that also takes into account
         passport credentials.
@@ -155,7 +165,14 @@ class PassportFile(TelegramObject):
 
         Args:
             data (List[Dict[:obj:`str`, ...]]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with these objects.
+            bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
+                May be :obj:`None`, in which case shortcut methods will not be available.
+
+                .. versionchanged:: NEXT.VERSION
+                   :paramref:`bot` is now optional and defaults to :obj:`None`
+
+                .. deprecated:: NEXT.VERSION
+                   This argument will be converted to an optional argument in future versions.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
         Returns:
