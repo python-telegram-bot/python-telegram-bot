@@ -71,7 +71,9 @@ class RevenueWithdrawalState(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["RevenueWithdrawalState"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["RevenueWithdrawalState"]:
         data = cls._parse_data(data)
 
         if not data:
@@ -146,7 +148,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: "Bot"
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["RevenueWithdrawalStateSucceeded"]:
         data = cls._parse_data(data)
 
@@ -214,7 +216,9 @@ class TransactionPartner(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["TransactionPartner"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["TransactionPartner"]:
         """Converts JSON data to the appropriate :class:`TransactionPartner` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -277,7 +281,7 @@ class TransactionPartnerFragment(TransactionPartner):
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: "Bot"
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["TransactionPartnerFragment"]:
         data = cls._parse_data(data)
 
@@ -321,7 +325,9 @@ class TransactionPartnerUser(TransactionPartner):
             )
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["TransactionPartnerUser"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["TransactionPartnerUser"]:
         data = cls._parse_data(data)
 
         if not data:
@@ -413,7 +419,9 @@ class StarTransaction(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StarTransaction"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["StarTransaction"]:
         data = cls._parse_data(data)
 
         if not data:
@@ -457,7 +465,9 @@ class StarTransactions(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StarTransactions"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["StarTransactions"]:
         data = cls._parse_data(data)
 
         if data is None:
