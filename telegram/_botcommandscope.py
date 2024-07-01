@@ -96,7 +96,7 @@ class BotCommandScope(TelegramObject):
                 :obj:`None`, in which case shortcut methods will not be available.
 
                 .. versionchanged:: NEXT.VERSION
-                   :paramref:`bot` now is optional and defaults to :obj:`None`
+                   :paramref:`bot` is now optional and defaults to :obj:`None`
 
         Returns:
             The Telegram object.

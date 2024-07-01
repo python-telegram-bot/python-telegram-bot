@@ -126,10 +126,10 @@ class PassportFile(TelegramObject):
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
             bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
-                Maybe be :obj:`None`, in which case shortcut methods will not be available.
+                May be :obj:`None`, in which case shortcut methods will not be available.
 
                 .. versionchanged:: NEXT.VERSION
-                   :paramref:`bot` now is optional and defaults to :obj:`None`
+                   :paramref:`bot` is now optional and defaults to :obj:`None`
 
                 .. deprecated:: NEXT.VERSION
                    This argument will be converted to an optional argument in future versions.
@@ -166,10 +166,10 @@ class PassportFile(TelegramObject):
         Args:
             data (List[Dict[:obj:`str`, ...]]): The JSON data.
             bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
-                Maybe be :obj:`None`, in which case shortcut methods will not be available.
+                May be :obj:`None`, in which case shortcut methods will not be available.
 
                 .. versionchanged:: NEXT.VERSION
-                   :paramref:`bot` now is optional and defaults to :obj:`None`
+                   :paramref:`bot` is now optional and defaults to :obj:`None`
 
                 .. deprecated:: NEXT.VERSION
                    This argument will be converted to an optional argument in future versions.
