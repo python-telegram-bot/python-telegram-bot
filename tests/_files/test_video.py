@@ -37,18 +37,6 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
-def video_file():
-    with data_file("telegram.mp4").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def video(bot, chat_id):
-    with data_file("telegram.mp4").open("rb") as f:
-        return (await bot.send_video(chat_id, video=f, read_timeout=50)).video
-
-
 class TestVideoBase:
     width = 360
     height = 640

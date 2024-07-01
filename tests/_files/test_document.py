@@ -37,18 +37,6 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
-def document_file():
-    with data_file("telegram.png").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def document(bot, chat_id):
-    with data_file("telegram.png").open("rb") as f:
-        return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
-
-
 class TestDocumentBase:
     caption = "DocumentTest - *Caption*"
     document_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.gif"

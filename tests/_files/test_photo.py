@@ -34,35 +34,7 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
-
-
-@pytest.fixture()
-def photo_file():
-    with data_file("telegram.jpg").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def photolist(bot, chat_id):
-    async def func():
-        with data_file("telegram.jpg").open("rb") as f:
-            return (await bot.send_photo(chat_id, photo=f, read_timeout=50)).photo
-
-    return await expect_bad_request(
-        func, "Type of file mismatch", "Telegram did not accept the file."
-    )
-
-
-@pytest.fixture(scope="module")
-def thumb(photolist):
-    return photolist[0]
-
-
-@pytest.fixture(scope="module")
-def photo(photolist):
-    return photolist[-1]
 
 
 class TestPhotoBase:

@@ -21,7 +21,6 @@ import pytest
 
 from telegram import InputSticker, MaskPosition
 from telegram._files.inputfile import InputFile
-from tests._files.test_sticker import video_sticker_file  # noqa: F401
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -77,7 +76,7 @@ class TestInputStickerWithoutRequest(TestInputStickerBase):
         assert input_sticker_dict["keywords"] == list(input_sticker.keywords)
         assert input_sticker_dict["format"] == input_sticker.format
 
-    def test_with_sticker_input_types(self, video_sticker_file):  # noqa: F811
+    def test_with_sticker_input_types(self, video_sticker_file):
         sticker = InputSticker(sticker=video_sticker_file, emoji_list=["👍"], format="video")
         assert isinstance(sticker.sticker, InputFile)
         sticker = InputSticker(data_file("telegram_video_sticker.webm"), ["👍"], "video")

@@ -244,7 +244,7 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert message.video_note.thumbnail.height == self.thumb_height
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, video_note, chat_id, tmp_file):
+    async def test_get_and_download(self, bot, video_note, tmp_file):
         new_file = await bot.get_file(video_note.file_id)
 
         assert new_file.file_size == self.file_size

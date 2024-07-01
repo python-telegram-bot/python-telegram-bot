@@ -41,7 +41,7 @@ from telegram.ext import ApplicationBuilder, Defaults, Updater
 from telegram.ext.filters import MessageFilter, UpdateFilter
 from tests.auxil.build_messages import DATE
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER
-from tests.auxil.constants import PRIVATE_KEY
+from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.envvars import RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
@@ -182,6 +182,23 @@ async def tz_bot(timezone, bot_info):
 
 
 @pytest.fixture(scope="session")
+async def tz_bots(tzinfos, bot_info):
+    bots = []
+    if len(bots) == 3:
+        return bots
+    for tzinfo in tzinfos:
+        defaults = Defaults(tzinfo=tzinfo)
+        try:
+            bots.append(_default_bots[defaults])
+        except KeyError:
+            default_bot = make_bot(bot_info, defaults=defaults)
+            await default_bot.initialize()
+            _default_bots[defaults] = default_bot
+            bots.append(default_bot)
+    return bots
+
+
+@pytest.fixture(scope="session")
 def chat_id(bot_info):
     return bot_info["chat_id"]
 
@@ -240,6 +257,30 @@ def class_thumb_file():
         yield f
 
 
+@pytest.fixture(scope="session")
+async def emoji_id(bot):
+    emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
+    first_sticker = emoji_sticker_list[0]
+    return first_sticker.custom_emoji_id
+
+
+@pytest.fixture()
+async def real_topic(bot, emoji_id, forum_group_id):
+    result = await bot.create_forum_topic(
+        chat_id=forum_group_id,
+        name=TEST_TOPIC_NAME,
+        icon_color=TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id=emoji_id,
+    )
+
+    yield result
+
+    result = await bot.delete_forum_topic(
+        chat_id=forum_group_id, message_thread_id=result.message_thread_id
+    )
+    assert result is True, "Topic was not deleted"
+
+
 @pytest.fixture(
     scope="class",
     params=[{"class": MessageFilter}, {"class": UpdateFilter}],
@@ -284,6 +325,18 @@ def tzinfo(request):
         return pytz.timezone(request.param)
     hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
     return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
+
+
+@pytest.fixture(scope="session")
+def tzinfos():
+    """Returns a list of timezone objects for testing."""
+    if TEST_WITH_OPT_DEPS:
+        return [pytz.timezone("Europe/Berlin"), pytz.timezone("Asia/Singapore"), pytz.utc]
+    return [
+        BasicTimezone(offset=datetime.timedelta(hours=2), name="Europe/Berlin"),
+        BasicTimezone(offset=datetime.timedelta(hours=8), name="Asia/Singapore"),
+        BasicTimezone(offset=datetime.timedelta(hours=0), name="UTC"),
+    ]
 
 
 @pytest.fixture(scope="session")
