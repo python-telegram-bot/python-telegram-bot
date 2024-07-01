@@ -46,7 +46,7 @@ class InlineKeyboardButton(TelegramObject):
           working as expected. Putting a game short name in it might, but is not guaranteed to
           work.
         * If your bot allows for arbitrary callback data, in keyboards returned in a response
-          from telegram, :attr:`callback_data` maybe be an instance of
+          from telegram, :attr:`callback_data` may be an instance of
           :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
           associated with the button was already deleted.
 
