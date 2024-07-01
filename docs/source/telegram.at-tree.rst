@@ -88,6 +88,9 @@ Available Types
     telegram.inputmediadocument
     telegram.inputmediaphoto
     telegram.inputmediavideo
+    telegram.inputpaidmedia
+    telegram.inputpaidmediaphoto
+    telegram.inputpaidmediavideo
     telegram.inputpolloption
     telegram.inputsticker
     telegram.keyboardbutton
