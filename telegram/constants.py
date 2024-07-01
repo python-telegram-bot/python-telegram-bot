@@ -90,10 +90,13 @@ __all__ = [
     "ReactionEmoji",
     "ReactionType",
     "ReplyLimit",
+    "RevenueWithdrawalStateType",
+    "StarTransactionsLimit",
     "StickerFormat",
     "StickerLimit",
     "StickerSetLimit",
     "StickerType",
+    "TransactionPartnerType",
     "UpdateType",
     "UserProfilePhotosLimit",
     "WebhookLimit",
@@ -146,7 +149,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=4)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=5)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -2303,6 +2306,42 @@ class ReplyLimit(IntEnum):
     """
 
 
+class RevenueWithdrawalStateType(StringEnum):
+    """This enum contains the available types of :class:`telegram.RevenueWithdrawalState`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PENDING = "pending"
+    """:obj:`str`: A withdrawal in progress."""
+    SUCCEEDED = "succeeded"
+    """:obj:`str`: A withdrawal succeeded."""
+    FAILED = "failed"
+    """:obj:`str`: A withdrawal failed and the transaction was refunded."""
+
+
+class StarTransactionsLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
+    :meth:`telegram.Bot.get_star_transactions`."""
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
+    :meth:`telegram.Bot.get_star_transactions`."""
+
+
 class StickerFormat(StringEnum):
     """This enum contains the available formats of :class:`telegram.Sticker` in the set. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -2434,6 +2473,23 @@ class StickerType(StringEnum):
     """:obj:`str`: Mask sticker."""
     CUSTOM_EMOJI = "custom_emoji"
     """:obj:`str`: Custom emoji sticker."""
+
+
+class TransactionPartnerType(StringEnum):
+    """This enum contains the available types of :class:`telegram.TransactionPartner`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    FRAGMENT = "fragment"
+    """:obj:`str`: Withdrawal transaction with Fragment."""
+    USER = "user"
+    """:obj:`str`: Transaction with a user."""
+    OTHER = "other"
+    """:obj:`str`: Transaction with unknown source or recipient."""
 
 
 class ParseMode(StringEnum):

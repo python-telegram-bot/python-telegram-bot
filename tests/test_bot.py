@@ -73,6 +73,8 @@ from telegram import (
     ReplyParameters,
     SentWebAppMessage,
     ShippingOption,
+    StarTransaction,
+    StarTransactions,
     Update,
     User,
     WebAppInfo,
@@ -2171,14 +2173,17 @@ class TestBotWithoutRequest:
 
     async def test_business_connection_id_argument(self, bot, monkeypatch):
         """We can't connect to a business acc, so we just test that the correct data is passed.
-        We also can't test every single method easily, so we just test one. Our linting will catch
-        any unused args with the others."""
+        We also can't test every single method easily, so we just test a few. Our linting will
+        catch any unused args with the others."""
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.parameters.get("business_connection_id") == 42
+            assert request_data.parameters.get("business_connection_id") == 42
+            return {}
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_message(2, "text", business_connection_id=42)
+
+        await bot.send_message(2, "text", business_connection_id=42)
+        await bot.stop_poll(chat_id=1, message_id=2, business_connection_id=42)
 
     async def test_message_effect_id_argument(self, bot, monkeypatch):
         """We can't test every single method easily, so we just test one. Our linting will catch
@@ -2220,6 +2225,20 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.refund_star_payment(42, "37")
+
+    async def test_get_star_transactions(self, bot, monkeypatch):
+        # we just want to test the offset parameter
+        st = StarTransactions([StarTransaction("1", 1, dtm.datetime.now())]).to_json()
+
+        async def do_request(url, request_data: RequestData, *args, **kwargs):
+            offset = request_data.parameters.get("offset") == 3
+            if offset:
+                return 200, f'{{"ok": true, "result": {st}}}'.encode()
+            return 400, b'{"ok": false, "result": []}'
+
+        monkeypatch.setattr(bot.request, "do_request", do_request)
+        obj = await bot.get_star_transactions(offset=3)
+        assert isinstance(obj, StarTransactions)
 
 
 class TestBotWithRequest:
@@ -4208,3 +4227,8 @@ class TestBotWithRequest:
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_bool_return_type(self, bot, chat_id, return_type):
         assert await bot.do_api_request("delete_my_commands", return_type=return_type) is True
+
+    async def test_get_star_transactions(self, bot):
+        transactions = await bot.get_star_transactions(limit=1)
+        assert isinstance(transactions, StarTransactions)
+        assert len(transactions.transactions) == 0

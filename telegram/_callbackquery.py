@@ -262,6 +262,8 @@ class CallbackQuery(TelegramObject):
                 entities=entities,
                 chat_id=None,
                 message_id=None,
+                # inline messages can not be sent on behalf of a bcid
+                business_connection_id=None,
             )
         return await self._get_message().edit_text(
             text=text,
@@ -330,6 +332,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
                 show_caption_above_media=show_caption_above_media,
+                # inline messages can not be sent on behalf of a bcid
+                business_connection_id=None,
             )
         return await self._get_message().edit_caption(
             caption=caption,
@@ -390,6 +394,8 @@ class CallbackQuery(TelegramObject):
                 api_kwargs=api_kwargs,
                 chat_id=None,
                 message_id=None,
+                # inline messages can not be sent on behalf of a bcid
+                business_connection_id=None,
             )
         return await self._get_message().edit_reply_markup(
             reply_markup=reply_markup,
@@ -447,6 +453,8 @@ class CallbackQuery(TelegramObject):
                 api_kwargs=api_kwargs,
                 chat_id=None,
                 message_id=None,
+                # inline messages can not be sent on behalf of a bcid
+                business_connection_id=None,
             )
         return await self._get_message().edit_media(
             media=media,
@@ -518,6 +526,8 @@ class CallbackQuery(TelegramObject):
                 live_period=live_period,
                 chat_id=None,
                 message_id=None,
+                # inline messages can not be sent on behalf of a bcid
+                business_connection_id=None,
             )
         return await self._get_message().edit_live_location(
             latitude=latitude,
@@ -581,6 +591,8 @@ class CallbackQuery(TelegramObject):
                 api_kwargs=api_kwargs,
                 chat_id=None,
                 message_id=None,
+                # inline messages can not be sent on behalf of a bcid
+                business_connection_id=None,
             )
         return await self._get_message().stop_live_location(
             reply_markup=reply_markup,
