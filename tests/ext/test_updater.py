@@ -1179,6 +1179,7 @@ class TestUpdater:
 
             assert len(caplog.records) == 1
             assert caplog.records[-1].getMessage().startswith("Something went wrong processing")
+            assert "Received data was: {" in caplog.records[-1].getMessage()
             assert caplog.records[-1].name == "telegram.ext.Updater"
             assert response.status_code == 400
             assert response.text == self.response_text.format(

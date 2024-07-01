@@ -168,7 +168,8 @@ class TelegramHandler(tornado.web.RequestHandler):
         except Exception as exc:
             _LOGGER.critical(
                 "Something went wrong processing the data received from Telegram. "
-                "Received data was *not* processed!",
+                "Received data was *not* processed! Received data was: %r",
+                data,
                 exc_info=exc,
             )
             raise tornado.web.HTTPError(
