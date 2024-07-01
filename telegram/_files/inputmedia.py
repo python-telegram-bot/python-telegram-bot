@@ -187,6 +187,7 @@ class InputPaidMediaPhoto(InputPaidMedia):
     ):
         media = parse_file_input(media, PhotoSize, attach=True, local_mode=True)
         super().__init__(media_type=InputPaidMedia.PHOTO, media=media, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class InputPaidMediaVideo(InputPaidMedia):
