@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from typing import List, Tuple
+
 import pytest
 
 from telegram import MessageEntity, User
@@ -81,6 +83,27 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
         entity = MessageEntity(type="url", offset=0, length=1)
         assert entity.type is MessageEntityType.URL
 
+    def test_fix_utf16(self):
+        import random
+
+        text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
+        inputs_outputs: List[Tuple[Tuple[int, int, str], Tuple[int, int]]] = [
+            ((2, 4, MessageEntity.BOLD), (3, 4)),
+            ((9, 6, MessageEntity.ITALIC), (11, 6)),
+            ((28, 3, MessageEntity.UNDERLINE), (30, 6)),
+        ]
+        random.shuffle(inputs_outputs)
+        unicode_entities = [
+            MessageEntity(offset=_input[0], length=_input[1], type=_input[2])
+            for _input, _ in inputs_outputs
+        ]
+        utf_16_entities = MessageEntity.adjust_message_entities_to_utf_16(text, unicode_entities)
+        for out_entity, input_output in zip(utf_16_entities, inputs_outputs):
+            _, output = input_output
+            offset, length = output
+            assert out_entity.offset == offset
+            assert out_entity.length == length
+
     def test_equality(self):
         a = MessageEntity(MessageEntity.BOLD, 2, 3)
         b = MessageEntity(MessageEntity.BOLD, 2, 3)
@@ -96,17 +119,3 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
 
         assert a != d
         assert hash(a) != hash(d)
-
-    def test_fix_utf16(self):
-        text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
-        unicode_entities = [
-            MessageEntity(offset=2, length=4, type=MessageEntity.BOLD),
-            MessageEntity(offset=9, length=6, type=MessageEntity.ITALIC),
-            MessageEntity(offset=28, length=3, type=MessageEntity.UNDERLINE),
-        ]
-        utf_16_entities = MessageEntity.adjust_message_entities_to_utf_16(text, unicode_entities)
-        offsets_lengths = [(3, 4), (11, 6), (30, 6)]
-        for entity, offset_length in zip(utf_16_entities, offsets_lengths):
-            offset, length = offset_length
-            assert entity.offset == offset
-            assert entity.length == length
