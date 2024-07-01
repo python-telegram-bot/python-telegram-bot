@@ -142,6 +142,9 @@ __all__ = (
     "InputMediaPhoto",
     "InputMediaVideo",
     "InputMessageContent",
+    "InputPaidMedia",
+    "InputPaidMediaPhoto",
+    "InputPaidMediaVideo",
     "InputPollOption",
     "InputSticker",
     "InputTextMessageContent",
@@ -333,6 +336,9 @@ from ._files.inputmedia import (
     InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
+    InputPaidMedia,
+    InputPaidMediaPhoto,
+    InputPaidMediaVideo,
 )
 from ._files.inputsticker import InputSticker
 from ._files.location import Location
