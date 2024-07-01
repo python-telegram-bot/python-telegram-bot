@@ -22,6 +22,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -r requirements-all.txt
+          python -W ignore -m pip install -r requirements-dev-all.txt
       - name: Check Links
         run: sphinx-build docs/source docs/build/html -W --keep-going -j auto -b linkcheck

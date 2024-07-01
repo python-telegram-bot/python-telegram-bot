@@ -3969,7 +3969,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to edit text and game messages.
 
         Note:
-            |editreplymarkup|.
+            * |editreplymarkup|.
+            * |bcid_edit_time|
 
         .. seealso:: :attr:`telegram.Game.text`
 
@@ -4074,7 +4075,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to edit captions of messages.
 
         Note:
-            |editreplymarkup|
+            * |editreplymarkup|
+            * |bcid_edit_time|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -4154,7 +4156,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         :attr:`~telegram.File.file_id` or specify a URL.
 
         Note:
-            |editreplymarkup|
+            * |editreplymarkup|
+            * |bcid_edit_time|
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
@@ -4218,7 +4221,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         (for inline bots).
 
         Note:
-            |editreplymarkup|
+            * |editreplymarkup|
+            * |bcid_edit_time|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
