@@ -18,7 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageEntity."""
 
-from typing import TYPE_CHECKING, Final, List, Optional
+import copy
+import itertools
+from typing import TYPE_CHECKING, Final, List, Optional, Sequence
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -141,6 +143,84 @@ class MessageEntity(TelegramObject):
         data["user"] = User.de_json(data.get("user"), bot)
 
         return super().de_json(data=data, bot=bot)
+
+    @staticmethod
+    def adjust_message_entities_to_utf_16(
+        text: str, entities: Sequence["MessageEntity"]
+    ) -> Sequence["MessageEntity"]:
+        """Utility functionality for converting the offset and length of entities from
+        Unicode (`str`) to UTF-16 (`utf-16-le` encoded `bytes`).
+
+        Tip:
+            Only the offsets and lengths calulated in UTF-16 is acceptable by the Telegram Bot API.
+            If they are calculated using the Unicode string (`str` object), errors may occur
+            when the text contains characters that are not in the Basic Multilingual Plane (BMP).
+            For more information, see `Unicode <https://en.wikipedia.org/wiki/Unicode>` and
+            `Plane (Unicode) <https://en.wikipedia.org/wiki/Plane_(Unicode)>`.
+
+        Examples:
+            Below is a snippet of code that demonstrates how to use this function to convert
+            entities from Unicode to UTF-16 space. The `unicode_entities` are calculated in
+            Unicode and the `utf_16_entities` are calculated in UTF-16.
+
+        .. code-block:: python
+
+            text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
+            unicode_entities = [
+                MessageEntity(offset=2, length=4, type=MessageEntity.BOLD),
+                MessageEntity(offset=9, length=6, type=MessageEntity.ITALIC),
+                MessageEntity(offset=28, length=3, type=MessageEntity.UNDERLINE),
+            ]
+            utf_16_entities = MessageEntity.adjust_message_entities_to_utf_16(
+                text, unicode_entities
+            )
+            await bot.send_message(
+                chat_id=123,
+                text=text,
+                entities=utf_16_entities,
+            )
+            # utf_16_entities[0]: offset=3, length=4
+            # utf_16_entities[1]: offset=11, length=6
+            # utf_16_entities[2]: offset=30, length=6
+
+        Args:
+            text (:obj:`str`): The text that the entities belong to
+            entities (List[:class:`telegram.MessageEntity`]): Sequence of entities
+                with offset and length calculated in Unicode
+
+        Returns:
+            Sequence[:class:`telegram.MessageEntity`]: Sequence of entities
+            with offset and length calculated in UTF-16 encoding
+        """
+        # get sorted offsets
+        offsets_list = sorted(
+            itertools.chain(*((x.offset, x.offset + x.length) for x in entities))
+        )
+        accumulated_length = 0
+        according_utf16_lengths: List[int] = []
+        # calculate the length of each slice text[:offset] in utf-16 accordingly,
+        # store them in `according_utf16_lengths`
+        for i, cut_offset in enumerate(offsets_list):
+            last_cut_offset = offsets_list[i - 1] if i > 0 else 0
+            text_slice = text[last_cut_offset:cut_offset]
+            accumulated_length += len(text_slice.encode("utf-16-le")) // 2
+            according_utf16_lengths.append(accumulated_length)
+        offset_translation = {
+            offset: according_utf16_lengths[i] for i, offset in enumerate(offsets_list)
+        }
+        # get the final output entites
+        out = []
+        for entity in entities:
+            translated_offset = offset_translation[entity.offset]
+            translated_length = (
+                offset_translation[entity.offset + entity.length] - translated_offset
+            )
+            new_entity = copy.copy(entity)
+            with new_entity._unfrozen():
+                new_entity.offset = translated_offset
+                new_entity.length = translated_length
+            out.append(new_entity)
+        return out
 
     ALL_TYPES: Final[List[str]] = list(constants.MessageEntityType)
     """List[:obj:`str`]: A list of all available message entity types."""
