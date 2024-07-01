@@ -361,7 +361,7 @@ class TestTransactionPartnerBase:
     user = transaction_partner_user().user
 
 
-class TestTransactionPartner(TestTransactionPartnerBase):
+class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
     def test_slot_behaviour(self, transaction_partner):
         inst = transaction_partner
         for attr in inst.__slots__:
@@ -421,7 +421,7 @@ class TestTransactionPartner(TestTransactionPartnerBase):
 
         assert isinstance(tp_dict, dict)
         assert tp_dict["type"] == transaction_partner.type
-        if hasattr(transaction_partner, "web_app"):
+        if hasattr(transaction_partner, "user"):
             assert tp_dict["user"] == transaction_partner.user.to_dict()
         if hasattr(transaction_partner, "withdrawal_state"):
             assert tp_dict["withdrawal_state"] == transaction_partner.withdrawal_state.to_dict()
@@ -469,7 +469,7 @@ class TestRevenueWithdrawalStateBase:
     url = "url"
 
 
-class TestRevenueWithdrawalState(TestRevenueWithdrawalStateBase):
+class TestRevenueWithdrawalStateWithoutRequest(TestRevenueWithdrawalStateBase):
     def test_slot_behaviour(self, revenue_withdrawal_state):
         inst = revenue_withdrawal_state
         for attr in inst.__slots__:
