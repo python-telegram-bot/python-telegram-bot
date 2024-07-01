@@ -113,6 +113,11 @@ Available Types
     telegram.messageoriginuser
     telegram.messagereactioncountupdated
     telegram.messagereactionupdated
+    telegram.paidmedia
+    telegram.paidmediainfo
+    telegram.paidmediaphoto
+    telegram.paidmediapreview
+    telegram.paidmediavideo
     telegram.photosize
     telegram.poll
     telegram.pollanswer
