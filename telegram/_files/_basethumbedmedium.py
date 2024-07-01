@@ -82,7 +82,7 @@ class _BaseThumbedMedium(_BaseMedium):
 
     @classmethod
     def de_json(
-        cls: Type[ThumbedMT_co], data: Optional[JSONDict], bot: "Bot"
+        cls: Type[ThumbedMT_co], data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional[ThumbedMT_co]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)

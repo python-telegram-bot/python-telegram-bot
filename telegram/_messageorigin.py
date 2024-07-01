@@ -94,7 +94,9 @@ class MessageOrigin(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MessageOrigin"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["MessageOrigin"]:
         """Converts JSON data to the appropriate :class:`MessageOrigin` object, i.e. takes
         care of selecting the correct subclass.
         """

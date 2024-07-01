@@ -193,7 +193,7 @@ class Sticker(_BaseThumbedMedium):
     """:const:`telegram.constants.StickerType.CUSTOM_EMOJI`"""
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Sticker"]:
+    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Sticker"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -305,7 +305,9 @@ class StickerSet(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StickerSet"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["StickerSet"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         if not data:
             return None

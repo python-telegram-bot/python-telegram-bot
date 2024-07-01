@@ -90,6 +90,11 @@ class TestTelegramObject:
         assert to.api_kwargs == {"foo": "bar"}
         assert to.get_bot() is bot
 
+    def test_de_json_optional_bot(self):
+        to = TelegramObject.de_json(data={})
+        with pytest.raises(RuntimeError, match="no bot associated with it"):
+            to.get_bot()
+
     def test_de_list(self, bot):
         class SubClass(TelegramObject):
             def __init__(self, arg: int, **kwargs):

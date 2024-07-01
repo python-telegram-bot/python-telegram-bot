@@ -69,13 +69,19 @@ class MenuButton(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MenuButton"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["MenuButton"]:
         """Converts JSON data to the appropriate :class:`MenuButton` object, i.e. takes
         care of selecting the correct subclass.
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
+            bot (:class:`telegram.Bot`, optional): The bot associated with this object. Defaults to
+                :obj:`None`, in which case shortcut methods will not be available.
+
+                .. versionchanged:: NEXT.VERSION
+                   :paramref:`bot` is now optional and defaults to :obj:`None`
 
         Returns:
             The Telegram object.
@@ -161,7 +167,9 @@ class MenuButtonWebApp(MenuButton):
             self._id_attrs = (self.type, self.text, self.web_app)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MenuButtonWebApp"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["MenuButtonWebApp"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
