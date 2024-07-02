@@ -93,7 +93,7 @@ class CallbackQuery(TelegramObject):
             with the callback button that originated the query.
 
             .. versionchanged:: 20.8
-               Objects maybe be of type :class:`telegram.MaybeInaccessibleMessage` since Bot API
+               Objects may be of type :class:`telegram.MaybeInaccessibleMessage` since Bot API
                7.0.
         data (:obj:`str` | :obj:`object`): Optional. Data associated with the callback button.
             Be aware that the message, which originated the query, can contain no callback buttons

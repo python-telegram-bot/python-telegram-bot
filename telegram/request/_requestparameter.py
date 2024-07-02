@@ -90,7 +90,7 @@ class RequestParameter:
         value: object,
     ) -> Tuple[object, List[InputFile]]:
         """Converts `value` into something that we can json-dump. Returns two values:
-        1. the JSON-dumpable value. Maybe be `None` in case the value is an InputFile which must
+        1. the JSON-dumpable value. May be `None` in case the value is an InputFile which must
            not be uploaded via an attach:// URI
         2. A list of InputFiles that should be uploaded for this value
 
