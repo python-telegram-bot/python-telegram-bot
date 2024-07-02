@@ -35,6 +35,11 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
 
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
+
 
 class TestBusinessBase:
     id_ = "123"
@@ -410,3 +415,74 @@ class TestBusinessOpeningHoursWithoutRequest(TestBusinessBase):
 
         assert boh1 != boh3
         assert hash(boh1) != hash(boh3)
+        
+    # def test_get_opening_hours_for_day_success_without_timezone(self):
+    #     boh = BusinessOpeningHours("Europe/Berlin", [
+    #         BusinessOpeningHoursInterval(0, 60),
+    #         BusinessOpeningHoursInterval(60, 120),
+    #         BusinessOpeningHoursInterval(120, 180),
+    #         BusinessOpeningHoursInterval(180, 240),
+    #         BusinessOpeningHoursInterval(240, 300),
+    #         BusinessOpeningHoursInterval(300, 360),
+    #         BusinessOpeningHoursInterval(360, 420),
+    #     ])
+        
+    #     assert boh.get_opening_hours_for_day(datetime(2021, 1, 1, 0, 0, 0)) == (0, 60)
+        
+    # def test_get_opening_hours_for_day_success_with_timezone(self):
+    #     boh = BusinessOpeningHours("Europe/Berlin", [
+    #         BusinessOpeningHoursInterval(0, 60),
+    #         BusinessOpeningHoursInterval(60, 120),
+    #         BusinessOpeningHoursInterval(120, 180),
+    #         BusinessOpeningHoursInterval(180, 240),
+    #         BusinessOpeningHoursInterval(240, 300),
+    #         BusinessOpeningHoursInterval(300, 360),
+    #         BusinessOpeningHoursInterval(360, 420),
+    #     ])
+        
+    #     assert boh.get_opening_hours_for_day(datetime(2021, 1, 1, 0, 0, 0), zoneinfo.ZoneInfo("Europe/Berlin")) == (0, 60)
+
+    def test_is_open_tznaive_closed(self):
+        boh = BusinessOpeningHours("Europe/Berlin", [
+            BusinessOpeningHoursInterval(0, 6969),
+        ])
+
+        # (0, 0, 0) -> (4, 20, 9)
+        assert boh.is_open(datetime(2024, 6, 29, 0, 0, 0)) == False
+        assert boh.is_open(datetime(2024, 6, 28, 21, 0, 0)) == False
+        assert boh.is_open(datetime(2024, 6, 28, 20, 10, 0)) == False
+    
+    def test_is_open_tznaive_open(self):
+        boh = BusinessOpeningHours("Europe/Berlin", [
+            BusinessOpeningHoursInterval(0, 6969),
+        ])
+
+        # (0, 0, 0) -> (4, 20, 9)
+        assert boh.is_open(datetime(2024, 6, 24, 0, 0, 0)) == True
+        assert boh.is_open(datetime(2024, 6, 28, 10, 0, 0)) == True
+        assert boh.is_open(datetime(2024, 6, 25, 20, 8, 0)) == True
+
+    def test_is_open_tzaware_closed(self):
+        boh = BusinessOpeningHours("Europe/Berlin", [
+            BusinessOpeningHoursInterval(0, 6969),
+        ])
+
+        # London is 2 hours behind of Berlin
+        tz = zoneinfo.ZoneInfo("Europe/London")
+
+        # (0, 0, 0) -> (4, 20, 9)
+        assert boh.is_open(datetime(2024, 6, 23, 23, 0, 0, tzinfo=tz)) == True
+        assert boh.is_open(datetime(2024, 6, 28, 10, 0, 0, tzinfo=tz)) == True
+
+    def test_is_open_tzaware_open(self):
+        boh = BusinessOpeningHours("Europe/Berlin", [
+            BusinessOpeningHoursInterval(0, 6969),
+        ])
+
+        # London is 2 hours behind of Berlin
+        tz = zoneinfo.ZoneInfo("Europe/London")
+
+        # (0, 0, 0) -> (4, 20, 9)
+        assert boh.is_open(datetime(2024, 6, 24, 2, 0, 0, tzinfo=tz)) == True
+        assert boh.is_open(datetime(2024, 6, 28, 12, 0, 0, tzinfo=tz)) == True
+        assert boh.is_open(datetime(2024, 6, 25, 21, 8, 0, tzinfo=tz)) == True

@@ -40,6 +40,7 @@ classifiers = [
 ]
 dependencies = [
     "httpx ~= 0.27",
+    'backports.zoneinfo;python_version<"3.9"'
 ]
 
 [project.urls]
