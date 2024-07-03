@@ -2490,6 +2490,8 @@ class TransactionPartnerType(StringEnum):
     """:obj:`str`: Transaction with a user."""
     OTHER = "other"
     """:obj:`str`: Transaction with unknown source or recipient."""
+    TELEGRAM_ADS = "telegram_ads"
+    """:obj:`str`: Transaction with Telegram Ads."""
 
 
 class ParseMode(StringEnum):
