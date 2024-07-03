@@ -4,6 +4,7 @@ on:
     paths:
       - telegram/**
       - tests/**
+      - .github/workflows/unit_tests.yml
       - pyproject.toml
       - requirements-unit-tests.txt
   push:
