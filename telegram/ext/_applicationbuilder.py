@@ -322,9 +322,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             bot = self._updater.bot
             update_queue = self._updater.update_queue
 
-        application: Application[
-            BT, CCT, UD, CD, BD, JQ
-        ] = DefaultValue.get_value(  # pylint: disable=not-callable
+        application: Application[BT, CCT, UD, CD, BD, JQ] = DefaultValue.get_value(
             self._application_class
         )(
             bot=bot,
