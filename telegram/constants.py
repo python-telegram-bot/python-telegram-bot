@@ -1603,6 +1603,11 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
+    PAID_MEDIA = "paid_media"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -1884,6 +1889,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
     NEW_CHAT_PHOTO = "new_chat_photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
+    PAID_MEDIA = "paid_media"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
