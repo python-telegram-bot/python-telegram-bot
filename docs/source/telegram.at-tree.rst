@@ -140,6 +140,7 @@ Available Types
     telegram.transactionpartner
     telegram.transactionpartnerfragment
     telegram.transactionpartnerother
+    telegram.transactionpartnertelegramads
     telegram.transactionpartneruser
     telegram.update
     telegram.user

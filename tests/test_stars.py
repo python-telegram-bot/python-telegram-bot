@@ -33,6 +33,7 @@ from telegram import (
     TransactionPartner,
     TransactionPartnerFragment,
     TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
     TransactionPartnerUser,
     User,
 )
@@ -101,6 +102,7 @@ def star_transactions():
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.USER,
+        TransactionPartner.TELEGRAM_ADS,
     ],
 )
 def tp_scope_type(request):
@@ -113,11 +115,13 @@ def tp_scope_type(request):
         TransactionPartnerFragment,
         TransactionPartnerOther,
         TransactionPartnerUser,
+        TransactionPartnerTelegramAds,
     ],
     ids=[
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.USER,
+        TransactionPartner.TELEGRAM_ADS,
     ],
 )
 def tp_scope_class(request):
@@ -130,11 +134,13 @@ def tp_scope_class(request):
         (TransactionPartnerFragment, TransactionPartner.FRAGMENT),
         (TransactionPartnerOther, TransactionPartner.OTHER),
         (TransactionPartnerUser, TransactionPartner.USER),
+        (TransactionPartnerTelegramAds, TransactionPartner.TELEGRAM_ADS),
     ],
     ids=[
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.USER,
+        TransactionPartner.TELEGRAM_ADS,
     ],
 )
 def tp_scope_class_and_type(request):

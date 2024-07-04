@@ -223,6 +223,7 @@ __all__ = (
     "TransactionPartner",
     "TransactionPartnerFragment",
     "TransactionPartnerOther",
+    "TransactionPartnerTelegramAds",
     "TransactionPartnerUser",
     "Update",
     "User",
@@ -455,6 +456,7 @@ from ._stars import (
     TransactionPartner,
     TransactionPartnerFragment,
     TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
     TransactionPartnerUser,
 )
 from ._story import Story
