@@ -542,7 +542,7 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(HTTPXRequest, "do_request", faulty_do_request)
 
-        bot = ExtBot(get_updates_request=HTTPXRequest(), token=bot.token)
+        bot = PytestExtBot(get_updates_request=HTTPXRequest(), token=bot.token)
 
         with caplog.at_level(logging.CRITICAL), pytest.raises(AttributeError):
             await bot.get_updates()
