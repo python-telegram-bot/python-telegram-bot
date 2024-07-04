@@ -127,7 +127,7 @@ class InputPaidMedia(TelegramObject):
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
     Args:
-        media_type (:obj:`str`): Type of media that the instance represents.
+        type (:obj:`str`): Type of media that the instance represents.
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.PhotoSize` | :class:`telegram.Video`): File to send. |fileinputnopath|
             Lastly you can pass an existing telegram media object of the corresponding type
@@ -147,13 +147,13 @@ class InputPaidMedia(TelegramObject):
 
     def __init__(
         self,
-        media_type: str,
+        type: str,  # pylint: disable=redefined-builtin
         media: Union[str, InputFile, PhotoSize, Video],
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.InputPaidMediaType, media_type, media_type)
+        self.type: str = enum.get_member(constants.InputPaidMediaType, type, type)
         self.media: Union[str, InputFile, PhotoSize, Video] = media
 
         self._freeze()
@@ -186,7 +186,7 @@ class InputPaidMediaPhoto(InputPaidMedia):
         api_kwargs: Optional[JSONDict] = None,
     ):
         media = parse_file_input(media, PhotoSize, attach=True, local_mode=True)
-        super().__init__(media_type=InputPaidMedia.PHOTO, media=media, api_kwargs=api_kwargs)
+        super().__init__(type=InputPaidMedia.PHOTO, media=media, api_kwargs=api_kwargs)
         self._freeze()
 
 
@@ -253,7 +253,7 @@ class InputPaidMediaVideo(InputPaidMedia):
             # things to work in local mode.
             media = parse_file_input(media, attach=True, local_mode=True)
 
-        super().__init__(media_type=InputPaidMedia.VIDEO, media=media, api_kwargs=api_kwargs)
+        super().__init__(type=InputPaidMedia.VIDEO, media=media, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.thumbnail: Optional[Union[str, InputFile]] = InputMedia._parse_thumbnail_input(
                 thumbnail

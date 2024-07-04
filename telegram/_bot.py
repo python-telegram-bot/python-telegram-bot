@@ -70,7 +70,7 @@ from telegram._files.chatphoto import ChatPhoto
 from telegram._files.contact import Contact
 from telegram._files.document import Document
 from telegram._files.file import File
-from telegram._files.inputmedia import InputMedia
+from telegram._files.inputmedia import InputMedia, InputPaidMedia
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import MaskPosition, Sticker, StickerSet
@@ -118,8 +118,6 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InputPaidMediaPhoto,
-        InputPaidMediaVideo,
         InputSticker,
         LabeledPrice,
         LinkPreviewOptions,
@@ -580,14 +578,16 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 with new._unfrozen():
                     new.parse_mode = DefaultValue.get_value(new.parse_mode)
                 data[key] = new
-            elif key == "media" and isinstance(val, Sequence):
+            elif (
+                key == "media"
+                and isinstance(val, Sequence)
+                and not isinstance(val[0], InputPaidMedia)
+            ):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy.copy(media) for media in val]
                 for media in copy_list:
-                    if hasattr(media, "parse_mode"):  # InputPaidMedia objects don't have this
-                        with media._unfrozen():
-                            media.parse_mode = DefaultValue.get_value(media.parse_mode)
-
+                    with media._unfrozen():
+                        media.parse_mode = DefaultValue.get_value(media.parse_mode)
                 data[key] = copy_list
             # 2)
             else:
@@ -9161,7 +9161,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[str, int],
         star_count: int,
-        media: Sequence[Union["InputPaidMediaPhoto", "InputPaidMediaVideo"]],
+        media: Sequence["InputPaidMedia"],
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,

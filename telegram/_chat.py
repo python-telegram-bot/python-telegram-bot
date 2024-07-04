@@ -48,8 +48,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InputPaidMediaPhoto,
-        InputPaidMediaVideo,
+        InputPaidMedia,
         InputPollOption,
         LabeledPrice,
         LinkPreviewOptions,
@@ -3262,7 +3261,7 @@ class _ChatBase(TelegramObject):
     async def send_paid_media(
         self,
         star_count: int,
-        media: Sequence[Union["InputPaidMediaPhoto", "InputPaidMediaVideo"]],
+        media: Sequence["InputPaidMedia"],
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
