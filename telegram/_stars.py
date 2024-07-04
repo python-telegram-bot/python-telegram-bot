@@ -309,20 +309,29 @@ class TransactionPartnerUser(TransactionPartner):
 
     Args:
         user (:class:`telegram.User`): Information about the user.
+        invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
         user (:class:`telegram.User`): Information about the user.
+        invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
     """
 
-    __slots__ = ("user",)
+    __slots__ = ("invoice_payload", "user")
 
-    def __init__(self, user: "User", *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(
+        self,
+        user: "User",
+        invoice_payload: Optional[str] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.user: User = user
+            self.invoice_payload: Optional[str] = invoice_payload
             self._id_attrs = (
                 self.type,
                 self.user,
