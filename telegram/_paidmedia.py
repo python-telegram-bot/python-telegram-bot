@@ -40,7 +40,7 @@ class PaidMedia(TelegramObject):
     * :class:`telegram.PaidMediaVideo`
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`type` are equal.
+    considered equal, if their :attr:`type` is equal.
 
     .. versionadded:: NEXT.VERSION
 
