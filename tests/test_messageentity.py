@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import random
 from typing import List, Tuple
 
 import pytest
@@ -84,8 +85,6 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
         assert entity.type is MessageEntityType.URL
 
     def test_fix_utf16(self):
-        import random
-
         text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
         inputs_outputs: List[Tuple[Tuple[int, int, str], Tuple[int, int]]] = [
             ((2, 4, MessageEntity.BOLD), (3, 4)),
