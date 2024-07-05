@@ -381,7 +381,8 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        caption (:obj:`str`, optional): Caption for the animation, audio, document, photo, video
+        caption (:obj:`str`, optional): Caption for the animation, audio, document, paid media,
+            photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
@@ -697,7 +698,8 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
-        caption (:obj:`str`): Optional. Caption for the animation, audio, document, photo, video
+        caption (:obj:`str`): Optional. Caption for the animation, audio, document, paid media,
+            photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
             about the contact.

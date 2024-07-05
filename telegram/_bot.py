@@ -7648,7 +7648,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> MessageId:
-        """Use this method to copy messages of any kind. Service messages and invoice messages
+        """Use this method to copy messages of any kind. Service messages, paid media messages,
+        giveaway messages, giveaway winners messages, and invoice messages
         can't be copied. The method is analogous to the method :meth:`forward_message`, but the
         copied message doesn't have a link to the original message.
 
@@ -7774,8 +7775,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> Tuple["MessageId", ...]:
         """
         Use this method to copy messages of any kind. If some of the specified messages can't be
-        found or copied, they are skipped. Service messages, giveaway messages, giveaway winners
-        messages, and invoice messages can't be copied. A quiz poll can be copied only if the value
+        found or copied, they are skipped. Service messages, paid media messages, giveaway
+        messages, giveaway winners messages, and invoice messages can't be copied. A quiz pollcan
+        be copied only if the value
         of the field correct_option_id is known to the bot. The method is analogous to the method
         :meth:`forward_messages`, but the copied messages don't have a link to the original
         message. Album grouping is kept for copied messages.
