@@ -781,6 +781,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         - :meth:`shutdown`
         - :meth:`post_shutdown`
 
+        A small wrapper is passed to :paramref:`telegram.ext.Updater.start_polling.error_callback`
+        which forwards errors occurring during polling to
+        :meth:`registered error handlers <add_error_handler>`. The update parameter of the callback
+        will be set to :obj:`None`.
+
         .. include:: inclusions/application_run_tip.rst
 
         Args:
