@@ -50,7 +50,7 @@ class PreCheckoutQuery(TelegramObject):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        invoice_payload (:obj:`str`): Bot-specified invoice payload.
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
@@ -66,7 +66,7 @@ class PreCheckoutQuery(TelegramObject):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        invoice_payload (:obj:`str`): Bot-specified invoice payload.
         shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.

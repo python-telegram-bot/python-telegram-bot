@@ -32,8 +32,8 @@ class Location(TelegramObject):
     considered equal, if their :attr:`longitude` and :attr:`latitude` are equal.
 
     Args:
-        longitude (:obj:`float`): Longitude as defined by sender.
-        latitude (:obj:`float`): Latitude as defined by sender.
+        longitude (:obj:`float`): Longitude as defined by the sender.
+        latitude (:obj:`float`): Latitude as defined by the sender.
         horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
             measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
         live_period (:obj:`int`, optional): Time relative to the message sending date, during which
@@ -45,8 +45,8 @@ class Location(TelegramObject):
             approaching another chat member, in meters. For sent live locations only.
 
     Attributes:
-        longitude (:obj:`float`): Longitude as defined by sender.
-        latitude (:obj:`float`): Latitude as defined by sender.
+        longitude (:obj:`float`): Longitude as defined by the sender.
+        latitude (:obj:`float`): Latitude as defined by the sender.
         horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
             measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
         live_period (:obj:`int`): Optional. Time relative to the message sending date, during which

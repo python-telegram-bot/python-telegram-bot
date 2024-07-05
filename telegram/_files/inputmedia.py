@@ -510,10 +510,10 @@ class InputMediaAudio(InputMedia):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        duration (:obj:`int`, optional): Duration of the audio in seconds as defined by sender.
-        performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
-            tags.
-        title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
+        duration (:obj:`int`, optional): Duration of the audio in seconds as defined by the sender.
+        performer (:obj:`str`, optional): Performer of the audio as defined by the sender or by
+            audio tags.
+        title (:obj:`str`, optional): Title of the audio as defined by the sender or by audio tags.
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
@@ -533,9 +533,9 @@ class InputMediaAudio(InputMedia):
                 * |tupleclassattrs|
                 * |alwaystuple|
         duration (:obj:`int`): Optional. Duration of the audio in seconds.
-        performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
-            tags.
-        title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
+        performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
+            audio tags.
+        title (:obj:`str`): Optional. Title of the audio as defined by the sender or by audio tags.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: 20.2
