@@ -71,6 +71,7 @@ __all__ = [
     "InlineQueryResultType",
     "InlineQueryResultsButtonLimit",
     "InputMediaType",
+    "InputPaidMediaType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
     "LocationLimit",
@@ -1254,6 +1255,21 @@ class InputMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaDocument`."""
     AUDIO = "audio"
     """:obj:`str`: Type of :class:`telegram.InputMediaAudio`."""
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+
+
+class InputPaidMediaType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputPaidMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
     PHOTO = "photo"
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
     VIDEO = "video"
