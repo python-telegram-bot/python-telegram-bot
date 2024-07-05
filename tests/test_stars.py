@@ -251,6 +251,7 @@ class TestStarTransactionWithoutRequest(TestStarTransactionBase):
         }
         st = StarTransaction.de_json(json_dict, bot)
         st_none = StarTransaction.de_json(None, bot)
+        assert st.api_kwargs == {}
         assert st.id == self.id
         assert st.amount == self.amount
         assert st.date == from_timestamp(self.date)
@@ -336,6 +337,7 @@ class TestStarTransactionsWithoutRequest(TestStarTransactionsBase):
         }
         st = StarTransactions.de_json(json_dict, bot)
         st_none = StarTransactions.de_json(None, bot)
+        assert st.api_kwargs == {}
         assert st.transactions == tuple(self.transactions)
         assert st_none is None
 
@@ -369,7 +371,7 @@ class TestTransactionPartnerBase:
     invoice_payload = "payload"
 
 
-class TestTransactionPartner(TestTransactionPartnerBase):
+class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
     def test_slot_behaviour(self, transaction_partner):
         inst = transaction_partner
         for attr in inst.__slots__:
@@ -485,7 +487,7 @@ class TestRevenueWithdrawalStateBase:
     url = "url"
 
 
-class TestRevenueWithdrawalState(TestRevenueWithdrawalStateBase):
+class TestRevenueWithdrawalStateWithoutRequest(TestRevenueWithdrawalStateBase):
     def test_slot_behaviour(self, revenue_withdrawal_state):
         inst = revenue_withdrawal_state
         for attr in inst.__slots__:

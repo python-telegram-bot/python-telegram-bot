@@ -46,6 +46,8 @@ from telegram import (
     MessageAutoDeleteTimerChanged,
     MessageEntity,
     MessageOriginChat,
+    PaidMediaInfo,
+    PaidMediaPreview,
     PassportData,
     PhotoSize,
     Poll,
@@ -275,6 +277,7 @@ def message(bot):
         {"chat_background_set": ChatBackground(type=BackgroundTypeChatTheme("ice"))},
         {"effect_id": "123456789"},
         {"show_caption_above_media": True},
+        {"paid_media": PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])},
     ],
     ids=[
         "reply",
@@ -346,6 +349,7 @@ def message(bot):
         "chat_background_set",
         "effect_id",
         "show_caption_above_media",
+        "paid_media",
     ],
 )
 def message_params(bot, request):
@@ -1221,6 +1225,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "game",
             "invoice",
             "location",
+            "paid_media",
             "passport_data",
             "photo",
             "poll",

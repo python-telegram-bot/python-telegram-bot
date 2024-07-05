@@ -82,6 +82,7 @@ __all__ = [
     "MessageLimit",
     "MessageOriginType",
     "MessageType",
+    "PaidMediaType",
     "ParseMode",
     "PollLimit",
     "PollType",
@@ -1602,6 +1603,11 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
+    PAID_MEDIA = "paid_media"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -1883,6 +1889,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
     NEW_CHAT_PHOTO = "new_chat_photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
+    PAID_MEDIA = "paid_media"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -1949,6 +1960,24 @@ class MessageType(StringEnum):
 
     .. versionadded:: 20.8
     """
+
+
+class PaidMediaType(StringEnum):
+    """
+    This enum contains the available types of :class:`telegram.PaidMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PREVIEW = "preview"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaPreview`."""
+    VIDEO = "video"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaVideo`."""
+    PHOTO = "photo"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
 
 
 class PollingLimit(IntEnum):
