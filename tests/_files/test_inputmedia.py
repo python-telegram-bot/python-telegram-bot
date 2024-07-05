@@ -1166,5 +1166,4 @@ class TestSendMediaGroupWithRequest:
         assert isinstance(msg, Message)
         assert msg.caption == "bye onlyfans"
         assert msg.show_caption_above_media
-        # TODO: uncomment after attributes are added to message:
-        # assert msg.paid_media.star_count == 20
+        assert msg.paid_media.star_count == 20
