@@ -176,6 +176,11 @@ __all__ = (
     "MessageReactionCountUpdated",
     "MessageReactionUpdated",
     "OrderInfo",
+    "PaidMedia",
+    "PaidMediaInfo",
+    "PaidMediaPhoto",
+    "PaidMediaPreview",
+    "PaidMediaVideo",
     "PassportData",
     "PassportElementError",
     "PassportElementErrorDataField",
@@ -226,6 +231,7 @@ __all__ = (
     "TransactionPartner",
     "TransactionPartnerFragment",
     "TransactionPartnerOther",
+    "TransactionPartnerTelegramAds",
     "TransactionPartnerUser",
     "Update",
     "User",
@@ -411,6 +417,7 @@ from ._messageorigin import (
     MessageOriginUser,
 )
 from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
+from ._paidmedia import PaidMedia, PaidMediaInfo, PaidMediaPhoto, PaidMediaPreview, PaidMediaVideo
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -461,6 +468,7 @@ from ._stars import (
     TransactionPartner,
     TransactionPartnerFragment,
     TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
     TransactionPartnerUser,
 )
 from ._story import Story

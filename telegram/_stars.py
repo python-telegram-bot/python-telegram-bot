@@ -183,8 +183,9 @@ class TransactionPartner(TelegramObject):
     """This object describes the source of a transaction, or its recipient for outgoing
     transactions. Currently, it can be one of:
 
-    * :class:`TransactionPartnerFragment`
     * :class:`TransactionPartnerUser`
+    * :class:`TransactionPartnerFragment`
+    * :class:`TransactionPartnerTelegramAds`
     * :class:`TransactionPartnerOther`
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -207,6 +208,8 @@ class TransactionPartner(TelegramObject):
     """:const:`telegram.constants.TransactionPartnerType.USER`"""
     OTHER: Final[str] = constants.TransactionPartnerType.OTHER
     """:const:`telegram.constants.TransactionPartnerType.OTHER`"""
+    TELEGRAM_ADS: Final[str] = constants.TransactionPartnerType.TELEGRAM_ADS
+    """:const:`telegram.constants.TransactionPartnerType.TELEGRAM_ADS`"""
 
     def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
@@ -242,6 +245,7 @@ class TransactionPartner(TelegramObject):
             cls.FRAGMENT: TransactionPartnerFragment,
             cls.USER: TransactionPartnerUser,
             cls.OTHER: TransactionPartnerOther,
+            cls.TELEGRAM_ADS: TransactionPartnerTelegramAds,
         }
 
         if cls is TransactionPartner and data.get("type") in _class_mapping:
@@ -305,20 +309,29 @@ class TransactionPartnerUser(TransactionPartner):
 
     Args:
         user (:class:`telegram.User`): Information about the user.
+        invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
         user (:class:`telegram.User`): Information about the user.
+        invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
     """
 
-    __slots__ = ("user",)
+    __slots__ = ("invoice_payload", "user")
 
-    def __init__(self, user: "User", *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(
+        self,
+        user: "User",
+        invoice_payload: Optional[str] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.user: User = user
+            self.invoice_payload: Optional[str] = invoice_payload
             self._id_attrs = (
                 self.type,
                 self.user,
@@ -352,6 +365,23 @@ class TransactionPartnerOther(TransactionPartner):
 
     def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(type=TransactionPartner.OTHER, api_kwargs=api_kwargs)
+        self._freeze()
+
+
+class TransactionPartnerTelegramAds(TransactionPartner):
+    """Describes a withdrawal transaction to the Telegram Ads platform.
+
+    .. versionadded:: NEXT.VERSION
+
+    Attributes:
+        type (:obj:`str`): The type of the transaction partner,
+            always :tg-const:`telegram.TransactionPartner.TELEGRAM_ADS`.
+    """
+
+    __slots__ = ()
+
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+        super().__init__(type=TransactionPartner.TELEGRAM_ADS, api_kwargs=api_kwargs)
         self._freeze()
 
 
