@@ -4374,7 +4374,16 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         else:
             self._LOGGER.debug("No new updates found.")
 
-        return Update.de_list(result, self)
+        try:
+            return Update.de_list(result, self)
+        except Exception as exc:
+            # This logging is in place mostly b/c we can't access the raw json data in Updater,
+            # where the exception is caught and logged again. Still, it might also be beneficial
+            # for custom usages of `get_updates`.
+            self._LOGGER.critical(
+                "Error while parsing updates! Received data was %r", result, exc_info=exc
+            )
+            raise exc
 
     async def set_webhook(
         self,

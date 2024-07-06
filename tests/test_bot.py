@@ -535,6 +535,29 @@ class TestBotWithoutRequest:
             123, "text", api_kwargs={"unknown_kwarg_1": 7, "unknown_kwarg_2": 5}
         )
 
+    async def test_get_updates_deserialization_error(self, bot, monkeypatch, caplog):
+        async def faulty_do_request(*args, **kwargs):
+            return (
+                HTTPStatus.OK,
+                b'{"ok": true, "result": [{"update_id": "1", "message": "unknown_format"}]}',
+            )
+
+        monkeypatch.setattr(HTTPXRequest, "do_request", faulty_do_request)
+
+        bot = PytestExtBot(get_updates_request=HTTPXRequest(), token=bot.token)
+
+        with caplog.at_level(logging.CRITICAL), pytest.raises(AttributeError):
+            await bot.get_updates()
+
+        assert len(caplog.records) == 1
+        assert caplog.records[0].name == "telegram.ext.ExtBot"
+        assert caplog.records[0].levelno == logging.CRITICAL
+        assert caplog.records[0].getMessage() == (
+            "Error while parsing updates! Received data was "
+            "[{'update_id': '1', 'message': 'unknown_format'}]"
+        )
+        assert caplog.records[0].exc_info[0] is AttributeError
+
     async def test_answer_web_app_query(self, bot, raw_bot, monkeypatch):
         params = False
 
