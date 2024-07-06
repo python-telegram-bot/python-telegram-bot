@@ -2460,7 +2460,7 @@ class TestApplication:
 
         monkeypatch.setattr(Application, "start", functools.partial(callback, name="start"))
         monkeypatch.setattr(
-            Updater, "start_polling", functools.partial(callback, name="start_polling")
+            Updater, "start_polling", functools.partialmethod(callback, name="start_polling")
         )
 
         app = (
