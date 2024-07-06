@@ -122,9 +122,9 @@ class InputPaidMedia(TelegramObject):
     * :class:`telegram.InputMediaPhoto`
     * :class:`telegram.InputMediaVideo`
 
-    .. versionadded:: NEXT.VERSION
-
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         type (:obj:`str`): Type of media that the instance represents.
@@ -162,9 +162,9 @@ class InputPaidMedia(TelegramObject):
 class InputPaidMediaPhoto(InputPaidMedia):
     """The paid media to send is a photo.
 
-    .. versionadded:: NEXT.VERSION
-
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
@@ -194,9 +194,9 @@ class InputPaidMediaVideo(InputPaidMedia):
     """
     The paid media to send is a video.
 
-    .. versionadded:: NEXT.VERSION
-
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
 
     Note:
         *  When using a :class:`telegram.Video` for the :attr:`media` attribute, it will take the
