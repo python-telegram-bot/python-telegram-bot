@@ -185,7 +185,7 @@ class MessageEntity(TelegramObject):
 
         Args:
             text (:obj:`str`): The text that the entities belong to
-            entities (List[:class:`telegram.MessageEntity`]): Sequence of entities
+            entities (Sequence[:class:`telegram.MessageEntity`]): Sequence of entities
                 with offset and length calculated in Unicode
 
         Returns:
