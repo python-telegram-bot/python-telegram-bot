@@ -58,6 +58,7 @@ __all__ = (
     "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
     "LOCATION",
+    "PAID_MEDIA",
     "PASSPORT_DATA",
     "PHOTO",
     "POLL",
@@ -1704,6 +1705,20 @@ class Mention(MessageFilter):
 
     def filter(self, message: Message) -> bool:
         return any(self._check_mention(message, mention) for mention in self._mentions)
+
+
+class _PaidMedia(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.paid_media)
+
+
+PAID_MEDIA = _PaidMedia(name="filters.PAID_MEDIA")
+"""Messages that contain :attr:`telegram.Message.paid_media`.
+
+.. versionadded:: NEXT.VERSION
+"""
 
 
 class _PassportData(MessageFilter):
