@@ -902,6 +902,11 @@ class TestFilters:
         update.message.story = "test"
         assert filters.STORY.check_update(update)
 
+    def test_filters_paid_media(self, update):
+        assert not filters.PAID_MEDIA.check_update(update)
+        update.message.paid_media = "test"
+        assert filters.PAID_MEDIA.check_update(update)
+
     def test_filters_video(self, update):
         assert not filters.VIDEO.check_update(update)
         update.message.video = "test"
