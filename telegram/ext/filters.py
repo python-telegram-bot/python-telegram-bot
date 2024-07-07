@@ -2198,7 +2198,10 @@ class StatusUpdate:
             return bool(message.refunded_payment)
 
     REFUNDED_PAYMENT = _RefundedPayment("filters.StatusUpdate.REFUNDED_PAYMENT")
-    """Messages that contain :attr:`telegram.Message.refunded_payment`."""
+    """Messages that contain :attr:`telegram.Message.refunded_payment`.
+    
+    .. versionadded:: NEXT.VERSION
+    """
 
     class _UserShared(MessageFilter):
         __slots__ = ()
