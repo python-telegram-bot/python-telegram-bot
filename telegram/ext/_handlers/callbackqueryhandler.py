@@ -86,8 +86,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
         game_pattern (:obj:`str` | :func:`re.Pattern <re.compile>` | :obj:`callable` | optional)
-            Pattern to test :attr:`telegram.CallbackQuery.game_short_name` against. If a string or a
-            regex pattern is passed, :func:`re.match` is used on
+            Pattern to test :attr:`telegram.CallbackQuery.game_short_name` against. If a string or
+            a regex pattern is passed, :func:`re.match` is used on
             :attr:`telegram.CallbackQuery.game_short_name` to determine if an update should be
             handled by this handler.
             To filter arbitrary objects you may pass:
@@ -118,7 +118,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
     """
 
-    __slots__ = ("pattern", "game_pattern")
+    __slots__ = ("game_pattern", "pattern")
 
     def __init__(
         self,
@@ -142,11 +142,11 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
         if callable(game_pattern) and asyncio.iscoroutinefunction(game_pattern):
             raise TypeError(
-                "The `game_pattern` must not be a coroutine function! Use an ordinary function instead."
+                "The `game_pattern` must not be a coroutine function! "
+                "Use an ordinary function instead."
             )
         if isinstance(game_pattern, str):
             game_pattern = re.compile(game_pattern)
-            
         self.pattern: Optional[
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = pattern
@@ -174,7 +174,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
             if callback_data:
                 if not self.pattern:
-                    return False 
+                    return False
                 if isinstance(self.pattern, type):
                     return isinstance(callback_data, self.pattern)
                 if callable(self.pattern):
@@ -192,8 +192,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
                 if not isinstance(game_short_name, str):
                     return False
                 if match := re.match(self.game_pattern, game_short_name):
-                    return match 
-            else: 
+                    return match
+            else:
                 return True
         return None
 
