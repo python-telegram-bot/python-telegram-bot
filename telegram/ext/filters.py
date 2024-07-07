@@ -1717,7 +1717,7 @@ class _PaidMedia(MessageFilter):
 PAID_MEDIA = _PaidMedia(name="filters.PAID_MEDIA")
 """Messages that contain :attr:`telegram.Message.paid_media`.
 
-    .. versionadded:: NEXT.VERSION
+.. versionadded:: NEXT.VERSION
 """
 
 
