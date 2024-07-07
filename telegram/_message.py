@@ -52,6 +52,7 @@ from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
+from telegram._paidmedia import PaidMediaInfo
 from telegram._passport.passportdata import PassportData
 from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
@@ -380,7 +381,8 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        caption (:obj:`str`, optional): Caption for the animation, audio, document, photo, video
+        caption (:obj:`str`, optional): Caption for the animation, audio, document, paid media,
+            photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
@@ -571,6 +573,10 @@ class Message(MaybeInaccessibleMessage):
             background set.
 
             .. versionadded:: 21.2
+        paid_media (:obj:`telegram.PaidMediaInfo`, optional): Message contains paid media;
+            information about the paid media.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -692,7 +698,8 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
-        caption (:obj:`str`): Optional. Caption for the animation, audio, document, photo, video
+        caption (:obj:`str`): Optional. Caption for the animation, audio, document, paid media,
+            photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
             about the contact.
@@ -884,6 +891,10 @@ class Message(MaybeInaccessibleMessage):
             background set
 
             .. versionadded:: 21.2
+        paid_media (:obj:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
+            information about the paid media.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -950,6 +961,7 @@ class Message(MaybeInaccessibleMessage):
         "new_chat_members",
         "new_chat_photo",
         "new_chat_title",
+        "paid_media",
         "passport_data",
         "photo",
         "pinned_message",
@@ -1067,6 +1079,7 @@ class Message(MaybeInaccessibleMessage):
         chat_background_set: Optional[ChatBackground] = None,
         effect_id: Optional[str] = None,
         show_caption_above_media: Optional[bool] = None,
+        paid_media: Optional[PaidMediaInfo] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1168,6 +1181,7 @@ class Message(MaybeInaccessibleMessage):
             self.chat_background_set: Optional[ChatBackground] = chat_background_set
             self.effect_id: Optional[str] = effect_id
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.paid_media: Optional[PaidMediaInfo] = paid_media
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1283,6 +1297,7 @@ class Message(MaybeInaccessibleMessage):
         data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
         data["chat_background_set"] = ChatBackground.de_json(data.get("chat_background_set"), bot)
+        data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
@@ -1346,6 +1361,7 @@ class Message(MaybeInaccessibleMessage):
         Location,
         PassportData,
         Sequence[PhotoSize],
+        PaidMediaInfo,
         Poll,
         Sticker,
         Story,
@@ -1369,6 +1385,7 @@ class Message(MaybeInaccessibleMessage):
         * :class:`telegram.Location`
         * :class:`telegram.PassportData`
         * List[:class:`telegram.PhotoSize`]
+        * :class:`telegram.PaidMediaInfo`
         * :class:`telegram.Poll`
         * :class:`telegram.Sticker`
         * :class:`telegram.Story`
@@ -1385,6 +1402,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.0
             :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
             attachment.
+
+        .. versionchanged:: NEXT.VERSION
+            :attr:`paid_media` is now also considered to be an attachment.
 
         """
         if not isinstance(self._effective_attachment, DefaultValue):

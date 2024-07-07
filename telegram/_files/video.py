@@ -39,11 +39,11 @@ class Video(_BaseThumbedMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        width (:obj:`int`): Video width as defined by sender.
-        height (:obj:`int`): Video height as defined by sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        file_name (:obj:`str`, optional): Original filename as defined by sender.
-        mime_type (:obj:`str`, optional): MIME type of a file as defined by sender.
+        width (:obj:`int`): Video width as defined by the sender.
+        height (:obj:`int`): Video height as defined by the sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by the sender.
+        file_name (:obj:`str`, optional): Original filename as defined by the sender.
+        mime_type (:obj:`str`, optional): MIME type of a file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`, optional): Video thumbnail.
 
@@ -55,11 +55,11 @@ class Video(_BaseThumbedMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        width (:obj:`int`): Video width as defined by sender.
-        height (:obj:`int`): Video height as defined by sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        file_name (:obj:`str`): Optional. Original filename as defined by sender.
-        mime_type (:obj:`str`): Optional. MIME type of a file as defined by sender.
+        width (:obj:`int`): Video width as defined by the sender.
+        height (:obj:`int`): Video height as defined by the sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by the sender.
+        file_name (:obj:`str`): Optional. Original filename as defined by the sender.
+        mime_type (:obj:`str`): Optional. MIME type of a file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
 

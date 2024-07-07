@@ -71,6 +71,7 @@ __all__ = [
     "InlineQueryResultType",
     "InlineQueryResultsButtonLimit",
     "InputMediaType",
+    "InputPaidMediaType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
     "LocationLimit",
@@ -82,6 +83,7 @@ __all__ = [
     "MessageLimit",
     "MessageOriginType",
     "MessageType",
+    "PaidMediaType",
     "ParseMode",
     "PollLimit",
     "PollType",
@@ -149,7 +151,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=5)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=6)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1259,6 +1261,21 @@ class InputMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
 
 
+class InputPaidMediaType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputPaidMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+
+
 class InlineQueryLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineQuery`/
     :meth:`telegram.Bot.answer_inline_query`. The enum members of this enumeration are instances
@@ -1602,6 +1619,11 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
+    PAID_MEDIA = "paid_media"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -1883,6 +1905,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
     NEW_CHAT_PHOTO = "new_chat_photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
+    PAID_MEDIA = "paid_media"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -1949,6 +1976,24 @@ class MessageType(StringEnum):
 
     .. versionadded:: 20.8
     """
+
+
+class PaidMediaType(StringEnum):
+    """
+    This enum contains the available types of :class:`telegram.PaidMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PREVIEW = "preview"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaPreview`."""
+    VIDEO = "video"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaVideo`."""
+    PHOTO = "photo"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
 
 
 class PollingLimit(IntEnum):
@@ -2490,6 +2535,8 @@ class TransactionPartnerType(StringEnum):
     """:obj:`str`: Transaction with a user."""
     OTHER = "other"
     """:obj:`str`: Transaction with unknown source or recipient."""
+    TELEGRAM_ADS = "telegram_ads"
+    """:obj:`str`: Transaction with Telegram Ads."""
 
 
 class ParseMode(StringEnum):

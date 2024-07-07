@@ -37,6 +37,7 @@ from telegram._giveaway import Giveaway, GiveawayWinners
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageentity import MessageEntity
 from telegram._messageorigin import MessageOrigin
+from telegram._paidmedia import PaidMediaInfo
 from telegram._payment.invoice import Invoice
 from telegram._poll import Poll
 from telegram._story import Story
@@ -101,6 +102,10 @@ class ExternalReplyInfo(TelegramObject):
         poll (:class:`telegram.Poll`, optional): Message is a native poll, information about the
             poll.
         venue (:class:`telegram.Venue`, optional): Message is a venue, information about the venue.
+        paid_media (:class:`telegram.PaidMedia`, optional): Message contains paid media;
+            information about the paid media.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         origin (:class:`telegram.MessageOrigin`): Origin of the message replied to by the given
@@ -144,6 +149,10 @@ class ExternalReplyInfo(TelegramObject):
         poll (:class:`telegram.Poll`): Optional. Message is a native poll, information about the
             poll.
         venue (:class:`telegram.Venue`): Optional. Message is a venue, information about the venue.
+        paid_media (:class:`telegram.PaidMedia`): Optional. Message contains paid media;
+            information about the paid media.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -162,6 +171,7 @@ class ExternalReplyInfo(TelegramObject):
         "location",
         "message_id",
         "origin",
+        "paid_media",
         "photo",
         "poll",
         "sticker",
@@ -197,6 +207,7 @@ class ExternalReplyInfo(TelegramObject):
         location: Optional[Location] = None,
         poll: Optional[Poll] = None,
         venue: Optional[Venue] = None,
+        paid_media: Optional[PaidMediaInfo] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -225,6 +236,7 @@ class ExternalReplyInfo(TelegramObject):
         self.location: Optional[Location] = location
         self.poll: Optional[Poll] = poll
         self.venue: Optional[Venue] = venue
+        self.paid_media: Optional[PaidMediaInfo] = paid_media
 
         self._id_attrs = (self.origin,)
 
@@ -263,6 +275,7 @@ class ExternalReplyInfo(TelegramObject):
         data["location"] = Location.de_json(data.get("location"), bot)
         data["poll"] = Poll.de_json(data.get("poll"), bot)
         data["venue"] = Venue.de_json(data.get("venue"), bot)
+        data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
 
         return super().de_json(data=data, bot=bot)
 

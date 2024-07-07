@@ -55,13 +55,15 @@ def chat_full_info(bot):
         bio=TestChatFullInfoBase.bio,
         linked_chat_id=TestChatFullInfoBase.linked_chat_id,
         location=TestChatFullInfoBase.location,
-        has_private_forwards=True,
-        has_protected_content=True,
-        has_visible_history=True,
-        join_to_send_messages=True,
-        join_by_request=True,
-        has_restricted_voice_and_video_messages=True,
-        is_forum=True,
+        has_private_forwards=TestChatFullInfoBase.has_private_forwards,
+        has_protected_content=TestChatFullInfoBase.has_protected_content,
+        has_visible_history=TestChatFullInfoBase.has_visible_history,
+        join_to_send_messages=TestChatFullInfoBase.join_to_send_messages,
+        join_by_request=TestChatFullInfoBase.join_by_request,
+        has_restricted_voice_and_video_messages=(
+            TestChatFullInfoBase.has_restricted_voice_and_video_messages
+        ),
+        is_forum=TestChatFullInfoBase.is_forum,
         active_usernames=TestChatFullInfoBase.active_usernames,
         emoji_status_custom_emoji_id=TestChatFullInfoBase.emoji_status_custom_emoji_id,
         emoji_status_expiration_date=TestChatFullInfoBase.emoji_status_expiration_date,
@@ -76,10 +78,11 @@ def chat_full_info(bot):
         business_intro=TestChatFullInfoBase.business_intro,
         business_location=TestChatFullInfoBase.business_location,
         business_opening_hours=TestChatFullInfoBase.business_opening_hours,
-        birthdate=Birthdate(1, 1),
+        birthdate=TestChatFullInfoBase.birthdate,
         personal_chat=TestChatFullInfoBase.personal_chat,
-        first_name="first_name",
-        last_name="last_name",
+        first_name=TestChatFullInfoBase.first_name,
+        last_name=TestChatFullInfoBase.last_name,
+        can_send_paid_media=TestChatFullInfoBase.can_send_paid_media,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -136,6 +139,7 @@ class TestChatFullInfoBase:
     personal_chat = Chat(3, "private", "private")
     first_name = "first_name"
     last_name = "last_name"
+    can_send_paid_media = True
 
 
 class TestChatFullInfoWithoutRequest(TestChatFullInfoBase):
@@ -188,6 +192,7 @@ class TestChatFullInfoWithoutRequest(TestChatFullInfoBase):
             "personal_chat": self.personal_chat.to_dict(),
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "can_send_paid_media": self.can_send_paid_media,
         }
         cfi = ChatFullInfo.de_json(json_dict, bot)
         assert cfi.id == self.id_
@@ -232,6 +237,7 @@ class TestChatFullInfoWithoutRequest(TestChatFullInfoBase):
         assert cfi.first_name == self.first_name
         assert cfi.last_name == self.last_name
         assert cfi.max_reaction_count == self.max_reaction_count
+        assert cfi.can_send_paid_media == self.can_send_paid_media
 
     def test_de_json_localization(self, bot, raw_bot, tz_bot):
         json_dict = {
@@ -305,6 +311,7 @@ class TestChatFullInfoWithoutRequest(TestChatFullInfoBase):
         assert cfi_dict["personal_chat"] == cfi.personal_chat.to_dict()
         assert cfi_dict["first_name"] == cfi.first_name
         assert cfi_dict["last_name"] == cfi.last_name
+        assert cfi_dict["can_send_paid_media"] == cfi.can_send_paid_media
 
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
 

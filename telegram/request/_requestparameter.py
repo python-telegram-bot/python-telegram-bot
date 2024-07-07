@@ -23,7 +23,7 @@ from datetime import datetime
 from typing import List, Optional, Sequence, Tuple, final
 
 from telegram._files.inputfile import InputFile
-from telegram._files.inputmedia import InputMedia
+from telegram._files.inputmedia import InputMedia, InputPaidMedia
 from telegram._files.inputsticker import InputSticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
@@ -117,7 +117,7 @@ class RequestParameter:
                 return value.attach_uri, [value]
             return None, [value]
 
-        if isinstance(value, InputMedia) and isinstance(value.media, InputFile):
+        if isinstance(value, (InputMedia, InputPaidMedia)) and isinstance(value.media, InputFile):
             # We call to_dict and change the returned dict instead of overriding
             # value.media in case the same value is reused for another request
             data = value.to_dict()

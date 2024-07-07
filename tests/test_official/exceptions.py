@@ -127,6 +127,8 @@ PTB_EXTRA_PARAMS = {
     "InputTextMessageContent": {"disable_web_page_preview"},  # convenience arg, here for bw compat
     "RevenueWithdrawalState": {"type"},  # attributes common to all subclasses
     "TransactionPartner": {"type"},  # attributes common to all subclasses
+    "PaidMedia": {"type"},  # attributes common to all subclasses
+    "InputPaidMedia": {"type", "media"},  # attributes common to all subclasses
 }
 
 
@@ -153,6 +155,8 @@ PTB_IGNORED_PARAMS = {
     r"BackgroundFill\w+": {"type"},
     r"RevenueWithdrawalState\w+": {"type"},
     r"TransactionPartner\w+": {"type"},
+    r"PaidMedia\w+": {"type"},
+    r"InputPaidMedia\w+": {"type"},
 }
 
 
