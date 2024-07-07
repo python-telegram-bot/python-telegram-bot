@@ -96,6 +96,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
                 :attr:`telegram.CallbackQuery.game_short_name`. It must return :obj:`True` or
                 :obj:`False`/:obj:`None` to indicate, whether the update should be handled.
 
+            .. versionadded:: NEXT.VERSION
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
