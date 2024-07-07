@@ -85,21 +85,16 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
-        game_patterm (:obj:`str` | :func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`, optional)
-            Pattern to test :attr:`telegram.CallbackQuery.game_patterm` against. If a string or a
+        game_pattern (:obj:`str` | :func:`re.Pattern <re.compile>` | :obj:`callable` | optional)
+            Pattern to test :attr:`telegram.CallbackQuery.game_short_name` against. If a string or a
             regex pattern is passed, :func:`re.match` is used on
-            :attr:`telegram.CallbackQuery.game_patterm` to determine if an update should be
-            handled by this handler. If your bot allows arbitrary objects as
-            :paramref:`~telegram.InlineKeyboardButton.callback_data`, non-strings will be accepted.
+            :attr:`telegram.CallbackQuery.game_short_name` to determine if an update should be
+            handled by this handler.
             To filter arbitrary objects you may pass:
 
             - a callable, accepting exactly one argument, namely the
-                :attr:`telegram.CallbackQuery.game_patterm`. It must return :obj:`True` or
+                :attr:`telegram.CallbackQuery.game_short_name`. It must return :obj:`True` or
                 :obj:`False`/:obj:`None` to indicate, whether the update should be handled.
-            - a :obj:`type`. If :attr:`telegram.CallbackQuery.game_patterm` is an instance of
-                that type (or a subclass), the update will be handled.
-
-            .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
@@ -114,8 +109,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
-        game_pattern (:func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`): Optional.
-            Regex pattern, callback or type to test :attr:`telegram.CallbackQuery.game_pattern`
+        game_pattern (:func:`re.Pattern <re.compile>` | :obj:`callable`): Optional.
+            Regex pattern, callback or type to test :attr:`telegram.CallbackQuery.game_short_name`
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
@@ -131,7 +126,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = None,
         game_pattern: Optional[
-            Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
+            Union[str, Pattern[str], Callable[[object], Optional[bool]]]
         ] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
@@ -155,7 +150,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = pattern
         self.game_pattern: Optional[
-            Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
+            Union[str, Pattern[str], Callable[[object], Optional[bool]]]
         ] = game_pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
@@ -186,8 +181,6 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             elif self.game_pattern:
                 if game_short_name is None:
                     return False
-                if isinstance(self.game_pattern, type):
-                    return isinstance(game_short_name, self.game_pattern)
                 if callable(self.game_pattern):
                     return self.game_pattern(game_short_name)
                 if not isinstance(game_short_name, str):
