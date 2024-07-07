@@ -167,9 +167,11 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         if isinstance(update, Update) and update.callback_query:
             callback_data = update.callback_query.data
             game_short_name = update.callback_query.game_short_name
-            if self.pattern:
-                if callback_data is None:
-                    return False
+
+            if not any([self.pattern, self.game_pattern]):
+                return True
+
+            if callback_data:
                 if isinstance(self.pattern, type):
                     return isinstance(callback_data, self.pattern)
                 if callable(self.pattern):
@@ -178,17 +180,14 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
                     return False
                 if match := re.match(self.pattern, callback_data):
                     return match
-            elif self.game_pattern:
-                if game_short_name is None:
-                    return False
+
+            elif game_short_name:
                 if callable(self.game_pattern):
                     return self.game_pattern(game_short_name)
                 if not isinstance(game_short_name, str):
                     return False
                 if match := re.match(self.game_pattern, game_short_name):
                     return match 
-            else:
-                return True
         return None
 
     def collect_additional_context(
