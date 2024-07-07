@@ -31,6 +31,8 @@ from telegram import (
     InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
+    InputPaidMediaPhoto,
+    InputPaidMediaVideo,
     Message,
     MessageEntity,
     ReplyParameters,
@@ -131,6 +133,25 @@ def input_media_document(class_thumb_file):
         parse_mode=TestInputMediaDocumentBase.parse_mode,
         caption_entities=TestInputMediaDocumentBase.caption_entities,
         disable_content_type_detection=TestInputMediaDocumentBase.disable_content_type_detection,
+    )
+
+
+@pytest.fixture(scope="module")
+def input_paid_media_photo():
+    return InputPaidMediaPhoto(
+        media=TestInputMediaPhotoBase.media,
+    )
+
+
+@pytest.fixture(scope="module")
+def input_paid_media_video(class_thumb_file):
+    return InputPaidMediaVideo(
+        media=TestInputMediaVideoBase.media,
+        thumbnail=class_thumb_file,
+        width=TestInputMediaVideoBase.width,
+        height=TestInputMediaVideoBase.height,
+        duration=TestInputMediaVideoBase.duration,
+        supports_streaming=TestInputMediaVideoBase.supports_streaming,
     )
 
 
@@ -512,6 +533,91 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
         )
         assert input_media_document.media == data_file("telegram.mp4").as_uri()
         assert input_media_document.thumbnail == data_file("telegram.jpg").as_uri()
+
+
+class TestInputPaidMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
+    def test_slot_behaviour(self, input_paid_media_photo):
+        inst = input_paid_media_photo
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_expected_values(self, input_paid_media_photo):
+        assert input_paid_media_photo.type == self.type_
+        assert input_paid_media_photo.media == self.media
+
+    def test_to_dict(self, input_paid_media_photo):
+        input_paid_media_photo_dict = input_paid_media_photo.to_dict()
+        assert input_paid_media_photo_dict["type"] == input_paid_media_photo.type
+        assert input_paid_media_photo_dict["media"] == input_paid_media_photo.media
+
+    def test_with_photo(self, photo):  # noqa: F811
+        # fixture found in test_photo
+        input_paid_media_photo = InputPaidMediaPhoto(photo)
+        assert input_paid_media_photo.type == self.type_
+        assert input_paid_media_photo.media == photo.file_id
+
+    def test_with_photo_file(self, photo_file):  # noqa: F811
+        # fixture found in test_photo
+        input_paid_media_photo = InputPaidMediaPhoto(photo_file)
+        assert input_paid_media_photo.type == self.type_
+        assert isinstance(input_paid_media_photo.media, InputFile)
+
+    def test_with_local_files(self):
+        input_paid_media_photo = InputPaidMediaPhoto(data_file("telegram.jpg"))
+        assert input_paid_media_photo.media == data_file("telegram.jpg").as_uri()
+
+
+class TestInputPaidMediaVideoWithoutRequest(TestInputMediaVideoBase):
+    def test_slot_behaviour(self, input_paid_media_video):
+        inst = input_paid_media_video
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_expected_values(self, input_paid_media_video):
+        assert input_paid_media_video.type == self.type_
+        assert input_paid_media_video.media == self.media
+        assert input_paid_media_video.width == self.width
+        assert input_paid_media_video.height == self.height
+        assert input_paid_media_video.duration == self.duration
+        assert input_paid_media_video.supports_streaming == self.supports_streaming
+        assert isinstance(input_paid_media_video.thumbnail, InputFile)
+
+    def test_to_dict(self, input_paid_media_video):
+        input_paid_media_video_dict = input_paid_media_video.to_dict()
+        assert input_paid_media_video_dict["type"] == input_paid_media_video.type
+        assert input_paid_media_video_dict["media"] == input_paid_media_video.media
+        assert input_paid_media_video_dict["width"] == input_paid_media_video.width
+        assert input_paid_media_video_dict["height"] == input_paid_media_video.height
+        assert input_paid_media_video_dict["duration"] == input_paid_media_video.duration
+        assert (
+            input_paid_media_video_dict["supports_streaming"]
+            == input_paid_media_video.supports_streaming
+        )
+        assert input_paid_media_video_dict["thumbnail"] == input_paid_media_video.thumbnail
+
+    def test_with_video(self, video):  # noqa: F811
+        # fixture found in test_video
+        input_paid_media_video = InputPaidMediaVideo(video)
+        assert input_paid_media_video.type == self.type_
+        assert input_paid_media_video.media == video.file_id
+        assert input_paid_media_video.width == video.width
+        assert input_paid_media_video.height == video.height
+        assert input_paid_media_video.duration == video.duration
+
+    def test_with_video_file(self, video_file):  # noqa: F811
+        # fixture found in test_video
+        input_paid_media_video = InputPaidMediaVideo(video_file)
+        assert input_paid_media_video.type == self.type_
+        assert isinstance(input_paid_media_video.media, InputFile)
+
+    def test_with_local_files(self):
+        input_paid_media_video = InputPaidMediaVideo(
+            data_file("telegram.mp4"), thumbnail=data_file("telegram.jpg")
+        )
+        assert input_paid_media_video.media == data_file("telegram.mp4").as_uri()
+        assert input_paid_media_video.thumbnail == data_file("telegram.jpg").as_uri()
 
 
 @pytest.fixture(scope="module")
@@ -1044,3 +1150,20 @@ class TestSendMediaGroupWithRequest:
         assert message.caption_entities == ()
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode
+
+    async def test_send_paid_media(self, bot, channel_id, photo_file, video_file):  # noqa: F811
+        msg = await bot.send_paid_media(
+            chat_id=channel_id,
+            star_count=20,
+            media=[
+                InputPaidMediaPhoto(media=photo_file),
+                InputPaidMediaVideo(media=video_file),
+            ],
+            caption="bye onlyfans",
+            show_caption_above_media=True,
+        )
+
+        assert isinstance(msg, Message)
+        assert msg.caption == "bye onlyfans"
+        assert msg.show_caption_above_media
+        assert msg.paid_media.star_count == 20

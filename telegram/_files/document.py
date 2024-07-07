@@ -39,10 +39,11 @@ class Document(_BaseThumbedMedium):
             or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
-        file_name (:obj:`str`, optional): Original filename as defined by sender.
-        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_name (:obj:`str`, optional): Original filename as defined by the sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
-        thumbnail (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by the
+            sender.
 
             .. versionadded:: 20.2
 
@@ -51,10 +52,11 @@ class Document(_BaseThumbedMedium):
             or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
-        file_name (:obj:`str`): Optional. Original filename as defined by sender.
-        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        file_name (:obj:`str`): Optional. Original filename as defined by the sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.
-        thumbnail (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by the
+            sender.
 
             .. versionadded:: 20.2
 

@@ -33,6 +33,7 @@ from telegram import (
     TransactionPartner,
     TransactionPartnerFragment,
     TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
     TransactionPartnerUser,
     User,
 )
@@ -101,6 +102,7 @@ def star_transactions():
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.USER,
+        TransactionPartner.TELEGRAM_ADS,
     ],
 )
 def tp_scope_type(request):
@@ -113,11 +115,13 @@ def tp_scope_type(request):
         TransactionPartnerFragment,
         TransactionPartnerOther,
         TransactionPartnerUser,
+        TransactionPartnerTelegramAds,
     ],
     ids=[
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.USER,
+        TransactionPartner.TELEGRAM_ADS,
     ],
 )
 def tp_scope_class(request):
@@ -130,11 +134,13 @@ def tp_scope_class(request):
         (TransactionPartnerFragment, TransactionPartner.FRAGMENT),
         (TransactionPartnerOther, TransactionPartner.OTHER),
         (TransactionPartnerUser, TransactionPartner.USER),
+        (TransactionPartnerTelegramAds, TransactionPartner.TELEGRAM_ADS),
     ],
     ids=[
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.USER,
+        TransactionPartner.TELEGRAM_ADS,
     ],
 )
 def tp_scope_class_and_type(request):
@@ -147,6 +153,7 @@ def transaction_partner(tp_scope_class_and_type):
     return tp_scope_class_and_type[0].de_json(
         {
             "type": tp_scope_class_and_type[1],
+            "invoice_payload": TestTransactionPartnerBase.invoice_payload,
             "withdrawal_state": TestTransactionPartnerBase.withdrawal_state.to_dict(),
             "user": TestTransactionPartnerBase.user.to_dict(),
         },
@@ -244,6 +251,7 @@ class TestStarTransactionWithoutRequest(TestStarTransactionBase):
         }
         st = StarTransaction.de_json(json_dict, bot)
         st_none = StarTransaction.de_json(None, bot)
+        assert st.api_kwargs == {}
         assert st.id == self.id
         assert st.amount == self.amount
         assert st.date == from_timestamp(self.date)
@@ -329,6 +337,7 @@ class TestStarTransactionsWithoutRequest(TestStarTransactionsBase):
         }
         st = StarTransactions.de_json(json_dict, bot)
         st_none = StarTransactions.de_json(None, bot)
+        assert st.api_kwargs == {}
         assert st.transactions == tuple(self.transactions)
         assert st_none is None
 
@@ -359,6 +368,7 @@ class TestStarTransactionsWithoutRequest(TestStarTransactionsBase):
 class TestTransactionPartnerBase:
     withdrawal_state = withdrawal_state_succeeded()
     user = transaction_partner_user().user
+    invoice_payload = "payload"
 
 
 class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
@@ -374,11 +384,14 @@ class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
 
         json_dict = {
             "type": type_,
+            "invoice_payload": self.invoice_payload,
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
         }
         tp = TransactionPartner.de_json(json_dict, bot)
-        assert set(tp.api_kwargs.keys()) == {"user", "withdrawal_state"} - set(cls.__slots__)
+        assert set(tp.api_kwargs.keys()) == {"user", "withdrawal_state", "invoice_payload"} - set(
+            cls.__slots__
+        )
 
         assert isinstance(tp, TransactionPartner)
         assert type(tp) is cls
@@ -387,6 +400,7 @@ class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
             assert tp.withdrawal_state == self.withdrawal_state
         if "user" in cls.__slots__:
             assert tp.user == self.user
+            assert tp.invoice_payload == self.invoice_payload
 
         assert cls.de_json(None, bot) is None
         assert TransactionPartner.de_json({}, bot) is None
@@ -394,6 +408,7 @@ class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
     def test_de_json_invalid_type(self, bot):
         json_dict = {
             "type": "invalid",
+            "invoice_payload": self.invoice_payload,
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
         }
@@ -401,6 +416,7 @@ class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
         assert tp.api_kwargs == {
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
+            "invoice_payload": self.invoice_payload,
         }
 
         assert type(tp) is TransactionPartner
@@ -411,6 +427,7 @@ class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
         TransactionPartnerFragment instance."""
         json_dict = {
             "type": "invalid",
+            "invoice_payload": self.invoice_payload,
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
         }
@@ -423,6 +440,7 @@ class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
         assert tp_dict["type"] == transaction_partner.type
         if hasattr(transaction_partner, "user"):
             assert tp_dict["user"] == transaction_partner.user.to_dict()
+            assert tp_dict["invoice_payload"] == transaction_partner.invoice_payload
         if hasattr(transaction_partner, "withdrawal_state"):
             assert tp_dict["withdrawal_state"] == transaction_partner.withdrawal_state.to_dict()
 

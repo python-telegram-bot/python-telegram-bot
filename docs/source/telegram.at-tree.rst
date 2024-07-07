@@ -88,6 +88,9 @@ Available Types
     telegram.inputmediadocument
     telegram.inputmediaphoto
     telegram.inputmediavideo
+    telegram.inputpaidmedia
+    telegram.inputpaidmediaphoto
+    telegram.inputpaidmediavideo
     telegram.inputpolloption
     telegram.inputsticker
     telegram.keyboardbutton
@@ -113,6 +116,11 @@ Available Types
     telegram.messageoriginuser
     telegram.messagereactioncountupdated
     telegram.messagereactionupdated
+    telegram.paidmedia
+    telegram.paidmediainfo
+    telegram.paidmediaphoto
+    telegram.paidmediapreview
+    telegram.paidmediavideo
     telegram.photosize
     telegram.poll
     telegram.pollanswer
@@ -125,22 +133,12 @@ Available Types
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.replyparameters
-    telegram.revenuewithdrawalstate
-    telegram.revenuewithdrawalstatefailed
-    telegram.revenuewithdrawalstatepending
-    telegram.revenuewithdrawalstatesucceeded
     telegram.sentwebappmessage
     telegram.shareduser
-    telegram.startransaction
-    telegram.startransactions
     telegram.story
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.textquote
-    telegram.transactionpartner
-    telegram.transactionpartnerfragment
-    telegram.transactionpartnerother
-    telegram.transactionpartneruser
     telegram.update
     telegram.user
     telegram.userchatboosts

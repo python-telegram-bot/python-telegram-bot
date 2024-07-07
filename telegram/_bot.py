@@ -70,7 +70,7 @@ from telegram._files.chatphoto import ChatPhoto
 from telegram._files.contact import Contact
 from telegram._files.document import Document
 from telegram._files.file import File
-from telegram._files.inputmedia import InputMedia
+from telegram._files.inputmedia import InputMedia, InputPaidMedia
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import MaskPosition, Sticker, StickerSet
@@ -84,11 +84,11 @@ from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
+from telegram._payment.stars import StarTransactions
 from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
-from telegram._stars import StarTransactions
 from telegram._telegramobject import TelegramObject
 from telegram._update import Update
 from telegram._user import User
@@ -578,13 +578,16 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 with new._unfrozen():
                     new.parse_mode = DefaultValue.get_value(new.parse_mode)
                 data[key] = new
-            elif key == "media" and isinstance(val, Sequence):
+            elif (
+                key == "media"
+                and isinstance(val, Sequence)
+                and not isinstance(val[0], InputPaidMedia)
+            ):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy.copy(media) for media in val]
                 for media in copy_list:
                     with media._unfrozen():
                         media.parse_mode = DefaultValue.get_value(media.parse_mode)
-
                 data[key] = copy_list
             # 2)
             else:
@@ -7654,7 +7657,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> MessageId:
-        """Use this method to copy messages of any kind. Service messages and invoice messages
+        """Use this method to copy messages of any kind. Service messages, paid media messages,
+        giveaway messages, giveaway winners messages, and invoice messages
         can't be copied. The method is analogous to the method :meth:`forward_message`, but the
         copied message doesn't have a link to the original message.
 
@@ -7780,11 +7784,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> Tuple["MessageId", ...]:
         """
         Use this method to copy messages of any kind. If some of the specified messages can't be
-        found or copied, they are skipped. Service messages, giveaway messages, giveaway winners
-        messages, and invoice messages can't be copied. A quiz poll can be copied only if the value
-        of the field correct_option_id is known to the bot. The method is analogous to the method
-        :meth:`forward_messages`, but the copied messages don't have a link to the original
-        message. Album grouping is kept for copied messages.
+        found or copied, they are skipped. Service messages, paid media messages, giveaway
+        messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can
+        be copied only if the value
+        of the field :attr:`telegram.Poll.correct_option_id` is known to the bot. The method is
+        analogous to the method :meth:`forward_messages`, but the copied messages don't have a
+        link to the original message. Album grouping is kept for copied messages.
 
         .. versionadded:: 20.8
 
@@ -9163,6 +9168,94 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def send_paid_media(
+        self,
+        chat_id: Union[str, int],
+        star_count: int,
+        media: Sequence["InputPaidMedia"],
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        show_caption_above_media: Optional[bool] = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Message:
+        """Use this method to send paid media to channel chats.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            star_count (:obj:`int`): The number of Telegram Stars that must be paid to buy access
+                to the media.
+            media (Sequence[:class:`telegram.InputPaidMedia`]): A list describing the media to be
+                sent; up to :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
+            caption (:obj:`str`, optional): Caption of the media to be sent,
+                0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "star_count": star_count,
+            "media": media,
+            "show_caption_above_media": show_caption_above_media,
+        }
+
+        return await self._send_message(
+            "sendPaidMedia",
+            data,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            reply_parameters=reply_parameters,
+            reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_to_message_id=reply_to_message_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -9417,3 +9510,5 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`refund_star_payment`"""
     getStarTransactions = get_star_transactions
     """Alias for :meth:`get_star_transactions`"""
+    sendPaidMedia = send_paid_media
+    """Alias for :meth:`send_paid_media`"""

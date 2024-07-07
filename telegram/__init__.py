@@ -142,6 +142,9 @@ __all__ = (
     "InputMediaPhoto",
     "InputMediaVideo",
     "InputMessageContent",
+    "InputPaidMedia",
+    "InputPaidMediaPhoto",
+    "InputPaidMediaVideo",
     "InputPollOption",
     "InputSticker",
     "InputTextMessageContent",
@@ -173,6 +176,11 @@ __all__ = (
     "MessageReactionCountUpdated",
     "MessageReactionUpdated",
     "OrderInfo",
+    "PaidMedia",
+    "PaidMediaInfo",
+    "PaidMediaPhoto",
+    "PaidMediaPreview",
+    "PaidMediaVideo",
     "PassportData",
     "PassportElementError",
     "PassportElementErrorDataField",
@@ -223,6 +231,7 @@ __all__ = (
     "TransactionPartner",
     "TransactionPartnerFragment",
     "TransactionPartnerOther",
+    "TransactionPartnerTelegramAds",
     "TransactionPartnerUser",
     "Update",
     "User",
@@ -333,6 +342,9 @@ from ._files.inputmedia import (
     InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
+    InputPaidMedia,
+    InputPaidMediaPhoto,
+    InputPaidMediaVideo,
 )
 from ._files.inputsticker import InputSticker
 from ._files.location import Location
@@ -405,6 +417,7 @@ from ._messageorigin import (
     MessageOriginUser,
 )
 from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
+from ._paidmedia import PaidMedia, PaidMediaInfo, PaidMediaPhoto, PaidMediaPreview, PaidMediaVideo
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -436,16 +449,7 @@ from ._payment.precheckoutquery import PreCheckoutQuery
 from ._payment.shippingaddress import ShippingAddress
 from ._payment.shippingoption import ShippingOption
 from ._payment.shippingquery import ShippingQuery
-from ._payment.successfulpayment import SuccessfulPayment
-from ._poll import InputPollOption, Poll, PollAnswer, PollOption
-from ._proximityalerttriggered import ProximityAlertTriggered
-from ._reaction import ReactionCount, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
-from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
-from ._replykeyboardmarkup import ReplyKeyboardMarkup
-from ._replykeyboardremove import ReplyKeyboardRemove
-from ._sentwebappmessage import SentWebAppMessage
-from ._shared import ChatShared, SharedUser, UsersShared
-from ._stars import (
+from ._payment.stars import (
     RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
@@ -455,8 +459,18 @@ from ._stars import (
     TransactionPartner,
     TransactionPartnerFragment,
     TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
     TransactionPartnerUser,
 )
+from ._payment.successfulpayment import SuccessfulPayment
+from ._poll import InputPollOption, Poll, PollAnswer, PollOption
+from ._proximityalerttriggered import ProximityAlertTriggered
+from ._reaction import ReactionCount, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
+from ._replykeyboardmarkup import ReplyKeyboardMarkup
+from ._replykeyboardremove import ReplyKeyboardRemove
+from ._sentwebappmessage import SentWebAppMessage
+from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject

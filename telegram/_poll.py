@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 
 class InputPollOption(TelegramObject):
     """
-    This object contains information about one answer option in a poll to send.
+    This object contains information about one answer option in a poll to be sent.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text` is equal.

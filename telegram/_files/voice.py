@@ -35,8 +35,8 @@ class Voice(_BaseMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
-        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
 
     Attributes:
@@ -45,8 +45,8 @@ class Voice(_BaseMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
-        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.
 
     """
