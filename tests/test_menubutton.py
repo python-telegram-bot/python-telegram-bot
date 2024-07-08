@@ -136,6 +136,13 @@ class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
         json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
         assert type(scope_class.de_json(json_dict, bot)) is scope_class
 
+    def test_de_json_empty_data(self, scope_class):
+        if scope_class in (MenuButtonWebApp,):
+            pytest.skip(
+                "This test is not relevant for subclasses that have more attributes than just type"
+            )
+        assert isinstance(scope_class.de_json({}, None), scope_class)
+
     def test_to_dict(self, menu_button):
         menu_button_dict = menu_button.to_dict()
 

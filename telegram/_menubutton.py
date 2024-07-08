@@ -94,7 +94,11 @@ class MenuButton(TelegramObject):
         }
 
         return cls._de_json_subclasses(
-            data=data, bot=bot, class_mapping=class_mapping, base_class=MenuButton
+            data=data,
+            bot=bot,
+            class_mapping=class_mapping,
+            base_class=MenuButton,
+            allow_empty_data=(MenuButtonCommands, MenuButtonDefault),
         )
 
     COMMANDS: Final[str] = constants.MenuButtonType.COMMANDS
