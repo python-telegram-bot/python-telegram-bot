@@ -2199,7 +2199,6 @@ class StatusUpdate:
 
     REFUNDED_PAYMENT = _RefundedPayment("filters.StatusUpdate.REFUNDED_PAYMENT")
     """Messages that contain :attr:`telegram.Message.refunded_payment`.
-    
     .. versionadded:: NEXT.VERSION
     """
 
