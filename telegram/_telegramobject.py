@@ -452,7 +452,8 @@ class TelegramObject:
             base_class: The base class of the hierarchy. E.g. `BotCommandScope`.
             class_mapping: A mapping from the `type` attribute to the corresponding subclass.
             preprocess_data: Optional. A callback that modifies the `data` in place. Useful for
-                de-json-ing nested types.
+                de-json-ing nested types. If the callback returns a non-None value, the object will
+                be directly returned.
             discriminator: Optional. Name of the attribute to base the subclass selection on.
                 Defaults to ``type``.
             allow_empty_data: Optional. If False (default), None will be returned if data is {}.
@@ -473,8 +474,8 @@ class TelegramObject:
             if cls not in allowed_classes:
                 return None
 
-        if preprocess_data:
-            preprocess_data(data)
+        if preprocess_data and (out := preprocess_data(data)) is not None:
+            return out
 
         # Here, discriminator needs to be still part of `data`, that's why we don't directly .pop()
         # in the if-clause above

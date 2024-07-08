@@ -108,12 +108,7 @@ class ChatMember(TelegramObject):
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["ChatMember"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[ChatMember]] = {
+        class_mapping: Dict[str, Type[ChatMember]] = {
             cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
             cls.MEMBER: ChatMemberMember,
@@ -122,23 +117,32 @@ class ChatMember(TelegramObject):
             cls.BANNED: ChatMemberBanned,
         }
 
-        if cls is ChatMember and data.get("status") in _class_mapping:
-            return _class_mapping[data.pop("status")].de_json(data=data, bot=bot)
+        def preprocess_data(data_: JSONDict) -> Optional[ChatMemberRestricted]:
+            data_["user"] = User.de_json(data_.get("user"), bot)
+            if "until_date" in data_:
+                # Get the local timezone from the bot if it has defaults
+                loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["user"] = User.de_json(data.get("user"), bot)
-        if "until_date" in data:
-            # Get the local timezone from the bot if it has defaults
-            loc_tzinfo = extract_tzinfo_from_defaults(bot)
+                data_["until_date"] = from_timestamp(data_["until_date"], tzinfo=loc_tzinfo)
 
-            data["until_date"] = from_timestamp(data["until_date"], tzinfo=loc_tzinfo)
+            # This is a deprecated field that TG still returns for backwards compatibility
+            # Let's filter it out to speed up the de-json process
+            if cls is ChatMemberRestricted and data_.get("can_send_media_messages") is not None:
+                api_kwargs = {"can_send_media_messages": data_.pop("can_send_media_messages")}
+                return super(cls, ChatMemberRestricted)._de_json(
+                    data=data_, bot=bot, api_kwargs=api_kwargs
+                )
 
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if cls is ChatMemberRestricted and data.get("can_send_media_messages") is not None:
-            api_kwargs = {"can_send_media_messages": data.pop("can_send_media_messages")}
-            return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
+            return None
 
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data,
+            bot=bot,
+            class_mapping=class_mapping,
+            preprocess_data=preprocess_data,
+            discriminator="status",
+            base_class=ChatMember,
+        )
 
 
 class ChatMemberOwner(ChatMember):
