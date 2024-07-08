@@ -87,24 +87,15 @@ class PaidMedia(TelegramObject):
             The Telegram object.
 
         """
-        data = cls._parse_data(data)
-
-        if data is None:
-            return None
-
-        if not data and cls is PaidMedia:
-            return None
-
-        _class_mapping: Dict[str, Type[PaidMedia]] = {
+        class_mapping: Dict[str, Type[PaidMedia]] = {
             cls.PREVIEW: PaidMediaPreview,
             cls.PHOTO: PaidMediaPhoto,
             cls.VIDEO: PaidMediaVideo,
         }
 
-        if cls is PaidMedia and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data, bot=bot, class_mapping=class_mapping, base_class=PaidMedia
+        )
 
 
 class PaidMediaPreview(PaidMedia):

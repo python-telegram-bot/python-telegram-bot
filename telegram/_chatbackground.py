@@ -82,21 +82,15 @@ class BackgroundFill(TelegramObject):
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["BackgroundFill"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[BackgroundFill]] = {
+        class_mapping: Dict[str, Type[BackgroundFill]] = {
             cls.SOLID: BackgroundFillSolid,
             cls.GRADIENT: BackgroundFillGradient,
             cls.FREEFORM_GRADIENT: BackgroundFillFreeformGradient,
         }
 
-        if cls is BackgroundFill and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data, bot=bot, class_mapping=class_mapping, base_class=BackgroundFill
+        )
 
 
 class BackgroundFillSolid(BackgroundFill):
@@ -273,28 +267,27 @@ class BackgroundType(TelegramObject):
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["BackgroundType"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[BackgroundType]] = {
+        class_mapping: Dict[str, Type[BackgroundType]] = {
             cls.FILL: BackgroundTypeFill,
             cls.WALLPAPER: BackgroundTypeWallpaper,
             cls.PATTERN: BackgroundTypePattern,
             cls.CHAT_THEME: BackgroundTypeChatTheme,
         }
 
-        if cls is BackgroundType and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
+        def preprocess_data(data_: JSONDict) -> None:
+            if "fill" in data_:
+                data_["fill"] = BackgroundFill.de_json(data_.get("fill"), bot)
 
-        if "fill" in data:
-            data["fill"] = BackgroundFill.de_json(data.get("fill"), bot)
+            if "document" in data_:
+                data_["document"] = Document.de_json(data_.get("document"), bot)
 
-        if "document" in data:
-            data["document"] = Document.de_json(data.get("document"), bot)
-
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data,
+            bot=bot,
+            class_mapping=class_mapping,
+            base_class=BackgroundType,
+            preprocess_data=preprocess_data,
+        )
 
 
 class BackgroundTypeFill(BackgroundType):

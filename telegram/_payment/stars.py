@@ -74,21 +74,15 @@ class RevenueWithdrawalState(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["RevenueWithdrawalState"]:
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[RevenueWithdrawalState]] = {
+        class_mapping: Dict[str, Type[RevenueWithdrawalState]] = {
             cls.PENDING: RevenueWithdrawalStatePending,
             cls.SUCCEEDED: RevenueWithdrawalStateSucceeded,
             cls.FAILED: RevenueWithdrawalStateFailed,
         }
 
-        if cls is RevenueWithdrawalState and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data, bot=bot, class_mapping=class_mapping, base_class=RevenueWithdrawalState
+        )
 
 
 class RevenueWithdrawalStatePending(RevenueWithdrawalState):
@@ -233,25 +227,20 @@ class TransactionPartner(TelegramObject):
             The Telegram object.
 
         """
-        data = cls._parse_data(data)
-
-        if data is None:
-            return None
-
-        if not data and cls is TransactionPartner:
-            return None
-
-        _class_mapping: Dict[str, Type[TransactionPartner]] = {
+        class_mapping: Dict[str, Type[TransactionPartner]] = {
             cls.FRAGMENT: TransactionPartnerFragment,
             cls.USER: TransactionPartnerUser,
             cls.OTHER: TransactionPartnerOther,
             cls.TELEGRAM_ADS: TransactionPartnerTelegramAds,
         }
 
-        if cls is TransactionPartner and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data,
+            bot=bot,
+            class_mapping=class_mapping,
+            base_class=TransactionPartner,
+            allow_empty_data=(TransactionPartnerOther,),
+        )
 
 
 class TransactionPartnerFragment(TransactionPartner):

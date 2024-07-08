@@ -87,23 +87,15 @@ class MenuButton(TelegramObject):
             The Telegram object.
 
         """
-        data = cls._parse_data(data)
-
-        if data is None:
-            return None
-
-        if not data and cls is MenuButton:
-            return None
-
-        _class_mapping: Dict[str, Type[MenuButton]] = {
+        class_mapping: Dict[str, Type[MenuButton]] = {
             cls.COMMANDS: MenuButtonCommands,
             cls.WEB_APP: MenuButtonWebApp,
             cls.DEFAULT: MenuButtonDefault,
         }
 
-        if cls is MenuButton and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data, bot=bot)
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data, bot=bot, class_mapping=class_mapping, base_class=MenuButton
+        )
 
     COMMANDS: Final[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""

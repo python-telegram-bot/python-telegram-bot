@@ -29,7 +29,9 @@ from types import MappingProxyType
 from typing import (
     TYPE_CHECKING,
     Any,
+    Callable,
     ClassVar,
+    Collection,
     Dict,
     Iterator,
     List,
@@ -430,6 +432,55 @@ class TelegramObject:
 
         obj.set_bot(bot=bot)
         return obj
+
+    @classmethod
+    def _de_json_subclasses(
+        cls: Type[Tele_co],
+        data: Optional[JSONDict],
+        bot: Optional["Bot"],
+        base_class: Type[Tele_co],
+        class_mapping: Dict[str, Type[Tele_co]],
+        preprocess_data: Optional[Callable[[JSONDict], Optional[Tele_co]]] = None,
+        discriminator: str = "type",
+        allow_empty_data: Union[bool, Collection[Type[Tele_co]]] = False,
+    ) -> Optional[Tele_co]:
+        """Internal helper for de-json-ing classes that have a discriminator attribute (usually
+        ``type``) and multiple subclasses. Takes care of selecting the correct subclass based on
+        the discriminator attribute.
+
+        Args:
+            base_class: The base class of the hierarchy. E.g. `BotCommandScope`.
+            class_mapping: A mapping from the `type` attribute to the corresponding subclass.
+            preprocess_data: Optional. A callback that modifies the `data` in place. Useful for
+                de-json-ing nested types.
+            discriminator: Optional. Name of the attribute to base the subclass selection on.
+                Defaults to ``type``.
+            allow_empty_data: Optional. If False (default), None will be returned if data is {}.
+                If a subclass has only the discriminator as attribute, passing {} as data should
+                return a valid instance. To support these cases, you can either pass True or a list
+                of classes that should be allowed to be created from empty data.
+        """
+        data = cls._parse_data(data)
+
+        if data is None:
+            return None
+
+        if cls is base_class and data.get(discriminator) in class_mapping:
+            return class_mapping[data.pop(discriminator)].de_json(data=data, bot=bot)
+
+        if not data:
+            allowed_classes = allow_empty_data if isinstance(allow_empty_data, Collection) else ()
+            if cls not in allowed_classes:
+                return None
+
+        if preprocess_data:
+            preprocess_data(data)
+
+        # Here, discriminator needs to be still part of `data`, that's why we don't directly .pop()
+        # in the if-clause above
+        return super(  # type: ignore[misc]  # pylint: disable=bad-super-call
+            base_class, cls
+        ).de_json(data=data, bot=bot)
 
     @classmethod
     def de_json(

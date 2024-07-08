@@ -114,24 +114,24 @@ class ChatBoostSource(TelegramObject):
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["ChatBoostSource"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[ChatBoostSource]] = {
+        class_mapping: Dict[str, Type[ChatBoostSource]] = {
             cls.PREMIUM: ChatBoostSourcePremium,
             cls.GIFT_CODE: ChatBoostSourceGiftCode,
             cls.GIVEAWAY: ChatBoostSourceGiveaway,
         }
 
-        if cls is ChatBoostSource and data.get("source") in _class_mapping:
-            return _class_mapping[data.pop("source")].de_json(data=data, bot=bot)
+        def preprocess_data(data_: JSONDict) -> None:
+            if "user" in data_:
+                data_["user"] = User.de_json(data_.get("user"), bot)
 
-        if "user" in data:
-            data["user"] = User.de_json(data.get("user"), bot)
-
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data,
+            bot=bot,
+            class_mapping=class_mapping,
+            base_class=ChatBoostSource,
+            preprocess_data=preprocess_data,
+            discriminator="source",
+        )
 
 
 class ChatBoostSourcePremium(ChatBoostSource):

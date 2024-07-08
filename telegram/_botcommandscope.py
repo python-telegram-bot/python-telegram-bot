@@ -102,12 +102,7 @@ class BotCommandScope(TelegramObject):
             The Telegram object.
 
         """
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[BotCommandScope]] = {
+        class_mapping: Dict[str, Type[BotCommandScope]] = {
             cls.DEFAULT: BotCommandScopeDefault,
             cls.ALL_PRIVATE_CHATS: BotCommandScopeAllPrivateChats,
             cls.ALL_GROUP_CHATS: BotCommandScopeAllGroupChats,
@@ -117,9 +112,9 @@ class BotCommandScope(TelegramObject):
             cls.CHAT_MEMBER: BotCommandScopeChatMember,
         }
 
-        if cls is BotCommandScope and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data, bot=bot, base_class=BotCommandScope, class_mapping=class_mapping
+        )
 
 
 class BotCommandScopeDefault(BotCommandScope):

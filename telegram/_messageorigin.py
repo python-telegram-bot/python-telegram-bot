@@ -100,33 +100,33 @@ class MessageOrigin(TelegramObject):
         """Converts JSON data to the appropriate :class:`MessageOrigin` object, i.e. takes
         care of selecting the correct subclass.
         """
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[MessageOrigin]] = {
+        class_mapping: Dict[str, Type[MessageOrigin]] = {
             cls.USER: MessageOriginUser,
             cls.HIDDEN_USER: MessageOriginHiddenUser,
             cls.CHAT: MessageOriginChat,
             cls.CHANNEL: MessageOriginChannel,
         }
-        if cls is MessageOrigin and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
+        def preprocess_data(data_: JSONDict) -> None:
+            loc_tzinfo = extract_tzinfo_from_defaults(bot)
+            data_["date"] = from_timestamp(data_.get("date"), tzinfo=loc_tzinfo)
 
-        if "sender_user" in data:
-            data["sender_user"] = User.de_json(data.get("sender_user"), bot)
+            if "sender_user" in data_:
+                data_["sender_user"] = User.de_json(data_.get("sender_user"), bot)
 
-        if "sender_chat" in data:
-            data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
+            if "sender_chat" in data_:
+                data_["sender_chat"] = Chat.de_json(data_.get("sender_chat"), bot)
 
-        if "chat" in data:
-            data["chat"] = Chat.de_json(data.get("chat"), bot)
+            if "chat" in data_:
+                data_["chat"] = Chat.de_json(data_.get("chat"), bot)
 
-        return super().de_json(data=data, bot=bot)
+        return cls._de_json_subclasses(
+            data=data,
+            bot=bot,
+            class_mapping=class_mapping,
+            base_class=MessageOrigin,
+            preprocess_data=preprocess_data,
+        )
 
 
 class MessageOriginUser(MessageOrigin):
