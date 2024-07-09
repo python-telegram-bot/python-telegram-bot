@@ -28,7 +28,7 @@ jobs:
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
       - name: Store the distribution packages
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
@@ -115,7 +115,7 @@ jobs:
             ./dist/*.tar.gz
             ./dist/*.whl
       - name: Store the distribution packages and signatures
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions-and-signatures
           path: dist/
