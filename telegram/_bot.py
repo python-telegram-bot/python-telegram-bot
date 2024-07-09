@@ -3972,7 +3972,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to edit text and game messages.
 
         Note:
-            * |editreplymarkup|.
+            * |editreplymarkup|
             * |bcid_edit_time|
 
         .. seealso:: :attr:`telegram.Game.text`
