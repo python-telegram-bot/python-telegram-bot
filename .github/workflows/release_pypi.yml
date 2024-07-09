@@ -166,7 +166,10 @@ jobs:
       - publish-to-test-pypi
       - compute-signatures
     if: |
-      always()
+      always() && (
+        (needs.publish-to-test-pypi.result == 'success') &&
+        (needs.compute-signatures.result == 'success')
+      )
     runs-on: ubuntu-latest
 
     permissions:
