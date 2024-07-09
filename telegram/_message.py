@@ -1385,8 +1385,8 @@ class Message(MaybeInaccessibleMessage):
         Voice,
         None,
     ]:
-        """If this message is neither a plain text message nor a status update, this gives the
-        attachment that this message was sent with. This may be one of
+        """If the message is a user generated content which is not a plain text message, this
+        property is set to this content. It may be one of
 
         * :class:`telegram.Audio`
         * :class:`telegram.Dice`
@@ -1419,6 +1419,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: NEXT.VERSION
             :attr:`paid_media` is now also considered to be an attachment.
 
+        .. deprecated:: NEXT.VERSION
+            :attr:`successful_payment` will be removed in future major versions.
+
         """
         if not isinstance(self._effective_attachment, DefaultValue):
             return self._effective_attachment
@@ -1426,6 +1429,15 @@ class Message(MaybeInaccessibleMessage):
         for attachment_type in MessageAttachmentType:
             if self[attachment_type]:
                 self._effective_attachment = self[attachment_type]  # type: ignore[assignment]
+                if attachment_type == MessageAttachmentType.SUCCESSFUL_PAYMENT:
+                    warn(
+                        PTBDeprecationWarning(
+                            "NEXT.VERSION",
+                            "successful_payment will no longer be considered an attachment in"
+                            " future major versions",
+                        ),
+                        stacklevel=2,
+                    )
                 break
         else:
             self._effective_attachment = None
