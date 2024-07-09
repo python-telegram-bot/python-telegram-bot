@@ -166,13 +166,19 @@ jobs:
       - publish-to-test-pypi
       - compute-signatures
     if: |
-      always() && (join(needs.*.result, '-') == 'success-success')
+      always()
     runs-on: ubuntu-latest
 
     permissions:
       contents: write  # IMPORTANT: mandatory for making GitHub Releases
 
     steps:
+      - name: Debug prints
+        run: |
+          echo "needs.publish-to-test-pypi.result: ${{ needs.publish-to-test-pypi.result }}"
+          echo "needs.compute-signatures.result: ${{ needs.compute-signatures.result }}"
+          echo "join: ${{ (join(needs.*.result, '-')) }}"
+          echo "join-eq: ${{ (join(needs.*.result, '-') == 'success-success') }}"
       - name: Download all the dists
         uses: actions/download-artifact@v4
         with:
