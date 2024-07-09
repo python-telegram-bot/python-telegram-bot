@@ -30,14 +30,11 @@ if TYPE_CHECKING:
 
 class KeyboardButtonRequestUsers(TelegramObject):
     """This object defines the criteria used to request a suitable user. The identifier of the
-    selected user will be shared with the bot when the corresponding button is pressed.
+    selected user will be shared with the bot when the corresponding button is pressed. `More
+    about requesting users » <https://core.telegram.org/bots/features#chat-and-user-selection>`_.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`request_id` is equal.
-
-    .. seealso::
-        `Telegram Docs on requesting users \
-        <https://core.telegram.org/bots/features#chat-and-user-selection>`_
 
     .. versionadded:: 20.8
         This class was previously named ``KeyboardButtonRequestUser``.
@@ -136,14 +133,11 @@ class KeyboardButtonRequestUsers(TelegramObject):
 
 class KeyboardButtonRequestChat(TelegramObject):
     """This object defines the criteria used to request a suitable chat. The identifier of the
-    selected user will be shared with the bot when the corresponding button is pressed.
+    selected user will be shared with the bot when the corresponding button is pressed. `More
+    about requesting users » <https://core.telegram.org/bots/features#chat-and-user-selection>`_.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`request_id` is equal.
-
-    .. seealso::
-        `Telegram Docs on requesting chats \
-        <https://core.telegram.org/bots/features#chat-and-user-selection>`_
 
     .. versionadded:: 20.1
 
