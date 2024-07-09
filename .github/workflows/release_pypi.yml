@@ -1,10 +1,13 @@
-name: Publish to PyPI
+name: Publish to PyPI and GitHub Releases
 
 on:
-  # Run on any tag
   push:
+    # Run on any new tag
     tags:
       - '**'
+    # run on the initial dev branch for testing only
+    branches:
+      - automate-pypi
   # manually trigger the workflow - for testing only
   workflow_dispatch:
 
