@@ -357,10 +357,8 @@ class Message(MaybeInaccessibleMessage):
         animation (:class:`telegram.Animation`, optional): Message is an animation, information
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
-        game (:class:`telegram.Game`, optional): Message is a game, information about the game.
-
-            .. seealso::
-                `Telegram Docs on games <https://core.telegram.org/bots/api#games>`_
+        game (:class:`telegram.Game`, optional): Message is a game,
+            `information about the game <https://core.telegram.org/bots/api#games>`_.
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -431,15 +429,10 @@ class Message(MaybeInaccessibleMessage):
                 This attribute now is either :class:`telegram.Message` or
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
-            information about the invoice.
-
-            .. seealso::
-                `Telegram Docs on payments <https://core.telegram.org/bots/api#payments>`_
+            `information about the invoice <https://core.telegram.org/bots/api#payments>`_.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
-            message about a successful payment, information about the payment.
-
-            .. seealso::
-                `Telegram Docs on payments <https://core.telegram.org/bots/api#payments>`_
+            message about a successful payment,
+            `information about the payment <https://core.telegram.org/bots/api#payments>`_.
         connected_website (:obj:`str`, optional): The domain name of the website on which the user
             has logged in.
 
@@ -681,10 +674,8 @@ class Message(MaybeInaccessibleMessage):
             field will also be set.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
-
-            .. seealso::
-                `Telegram Docs on games <https://core.telegram.org/bots/api#games>`_
+        game (:class:`telegram.Game`): Optional. Message is a game,
+            `information about the game <https://core.telegram.org/bots/api#games>`_.
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -764,15 +755,10 @@ class Message(MaybeInaccessibleMessage):
                 This attribute now is either :class:`telegram.Message` or
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
-            information about the invoice.
-
-            .. seealso::
-                `Telegram Docs on payments <https://core.telegram.org/bots/api#payments>`_
+            `information about the invoice <https://core.telegram.org/bots/api#payments>`_.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
-            message about a successful payment, information about the payment.
-
-            .. seealso::
-                `Telegram Docs on payments <https://core.telegram.org/bots/api#payments>`_
+            message about a successful payment,
+            `information about the payment <https://core.telegram.org/bots/api#payments>`_.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
 

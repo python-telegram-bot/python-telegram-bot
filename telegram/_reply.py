@@ -90,19 +90,14 @@ class ExternalReplyInfo(TelegramObject):
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value.
-        game (:Class:`telegram.Game`. optional): Message is a game, information about the game.
-
-            .. seealso::
-                `Telegram Docs on games <https://core.telegram.org/bots/api#games>`_
+        game (:Class:`telegram.Game`. optional): Message is a game,
+            `information about the game <https://core.telegram.org/bots/api#games>`_.
         giveaway (:class:`telegram.Giveaway`, optional): Message is a scheduled giveaway,
             information about the giveaway.
         giveaway_winners (:class:`telegram.GiveawayWinners`, optional): A giveaway with public
             winners was completed.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
-            information about the invoice.
-
-            .. seealso::
-                `Telegram Docs on payments <https://core.telegram.org/bots/api#payments>`_
+            `information about the invoice <https://core.telegram.org/bots/api#payments>`_.
         location (:class:`telegram.Location`, optional): Message is a shared location, information
             about the location.
         poll (:class:`telegram.Poll`, optional): Message is a native poll, information about the
@@ -143,19 +138,14 @@ class ExternalReplyInfo(TelegramObject):
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
             about the contact.
         dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.
-        game (:Class:`telegram.Game`): Optional. Message is a game, information about the game.
-
-            .. seealso::
-                `Telegram Docs on games <https://core.telegram.org/bots/api#games>`_
+        game (:Class:`telegram.Game`): Optional. Message is a game,
+            `information about the game <https://core.telegram.org/bots/api#games>`_.
         giveaway (:class:`telegram.Giveaway`): Optional. Message is a scheduled giveaway,
             information about the giveaway.
         giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
             winners was completed.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
-            information about the invoice.
-
-            .. seealso::
-                `Telegram Docs on payments <https://core.telegram.org/bots/api#payments>`_
+            `information about the invoice <https://core.telegram.org/bots/api#payments>`_.
         location (:class:`telegram.Location`): Optional. Message is a shared location, information
             about the location.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll, information about the
