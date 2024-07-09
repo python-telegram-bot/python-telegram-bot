@@ -88,8 +88,8 @@ jobs:
     # https://github.com/actions/runner/issues/491#issuecomment-850884422
     if: |
       always() && (
-        (needs.publish-to-pypi.outcome == 'success') ||
-        (needs.publish-to-test-pypi.outcome == 'success')
+        (needs.publish-to-pypi.result == 'success') ||
+        (needs.publish-to-test-pypi.result == 'success')
       )
 
     permissions:
