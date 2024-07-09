@@ -53,6 +53,7 @@ from telegram import (
     Poll,
     PollOption,
     ProximityAlertTriggered,
+    RefundedPayment,
     ReplyParameters,
     SharedUser,
     Sticker,
@@ -278,6 +279,7 @@ def message(bot):
         {"effect_id": "123456789"},
         {"show_caption_above_media": True},
         {"paid_media": PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])},
+        {"refunded_payment": RefundedPayment("EUR", 243, "payload", "charge_id", "provider_id")},
     ],
     ids=[
         "reply",
@@ -350,6 +352,7 @@ def message(bot):
         "effect_id",
         "show_caption_above_media",
         "paid_media",
+        "refunded_payment",
     ],
 )
 def message_params(bot, request):

@@ -151,7 +151,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=6)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=7)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1920,6 +1920,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     PROXIMITY_ALERT_TRIGGERED = "proximity_alert_triggered"
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
+    REFUNDED_PAYMENT = "refunded_payment"
+    """:obj:`str`: Messages with :attr:`telegram.Message.refunded_payment`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     REPLY_TO_STORY = "reply_to_story"
     """:obj:`str`: Messages with :attr:`telegram.Message.reply_to_story`.
 

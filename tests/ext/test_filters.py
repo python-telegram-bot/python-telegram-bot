@@ -1100,6 +1100,11 @@ class TestFilters:
         assert filters.StatusUpdate.CHAT_BACKGROUND_SET.check_update(update)
         update.message.chat_background_set = None
 
+        update.message.refunded_payment = "refunded_payment"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.REFUNDED_PAYMENT.check_update(update)
+        update.message.refunded_payment = None
+
     def test_filters_forwarded(self, update, message_origin_user):
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = MessageOriginHiddenUser(datetime.datetime.utcnow(), 1)
