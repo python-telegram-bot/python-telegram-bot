@@ -141,7 +141,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = pattern
         self.game_pattern: Optional[
-            Union[str, Pattern[str], Callable[[object], Optional[bool]]]
+            Union[str, Pattern[str]]
         ] = game_pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
