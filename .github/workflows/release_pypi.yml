@@ -125,6 +125,9 @@ jobs:
     needs:
       - publish-to-pypi
       - compute-signatures
+    if: |
+      always() && (join(needs.*.result, '-') == 'success-success')
+
     runs-on: ubuntu-latest
 
     permissions:
@@ -162,6 +165,8 @@ jobs:
     needs:
       - publish-to-test-pypi
       - compute-signatures
+    if: |
+      always() && (join(needs.*.result, '-') == 'success-success')
     runs-on: ubuntu-latest
 
     permissions:
