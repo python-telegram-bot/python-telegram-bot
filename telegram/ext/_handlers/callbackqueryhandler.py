@@ -121,9 +121,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         pattern: Optional[
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = None,
-        game_pattern: Optional[
-            Union[str, Pattern[str]]
-        ] = None,
+        game_pattern: Optional[Union[str, Pattern[str]]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
@@ -140,9 +138,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         self.pattern: Optional[
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = pattern
-        self.game_pattern: Optional[
-            Union[str, Pattern[str]]
-        ] = game_pattern
+        self.game_pattern: Optional[Union[str, Pattern[str]]] = game_pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
