@@ -264,7 +264,7 @@ class KeyboardButtonRequestChat(TelegramObject):
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: "Bot"
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["KeyboardButtonRequestChat"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)

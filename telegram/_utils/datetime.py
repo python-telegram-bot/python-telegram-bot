@@ -188,13 +188,16 @@ def from_timestamp(
     return dtm.datetime.fromtimestamp(unixtime, tz=UTC if tzinfo is None else tzinfo)
 
 
-def extract_tzinfo_from_defaults(bot: "Bot") -> Union[dtm.tzinfo, None]:
+def extract_tzinfo_from_defaults(bot: Optional["Bot"]) -> Union[dtm.tzinfo, None]:
     """
     Extracts the timezone info from the default values of the bot.
     If the bot has no default values, :obj:`None` is returned.
     """
     # We don't use `ininstance(bot, ExtBot)` here so that this works
     # without the job-queue extra dependencies as well
+    if bot is None:
+        return None
+
     if hasattr(bot, "defaults") and bot.defaults:
         return bot.defaults.tzinfo
     return None

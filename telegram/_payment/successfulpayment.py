@@ -44,7 +44,7 @@ class SuccessfulPayment(TelegramObject):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        invoice_payload (:obj:`str`): Bot-specified invoice payload.
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
@@ -60,7 +60,7 @@ class SuccessfulPayment(TelegramObject):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        invoice_payload (:obj:`str`): Bot-specified invoice payload.
         shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
@@ -105,7 +105,9 @@ class SuccessfulPayment(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SuccessfulPayment"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["SuccessfulPayment"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

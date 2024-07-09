@@ -46,11 +46,14 @@ from telegram import (
     MessageAutoDeleteTimerChanged,
     MessageEntity,
     MessageOriginChat,
+    PaidMediaInfo,
+    PaidMediaPreview,
     PassportData,
     PhotoSize,
     Poll,
     PollOption,
     ProximityAlertTriggered,
+    RefundedPayment,
     ReplyParameters,
     SharedUser,
     Sticker,
@@ -275,6 +278,8 @@ def message(bot):
         {"chat_background_set": ChatBackground(type=BackgroundTypeChatTheme("ice"))},
         {"effect_id": "123456789"},
         {"show_caption_above_media": True},
+        {"paid_media": PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])},
+        {"refunded_payment": RefundedPayment("EUR", 243, "payload", "charge_id", "provider_id")},
     ],
     ids=[
         "reply",
@@ -346,6 +351,8 @@ def message(bot):
         "chat_background_set",
         "effect_id",
         "show_caption_above_media",
+        "paid_media",
+        "refunded_payment",
     ],
 )
 def message_params(bot, request):
@@ -1221,6 +1228,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "game",
             "invoice",
             "location",
+            "paid_media",
             "passport_data",
             "photo",
             "poll",
@@ -2347,7 +2355,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.edit_text,
             Bot.edit_message_text,
-            ["chat_id", "message_id", "inline_message_id"],
+            ["chat_id", "message_id", "inline_message_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -2355,7 +2363,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "edit_message_text",
             skip_params=["inline_message_id"],
-            shortcut_kwargs=["message_id", "chat_id"],
+            shortcut_kwargs=["message_id", "chat_id", "business_connection_id"],
         )
         assert await check_defaults_handling(message.edit_text, message.get_bot())
 
@@ -2372,7 +2380,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.edit_caption,
             Bot.edit_message_caption,
-            ["chat_id", "message_id", "inline_message_id"],
+            ["chat_id", "message_id", "inline_message_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -2380,7 +2388,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "edit_message_caption",
             skip_params=["inline_message_id"],
-            shortcut_kwargs=["message_id", "chat_id"],
+            shortcut_kwargs=["message_id", "chat_id", "business_connection_id"],
         )
         assert await check_defaults_handling(message.edit_caption, message.get_bot())
 
@@ -2397,7 +2405,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.edit_media,
             Bot.edit_message_media,
-            ["chat_id", "message_id", "inline_message_id"],
+            ["chat_id", "message_id", "inline_message_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -2405,7 +2413,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "edit_message_media",
             skip_params=["inline_message_id"],
-            shortcut_kwargs=["message_id", "chat_id"],
+            shortcut_kwargs=["message_id", "chat_id", "business_connection_id"],
         )
         assert await check_defaults_handling(message.edit_media, message.get_bot())
 
@@ -2422,7 +2430,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.edit_reply_markup,
             Bot.edit_message_reply_markup,
-            ["chat_id", "message_id", "inline_message_id"],
+            ["chat_id", "message_id", "inline_message_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -2430,7 +2438,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "edit_message_reply_markup",
             skip_params=["inline_message_id"],
-            shortcut_kwargs=["message_id", "chat_id"],
+            shortcut_kwargs=["message_id", "chat_id", "business_connection_id"],
         )
         assert await check_defaults_handling(message.edit_reply_markup, message.get_bot())
 
@@ -2449,7 +2457,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.edit_live_location,
             Bot.edit_message_live_location,
-            ["chat_id", "message_id", "inline_message_id"],
+            ["chat_id", "message_id", "inline_message_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -2457,7 +2465,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "edit_message_live_location",
             skip_params=["inline_message_id"],
-            shortcut_kwargs=["message_id", "chat_id"],
+            shortcut_kwargs=["message_id", "chat_id", "business_connection_id"],
         )
         assert await check_defaults_handling(message.edit_live_location, message.get_bot())
 
@@ -2473,7 +2481,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.stop_live_location,
             Bot.stop_message_live_location,
-            ["chat_id", "message_id", "inline_message_id"],
+            ["chat_id", "message_id", "inline_message_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -2481,7 +2489,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "stop_message_live_location",
             skip_params=["inline_message_id"],
-            shortcut_kwargs=["message_id", "chat_id"],
+            shortcut_kwargs=["message_id", "chat_id", "business_connection_id"],
         )
         assert await check_defaults_handling(message.stop_live_location, message.get_bot())
 
@@ -2561,9 +2569,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             return chat_id and message_id
 
         assert check_shortcut_signature(
-            Message.stop_poll, Bot.stop_poll, ["chat_id", "message_id"], []
+            Message.stop_poll,
+            Bot.stop_poll,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
         )
-        assert await check_shortcut_call(message.stop_poll, message.get_bot(), "stop_poll")
+        assert await check_shortcut_call(
+            message.stop_poll,
+            message.get_bot(),
+            "stop_poll",
+            shortcut_kwargs=["business_connection_id"],
+        )
         assert await check_defaults_handling(message.stop_poll, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "stop_poll", make_assertion)
@@ -2624,7 +2640,9 @@ class TestMessageWithoutRequest(TestMessageBase):
     async def test_default_do_quote(
         self, bot, message, default_quote, chat_type, expected, monkeypatch
     ):
-        message.set_bot(PytestExtBot(token=bot.token, defaults=Defaults(do_quote=default_quote)))
+        original_bot = message.get_bot()
+        temp_bot = PytestExtBot(token=bot.token, defaults=Defaults(do_quote=default_quote))
+        message.set_bot(temp_bot)
 
         async def make_assertion(*_, **kwargs):
             reply_parameters = kwargs.get("reply_parameters") or ReplyParameters(message_id=False)
@@ -2637,7 +2655,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.chat.type = chat_type
             assert await message.reply_text("test")
         finally:
-            message.get_bot()._defaults = None
+            message.set_bot(original_bot)
 
     async def test_edit_forum_topic(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):

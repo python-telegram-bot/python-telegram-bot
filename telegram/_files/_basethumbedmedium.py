@@ -44,7 +44,7 @@ class _BaseThumbedMedium(_BaseMedium):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): File size.
-        thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by the sender.
 
             .. versionadded:: 20.2
 
@@ -54,7 +54,7 @@ class _BaseThumbedMedium(_BaseMedium):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): Optional. File size.
-        thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by the sender.
 
             .. versionadded:: 20.2
 
@@ -82,7 +82,7 @@ class _BaseThumbedMedium(_BaseMedium):
 
     @classmethod
     def de_json(
-        cls: Type[ThumbedMT_co], data: Optional[JSONDict], bot: "Bot"
+        cls: Type[ThumbedMT_co], data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional[ThumbedMT_co]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)

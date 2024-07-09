@@ -16,6 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import random
+from typing import List, Tuple
+
 import pytest
 
 from telegram import MessageEntity, User
@@ -80,6 +83,25 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
         assert entity.type == "foo"
         entity = MessageEntity(type="url", offset=0, length=1)
         assert entity.type is MessageEntityType.URL
+
+    def test_fix_utf16(self):
+        text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
+        inputs_outputs: List[Tuple[Tuple[int, int, str], Tuple[int, int]]] = [
+            ((2, 4, MessageEntity.BOLD), (3, 4)),
+            ((9, 6, MessageEntity.ITALIC), (11, 6)),
+            ((28, 3, MessageEntity.UNDERLINE), (30, 6)),
+        ]
+        random.shuffle(inputs_outputs)
+        unicode_entities = [
+            MessageEntity(offset=_input[0], length=_input[1], type=_input[2])
+            for _input, _ in inputs_outputs
+        ]
+        utf_16_entities = MessageEntity.adjust_message_entities_to_utf_16(text, unicode_entities)
+        for out_entity, input_output in zip(utf_16_entities, inputs_outputs):
+            _, output = input_output
+            offset, length = output
+            assert out_entity.offset == offset
+            assert out_entity.length == length
 
     def test_equality(self):
         a = MessageEntity(MessageEntity.BOLD, 2, 3)

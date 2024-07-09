@@ -142,6 +142,9 @@ __all__ = (
     "InputMediaPhoto",
     "InputMediaVideo",
     "InputMessageContent",
+    "InputPaidMedia",
+    "InputPaidMediaPhoto",
+    "InputPaidMediaVideo",
     "InputPollOption",
     "InputSticker",
     "InputTextMessageContent",
@@ -173,6 +176,11 @@ __all__ = (
     "MessageReactionCountUpdated",
     "MessageReactionUpdated",
     "OrderInfo",
+    "PaidMedia",
+    "PaidMediaInfo",
+    "PaidMediaPhoto",
+    "PaidMediaPreview",
+    "PaidMediaVideo",
     "PassportData",
     "PassportElementError",
     "PassportElementErrorDataField",
@@ -196,10 +204,15 @@ __all__ = (
     "ReactionType",
     "ReactionTypeCustomEmoji",
     "ReactionTypeEmoji",
+    "RefundedPayment",
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
     "ReplyParameters",
     "ResidentialAddress",
+    "RevenueWithdrawalState",
+    "RevenueWithdrawalStateFailed",
+    "RevenueWithdrawalStatePending",
+    "RevenueWithdrawalStateSucceeded",
     "SecureData",
     "SecureValue",
     "SentWebAppMessage",
@@ -207,6 +220,8 @@ __all__ = (
     "ShippingAddress",
     "ShippingOption",
     "ShippingQuery",
+    "StarTransaction",
+    "StarTransactions",
     "Sticker",
     "StickerSet",
     "Story",
@@ -214,6 +229,11 @@ __all__ = (
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
     "TextQuote",
+    "TransactionPartner",
+    "TransactionPartnerFragment",
+    "TransactionPartnerOther",
+    "TransactionPartnerTelegramAds",
+    "TransactionPartnerUser",
     "Update",
     "User",
     "UserChatBoosts",
@@ -323,6 +343,9 @@ from ._files.inputmedia import (
     InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
+    InputPaidMedia,
+    InputPaidMediaPhoto,
+    InputPaidMediaVideo,
 )
 from ._files.inputsticker import InputSticker
 from ._files.location import Location
@@ -395,6 +418,7 @@ from ._messageorigin import (
     MessageOriginUser,
 )
 from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
+from ._paidmedia import PaidMedia, PaidMediaInfo, PaidMediaPhoto, PaidMediaPreview, PaidMediaVideo
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -423,9 +447,23 @@ from ._payment.invoice import Invoice
 from ._payment.labeledprice import LabeledPrice
 from ._payment.orderinfo import OrderInfo
 from ._payment.precheckoutquery import PreCheckoutQuery
+from ._payment.refundedpayment import RefundedPayment
 from ._payment.shippingaddress import ShippingAddress
 from ._payment.shippingoption import ShippingOption
 from ._payment.shippingquery import ShippingQuery
+from ._payment.stars import (
+    RevenueWithdrawalState,
+    RevenueWithdrawalStateFailed,
+    RevenueWithdrawalStatePending,
+    RevenueWithdrawalStateSucceeded,
+    StarTransaction,
+    StarTransactions,
+    TransactionPartner,
+    TransactionPartnerFragment,
+    TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
+    TransactionPartnerUser,
+)
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import InputPollOption, Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered

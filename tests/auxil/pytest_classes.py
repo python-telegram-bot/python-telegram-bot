@@ -21,7 +21,7 @@ modify behavior of the respective parent classes in order to make them easier to
 pytest framework. A common change is to allow monkeypatching of the class members by not
 enforcing slots in the subclasses."""
 from telegram import Bot, Message, User
-from telegram.ext import Application, ExtBot
+from telegram.ext import Application, ExtBot, Updater
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
@@ -86,6 +86,10 @@ class PytestApplication(Application):
 
 
 class PytestMessage(Message):
+    pass
+
+
+class PytestUpdater(Updater):
     pass
 
 

@@ -216,6 +216,8 @@ class TestConstantsWithoutRequest:
             name = to_snake_case(match.group(1))
             if name == "photo_size":
                 name = "photo"
+            if name == "paid_media_info":
+                name = "paid_media"
             try:
                 constants.MessageAttachmentType(name)
             except ValueError:

@@ -193,7 +193,9 @@ class EncryptedPassportElement(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["EncryptedPassportElement"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["EncryptedPassportElement"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -210,14 +212,21 @@ class EncryptedPassportElement(TelegramObject):
 
     @classmethod
     def de_json_decrypted(
-        cls, data: Optional[JSONDict], bot: "Bot", credentials: "Credentials"
+        cls, data: Optional[JSONDict], bot: Optional["Bot"], credentials: "Credentials"
     ) -> Optional["EncryptedPassportElement"]:
         """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
         passport credentials.
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
+            bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
+                May be :obj:`None`, in which case shortcut methods will not be available.
+
+                .. versionchanged:: NEXT.VERSION
+                   :paramref:`bot` is now optional and defaults to :obj:`None`
+
+                .. deprecated:: NEXT.VERSION
+                   This argument will be converted to an optional argument in future versions.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
         Returns:

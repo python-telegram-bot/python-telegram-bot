@@ -18,12 +18,12 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.12
           cache: 'pip'
           cache-dependency-path: '**/requirements*.txt'
       - name: Install Pyright
         run: |
-          python -W ignore -m pip install pyright~=1.1.316
+          python -W ignore -m pip install pyright~=1.1.367
       - name: Get PR Completeness
         # Must run before base completeness, as base completeness will checkout the base branch
         # And we can't go back to the PR branch after that in case the PR is coming from a fork

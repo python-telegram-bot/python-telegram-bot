@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
-from typing import Optional, Sequence, Tuple, Union
+from typing import Final, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._files.animation import Animation
@@ -115,13 +115,162 @@ class InputMedia(TelegramObject):
         )
 
 
+class InputPaidMedia(TelegramObject):
+    """
+    Base class for Telegram InputPaidMedia Objects. Currently, it can be one of:
+
+    * :class:`telegram.InputMediaPhoto`
+    * :class:`telegram.InputMediaVideo`
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        type (:obj:`str`): Type of media that the instance represents.
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            :class:`telegram.PhotoSize` | :class:`telegram.Video`): File to send. |fileinputnopath|
+            Lastly you can pass an existing telegram media object of the corresponding type
+            to send.
+
+    Attributes:
+        type (:obj:`str`): Type of the input media.
+        media (:obj:`str` | :class:`telegram.InputFile`): Media to send.
+    """
+
+    PHOTO: Final[str] = constants.InputPaidMediaType.PHOTO
+    """:const:`telegram.constants.InputPaidMediaType.PHOTO`"""
+    VIDEO: Final[str] = constants.InputPaidMediaType.VIDEO
+    """:const:`telegram.constants.InputPaidMediaType.VIDEO`"""
+
+    __slots__ = ("media", "type")
+
+    def __init__(
+        self,
+        type: str,  # pylint: disable=redefined-builtin
+        media: Union[str, InputFile, PhotoSize, Video],
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.type: str = enum.get_member(constants.InputPaidMediaType, type, type)
+        self.media: Union[str, InputFile, PhotoSize, Video] = media
+
+        self._freeze()
+
+
+class InputPaidMediaPhoto(InputPaidMedia):
+    """The paid media to send is a photo.
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            :class:`telegram.PhotoSize`): File to send. |fileinputnopath|
+            Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
+
+    Attributes:
+        type (:obj:`str`): Type of the media, always
+            :tg-const:`telegram.constants.InputPaidMediaType.PHOTO`.
+        media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        media: Union[FileInput, PhotoSize],
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        media = parse_file_input(media, PhotoSize, attach=True, local_mode=True)
+        super().__init__(type=InputPaidMedia.PHOTO, media=media, api_kwargs=api_kwargs)
+        self._freeze()
+
+
+class InputPaidMediaVideo(InputPaidMedia):
+    """
+    The paid media to send is a video.
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
+
+    Note:
+        *  When using a :class:`telegram.Video` for the :attr:`media` attribute, it will take the
+           width, height and duration from that video, unless otherwise specified with the optional
+           arguments.
+        *  :paramref:`thumbnail` will be ignored for small video files, for which Telegram can
+           easily generate thumbnails. However, this behaviour is undocumented and might be
+           changed by Telegram.
+
+    Args:
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            :class:`telegram.Video`): File to send. |fileinputnopath|
+            Lastly you can pass an existing :class:`telegram.Video` object to send.
+        thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): |thumbdocstringnopath|
+        width (:obj:`int`, optional): Video width.
+        height (:obj:`int`, optional): Video height.
+        duration (:obj:`int`, optional): Video duration in seconds.
+        supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
+            suitable for streaming.
+
+    Attributes:
+        type (:obj:`str`): Type of the media, always
+            :tg-const:`telegram.constants.InputPaidMediaType.VIDEO`.
+        media (:obj:`str` | :class:`telegram.InputFile`): Video to send.
+        thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
+        width (:obj:`int`): Optional. Video width.
+        height (:obj:`int`): Optional. Video height.
+        duration (:obj:`int`): Optional. Video duration in seconds.
+        supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
+            suitable for streaming.
+    """
+
+    __slots__ = ("duration", "height", "supports_streaming", "thumbnail", "width")
+
+    def __init__(
+        self,
+        media: Union[FileInput, Video],
+        thumbnail: Optional[FileInput] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        duration: Optional[int] = None,
+        supports_streaming: Optional[bool] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        if isinstance(media, Video):
+            width = width if width is not None else media.width
+            height = height if height is not None else media.height
+            duration = duration if duration is not None else media.duration
+            media = media.file_id
+        else:
+            # We use local_mode=True because we don't have access to the actual setting and want
+            # things to work in local mode.
+            media = parse_file_input(media, attach=True, local_mode=True)
+
+        super().__init__(type=InputPaidMedia.VIDEO, media=media, api_kwargs=api_kwargs)
+        with self._unfrozen():
+            self.thumbnail: Optional[Union[str, InputFile]] = InputMedia._parse_thumbnail_input(
+                thumbnail
+            )
+            self.width: Optional[int] = width
+            self.height: Optional[int] = height
+            self.duration: Optional[int] = duration
+            self.supports_streaming: Optional[bool] = supports_streaming
+
+
 class InputMediaAnimation(InputMedia):
     """Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 
     Note:
         When using a :class:`telegram.Animation` for the :attr:`media` attribute, it will take the
-        width, height and duration from that video, unless otherwise specified with the optional
-        arguments.
+        width, height and duration from that animation, unless otherwise specified with the
+        optional arguments.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
@@ -510,10 +659,10 @@ class InputMediaAudio(InputMedia):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        duration (:obj:`int`, optional): Duration of the audio in seconds as defined by sender.
-        performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
-            tags.
-        title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
+        duration (:obj:`int`, optional): Duration of the audio in seconds as defined by the sender.
+        performer (:obj:`str`, optional): Performer of the audio as defined by the sender or by
+            audio tags.
+        title (:obj:`str`, optional): Title of the audio as defined by the sender or by audio tags.
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
@@ -533,9 +682,9 @@ class InputMediaAudio(InputMedia):
                 * |tupleclassattrs|
                 * |alwaystuple|
         duration (:obj:`int`): Optional. Duration of the audio in seconds.
-        performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
-            tags.
-        title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
+        performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
+            audio tags.
+        title (:obj:`str`): Optional. Title of the audio as defined by the sender or by audio tags.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: 20.2

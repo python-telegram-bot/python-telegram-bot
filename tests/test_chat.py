@@ -1244,6 +1244,22 @@ class TestChatWithoutRequest(TestChatBase):
             123, [ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)], True
         )
 
+    async def test_instance_method_send_paid_media(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["media"] == "media"
+                and kwargs["star_count"] == 42
+                and kwargs["caption"] == "stars"
+            )
+
+        assert check_shortcut_signature(Chat.send_paid_media, Bot.send_paid_media, ["chat_id"], [])
+        assert await check_shortcut_call(chat.send_paid_media, chat.get_bot(), "send_paid_media")
+        assert await check_defaults_handling(chat.send_paid_media, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_paid_media", make_assertion)
+        assert await chat.send_paid_media(media="media", star_count=42, caption="stars")
+
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):

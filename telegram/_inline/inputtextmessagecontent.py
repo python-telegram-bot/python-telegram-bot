@@ -108,7 +108,7 @@ class InputTextMessageContent(InputMessageContent):
             # Optionals
             self.parse_mode: ODVInput[str] = parse_mode
             self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.link_preview_options: ODVInput["LinkPreviewOptions"] = parse_lpo_and_dwpp(
+            self.link_preview_options: ODVInput[LinkPreviewOptions] = parse_lpo_and_dwpp(
                 disable_web_page_preview, link_preview_options
             )
 
