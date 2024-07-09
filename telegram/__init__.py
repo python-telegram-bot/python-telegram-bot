@@ -204,6 +204,7 @@ __all__ = (
     "ReactionType",
     "ReactionTypeCustomEmoji",
     "ReactionTypeEmoji",
+    "RefundedPayment",
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
     "ReplyParameters",
@@ -446,6 +447,7 @@ from ._payment.invoice import Invoice
 from ._payment.labeledprice import LabeledPrice
 from ._payment.orderinfo import OrderInfo
 from ._payment.precheckoutquery import PreCheckoutQuery
+from ._payment.refundedpayment import RefundedPayment
 from ._payment.shippingaddress import ShippingAddress
 from ._payment.shippingoption import ShippingOption
 from ._payment.shippingquery import ShippingQuery

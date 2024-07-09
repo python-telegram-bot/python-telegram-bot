@@ -1959,6 +1959,7 @@ class StatusUpdate:
                 or StatusUpdate.NEW_CHAT_TITLE.check_update(update)
                 or StatusUpdate.PINNED_MESSAGE.check_update(update)
                 or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
+                or StatusUpdate.REFUNDED_PAYMENT.check_update(update)
                 or StatusUpdate.USERS_SHARED.check_update(update)
                 or StatusUpdate.USER_SHARED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
@@ -2204,6 +2205,17 @@ class StatusUpdate:
         "filters.StatusUpdate.PROXIMITY_ALERT_TRIGGERED"
     )
     """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
+
+    class _RefundedPayment(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.refunded_payment)
+
+    REFUNDED_PAYMENT = _RefundedPayment("filters.StatusUpdate.REFUNDED_PAYMENT")
+    """Messages that contain :attr:`telegram.Message.refunded_payment`.
+    .. versionadded:: NEXT.VERSION
+    """
 
     class _UserShared(MessageFilter):
         __slots__ = ()

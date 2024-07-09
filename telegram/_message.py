@@ -55,6 +55,7 @@ from telegram._messageentity import MessageEntity
 from telegram._paidmedia import PaidMediaInfo
 from telegram._passport.passportdata import PassportData
 from telegram._payment.invoice import Invoice
+from telegram._payment.refundedpayment import RefundedPayment
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
@@ -577,6 +578,10 @@ class Message(MaybeInaccessibleMessage):
             information about the paid media.
 
             .. versionadded:: NEXT.VERSION
+        refunded_payment (:obj:`telegram.RefundedPayment`, optional): Message is a service message
+            about a refunded payment, information about the payment.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -895,6 +900,10 @@ class Message(MaybeInaccessibleMessage):
             information about the paid media.
 
             .. versionadded:: NEXT.VERSION
+        refunded_payment (:obj:`telegram.RefundedPayment`): Optional. Message is a service message
+            about a refunded payment, information about the payment.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -968,6 +977,7 @@ class Message(MaybeInaccessibleMessage):
         "poll",
         "proximity_alert_triggered",
         "quote",
+        "refunded_payment",
         "reply_markup",
         "reply_to_message",
         "reply_to_story",
@@ -1080,6 +1090,7 @@ class Message(MaybeInaccessibleMessage):
         effect_id: Optional[str] = None,
         show_caption_above_media: Optional[bool] = None,
         paid_media: Optional[PaidMediaInfo] = None,
+        refunded_payment: Optional[RefundedPayment] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1182,6 +1193,7 @@ class Message(MaybeInaccessibleMessage):
             self.effect_id: Optional[str] = effect_id
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
             self.paid_media: Optional[PaidMediaInfo] = paid_media
+            self.refunded_payment: Optional[RefundedPayment] = refunded_payment
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1298,6 +1310,7 @@ class Message(MaybeInaccessibleMessage):
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
         data["chat_background_set"] = ChatBackground.de_json(data.get("chat_background_set"), bot)
         data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
+        data["refunded_payment"] = RefundedPayment.de_json(data.get("refunded_payment"), bot)
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
