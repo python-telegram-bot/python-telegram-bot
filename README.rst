@@ -1,16 +1,3 @@
-.. raw:: html
-
-    <div style="display: none">
-
-Hidden Headline
-===============
-This is just here to get furo to display the right sidebar.
-
-.. raw:: html
-
-    </div>
-
-
 .. image:: https://raw.githubusercontent.com/python-telegram-bot/logos/master/logo-text/png/ptb-logo-text_768.png
    :align: center
    :target: https://python-telegram-bot.org
@@ -180,8 +167,6 @@ Quick Start
 
 Our Wiki contains an `Introduction to the API <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Introduction-to-the-API>`_ explaining how the pure Bot API can be accessed via ``python-telegram-bot``.
 Moreover, the `Tutorial: Your first Bot <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions---Your-first-Bot>`_ gives an introduction on how chatbots can be easily programmed with the help of the ``telegram.ext`` module.
-
-For additional resources, please see below.
 
 Resources
 ~~~~~~~~~
