@@ -8,6 +8,7 @@ Payments
     telegram.labeledprice
     telegram.orderinfo
     telegram.precheckoutquery
+    telegram.refundedpayment
     telegram.revenuewithdrawalstate
     telegram.revenuewithdrawalstatefailed
     telegram.revenuewithdrawalstatepending

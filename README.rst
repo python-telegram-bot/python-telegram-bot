@@ -11,7 +11,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-7.6-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-7.7-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API version
 
@@ -79,7 +79,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **7.6** are supported.
+All types and methods of the Telegram Bot API **7.7** are supported.
 
 Installing
 ==========
