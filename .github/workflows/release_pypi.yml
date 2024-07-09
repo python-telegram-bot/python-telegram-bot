@@ -83,13 +83,13 @@ jobs:
     needs:
       - publish-to-pypi
       - publish-to-test-pypi
-    if:
-      # run if either of the publishing jobs ran successfully
-      # see also:
-      # https://github.com/actions/runner/issues/491#issuecomment-850884422
+    # run if either of the publishing jobs ran successfully
+    # see also:
+    # https://github.com/actions/runner/issues/491#issuecomment-850884422
+    if: |
       always() && (
-        needs.publish-to-pypi.outcome == 'success' ||
-        needs.publish-to-test-pypi.outcome == 'success'
+        (needs.publish-to-pypi.outcome == 'success') ||
+        (needs.publish-to-test-pypi.outcome == 'success')
       )
 
     permissions:
