@@ -173,7 +173,7 @@ Additionally, two shortcuts are provided:
 Working with PTB
 ----------------
 
-Once you have installed, the library, you can begin working with it, so let's get started!
+Once you have installed the library, you can begin working with it - so let's get started!
 
 Quick Start
 ~~~~~~~~~~~
