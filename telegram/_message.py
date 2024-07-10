@@ -1098,10 +1098,10 @@ class Message(MaybeInaccessibleMessage):
 
         with self._unfrozen():
             # Required
-            self.message_id: int = message_id
+            self.message_id = message_id
             # Optionals
-            self.from_user: Optional[User] = from_user
-            self.sender_chat: Optional[Chat] = sender_chat
+            self.from_user = from_user
+            self.sender_chat = sender_chat
             self.date: datetime.datetime = date
             self.chat: Chat = chat
             self.is_automatic_forward: Optional[bool] = is_automatic_forward
