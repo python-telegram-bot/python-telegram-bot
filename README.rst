@@ -84,6 +84,15 @@ Telegram API support
 All types and methods of the Telegram Bot API **7.7** are natively supported by this library.
 In addition, Bot API functionality not yet natively included can still be used as described `in our wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Bot-API-Forward-Compatibility>`_.
 
+Notable Features
+~~~~~~~~~~~~~~~~
+
+- `Fully asynchronous <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+- Convenient shortcut methods, e.g. `Message.reply_text <https://docs.python-telegram-bot.org/en/stable/telegram.message.html#telegram.Message.reply_text>`_
+- `Fully annotated with static type hints <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Type-Checking>`_
+- `Customizable and extendable interface <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
+- Seamless integration with `webhooks <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_ and `polling <https://docs.python-telegram-bot.org/en/stable/telegram.ext.application.html#telegram.ext.Application.run_polling>`_
+- `Comprehensive documentation and examples <#working-with-ptb>`_
 
 Installing
 ----------
