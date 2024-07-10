@@ -242,9 +242,19 @@ class TestCallbackQueryHandler:
         callback_query.callback_query.game_short_name = "this is a short game name"
         assert not handler.check_update(callback_query)
 
-        callback_query.callback_query.game_short_name = object()
-        assert not handler.check_update(callback_query)
-
         callback_query.callback_query.data = "something"
         handler = CallbackQueryHandler(self.callback_basic, game_pattern="")
         assert not handler.check_update(callback_query)
+
+    @pytest.mark.parametrize(
+        ("data", "pattern", "game_short_name", "game_pattern", "expected_result"),
+        (
+            (None, None, "some_short_name", ".*name", True),
+            # TODO: Pass possible conbinations
+        )
+    )
+    def test_pattern_and_game_pattern_interaction(self, callback_query, data, pattern, game_short_name, game_pattern, expected_result):
+        callback_query.callback_query.data = data 
+        callback_query.callback_query.game_short_name = game_short_name         
+        handler = CallbackQueryHandler(callback=self.callback, pattern=pattern, game_pattern=game_pattern)
+        assert handler.check_update(callback_query) == expected_result

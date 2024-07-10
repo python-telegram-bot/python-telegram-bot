@@ -51,6 +51,15 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
           .. versionadded:: 13.6
 
+        * If neither :paramref:`pattern` nor :paramref:`game_pattern` is set, `any` ``CallbackQuery`` 
+          will be handled. If only :paramref:`pattern` is set, queries with 
+          :attr:`~telegram.CallbackQuery.game_short_name` will `not` be considered and vice versa. If
+          both patterns are set, queries with either :attr:`~telegram.CallbackQuery.game_short_name`
+          or :attr:`~telegram.CallbackQuery.data` 
+          matching the defined pattern will be handled
+
+          .. versionadded:: NEXT.VERSION
+
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
@@ -106,7 +115,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
         game_pattern (:func:`re.Pattern <re.compile>`): Optional.
-            Regex pattern, callback or type to test :attr:`telegram.CallbackQuery.game_short_name`
+            Regex pattern to test :attr:`telegram.CallbackQuery.game_short_name`
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
@@ -176,8 +185,6 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
         elif game_short_name:
             if not self.game_pattern:
-                return False
-            if not isinstance(game_short_name, str):
                 return False
             if match := re.match(self.game_pattern, game_short_name):
                 return match
