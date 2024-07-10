@@ -2774,3 +2774,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
         assert await message.unpin_all_forum_topic_messages()
+
+    def test_attachement_successful_payment_deprecated(self, message, recwarn):
+        message.successful_payment = "something"
+        # kinda unnecessary to assert but one needs to call the function ofc so. Here we are.
+        assert message.effective_attachment == "something"
+        assert len(recwarn) == 1
+        assert (
+            "successful_payment will no longer be considered an attachment in future major "
+            "versions" in str(recwarn[0].message)
+        )
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert recwarn[0].filename == __file__
