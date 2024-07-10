@@ -2368,11 +2368,15 @@ class TestBotWithRequest:
     # test modules. No need to duplicate here.
 
     async def test_delete_messages(self, bot, chat_id):
-        msg1 = await bot.send_message(chat_id, text="will be deleted")
-        msg2 = await bot.send_message(chat_id, text="will be deleted")
-        await asyncio.sleep(2)
+        msg1, msg2 = await asyncio.gather(
+            bot.send_message(chat_id, text="will be deleted"),
+            bot.send_message(chat_id, text="will be deleted"),
+        )
 
-        assert await bot.delete_messages(chat_id=chat_id, message_ids=(msg1.id, msg2.id)) is True
+        assert (
+            await bot.delete_messages(chat_id=chat_id, message_ids=sorted((msg1.id, msg2.id)))
+            is True
+        )
 
     async def test_send_venue(self, bot, chat_id):
         longitude = -46.788279
@@ -3915,7 +3919,7 @@ class TestBotWithRequest:
         msg1, msg2 = await tasks
 
         copy_messages = await bot.copy_messages(
-            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
+            chat_id, from_chat_id=chat_id, message_ids=sorted((msg1.message_id, msg2.message_id))
         )
         assert isinstance(copy_messages, tuple)
 
