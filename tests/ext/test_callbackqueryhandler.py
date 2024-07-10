@@ -229,9 +229,8 @@ class TestCallbackQueryHandler:
         with pytest.raises(TypeError, match="must not be a coroutine function"):
             CallbackQueryHandler(self.callback, pattern=pattern)
 
-
     def test_game_pattern(self, callback_query):
-        callback_query.callback_query.data = None 
+        callback_query.callback_query.data = None
 
         callback_query.callback_query.game_short_name = "test data"
         handler = CallbackQueryHandler(self.callback_basic, game_pattern=".*est.*")
