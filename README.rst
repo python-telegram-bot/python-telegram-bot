@@ -66,23 +66,36 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
 Introduction
-============
+------------
 
 This library provides a pure Python, asynchronous interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
 It's compatible with Python versions **3.8+**.
 
-In addition to the pure API implementation, this library features a number of high-level classes to
+In addition to the pure API implementation, this library features several convenience methods and shortcuts as well as a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
 ``telegram.ext`` submodule.
 
-Telegram API support
-====================
+After installing_ the library, be sure to check out the section on `working with PTB`_.
 
-All types and methods of the Telegram Bot API **7.7** are supported.
+Telegram API support
+~~~~~~~~~~~~~~~~~~~~
+
+All types and methods of the Telegram Bot API **7.7** are natively supported by this library.
+In addition, Bot API functionality not yet natively included can still be used as described `in our wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Bot-API-Forward-Compatibility>`_.
+
+Notable Features
+~~~~~~~~~~~~~~~~
+
+- `Fully asynchronous <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+- Convenient shortcut methods, e.g. `Message.reply_text <https://docs.python-telegram-bot.org/en/stable/telegram.message.html#telegram.Message.reply_text>`_
+- `Fully annotated with static type hints <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Type-Checking>`_
+- `Customizable and extendable interface <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
+- Seamless integration with `webhooks <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_ and `polling <https://docs.python-telegram-bot.org/en/stable/telegram.ext.application.html#telegram.ext.Application.run_polling>`_
+- `Comprehensive documentation and examples <#working-with-ptb>`_
 
 Installing
-==========
+----------
 
 You can install or upgrade ``python-telegram-bot`` via
 
@@ -102,7 +115,7 @@ You can also install ``python-telegram-bot`` from source, though this is usually
     $ python -m build
 
 Verifying Releases
-------------------
+~~~~~~~~~~~~~~~~~~
 
 We sign all the releases with a GPG key.
 The signatures are uploaded to both the `GitHub releases page <https://github.com/python-telegram-bot/python-telegram-bot/releases>`_ and the `PyPI project <https://pypi.org/project/python-telegram-bot/>`_ and end with a suffix ``.asc``.
@@ -114,7 +127,7 @@ In addition, the GitHub release page also contains the sha1 hashes of the releas
 This allows you to verify that a release file that you downloaded was indeed provided by the ``python-telegram-bot`` team.
 
 Dependencies & Their Versions
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``python-telegram-bot`` tries to use as few 3rd party dependencies as possible.
 However, for some features using a 3rd party library is more sane than implementing the functionality again.
@@ -150,14 +163,19 @@ Additionally, two shortcuts are provided:
 * ``pip install "python-telegram-bot[all]"`` installs all optional dependencies.
 * ``pip install "python-telegram-bot[ext]"`` installs all optional dependencies that are related to ``telegram.ext``, i.e. ``[rate-limiter, webhooks, callback-data, job-queue]``.
 
+Working with PTB
+----------------
+
+Once you have installed the library, you can begin working with it - so let's get started!
+
 Quick Start
-===========
+~~~~~~~~~~~
 
 Our Wiki contains an `Introduction to the API <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Introduction-to-the-API>`_ explaining how the pure Bot API can be accessed via ``python-telegram-bot``.
 Moreover, the `Tutorial: Your first Bot <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions---Your-first-Bot>`_ gives an introduction on how chatbots can be easily programmed with the help of the ``telegram.ext`` module.
 
 Resources
-=========
+~~~~~~~~~
 
 - The `package documentation <https://docs.python-telegram-bot.org/>`_ is the technical reference for ``python-telegram-bot``.
   It contains descriptions of all available classes, modules, methods and arguments as well as the `changelog <https://docs.python-telegram-bot.org/changelog.html>`_.
@@ -168,7 +186,7 @@ Resources
 - The `official Telegram Bot API documentation <https://core.telegram.org/bots/api>`_ is of course always worth a read.
 
 Getting help
-============
+~~~~~~~~~~~~
 
 If the resources mentioned above don't answer your questions or simply overwhelm you, there are several ways of getting help.
 
@@ -179,7 +197,7 @@ If the resources mentioned above don't answer your questions or simply overwhelm
 3. You can even ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
 
 Concurrency
-===========
+~~~~~~~~~~~
 
 Since v20.0, ``python-telegram-bot`` is built on top of Pythons ``asyncio`` module.
 Because ``asyncio`` is in general single-threaded, ``python-telegram-bot`` does currently not aim to be thread-safe.
@@ -192,20 +210,20 @@ Noteworthy parts of ``python-telegram-bots`` API that are likely to cause issues
 * all classes in the ``telegram.ext.filters`` module that allow to add/remove allowed users/chats at runtime
 
 Contributing
-============
+------------
 
 Contributions of all sizes are welcome.
 Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/CONTRIBUTING.rst>`_ to get started.
 You can also help by `reporting bugs or feature requests <https://github.com/python-telegram-bot/python-telegram-bot/issues/new/choose>`_.
 
 Donating
-========
+--------
 Occasionally we are asked if we accept donations to support the development.
 While we appreciate the thought, maintaining PTB is our hobby, and we have almost no running costs for it. We therefore have nothing set up to accept donations.
 If you still want to donate, we kindly ask you to donate to another open source project/initiative of your choice instead.
 
 License
-=======
+-------
 
 You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_.
 Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
