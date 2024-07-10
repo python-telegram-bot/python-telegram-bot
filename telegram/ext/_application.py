@@ -319,7 +319,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 stacklevel=2,
             )
 
-        self.bot = bot
+        self.bot: BT = bot
         self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
