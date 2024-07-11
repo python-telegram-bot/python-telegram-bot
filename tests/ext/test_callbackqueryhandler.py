@@ -263,6 +263,10 @@ class TestCallbackQueryHandler:
         expected_result
     ):
         callback_query.callback_query.data = data
-        callback_query.callback_query.game_short_name = game_short_name    
-        handler = CallbackQueryHandler(callback=self.callback, pattern=pattern, game_pattern=game_pattern)
+        callback_query.callback_query.game_short_name = game_short_name
+        handler = CallbackQueryHandler(
+            callback=self.callback, 
+            pattern=pattern, 
+            game_pattern=game_pattern
+        )
         assert bool(handler.check_update(callback_query)) == expected_result
