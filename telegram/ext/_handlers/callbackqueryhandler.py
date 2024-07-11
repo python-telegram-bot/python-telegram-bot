@@ -51,9 +51,9 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
           .. versionadded:: 13.6
 
-        * If neither :paramref:`pattern` nor :paramref:`game_pattern` is set, `any` 
-          ``CallbackQuery`` will be handled. If only :paramref:`pattern` is set, queries with 
-          :attr:`~telegram.CallbackQuery.game_short_name` will `not` be considered and vice versa. 
+        * If neither :paramref:`pattern` nor :paramref:`game_pattern` is set, `any`
+          ``CallbackQuery`` will be handled. If only :paramref:`pattern` is set, queries with
+          :attr:`~telegram.CallbackQuery.game_short_name` will `not` be considered and vice versa.
           If both patterns are set, queries with either :attr:
           `~telegram.CallbackQuery.game_short_name` or :attr:`~telegram.CallbackQuery.data`
           matching the defined pattern will be handled
