@@ -229,32 +229,28 @@ class TestCallbackQueryHandler:
         with pytest.raises(TypeError, match="must not be a coroutine function"):
             CallbackQueryHandler(self.callback, pattern=pattern)
 
-    def test_game_pattern(self, callback_query):
-        callback_query.callback_query.data = None
-
-        callback_query.callback_query.game_short_name = "test data"
-        handler = CallbackQueryHandler(self.callback_basic, game_pattern=".*est.*")
-        assert handler.check_update(callback_query)
-
-        callback_query.callback_query.game_short_name = "nothing here"
-        assert not handler.check_update(callback_query)
-
-        callback_query.callback_query.game_short_name = "this is a short game name"
-        assert not handler.check_update(callback_query)
-
-        callback_query.callback_query.data = "something"
-        handler = CallbackQueryHandler(self.callback_basic, game_pattern="")
-        assert not handler.check_update(callback_query)
-
     @pytest.mark.parametrize(
         ("data", "pattern", "game_short_name", "game_pattern", "expected_result"),
         (
-            (None, None, "some_short_name", ".*name", True),
-            # TODO: Pass possible conbinations
+            # It should handle all callbacks if no pattern or game_pattern is provided
+            ("data", None, None, None, True),
+            (None, None, "game_data", None, True),
+
+            # It should handle if the pattern matches
+            ("data", "data", None, None, True),
+            (None, None, "game_data", "game_data", True),
+
+            # It should not handle if the pattern does not match
+            ("data", "other_data", None, None, False), 
+            (None, None, "game_data", "other_game_data", False),
+
+            # It filters based on what is coming from the update
+           ("data", "data", None, "game_data", True),
+           (None, "data", "game_data", ".*data", True),
         )
     )
     def test_pattern_and_game_pattern_interaction(self, callback_query, data, pattern, game_short_name, game_pattern, expected_result):
         callback_query.callback_query.data = data 
         callback_query.callback_query.game_short_name = game_short_name         
         handler = CallbackQueryHandler(callback=self.callback, pattern=pattern, game_pattern=game_pattern)
-        assert handler.check_update(callback_query) == expected_result
+        assert bool(handler.check_update(callback_query)) == expected_result
