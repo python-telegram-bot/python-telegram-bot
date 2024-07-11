@@ -246,7 +246,6 @@ class TestCallbackQueryHandler:
         handler = CallbackQueryHandler(self.callback_basic, game_pattern="")
         assert not handler.check_update(callback_query)
 
-
     @pytest.mark.parametrize(
         ("data", "pattern", "game_short_name", "game_pattern", "expected_result"),
         [
@@ -255,12 +254,7 @@ class TestCallbackQueryHandler:
         ]
     )
     def test_pattern_and_game_pattern_interaction(
-        self,
-        callback_query,
-        data, pattern,
-        game_short_name,
-        game_pattern,
-        expected_result
+        self, callback_query, data, pattern, game_short_name, game_pattern, expected_result
     ):
         callback_query.callback_query.data = data
         callback_query.callback_query.game_short_name = game_short_name
