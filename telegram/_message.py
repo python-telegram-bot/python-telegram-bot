@@ -336,7 +336,7 @@ class Message(MaybeInaccessibleMessage):
         effect_id (:obj:`str`, optional): Unique identifier of the message effect added to the
             message.
 
-            ..versionadded:: 21.3
+            .. versionadded:: 21.3
 
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -358,6 +358,7 @@ class Message(MaybeInaccessibleMessage):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
+            `More about games >> <https://core.telegram.org/bots/api#games>`_.
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -373,7 +374,8 @@ class Message(MaybeInaccessibleMessage):
             video.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
             the file.
-        video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
+        video_note (:class:`telegram.VideoNote`, optional): Message is a
+            `video note <https://telegram.org/blog/video-messages-and-telescope>`_, information
             about the video message.
         new_chat_members (Sequence[:class:`telegram.User`], optional): New members that were added
             to the group or supergroup and information about them (the bot itself may be one of
@@ -429,10 +431,13 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
+            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
+            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
         connected_website (:obj:`str`, optional): The domain name of the website on which the user
             has logged in.
+            `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
@@ -670,6 +675,7 @@ class Message(MaybeInaccessibleMessage):
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
+            `More about games >> <https://core.telegram.org/bots/api#games>`_.
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -693,7 +699,8 @@ class Message(MaybeInaccessibleMessage):
             the file.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
+        video_note (:class:`telegram.VideoNote`): Optional. Message is a
+            `video note <https://telegram.org/blog/video-messages-and-telescope>`_, information
             about the video message.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -750,10 +757,13 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
+            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
             message about a successful payment, information about the payment.
+            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
+            `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
