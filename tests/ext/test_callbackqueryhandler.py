@@ -249,9 +249,9 @@ class TestCallbackQueryHandler:
     @pytest.mark.parametrize(
         ("data", "pattern", "game_short_name", "game_pattern", "expected_result"),
         [
-           ("data", "data", None, "game_data", True),
-           (None, "data", "game_data", ".*data", True),
-        ]
+            ("data", "data", None, "game_data", True),
+            (None, "data", "game_data", ".*data", True),
+        ],
     )
     def test_pattern_and_game_pattern_interaction(
         self, callback_query, data, pattern, game_short_name, game_pattern, expected_result
