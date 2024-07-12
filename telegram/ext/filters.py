@@ -1717,7 +1717,7 @@ class _PaidMedia(MessageFilter):
 PAID_MEDIA = _PaidMedia(name="filters.PAID_MEDIA")
 """Messages that contain :attr:`telegram.Message.paid_media`.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 21.4
 """
 
 
@@ -2214,7 +2214,7 @@ class StatusUpdate:
 
     REFUNDED_PAYMENT = _RefundedPayment("filters.StatusUpdate.REFUNDED_PAYMENT")
     """Messages that contain :attr:`telegram.Message.refunded_payment`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
 
     class _UserShared(MessageFilter):

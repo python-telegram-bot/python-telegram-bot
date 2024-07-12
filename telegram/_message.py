@@ -582,11 +582,11 @@ class Message(MaybeInaccessibleMessage):
         paid_media (:obj:`telegram.PaidMediaInfo`, optional): Message contains paid media;
             information about the paid media.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.4
         refunded_payment (:obj:`telegram.RefundedPayment`, optional): Message is a service message
             about a refunded payment, information about the payment.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.4
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -909,11 +909,11 @@ class Message(MaybeInaccessibleMessage):
         paid_media (:obj:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
             information about the paid media.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.4
         refunded_payment (:obj:`telegram.RefundedPayment`): Optional. Message is a service message
             about a refunded payment, information about the payment.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.4
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1426,10 +1426,10 @@ class Message(MaybeInaccessibleMessage):
             :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
             attachment.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.4
             :attr:`paid_media` is now also considered to be an attachment.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 21.4
             :attr:`successful_payment` will be removed in future major versions.
 
         """
@@ -1442,7 +1442,7 @@ class Message(MaybeInaccessibleMessage):
                 if attachment_type == MessageAttachmentType.SUCCESSFUL_PAYMENT:
                     warn(
                         PTBDeprecationWarning(
-                            "NEXT.VERSION",
+                            "21.4",
                             "successful_payment will no longer be considered an attachment in"
                             " future major versions",
                         ),
@@ -3649,7 +3649,7 @@ class Message(MaybeInaccessibleMessage):
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.4
            Now also passes :attr:`business_connection_id`.
 
         Returns:
@@ -3706,7 +3706,7 @@ class Message(MaybeInaccessibleMessage):
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.4
            Now also passes :attr:`business_connection_id`.
 
         Returns:
@@ -3759,7 +3759,7 @@ class Message(MaybeInaccessibleMessage):
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.4
            Now also passes :attr:`business_connection_id`.
 
         Returns:
@@ -3808,7 +3808,7 @@ class Message(MaybeInaccessibleMessage):
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.4
            Now also passes :attr:`business_connection_id`.
 
         Returns:
@@ -3862,7 +3862,7 @@ class Message(MaybeInaccessibleMessage):
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.4
            Now also passes :attr:`business_connection_id`.
 
         Returns:
@@ -3916,7 +3916,7 @@ class Message(MaybeInaccessibleMessage):
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.4
            Now also passes :attr:`business_connection_id`.
 
         Returns:
@@ -4072,7 +4072,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.stop_poll`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.4
            Now also passes :attr:`business_connection_id`.
 
         Returns:

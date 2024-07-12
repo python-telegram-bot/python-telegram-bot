@@ -198,7 +198,7 @@ class ChatFullInfo(_ChatBase):
         can_send_paid_media (:obj:`bool`, optional): :obj:`True`, if paid media messages can be
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.4
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -352,7 +352,7 @@ class ChatFullInfo(_ChatBase):
         can_send_paid_media (:obj:`bool`): Optional. :obj:`True`, if paid media messages can be
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.4
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups

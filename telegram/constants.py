@@ -1265,7 +1265,7 @@ class InputPaidMediaType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputPaidMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
 
     __slots__ = ()
@@ -1622,7 +1622,7 @@ class MessageAttachmentType(StringEnum):
     PAID_MEDIA = "paid_media"
     """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
@@ -1908,7 +1908,7 @@ class MessageType(StringEnum):
     PAID_MEDIA = "paid_media"
     """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
@@ -1923,7 +1923,7 @@ class MessageType(StringEnum):
     REFUNDED_PAYMENT = "refunded_payment"
     """:obj:`str`: Messages with :attr:`telegram.Message.refunded_payment`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
     REPLY_TO_STORY = "reply_to_story"
     """:obj:`str`: Messages with :attr:`telegram.Message.reply_to_story`.
@@ -1988,7 +1988,7 @@ class PaidMediaType(StringEnum):
     This enum contains the available types of :class:`telegram.PaidMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
 
     __slots__ = ()
@@ -2360,7 +2360,7 @@ class RevenueWithdrawalStateType(StringEnum):
     """This enum contains the available types of :class:`telegram.RevenueWithdrawalState`.
     The enum members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
 
     __slots__ = ()
@@ -2377,7 +2377,7 @@ class StarTransactionsLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.Bot.get_star_transactions`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
 
     __slots__ = ()
@@ -2529,7 +2529,7 @@ class TransactionPartnerType(StringEnum):
     """This enum contains the available types of :class:`telegram.TransactionPartner`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
     """
 
     __slots__ = ()

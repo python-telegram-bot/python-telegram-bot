@@ -108,7 +108,7 @@ class ExternalReplyInfo(TelegramObject):
         paid_media (:class:`telegram.PaidMedia`, optional): Message contains paid media;
             information about the paid media.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.4
 
     Attributes:
         origin (:class:`telegram.MessageOrigin`): Origin of the message replied to by the given
@@ -158,7 +158,7 @@ class ExternalReplyInfo(TelegramObject):
         paid_media (:class:`telegram.PaidMedia`): Optional. Message contains paid media;
             information about the paid media.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.4
     """
 
     __slots__ = (

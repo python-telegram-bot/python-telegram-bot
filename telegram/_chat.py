@@ -3286,7 +3286,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.send_paid_media`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.4
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.

@@ -158,7 +158,7 @@ class MessageEntity(TelegramObject):
             For more information, see `Unicode <https://en.wikipedia.org/wiki/Unicode>`_ and
             `Plane (Unicode) <https://en.wikipedia.org/wiki/Plane_(Unicode)>`_.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.4
 
         Examples:
             Below is a snippet of code that demonstrates how to use this function to convert

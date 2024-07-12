@@ -42,7 +42,7 @@ class PaidMedia(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         type (:obj:`str`): Type of the paid media.
@@ -114,7 +114,7 @@ class PaidMediaPreview(PaidMedia):
     considered equal, if their :attr:`width`, :attr:`height`, and :attr:`duration`
     are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PREVIEW`.
@@ -156,7 +156,7 @@ class PaidMediaPhoto(PaidMedia):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`photo` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PHOTO`.
@@ -202,7 +202,7 @@ class PaidMediaVideo(PaidMedia):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`video` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.VIDEO`.
@@ -248,7 +248,7 @@ class PaidMediaInfo(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`star_count` and :attr:`paid_media` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         star_count (:obj:`int`): The number of Telegram Stars that must be paid to buy access to

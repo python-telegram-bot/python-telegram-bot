@@ -2856,7 +2856,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.2.
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.4
 
         Keyword Args:
             location (:class:`telegram.Location`, optional): The location to send.
@@ -2932,7 +2932,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 inline keyboard.
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.4
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -4006,7 +4006,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 inline keyboard.
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.4
 
         Keyword Args:
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
@@ -4104,7 +4104,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.4
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -4177,7 +4177,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 inline keyboard.
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.4
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -4238,7 +4238,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 inline keyboard.
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.4
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -7185,7 +7185,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 message inline keyboard.
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.4
 
         Returns:
             :class:`telegram.Poll`: On success, the stopped Poll is returned.
@@ -9138,7 +9138,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> StarTransactions:
         """Returns the bot's Telegram Star transactions in chronological order.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.4
 
         Args:
             offset (:obj:`int`, optional): Number of transactions to skip in the response.
@@ -9193,7 +9193,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> Message:
         """Use this method to send paid media to channel chats.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.4
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
