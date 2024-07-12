@@ -19,3 +19,32 @@ This is just here to get furo to display the right sidebar.
 
 .. The toctrees are hidden such that they don't render on the start page but still include the contents into the documentation.
 
+.. toctree::
+   :hidden:
+   :caption: Reference
+
+   telegram
+   telegram.ext
+   telegram_auxil
+   Telegrams Bot API Docs <https://core.telegram.org/bots/api>
+
+.. toctree::
+   :hidden:
+   :caption: Resources
+
+   examples
+   Wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki>
+
+.. toctree::
+   :hidden:
+   :caption: Project
+
+   stability_policy
+   changelog
+   coc
+   contributing
+   testing
+   Website <https://python-telegram-bot.org>
+   GitHub Repository <https://github.com/python-telegram-bot/python-telegram-bot/>
+   Telegram Channel <https://t.me/pythontelegrambotchannel/>
+   Telegram User Group <https://t.me/pythontelegrambotgroup/>
