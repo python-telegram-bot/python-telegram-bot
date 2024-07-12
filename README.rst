@@ -117,14 +117,18 @@ You can also install ``python-telegram-bot`` from source, though this is usually
 Verifying Releases
 ~~~~~~~~~~~~~~~~~~
 
-We sign all the releases with a GPG key.
-The signatures are uploaded to both the `GitHub releases page <https://github.com/python-telegram-bot/python-telegram-bot/releases>`_ and the `PyPI project <https://pypi.org/project/python-telegram-bot/>`_ and end with a suffix ``.asc``.
+To enable you to verify that a release file that you downloaded was indeed provided by the ``python-telegram-bot`` team, we have taken the following measures.
+
+Starting with NEXT.VERSION, all releases are signed via `sigstore <https://sigstore.dev>`_.
+The corresponding signature files are uploaded to the `GitHub releases page`_.
+To verify the signature, please install the `sigstore Python client <https://pypi.org/project/sigstore/>`_ and follow the instructions for `verifying signatures from GitHub Actions <https://github.com/sigstore/sigstore-python#signatures-from-github-actions>`_. As input for the ``--repository`` parameter, please use the value ``python-telegram-bot/python-telegram-bot``.
+
+Earlier releases are signed with a GPG key.
+The signatures are uploaded to both the `GitHub releases page`_ and the `PyPI project <https://pypi.org/project/python-telegram-bot/>`_ and end with a suffix ``.asc``.
 Please find the public keys `here <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/public_keys>`_.
-The keys are named in the format ``<first_version>-<last_version>.gpg`` or ``<first_version>-current.gpg`` if the key is currently being used for new releases.
+The keys are named in the format ``<first_version>-<last_version>.gpg``.
 
 In addition, the GitHub release page also contains the sha1 hashes of the release files in the files with the suffix ``.sha1``.
-
-This allows you to verify that a release file that you downloaded was indeed provided by the ``python-telegram-bot`` team.
 
 Dependencies & Their Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -227,3 +231,5 @@ License
 
 You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_.
 Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
+
+.. _`GitHub releases page`: https://github.com/python-telegram-bot/python-telegram-bot/releases>

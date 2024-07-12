@@ -1,0 +1,204 @@
+name: Publish to PyPI
+
+on:
+  # Run on any tag
+  push:
+    tags:
+      - '**'
+  # manually trigger the workflow - for testing only
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install pypa/build
+        run: >-
+          python3 -m pip install build --user
+      - name: Build a binary wheel and a source tarball
+        run: python3 -m build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+    name: Publish to PyPI
+    # only publish to PyPI on tag pushes
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    environment:
+      name: release_pypi
+      url: https://pypi.org/p/python-telegram-bot
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  publish-to-test-pypi:
+    name: Publish to Test PyPI
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    environment:
+      name: release_test_pypi
+      url: https://test.pypi.org/p/python-telegram-bot
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  compute-signatures:
+    name: Compute SHA1 Sums and Sign with Sigstore
+    runs-on: ubuntu-latest
+    needs:
+      - publish-to-pypi
+      - publish-to-test-pypi
+    # run if either of the publishing jobs ran successfully
+    # see also:
+    # https://github.com/actions/runner/issues/491#issuecomment-850884422
+    if: |
+      always() && (
+        (needs.publish-to-pypi.result == 'success') ||
+        (needs.publish-to-test-pypi.result == 'success')
+      )
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for sigstore
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Compute SHA1 Sums
+        run: |
+          # Compute SHA1 sum of the distribution packages and save it to a file with the same name,
+          # but with .sha1 extension
+          for file in dist/*; do
+              sha1sum $file > $file.sha1
+          done
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - name: Store the distribution packages and signatures
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions-and-signatures
+          path: dist/
+
+  github-release:
+    name: Upload to GitHub Release
+    needs:
+      - publish-to-pypi
+      - compute-signatures
+    if: |
+      always() && (
+        (needs.publish-to-pypi.result == 'success') &&
+        (needs.compute-signatures.result == 'success')
+      )
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # IMPORTANT: mandatory for making GitHub Releases
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions-and-signatures
+          path: dist/
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # Create a GitHub Release for this tag. The description can be changed later, as for now
+        # we don't define it through this workflow.
+        run: >-
+          gh release create
+          '${{ github.ref_name }}'
+          --repo '${{ github.repository }}'
+          --generate-notes
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # Upload to GitHub Release using the `gh` CLI.
+        # `dist/` contains the built packages, and the
+        # sigstore-produced signatures and certificates.
+        run: >-
+          gh release upload
+          '${{ github.ref_name }}' dist/**
+          --repo '${{ github.repository }}'
+
+  github-test-release:
+    name: Upload to GitHub Release Draft
+    needs:
+      - publish-to-test-pypi
+      - compute-signatures
+    if: |
+      always() && (
+        (needs.publish-to-test-pypi.result == 'success') &&
+        (needs.compute-signatures.result == 'success')
+      )
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # IMPORTANT: mandatory for making GitHub Releases
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions-and-signatures
+          path: dist/
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # Create a GitHub Release *draft*. The description can be changed later, as for now
+        # we don't define it through this workflow.
+        run: >-
+          gh release create
+          '${{ github.ref_name }}'
+          --repo '${{ github.repository }}'
+          --generate-notes
+          --draft
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # Upload to GitHub Release using the `gh` CLI.
+        # `dist/` contains the built packages, and the
+        # sigstore-produced signatures and certificates.
+        run: >-
+          gh release upload
+          '${{ github.ref_name }}' dist/**
+          --repo '${{ github.repository }}'
