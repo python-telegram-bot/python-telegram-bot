@@ -3972,7 +3972,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to edit text and game messages.
 
         Note:
-            * |editreplymarkup|.
+            * |editreplymarkup|
             * |bcid_edit_time|
 
         .. seealso:: :attr:`telegram.Game.text`
@@ -5037,15 +5037,16 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionchanged:: 20.0
                     |sequenceargs|
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
-                *smallest* units of the currency (integer, **not** float/double). For example, for
-                a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
-                `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
-                shows the number of digits past the decimal point for each currency (2 for the
-                majority of currencies). Defaults to ``0``. Not supported for payment in |tg_stars|
+                *smallest units* of the currency (integer, **not** float/double). For example, for
+                a maximum tip of ``US$ 1.45`` pass ``max_tip_amount = 145``. See the ``exp``
+                parameter in `currencies.json
+                <https://core.telegram.org/bots/payments/currencies.json>`_, it shows the number of
+                digits past the decimal point for each currency (2 for the majority of currencies).
+                Defaults to ``0``. Not supported for payment in |tg_stars|.
 
                 .. versionadded:: 13.5
             suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of
-                suggested amounts of tips in the *smallest* units of the currency (integer, **not**
+                suggested amounts of tips in the *smallest units* of the currency (integer, **not**
                 float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
                 amounts can be specified. The suggested tip amounts must be positive, passed in a
                 strictly increased order and must not exceed :paramref:`max_tip_amount`.
@@ -7978,14 +7979,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 20.0
                     |sequenceargs|
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
-                *smallest* units of the currency (integer, **not** float/double). For example, for
-                a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
-                `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
-                shows the number of digits past the decimal point for each currency (2 for the
-                majority of currencies). Defaults to ``0``. Not supported for payments in
-                |tg_stars|.
+                *smallest units* of the currency (integer, **not** float/double). For example, for
+                a maximum tip of ``US$ 1.45`` pass ``max_tip_amount = 145``. See the ``exp``
+                parameter in `currencies.json
+                <https://core.telegram.org/bots/payments/currencies.json>`_, it shows the number of
+                digits past the decimal point for each currency (2 for the majority of currencies).
+                Defaults to ``0``. Not supported for payments in |tg_stars|.
             suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of
-                suggested amounts of tips in the *smallest* units of the currency (integer, **not**
+                suggested amounts of tips in the *smallest units* of the currency (integer, **not**
                 float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
                 amounts can be specified. The suggested tip amounts must be positive, passed in a
                 strictly increased order and must not exceed :paramref:`max_tip_amount`.

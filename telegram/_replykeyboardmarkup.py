@@ -41,7 +41,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         A reply keyboard with reply options.
 
     .. seealso::
-        An another kind of keyboard would be the :class:`telegram.InlineKeyboardMarkup`.
+        Another kind of keyboard would be the :class:`telegram.InlineKeyboardMarkup`.
 
     Examples:
         * Example usage: A user requests to change the bot's language, bot replies to the request

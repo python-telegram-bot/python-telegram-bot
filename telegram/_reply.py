@@ -81,8 +81,9 @@ class ExternalReplyInfo(TelegramObject):
             sticker.
         story (:class:`telegram.Story`, optional): Message is a forwarded story.
         video (:class:`telegram.Video`, optional): Message is a video, information about the video.
-        video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
-            about the video message.
+        video_note (:class:`telegram.VideoNote`, optional): Message is a `video note
+            <https://telegram.org/blog/video-messages-and-telescope>`_, information about the video
+            message.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
             the file.
         has_media_spoiler (:obj:`bool`, optional): :obj:`True`, if the message media is covered by
@@ -91,12 +92,14 @@ class ExternalReplyInfo(TelegramObject):
             about the contact.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value.
         game (:Class:`telegram.Game`. optional): Message is a game, information about the game.
+            `More about games >> <https://core.telegram.org/bots/api#games>`_.
         giveaway (:class:`telegram.Giveaway`, optional): Message is a scheduled giveaway,
             information about the giveaway.
         giveaway_winners (:class:`telegram.GiveawayWinners`, optional): A giveaway with public
             winners was completed.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
-            information about the invoice.
+            information about the invoice. `More about payments >>
+            <https://core.telegram.org/bots/api#payments>`_.
         location (:class:`telegram.Location`, optional): Message is a shared location, information
             about the location.
         poll (:class:`telegram.Poll`, optional): Message is a native poll, information about the
@@ -128,8 +131,9 @@ class ExternalReplyInfo(TelegramObject):
             sticker.
         story (:class:`telegram.Story`): Optional. Message is a forwarded story.
         video (:class:`telegram.Video`): Optional. Message is a video, information about the video.
-        video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
-            about the video message.
+        video_note (:class:`telegram.VideoNote`): Optional. Message is a `video note
+            <https://telegram.org/blog/video-messages-and-telescope>`_, information about the video
+            message.
         voice (:class:`telegram.Voice`): Optional. Message is a voice message, information about
             the file.
         has_media_spoiler (:obj:`bool`): Optional. :obj:`True`, if the message media is covered by
@@ -138,12 +142,14 @@ class ExternalReplyInfo(TelegramObject):
             about the contact.
         dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.
         game (:Class:`telegram.Game`): Optional. Message is a game, information about the game.
+            `More about games >> <https://core.telegram.org/bots/api#games>`_.
         giveaway (:class:`telegram.Giveaway`): Optional. Message is a scheduled giveaway,
             information about the giveaway.
         giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
             winners was completed.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
-            information about the invoice.
+            information about the invoice. `More about payments >>
+            <https://core.telegram.org/bots/api#payments>`_.
         location (:class:`telegram.Location`): Optional. Message is a shared location, information
             about the location.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll, information about the

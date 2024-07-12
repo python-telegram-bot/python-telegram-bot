@@ -42,7 +42,7 @@ class InlineKeyboardMarkup(TelegramObject):
         An inline keyboard on a message
 
     .. seealso::
-        An another kind of keyboard would be the :class:`telegram.ReplyKeyboardMarkup`.
+        Another kind of keyboard would be the :class:`telegram.ReplyKeyboardMarkup`.
 
     Examples:
         * :any:`Inline Keyboard 1 <examples.inlinekeyboard>`

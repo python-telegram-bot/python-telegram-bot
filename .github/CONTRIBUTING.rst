@@ -194,7 +194,7 @@ Feel free to copy (parts of) the checklist to the PR description to remind you o
    - Added or updated documentation for the changed class(es) and/or method(s)
    - Added the new method(s) to ``_extbot.py``
    - Added or updated ``bot_methods.rst``
-   - Updated the Bot API version number in all places: ``README.rst`` and ``README_RAW.rst`` (including the badge), as well as ``telegram.constants.BOT_API_VERSION_INFO``
+   - Updated the Bot API version number in all places: ``README.rst`` (including the badge) and ``telegram.constants.BOT_API_VERSION_INFO``
    - Added logic for arbitrary callback data in :class:`telegram.ext.ExtBot` for new methods that either accept a ``reply_markup`` in some form or have a return type that is/contains :class:`~telegram.Message`
 
 Documenting
