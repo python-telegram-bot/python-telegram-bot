@@ -442,7 +442,7 @@ class TelegramObject:
             bot (:class:`telegram.Bot`, optional): The bot associated with this object. Defaults to
                 :obj:`None`, in which case shortcut methods will not be available.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.4
                    :paramref:`bot` is now optional and defaults to :obj:`None`
 
         Returns:
@@ -467,7 +467,7 @@ class TelegramObject:
             bot (:class:`telegram.Bot`, optional): The bot associated with these object. Defaults
                 to :obj:`None`, in which case shortcut methods will not be available.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.4
                    :paramref:`bot` is now optional and defaults to :obj:`None`
 
         Returns:

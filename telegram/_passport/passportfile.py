@@ -128,10 +128,10 @@ class PassportFile(TelegramObject):
             bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
                 May be :obj:`None`, in which case shortcut methods will not be available.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.4
                    :paramref:`bot` is now optional and defaults to :obj:`None`
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 21.4
                    This argument will be converted to an optional argument in future versions.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
@@ -168,10 +168,10 @@ class PassportFile(TelegramObject):
             bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
                 May be :obj:`None`, in which case shortcut methods will not be available.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.4
                    :paramref:`bot` is now optional and defaults to :obj:`None`
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 21.4
                    This argument will be converted to an optional argument in future versions.
             credentials (:class:`telegram.FileCredentials`): The credentials
 

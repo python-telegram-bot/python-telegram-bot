@@ -45,7 +45,7 @@ class RevenueWithdrawalState(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         type (:obj:`str`): The type of the state.
@@ -94,7 +94,7 @@ class RevenueWithdrawalState(TelegramObject):
 class RevenueWithdrawalStatePending(RevenueWithdrawalState):
     """The withdrawal is in progress.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Attributes:
         type (:obj:`str`): The type of the state, always
@@ -114,7 +114,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`date` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         date (:obj:`datetime.datetime`): Date the withdrawal was completed as a datetime object.
@@ -165,7 +165,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
 class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
     """The withdrawal failed and the transaction was refunded.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Attributes:
         type (:obj:`str`): The type of the state, always
@@ -191,7 +191,7 @@ class TransactionPartner(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         type (:obj:`str`): The type of the transaction partner.
@@ -257,7 +257,7 @@ class TransactionPartner(TelegramObject):
 class TransactionPartnerFragment(TransactionPartner):
     """Describes a withdrawal transaction with Fragment.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         withdrawal_state (:obj:`telegram.RevenueWithdrawalState`, optional): State of the
@@ -305,7 +305,7 @@ class TransactionPartnerUser(TransactionPartner):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -354,7 +354,7 @@ class TransactionPartnerUser(TransactionPartner):
 class TransactionPartnerOther(TransactionPartner):
     """Describes a transaction with an unknown partner.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
@@ -371,7 +371,7 @@ class TransactionPartnerOther(TransactionPartner):
 class TransactionPartnerTelegramAds(TransactionPartner):
     """Describes a withdrawal transaction to the Telegram Ads platform.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
@@ -391,7 +391,7 @@ class StarTransaction(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id`, :attr:`source`, and :attr:`receiver` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         id (:obj:`str`): Unique identifier of the transaction. Coincides with the identifer
@@ -474,7 +474,7 @@ class StarTransactions(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`transactions` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.4
 
     Args:
         transactions (Sequence[:class:`telegram.StarTransaction`]): The list of transactions.
