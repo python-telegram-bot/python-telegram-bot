@@ -31,6 +31,8 @@ from telegram._utils.types import JSONDict
 if TYPE_CHECKING:
     from telegram import Bot
 
+_SEM = Sequence["MessageEntity"]
+
 
 class MessageEntity(TelegramObject):
     """
@@ -145,9 +147,7 @@ class MessageEntity(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     @staticmethod
-    def adjust_message_entities_to_utf_16(
-        text: str, entities: Sequence["MessageEntity"]
-    ) -> Sequence["MessageEntity"]:
+    def adjust_message_entities_to_utf_16(text: str, entities: _SEM) -> _SEM:
         """Utility functionality for converting the offset and length of entities from
         Unicode (:obj:`str`) to UTF-16 (``utf-16-le`` encoded :obj:`bytes`).
 
@@ -220,9 +220,7 @@ class MessageEntity(TelegramObject):
         return out
 
     @staticmethod
-    def shift_entities(
-        by: Union[str, int], entities: Sequence["MessageEntity"]
-    ) -> Sequence["MessageEntity"]:
+    def shift_entities(by: Union[str, int], entities: _SEM) -> _SEM:
         """Utility functionality for shifting the offset of entities by a given amount.
 
         Examples:
@@ -287,10 +285,8 @@ class MessageEntity(TelegramObject):
     @classmethod
     def concatenate(
         cls,
-        *args: Union[
-            Tuple[str, Sequence["MessageEntity"]], Tuple[str, Sequence["MessageEntity"], bool]
-        ],
-    ) -> Tuple[str, Sequence["MessageEntity"]]:
+        *args: Union[Tuple[str, _SEM], Tuple[str, _SEM, bool]],
+    ) -> Tuple[str, _SEM]:
         """Utility functionality for concatenating two text along with their formatting entities.
 
         Tip:
@@ -352,7 +348,7 @@ class MessageEntity(TelegramObject):
         for arg in args:
             text, entities = arg[0], arg[1]
 
-            if len(arg) > 2 and arg[2] is True:
+            if len(arg) > 2 and arg[2]:
                 entities = cls.adjust_message_entities_to_utf_16(text, entities)
 
             output_entities.extend(cls.shift_entities(output_text, entities))
