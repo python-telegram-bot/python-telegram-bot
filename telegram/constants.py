@@ -98,6 +98,7 @@ __all__ = [
     "StickerLimit",
     "StickerSetLimit",
     "StickerType",
+    "TextEncoding",
     "TransactionPartnerType",
     "UpdateType",
     "UserProfilePhotosLimit",
@@ -3096,3 +3097,15 @@ class BackgroundFillType(StringEnum):
     """:obj:`str`: A :class:`telegram.BackgroundFill` with gradient fill."""
     FREEFORM_GRADIENT = "freeform_gradient"
     """:obj:`str`: A :class:`telegram.BackgroundFill` with freeform_gradient fill."""
+
+
+class TextEncoding(StringEnum):
+    """This enum contains encoding schemes for text.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    UTF_8 = "utf-8"
+    UTF_16_LE = "utf-8"

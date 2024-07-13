@@ -40,6 +40,7 @@ except ImportError:
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
+from telegram.constants import TextEncoding
 from telegram.error import PassportDecryptionError
 
 if TYPE_CHECKING:
@@ -98,7 +99,7 @@ def decrypt(secret, hash, data):
 @no_type_check
 def decrypt_json(secret, hash, data):
     """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
-    return json.loads(decrypt(secret, hash, data).decode("utf-8"))
+    return json.loads(decrypt(secret, hash, data).decode(TextEncoding.UTF_8))
 
 
 class EncryptedCredentials(TelegramObject):

@@ -27,6 +27,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.types import JSONDict
+from telegram.constants import TextEncoding
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -203,7 +204,7 @@ class MessageEntity(TelegramObject):
         for i, position in enumerate(positions):
             last_position = positions[i - 1] if i > 0 else 0
             text_slice = text[last_position:position]
-            accumulated_length += len(text_slice.encode("utf-16-le")) // 2
+            accumulated_length += len(text_slice.encode(TextEncoding.UTF_16_LE)) // 2
             position_translation[position] = accumulated_length
         # get the final output entites
         out = []

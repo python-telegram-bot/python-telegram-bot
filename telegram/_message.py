@@ -85,7 +85,7 @@ from telegram._videochat import (
 )
 from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
-from telegram.constants import ZERO_DATE, MessageAttachmentType, ParseMode
+from telegram.constants import ZERO_DATE, MessageAttachmentType, ParseMode, TextEncoding
 from telegram.helpers import escape_markdown
 from telegram.warnings import PTBDeprecationWarning
 
@@ -1516,8 +1516,8 @@ class Message(MaybeInaccessibleMessage):
             raise RuntimeError("This message has neither text nor caption.")
 
         # Telegram wants the position in UTF-16 code units, so we have to calculate in that space
-        utf16_text = text.encode("utf-16-le")
-        utf16_quote = quote.encode("utf-16-le")
+        utf16_text = text.encode(TextEncoding.UTF_16_LE)
+        utf16_quote = quote.encode(TextEncoding.UTF_16_LE)
         effective_index = index or 0
 
         matches = list(re.finditer(re.escape(utf16_quote), utf16_text))
@@ -4479,7 +4479,7 @@ class Message(MaybeInaccessibleMessage):
         if message_text is None:
             return None
 
-        utf_16_text = message_text.encode("utf-16-le")
+        utf_16_text = message_text.encode(TextEncoding.UTF_16_LE)
         html_text = ""
         last_offset = 0
 
@@ -4543,7 +4543,9 @@ class Message(MaybeInaccessibleMessage):
             # text is part of the parent entity
             html_text += (
                 escape(
-                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode("utf-16-le")
+                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode(
+                        TextEncoding.UTF_16_LE
+                    )
                 )
                 + insert
             )
@@ -4551,7 +4553,7 @@ class Message(MaybeInaccessibleMessage):
             last_offset = entity.offset - offset + entity.length
 
         # see comment above
-        html_text += escape(utf_16_text[last_offset * 2 :].decode("utf-16-le"))
+        html_text += escape(utf_16_text[last_offset * 2 :].decode(TextEncoding.UTF_16_LE))
 
         return html_text
 
@@ -4680,7 +4682,7 @@ class Message(MaybeInaccessibleMessage):
         if message_text is None:
             return None
 
-        utf_16_text = message_text.encode("utf-16-le")
+        utf_16_text = message_text.encode(TextEncoding.UTF_16_LE)
         markdown_text = ""
         last_offset = 0
 
@@ -4773,7 +4775,7 @@ class Message(MaybeInaccessibleMessage):
             markdown_text += (
                 escape_markdown(
                     utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode(
-                        "utf-16-le"
+                        TextEncoding.UTF_16_LE
                     ),
                     version=version,
                 )
@@ -4784,7 +4786,7 @@ class Message(MaybeInaccessibleMessage):
 
         # see comment above
         markdown_text += escape_markdown(
-            utf_16_text[last_offset * 2 :].decode("utf-16-le"),
+            utf_16_text[last_offset * 2 :].decode(TextEncoding.UTF_16_LE),
             version=version,
         )
 

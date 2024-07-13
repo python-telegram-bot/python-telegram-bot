@@ -24,6 +24,7 @@ from uuid import uuid4
 
 from telegram._utils.files import load_file
 from telegram._utils.types import FieldTuple
+from telegram.constants import TextEncoding
 
 _DEFAULT_MIME_TYPE = "application/octet-stream"
 
@@ -74,7 +75,7 @@ class InputFile:
         if isinstance(obj, bytes):
             self.input_file_content: bytes = obj
         elif isinstance(obj, str):
-            self.input_file_content = obj.encode("utf-8")
+            self.input_file_content = obj.encode(TextEncoding.UTF_8)
         else:
             reported_filename, self.input_file_content = load_file(obj)
             filename = filename or reported_filename
