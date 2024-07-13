@@ -51,6 +51,15 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
           .. versionadded:: 13.6
 
+        * If neither :paramref:`pattern` nor :paramref:`game_pattern` is set, `any`
+          ``CallbackQuery`` will be handled. If only :paramref:`pattern` is set, queries with
+          :attr:`~telegram.CallbackQuery.game_short_name` will `not` be considered and vice versa.
+          If both patterns are set, queries with either :attr:
+          `~telegram.CallbackQuery.game_short_name` or :attr:`~telegram.CallbackQuery.data`
+          matching the defined pattern will be handled
+
+          .. versionadded:: NEXT.VERSION
+
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
@@ -85,6 +94,13 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
+        game_pattern (:obj:`str` | :func:`re.Pattern <re.compile>` | optional)
+            Pattern to test :attr:`telegram.CallbackQuery.game_short_name` against. If a string or
+            a regex pattern is passed, :func:`re.match` is used on
+            :attr:`telegram.CallbackQuery.game_short_name` to determine if an update should be
+            handled by this handler.
+
+            .. versionadded:: NEXT.VERSION
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
@@ -98,13 +114,15 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
+        game_pattern (:func:`re.Pattern <re.compile>`): Optional.
+            Regex pattern to test :attr:`telegram.CallbackQuery.game_short_name`
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
 
     """
 
-    __slots__ = ("pattern",)
+    __slots__ = ("game_pattern", "pattern")
 
     def __init__(
         self,
@@ -112,6 +130,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         pattern: Optional[
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = None,
+        game_pattern: Optional[Union[str, Pattern[str]]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
@@ -120,13 +139,15 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             raise TypeError(
                 "The `pattern` must not be a coroutine function! Use an ordinary function instead."
             )
-
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
+        if isinstance(game_pattern, str):
+            game_pattern = re.compile(game_pattern)
         self.pattern: Optional[
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = pattern
+        self.game_pattern: Optional[Union[str, Pattern[str]]] = game_pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -139,22 +160,37 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
         """
         # pylint: disable=too-many-return-statements
-        if isinstance(update, Update) and update.callback_query:
-            callback_data = update.callback_query.data
-            if self.pattern:
-                if callback_data is None:
-                    return False
-                if isinstance(self.pattern, type):
-                    return isinstance(callback_data, self.pattern)
-                if callable(self.pattern):
-                    return self.pattern(callback_data)
-                if not isinstance(callback_data, str):
-                    return False
-                if match := re.match(self.pattern, callback_data):
-                    return match
-            else:
-                return True
-        return None
+        if not (isinstance(update, Update) and update.callback_query):
+            return None
+
+        callback_data = update.callback_query.data
+        game_short_name = update.callback_query.game_short_name
+
+        if not any([self.pattern, self.game_pattern]):
+            return True
+
+        # we check for .data or .game_short_name from update to filter based on whats coming
+        # this gives xor-like behavior
+        if callback_data:
+            if not self.pattern:
+                return False
+            if isinstance(self.pattern, type):
+                return isinstance(callback_data, self.pattern)
+            if callable(self.pattern):
+                return self.pattern(callback_data)
+            if not isinstance(callback_data, str):
+                return False
+            if match := re.match(self.pattern, callback_data):
+                return match
+
+        elif game_short_name:
+            if not self.game_pattern:
+                return False
+            if match := re.match(self.game_pattern, game_short_name):
+                return match
+        else:
+            return True
+        return False
 
     def collect_additional_context(
         self,
