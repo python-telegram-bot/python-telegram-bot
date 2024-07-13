@@ -126,6 +126,31 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
             for key, value in kwargs.items():
                 assert getattr(entity, key) == value
 
+    def test_concatenate(self):
+        kwargs = {
+            "url": "url",
+            "user": 42,
+            "language": "python",
+            "custom_emoji_id": "custom_emoji_id",
+        }
+        first_entity = MessageEntity(MessageEntity.BOLD, 0, 6, **kwargs)
+        second_entity = MessageEntity(MessageEntity.ITALIC, 0, 4, **kwargs)
+        third_entity = MessageEntity(MessageEntity.UNDERLINE, 3, 6, **kwargs)
+
+        first = ("prefix 𝛙𝌢𑁍 | ", [first_entity], True)
+        second = ("text 𝛙𝌢𑁍", [second_entity], False)
+        third = (" | suffix 𝛙𝌢𑁍", [third_entity])
+
+        new_text, new_entities = MessageEntity.concatenate(first, second, third)
+
+        assert new_text == "prefix 𝛙𝌢𑁍 | text 𝛙𝌢𑁍 | suffix 𝛙𝌢𑁍"
+        assert [entity.offset for entity in new_entities] == [0, 16, 30]
+        for old, new in zip([first_entity, second_entity, third_entity], new_entities):
+            assert new is not old
+            assert new.type == old.type
+            for key, value in kwargs.items():
+                assert getattr(new, key) == value
+
     def test_equality(self):
         a = MessageEntity(MessageEntity.BOLD, 2, 3)
         b = MessageEntity(MessageEntity.BOLD, 2, 3)
