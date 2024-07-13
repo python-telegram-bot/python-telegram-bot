@@ -249,8 +249,18 @@ class TestCallbackQueryHandler:
     @pytest.mark.parametrize(
         ("data", "pattern", "game_short_name", "game_pattern", "expected_result"),
         [
-            ("data", "data", None, "game_data", True),
-            (None, "data", "game_data", ".*data", True),
+            (None, None, None, None, True),
+            (None, ".*data", None, None, True),
+            (None, None, None, ".*game", True),
+            (None, ".*data", None, ".*game", True),
+            ("some_data", None, None, None, True),
+            ("some_data", ".*data", None, None, True),
+            ("some_data", None, None, ".*game", False),
+            ("some_data", ".*data", None, ".*game", True),
+            (None, None, "some_game", None, True),
+            (None, ".*data", "some_game", None, False),
+            (None, None, "some_game", ".*game", True),
+            (None, ".*data", "some_game", ".*game", True),
         ],
     )
     def test_pattern_and_game_pattern_interaction(
