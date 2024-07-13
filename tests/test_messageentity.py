@@ -103,6 +103,29 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
             assert out_entity.offset == offset
             assert out_entity.length == length
 
+    @pytest.mark.parametrize("by", [6, "prefix", "𝛙𝌢𑁍"])
+    def test_shift_entities(self, by):
+        kwargs = {
+            "url": "url",
+            "user": 42,
+            "language": "python",
+            "custom_emoji_id": "custom_emoji_id",
+        }
+        entities = [
+            MessageEntity(MessageEntity.BOLD, 2, 3, **kwargs),
+            MessageEntity(MessageEntity.BOLD, 5, 6, **kwargs),
+        ]
+        shifted = MessageEntity.shift_entities(by, entities)
+        assert shifted[0].offset == 8
+        assert shifted[1].offset == 11
+
+        assert shifted[0] is not entities[0]
+        assert shifted[1] is not entities[1]
+
+        for entity in shifted:
+            for key, value in kwargs.items():
+                assert getattr(entity, key) == value
+
     def test_equality(self):
         a = MessageEntity(MessageEntity.BOLD, 2, 3)
         b = MessageEntity(MessageEntity.BOLD, 2, 3)

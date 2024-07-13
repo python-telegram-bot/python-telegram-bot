@@ -20,7 +20,7 @@
 
 import copy
 import itertools
-from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence
+from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -205,7 +205,7 @@ class MessageEntity(TelegramObject):
             text_slice = text[last_position:position]
             accumulated_length += len(text_slice.encode("utf-16-le")) // 2
             position_translation[position] = accumulated_length
-        # get the final output entites
+        # get the final output entities
         out = []
         for entity in entities:
             translated_positions = position_translation[entity.offset]
@@ -216,6 +216,71 @@ class MessageEntity(TelegramObject):
             with new_entity._unfrozen():
                 new_entity.offset = translated_positions
                 new_entity.length = translated_length
+            out.append(new_entity)
+        return out
+
+    @staticmethod
+    def shift_entities(
+        by: Union[str, int], entities: Sequence["MessageEntity"]
+    ) -> Sequence["MessageEntity"]:
+        """Utility functionality for shifting the offset of entities by a given amount.
+
+        Examples:
+            Shifting by an integer amount:
+
+            .. code-block:: python
+
+                text = "Hello, world!"
+                entities = [
+                    MessageEntity(offset=0, length=5, type=MessageEntity.BOLD),
+                    MessageEntity(offset=7, length=5, type=MessageEntity.ITALIC),
+                ]
+                shifted_entities = MessageEntity.shift_entities(1, entities)
+                await bot.send_message(
+                    chat_id=123,
+                    text="!" + text,
+                    entities=shifted_entities,
+                )
+
+            Shifting using a string:
+
+            .. code-block:: python
+
+                text = "Hello, world!"
+                prefix = "𝄢"
+                entities = [
+                    MessageEntity(offset=0, length=5, type=MessageEntity.BOLD),
+                    MessageEntity(offset=7, length=5, type=MessageEntity.ITALIC),
+                ]
+                shifted_entities = MessageEntity.shift_entities(prefix, entities)
+                await bot.send_message(
+                    chat_id=123,
+                    text=prefix + text,
+                    entities=shifted_entities,
+                )
+
+        Tip:
+            The :paramref:`entities` are *not* modified in place. The function returns a sequence
+            of new objects.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            by (Union[:obj:`str`, :obj:`int`]): Either the amount to shift the offset by or
+                a string whose length will be used as the amount to shift the offset by. In this
+                case, UTF-16 encoding will be used to calculate the length.
+            entities (Sequence[:class:`telegram.MessageEntity`]): Sequence of entities
+
+        Returns:
+            Sequence[:class:`telegram.MessageEntity`]: Sequence of entities with the offset shifted
+        """
+        effective_shift = by if isinstance(by, int) else len(by.encode("utf-16-le")) // 2
+
+        out = []
+        for entity in entities:
+            new_entity = copy.copy(entity)
+            with new_entity._unfrozen():
+                new_entity.offset += effective_shift
             out.append(new_entity)
         return out
 
