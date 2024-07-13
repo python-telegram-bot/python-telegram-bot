@@ -26,14 +26,14 @@ jobs:
           name: python-package-distributions
           path: dist/
 
-  publish-to-test-pypi:
-    name: Publish to Test PyPI
+  publish-to-pypi:
+    name: Publish to PyPI
     needs:
       - build
     runs-on: ubuntu-latest
     environment:
-      name: release_test_pypi
-      url: https://test.pypi.org/p/python-telegram-bot
+      name: release_pypi
+      url: https://pypi.org/p/python-telegram-bot
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -43,16 +43,14 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-      - name: Publish to Test PyPI
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
 
   compute-signatures:
     name: Compute SHA1 Sums and Sign with Sigstore
     runs-on: ubuntu-latest
     needs:
-      - publish-to-test-pypi
+      - publish-to-pypi
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for sigstore
@@ -82,8 +80,8 @@ jobs:
           name: python-package-distributions-and-signatures
           path: dist/
 
-  github-test-release:
-    name: Upload to GitHub Release Draft
+  github-release:
+    name: Upload to GitHub Release
     needs:
       - compute-signatures
 
@@ -101,14 +99,13 @@ jobs:
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        # Create a GitHub Release *draft*. The description can be changed later, as for now
+        # Create a tag and a GitHub Release. The description can be changed later, as for now
         # we don't define it through this workflow.
         run: >-
           gh release create
           '${{ github.ref_name }}'
           --repo '${{ github.repository }}'
           --generate-notes
-          --draft
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
