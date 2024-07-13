@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Publish to Test PyPI
 
 on:
   # manually trigger the workflow
