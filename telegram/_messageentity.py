@@ -345,7 +345,7 @@ class MessageEntity(TelegramObject):
 
         Returns:
             Tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`]]: The concatenated text
-                and its entities
+            and its entities
         """
         output_text = ""
         output_entities: List[MessageEntity] = []
