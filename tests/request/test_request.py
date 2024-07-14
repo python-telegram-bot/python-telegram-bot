@@ -31,7 +31,7 @@ import pytest
 from httpx import AsyncHTTPTransport
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram.constants import TextEncoding
+from telegram._utils.strings import TextEncoding
 from telegram.error import (
     BadRequest,
     ChatMigrated,

@@ -26,10 +26,10 @@ from typing import AsyncContextManager, Final, List, Optional, Tuple, Type, Type
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings import warn
 from telegram._version import __version__ as ptb_ver
-from telegram.constants import TextEncoding
 from telegram.error import (
     BadRequest,
     ChatMigrated,

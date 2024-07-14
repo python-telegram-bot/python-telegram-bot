@@ -22,7 +22,7 @@ import json
 import os
 import random
 
-from telegram.constants import TextEncoding
+from telegram._utils.strings import TextEncoding
 
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine
 # These bots are only able to talk in our test chats, so they are quite useless for other

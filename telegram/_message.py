@@ -68,6 +68,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
     CorrectOptionID,
     FileInput,
@@ -85,7 +86,7 @@ from telegram._videochat import (
 )
 from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
-from telegram.constants import ZERO_DATE, MessageAttachmentType, ParseMode, TextEncoding
+from telegram.constants import ZERO_DATE, MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
 from telegram.warnings import PTBDeprecationWarning
 

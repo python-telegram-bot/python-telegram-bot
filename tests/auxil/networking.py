@@ -23,8 +23,8 @@ import pytest
 from httpx import AsyncClient, AsyncHTTPTransport, Response
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import ODVInput
-from telegram.constants import TextEncoding
 from telegram.error import BadRequest, RetryAfter, TimedOut
 from telegram.request import HTTPXRequest, RequestData
 

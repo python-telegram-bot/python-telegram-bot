@@ -21,8 +21,8 @@ import json
 from typing import Any, Dict, List, Optional, Union, final
 from urllib.parse import urlencode
 
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import UploadFileDict
-from telegram.constants import TextEncoding
 from telegram.request._requestparameter import RequestParameter
 
 

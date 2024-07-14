@@ -26,7 +26,7 @@ Warning:
 from typing import Dict, Optional, Sequence
 
 from telegram._messageentity import MessageEntity
-from telegram.constants import TextEncoding
+from telegram._utils.strings import TextEncoding
 
 
 def parse_message_entity(text: str, entity: MessageEntity) -> str:

@@ -24,8 +24,8 @@ from telegram._files.photosize import PhotoSize
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
-from telegram.constants import TextEncoding
 
 if TYPE_CHECKING:
     from telegram import Bot

@@ -23,8 +23,8 @@ from typing import IO, Optional, Union
 from uuid import uuid4
 
 from telegram._utils.files import load_file
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import FieldTuple
-from telegram.constants import TextEncoding
 
 _DEFAULT_MIME_TYPE = "application/octet-stream"
 

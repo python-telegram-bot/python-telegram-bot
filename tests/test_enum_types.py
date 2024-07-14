@@ -19,7 +19,7 @@
 import re
 from pathlib import Path
 
-from telegram.constants import TextEncoding
+from telegram._utils.strings import TextEncoding
 
 telegram_root = Path(__file__).parent.parent / "telegram"
 telegram_ext_root = telegram_root / "ext"

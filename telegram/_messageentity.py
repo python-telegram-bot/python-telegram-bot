@@ -26,8 +26,8 @@ from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
-from telegram.constants import TextEncoding
 
 if TYPE_CHECKING:
     from telegram import Bot

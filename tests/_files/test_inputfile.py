@@ -24,7 +24,7 @@ from io import BytesIO
 import pytest
 
 from telegram import InputFile
-from telegram.constants import TextEncoding
+from telegram._utils.strings import TextEncoding
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
