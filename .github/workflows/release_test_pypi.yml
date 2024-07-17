@@ -113,11 +113,12 @@ jobs:
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.build.outputs.TAG }}
         # Create a GitHub Release *draft*. The description can be changed later, as for now
         # we don't define it through this workflow.
         run: >-
           gh release create
-          '$TAG'
+          '${{ env.TAG }}'
           --repo '${{ github.repository }}'
           --generate-notes
           --draft
@@ -130,5 +131,5 @@ jobs:
         # sigstore-produced signatures and certificates.
         run: >-
           gh release upload
-          '$TAG' dist/**
+          '${{ env.TAG }}' dist/**
           --repo '${{ github.repository }}'
