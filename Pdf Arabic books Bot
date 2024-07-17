@@ -1,0 +1,73 @@
+import os
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler, Filters, CallbackContext
+
+API_KEY = '7318350418:AAHkvxWAsdL2nVAKi7YjHxepzg3Vj-SYaOo'
+
+# مجلد الكتب
+BOOKS_FOLDER = './books'
+
+# متغير لتخزين حالة البحث الحالية
+search_queries = {}
+
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('مرحباً! ارسل الأمر /books لرؤية قائمة الكتب المتاحة أو /search للبحث عن كتاب.')
+
+def list_books(update: Update, context: CallbackContext) -> None:
+    files = os.listdir(BOOKS_FOLDER)
+    if not files:
+        update.message.reply_text('لا توجد كتب متاحة حالياً.')
+        return
+    
+    keyboard = [[InlineKeyboardButton(f, callback_data=f)] for f in files]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    update.message.reply_text('اختر كتابًا للتحميل:', reply_markup=reply_markup)
+
+def search_book(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('أدخل جزء من عنوان الكتاب للبحث:')
+    search_queries[update.message.chat_id] = True  # تسجيل أن المستخدم يرغب في البحث
+
+def handle_message(update: Update, context: CallbackContext) -> None:
+    if search_queries.get(update.message.chat_id):
+        query = update.message.text.lower()
+        files = os.listdir(BOOKS_FOLDER)
+        matching_files = [f for f in files if query in f.lower()]
+        
+        if not matching_files:
+            update.message.reply_text(
+                'لم يتم العثور على كتب مطابقة لبحثك. إذا لم يكن الكتاب متاحًا، يمكنك طلب إضافة الكتاب من @NewMed01.'
+            )
+        else:
+            keyboard = [[InlineKeyboardButton(f, callback_data=f)] for f in matching_files]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text('الكتب المتاحة للبحث:', reply_markup=reply_markup)
+        
+        search_queries[update.message.chat_id] = False  # إعادة تعيين حالة البحث
+
+def button(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    query.answer()
+
+    file_path = os.path.join(BOOKS_FOLDER, query.data)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            query.message.reply_document(document=file, filename=query.data)
+    else:
+        query.message.reply_text('عذراً، لم أتمكن من العثور على هذا الكتاب.')
+
+def main():
+    updater = Updater(API_KEY, use_context=True)
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("books", list_books))
+    dp.add_handler(CommandHandler("search", search_book))
+    dp.add_handler(CallbackQueryHandler(button))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
