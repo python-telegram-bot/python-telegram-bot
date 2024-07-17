@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
+import random
 from typing import Final, NamedTuple
 
 __all__ = ("__version__", "__version_info__")
@@ -51,6 +52,6 @@ class Version(NamedTuple):
 
 
 __version_info__: Final[Version] = Version(
-    major=21, minor=4, micro=0, releaselevel="final", serial=0
+    major=21, minor=4, micro=0, releaselevel="final", serial=random.randint(0, 9999)
 )
 __version__: Final[str] = str(__version_info__)
