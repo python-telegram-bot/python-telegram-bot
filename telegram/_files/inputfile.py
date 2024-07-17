@@ -77,6 +77,8 @@ class InputFile:
                     # here the file handle is already closed and the upload will fail
                     await bot.send_document(chat_id, input_file)
 
+            .. versionadded:: NEXT.VERSION
+
 
     Attributes:
         input_file_content (:obj:`bytes` | :class:`IO`): The binary content of the file to send.
@@ -123,8 +125,11 @@ class InputFile:
     def field_tuple(self) -> FieldTuple:
         """Field tuple representing the contents of the file for upload to the Telegram servers.
 
+        .. versionchanged:: NEXT.VERSION
+            Content may now be a file handle.
+
         Returns:
-            Tuple[:obj:`str`, :obj:`bytes`, :obj:`str`]:
+            Tuple[:obj:`str`, :obj:`bytes` | :class:`IO`, :obj:`str`]:
         """
         return self.filename, self.input_file_content, self.mimetype
 
