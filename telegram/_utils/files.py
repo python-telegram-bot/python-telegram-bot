@@ -110,8 +110,8 @@ def parse_file_input(  # pylint: disable=too-many-return-statements
       attribute.
 
     Args:
-        file_input (:obj:`str` | :obj:`bytes` | :term:`file object` | Telegram media object): The
-            input to parse.
+        file_input (:obj:`str` | :obj:`bytes` | :term:`file object` | :class:`~telegram.InputFile`\
+            | Telegram media object): The input to parse.
         tg_type (:obj:`type`, optional): The Telegram media type the input can be. E.g.
             :class:`telegram.Animation`.
         filename (:obj:`str`, optional): The filename. Only relevant in case an
