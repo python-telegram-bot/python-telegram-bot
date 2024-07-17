@@ -61,12 +61,22 @@ def load_file(
     except AttributeError:
         return None, cast(Union[bytes, "InputFile", str, Path], obj)
 
-    if hasattr(obj, "name") and not isinstance(obj.name, int):
-        filename = Path(obj.name).name
-    else:
-        filename = None
+    filename = guess_file_name(obj)
 
     return filename, contents
+
+
+def guess_file_name(obj: Optional[FileInput]) -> Optional[str]:
+    """If the input is a file handle, read name and return it. Otherwise, return
+    the input unchanged.
+    """
+    if obj is None:
+        return None
+
+    if hasattr(obj, "name") and not isinstance(obj.name, int):
+        return Path(obj.name).name
+
+    return None
 
 
 def is_local_file(obj: Optional[FilePathInput]) -> bool:
