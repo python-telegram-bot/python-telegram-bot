@@ -11,6 +11,8 @@ jobs:
   build:
     name: Build Distribution
     runs-on: ubuntu-latest
+    outputs:
+      TAG: ${{ steps.get_tag.outputs.TAG }}
 
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +30,11 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
+      - name: Get Tag Name
+        id: get_tag
+        run: |
+          TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
 
   publish-to-test-pypi:
     name: Publish to Test PyPI
@@ -88,6 +95,7 @@ jobs:
   github-test-release:
     name: Upload to GitHub Release Draft
     needs:
+      - build
       - compute-signatures
 
     runs-on: ubuntu-latest
@@ -101,10 +109,6 @@ jobs:
         with:
           name: python-package-distributions-and-signatures
           path: dist/
-      - name: Get Tag Name
-        run: |
-          TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
-          echo "TAG=$TAG" >> $GITHUB_ENV
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -119,6 +123,7 @@ jobs:
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.build.outputs.TAG }}
         # Upload to GitHub Release using the `gh` CLI.
         # `dist/` contains the built packages, and the
         # sigstore-produced signatures and certificates.
