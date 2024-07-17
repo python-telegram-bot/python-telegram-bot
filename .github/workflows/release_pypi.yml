@@ -27,6 +27,12 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
+      - name: Get Tag Name
+        id: get_tag
+        run: |
+          pip install .
+          TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
 
   publish-to-pypi:
     name: Publish to PyPI
@@ -81,11 +87,6 @@ jobs:
         with:
           name: python-package-distributions-and-signatures
           path: dist/
-      - name: Get Tag Name
-        id: get_tag
-        run: |
-          TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
-          echo "TAG=$TAG" >> $GITHUB_OUTPUT
 
   github-release:
     name: Upload to GitHub Release

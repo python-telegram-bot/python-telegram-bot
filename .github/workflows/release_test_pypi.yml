@@ -33,6 +33,7 @@ jobs:
       - name: Get Tag Name
         id: get_tag
         run: |
+          pip install .
           TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
           echo "TAG=$TAG" >> $GITHUB_OUTPUT
 
