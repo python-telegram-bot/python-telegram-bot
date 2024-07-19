@@ -1,4 +1,4 @@
-sphinx==7.3.7
+sphinx==7.4.6
 furo==2024.5.6
 furo-sphinx-search @ git+https://github.com/harshil21/furo-sphinx-search@v0.2.0.1
 sphinx-paramlinks==0.6.0
