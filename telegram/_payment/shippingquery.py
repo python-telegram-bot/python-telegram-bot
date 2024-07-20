@@ -43,13 +43,13 @@ class ShippingQuery(TelegramObject):
     Args:
         id (:obj:`str`): Unique query identifier.
         from_user (:class:`telegram.User`): User who sent the query.
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        invoice_payload (:obj:`str`): Bot-specified invoice payload.
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
 
     Attributes:
         id (:obj:`str`): Unique query identifier.
         from_user (:class:`telegram.User`): User who sent the query.
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        invoice_payload (:obj:`str`): Bot-specified invoice payload.
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
 
 
@@ -77,7 +77,9 @@ class ShippingQuery(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ShippingQuery"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ShippingQuery"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

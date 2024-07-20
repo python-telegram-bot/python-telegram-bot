@@ -23,7 +23,7 @@ from datetime import datetime
 from typing import List, Optional, Sequence, Tuple, final
 
 from telegram._files.inputfile import InputFile
-from telegram._files.inputmedia import InputMedia
+from telegram._files.inputmedia import InputMedia, InputPaidMedia
 from telegram._files.inputsticker import InputSticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
@@ -90,7 +90,7 @@ class RequestParameter:
         value: object,
     ) -> Tuple[object, List[InputFile]]:
         """Converts `value` into something that we can json-dump. Returns two values:
-        1. the JSON-dumpable value. Maybe be `None` in case the value is an InputFile which must
+        1. the JSON-dumpable value. May be `None` in case the value is an InputFile which must
            not be uploaded via an attach:// URI
         2. A list of InputFiles that should be uploaded for this value
 
@@ -117,7 +117,7 @@ class RequestParameter:
                 return value.attach_uri, [value]
             return None, [value]
 
-        if isinstance(value, InputMedia) and isinstance(value.media, InputFile):
+        if isinstance(value, (InputMedia, InputPaidMedia)) and isinstance(value.media, InputFile):
             # We call to_dict and change the returned dict instead of overriding
             # value.media in case the same value is reused for another request
             data = value.to_dict()

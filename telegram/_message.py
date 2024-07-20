@@ -52,8 +52,10 @@ from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
+from telegram._paidmedia import PaidMediaInfo
 from telegram._passport.passportdata import PassportData
 from telegram._payment.invoice import Invoice
+from telegram._payment.refundedpayment import RefundedPayment
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
@@ -178,7 +180,10 @@ class MaybeInaccessibleMessage(TelegramObject):
 
     @classmethod
     def _de_json(
-        cls, data: Optional[JSONDict], bot: "Bot", api_kwargs: Optional[JSONDict] = None
+        cls,
+        data: Optional[JSONDict],
+        bot: Optional["Bot"] = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> Optional["MaybeInaccessibleMessage"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
@@ -331,7 +336,7 @@ class Message(MaybeInaccessibleMessage):
         effect_id (:obj:`str`, optional): Unique identifier of the message effect added to the
             message.
 
-            ..versionadded:: 21.3
+            .. versionadded:: 21.3
 
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -353,6 +358,7 @@ class Message(MaybeInaccessibleMessage):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
+            `More about games >> <https://core.telegram.org/bots/api#games>`_.
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -368,7 +374,8 @@ class Message(MaybeInaccessibleMessage):
             video.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
             the file.
-        video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
+        video_note (:class:`telegram.VideoNote`, optional): Message is a
+            `video note <https://telegram.org/blog/video-messages-and-telescope>`_, information
             about the video message.
         new_chat_members (Sequence[:class:`telegram.User`], optional): New members that were added
             to the group or supergroup and information about them (the bot itself may be one of
@@ -377,7 +384,8 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        caption (:obj:`str`, optional): Caption for the animation, audio, document, photo, video
+        caption (:obj:`str`, optional): Caption for the animation, audio, document, paid media,
+            photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
@@ -423,10 +431,13 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
+            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
+            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
         connected_website (:obj:`str`, optional): The domain name of the website on which the user
             has logged in.
+            `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
@@ -568,6 +579,14 @@ class Message(MaybeInaccessibleMessage):
             background set.
 
             .. versionadded:: 21.2
+        paid_media (:obj:`telegram.PaidMediaInfo`, optional): Message contains paid media;
+            information about the paid media.
+
+            .. versionadded:: 21.4
+        refunded_payment (:obj:`telegram.RefundedPayment`, optional): Message is a service message
+            about a refunded payment, information about the payment.
+
+            .. versionadded:: 21.4
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -656,6 +675,7 @@ class Message(MaybeInaccessibleMessage):
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
+            `More about games >> <https://core.telegram.org/bots/api#games>`_.
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -679,7 +699,8 @@ class Message(MaybeInaccessibleMessage):
             the file.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
+        video_note (:class:`telegram.VideoNote`): Optional. Message is a
+            `video note <https://telegram.org/blog/video-messages-and-telescope>`_, information
             about the video message.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -689,7 +710,8 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
-        caption (:obj:`str`): Optional. Caption for the animation, audio, document, photo, video
+        caption (:obj:`str`): Optional. Caption for the animation, audio, document, paid media,
+            photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
             about the contact.
@@ -735,10 +757,13 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
+            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
             message about a successful payment, information about the payment.
+            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
+            `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
@@ -881,6 +906,14 @@ class Message(MaybeInaccessibleMessage):
             background set
 
             .. versionadded:: 21.2
+        paid_media (:obj:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
+            information about the paid media.
+
+            .. versionadded:: 21.4
+        refunded_payment (:obj:`telegram.RefundedPayment`): Optional. Message is a service message
+            about a refunded payment, information about the payment.
+
+            .. versionadded:: 21.4
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -947,12 +980,14 @@ class Message(MaybeInaccessibleMessage):
         "new_chat_members",
         "new_chat_photo",
         "new_chat_title",
+        "paid_media",
         "passport_data",
         "photo",
         "pinned_message",
         "poll",
         "proximity_alert_triggered",
         "quote",
+        "refunded_payment",
         "reply_markup",
         "reply_to_message",
         "reply_to_story",
@@ -1064,6 +1099,8 @@ class Message(MaybeInaccessibleMessage):
         chat_background_set: Optional[ChatBackground] = None,
         effect_id: Optional[str] = None,
         show_caption_above_media: Optional[bool] = None,
+        paid_media: Optional[PaidMediaInfo] = None,
+        refunded_payment: Optional[RefundedPayment] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1165,6 +1202,8 @@ class Message(MaybeInaccessibleMessage):
             self.chat_background_set: Optional[ChatBackground] = chat_background_set
             self.effect_id: Optional[str] = effect_id
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.paid_media: Optional[PaidMediaInfo] = paid_media
+            self.refunded_payment: Optional[RefundedPayment] = refunded_payment
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1205,7 +1244,7 @@ class Message(MaybeInaccessibleMessage):
         return None
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Message"]:
+    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Message"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -1280,6 +1319,8 @@ class Message(MaybeInaccessibleMessage):
         data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
         data["chat_background_set"] = ChatBackground.de_json(data.get("chat_background_set"), bot)
+        data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
+        data["refunded_payment"] = RefundedPayment.de_json(data.get("refunded_payment"), bot)
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
@@ -1343,6 +1384,7 @@ class Message(MaybeInaccessibleMessage):
         Location,
         PassportData,
         Sequence[PhotoSize],
+        PaidMediaInfo,
         Poll,
         Sticker,
         Story,
@@ -1353,8 +1395,8 @@ class Message(MaybeInaccessibleMessage):
         Voice,
         None,
     ]:
-        """If this message is neither a plain text message nor a status update, this gives the
-        attachment that this message was sent with. This may be one of
+        """If the message is a user generated content which is not a plain text message, this
+        property is set to this content. It may be one of
 
         * :class:`telegram.Audio`
         * :class:`telegram.Dice`
@@ -1366,6 +1408,7 @@ class Message(MaybeInaccessibleMessage):
         * :class:`telegram.Location`
         * :class:`telegram.PassportData`
         * List[:class:`telegram.PhotoSize`]
+        * :class:`telegram.PaidMediaInfo`
         * :class:`telegram.Poll`
         * :class:`telegram.Sticker`
         * :class:`telegram.Story`
@@ -1383,6 +1426,12 @@ class Message(MaybeInaccessibleMessage):
             :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
             attachment.
 
+        .. versionchanged:: 21.4
+            :attr:`paid_media` is now also considered to be an attachment.
+
+        .. deprecated:: 21.4
+            :attr:`successful_payment` will be removed in future major versions.
+
         """
         if not isinstance(self._effective_attachment, DefaultValue):
             return self._effective_attachment
@@ -1390,6 +1439,15 @@ class Message(MaybeInaccessibleMessage):
         for attachment_type in MessageAttachmentType:
             if self[attachment_type]:
                 self._effective_attachment = self[attachment_type]  # type: ignore[assignment]
+                if attachment_type == MessageAttachmentType.SUCCESSFUL_PAYMENT:
+                    warn(
+                        PTBDeprecationWarning(
+                            "21.4",
+                            "successful_payment will no longer be considered an attachment in"
+                            " future major versions",
+                        ),
+                        stacklevel=2,
+                    )
                 break
         else:
             self._effective_attachment = None
@@ -3578,7 +3636,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_text(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.edit_message_text`.
@@ -3587,6 +3648,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: 21.4
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3608,6 +3672,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             entities=entities,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def edit_caption(
@@ -3627,7 +3692,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_caption(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3637,6 +3705,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: 21.4
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3657,6 +3728,7 @@ class Message(MaybeInaccessibleMessage):
             caption_entities=caption_entities,
             inline_message_id=None,
             show_caption_above_media=show_caption_above_media,
+            business_connection_id=self.business_connection_id,
         )
 
     async def edit_media(
@@ -3673,7 +3745,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_media(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3683,6 +3758,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself(i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: 21.4
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -3700,6 +3778,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def edit_reply_markup(
@@ -3715,7 +3794,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_reply_markup(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3725,6 +3807,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: 21.4
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3740,6 +3825,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def edit_live_location(
@@ -3762,7 +3848,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.edit_message_live_location(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3772,6 +3861,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: 21.4
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3794,6 +3886,7 @@ class Message(MaybeInaccessibleMessage):
             proximity_alert_radius=proximity_alert_radius,
             live_period=live_period,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def stop_live_location(
@@ -3809,7 +3902,10 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
              await bot.stop_message_live_location(
-                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 business_connection_id=message.business_connection_id,
+                 *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -3819,6 +3915,9 @@ class Message(MaybeInaccessibleMessage):
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
             of methods) or channel posts, if the bot is an admin in that channel. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+        .. versionchanged:: 21.4
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -3834,6 +3933,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
+            business_connection_id=self.business_connection_id,
         )
 
     async def set_game_score(
@@ -3964,10 +4064,16 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.stop_poll(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.stop_poll`.
+
+        .. versionchanged:: 21.4
+           Now also passes :attr:`business_connection_id`.
 
         Returns:
             :class:`telegram.Poll`: On success, the stopped Poll with the final results is
@@ -3983,6 +4089,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def pin(

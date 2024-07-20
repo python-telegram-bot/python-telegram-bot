@@ -37,6 +37,7 @@ from telegram._giveaway import Giveaway, GiveawayWinners
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageentity import MessageEntity
 from telegram._messageorigin import MessageOrigin
+from telegram._paidmedia import PaidMediaInfo
 from telegram._payment.invoice import Invoice
 from telegram._poll import Poll
 from telegram._story import Story
@@ -80,8 +81,9 @@ class ExternalReplyInfo(TelegramObject):
             sticker.
         story (:class:`telegram.Story`, optional): Message is a forwarded story.
         video (:class:`telegram.Video`, optional): Message is a video, information about the video.
-        video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
-            about the video message.
+        video_note (:class:`telegram.VideoNote`, optional): Message is a `video note
+            <https://telegram.org/blog/video-messages-and-telescope>`_, information about the video
+            message.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
             the file.
         has_media_spoiler (:obj:`bool`, optional): :obj:`True`, if the message media is covered by
@@ -90,17 +92,23 @@ class ExternalReplyInfo(TelegramObject):
             about the contact.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value.
         game (:Class:`telegram.Game`. optional): Message is a game, information about the game.
+            `More about games >> <https://core.telegram.org/bots/api#games>`_.
         giveaway (:class:`telegram.Giveaway`, optional): Message is a scheduled giveaway,
             information about the giveaway.
         giveaway_winners (:class:`telegram.GiveawayWinners`, optional): A giveaway with public
             winners was completed.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
-            information about the invoice.
+            information about the invoice. `More about payments >>
+            <https://core.telegram.org/bots/api#payments>`_.
         location (:class:`telegram.Location`, optional): Message is a shared location, information
             about the location.
         poll (:class:`telegram.Poll`, optional): Message is a native poll, information about the
             poll.
         venue (:class:`telegram.Venue`, optional): Message is a venue, information about the venue.
+        paid_media (:class:`telegram.PaidMedia`, optional): Message contains paid media;
+            information about the paid media.
+
+            .. versionadded:: 21.4
 
     Attributes:
         origin (:class:`telegram.MessageOrigin`): Origin of the message replied to by the given
@@ -123,8 +131,9 @@ class ExternalReplyInfo(TelegramObject):
             sticker.
         story (:class:`telegram.Story`): Optional. Message is a forwarded story.
         video (:class:`telegram.Video`): Optional. Message is a video, information about the video.
-        video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
-            about the video message.
+        video_note (:class:`telegram.VideoNote`): Optional. Message is a `video note
+            <https://telegram.org/blog/video-messages-and-telescope>`_, information about the video
+            message.
         voice (:class:`telegram.Voice`): Optional. Message is a voice message, information about
             the file.
         has_media_spoiler (:obj:`bool`): Optional. :obj:`True`, if the message media is covered by
@@ -133,17 +142,23 @@ class ExternalReplyInfo(TelegramObject):
             about the contact.
         dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.
         game (:Class:`telegram.Game`): Optional. Message is a game, information about the game.
+            `More about games >> <https://core.telegram.org/bots/api#games>`_.
         giveaway (:class:`telegram.Giveaway`): Optional. Message is a scheduled giveaway,
             information about the giveaway.
         giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
             winners was completed.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
-            information about the invoice.
+            information about the invoice. `More about payments >>
+            <https://core.telegram.org/bots/api#payments>`_.
         location (:class:`telegram.Location`): Optional. Message is a shared location, information
             about the location.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll, information about the
             poll.
         venue (:class:`telegram.Venue`): Optional. Message is a venue, information about the venue.
+        paid_media (:class:`telegram.PaidMedia`): Optional. Message contains paid media;
+            information about the paid media.
+
+            .. versionadded:: 21.4
     """
 
     __slots__ = (
@@ -162,6 +177,7 @@ class ExternalReplyInfo(TelegramObject):
         "location",
         "message_id",
         "origin",
+        "paid_media",
         "photo",
         "poll",
         "sticker",
@@ -197,6 +213,7 @@ class ExternalReplyInfo(TelegramObject):
         location: Optional[Location] = None,
         poll: Optional[Poll] = None,
         venue: Optional[Venue] = None,
+        paid_media: Optional[PaidMediaInfo] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -225,13 +242,16 @@ class ExternalReplyInfo(TelegramObject):
         self.location: Optional[Location] = location
         self.poll: Optional[Poll] = poll
         self.venue: Optional[Venue] = venue
+        self.paid_media: Optional[PaidMediaInfo] = paid_media
 
         self._id_attrs = (self.origin,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ExternalReplyInfo"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ExternalReplyInfo"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -261,6 +281,7 @@ class ExternalReplyInfo(TelegramObject):
         data["location"] = Location.de_json(data.get("location"), bot)
         data["poll"] = Poll.de_json(data.get("poll"), bot)
         data["venue"] = Venue.de_json(data.get("venue"), bot)
+        data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -329,7 +350,9 @@ class TextQuote(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["TextQuote"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["TextQuote"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -434,7 +457,9 @@ class ReplyParameters(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ReplyParameters"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ReplyParameters"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

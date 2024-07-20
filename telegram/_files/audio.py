@@ -39,12 +39,12 @@ class Audio(_BaseThumbedMedium):
             or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
-        performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
-            tags.
-        title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
-        file_name (:obj:`str`, optional): Original filename as defined by sender.
-        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        performer (:obj:`str`, optional): Performer of the audio as defined by the sender or by
+            audio tags.
+        title (:obj:`str`, optional): Title of the audio as defined by the sender or by audio tags.
+        file_name (:obj:`str`, optional): Original filename as defined by the sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
@@ -56,12 +56,12 @@ class Audio(_BaseThumbedMedium):
             or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
-        performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
-            tags.
-        title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
-        file_name (:obj:`str`): Optional. Original filename as defined by sender.
-        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
+            audio tags.
+        title (:obj:`str`): Optional. Title of the audio as defined by the sender or by audio tags.
+        file_name (:obj:`str`): Optional. Original filename as defined by the sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.

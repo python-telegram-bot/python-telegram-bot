@@ -4,6 +4,58 @@
 Changelog
 =========
 
+Version 21.4
+============
+
+*Released 2024-07-12*
+
+This is the technical changelog for version 21.4. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for Bot API 7.5 (:pr:`4328`, :pr:`4316`, :pr:`4315`, :pr:`4312` closes :issue:`4310`, :pr:`4311`)
+- Full Support for Bot API 7.6 (:pr:`4333` closes :issue:`4331`, :pr:`4344`, :pr:`4341`, :pr:`4334`, :pr:`4335`, :pr:`4351`, :pr:`4342`, :pr:`4348`)
+- Full Support for Bot API 7.7 (:pr:`4356` closes :issue:`4355`)
+- Drop ``python-telegram-bot-raw`` And Switch to ``pyproject.toml`` Based Packaging (:pr:`4288` closes :issue:`4129` and :issue:`4296`)
+- Deprecate Inclusion of ``successful_payment`` in ``Message.effective_attachment`` (:pr:`4365` closes :issue:`4350`)
+
+New Features
+------------
+
+- Add Support for Python 3.13 Beta (:pr:`4253`)
+- Add ``filters.PAID_MEDIA`` (:pr:`4357`)
+- Log Received Data on Deserialization Errors (:pr:`4304`)
+- Add ``MessageEntity.adjust_message_entities_to_utf_16`` Utility Function (:pr:`4323` by `Antares0982 <https://github.com/Antares0982>`_ closes :issue:`4319`)
+- Make Argument ``bot`` of ``TelegramObject.de_json`` Optional (:pr:`4320`)
+
+Documentation Improvements
+--------------------------
+
+- Documentation Improvements (:pr:`4303` closes :issue:`4301`)
+- Restructure Readme (:pr:`4362`)
+- Fix Link-Check Workflow (:pr:`4332`)
+
+Internal Changes
+----------------
+
+- Automate PyPI Releases (:pr:`4364` closes :issue:`4318`)
+- Add ``mise-en-place`` to ``.gitignore`` (:pr:`4300`)
+- Use a Composite Action for Testing Type Completeness (:pr:`4367`)
+- Stabilize Some Concurrency Usages in Test Suite (:pr:`4360`)
+- Add a Test Case for ``MenuButton`` (:pr:`4363`)
+- Extend ``SuccessfulPayment`` Test (:pr:`4349`)
+- Small Fixes for ``test_stars.py`` (:pr:`4347`)
+- Use Python 3.13 Beta 3 in Test Suite (:pr:`4336`)
+
+Dependency Updates
+------------------
+
+- Bump ``ruff`` and Add New Rules (:pr:`4329`)
+- Bump ``pre-commit`` Hooks to Latest Versions (:pr:`4337`)
+- Add Lower Bound for ``flaky`` Dependency (:pr:`4322` by `Palaptin <https://github.com/Palaptin>`_)
+- Bump ``pytest`` from 8.2.1 to 8.2.2 (:pr:`4294`)
+
 Version 21.3
 ============
 *Released 2024-06-07*

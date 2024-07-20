@@ -29,6 +29,8 @@ from telegram import (
     LinkPreviewOptions,
     MessageEntity,
     MessageOriginUser,
+    PaidMediaInfo,
+    PaidMediaPreview,
     ReplyParameters,
     TextQuote,
     User,
@@ -44,6 +46,7 @@ def external_reply_info():
         message_id=TestExternalReplyInfoBase.message_id,
         link_preview_options=TestExternalReplyInfoBase.link_preview_options,
         giveaway=TestExternalReplyInfoBase.giveaway,
+        paid_media=TestExternalReplyInfoBase.paid_media,
     )
 
 
@@ -59,6 +62,7 @@ class TestExternalReplyInfoBase:
         dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0),
         1,
     )
+    paid_media = PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])
 
 
 class TestExternalReplyInfoWithoutRequest(TestExternalReplyInfoBase):
@@ -76,6 +80,7 @@ class TestExternalReplyInfoWithoutRequest(TestExternalReplyInfoBase):
             "message_id": self.message_id,
             "link_preview_options": self.link_preview_options.to_dict(),
             "giveaway": self.giveaway.to_dict(),
+            "paid_media": self.paid_media.to_dict(),
         }
 
         external_reply_info = ExternalReplyInfo.de_json(json_dict, bot)
@@ -86,6 +91,7 @@ class TestExternalReplyInfoWithoutRequest(TestExternalReplyInfoBase):
         assert external_reply_info.message_id == self.message_id
         assert external_reply_info.link_preview_options == self.link_preview_options
         assert external_reply_info.giveaway == self.giveaway
+        assert external_reply_info.paid_media == self.paid_media
 
         assert ExternalReplyInfo.de_json(None, bot) is None
 
@@ -98,6 +104,7 @@ class TestExternalReplyInfoWithoutRequest(TestExternalReplyInfoBase):
         assert ext_reply_info_dict["message_id"] == self.message_id
         assert ext_reply_info_dict["link_preview_options"] == self.link_preview_options.to_dict()
         assert ext_reply_info_dict["giveaway"] == self.giveaway.to_dict()
+        assert ext_reply_info_dict["paid_media"] == self.paid_media.to_dict()
 
     def test_equality(self, external_reply_info):
         a = external_reply_info

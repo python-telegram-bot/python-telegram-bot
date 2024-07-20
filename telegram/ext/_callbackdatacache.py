@@ -30,6 +30,8 @@ except ImportError:
     CACHE_TOOLS_AVAILABLE = False
 
 
+import contextlib
+
 from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
 from telegram._utils.datetime import to_float_timestamp
 from telegram.error import TelegramError
@@ -425,10 +427,8 @@ class CallbackDataCache:
             raise KeyError("CallbackQuery was not found in cache.") from exc
 
     def __drop_keyboard(self, keyboard_uuid: str) -> None:
-        try:
+        with contextlib.suppress(KeyError):
             self._keyboard_data.pop(keyboard_uuid)
-        except KeyError:
-            return
 
     def clear_callback_data(self, time_cutoff: Optional[Union[float, datetime]] = None) -> None:
         """Clears the stored callback data.

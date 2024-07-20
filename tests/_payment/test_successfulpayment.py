@@ -68,6 +68,7 @@ class TestSuccessfulPaymentWithoutRequest(TestSuccessfulPaymentBase):
         assert successful_payment.invoice_payload == self.invoice_payload
         assert successful_payment.shipping_option_id == self.shipping_option_id
         assert successful_payment.currency == self.currency
+        assert successful_payment.total_amount == self.total_amount
         assert successful_payment.order_info == self.order_info
         assert successful_payment.telegram_payment_charge_id == self.telegram_payment_charge_id
         assert successful_payment.provider_payment_charge_id == self.provider_payment_charge_id
@@ -81,6 +82,7 @@ class TestSuccessfulPaymentWithoutRequest(TestSuccessfulPaymentBase):
             successful_payment_dict["shipping_option_id"] == successful_payment.shipping_option_id
         )
         assert successful_payment_dict["currency"] == successful_payment.currency
+        assert successful_payment_dict["total_amount"] == successful_payment.total_amount
         assert successful_payment_dict["order_info"] == successful_payment.order_info.to_dict()
         assert (
             successful_payment_dict["telegram_payment_charge_id"]

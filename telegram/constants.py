@@ -71,6 +71,7 @@ __all__ = [
     "InlineQueryResultType",
     "InlineQueryResultsButtonLimit",
     "InputMediaType",
+    "InputPaidMediaType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
     "LocationLimit",
@@ -82,6 +83,7 @@ __all__ = [
     "MessageLimit",
     "MessageOriginType",
     "MessageType",
+    "PaidMediaType",
     "ParseMode",
     "PollLimit",
     "PollType",
@@ -90,10 +92,13 @@ __all__ = [
     "ReactionEmoji",
     "ReactionType",
     "ReplyLimit",
+    "RevenueWithdrawalStateType",
+    "StarTransactionsLimit",
     "StickerFormat",
     "StickerLimit",
     "StickerSetLimit",
     "StickerType",
+    "TransactionPartnerType",
     "UpdateType",
     "UserProfilePhotosLimit",
     "WebhookLimit",
@@ -146,7 +151,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=4)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=7)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1256,6 +1261,21 @@ class InputMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
 
 
+class InputPaidMediaType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputPaidMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 21.4
+    """
+
+    __slots__ = ()
+
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+
+
 class InlineQueryLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineQuery`/
     :meth:`telegram.Bot.answer_inline_query`. The enum members of this enumeration are instances
@@ -1599,6 +1619,11 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
+    PAID_MEDIA = "paid_media"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
+
+    .. versionadded:: 21.4
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -1880,6 +1905,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
     NEW_CHAT_PHOTO = "new_chat_photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
+    PAID_MEDIA = "paid_media"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
+
+    .. versionadded:: 21.4
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -1890,6 +1920,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     PROXIMITY_ALERT_TRIGGERED = "proximity_alert_triggered"
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
+    REFUNDED_PAYMENT = "refunded_payment"
+    """:obj:`str`: Messages with :attr:`telegram.Message.refunded_payment`.
+
+    .. versionadded:: 21.4
+    """
     REPLY_TO_STORY = "reply_to_story"
     """:obj:`str`: Messages with :attr:`telegram.Message.reply_to_story`.
 
@@ -1946,6 +1981,24 @@ class MessageType(StringEnum):
 
     .. versionadded:: 20.8
     """
+
+
+class PaidMediaType(StringEnum):
+    """
+    This enum contains the available types of :class:`telegram.PaidMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 21.4
+    """
+
+    __slots__ = ()
+
+    PREVIEW = "preview"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaPreview`."""
+    VIDEO = "video"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaVideo`."""
+    PHOTO = "photo"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
 
 
 class PollingLimit(IntEnum):
@@ -2303,6 +2356,42 @@ class ReplyLimit(IntEnum):
     """
 
 
+class RevenueWithdrawalStateType(StringEnum):
+    """This enum contains the available types of :class:`telegram.RevenueWithdrawalState`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 21.4
+    """
+
+    __slots__ = ()
+
+    PENDING = "pending"
+    """:obj:`str`: A withdrawal in progress."""
+    SUCCEEDED = "succeeded"
+    """:obj:`str`: A withdrawal succeeded."""
+    FAILED = "failed"
+    """:obj:`str`: A withdrawal failed and the transaction was refunded."""
+
+
+class StarTransactionsLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 21.4
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
+    :meth:`telegram.Bot.get_star_transactions`."""
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
+    :meth:`telegram.Bot.get_star_transactions`."""
+
+
 class StickerFormat(StringEnum):
     """This enum contains the available formats of :class:`telegram.Sticker` in the set. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -2434,6 +2523,25 @@ class StickerType(StringEnum):
     """:obj:`str`: Mask sticker."""
     CUSTOM_EMOJI = "custom_emoji"
     """:obj:`str`: Custom emoji sticker."""
+
+
+class TransactionPartnerType(StringEnum):
+    """This enum contains the available types of :class:`telegram.TransactionPartner`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 21.4
+    """
+
+    __slots__ = ()
+
+    FRAGMENT = "fragment"
+    """:obj:`str`: Withdrawal transaction with Fragment."""
+    USER = "user"
+    """:obj:`str`: Transaction with a user."""
+    OTHER = "other"
+    """:obj:`str`: Transaction with unknown source or recipient."""
+    TELEGRAM_ADS = "telegram_ads"
+    """:obj:`str`: Transaction with Telegram Ads."""
 
 
 class ParseMode(StringEnum):

@@ -42,7 +42,7 @@ class InlineKeyboardMarkup(TelegramObject):
         An inline keyboard on a message
 
     .. seealso::
-        An another kind of keyboard would be the :class:`telegram.ReplyKeyboardMarkup`.
+        Another kind of keyboard would be the :class:`telegram.ReplyKeyboardMarkup`.
 
     Examples:
         * :any:`Inline Keyboard 1 <examples.inlinekeyboard>`
@@ -90,7 +90,9 @@ class InlineKeyboardMarkup(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineKeyboardMarkup"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["InlineKeyboardMarkup"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         if not data:
             return None

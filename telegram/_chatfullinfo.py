@@ -121,7 +121,8 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 20.0
         emoji_status_expiration_date (:class:`datetime.datetime`, optional): Expiration date of
-            emoji status of the chat or the other party in a private chat, in seconds.
+            emoji status of the chat or the other party in a private chat, as a datetime object,
+            if any.
 
             |datetime_localization|
 
@@ -194,6 +195,10 @@ class ChatFullInfo(_ChatBase):
             chats.
         location (:class:`telegram.ChatLocation`, optional): For supergroups, the location to which
             the supergroup is connected.
+        can_send_paid_media (:obj:`bool`, optional): :obj:`True`, if paid media messages can be
+            sent or forwarded to the channel chat. The field is available only for channel chats.
+
+            .. versionadded:: 21.4
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -270,7 +275,8 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 20.0
         emoji_status_expiration_date (:class:`datetime.datetime`): Optional. Expiration date of
-            emoji status of the chat or the other party in a private chat, in seconds.
+            emoji status of the chat or the other party in a private chat, as a datetime object,
+            if any.
 
             |datetime_localization|
 
@@ -343,6 +349,10 @@ class ChatFullInfo(_ChatBase):
             chats.
         location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
             the supergroup is connected.
+        can_send_paid_media (:obj:`bool`): Optional. :obj:`True`, if paid media messages can be
+            sent or forwarded to the channel chat. The field is available only for channel chats.
+
+            .. versionadded:: 21.4
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
@@ -358,6 +368,7 @@ class ChatFullInfo(_ChatBase):
         "business_intro",
         "business_location",
         "business_opening_hours",
+        "can_send_paid_media",
         "can_set_sticker_set",
         "custom_emoji_sticker_set_name",
         "description",
@@ -432,6 +443,7 @@ class ChatFullInfo(_ChatBase):
         custom_emoji_sticker_set_name: Optional[str] = None,
         linked_chat_id: Optional[int] = None,
         location: Optional[ChatLocation] = None,
+        can_send_paid_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -494,9 +506,12 @@ class ChatFullInfo(_ChatBase):
             self.business_intro: Optional[BusinessIntro] = business_intro
             self.business_location: Optional[BusinessLocation] = business_location
             self.business_opening_hours: Optional[BusinessOpeningHours] = business_opening_hours
+            self.can_send_paid_media: Optional[bool] = can_send_paid_media
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatFullInfo"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ChatFullInfo"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

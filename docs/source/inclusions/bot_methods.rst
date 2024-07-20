@@ -33,6 +33,8 @@
           - Used for sending media grouped together
         * - :meth:`~telegram.Bot.send_message`
           - Used for sending text messages
+        * - :meth:`~telegram.Bot.send_paid_media`
+          - Used for sending paid media to channels
         * - :meth:`~telegram.Bot.send_photo`
           - Used for sending photos
         * - :meth:`~telegram.Bot.send_poll`
@@ -369,6 +371,8 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
+    * - :meth:`~telegram.Bot.get_star_transactions`
+      - Used for obtaining the bot's Telegram Stars transactions
     * - :meth:`~telegram.Bot.refund_star_payment`
       - Used for refunding a payment in Telegram Stars
 

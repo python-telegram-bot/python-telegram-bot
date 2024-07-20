@@ -68,8 +68,8 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
     @staticmethod
     def skip_params(callback_query: CallbackQuery):
         if callback_query.inline_message_id:
-            return {"message_id", "chat_id"}
-        return {"inline_message_id"}
+            return {"message_id", "chat_id", "business_connection_id"}
+        return {"inline_message_id", "business_connection_id"}
 
     @staticmethod
     def shortcut_kwargs(callback_query: CallbackQuery):
@@ -178,7 +178,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_text,
             Bot.edit_message_text,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -210,7 +210,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_caption,
             Bot.edit_message_caption,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -242,7 +242,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_reply_markup,
             Bot.edit_message_reply_markup,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -274,7 +274,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_media,
             Bot.edit_message_media,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -308,7 +308,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_live_location,
             Bot.edit_message_live_location,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -340,7 +340,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.stop_message_live_location,
             Bot.stop_message_live_location,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(

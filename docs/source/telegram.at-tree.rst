@@ -88,6 +88,9 @@ Available Types
     telegram.inputmediadocument
     telegram.inputmediaphoto
     telegram.inputmediavideo
+    telegram.inputpaidmedia
+    telegram.inputpaidmediaphoto
+    telegram.inputpaidmediavideo
     telegram.inputpolloption
     telegram.inputsticker
     telegram.keyboardbutton
@@ -113,6 +116,11 @@ Available Types
     telegram.messageoriginuser
     telegram.messagereactioncountupdated
     telegram.messagereactionupdated
+    telegram.paidmedia
+    telegram.paidmediainfo
+    telegram.paidmediaphoto
+    telegram.paidmediapreview
+    telegram.paidmediavideo
     telegram.photosize
     telegram.poll
     telegram.pollanswer

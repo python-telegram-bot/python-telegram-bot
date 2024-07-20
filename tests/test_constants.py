@@ -216,6 +216,8 @@ class TestConstantsWithoutRequest:
             name = to_snake_case(match.group(1))
             if name == "photo_size":
                 name = "photo"
+            if name == "paid_media_info":
+                name = "paid_media"
             try:
                 constants.MessageAttachmentType(name)
             except ValueError:
@@ -232,6 +234,11 @@ class TestConstantsWithRequest:
             return_exceptions=True,
         )
         good_msg, bad_msg = await tasks
+
+        if isinstance(good_msg, BaseException):
+            # handling xfails
+            raise good_msg
+
         assert good_msg.text == good_text
         assert isinstance(bad_msg, BadRequest)
         assert "Message is too long" in str(bad_msg)
@@ -245,6 +252,11 @@ class TestConstantsWithRequest:
             return_exceptions=True,
         )
         good_msg, bad_msg = await tasks
+
+        if isinstance(good_msg, BaseException):
+            # handling xfails
+            raise good_msg
+
         assert good_msg.caption == good_caption
         assert isinstance(bad_msg, BadRequest)
         assert "Message caption is too long" in str(bad_msg)

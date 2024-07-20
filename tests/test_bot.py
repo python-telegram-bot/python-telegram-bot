@@ -73,6 +73,8 @@ from telegram import (
     ReplyParameters,
     SentWebAppMessage,
     ShippingOption,
+    StarTransaction,
+    StarTransactions,
     Update,
     User,
     WebAppInfo,
@@ -533,6 +535,29 @@ class TestBotWithoutRequest:
             123, "text", api_kwargs={"unknown_kwarg_1": 7, "unknown_kwarg_2": 5}
         )
 
+    async def test_get_updates_deserialization_error(self, bot, monkeypatch, caplog):
+        async def faulty_do_request(*args, **kwargs):
+            return (
+                HTTPStatus.OK,
+                b'{"ok": true, "result": [{"update_id": "1", "message": "unknown_format"}]}',
+            )
+
+        monkeypatch.setattr(HTTPXRequest, "do_request", faulty_do_request)
+
+        bot = PytestExtBot(get_updates_request=HTTPXRequest(), token=bot.token)
+
+        with caplog.at_level(logging.CRITICAL), pytest.raises(AttributeError):
+            await bot.get_updates()
+
+        assert len(caplog.records) == 1
+        assert caplog.records[0].name == "telegram.ext.ExtBot"
+        assert caplog.records[0].levelno == logging.CRITICAL
+        assert caplog.records[0].getMessage() == (
+            "Error while parsing updates! Received data was "
+            "[{'update_id': '1', 'message': 'unknown_format'}]"
+        )
+        assert caplog.records[0].exc_info[0] is AttributeError
+
     async def test_answer_web_app_query(self, bot, raw_bot, monkeypatch):
         params = False
 
@@ -559,11 +584,11 @@ class TestBotWithoutRequest:
         copied_result = copy.copy(result)
 
         ext_bot = bot
-        for bot in (ext_bot, raw_bot):
+        for bot_type in (ext_bot, raw_bot):
             # We need to test 1) below both the bot and raw_bot and setting this up with
             # pytest.parametrize appears to be difficult ...
-            monkeypatch.setattr(bot.request, "post", make_assertion)
-            web_app_msg = await bot.answer_web_app_query("12345", result)
+            monkeypatch.setattr(bot_type.request, "post", make_assertion)
+            web_app_msg = await bot_type.answer_web_app_query("12345", result)
             assert params, "something went wrong with passing arguments to the request"
             assert isinstance(web_app_msg, SentWebAppMessage)
             assert web_app_msg.inline_message_id == "321"
@@ -761,11 +786,11 @@ class TestBotWithoutRequest:
 
         copied_results = copy.copy(results)
         ext_bot = bot
-        for bot in (ext_bot, raw_bot):
+        for bot_type in (ext_bot, raw_bot):
             # We need to test 1) below both the bot and raw_bot and setting this up with
             # pytest.parametrize appears to be difficult ...
-            monkeypatch.setattr(bot.request, "post", make_assertion)
-            assert await bot.answer_inline_query(
+            monkeypatch.setattr(bot_type.request, "post", make_assertion)
+            assert await bot_type.answer_inline_query(
                 1234,
                 results=results,
                 cache_time=300,
@@ -790,7 +815,7 @@ class TestBotWithoutRequest:
                         copied_results[idx].input_message_content, "disable_web_page_preview", None
                     )
 
-            monkeypatch.delattr(bot.request, "post")
+            monkeypatch.delattr(bot_type.request, "post")
 
     async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -2171,14 +2196,17 @@ class TestBotWithoutRequest:
 
     async def test_business_connection_id_argument(self, bot, monkeypatch):
         """We can't connect to a business acc, so we just test that the correct data is passed.
-        We also can't test every single method easily, so we just test one. Our linting will catch
-        any unused args with the others."""
+        We also can't test every single method easily, so we just test a few. Our linting will
+        catch any unused args with the others."""
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.parameters.get("business_connection_id") == 42
+            assert request_data.parameters.get("business_connection_id") == 42
+            return {}
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_message(2, "text", business_connection_id=42)
+
+        await bot.send_message(2, "text", business_connection_id=42)
+        await bot.stop_poll(chat_id=1, message_id=2, business_connection_id=42)
 
     async def test_message_effect_id_argument(self, bot, monkeypatch):
         """We can't test every single method easily, so we just test one. Our linting will catch
@@ -2220,6 +2248,20 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.refund_star_payment(42, "37")
+
+    async def test_get_star_transactions(self, bot, monkeypatch):
+        # we just want to test the offset parameter
+        st = StarTransactions([StarTransaction("1", 1, dtm.datetime.now())]).to_json()
+
+        async def do_request(url, request_data: RequestData, *args, **kwargs):
+            offset = request_data.parameters.get("offset") == 3
+            if offset:
+                return 200, f'{{"ok": true, "result": {st}}}'.encode()
+            return 400, b'{"ok": false, "result": []}'
+
+        monkeypatch.setattr(bot.request, "do_request", do_request)
+        obj = await bot.get_star_transactions(offset=3)
+        assert isinstance(obj, StarTransactions)
 
 
 class TestBotWithRequest:
@@ -2326,11 +2368,15 @@ class TestBotWithRequest:
     # test modules. No need to duplicate here.
 
     async def test_delete_messages(self, bot, chat_id):
-        msg1 = await bot.send_message(chat_id, text="will be deleted")
-        msg2 = await bot.send_message(chat_id, text="will be deleted")
-        await asyncio.sleep(2)
+        msg1, msg2 = await asyncio.gather(
+            bot.send_message(chat_id, text="will be deleted"),
+            bot.send_message(chat_id, text="will be deleted"),
+        )
 
-        assert await bot.delete_messages(chat_id=chat_id, message_ids=(msg1.id, msg2.id)) is True
+        assert (
+            await bot.delete_messages(chat_id=chat_id, message_ids=sorted((msg1.id, msg2.id)))
+            is True
+        )
 
     async def test_send_venue(self, bot, chat_id):
         longitude = -46.788279
@@ -3873,7 +3919,7 @@ class TestBotWithRequest:
         msg1, msg2 = await tasks
 
         copy_messages = await bot.copy_messages(
-            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
+            chat_id, from_chat_id=chat_id, message_ids=sorted((msg1.message_id, msg2.message_id))
         )
         assert isinstance(copy_messages, tuple)
 
@@ -4208,3 +4254,8 @@ class TestBotWithRequest:
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_bool_return_type(self, bot, chat_id, return_type):
         assert await bot.do_api_request("delete_my_commands", return_type=return_type) is True
+
+    async def test_get_star_transactions(self, bot):
+        transactions = await bot.get_star_transactions(limit=1)
+        assert isinstance(transactions, StarTransactions)
+        assert len(transactions.transactions) == 0
