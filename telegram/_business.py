@@ -20,8 +20,9 @@
 """This module contains the Telegram Business related classes."""
 
 from datetime import date, datetime, time
-from sys import version_info
 from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
+
+import zoneinfo
 
 from telegram._chat import Chat
 from telegram._files.location import Location
@@ -31,11 +32,6 @@ from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -460,7 +456,9 @@ class BusinessOpeningHours(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def get_opening_hours_for_day(self, target_date: Union[date, datetime], tzinfo: Optional[zoneinfo.ZoneInfo] = None) -> Tuple[Tuple[datetime, datetime], ...]:
+    def get_opening_hours_for_day(
+        self, target_date: Union[date, datetime], tzinfo: Optional[zoneinfo.ZoneInfo] = None
+    ) -> Tuple[Tuple[datetime, datetime], ...]:
         """
         Get the opening hours for a specific day.
 
@@ -479,8 +477,8 @@ class BusinessOpeningHours(TelegramObject):
         output = []
 
         for interval in self.opening_hours:
-            opening_time = datetime.combine(target_date, time(*interval.opening_time), tzinfo)
-            closing_time = datetime.combine(target_date, time(*interval.closing_time), tzinfo)
+            opening_time = datetime.combine(target_date, time(*interval.opening_time[1:]), tzinfo)
+            closing_time = datetime.combine(target_date, time(*interval.closing_time[1:]), tzinfo)
 
             output.append((opening_time, closing_time))
 
@@ -498,16 +496,27 @@ class BusinessOpeningHours(TelegramObject):
         Returns:
             bool: True, if the business is open at the given time. False otherwise.
         """
+
+        def time_to_minutes(weekday: int, hour: int, minute: int) -> int:
+            return (weekday * 24 * 60) + (hour * 60) + minute
+
         if target_datetime.tzinfo is not None:
             target_datetime = target_datetime.astimezone(zoneinfo.ZoneInfo(self.time_zone_name))
 
-        if any(
-            interval.opening_time[0] <= target_datetime.weekday() <= interval.closing_time[0]
-            and interval.opening_time[1] * 60 + interval.opening_time[2]
-            <= target_datetime.hour * 60 + target_datetime.minute
-            < interval.closing_time[1] * 60 + interval.closing_time[2]
+        return any(
+            time_to_minutes(
+                target_datetime.weekday(), target_datetime.hour, target_datetime.minute
+            )
+            >= time_to_minutes(*interval.opening_time)
+            or time_to_minutes(
+                target_datetime.weekday(), target_datetime.hour, target_datetime.minute
+            )
+            <= time_to_minutes(*interval.closing_time)
+            if time_to_minutes(*interval.closing_time) < time_to_minutes(*interval.opening_time)
+            else time_to_minutes(*interval.opening_time)
+            <= time_to_minutes(
+                target_datetime.weekday(), target_datetime.hour, target_datetime.minute
+            )
+            <= time_to_minutes(*interval.closing_time)
             for interval in self.opening_hours
-        ):
-            return True
-
-        return False
+        )
