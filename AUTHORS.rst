@@ -97,6 +97,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Oleg Sushchenko <https://github.com/feuillemorte>`_
 - `Or Bin <https://github.com/OrBin>`_
 - `overquota <https://github.com/overquota>`_
+- `Pablo Martinez <https://github.com/elpekenin>`_
 - `Paradox <https://github.com/paradox70>`_
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_

@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 from pathlib import Path
@@ -251,7 +252,14 @@ htmlhelp_basename = "python-telegram-bot-doc"
 
 # The base URL which points to the root of the HTML documentation. It is used to indicate the
 # location of document using The Canonical Link Relation. Default: ''.
-html_baseurl = "https://docs.python-telegram-bot.org"
+# Set canonical URL from the Read the Docs Domain
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+html_context = {}
+if os.environ.get("READTHEDOCS", "") == "True":
+    html_context["READTHEDOCS"] = True
+
 
 # -- Options for LaTeX output ---------------------------------------------
 

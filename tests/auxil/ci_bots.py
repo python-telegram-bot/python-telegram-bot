@@ -22,6 +22,8 @@ import json
 import os
 import random
 
+from telegram._utils.strings import TextEncoding
+
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine
 # These bots are only able to talk in our test chats, so they are quite useless for other
 # purposes than testing.
@@ -42,10 +44,12 @@ GITHUB_ACTION = os.getenv("GITHUB_ACTION", None)
 BOTS = os.getenv("BOTS", None)
 JOB_INDEX = os.getenv("JOB_INDEX", None)
 if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
-    BOTS = json.loads(base64.b64decode(BOTS).decode("utf-8"))
+    BOTS = json.loads(base64.b64decode(BOTS).decode(TextEncoding.UTF_8))
     JOB_INDEX = int(JOB_INDEX)
 
-FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode("utf-8"))  # type: list[dict[str, str]]
+FALLBACKS = json.loads(
+    base64.b64decode(FALLBACKS).decode(TextEncoding.UTF_8)
+)  # type: list[dict[str, str]]
 
 
 class BotInfoProvider:

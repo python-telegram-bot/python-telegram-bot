@@ -24,6 +24,7 @@ from io import BytesIO
 import pytest
 
 from telegram import InputFile
+from telegram._utils.strings import TextEncoding
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -150,17 +151,17 @@ class TestInputFileWithRequest:
         await (await message.document.get_file()).download_to_memory(out=out)
         out.seek(0)
 
-        assert out.read().decode("utf-8") == "PTB Rocks! ⅞"
+        assert out.read().decode(TextEncoding.UTF_8) == "PTB Rocks! ⅞"
 
     async def test_send_string(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods
         message = await bot.send_document(
-            chat_id, InputFile(data_file("text_file.txt").read_text(encoding="utf-8"))
+            chat_id, InputFile(data_file("text_file.txt").read_text(encoding=TextEncoding.UTF_8))
         )
         out = BytesIO()
 
         await (await message.document.get_file()).download_to_memory(out=out)
         out.seek(0)
 
-        assert out.read().decode("utf-8") == "PTB Rocks! ⅞"
+        assert out.read().decode(TextEncoding.UTF_8) == "PTB Rocks! ⅞"
