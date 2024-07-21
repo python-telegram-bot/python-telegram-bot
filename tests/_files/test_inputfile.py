@@ -19,7 +19,7 @@
 import contextlib
 import subprocess
 import sys
-from io import BytesIO
+from io import BufferedReader, BytesIO
 
 import pytest
 
@@ -66,21 +66,45 @@ class TestInputFileWithoutRequest:
             assert input_file.attach_name is None
             assert input_file.attach_uri is None
 
-    def test_mimetypes(self):
+    @pytest.mark.parametrize("read_file_handle", [True, False])
+    def test_mimetypes_file_handle(self, read_file_handle):
         # Only test a few to make sure logic works okay
-        assert InputFile(data_file("telegram.jpg").open("rb")).mimetype == "image/jpeg"
+        assert (
+            InputFile(
+                data_file("telegram.jpg").open("rb"), read_file_handle=read_file_handle
+            ).mimetype
+            == "image/jpeg"
+        )
         # For some reason python can guess the type on macOS
-        assert InputFile(data_file("telegram.webp").open("rb")).mimetype in [
+        assert InputFile(
+            data_file("telegram.webp").open("rb"), read_file_handle=read_file_handle
+        ).mimetype in [
             "application/octet-stream",
             "image/webp",
         ]
-        assert InputFile(data_file("telegram.mp3").open("rb")).mimetype == "audio/mpeg"
+        assert (
+            InputFile(
+                data_file("telegram.mp3").open("rb"), read_file_handle=read_file_handle
+            ).mimetype
+            == "audio/mpeg"
+        )
         # For some reason windows drops the trailing i
-        assert InputFile(data_file("telegram.midi").open("rb")).mimetype in [
+        assert InputFile(
+            data_file("telegram.midi").open("rb"), read_file_handle=read_file_handle
+        ).mimetype in [
             "audio/mid",
             "audio/midi",
         ]
 
+        # Test string file
+        assert (
+            InputFile(
+                data_file("text_file.txt").open("rb"), read_file_handle=read_file_handle
+            ).mimetype
+            == "text/plain"
+        )
+
+    def test_mimetypes_other(self):
         # Test guess from file
         assert InputFile(BytesIO(b"blah"), filename="tg.jpg").mimetype == "image/jpeg"
         assert InputFile(BytesIO(b"blah"), filename="tg.mp3").mimetype == "audio/mpeg"
@@ -92,20 +116,49 @@ class TestInputFileWithoutRequest:
         )
         assert InputFile(BytesIO(b"blah")).mimetype == "application/octet-stream"
 
-        # Test string file
-        assert InputFile(data_file("text_file.txt").open()).mimetype == "text/plain"
-
-    def test_filenames(self):
-        assert InputFile(data_file("telegram.jpg").open("rb")).filename == "telegram.jpg"
-        assert InputFile(data_file("telegram.jpg").open("rb"), filename="blah").filename == "blah"
+    @pytest.mark.parametrize("read_file_handle", [True, False])
+    def test_filenames(self, read_file_handle):
         assert (
-            InputFile(data_file("telegram.jpg").open("rb"), filename="blah.jpg").filename
+            InputFile(
+                data_file("telegram.jpg").open("rb"), read_file_handle=read_file_handle
+            ).filename
+            == "telegram.jpg"
+        )
+        assert (
+            InputFile(
+                data_file("telegram.jpg").open("rb"),
+                filename="blah",
+                read_file_handle=read_file_handle,
+            ).filename
+            == "blah"
+        )
+        assert (
+            InputFile(
+                data_file("telegram.jpg").open("rb"),
+                filename="blah.jpg",
+                read_file_handle=read_file_handle,
+            ).filename
             == "blah.jpg"
         )
-        assert InputFile(data_file("telegram").open("rb")).filename == "telegram"
-        assert InputFile(data_file("telegram").open("rb"), filename="blah").filename == "blah"
         assert (
-            InputFile(data_file("telegram").open("rb"), filename="blah.jpg").filename == "blah.jpg"
+            InputFile(data_file("telegram").open("rb"), read_file_handle=read_file_handle).filename
+            == "telegram"
+        )
+        assert (
+            InputFile(
+                data_file("telegram").open("rb"),
+                filename="blah",
+                read_file_handle=read_file_handle,
+            ).filename
+            == "blah"
+        )
+        assert (
+            InputFile(
+                data_file("telegram").open("rb"),
+                filename="blah.jpg",
+                read_file_handle=read_file_handle,
+            ).filename
+            == "blah.jpg"
         )
 
         class MockedFileobject:
@@ -139,6 +192,19 @@ class TestInputFileWithoutRequest:
             InputFile(MockedFileobject(data_file("telegram")), filename="blah.jpg").filename
             == "blah.jpg"
         )
+
+    @pytest.mark.parametrize("read_file_handle", [True, False])
+    def test_read_file_handle(self, read_file_handle):
+        input_file = InputFile(
+            data_file("telegram.jpg").open("rb"), read_file_handle=read_file_handle
+        )
+        content = input_file.field_tuple[1]
+        if read_file_handle:
+            assert isinstance(content, bytes)
+            assert content == data_file("telegram.jpg").read_bytes()
+        else:
+            assert isinstance(content, BufferedReader)
+            assert content.read() == data_file("telegram.jpg").read_bytes()
 
 
 class TestInputFileWithRequest:

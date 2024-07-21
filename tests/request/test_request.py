@@ -30,6 +30,7 @@ import httpx
 import pytest
 from httpx import AsyncHTTPTransport
 
+from telegram import InputFile
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import TextEncoding
 from telegram.error import (
@@ -50,6 +51,8 @@ from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.slots import mro_slots
+
+from ..auxil.files import data_file
 
 # We only need mixed_rqs fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
@@ -821,3 +824,15 @@ class TestHTTPXRequestWithRequest:
             task_2.exception()
         except (asyncio.CancelledError, asyncio.InvalidStateError):
             pass
+
+    async def test_input_file_postponed_read(self, bot, chat_id):
+        """Here we test that `read_file_handle=False` is correctly handled by HTTPXRequest.
+        Since manually building the RequestData object has no real benefit, we simply use the Bot
+        for that.
+        """
+        message = await bot.send_document(
+            document=InputFile(data_file("telegram.jpg").open("rb"), read_file_handle=False),
+            chat_id=chat_id,
+        )
+        assert message.document
+        assert message.document.file_name == "telegram.jpg"
