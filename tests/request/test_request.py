@@ -31,6 +31,7 @@ import pytest
 from httpx import AsyncHTTPTransport
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.strings import TextEncoding
 from telegram.error import (
     BadRequest,
     ChatMigrated,
@@ -247,7 +248,7 @@ class TestRequestWithoutRequest:
         else:
             match = "Unknown HTTPError"
 
-        server_response = json.dumps(response_data).encode("utf-8")
+        server_response = json.dumps(response_data).encode(TextEncoding.UTF_8)
 
         monkeypatch.setattr(
             httpx_request,

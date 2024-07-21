@@ -24,6 +24,23 @@ Warning:
     the changelog.
 """
 
+from telegram._utils.enum import StringEnum
+
+# TODO: Remove this when https://github.com/PyCQA/pylint/issues/6887 is resolved.
+# pylint: disable=invalid-enum-extension,invalid-slots
+
+
+class TextEncoding(StringEnum):
+    """This enum contains encoding schemes for text.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    UTF_8 = "utf-8"
+    UTF_16_LE = "utf-16-le"
+
 
 def to_camel_case(snake_str: str) -> str:
     """Converts a snake_case string to camelCase.
