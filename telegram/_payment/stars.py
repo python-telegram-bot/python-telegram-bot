@@ -19,8 +19,9 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars transactions."""
 
+from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -79,7 +80,7 @@ class RevenueWithdrawalState(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type[RevenueWithdrawalState]] = {
+        _class_mapping: dict[str, type[RevenueWithdrawalState]] = {
             cls.PENDING: RevenueWithdrawalStatePending,
             cls.SUCCEEDED: RevenueWithdrawalStateSucceeded,
             cls.FAILED: RevenueWithdrawalStateFailed,
@@ -226,7 +227,7 @@ class TransactionPartner(TelegramObject):
         care of selecting the correct subclass.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (dict[:obj:`str`, ...]): The JSON data.
             bot (:class:`telegram.Bot`): The bot associated with this object.
 
         Returns:
@@ -241,7 +242,7 @@ class TransactionPartner(TelegramObject):
         if not data and cls is TransactionPartner:
             return None
 
-        _class_mapping: Dict[str, Type[TransactionPartner]] = {
+        _class_mapping: dict[str, type[TransactionPartner]] = {
             cls.FRAGMENT: TransactionPartnerFragment,
             cls.USER: TransactionPartnerUser,
             cls.OTHER: TransactionPartnerOther,
@@ -480,7 +481,7 @@ class StarTransactions(TelegramObject):
         transactions (Sequence[:class:`telegram.StarTransaction`]): The list of transactions.
 
     Attributes:
-        transactions (Tuple[:class:`telegram.StarTransaction`]): The list of transactions.
+        transactions (tuple[:class:`telegram.StarTransaction`]): The list of transactions.
     """
 
     __slots__ = ("transactions",)
@@ -489,7 +490,7 @@ class StarTransactions(TelegramObject):
         self, transactions: Sequence[StarTransaction], *, api_kwargs: Optional[JSONDict] = None
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.transactions: Tuple[StarTransaction, ...] = parse_sequence_arg(transactions)
+        self.transactions: tuple[StarTransaction, ...] = parse_sequence_arg(transactions)
 
         self._id_attrs = (self.transactions,)
         self._freeze()

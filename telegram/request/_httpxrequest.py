@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
-from typing import Collection, Optional, Tuple, Union
+from collections.abc import Collection
+from typing import Optional, Union
 
 import httpx
 
@@ -245,7 +246,7 @@ class HTTPXRequest(BaseRequest):
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
-    ) -> Tuple[int, bytes]:
+    ) -> tuple[int, bytes]:
         """See :meth:`BaseRequest.do_request`."""
         if self._client.is_closed:
             raise RuntimeError("This HTTPXRequest is not initialized!")

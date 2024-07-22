@@ -19,7 +19,8 @@
 """This module contains the CallbackQueryHandler class."""
 import asyncio
 import re
-from typing import TYPE_CHECKING, Any, Callable, Match, Optional, Pattern, TypeVar, Union, cast
+from re import Match, Pattern
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE

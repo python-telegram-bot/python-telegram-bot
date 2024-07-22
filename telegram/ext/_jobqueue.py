@@ -20,7 +20,7 @@
 import asyncio
 import datetime
 import weakref
-from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Generic, Optional, Union, cast, overload
 
 try:
     import pytz
@@ -152,7 +152,7 @@ class JobQueue(Generic[CCT]):
         .. versionadded:: 20.7
 
         Returns:
-            Dict[:obj:`str`, :obj:`object`]: The configuration values as dictionary.
+            dict[:obj:`str`, :obj:`object`]: The configuration values as dictionary.
 
         """
         timezone: object = pytz.utc
@@ -532,7 +532,7 @@ class JobQueue(Generic[CCT]):
         self,
         callback: JobCallback[CCT],
         time: datetime.time,
-        days: Tuple[int, ...] = _ALL_DAYS,
+        days: tuple[int, ...] = _ALL_DAYS,
         data: Optional[object] = None,
         name: Optional[str] = None,
         chat_id: Optional[int] = None,
@@ -556,7 +556,7 @@ class JobQueue(Generic[CCT]):
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (:obj:`datetime.time.tzinfo`) is :obj:`None`, the default timezone of the bot will
                 be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
-            days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
+            days (tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run (where ``0-6`` correspond to sunday - saturday). By default, the job will run
                 every day.
 
@@ -693,20 +693,20 @@ class JobQueue(Generic[CCT]):
             # so give it a tiny bit of time to actually shut down.
             await asyncio.sleep(0.01)
 
-    def jobs(self) -> Tuple["Job[CCT]", ...]:
+    def jobs(self) -> tuple["Job[CCT]", ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`.
 
         Returns:
-            Tuple[:class:`Job`]: Tuple of all *scheduled* jobs.
+            tuple[:class:`Job`]: Tuple of all *scheduled* jobs.
         """
         return tuple(Job.from_aps_job(job) for job in self.scheduler.get_jobs())
 
-    def get_jobs_by_name(self, name: str) -> Tuple["Job[CCT]", ...]:
+    def get_jobs_by_name(self, name: str) -> tuple["Job[CCT]", ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
         in the :class:`JobQueue`.
 
         Returns:
-            Tuple[:class:`Job`]: Tuple of all *pending* or *scheduled* jobs matching the name.
+            tuple[:class:`Job`]: Tuple of all *pending* or *scheduled* jobs matching the name.
         """
         return tuple(job for job in self.jobs() if job.name == name)
 

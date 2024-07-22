@@ -19,7 +19,8 @@
 """This module contains the StringRegexHandler class."""
 
 import re
-from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union
+from re import Match, Pattern
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType

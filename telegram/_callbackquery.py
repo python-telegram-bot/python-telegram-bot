@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._files.location import Location
@@ -676,7 +677,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["GameHighScore", ...]:
+    ) -> tuple["GameHighScore", ...]:
         """Shortcut for either::
 
             await update.callback_query.message.get_game_high_score(*args, **kwargs)
@@ -695,7 +696,7 @@ class CallbackQuery(TelegramObject):
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
-            Tuple[:class:`telegram.GameHighScore`]
+            tuple[:class:`telegram.GameHighScore`]
 
         Raises:
             :exc:`TypeError` if :attr:`message` is not accessible.

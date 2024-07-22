@@ -19,13 +19,17 @@
 """This module contains the BaseProcessor class."""
 from abc import ABC, abstractmethod
 from asyncio import BoundedSemaphore
+from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Any, AsyncContextManager, Awaitable, Optional, Type, TypeVar, final
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, final
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable
 
 _BUPT = TypeVar("_BUPT", bound="BaseUpdateProcessor")
 
 
-class BaseUpdateProcessor(AsyncContextManager["BaseUpdateProcessor"], ABC):
+class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], ABC):
     """An abstract base class for update processors. You can use this class to implement
     your own update processor.
 
@@ -88,7 +92,7 @@ class BaseUpdateProcessor(AsyncContextManager["BaseUpdateProcessor"], ABC):
 
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]],
+        exc_type: Optional[type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:

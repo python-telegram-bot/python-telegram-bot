@@ -15,7 +15,7 @@ bot.
 """
 
 import logging
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
@@ -66,7 +66,7 @@ END = ConversationHandler.END
 
 
 # Helper
-def _name_switcher(level: str) -> Tuple[str, str]:
+def _name_switcher(level: str) -> tuple[str, str]:
     if level == PARENTS:
         return "Father", "Mother"
     return "Brother", "Sister"
@@ -122,7 +122,7 @@ async def adding_self(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
 async def show_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Pretty print gathered data."""
 
-    def pretty_print(data: Dict[str, Any], level: str) -> str:
+    def pretty_print(data: dict[str, Any], level: str) -> str:
         people = data.get(level)
         if not people:
             return "\nNo information yet."

@@ -21,7 +21,8 @@ import datetime
 import functools
 import inspect
 import re
-from typing import Any, Callable, Collection, Dict, Iterable, List, Optional, Tuple
+from collections.abc import Collection, Iterable
+from typing import Any, Callable, Optional
 
 import pytest
 
@@ -57,9 +58,9 @@ Class name (in a named group) is surrounded by parentheses and single quotes.
 def check_shortcut_signature(
     shortcut: Callable,
     bot_method: Callable,
-    shortcut_kwargs: List[str],
-    additional_kwargs: List[str],
-    annotation_overrides: Optional[Dict[str, Tuple[Any, Any]]] = None,
+    shortcut_kwargs: list[str],
+    additional_kwargs: list[str],
+    annotation_overrides: Optional[dict[str, tuple[Any, Any]]] = None,
 ) -> bool:
     """
     Checks that the signature of a shortcut matches the signature of the underlying bot method.
@@ -389,7 +390,7 @@ async def make_assertion(
     url,
     request_data: RequestData,
     method_name: str,
-    kwargs_need_default: List[str],
+    kwargs_need_default: list[str],
     return_value,
     manually_passed_value: Any = DEFAULT_NONE,
     expected_defaults_value: Any = DEFAULT_NONE,
@@ -451,7 +452,7 @@ async def make_assertion(
             )
 
     # Check InputMedia (parse_mode can have a default)
-    def check_input_media(m: Dict):
+    def check_input_media(m: dict):
         parse_mode = m.get("parse_mode")
         if no_value_expected and parse_mode is not None:
             pytest.fail("InputMedia has non-None parse_mode, expected it to be absent")

@@ -872,9 +872,12 @@ class TestPicklePersistence:
             "A load persistent id instruction was encountered,\nbut no persistent_load "
             "function was specified."
         )
-        with Path("pickletest_chat_data").open("rb") as f, pytest.raises(
-            pickle.UnpicklingError,
-            match=err_msg if sys.version_info < (3, 12) else err_msg.replace("\n", " "),
+        with (
+            Path("pickletest_chat_data").open("rb") as f,
+            pytest.raises(
+                pickle.UnpicklingError,
+                match=err_msg if sys.version_info < (3, 12) else err_msg.replace("\n", " "),
+            ),
         ):
             pickle.load(f)
 

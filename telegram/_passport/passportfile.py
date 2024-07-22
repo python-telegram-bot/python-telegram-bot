@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Encrypted PassportFile."""
 
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -124,7 +124,7 @@ class PassportFile(TelegramObject):
         passport credentials.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (dict[:obj:`str`, ...]): The JSON data.
             bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
                 May be :obj:`None`, in which case shortcut methods will not be available.
 
@@ -151,10 +151,10 @@ class PassportFile(TelegramObject):
     @classmethod
     def de_list_decrypted(
         cls,
-        data: Optional[List[JSONDict]],
+        data: Optional[list[JSONDict]],
         bot: Optional["Bot"],
-        credentials: List["FileCredentials"],
-    ) -> Tuple[Optional["PassportFile"], ...]:
+        credentials: list["FileCredentials"],
+    ) -> tuple[Optional["PassportFile"], ...]:
         """Variant of :meth:`telegram.TelegramObject.de_list` that also takes into account
         passport credentials.
 
@@ -164,7 +164,7 @@ class PassportFile(TelegramObject):
            * Filters out any :obj:`None` values
 
         Args:
-            data (List[Dict[:obj:`str`, ...]]): The JSON data.
+            data (list[dict[:obj:`str`, ...]]): The JSON data.
             bot (:class:`telegram.Bot` | :obj:`None`): The bot associated with these object.
                 May be :obj:`None`, in which case shortcut methods will not be available.
 
@@ -176,7 +176,7 @@ class PassportFile(TelegramObject):
             credentials (:class:`telegram.FileCredentials`): The credentials
 
         Returns:
-            Tuple[:class:`telegram.PassportFile`]:
+            tuple[:class:`telegram.PassportFile`]:
 
         """
         if not data:

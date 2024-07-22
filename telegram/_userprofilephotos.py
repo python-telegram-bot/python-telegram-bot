@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram UserProfilePhotos."""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
@@ -43,7 +44,7 @@ class UserProfilePhotos(TelegramObject):
 
     Attributes:
         total_count (:obj:`int`): Total number of profile pictures.
-        photos (Tuple[Tuple[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4
+        photos (tuple[tuple[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4
             sizes each).
 
             .. versionchanged:: 20.0
@@ -63,7 +64,7 @@ class UserProfilePhotos(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.total_count: int = total_count
-        self.photos: Tuple[Tuple[PhotoSize, ...], ...] = tuple(tuple(sizes) for sizes in photos)
+        self.photos: tuple[tuple[PhotoSize, ...], ...] = tuple(tuple(sizes) for sizes in photos)
 
         self._id_attrs = (self.total_count, self.photos)
 

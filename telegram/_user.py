@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
+from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
@@ -605,7 +606,7 @@ class User(TelegramObject):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-    ) -> Tuple["Message", ...]:
+    ) -> tuple["Message", ...]:
         """Shortcut for::
 
              await bot.send_media_group(update.effective_user.id, *args, **kwargs)
@@ -616,7 +617,7 @@ class User(TelegramObject):
             |user_chat_id_note|
 
         Returns:
-            Tuple[:class:`telegram.Message`:] On success, a tuple of :class:`~telegram.Message`
+            tuple[:class:`telegram.Message`:] On success, a tuple of :class:`~telegram.Message`
             instances that were sent is returned.
 
         """
@@ -1723,7 +1724,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.copy_messages(chat_id=update.effective_user.id, *argss, **kwargs)
@@ -1735,7 +1736,7 @@ class User(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
 
         """
@@ -1768,7 +1769,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.copy_messages(from_chat_id=update.effective_user.id, *argss, **kwargs)
@@ -1780,7 +1781,7 @@ class User(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
 
         """
@@ -1897,7 +1898,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.forward_messages(chat_id=update.effective_user.id, *argss, **kwargs)
@@ -1909,7 +1910,7 @@ class User(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of sent messages is returned.
 
         """
@@ -1940,7 +1941,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.forward_messages(from_chat_id=update.effective_user.id, *argss, **kwargs)
@@ -1952,7 +1953,7 @@ class User(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of sent messages is returned.
 
         """

@@ -19,7 +19,8 @@
 # pylint: disable=missing-module-docstring,  redefined-builtin
 import json
 from base64 import b64decode
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple, no_type_check
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional, no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -390,11 +391,11 @@ class SecureValue(TelegramObject):
         selfie (:class:`telegram.FileCredentials`, optional): Credentials for encrypted selfie
             of the user with a document. Can be available for "passport", "driver_license",
             "identity_card" and "internal_passport".
-        translation (List[:class:`telegram.FileCredentials`], optional): Credentials for an
+        translation (list[:class:`telegram.FileCredentials`], optional): Credentials for an
             encrypted translation of the document. Available for "passport", "driver_license",
             "identity_card", "internal_passport", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration" and "temporary_registration".
-        files (List[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
+        files (list[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
             files. Available for "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
 
@@ -410,7 +411,7 @@ class SecureValue(TelegramObject):
         selfie (:class:`telegram.FileCredentials`): Optional. Credentials for encrypted selfie
             of the user with a document. Can be available for "passport", "driver_license",
             "identity_card" and "internal_passport".
-        translation (Tuple[:class:`telegram.FileCredentials`]): Optional. Credentials for an
+        translation (tuple[:class:`telegram.FileCredentials`]): Optional. Credentials for an
             encrypted translation of the document. Available for "passport", "driver_license",
             "identity_card", "internal_passport", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration" and "temporary_registration".
@@ -418,7 +419,7 @@ class SecureValue(TelegramObject):
             .. versionchanged:: 20.0
                 |tupleclassattrs|
 
-        files (Tuple[:class:`telegram.FileCredentials`]): Optional. Credentials for encrypted
+        files (tuple[:class:`telegram.FileCredentials`]): Optional. Credentials for encrypted
             files. Available for "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
 
@@ -447,8 +448,8 @@ class SecureValue(TelegramObject):
         self.front_side: Optional[FileCredentials] = front_side
         self.reverse_side: Optional[FileCredentials] = reverse_side
         self.selfie: Optional[FileCredentials] = selfie
-        self.files: Tuple[FileCredentials, ...] = parse_sequence_arg(files)
-        self.translation: Tuple[FileCredentials, ...] = parse_sequence_arg(translation)
+        self.files: tuple[FileCredentials, ...] = parse_sequence_arg(files)
+        self.translation: tuple[FileCredentials, ...] = parse_sequence_arg(translation)
 
         self._freeze()
 

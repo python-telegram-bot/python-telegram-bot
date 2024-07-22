@@ -23,7 +23,8 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from typing import Optional, Sequence, Tuple, TypeVar
+from collections.abc import Sequence
+from typing import Optional, TypeVar
 
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._utils.types import ODVInput
@@ -31,7 +32,7 @@ from telegram._utils.types import ODVInput
 T = TypeVar("T")
 
 
-def parse_sequence_arg(arg: Optional[Sequence[T]]) -> Tuple[T, ...]:
+def parse_sequence_arg(arg: Optional[Sequence[T]]) -> tuple[T, ...]:
     """Parses an optional sequence into a tuple
 
     Args:

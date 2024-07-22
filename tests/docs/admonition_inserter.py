@@ -96,7 +96,7 @@ class TestAdmonitionInserter:
             (
                 "available_in",
                 telegram.Sticker,
-                ":attr:`telegram.StickerSet.stickers`",  # Tuple[telegram.Sticker]
+                ":attr:`telegram.StickerSet.stickers`",  # tuple[telegram.Sticker]
             ),
             (
                 "available_in",
