@@ -358,7 +358,7 @@ class Message(MaybeInaccessibleMessage):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
-            `More about games >> <https://core.telegram.org/bots/api#games>`_.
+            `More about games >> <https://docs.python-telegram-bot.org/telegram.games-tree.html>`_.
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -431,10 +431,12 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            `More about payments >> \
+                <https://docs.python-telegram-bot.org/telegram.payments-tree.html>`_.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            `More about payments >> \
+                <https://docs.python-telegram-bot.org/telegram.payments-tree.html>`_.
         connected_website (:obj:`str`, optional): The domain name of the website on which the user
             has logged in.
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
@@ -675,7 +677,7 @@ class Message(MaybeInaccessibleMessage):
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
-            `More about games >> <https://core.telegram.org/bots/api#games>`_.
+            `More about games >> <https://docs.python-telegram-bot.org/telegram.games-tree.html>`_.
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -757,10 +759,12 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            `More about payments >> \
+                <https://docs.python-telegram-bot.org/telegram.payments-tree.html>`_.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
             message about a successful payment, information about the payment.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            `More about payments >> \
+                <https://docs.python-telegram-bot.org/telegram.payments-tree.html>`_.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
