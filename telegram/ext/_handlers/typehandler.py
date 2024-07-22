@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the TypeHandler class."""
 
-# cant use type, variable has the same name, use deprecated class instead
 from typing import Optional, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
