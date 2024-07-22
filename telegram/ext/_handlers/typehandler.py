@@ -19,7 +19,7 @@
 """This module contains the TypeHandler class."""
 
 # cant use type, variable has the same name, use deprecated class instead
-from typing import Optional, Type, TypeVar  # noqa: UP035
+from typing import Optional, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
@@ -28,7 +28,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
 UT = TypeVar("UT")
-GenericUT = Type[UT]  # noqa: UP006
+GenericUT = type[UT]
 
 
 class TypeHandler(BaseHandler[UT, CCT]):
