@@ -24,6 +24,7 @@ from telegram._files.photosize import PhotoSize
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -157,10 +158,10 @@ class Game(TelegramObject):
         if not self.text:
             raise RuntimeError("This Game has no 'text'.")
 
-        entity_text = self.text.encode("utf-16-le")
+        entity_text = self.text.encode(TextEncoding.UTF_16_LE)
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
-        return entity_text.decode("utf-16-le")
+        return entity_text.decode(TextEncoding.UTF_16_LE)
 
     def parse_text_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
         """

@@ -21,6 +21,7 @@ import json
 from typing import Any, Dict, List, Optional, Union, final
 from urllib.parse import urlencode
 
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import UploadFileDict
 from telegram.request._requestparameter import RequestParameter
 
@@ -109,7 +110,7 @@ class RequestData:
             To use a custom library for JSON encoding, you can directly encode the keys of
             :attr:`parameters` - note that string valued keys should not be JSON encoded.
         """
-        return json.dumps(self.json_parameters).encode("utf-8")
+        return json.dumps(self.json_parameters).encode(TextEncoding.UTF_8)
 
     @property
     def multipart_data(self) -> UploadFileDict:

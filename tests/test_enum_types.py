@@ -19,6 +19,8 @@
 import re
 from pathlib import Path
 
+from telegram._utils.strings import TextEncoding
+
 telegram_root = Path(__file__).parent.parent / "telegram"
 telegram_ext_root = telegram_root / "ext"
 exclude_dirs = {
@@ -46,7 +48,7 @@ def test_types_are_converted_to_enum():
             # We don't check tg.ext.
             continue
 
-        text = path.read_text(encoding="utf-8")
+        text = path.read_text(encoding=TextEncoding.UTF_8)
         for match in re.finditer(pattern, text):
             if any(exclude_pattern.match(match.group(0)) for exclude_pattern in exclude_patterns):
                 continue
