@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram MessageOigin."""
 import datetime
-from typing import TYPE_CHECKING, Dict, Final, Optional, Type
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._chat import Chat
@@ -105,7 +105,7 @@ class MessageOrigin(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type[MessageOrigin]] = {
+        _class_mapping: dict[str, type[MessageOrigin]] = {
             cls.USER: MessageOriginUser,
             cls.HIDDEN_USER: MessageOriginHiddenUser,
             cls.CHAT: MessageOriginChat,

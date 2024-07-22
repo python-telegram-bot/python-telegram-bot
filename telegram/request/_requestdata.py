@@ -18,7 +18,7 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that holds the parameters of a request to the Bot API."""
 import json
-from typing import Any, Dict, List, Optional, Union, final
+from typing import Any, Optional, Union, final
 from urllib.parse import urlencode
 
 from telegram._utils.types import UploadFileDict
@@ -44,12 +44,12 @@ class RequestData:
 
     __slots__ = ("_parameters", "contains_files")
 
-    def __init__(self, parameters: Optional[List[RequestParameter]] = None):
-        self._parameters: List[RequestParameter] = parameters or []
+    def __init__(self, parameters: Optional[list[RequestParameter]] = None):
+        self._parameters: list[RequestParameter] = parameters or []
         self.contains_files: bool = any(param.input_files for param in self._parameters)
 
     @property
-    def parameters(self) -> Dict[str, Union[str, int, List[Any], Dict[Any, Any]]]:
+    def parameters(self) -> dict[str, Union[str, int, list[Any], dict[Any, Any]]]:
         """Gives the parameters as mapping of parameter name to the parameter value, which can be
         a single object of type :obj:`int`, :obj:`float`, :obj:`str` or :obj:`bool` or any
         (possibly nested) composition of lists, tuples and dictionaries, where each entry, key
@@ -62,7 +62,7 @@ class RequestData:
         }
 
     @property
-    def json_parameters(self) -> Dict[str, str]:
+    def json_parameters(self) -> dict[str, str]:
         """Gives the parameters as mapping of parameter name to the respective JSON encoded
         value.
 
@@ -77,24 +77,24 @@ class RequestData:
             if param.json_value is not None
         }
 
-    def url_encoded_parameters(self, encode_kwargs: Optional[Dict[str, Any]] = None) -> str:
+    def url_encoded_parameters(self, encode_kwargs: Optional[dict[str, Any]] = None) -> str:
         """Encodes the parameters with :func:`urllib.parse.urlencode`.
 
         Args:
-            encode_kwargs (Dict[:obj:`str`, any], optional): Additional keyword arguments to pass
+            encode_kwargs (dict[:obj:`str`, any], optional): Additional keyword arguments to pass
                 along to :func:`urllib.parse.urlencode`.
         """
         if encode_kwargs:
             return urlencode(self.json_parameters, **encode_kwargs)
         return urlencode(self.json_parameters)
 
-    def parametrized_url(self, url: str, encode_kwargs: Optional[Dict[str, Any]] = None) -> str:
+    def parametrized_url(self, url: str, encode_kwargs: Optional[dict[str, Any]] = None) -> str:
         """Shortcut for attaching the return value of :meth:`url_encoded_parameters` to the
         :paramref:`url`.
 
         Args:
             url (:obj:`str`): The URL the parameters will be attached to.
-            encode_kwargs (Dict[:obj:`str`, any], optional): Additional keyword arguments to pass
+            encode_kwargs (dict[:obj:`str`, any], optional): Additional keyword arguments to pass
                 along to :func:`urllib.parse.urlencode`.
         """
         url_parameters = self.url_encoded_parameters(encode_kwargs=encode_kwargs)

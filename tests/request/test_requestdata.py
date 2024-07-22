@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import json
-from typing import Any, Dict
+from typing import Any
 from urllib.parse import quote
 
 import pytest
@@ -30,7 +30,7 @@ from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
-def inputfiles() -> Dict[bool, InputFile]:
+def inputfiles() -> dict[bool, InputFile]:
     return {True: InputFile(obj="data", attach=True), False: InputFile(obj="data", attach=False)}
 
 
@@ -52,7 +52,7 @@ def input_media_photo() -> InputMediaPhoto:
 
 
 @pytest.fixture(scope="module")
-def simple_params() -> Dict[str, Any]:
+def simple_params() -> dict[str, Any]:
     return {
         "string": "string",
         "integer": 1,
@@ -62,7 +62,7 @@ def simple_params() -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def simple_jsons() -> Dict[str, Any]:
+def simple_jsons() -> dict[str, Any]:
     return {
         "string": "string",
         "integer": json.dumps(1),
@@ -79,7 +79,7 @@ def simple_rqs(simple_params) -> RequestData:
 
 
 @pytest.fixture(scope="module")
-def file_params(inputfiles, input_media_video, input_media_photo) -> Dict[str, Any]:
+def file_params(inputfiles, input_media_video, input_media_photo) -> dict[str, Any]:
     return {
         "inputfile_attach": inputfiles[True],
         "inputfile_no_attach": inputfiles[False],
@@ -89,7 +89,7 @@ def file_params(inputfiles, input_media_video, input_media_photo) -> Dict[str, A
 
 
 @pytest.fixture(scope="module")
-def file_jsons(inputfiles, input_media_video, input_media_photo) -> Dict[str, Any]:
+def file_jsons(inputfiles, input_media_video, input_media_photo) -> dict[str, Any]:
     input_media_video_dict = input_media_video.to_dict()
     input_media_video_dict["media"] = input_media_video.media.attach_uri
     input_media_video_dict["thumbnail"] = input_media_video.thumbnail.attach_uri
@@ -110,14 +110,14 @@ def file_rqs(file_params) -> RequestData:
 
 
 @pytest.fixture(scope="module")
-def mixed_params(file_params, simple_params) -> Dict[str, Any]:
+def mixed_params(file_params, simple_params) -> dict[str, Any]:
     both = file_params.copy()
     both.update(simple_params)
     return both
 
 
 @pytest.fixture(scope="module")
-def mixed_jsons(file_jsons, simple_jsons) -> Dict[str, Any]:
+def mixed_jsons(file_jsons, simple_jsons) -> dict[str, Any]:
     both = file_jsons.copy()
     both.update(simple_jsons)
     return both

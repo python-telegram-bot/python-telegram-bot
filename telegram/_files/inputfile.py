@@ -95,7 +95,7 @@ class InputFile:
         """Field tuple representing the contents of the file for upload to the Telegram servers.
 
         Returns:
-            Tuple[:obj:`str`, :obj:`bytes`, :obj:`str`]:
+            tuple[:obj:`str`, :obj:`bytes`, :obj:`str`]:
         """
         return self.filename, self.input_file_content, self.mimetype
 

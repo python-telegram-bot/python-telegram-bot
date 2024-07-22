@@ -20,7 +20,8 @@
 
 import copy
 import itertools
-from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -199,7 +200,7 @@ class MessageEntity(TelegramObject):
         accumulated_length = 0
         # calculate the length of each slice text[:position] in utf-16 accordingly,
         # store the position translations
-        position_translation: Dict[int, int] = {}
+        position_translation: dict[int, int] = {}
         for i, position in enumerate(positions):
             last_position = positions[i - 1] if i > 0 else 0
             text_slice = text[last_position:position]
@@ -219,8 +220,8 @@ class MessageEntity(TelegramObject):
             out.append(new_entity)
         return out
 
-    ALL_TYPES: Final[List[str]] = list(constants.MessageEntityType)
-    """List[:obj:`str`]: A list of all available message entity types."""
+    ALL_TYPES: Final[list[str]] = list(constants.MessageEntityType)
+    """list[:obj:`str`]: A list of all available message entity types."""
     BLOCKQUOTE: Final[str] = constants.MessageEntityType.BLOCKQUOTE
     """:const:`telegram.constants.MessageEntityType.BLOCKQUOTE`
 

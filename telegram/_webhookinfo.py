@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
+from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -89,7 +90,7 @@ class WebhookInfo(TelegramObject):
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
             connections to the webhook for update delivery.
-        allowed_updates (Tuple[:obj:`str`]): Optional. A list of update types the bot is
+        allowed_updates (tuple[:obj:`str`]): Optional. A list of update types the bot is
             subscribed to. Defaults to all update types, except
             :attr:`telegram.Update.chat_member`.
 
@@ -144,7 +145,7 @@ class WebhookInfo(TelegramObject):
         self.last_error_date: Optional[datetime] = last_error_date
         self.last_error_message: Optional[str] = last_error_message
         self.max_connections: Optional[int] = max_connections
-        self.allowed_updates: Tuple[str, ...] = parse_sequence_arg(allowed_updates)
+        self.allowed_updates: tuple[str, ...] = parse_sequence_arg(allowed_updates)
         self.last_synchronization_error_date: Optional[datetime] = last_synchronization_error_date
 
         self._id_attrs = (

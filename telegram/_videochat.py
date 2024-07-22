@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram video chats."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -102,7 +103,7 @@ class VideoChatParticipantsInvited(TelegramObject):
                 |sequenceclassargs|
 
     Attributes:
-        users (Tuple[:class:`telegram.User`]): New members that were invited to the video chat.
+        users (tuple[:class:`telegram.User`]): New members that were invited to the video chat.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -118,7 +119,7 @@ class VideoChatParticipantsInvited(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.users: Tuple[User, ...] = parse_sequence_arg(users)
+        self.users: tuple[User, ...] = parse_sequence_arg(users)
         self._id_attrs = (self.users,)
 
         self._freeze()

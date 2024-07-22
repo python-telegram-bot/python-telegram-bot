@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
 import re
-from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union, cast
+from re import Match, Pattern
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE

@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the TypeHandler class."""
 
-from typing import Optional, Type, TypeVar
+# cant use type, variable has the same name, use deprecated class instead
+from typing import Optional, Type, TypeVar  # noqa: UP035
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
@@ -27,6 +28,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
 UT = TypeVar("UT")
+GenericUT = Type[UT]  # noqa: UP006
 
 
 class TypeHandler(BaseHandler[UT, CCT]):
@@ -71,13 +73,13 @@ class TypeHandler(BaseHandler[UT, CCT]):
 
     def __init__(
         self,
-        type: Type[UT],  # pylint: disable=redefined-builtin
+        type: GenericUT,  # pylint: disable=redefined-builtin
         callback: HandlerCallback[UT, CCT, RT],
         strict: bool = False,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
-        self.type: Type[UT] = type
+        self.type: GenericUT = type
         self.strict: Optional[bool] = strict
 
     def check_update(self, update: object) -> bool:

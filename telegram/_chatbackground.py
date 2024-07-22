@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to chat backgrounds."""
-from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._files.document import Document
@@ -87,7 +88,7 @@ class BackgroundFill(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type[BackgroundFill]] = {
+        _class_mapping: dict[str, type[BackgroundFill]] = {
             cls.SOLID: BackgroundFillSolid,
             cls.GRADIENT: BackgroundFillGradient,
             cls.FREEFORM_GRADIENT: BackgroundFillFreeformGradient,
@@ -212,7 +213,7 @@ class BackgroundFillFreeformGradient(BackgroundFill):
         super().__init__(type=self.FREEFORM_GRADIENT, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.colors: Tuple[int, ...] = parse_sequence_arg(colors)
+            self.colors: tuple[int, ...] = parse_sequence_arg(colors)
 
             self._id_attrs = (self.colors,)
 
@@ -278,7 +279,7 @@ class BackgroundType(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type[BackgroundType]] = {
+        _class_mapping: dict[str, type[BackgroundType]] = {
             cls.FILL: BackgroundTypeFill,
             cls.WALLPAPER: BackgroundTypeWallpaper,
             cls.PATTERN: BackgroundTypePattern,

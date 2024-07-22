@@ -18,9 +18,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
+from collections.abc import Sequence
 from datetime import datetime
 from html import escape
-from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._chatpermissions import ChatPermissions
@@ -296,7 +297,7 @@ class _ChatBase(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["ChatMember", ...]:
+    ) -> tuple["ChatMember", ...]:
         """Shortcut for::
 
              await bot.get_chat_administrators(update.effective_chat.id, *args, **kwargs)
@@ -305,7 +306,7 @@ class _ChatBase(TelegramObject):
         :meth:`telegram.Bot.get_chat_administrators`.
 
         Returns:
-            Tuple[:class:`telegram.ChatMember`]: A tuple of administrators in a chat. An Array of
+            tuple[:class:`telegram.ChatMember`]: A tuple of administrators in a chat. An Array of
             :class:`telegram.ChatMember` objects that contains information about all
             chat administrators except other bots. If the chat is a group or a supergroup
             and no administrators were appointed, only the creator will be returned.
@@ -1136,7 +1137,7 @@ class _ChatBase(TelegramObject):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-    ) -> Tuple["Message", ...]:
+    ) -> tuple["Message", ...]:
         """Shortcut for::
 
              await bot.send_media_group(update.effective_chat.id, *args, **kwargs)
@@ -1144,7 +1145,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
         Returns:
-            Tuple[:class:`telegram.Message`]: On success, a tuple of :class:`~telegram.Message`
+            tuple[:class:`telegram.Message`]: On success, a tuple of :class:`~telegram.Message`
             instances that were sent is returned.
 
         """
@@ -2264,7 +2265,7 @@ class _ChatBase(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.copy_messages(chat_id=update.effective_chat.id, *args, **kwargs)
@@ -2276,7 +2277,7 @@ class _ChatBase(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
 
         """
@@ -2309,7 +2310,7 @@ class _ChatBase(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.copy_messages(from_chat_id=update.effective_chat.id, *args, **kwargs)
@@ -2321,7 +2322,7 @@ class _ChatBase(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
 
         """
@@ -2438,7 +2439,7 @@ class _ChatBase(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.forward_messages(chat_id=update.effective_chat.id, *args, **kwargs)
@@ -2450,7 +2451,7 @@ class _ChatBase(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of sent messages is returned.
 
         """
@@ -2481,7 +2482,7 @@ class _ChatBase(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.forward_messages(from_chat_id=update.effective_chat.id, *args, **kwargs)
@@ -2493,7 +2494,7 @@ class _ChatBase(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of sent messages is returned.
 
         """

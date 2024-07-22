@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
-from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -259,7 +260,7 @@ class StickerSet(TelegramObject):
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        stickers (Tuple[:class:`telegram.Sticker`]): List of all set stickers.
+        stickers (tuple[:class:`telegram.Sticker`]): List of all set stickers.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -296,7 +297,7 @@ class StickerSet(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
         self.title: str = title
-        self.stickers: Tuple[Sticker, ...] = parse_sequence_arg(stickers)
+        self.stickers: tuple[Sticker, ...] = parse_sequence_arg(stickers)
         self.sticker_type: str = sticker_type
         # Optional
         self.thumbnail: Optional[PhotoSize] = thumbnail

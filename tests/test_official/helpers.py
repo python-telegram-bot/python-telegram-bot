@@ -20,7 +20,8 @@
 
 import functools
 import re
-from typing import TYPE_CHECKING, Any, Sequence, _eval_type, get_type_hints
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any, _eval_type, get_type_hints
 
 from bs4 import PageElement, Tag
 

@@ -26,14 +26,14 @@ Warning:
     the changelog.
 """
 import warnings
-from typing import Type, Union
+from typing import Union
 
 from telegram.warnings import PTBUserWarning
 
 
 def warn(
     message: Union[str, PTBUserWarning],
-    category: Type[Warning] = PTBUserWarning,
+    category: type[Warning] = PTBUserWarning,
     stacklevel: int = 0,
 ) -> None:
     """
@@ -48,7 +48,7 @@ def warn(
             .. versionchanged:: 21.2
                 Now also accepts a :obj:`PTBUserWarning` instance.
 
-        category (:obj:`Type[Warning]`, optional): Specify the Warning class to pass to
+        category (:obj:`type[Warning]`, optional): Specify the Warning class to pass to
             ``warnings.warn()``. Defaults to :class:`telegram.warnings.PTBUserWarning`.
         stacklevel (:obj:`int`, optional): Specify the stacklevel to pass to ``warnings.warn()``.
             Pass the same value as you'd pass directly to ``warnings.warn()``. Defaults to ``0``.
