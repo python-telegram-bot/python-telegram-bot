@@ -28,6 +28,8 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
 UT = TypeVar("UT")
+# If this is written directly next to the type variable mypy gets confused with [valid-type]. This
+# could be reported to them but I doubt they would change this since we override a builtin type -.-
 GenericUT = type[UT]
 
 
