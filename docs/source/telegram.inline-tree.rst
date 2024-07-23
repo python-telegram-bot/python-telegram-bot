@@ -1,3 +1,5 @@
+.. _inline-tree:
+
 Inline Mode
 -----------
 
