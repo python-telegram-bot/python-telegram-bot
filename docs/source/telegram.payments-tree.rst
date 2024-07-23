@@ -1,3 +1,5 @@
+.. _payments-tree:
+
 Payments
 --------
 
