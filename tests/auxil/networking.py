@@ -23,6 +23,7 @@ import pytest
 from httpx import AsyncClient, AsyncHTTPTransport, Response
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import ODVInput
 from telegram.error import BadRequest, RetryAfter, TimedOut
 from telegram.request import HTTPXRequest, RequestData
@@ -103,7 +104,7 @@ async def send_webhook_message(
         content_len = None
         payload = None
     else:
-        payload = bytes(payload_str, encoding="utf-8")
+        payload = bytes(payload_str, encoding=TextEncoding.UTF_8)
 
     if content_len == -1:
         content_len = len(payload)

@@ -26,6 +26,7 @@ from typing import AsyncContextManager, Final, List, Optional, Tuple, Type, Type
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings import warn
 from telegram._version import __version__ as ptb_ver
@@ -403,7 +404,7 @@ class BaseRequest(
         Raises:
             TelegramError: If loading the JSON data failed
         """
-        decoded_s = payload.decode("utf-8", "replace")
+        decoded_s = payload.decode(TextEncoding.UTF_8, "replace")
         try:
             return json.loads(decoded_s)
         except ValueError as exc:
