@@ -457,19 +457,19 @@ class BusinessOpeningHours(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     def get_opening_hours_for_day(
-        self, target_date: Union[date, datetime], tzinfo: Optional[zoneinfo.ZoneInfo] = None
+        self, target_date: date, tzinfo: Optional[zoneinfo.ZoneInfo] = None
     ) -> Tuple[Tuple[datetime, datetime], ...]:
         """
         Get the opening hours for a specific day.
 
-        .. versionadded:: 21.4
+        .. versionadded:: NEXT.VERSION
 
         Args:
-            target_date (date): The date for which to get the opening hours.
-            tzinfo (Optional[zoneinfo.ZoneInfo], optional): The timezone to use for the opening hours. Defaults to None. If None, the time zone of the business is used.
+            target_date (:class:`datetime.date`): The date for which to get the opening hours.
+            tzinfo (:class:`zoneinfo.ZoneInfo`, optional): The timezone to use for the opening hours.  If :obj:`None`, the time zone of the business is used, i.e. :attr:`time_zone_name`. Defaults to :obj:`None`.
 
         Returns:
-            Tuple[Tuple[datetime, datetime], ...]: A tuple of tuples containing the opening and closing times for the day.
+            Tuple[Tuple[:class:`datetime.datetime`, :class:`datetime.datetime`], ...]: A tuple of tuples containing the opening and closing times for the day.
         """
         if tzinfo is None:
             tzinfo = zoneinfo.ZoneInfo(self.time_zone_name)
@@ -488,13 +488,13 @@ class BusinessOpeningHours(TelegramObject):
         """
         Check if the business is open at the given time. If the given time is time zone naive, the time zone of the business is used.
 
-        .. versionadded:: 21.4
+        .. versionadded:: NEXT.VERSION
 
         Args:
-            target_datetime (datetime): The time to check if the business is open.
+            target_datetime (:class:`datetime.datetime`): The time to check if the business is open.
 
         Returns:
-            bool: True, if the business is open at the given time. False otherwise.
+            :obj:`bool`: :obj:`True`, if the business is open at the given time. :obj:`False` otherwise.
         """
 
         def time_to_minutes(weekday: int, hour: int, minute: int) -> int:

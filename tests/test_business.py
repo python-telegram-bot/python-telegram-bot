@@ -426,7 +426,7 @@ class TestBusinessOpeningHoursWithoutRequest(TestBusinessBase):
         assert boh1 != boh3
         assert hash(boh1) != hash(boh3)
 
-    def test_get_opening_hours_for_day_success_without_timezone(
+    def test_get_opening_hours_for_day_without_timezone(
         self, business_hours: BusinessOpeningHours
     ):
         target_date = date(2023, 7, 17)  # Monday
@@ -439,7 +439,7 @@ class TestBusinessOpeningHoursWithoutRequest(TestBusinessBase):
         assert opening_hours_for_day[0][0] == expected_opening_time
         assert opening_hours_for_day[0][1] == expected_closing_time
 
-    def test_get_opening_hours_for_day_success_with_timezone(
+    def test_get_opening_hours_for_day_with_timezone(
         self, business_hours: BusinessOpeningHours
     ):
         target_date = date(2023, 7, 17)  # Monday
