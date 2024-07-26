@@ -105,10 +105,6 @@ jobs:
         with:
           name: python-package-distributions-and-signatures
           path: dist/
-      - name: Get Tag Name
-        run: |
-          TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
-          echo "TAG=$TAG" >> $GITHUB_ENV
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
