@@ -465,11 +465,14 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.pin_message,
             Bot.pin_chat_message,
-            ["message_id", "chat_id"],
+            ["message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
-            callback_query.pin_message, callback_query.get_bot(), "pin_chat_message"
+            callback_query.pin_message,
+            callback_query.get_bot(),
+            "pin_chat_message",
+            ["business_connection_id"],
         )
         assert await check_defaults_handling(callback_query.pin_message, callback_query.get_bot())
 
@@ -490,14 +493,15 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.unpin_message,
             Bot.unpin_chat_message,
-            ["message_id", "chat_id"],
+            ["message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
             callback_query.unpin_message,
             callback_query.get_bot(),
             "unpin_chat_message",
-            shortcut_kwargs=["message_id", "chat_id"],
+            shortcut_kwargs=["message_id"],
+            skip_params=["business_connection_id"],
         )
         assert await check_defaults_handling(
             callback_query.unpin_message, callback_query.get_bot()

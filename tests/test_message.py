@@ -2592,9 +2592,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             return chat_id and message_id
 
         assert check_shortcut_signature(
-            Message.pin, Bot.pin_chat_message, ["chat_id", "message_id"], []
+            Message.pin,
+            Bot.pin_chat_message,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
         )
-        assert await check_shortcut_call(message.pin, message.get_bot(), "pin_chat_message")
+        assert await check_shortcut_call(
+            message.pin,
+            message.get_bot(),
+            "pin_chat_message",
+            shortcut_kwargs=["chat_id", "message_id", "business_connection_id"],
+        )
         assert await check_defaults_handling(message.pin, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "pin_chat_message", make_assertion)
@@ -2607,13 +2615,16 @@ class TestMessageWithoutRequest(TestMessageBase):
             return chat_id and message_id
 
         assert check_shortcut_signature(
-            Message.unpin, Bot.unpin_chat_message, ["chat_id", "message_id"], []
+            Message.unpin,
+            Bot.unpin_chat_message,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
         )
         assert await check_shortcut_call(
             message.unpin,
             message.get_bot(),
             "unpin_chat_message",
-            shortcut_kwargs=["chat_id", "message_id"],
+            shortcut_kwargs=["chat_id", "message_id", "business_connection_id"],
         )
         assert await check_defaults_handling(message.unpin, message.get_bot())
 

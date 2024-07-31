@@ -4106,10 +4106,17 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.pin_chat_message(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
+
+        .. versionchanged:: NEXT.VERSION
+            Now also passes :attr:`business_connection_id` to
+            :meth:`telegram.Bot.pin_chat_message`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4118,6 +4125,7 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().pin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             disable_notification=disable_notification,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4138,10 +4146,17 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.unpin_chat_message(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
+
+        .. versionchanged:: NEXT.VERSION
+            Now also passes :attr:`business_connection_id` to
+            :meth:`telegram.Bot.pin_chat_message`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4150,6 +4165,7 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().unpin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
