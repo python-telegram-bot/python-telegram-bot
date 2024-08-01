@@ -41,7 +41,7 @@ jobs:
 
       - name: Test Summary
         id: test_summary
-        uses: test-summary/action@v2.3
+        uses: test-summary/action@v2.4
         if: always()  # always run, even if tests fail
         with:
           paths: .test_report_official.xml
