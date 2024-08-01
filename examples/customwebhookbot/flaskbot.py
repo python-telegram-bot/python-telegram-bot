@@ -4,7 +4,7 @@
 """
 Simple example of a bot that uses a custom webhook setup and handles custom updates.
 For the custom webhook setup, the libraries `flask`, `asgiref` and `uvicorn` are used. Please
-install them as `pip install flask[async]~=2.3.2 uvicorn~=0.23.2 asgiref~=3.7.2`.
+install them as `pip install flask[async]~=2.4.2 uvicorn~=0.23.2 asgiref~=3.7.2`.
 Note that any other `asyncio` based web server framework can be used for a custom webhook setup
 just as well.
 

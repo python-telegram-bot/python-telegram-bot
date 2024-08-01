@@ -39,13 +39,13 @@ class TestVersion:
     @pytest.mark.parametrize(
         ("version", "expected"),
         [
-            (Version(1, 2, 3, "alpha", 4), "1.2.3a4"),
-            (Version(2, 3, 4, "beta", 5), "2.3.4b5"),
-            (Version(1, 2, 3, "candidate", 4), "1.2.3rc4"),
+            (Version(1, 2, 3, "alpha", 4), "1.2.4a4"),
+            (Version(2, 3, 4, "beta", 5), "2.4.4b5"),
+            (Version(1, 2, 3, "candidate", 4), "1.2.4rc4"),
             (Version(1, 2, 0, "alpha", 4), "1.2a4"),
-            (Version(2, 3, 0, "beta", 5), "2.3b5"),
+            (Version(2, 3, 0, "beta", 5), "2.4b5"),
             (Version(1, 2, 0, "candidate", 4), "1.2rc4"),
-            (Version(1, 2, 3, "final", 0), "1.2.3"),
+            (Version(1, 2, 3, "final", 0), "1.2.4"),
             (Version(1, 2, 0, "final", 0), "1.2"),
         ],
     )
