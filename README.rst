@@ -11,7 +11,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-7.7-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-7.8-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API version
 
@@ -81,7 +81,7 @@ After installing_ the library, be sure to check out the section on `working with
 Telegram API support
 ~~~~~~~~~~~~~~~~~~~~
 
-All types and methods of the Telegram Bot API **7.7** are natively supported by this library.
+All types and methods of the Telegram Bot API **7.8** are natively supported by this library.
 In addition, Bot API functionality not yet natively included can still be used as described `in our wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Bot-API-Forward-Compatibility>`_.
 
 Notable Features

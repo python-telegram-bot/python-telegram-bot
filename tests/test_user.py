@@ -43,6 +43,7 @@ def json_dict():
         "is_premium": TestUserBase.is_premium,
         "added_to_attachment_menu": TestUserBase.added_to_attachment_menu,
         "can_connect_to_business": TestUserBase.can_connect_to_business,
+        "has_main_web_app": TestUserBase.has_main_web_app,
     }
 
 
@@ -61,6 +62,7 @@ def user(bot):
         is_premium=TestUserBase.is_premium,
         added_to_attachment_menu=TestUserBase.added_to_attachment_menu,
         can_connect_to_business=TestUserBase.can_connect_to_business,
+        has_main_web_app=TestUserBase.has_main_web_app,
     )
     user.set_bot(bot)
     user._unfreeze()
@@ -80,6 +82,7 @@ class TestUserBase:
     is_premium = True
     added_to_attachment_menu = False
     can_connect_to_business = True
+    has_main_web_app = False
 
 
 class TestUserWithoutRequest(TestUserBase):
@@ -104,6 +107,7 @@ class TestUserWithoutRequest(TestUserBase):
         assert user.is_premium == self.is_premium
         assert user.added_to_attachment_menu == self.added_to_attachment_menu
         assert user.can_connect_to_business == self.can_connect_to_business
+        assert user.has_main_web_app == self.has_main_web_app
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -121,6 +125,7 @@ class TestUserWithoutRequest(TestUserBase):
         assert user_dict["is_premium"] == user.is_premium
         assert user_dict["added_to_attachment_menu"] == user.added_to_attachment_menu
         assert user_dict["can_connect_to_business"] == user.can_connect_to_business
+        assert user_dict["has_main_web_app"] == user.has_main_web_app
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)
