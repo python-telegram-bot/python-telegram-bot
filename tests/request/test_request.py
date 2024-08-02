@@ -49,10 +49,9 @@ from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.slots import mro_slots
-
-from ..auxil.files import data_file
 
 # We only need mixed_rqs fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
