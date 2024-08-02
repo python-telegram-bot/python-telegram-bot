@@ -250,7 +250,7 @@ class ExternalReplyInfo(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["ExternalReplyInfo"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
@@ -299,7 +299,8 @@ class TextQuote(TelegramObject):
             message.
         position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
             units as specified by the sender.
-        entities (Sequence[:obj:`telegram.MessageEntity`], optional): Special entities that appear
+        entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities that
+            appear
             in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
             custom_emoji entities are kept in quotes.
         is_manual (:obj:`bool`, optional): :obj:`True`, if the quote was chosen manually by the
@@ -310,7 +311,7 @@ class TextQuote(TelegramObject):
             message.
         position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
             units as specified by the sender.
-        entities (Tuple[:obj:`telegram.MessageEntity`]): Optional. Special entities that appear
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that appear
             in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
             custom_emoji entities are kept in quotes.
         is_manual (:obj:`bool`): Optional. :obj:`True`, if the quote was chosen manually by the
@@ -351,7 +352,7 @@ class TextQuote(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["TextQuote"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
@@ -387,7 +388,8 @@ class ReplyParameters(TelegramObject):
         quote_parse_mode (:obj:`str`, optional): Mode for parsing entities in the quote. See
             :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
             more details.
-        quote_entities (Sequence[:obj:`telegram.MessageEntity`], optional): A JSON-serialized list
+        quote_entities (Sequence[:class:`telegram.MessageEntity`], optional): A JSON-serialized
+            list
             of special entities that appear in the quote. It can be specified instead of
             :paramref:`quote_parse_mode`.
         quote_position (:obj:`int`, optional): Position of the quote in the original message in
@@ -409,8 +411,8 @@ class ReplyParameters(TelegramObject):
         quote_parse_mode (:obj:`str`): Optional. Mode for parsing entities in the quote. See
             :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
             more details.
-        quote_entities (Tuple[:obj:`telegram.MessageEntity`]): Optional. A JSON-serialized list of
-            special entities that appear in the quote. It can be specified instead of
+        quote_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. A JSON-serialized list
+            of special entities that appear in the quote. It can be specified instead of
             :paramref:`quote_parse_mode`.
         quote_position (:obj:`int`): Optional. Position of the quote in the original message in
             UTF-16 code units.
@@ -458,7 +460,7 @@ class ReplyParameters(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["ReplyParameters"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:

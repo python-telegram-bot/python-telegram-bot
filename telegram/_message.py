@@ -570,22 +570,22 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
-        sender_business_bot (:obj:`telegram.User`, optional): The bot that actually sent the
+        sender_business_bot (:class:`telegram.User`, optional): The bot that actually sent the
             message on behalf of the business account. Available only for outgoing messages sent
             on behalf of the connected business account.
 
             .. versionadded:: 21.1
 
-        chat_background_set  (:obj:`telegram.ChatBackground`, optional): Service message: chat
+        chat_background_set  (:class:`telegram.ChatBackground`, optional): Service message: chat
             background set.
 
             .. versionadded:: 21.2
-        paid_media (:obj:`telegram.PaidMediaInfo`, optional): Message contains paid media;
+        paid_media (:class:`telegram.PaidMediaInfo`, optional): Message contains paid media;
             information about the paid media.
 
             .. versionadded:: 21.4
-        refunded_payment (:obj:`telegram.RefundedPayment`, optional): Message is a service message
-            about a refunded payment, information about the payment.
+        refunded_payment (:class:`telegram.RefundedPayment`, optional): Message is a service
+            message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
 
@@ -897,22 +897,22 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
-        sender_business_bot (:obj:`telegram.User`): Optional. The bot that actually sent the
+        sender_business_bot (:class:`telegram.User`): Optional. The bot that actually sent the
             message on behalf of the business account. Available only for outgoing messages sent
             on behalf of the connected business account.
 
             .. versionadded:: 21.1
 
-        chat_background_set (:obj:`telegram.ChatBackground`): Optional. Service message: chat
+        chat_background_set (:class:`telegram.ChatBackground`): Optional. Service message: chat
             background set
 
             .. versionadded:: 21.2
-        paid_media (:obj:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
+        paid_media (:class:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
             information about the paid media.
 
             .. versionadded:: 21.4
-        refunded_payment (:obj:`telegram.RefundedPayment`): Optional. Message is a service message
-            about a refunded payment, information about the payment.
+        refunded_payment (:class:`telegram.RefundedPayment`): Optional. Message is a service
+            message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
 

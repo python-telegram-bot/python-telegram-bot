@@ -260,13 +260,13 @@ class TransactionPartnerFragment(TransactionPartner):
     .. versionadded:: 21.4
 
     Args:
-        withdrawal_state (:obj:`telegram.RevenueWithdrawalState`, optional): State of the
+        withdrawal_state (:class:`telegram.RevenueWithdrawalState`, optional): State of the
             transaction if the transaction is outgoing.
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.FRAGMENT`.
-        withdrawal_state (:obj:`telegram.RevenueWithdrawalState`): Optional. State of the
+        withdrawal_state (:class:`telegram.RevenueWithdrawalState`): Optional. State of the
             transaction if the transaction is outgoing.
     """
 
