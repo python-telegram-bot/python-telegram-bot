@@ -1305,8 +1305,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            photo (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.PhotoSize`): Photo to send.
+            photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+                | :class:`pathlib.Path` | :class:`telegram.PhotoSize`): Photo to send.
                 |fileinput|
                 Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
 
@@ -1465,9 +1465,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            audio (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.Audio`): Audio file to send.
-                |fileinput|
+            audio (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.Audio`): Audio file to
+                send. |fileinput|
                 Lastly you can pass an existing :class:`telegram.Audio` object to send.
 
                 .. versionchanged:: 13.2
@@ -1617,8 +1617,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            document (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.Document`): File to send.
+            document (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.Document`): File to send.
                 |fileinput|
                 Lastly you can pass an existing :class:`telegram.Document` object to send.
 
@@ -1755,8 +1755,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.Sticker`): Sticker to send.
+            sticker (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.Sticker`): Sticker to send.
                 |fileinput| Video stickers can only be sent by a ``file_id``. Video and animated
                 stickers can't be sent via an HTTP URL.
 
@@ -1895,8 +1895,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            video (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.Video`): Video file to send.
+            video (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+                | :class:`pathlib.Path` | :class:`telegram.Video`): Video file to send.
                 |fileinput|
                 Lastly you can pass an existing :class:`telegram.Video` object to send.
 
@@ -2059,8 +2059,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            video_note (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.VideoNote`): Video note to send.
+            video_note (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.VideoNote`): Video note
+                to send.
                 Pass a file_id as String to send a video note that exists on the Telegram
                 servers (recommended) or upload a new video using multipart/form-data.
                 |uploadinput|
@@ -2209,9 +2210,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            animation (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.Animation`): Animation to send.
-                |fileinput|
+            animation (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.Animation`): Animation to
+                send. |fileinput|
                 Lastly you can pass an existing :class:`telegram.Animation` object to send.
 
                 .. versionchanged:: 13.2
@@ -2371,8 +2372,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            voice (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.Voice`): Voice file to send.
+            voice (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+                | :class:`pathlib.Path` | :class:`telegram.Voice`): Voice file to send.
                 |fileinput|
                 Lastly you can pass an existing :class:`telegram.Voice` object to send.
 
@@ -6370,8 +6371,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
-            sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`):
-                A file with the sticker in the  ``".WEBP"``, ``".PNG"``, ``".TGS"`` or ``".WEBM"``
+            sticker (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path`): A file with the sticker in the
+                ``".WEBP"``, ``".PNG"``, ``".TGS"`` or ``".WEBM"``
                 format. See `here <https://core.telegram.org/stickers>`_ for technical requirements
                 . |uploadinput|
 
@@ -6695,8 +6697,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: 21.1
 
-            thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): A **.WEBP** or **.PNG** image with the thumbnail, must
+            thumbnail (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path`, optional): A **.WEBP** or **.PNG** image
+                with the thumbnail, must
                 be up to :tg-const:`telegram.constants.StickerSetLimit.MAX_STATIC_THUMBNAIL_SIZE`
                 kilobytes in size and have width and height of exactly
                 :tg-const:`telegram.constants.StickerSetLimit.STATIC_THUMB_DIMENSIONS` px, or a

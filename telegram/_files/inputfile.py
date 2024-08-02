@@ -22,7 +22,7 @@ import mimetypes
 from typing import IO, Optional, Union
 from uuid import uuid4
 
-from telegram._utils.files import load_file
+from telegram._utils.files import guess_file_name, load_file
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import FieldTuple
 
@@ -53,9 +53,36 @@ class InputFile:
         attach (:obj:`bool`, optional): Pass :obj:`True` if the parameter this file belongs to in
             the request to Telegram should point to the multipart data via an ``attach://`` URI.
             Defaults to `False`.
+        read_file_handle (:obj:`bool`, optional): If :obj:`True` and :paramref:`obj` is a file
+            handle, the data will be read from the file handle on initialization of this object.
+            If :obj:`False`, the file handle will be passed on to the
+            `networking backend <telegram.request.BaseRequest.do_request>`_ which will have to
+            handle the reading. Defaults to :obj:`True`.
+
+            Tip:
+                If you upload extremely large files, you may want to set this to :obj:`False` to
+                avoid reading the complete file into memory. Additionally, this may be supported
+                better by the networking backend (in particular it is handled better by
+                the default :class:`~telegram.request.HTTPXRequest`).
+
+            Important:
+                If you set this to :obj:`False`, you have to ensure that the file handle is still
+                open when the request is made. In particular, the following snippet can *not* work
+                as expected.
+
+                .. code-block:: python
+
+                    with open('file.txt', 'rb') as file:
+                        input_file = InputFile(file, read_file_handle=False)
+
+                    # here the file handle is already closed and the upload will fail
+                    await bot.send_document(chat_id, input_file)
+
+            .. versionadded:: NEXT.VERSION
+
 
     Attributes:
-        input_file_content (:obj:`bytes`): The binary content of the file to send.
+        input_file_content (:obj:`bytes` | :class:`IO`): The binary content of the file to send.
         attach_name (:obj:`str`): Optional. If present, the parameter this file belongs to in
             the request to Telegram should point to the multipart data via a an URI of the form
             ``attach://<attach_name>`` URI.
@@ -71,14 +98,18 @@ class InputFile:
         obj: Union[IO[bytes], bytes, str],
         filename: Optional[str] = None,
         attach: bool = False,
+        read_file_handle: bool = True,
     ):
         if isinstance(obj, bytes):
-            self.input_file_content: bytes = obj
+            self.input_file_content: Union[bytes, IO[bytes]] = obj
         elif isinstance(obj, str):
             self.input_file_content = obj.encode(TextEncoding.UTF_8)
-        else:
+        elif read_file_handle:
             reported_filename, self.input_file_content = load_file(obj)
             filename = filename or reported_filename
+        else:
+            self.input_file_content = obj
+            filename = filename or guess_file_name(obj)
 
         self.attach_name: Optional[str] = "attached" + uuid4().hex if attach else None
 
@@ -95,8 +126,11 @@ class InputFile:
     def field_tuple(self) -> FieldTuple:
         """Field tuple representing the contents of the file for upload to the Telegram servers.
 
+        .. versionchanged:: NEXT.VERSION
+            Content may now be a file handle.
+
         Returns:
-            Tuple[:obj:`str`, :obj:`bytes`, :obj:`str`]:
+            Tuple[:obj:`str`, :obj:`bytes` | :class:`IO`, :obj:`str`]:
         """
         return self.filename, self.input_file_content, self.mimetype
 

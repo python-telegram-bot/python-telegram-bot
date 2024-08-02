@@ -129,7 +129,11 @@ class RequestData:
 
     @property
     def multipart_data(self) -> UploadFileDict:
-        """Gives the files contained in this object as mapping of part name to encoded content."""
+        """Gives the files contained in this object as mapping of part name to encoded content.
+
+        .. versionchanged:: NEXT.VERSION
+            Content may now be a file handle.
+        """
         multipart_data: UploadFileDict = {}
         for param in self._parameters:
             m_data = param.multipart_data
