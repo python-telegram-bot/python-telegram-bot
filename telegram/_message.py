@@ -359,7 +359,7 @@ class Message(MaybeInaccessibleMessage):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
-            `More about games >> <https://core.telegram.org/bots/api#games>`_.
+            :ref:`More about games >> <games-tree>`.
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -432,10 +432,10 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            :ref:`More about payments >> <payments-tree>`.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            :ref:`More about payments >> <payments-tree>`.
         connected_website (:obj:`str`, optional): The domain name of the website on which the user
             has logged in.
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
@@ -676,7 +676,7 @@ class Message(MaybeInaccessibleMessage):
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
-            `More about games >> <https://core.telegram.org/bots/api#games>`_.
+            :ref:`More about games >> <games-tree>`.
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -758,10 +758,10 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            :ref:`More about payments >> <payments-tree>`.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
             message about a successful payment, information about the payment.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            :ref:`More about payments >> <payments-tree>`.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
@@ -4106,10 +4106,17 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.pin_chat_message(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
+
+        .. versionchanged:: NEXT.VERSION
+            Now also passes :attr:`business_connection_id` to
+            :meth:`telegram.Bot.pin_chat_message`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4118,6 +4125,7 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().pin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             disable_notification=disable_notification,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4138,10 +4146,17 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.unpin_chat_message(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
+
+        .. versionchanged:: NEXT.VERSION
+            Now also passes :attr:`business_connection_id` to
+            :meth:`telegram.Bot.pin_chat_message`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4150,6 +4165,7 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().unpin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

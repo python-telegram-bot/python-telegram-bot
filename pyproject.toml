@@ -67,7 +67,7 @@ all = [
 ]
 callback-data = [
     # Cachetools doesn't have a strict stability policy. Let's be cautious for now.
-    "cachetools~=5.3.3",
+    "cachetools>=5.3.3,<5.5.0",
 ]
 ext = [
     "python-telegram-bot[callback-data,job-queue,rate-limiter,webhooks]",

@@ -6132,6 +6132,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         chat_id: Union[str, int],
         message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6152,6 +6153,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             disable_notification (:obj:`bool`, optional): Pass :obj:`True`, if it is not necessary
                 to send a notification to all chat members about the new pinned message.
                 Notifications are always disabled in channels and private chats.
+            business_connection_id (:obj:`str`, optional): Unique identifier of the business
+                connection on behalf of which the message will be pinned.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6164,6 +6169,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "chat_id": chat_id,
             "message_id": message_id,
             "disable_notification": disable_notification,
+            "business_connection_id": business_connection_id,
         }
 
         return await self._post(
@@ -6180,6 +6186,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self,
         chat_id: Union[str, int],
         message_id: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6196,8 +6203,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            message_id (:obj:`int`, optional): Identifier of a message to unpin. If not specified,
+            message_id (:obj:`int`, optional): Identifier of the message to unpin. Required if
+                :paramref:`business_connection_id` is specified. If not specified,
                 the most recent pinned message (by sending date) will be unpinned.
+            business_connection_id (:obj:`str`, optional): Unique identifier of the business
+                connection on behalf of which the message will be unpinned.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6206,7 +6218,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "message_id": message_id}
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "business_connection_id": business_connection_id,
+        }
 
         return await self._post(
             "unpinChatMessage",

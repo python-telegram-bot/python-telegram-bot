@@ -2238,6 +2238,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Union[str, int],
         message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2254,6 +2255,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            business_connection_id=business_connection_id,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
@@ -3739,6 +3741,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[str, int],
         message_id: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3754,6 +3757,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            business_connection_id=business_connection_id,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
