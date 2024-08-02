@@ -6203,7 +6203,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             message_id (:obj:`int`, optional): Identifier of the message to unpin. Required if
-                :paramref:`business_connection_id<` is specified. If not specified,
+                :paramref:`business_connection_id` is specified. If not specified,
                 the most recent pinned message (by sending date) will be unpinned.
             business_connection_id (:obj:`str`, optional): Unique identifier of the business
                 connection on behalf of which the message will be unpinned.
