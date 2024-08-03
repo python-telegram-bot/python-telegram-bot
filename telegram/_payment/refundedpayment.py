@@ -30,6 +30,8 @@ class RefundedPayment(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`telegram_payment_charge_id` is equal.
 
+    .. versionadded:: 21.4
+
     Args:
         currency (:obj:`str`): Three-letter ISO 4217 `currency
             <https://core.telegram.org/bots/payments#supported-currencies>`_ code, or ``XTR`` for
