@@ -74,6 +74,17 @@ class RevenueWithdrawalState(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["RevenueWithdrawalState"]:
+        """Converts JSON data to the appropriate :class:`RevenueWithdrawalState` object, i.e. takes
+        care of selecting the correct subclass.
+
+        Args:
+            data (Dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with this object.
+
+        Returns:
+            The Telegram object.
+
+        """
         data = cls._parse_data(data)
 
         if not data:
@@ -150,6 +161,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["RevenueWithdrawalStateSucceeded"]:
+        """See :meth:`telegram.RevenueWithdrawalState.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
@@ -287,6 +299,7 @@ class TransactionPartnerFragment(TransactionPartner):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["TransactionPartnerFragment"]:
+        """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
@@ -341,6 +354,7 @@ class TransactionPartnerUser(TransactionPartner):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["TransactionPartnerUser"]:
+        """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
@@ -452,6 +466,7 @@ class StarTransaction(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["StarTransaction"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
@@ -498,6 +513,7 @@ class StarTransactions(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["StarTransactions"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
