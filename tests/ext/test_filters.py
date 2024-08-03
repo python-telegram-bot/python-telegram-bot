@@ -43,7 +43,7 @@ from telegram.ext import filters
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def update():
     update = Update(
         0,

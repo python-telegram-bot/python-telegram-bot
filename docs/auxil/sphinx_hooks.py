@@ -16,6 +16,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 import collections.abc
+import contextlib
 import inspect
 import re
 import typing
@@ -153,13 +154,11 @@ def autodoc_process_docstring(
     if isinstance(obj, telegram.ext.filters.BaseFilter):
         obj = obj.__class__
 
-    try:
+    with contextlib.suppress(Exception):
         source_lines, start_line = inspect.getsourcelines(obj)
         end_line = start_line + len(source_lines)
         file = Path(inspect.getsourcefile(obj)).relative_to(FILE_ROOT)
         LINE_NUMBERS[name] = (file, start_line, end_line)
-    except Exception:
-        pass
 
     # Since we don't document the `__init__`, we call this manually to have it available for
     # attributes -- see the note above

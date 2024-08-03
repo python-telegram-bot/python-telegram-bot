@@ -74,7 +74,7 @@ def mocker_factory(
     return make_assertion
 
 
-@pytest.fixture()
+@pytest.fixture
 async def httpx_request():
     async with NonchalantHttpxRequest() as rq:
         yield rq

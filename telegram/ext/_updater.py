@@ -145,10 +145,10 @@ class Updater(AsyncContextManager["Updater"]):
         """
         try:
             await self.initialize()
-            return self
-        except Exception as exc:
+        except Exception:
             await self.shutdown()
-            raise exc
+            raise
+        return self
 
     async def __aexit__(
         self,
@@ -214,7 +214,7 @@ class Updater(AsyncContextManager["Updater"]):
     async def start_polling(
         self,
         poll_interval: float = 0.0,
-        timeout: int = 10,
+        timeout: int = 10,  # noqa: ASYNC109
         bootstrap_retries: int = -1,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -339,16 +339,15 @@ class Updater(AsyncContextManager["Updater"]):
                 _LOGGER.debug("Waiting for polling to start")
                 await polling_ready.wait()
                 _LOGGER.debug("Polling updates from Telegram started")
-
-                return self.update_queue
-            except Exception as exc:
+            except Exception:
                 self._running = False
-                raise exc
+                raise
+            return self.update_queue
 
     async def _start_polling(
         self,
         poll_interval: float,
-        timeout: int,
+        timeout: int,  # noqa: ASYNC109
         read_timeout: ODVInput[float],
         write_timeout: ODVInput[float],
         connect_timeout: ODVInput[float],
@@ -384,9 +383,9 @@ class Updater(AsyncContextManager["Updater"]):
                     pool_timeout=pool_timeout,
                     allowed_updates=allowed_updates,
                 )
-            except TelegramError as exc:
+            except TelegramError:
                 # TelegramErrors should be processed by the network retry loop
-                raise exc
+                raise
             except Exception as exc:
                 # Other exceptions should not. Let's log them for now.
                 _LOGGER.critical(
@@ -446,13 +445,12 @@ class Updater(AsyncContextManager["Updater"]):
                     pool_timeout=pool_timeout,
                     allowed_updates=allowed_updates,
                 )
-            except TelegramError as exc:
-                _LOGGER.error(
+            except TelegramError:
+                _LOGGER.exception(
                     "Error while calling `get_updates` one more time to mark all fetched updates "
                     "as read: %s. Suppressing error to ensure graceful shutdown. When polling for "
                     "updates is restarted, updates may be fetched again. Please adjust timeouts "
                     "via `ApplicationBuilder` or the parameter `get_updates_request` of `Bot`.",
-                    exc_info=exc,
                 )
 
         self.__polling_cleanup_cb = _get_updates_cleanup
@@ -623,9 +621,9 @@ class Updater(AsyncContextManager["Updater"]):
                 _LOGGER.debug("Waiting for webhook server to start")
                 await webhook_ready.wait()
                 _LOGGER.debug("Webhook server started")
-            except Exception as exc:
+            except Exception:
                 self._running = False
-                raise exc
+                raise
 
             # Return the update queue so the main thread can insert updates
             return self.update_queue
@@ -761,11 +759,11 @@ class Updater(AsyncContextManager["Updater"]):
                 _LOGGER.debug("Timed out %s: %s", description, toe)
                 # If failure is due to timeout, we should retry asap.
                 cur_interval = 0
-            except InvalidToken as pex:
-                _LOGGER.error("Invalid token; aborting")
-                raise pex
+            except InvalidToken:
+                _LOGGER.exception("Invalid token; aborting")
+                raise
             except TelegramError as telegram_exc:
-                _LOGGER.error("Error while %s: %s", description, telegram_exc)
+                _LOGGER.exception("Error while %s:", description)
                 on_err_cb(telegram_exc)
 
                 # increase waiting times on subsequent errors up to 30secs

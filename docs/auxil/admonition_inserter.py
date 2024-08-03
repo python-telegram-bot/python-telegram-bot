@@ -580,7 +580,7 @@ class AdmonitionInserter:
             f"telegram.ext.filters.{name}",
         ):
             try:
-                return eval(option)
+                return eval(option)  # noqa: S307
             # NameError will be raised if trying to eval just name and it doesn't work, e.g.
             # "Name 'ApplicationBuilder' is not defined".
             # AttributeError will be raised if trying to e.g. eval f"telegram.{name}" when the

@@ -86,7 +86,7 @@ class TestUpdater:
 
     # This is needed instead of pytest's temp_path because the file path gets too long on macOS
     # otherwise
-    @pytest.fixture()
+    @pytest.fixture
     def file_path(self) -> str:
         path = TEST_DATA_PATH / "test.sock"
         yield str(path)

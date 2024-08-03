@@ -261,7 +261,7 @@ def build_conversation_handler(name: str, persistent: bool = True) -> BaseHandle
     return TrackingConversationHandler(name=name, persistent=persistent)
 
 
-@pytest.fixture()
+@pytest.fixture
 def papp(request, bot_info) -> Application:
     papp_input = request.param
     store_data = {}

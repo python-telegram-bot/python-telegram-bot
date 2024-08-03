@@ -181,7 +181,7 @@ def iter_args(instance: ChatMember, de_json_inst: ChatMember, include_optional: 
             yield inst_at, json_at
 
 
-@pytest.fixture()
+@pytest.fixture
 def chat_member_type(request):
     return request.param()
 

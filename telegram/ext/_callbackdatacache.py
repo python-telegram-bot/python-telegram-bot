@@ -278,9 +278,9 @@ class CallbackDataCache:
             button_data = keyboard_data.button_data[button]
             # Update the timestamp for the LRU
             keyboard_data.update_access_time()
-            return keyboard, button_data
         except KeyError:
             return None, InvalidCallbackData(callback_data)
+        return keyboard, button_data
 
     @staticmethod
     def extract_uuids(callback_data: str) -> Tuple[str, str]:

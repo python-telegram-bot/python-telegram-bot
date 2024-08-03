@@ -107,7 +107,7 @@ from ._files.test_photo import photo_file
 from .auxil.build_messages import make_message
 
 
-@pytest.fixture()
+@pytest.fixture
 async def message(bot, chat_id):  # mostly used in tests for edit_message
     out = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True

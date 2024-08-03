@@ -55,7 +55,7 @@ class TGConstXRefRole(PyXRefRole):
         try:
             # We use `eval` to get the value of the expression. Maybe there are better ways to
             # do this via importlib or so, but it does the job for now
-            value = eval(target)
+            value = eval(target)  # noqa: S307
             # Maybe we need a better check if the target is actually from tg.constants
             # for now checking if it's an Enum suffices since those are used nowhere else in PTB
             if isinstance(value, Enum):
@@ -88,7 +88,6 @@ class TGConstXRefRole(PyXRefRole):
                 refnode.rawsource,
                 CONSTANTS_ROLE,
             )
-            return title, target
         except Exception as exc:
             sphinx_logger.exception(
                 "%s:%d: WARNING: Did not convert reference %s due to an exception.",
@@ -97,4 +96,6 @@ class TGConstXRefRole(PyXRefRole):
                 refnode.rawsource,
                 exc_info=exc,
             )
+            return title, target
+        else:
             return title, target
