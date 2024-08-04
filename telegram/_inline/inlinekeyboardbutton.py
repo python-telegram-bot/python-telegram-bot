@@ -99,7 +99,7 @@ class InlineKeyboardButton(TelegramObject):
 
             .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
-        web_app (:obj:`telegram.WebAppInfo`, optional): Description of the `Web App
+        web_app (:class:`telegram.WebAppInfo`, optional): Description of the `Web App
             <https://core.telegram.org/bots/webapps>`_  that will be launched when the user presses
             the button. The Web App will be able to send an arbitrary message on behalf of the user
             using the method :meth:`~telegram.Bot.answer_web_app_query`. Available only in
@@ -137,7 +137,7 @@ class InlineKeyboardButton(TelegramObject):
             Note:
                 This type of button **must** always be the first button in the first row and can
                 only be used in invoice messages.
-        switch_inline_query_chosen_chat (:obj:`telegram.SwitchInlineQueryChosenChat`, optional):
+        switch_inline_query_chosen_chat (:class:`telegram.SwitchInlineQueryChosenChat`, optional):
             If set, pressing the button will prompt the user to select one of their chats of the
             specified type, open that chat and insert the bot's username and the specified inline
             query in the input field. Not supported for messages sent on behalf of a Telegram
@@ -170,7 +170,7 @@ class InlineKeyboardButton(TelegramObject):
             to the bot when the button is pressed, UTF-8
             :tg-const:`telegram.InlineKeyboardButton.MIN_CALLBACK_DATA`-
             :tg-const:`telegram.InlineKeyboardButton.MAX_CALLBACK_DATA` bytes.
-        web_app (:obj:`telegram.WebAppInfo`): Optional. Description of the `Web App
+        web_app (:class:`telegram.WebAppInfo`): Optional. Description of the `Web App
             <https://core.telegram.org/bots/webapps>`_  that will be launched when the user presses
             the button. The Web App will be able to send an arbitrary message on behalf of the user
             using the method :meth:`~telegram.Bot.answer_web_app_query`. Available only in
@@ -208,7 +208,7 @@ class InlineKeyboardButton(TelegramObject):
             Note:
                 This type of button **must** always be the first button in the first row and can
                 only be used in invoice messages.
-        switch_inline_query_chosen_chat (:obj:`telegram.SwitchInlineQueryChosenChat`): Optional.
+        switch_inline_query_chosen_chat (:class:`telegram.SwitchInlineQueryChosenChat`): Optional.
             If set, pressing the button will prompt the user to select one of their chats of the
             specified type, open that chat and insert the bot's username and the specified inline
             query in the input field. Not supported for messages sent on behalf of a Telegram

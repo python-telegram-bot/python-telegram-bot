@@ -112,7 +112,7 @@ class EncryptedCredentials(TelegramObject):
 
     Note:
         This object is decrypted only when originating from
-        :obj:`telegram.PassportData.decrypted_credentials`.
+        :attr:`telegram.PassportData.decrypted_credentials`.
 
     Args:
         data (:class:`telegram.Credentials` | :obj:`str`): Decrypted data with unique user's

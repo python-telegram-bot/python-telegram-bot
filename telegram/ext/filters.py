@@ -302,7 +302,7 @@ class BaseFilter:
 
 class MessageFilter(BaseFilter):
     """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
-    to :meth:`filter` is :obj:`telegram.Update.effective_message`.
+    to :meth:`filter` is :attr:`telegram.Update.effective_message`.
 
     Please see :class:`BaseFilter` for details on how to create custom filters.
 

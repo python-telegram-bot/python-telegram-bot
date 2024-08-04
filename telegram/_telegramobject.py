@@ -354,7 +354,7 @@ class TelegramObject:
             memodict (:obj:`dict`): A dictionary that maps objects to their copies.
 
         Returns:
-            :obj:`telegram.TelegramObject`: The copied object.
+            :class:`telegram.TelegramObject`: The copied object.
         """
         bot = self._bot  # Save bot so we can set it after copying
         self.set_bot(None)  # set to None so it is not deepcopied

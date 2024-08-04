@@ -42,7 +42,7 @@ class EncryptedPassportElement(TelegramObject):
 
     Note:
         This object is decrypted only when originating from
-        :obj:`telegram.PassportData.decrypted_data`.
+        :attr:`telegram.PassportData.decrypted_data`.
 
     Args:
         type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",
