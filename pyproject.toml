@@ -138,7 +138,7 @@ select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET
 "telegram/**.py" = ["TRY003"]
 "telegram/ext/_applicationbuilder.py" = ["TRY004"]
 "telegram/ext/filters.py" = ["D102"]
-"docs/**.py" = ["INP001", "ARG", "D", "TRY003"]
+"docs/**.py" = ["INP001", "ARG", "D", "TRY003", "S"]
 "examples/**.py" = ["ARG", "D", "S105", "TRY003"]
 
 [tool.ruff.lint.pydocstyle]

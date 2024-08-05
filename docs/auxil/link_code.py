@@ -15,7 +15,6 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-# ruff: noqa: S607, S603
 """Functionality in this file is used for getting the [source] links on the classes, methods etc
 to link to the correct files & lines on github. Can be simplified once
 https://github.com/sphinx-doc/sphinx/issues/1556 is closed
