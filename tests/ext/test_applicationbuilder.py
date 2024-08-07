@@ -48,7 +48,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def builder():
     return ApplicationBuilder()
 

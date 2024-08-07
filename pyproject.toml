@@ -128,14 +128,21 @@ explicit-preview-rules = true  # TODO: Drop this when RUF022 and RUF023 are out 
 ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
           "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
-          "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB"]
+          "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB", "DOC", "TRY", 
+          "D100", "D101", "D102", "D103", "D300", "D418", "D419", "S"]
 # Add "A (flake8-builtins)" after we drop pylint
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["B018"]
-"tests/**.py" = ["RUF012", "ASYNC230", "DTZ", "ARG", "T201"]
-"docs/**.py" = ["INP001", "ARG"]
-"examples/**.py" = ["ARG"]
+"tests/**.py" = ["RUF012", "ASYNC230", "DTZ", "ARG", "T201", "ASYNC109", "D", "S", "TRY"]
+"telegram/**.py" = ["TRY003"]
+"telegram/ext/_applicationbuilder.py" = ["TRY004"]
+"telegram/ext/filters.py" = ["D102"]
+"docs/**.py" = ["INP001", "ARG", "D", "TRY003", "S"]
+"examples/**.py" = ["ARG", "D", "S105", "TRY003"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 # PYLINT:
 [tool.pylint."messages control"]

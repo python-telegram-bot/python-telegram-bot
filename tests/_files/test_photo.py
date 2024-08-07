@@ -38,7 +38,7 @@ from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def photo_file():
     with data_file("telegram.jpg").open("rb") as f:
         yield f

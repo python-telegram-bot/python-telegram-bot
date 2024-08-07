@@ -250,7 +250,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
                     _LOGGER.exception(
                         "Rate limit hit after maximum of %d retries", max_retries, exc_info=exc
                     )
-                    raise exc
+                    raise
 
                 sleep = exc.retry_after + 0.1
                 _LOGGER.info("Rate limit hit. Retrying after %f seconds", sleep)

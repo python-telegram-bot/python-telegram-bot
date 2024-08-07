@@ -47,7 +47,7 @@ def json_dict():
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def user(bot):
     user = User(
         id=TestUserBase.id_,

@@ -23,14 +23,14 @@ from telegram.ext._utils.trackingdict import TrackingDict
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def td() -> TrackingDict:
     td = TrackingDict()
     td.update_no_track({1: 1})
     return td
 
 
-@pytest.fixture()
+@pytest.fixture
 def data() -> dict:
     return {1: 1}
 
