@@ -16,9 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from datetime import datetime
+from datetime import date, datetime
 
 import pytest
+import zoneinfo
 
 from telegram import (
     BusinessConnection,
@@ -111,6 +112,20 @@ def business_opening_hours():
         TestBusinessBase.time_zone_name,
         TestBusinessBase.opening_hours,
     )
+
+
+@pytest.fixture(scope="module")
+def business_hours():
+    tz_name = "Europe/Berlin"
+    opening_hours = [
+        BusinessOpeningHoursInterval(
+            opening_minute=420, closing_minute=1320
+        ),  # Monday 07:00 - 22:00
+        BusinessOpeningHoursInterval(
+            opening_minute=1860, closing_minute=2760
+        ),  # Tuesday 07:00 - 22:00
+    ]
+    return BusinessOpeningHours(time_zone_name=tz_name, opening_hours=opening_hours)
 
 
 class TestBusinessConnectionWithoutRequest(TestBusinessBase):
@@ -410,3 +425,51 @@ class TestBusinessOpeningHoursWithoutRequest(TestBusinessBase):
 
         assert boh1 != boh3
         assert hash(boh1) != hash(boh3)
+
+    def test_get_opening_hours_for_day_without_timezone(
+        self, business_hours: BusinessOpeningHours
+    ):
+        target_date = date(2023, 7, 17)  # Monday
+        expected_tz = zoneinfo.ZoneInfo(business_hours.time_zone_name)
+        expected_opening_time = datetime(2023, 7, 17, 7, 0, tzinfo=expected_tz)
+        expected_closing_time = datetime(2023, 7, 17, 22, 0, tzinfo=expected_tz)
+
+        opening_hours_for_day = business_hours.get_opening_hours_for_day(target_date)
+
+        assert opening_hours_for_day[0][0] == expected_opening_time
+        assert opening_hours_for_day[0][1] == expected_closing_time
+
+    def test_get_opening_hours_for_day_with_timezone(
+        self, business_hours: BusinessOpeningHours
+    ):
+        target_date = date(2023, 7, 17)  # Monday
+        test_tz = zoneinfo.ZoneInfo("UTC")
+        expected_opening_time = datetime(2023, 7, 17, 7, 0, tzinfo=test_tz)
+        expected_closing_time = datetime(2023, 7, 17, 22, 0, tzinfo=test_tz)
+
+        opening_hours_for_day = business_hours.get_opening_hours_for_day(
+            target_date, tzinfo=test_tz
+        )
+
+        assert opening_hours_for_day[0][0] == expected_opening_time
+        assert opening_hours_for_day[0][1] == expected_closing_time
+
+    def test_is_open_tznaive_closed(self, business_hours: BusinessOpeningHours):
+        test_datetime = datetime(2023, 7, 19, 12, 0)  # Wednesday 12:00, tz naive
+        assert business_hours.is_open(test_datetime) is False
+
+    def test_is_open_tznaive_open(self, business_hours: BusinessOpeningHours):
+        test_datetime = datetime(2023, 7, 17, 12, 0)  # Monday 12:00, tz naive
+        assert business_hours.is_open(test_datetime) is True
+
+    def test_is_open_tzaware_closed(self, business_hours: BusinessOpeningHours):
+        test_datetime = datetime(
+            2023, 7, 19, 12, 0, tzinfo=zoneinfo.ZoneInfo("UTC")
+        )  # Wednesday 12:00 UTC
+        assert business_hours.is_open(test_datetime) is False
+
+    def test_is_open_tzaware_open(self, business_hours: BusinessOpeningHours):
+        test_datetime = datetime(
+            2023, 7, 17, 12, 0, tzinfo=zoneinfo.ZoneInfo("UTC")
+        )  # Monday 12:00 UTC
+        assert business_hours.is_open(test_datetime) is True
