@@ -2265,6 +2265,21 @@ class TestBotWithoutRequest:
         obj = await bot.get_star_transactions(offset=3)
         assert isinstance(obj, StarTransactions)
 
+    async def test_subscription_link(
+        self,
+        monkeypatch,
+        bot,
+    ):
+        # Since the chat invite link object does not say if the sub args are passed we can
+        # only check here
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("subscription_period") == 2592000
+            assert request_data.parameters.get("subscription_price") == 6
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        await bot.create_chat_subscription_invite_link(1234, 2592000, 6)
+
 
 class TestBotWithRequest:
     """
@@ -4261,3 +4276,14 @@ class TestBotWithRequest:
         transactions = await bot.get_star_transactions(limit=1)
         assert isinstance(transactions, StarTransactions)
         assert len(transactions.transactions) == 0
+
+    async def test_chat_subscription_links(self, bot, channel_id):
+        sub_link = await bot.create_chat_subscription_invite_link(
+            channel_id, "sub_name", 2592000, 1
+        )
+        assert sub_link.name == "sub_name"
+
+        edited_link = await bot.edit_chat_subscription_invite_link(
+            chat_id=channel_id, invite_link=sub_link, name="sub_name_2"
+        )
+        assert edited_link.name == "sub_name_2"

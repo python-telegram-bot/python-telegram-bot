@@ -204,6 +204,7 @@ __all__ = (
     "ReactionType",
     "ReactionTypeCustomEmoji",
     "ReactionTypeEmoji",
+    "ReactionTypePaid",
     "RefundedPayment",
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
@@ -467,7 +468,13 @@ from ._payment.stars import (
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import InputPollOption, Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
-from ._reaction import ReactionCount, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from ._reaction import (
+    ReactionCount,
+    ReactionType,
+    ReactionTypeCustomEmoji,
+    ReactionTypeEmoji,
+    ReactionTypePaid,
+)
 from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
