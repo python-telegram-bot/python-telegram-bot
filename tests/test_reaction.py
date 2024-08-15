@@ -89,7 +89,7 @@ def iter_args(instance: ReactionType, de_json_inst: ReactionType, include_option
             yield inst_at, json_at
 
 
-@pytest.fixture()
+@pytest.fixture
 def reaction_type(request):
     return request.param()
 

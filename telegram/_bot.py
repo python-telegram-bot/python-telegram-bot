@@ -324,10 +324,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         try:
             await self.initialize()
-            return self
-        except Exception as exc:
+        except Exception:
             await self.shutdown()
-            raise exc
+            raise
+        return self
 
     async def __aexit__(
         self,
@@ -4271,7 +4271,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
-        timeout: Optional[int] = None,
+        timeout: Optional[int] = None,  # noqa: ASYNC109
         allowed_updates: Optional[Sequence[str]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4387,7 +4387,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             self._LOGGER.critical(
                 "Error while parsing updates! Received data was %r", result, exc_info=exc
             )
-            raise exc
+            raise
 
     async def set_webhook(
         self,

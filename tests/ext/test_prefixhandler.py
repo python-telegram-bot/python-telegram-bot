@@ -56,15 +56,15 @@ class TestPrefixHandler(BaseTest):
     def commands(self, request):
         return TestPrefixHandler.COMMANDS[: request.param]
 
-    @pytest.fixture()
+    @pytest.fixture
     def prefix_message_text(self, prefix, command):
         return prefix + command
 
-    @pytest.fixture()
+    @pytest.fixture
     def prefix_message(self, prefix_message_text):
         return make_message(prefix_message_text)
 
-    @pytest.fixture()
+    @pytest.fixture
     def prefix_message_update(self, prefix_message):
         return make_message_update(prefix_message)
 

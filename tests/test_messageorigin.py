@@ -114,7 +114,7 @@ def iter_args(
             yield inst_at, json_at
 
 
-@pytest.fixture()
+@pytest.fixture
 def message_origin_type(request):
     return request.param()
 

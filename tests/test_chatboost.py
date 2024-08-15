@@ -107,7 +107,7 @@ def user_chat_boosts(chat_boost):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def chat_boost_source(request):
     return request.param()
 

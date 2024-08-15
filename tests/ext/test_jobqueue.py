@@ -44,7 +44,7 @@ class CustomContext(CallbackContext):
     pass
 
 
-@pytest.fixture()
+@pytest.fixture
 async def job_queue(app):
     jq = JobQueue()
     jq.set_application(app)
