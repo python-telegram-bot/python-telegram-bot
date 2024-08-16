@@ -1193,16 +1193,20 @@ class TestMessageWithoutRequest(TestMessageBase):
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
         assert message.link == f"https://t.me/c/{3}/{message.message_id}"
 
-    def test_link_with_topics(self, message):
+    @pytest.mark.parametrize("type_", argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_topics(self, message, type_):
         message.chat.username = None
         message.chat.id = -1003
+        message.chat.type = type_
         message.is_topic_message = True
         message.message_thread_id = 123
         assert message.link == f"https://t.me/c/3/{message.message_id}?thread=123"
 
-    def test_link_with_reply(self, message):
+    @pytest.mark.parametrize("type_", argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_reply(self, message, type_):
         message.chat.username = None
         message.chat.id = -1003
+        message.chat.type = type_
         message.reply_to_message = Message(7, self.from_user, self.date, self.chat, text="Reply")
         message.message_thread_id = 123
         assert message.link == f"https://t.me/c/3/{message.message_id}?thread=123"
@@ -1349,6 +1353,7 @@ class TestMessageWithoutRequest(TestMessageBase):
     )
     def test_build_reply_arguments_chat_id_and_message_id(self, message, target_chat_id, expected):
         message.chat.id = 3
+        message.chat.username = None
         reply_kwargs = message.build_reply_arguments(target_chat_id=target_chat_id)
         assert reply_kwargs["chat_id"] == expected
         assert reply_kwargs["reply_parameters"].chat_id == (None if expected == 3 else 3)
