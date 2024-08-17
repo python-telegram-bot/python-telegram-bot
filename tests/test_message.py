@@ -90,7 +90,7 @@ from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def message(bot):
     message = PytestMessage(
         message_id=TestMessageBase.id_,
@@ -1353,7 +1353,6 @@ class TestMessageWithoutRequest(TestMessageBase):
     )
     def test_build_reply_arguments_chat_id_and_message_id(self, message, target_chat_id, expected):
         message.chat.id = 3
-        message.chat.username = None
         reply_kwargs = message.build_reply_arguments(target_chat_id=target_chat_id)
         assert reply_kwargs["chat_id"] == expected
         assert reply_kwargs["reply_parameters"].chat_id == (None if expected == 3 else 3)
