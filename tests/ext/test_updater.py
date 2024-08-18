@@ -571,7 +571,7 @@ class TestUpdater:
                     else:
                         assert len(caplog.records) > 0
                         assert any(
-                            "Error while getting Updates:" in record.getMessage()
+                            "Exception happened while polling for updates." in record.getMessage()
                             and record.name == "telegram.ext.Updater"
                             for record in caplog.records
                         )
@@ -593,7 +593,7 @@ class TestUpdater:
                 else:
                     assert len(caplog.records) > 0
                     assert any(
-                        "Error while getting Updates:" in record.getMessage()
+                        "Exception happened while polling for updates." in record.getMessage()
                         and record.name == "telegram.ext.Updater"
                         for record in caplog.records
                     )
