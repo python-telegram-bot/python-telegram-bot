@@ -763,7 +763,6 @@ class Updater(AsyncContextManager["Updater"]):
                 _LOGGER.exception("Invalid token; aborting")
                 raise
             except TelegramError as telegram_exc:
-                _LOGGER.exception("Error while %s:", description)
                 on_err_cb(telegram_exc)
 
                 # increase waiting times on subsequent errors up to 30secs
