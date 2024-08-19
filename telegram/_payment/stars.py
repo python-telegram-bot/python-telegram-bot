@@ -321,7 +321,7 @@ class TransactionPartnerUser(TransactionPartner):
             always :tg-const:`telegram.TransactionPartner.USER`.
         user (:class:`telegram.User`): Information about the user.
         invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
-        paid_media (Sequence[:class:`telegram.PaidMedia`]): Optional. Information about the paid
+        paid_media (Tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
             media bought by the user.
 
             .. versionadded:: NEXT.VERSION
@@ -346,7 +346,7 @@ class TransactionPartnerUser(TransactionPartner):
         with self._unfrozen():
             self.user: User = user
             self.invoice_payload: Optional[str] = invoice_payload
-            self.paid_media: Optional[Sequence[PaidMedia]] = paid_media
+            self.paid_media: Optional[Tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
             self._id_attrs = (
                 self.type,
                 self.user,
