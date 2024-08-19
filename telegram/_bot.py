@@ -8180,7 +8180,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """
         Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must
-        be an administrator in the chat for this to work and must have
+        be an administrator in the chat for this to work and must have the
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
         unless it is the creator of the topic.
 
@@ -8448,7 +8448,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """
         Use this method to edit the name of the 'General' topic in a forum supergroup chat. The bot
-        must be an administrator in the chat for this to work and must have
+        must be an administrator in the chat for this to work and must have the
         :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
         .. versionadded:: 20.0
@@ -9213,7 +9213,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> Message:
-        """Use this method to send paid media to channel chats.
+        """Use this method to send paid media.
 
         .. versionadded:: 21.4
 
@@ -9300,11 +9300,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> ChatInviteLink:
         """
         Use this method to create a `subscription invite link <https://telegram.org/blog/\
-            superchannels-star-reactions-subscriptions#star-subscriptions>`_ for a channel chat.
-            The bot must have :attr:`telegram.ChatPermissions.can_invite_users` administrator
-            right. The link can be edited using the :meth:`edit_chat_subscription_invite_link` or
-            revoked using the :meth:`revoke_chat_invite_Link`.
-
+        superchannels-star-reactions-subscriptions#star-subscriptions>`_ for a channel chat.
+        The bot must have the :attr:`~telegram.ChatPermissions.can_invite_users` administrator
+        right. The link can be edited using the :meth:`edit_chat_subscription_invite_link` or
+        revoked using the :meth:`revoke_chat_invite_link`.
 
         .. versionadded:: NEXT.VERSION
 

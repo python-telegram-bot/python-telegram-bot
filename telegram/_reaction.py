@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 class ReactionType(TelegramObject):
     """Base class for Telegram ReactionType Objects.
     There exist :class:`telegram.ReactionTypeEmoji`, :class:`telegram.ReactionTypeCustomEmoji`
-        and :class:`telegram.ReactionTypePaid`.
+    and :class:`telegram.ReactionTypePaid`.
 
     .. versionadded:: 20.8
     .. versionchanged:: NEXT.VERSION
