@@ -4277,13 +4277,18 @@ class TestBotWithRequest:
         assert isinstance(transactions, StarTransactions)
         assert len(transactions.transactions) == 0
 
-    async def test_create_edit_chat_subscription_link(self, bot, channel_id):
+    async def test_create_edit_chat_subscription_link(
+        self, bot, subscription_channel_id, channel_id
+    ):
         sub_link = await bot.create_chat_subscription_invite_link(
-            channel_id, "sub_name", 2592000, 1
+            subscription_channel_id,
+            name="sub_name",
+            subscription_period=2592000,
+            subscription_price=1,
         )
         assert sub_link.name == "sub_name"
 
         edited_link = await bot.edit_chat_subscription_invite_link(
-            chat_id=channel_id, invite_link=sub_link, name="sub_name_2"
+            chat_id=subscription_channel_id, invite_link=sub_link, name="sub_name_2"
         )
         assert edited_link.name == "sub_name_2"
