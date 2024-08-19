@@ -2265,7 +2265,7 @@ class TestBotWithoutRequest:
         obj = await bot.get_star_transactions(offset=3)
         assert isinstance(obj, StarTransactions)
 
-    async def test_subscription_link(
+    async def test_create_chat_subscription_invite_link(
         self,
         monkeypatch,
         bot,
@@ -4277,7 +4277,7 @@ class TestBotWithRequest:
         assert isinstance(transactions, StarTransactions)
         assert len(transactions.transactions) == 0
 
-    async def test_chat_subscription_links(self, bot, channel_id):
+    async def test_create_edit_chat_subscription_link(self, bot, channel_id):
         sub_link = await bot.create_chat_subscription_invite_link(
             channel_id, "sub_name", 2592000, 1
         )
