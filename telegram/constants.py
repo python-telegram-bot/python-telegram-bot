@@ -3120,4 +3120,4 @@ class ChatSubscriptionLimit(IntEnum):
     MIN_PRICE = 1
     """:obj:`int`: Amount of stars a user pays, minimum amount the subscription can be set to."""
     MAX_PRICE = 2500
-    """:obj:`int`: Amount of stars a user pays, maxcimum amount the subscription can be set to."""
+    """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to."""
