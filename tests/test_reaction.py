@@ -118,6 +118,7 @@ class TestReactionTypesWithoutRequest:
     def test_de_json_required_args(self, bot, reaction_type):
         cls = reaction_type.__class__
         assert cls.de_json(None, bot) is None
+        assert ReactionType.de_json({}, bot) is None
 
         json_dict = make_json_dict(reaction_type)
         const_reaction_type = ReactionType.de_json(json_dict, bot)
