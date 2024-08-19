@@ -4442,3 +4442,4 @@ class ExtBot(Bot, Generic[RLARGS]):
     getStarTransactions = get_star_transactions
     createChatSubscriptionInviteLink = create_chat_subscription_invite_link
     editChatSubscriptionInviteLink = edit_chat_subscription_invite_link
+    sendPaidMedia = send_paid_media
