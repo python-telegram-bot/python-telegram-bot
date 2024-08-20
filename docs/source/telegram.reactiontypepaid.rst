@@ -1,5 +1,5 @@
 ReactionTypePaid
-================d
+================
 
 .. autoclass:: telegram.ReactionTypePaid
     :members:
