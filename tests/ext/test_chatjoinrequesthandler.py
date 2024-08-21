@@ -96,7 +96,7 @@ def chat_join_request(time, bot):
     return cjr
 
 
-@pytest.fixture()
+@pytest.fixture
 def chat_join_request_update(bot, chat_join_request):
     return Update(0, chat_join_request=chat_join_request)
 

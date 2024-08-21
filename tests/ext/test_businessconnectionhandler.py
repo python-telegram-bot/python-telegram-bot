@@ -88,7 +88,7 @@ def business_connection(bot):
     return bc
 
 
-@pytest.fixture()
+@pytest.fixture
 def business_connection_update(bot, business_connection):
     return Update(0, business_connection=business_connection)
 

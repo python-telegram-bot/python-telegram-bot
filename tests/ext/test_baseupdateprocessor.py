@@ -28,7 +28,7 @@ from tests.auxil.asyncio_helpers import call_after
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_processor():
     class MockProcessor(SimpleUpdateProcessor):
         test_flag = False

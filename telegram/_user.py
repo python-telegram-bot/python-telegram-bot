@@ -97,6 +97,10 @@ class User(TelegramObject):
             :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 21.1
+        has_main_web_app (:obj:`bool`, optional): :obj:`True`, if the bot has the main Web App.
+            Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -124,6 +128,11 @@ class User(TelegramObject):
             :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 21.1
+        has_main_web_app (:obj:`bool`) Optional. :obj:`True`, if the bot has the main Web App.
+            Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
+
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
         case so far, but Telegram does not guarantee that this stays this way.
@@ -135,6 +144,7 @@ class User(TelegramObject):
         "can_join_groups",
         "can_read_all_group_messages",
         "first_name",
+        "has_main_web_app",
         "id",
         "is_bot",
         "is_premium",
@@ -158,6 +168,7 @@ class User(TelegramObject):
         is_premium: Optional[bool] = None,
         added_to_attachment_menu: Optional[bool] = None,
         can_connect_to_business: Optional[bool] = None,
+        has_main_web_app: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -176,6 +187,7 @@ class User(TelegramObject):
         self.is_premium: Optional[bool] = is_premium
         self.added_to_attachment_menu: Optional[bool] = added_to_attachment_menu
         self.can_connect_to_business: Optional[bool] = can_connect_to_business
+        self.has_main_web_app: Optional[bool] = has_main_web_app
 
         self._id_attrs = (self.id,)
 
@@ -301,6 +313,7 @@ class User(TelegramObject):
         self,
         message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -329,12 +342,14 @@ class User(TelegramObject):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            business_connection_id=business_connection_id,
             api_kwargs=api_kwargs,
         )
 
     async def unpin_message(
         self,
         message_id: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -363,6 +378,7 @@ class User(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             message_id=message_id,
+            business_connection_id=business_connection_id,
         )
 
     async def unpin_all_messages(

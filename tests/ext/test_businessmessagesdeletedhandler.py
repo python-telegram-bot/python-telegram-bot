@@ -85,7 +85,7 @@ def business_messages_deleted(bot):
     return bmd
 
 
-@pytest.fixture()
+@pytest.fixture
 def business_messages_deleted_update(bot, business_messages_deleted):
     return Update(0, deleted_business_messages=business_messages_deleted)
 

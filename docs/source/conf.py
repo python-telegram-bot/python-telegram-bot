@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 from pathlib import Path
@@ -29,7 +30,7 @@ version = telegram.__version__
 release = telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "6.1.3"
+needs_sphinx = "8.0.2"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -251,7 +252,14 @@ htmlhelp_basename = "python-telegram-bot-doc"
 
 # The base URL which points to the root of the HTML documentation. It is used to indicate the
 # location of document using The Canonical Link Relation. Default: ''.
-html_baseurl = "https://docs.python-telegram-bot.org"
+# Set canonical URL from the Read the Docs Domain
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+html_context = {}
+if os.environ.get("READTHEDOCS", "") == "True":
+    html_context["READTHEDOCS"] = True
+
 
 # -- Options for LaTeX output ---------------------------------------------
 

@@ -49,7 +49,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def sticker_file():
     with data_file("telegram.webp").open("rb") as file:
         yield file
@@ -65,7 +65,7 @@ async def sticker(bot, chat_id):
         return sticker
 
 
-@pytest.fixture()
+@pytest.fixture
 def animated_sticker_file():
     with data_file("telegram_animated_sticker.tgs").open("rb") as f:
         yield f
@@ -77,7 +77,7 @@ async def animated_sticker(bot, chat_id):
         return (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
 
 
-@pytest.fixture()
+@pytest.fixture
 def video_sticker_file():
     with data_file("telegram_video_sticker.webm").open("rb") as f:
         yield f
@@ -524,7 +524,7 @@ class TestStickerWithRequest(TestStickerBase):
             await bot.send_sticker(chat_id, "")
 
 
-@pytest.fixture()
+@pytest.fixture
 async def sticker_set(bot):
     ss = await bot.get_sticker_set(f"test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -538,7 +538,7 @@ async def sticker_set(bot):
     return ss
 
 
-@pytest.fixture()
+@pytest.fixture
 async def animated_sticker_set(bot):
     ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -552,7 +552,7 @@ async def animated_sticker_set(bot):
     return ss
 
 
-@pytest.fixture()
+@pytest.fixture
 async def video_sticker_set(bot):
     ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -566,7 +566,7 @@ async def video_sticker_set(bot):
     return ss
 
 
-@pytest.fixture()
+@pytest.fixture
 def sticker_set_thumb_file():
     with data_file("sticker_set_thumb.png").open("rb") as file:
         yield file

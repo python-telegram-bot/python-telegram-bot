@@ -140,7 +140,7 @@ class AdmonitionInserter:
             r"^\s*(?P<attr_name>[a-z_]+)"  # Any number of spaces, named group for attribute
             r"\s?\("  # Optional whitespace, opening parenthesis
             r".*"  # Any number of characters (that could denote a built-in type)
-            r":class:`.+`"  # Marker of a classref, class name in backticks
+            r":(class|obj):`.+`"  # Marker of a classref, class name in backticks
             r".*\):"  # Any number of characters, closing parenthesis, colon.
             # The ^ colon above along with parenthesis is important because it makes sure that
             # the class is mentioned in the attribute description, not in free text.
@@ -149,11 +149,11 @@ class AdmonitionInserter:
         )
 
         # for properties: there is no attr name in docstring.  Just check if there's a class name.
-        prop_docstring_pattern = re.compile(r":class:`.+`.*:")
+        prop_docstring_pattern = re.compile(r":(class|obj):`.+`.*:")
 
         # pattern for iterating over potentially many class names in docstring for one attribute.
         # Tilde is optional (sometimes it is in the docstring, sometimes not).
-        single_class_name_pattern = re.compile(r":class:`~?(?P<class_name>[\w.]*)`")
+        single_class_name_pattern = re.compile(r":(class|obj):`~?(?P<class_name>[\w.]*)`")
 
         classes_to_inspect = inspect.getmembers(telegram, inspect.isclass) + inspect.getmembers(
             telegram.ext, inspect.isclass
@@ -366,6 +366,7 @@ class AdmonitionInserter:
                     # to ".. admonition: Examples":
                     ".. admonition:: Examples",
                     ".. version",
+                    "Args:",
                     # The space after ":param" is important because docstring can contain
                     # ":paramref:" in its plain text in the beginning of a line (e.g. ExtBot):
                     ":param ",

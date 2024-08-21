@@ -112,12 +112,12 @@ def message_reaction_count_updated(time, bot):
     return mr
 
 
-@pytest.fixture()
+@pytest.fixture
 def message_reaction_update(bot, message_reaction_updated):
     return Update(0, message_reaction=message_reaction_updated)
 
 
-@pytest.fixture()
+@pytest.fixture
 def message_reaction_count_update(bot, message_reaction_count_updated):
     return Update(0, message_reaction_count=message_reaction_count_updated)
 

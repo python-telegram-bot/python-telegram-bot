@@ -107,7 +107,7 @@ from ._files.test_photo import photo_file
 from .auxil.build_messages import make_message
 
 
-@pytest.fixture()
+@pytest.fixture
 async def message(bot, chat_id):  # mostly used in tests for edit_message
     out = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
@@ -2207,6 +2207,8 @@ class TestBotWithoutRequest:
 
         await bot.send_message(2, "text", business_connection_id=42)
         await bot.stop_poll(chat_id=1, message_id=2, business_connection_id=42)
+        await bot.pin_chat_message(chat_id=1, message_id=2, business_connection_id=42)
+        await bot.unpin_chat_message(chat_id=1, business_connection_id=42)
 
     async def test_message_effect_id_argument(self, bot, monkeypatch):
         """We can't test every single method easily, so we just test one. Our linting will catch

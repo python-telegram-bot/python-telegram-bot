@@ -26,6 +26,7 @@ Warning:
 from typing import Dict, Optional, Sequence
 
 from telegram._messageentity import MessageEntity
+from telegram._utils.strings import TextEncoding
 
 
 def parse_message_entity(text: str, entity: MessageEntity) -> str:
@@ -38,10 +39,10 @@ def parse_message_entity(text: str, entity: MessageEntity) -> str:
     Returns:
         :obj:`str`: The text of the given entity.
     """
-    entity_text = text.encode("utf-16-le")
+    entity_text = text.encode(TextEncoding.UTF_16_LE)
     entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
-    return entity_text.decode("utf-16-le")
+    return entity_text.decode(TextEncoding.UTF_16_LE)
 
 
 def parse_message_entities(

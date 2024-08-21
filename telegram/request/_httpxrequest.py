@@ -189,7 +189,7 @@ class HTTPXRequest(BaseRequest):
             self._client = self._build_client()
         except ImportError as exc:
             if "httpx[http2]" not in str(exc) and "httpx[socks]" not in str(exc):
-                raise exc
+                raise
 
             if "httpx[socks]" in str(exc):
                 raise RuntimeError(
