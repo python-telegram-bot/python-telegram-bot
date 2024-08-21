@@ -4284,11 +4284,15 @@ class TestBotWithRequest:
             subscription_channel_id,
             name="sub_name",
             subscription_period=2592000,
-            subscription_price=1,
+            subscription_price=13,
         )
         assert sub_link.name == "sub_name"
+        assert sub_link.subscription_period == 2592000
+        assert sub_link.subscription_price == 13
 
         edited_link = await bot.edit_chat_subscription_invite_link(
             chat_id=subscription_channel_id, invite_link=sub_link, name="sub_name_2"
         )
         assert edited_link.name == "sub_name_2"
+        assert sub_link.subscription_period == 2592000
+        assert sub_link.subscription_price == 13
