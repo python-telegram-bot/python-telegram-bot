@@ -50,8 +50,8 @@ class InputMedia(TelegramObject):
 
     Args:
         media_type (:obj:`str`): Type of media that the instance represents.
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.Animation` |  :class:`telegram.Audio` | \
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.Animation` |  :class:`telegram.Audio` | \
             :class:`telegram.Document` | :class:`telegram.PhotoSize` | \
             :class:`telegram.Video`): File to send.
             |fileinputnopath|
@@ -128,8 +128,9 @@ class InputPaidMedia(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of media that the instance represents.
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.PhotoSize` | :class:`telegram.Video`): File to send. |fileinputnopath|
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.PhotoSize` | :class:`telegram.Video`): File
+            to send. |fileinputnopath|
             Lastly you can pass an existing telegram media object of the corresponding type
             to send.
 
@@ -167,8 +168,8 @@ class InputPaidMediaPhoto(InputPaidMedia):
     .. versionadded:: 21.4
 
     Args:
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.PhotoSize`): File to send. |fileinputnopath|
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.PhotoSize`): File to send. |fileinputnopath|
             Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
 
     Attributes:
@@ -207,8 +208,8 @@ class InputPaidMediaVideo(InputPaidMedia):
            changed by Telegram.
 
     Args:
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.Video`): File to send. |fileinputnopath|
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.Video`): File to send. |fileinputnopath|
             Lastly you can pass an existing :class:`telegram.Video` object to send.
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
@@ -278,8 +279,8 @@ class InputMediaAnimation(InputMedia):
       |removed_thumb_note|
 
     Args:
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.Animation`): File to send. |fileinputnopath|
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.Animation`): File to send. |fileinputnopath|
             Lastly you can pass an existing :class:`telegram.Animation` object to send.
 
             .. versionchanged:: 13.2
@@ -401,8 +402,8 @@ class InputMediaPhoto(InputMedia):
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
     Args:
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.PhotoSize`): File to send. |fileinputnopath|
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.PhotoSize`): File to send. |fileinputnopath|
             Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
 
             .. versionchanged:: 13.2
@@ -501,8 +502,8 @@ class InputMediaVideo(InputMedia):
       |removed_thumb_note|
 
     Args:
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.Video`): File to send. |fileinputnopath|
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.Video`): File to send. |fileinputnopath|
             Lastly you can pass an existing :class:`telegram.Video` object to send.
 
             .. versionchanged:: 13.2
@@ -639,8 +640,8 @@ class InputMediaAudio(InputMedia):
       |removed_thumb_note|
 
     Args:
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.Audio`): File to send. |fileinputnopath|
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.Audio`): File to send. |fileinputnopath|
             Lastly you can pass an existing :class:`telegram.Audio` object to send.
 
             .. versionchanged:: 13.2
@@ -743,8 +744,8 @@ class InputMediaDocument(InputMedia):
       |removed_thumb_note|
 
     Args:
-        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-            :class:`telegram.Document`): File to send. |fileinputnopath|
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+            | :class:`pathlib.Path` | :class:`telegram.Document`): File to send. |fileinputnopath|
             Lastly you can pass an existing :class:`telegram.Document` object to send.
 
             .. versionchanged:: 13.2

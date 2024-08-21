@@ -639,11 +639,11 @@ class TestApplication:
             assert len(app.handlers[-1]) == 1
 
             # Now lets test the errors which can be produced-
-            with pytest.raises(ValueError, match="The `group` argument"):
+            with pytest.raises(TypeError, match="The `group` argument"):
                 app.add_handlers({2: [msg_handler_set_count]}, group=0)
-            with pytest.raises(ValueError, match="Handlers for group 3"):
+            with pytest.raises(TypeError, match="Handlers for group 3"):
                 app.add_handlers({3: msg_handler_set_count})
-            with pytest.raises(ValueError, match="The `handlers` argument must be a sequence"):
+            with pytest.raises(TypeError, match="The `handlers` argument must be a sequence"):
                 app.add_handlers({msg_handler_set_count})
 
             await app.stop()

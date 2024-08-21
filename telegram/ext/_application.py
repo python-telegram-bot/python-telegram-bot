@@ -384,10 +384,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         """
         try:
             await self.initialize()
-            return self
-        except Exception as exc:
+        except Exception:
             await self.shutdown()
-            raise exc
+            raise
+        return self
 
     async def __aexit__(
         self,
@@ -646,9 +646,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             )
             _LOGGER.info("Application started")
 
-        except Exception as exc:
+        except Exception:
             self._running = False
-            raise exc
+            raise
 
     async def stop(self) -> None:
         """Stops the process after processing any pending updates or tasks created by
@@ -1227,7 +1227,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 await self.process_error(update=update, error=exception, coroutine=coroutine)
 
             # Raise exception so that it can be set on the task and retrieved by task.exception()
-            raise exception
+            raise
         finally:
             self._mark_for_persistence_update(update=update)
 
@@ -1445,14 +1445,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 1: [CallbackQueryHandler(...), CommandHandler(...)]
             }
 
+        Raises:
+            :exc:`TypeError`: If the combination of arguments is invalid.
         """
         if isinstance(handlers, dict) and not isinstance(group, DefaultValue):
-            raise ValueError("The `group` argument can only be used with a sequence of handlers.")
+            raise TypeError("The `group` argument can only be used with a sequence of handlers.")
 
         if isinstance(handlers, dict):
             for handler_group, grp_handlers in handlers.items():
                 if not isinstance(grp_handlers, (list, tuple)):
-                    raise ValueError(f"Handlers for group {handler_group} must be a list or tuple")
+                    raise TypeError(f"Handlers for group {handler_group} must be a list or tuple")
 
                 for handler in grp_handlers:
                     self.add_handler(handler, handler_group)
@@ -1462,7 +1464,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 self.add_handler(handler, DefaultValue.get_value(group))
 
         else:
-            raise ValueError(
+            raise TypeError(
                 "The `handlers` argument must be a sequence of handlers or a "
                 "dictionary where the keys are groups and values are sequences of handlers."
             )
@@ -1644,9 +1646,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     self.__update_persistence_event.wait(),
                     timeout=self.persistence.update_interval,
                 )
-                return
             except asyncio.TimeoutError:
                 pass
+            else:
+                return
 
             # putting this *after* the wait_for so we don't immediately update on startup as
             # that would make little sense

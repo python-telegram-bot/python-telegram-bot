@@ -60,6 +60,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
 - `Iulian Onofrei <https://github.com/revolter>`_
+- `Jainam Oswal <https://github.com/jainamoswal>`_
 - `Jasmin Bom <https://github.com/jsmnbom>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `jeffffc <https://github.com/jeffffc>`_
@@ -86,6 +87,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Miguel C. R. <https://github.com/MiguelX413>`_
 - `miles <https://github.com/miles170>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
+- `Mohd Yusuf <https://github.com/mohdyusuf2312>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `neurrone <https://github.com/neurrone>`_
 - `NikitaPirate <https://github.com/NikitaPirate>`_
@@ -96,6 +98,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Oleg Sushchenko <https://github.com/feuillemorte>`_
 - `Or Bin <https://github.com/OrBin>`_
 - `overquota <https://github.com/overquota>`_
+- `Pablo Martinez <https://github.com/elpekenin>`_
 - `Paradox <https://github.com/paradox70>`_
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_

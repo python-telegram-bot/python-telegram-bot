@@ -49,12 +49,12 @@ def withdrawal_state_succeeded():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def withdrawal_state_failed():
     return RevenueWithdrawalStateFailed()
 
 
-@pytest.fixture()
+@pytest.fixture
 def withdrawal_state_pending():
     return RevenueWithdrawalStatePending()
 
@@ -65,7 +65,7 @@ def transaction_partner_user():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def transaction_partner_other():
     return TransactionPartnerOther()
 
@@ -86,7 +86,7 @@ def star_transaction():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def star_transactions():
     return StarTransactions(
         transactions=[
