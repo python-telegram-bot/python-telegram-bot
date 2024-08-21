@@ -9369,6 +9369,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             name (:obj:`str`, optional): Invite link name;
                 0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
+                Tip:
+                    Omitting this argument removes the name of the invite link.
+
         Returns:
             :class:`telegram.ChatInviteLink`
 
