@@ -3093,7 +3093,7 @@ class TestBotWithRequest:
     async def test_get_chat_member(self, bot, channel_id, chat_id):
         chat_member = await bot.get_chat_member(channel_id, chat_id)
 
-        assert chat_member.status == "administrator"
+        assert chat_member.status == "creator"
         assert chat_member.user.first_name == "PTB"
         assert chat_member.user.last_name == "Test user"
 
@@ -3267,7 +3267,7 @@ class TestBotWithRequest:
         with pytest.raises(BadRequest, match="Not enough rights"):
             assert await bot.promote_chat_member(
                 channel_id,
-                95205500,
+                1325859552,
                 is_anonymous=True,
                 can_change_info=True,
                 can_post_messages=True,
@@ -3290,7 +3290,7 @@ class TestBotWithRequest:
             data = args[1]
             return (
                 data.get("chat_id") == channel_id
-                and data.get("user_id") == 95205500
+                and data.get("user_id") == 1325859552
                 and data.get("is_anonymous") == 1
                 and data.get("can_change_info") == 2
                 and data.get("can_post_messages") == 3
@@ -3311,7 +3311,7 @@ class TestBotWithRequest:
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.promote_chat_member(
             channel_id,
-            95205500,
+            1325859552,
             is_anonymous=1,
             can_change_info=2,
             can_post_messages=3,
