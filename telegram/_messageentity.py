@@ -349,7 +349,7 @@ class MessageEntity(TelegramObject):
         for arg in args:
             text, entities = arg[0], arg[1]
 
-            if len(arg) > 2 and arg[2]:
+            if len(arg) > 2 and arg[2] is True:
                 entities = cls.adjust_message_entities_to_utf_16(text, entities)
 
             output_entities.extend(cls.shift_entities(output_text, entities))
