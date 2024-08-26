@@ -265,7 +265,7 @@ class MessageEntity(TelegramObject):
         .. versionadded:: NEXT.VERSION
 
         Args:
-            by (Union[:obj:`str`, :obj:`int`]): Either the amount to shift the offset by or
+            by (:obj:`str` | :obj:`int`): Either the amount to shift the offset by or
                 a string whose length will be used as the amount to shift the offset by. In this
                 case, UTF-16 encoding will be used to calculate the length.
             entities (Sequence[:class:`telegram.MessageEntity`]): Sequence of entities
