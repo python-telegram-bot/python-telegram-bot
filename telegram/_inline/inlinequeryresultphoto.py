@@ -48,15 +48,13 @@ class InlineQueryResultPhoto(InlineQueryResult):
             :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
             must not exceed 5MB.
-        thumbnail_url (:obj:`str`, optional): URL of the thumbnail for the photo.
-
-            Warning:
-                The Bot API does **not** define this as an optional argument. It is formally
-                optional for backwards compatibility with the deprecated :paramref:`thumb_url`.
-                If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
-                :class:`ValueError` will be raised.
+        thumbnail_url (:obj:`str`): URL of the thumbnail for the photo.
 
             .. versionadded:: 20.2
+
+            ..versionchanged:: 20.5
+              |thumbnail_url_mandatory|
+
         photo_width (:obj:`int`, optional): Width of the photo.
         photo_height (:obj:`int`, optional): Height of the photo.
         title (:obj:`str`, optional): Title for the result.
@@ -77,10 +75,6 @@ class InlineQueryResultPhoto(InlineQueryResult):
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
             .. versionadded:: 21.3
-
-    Raises:
-        :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
-            supplied or if both are supplied and are not equal.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.PHOTO`.
