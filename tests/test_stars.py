@@ -24,6 +24,8 @@ import pytest
 
 from telegram import (
     Dice,
+    PaidMediaPhoto,
+    PhotoSize,
     RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
@@ -62,6 +64,16 @@ def withdrawal_state_pending():
 def transaction_partner_user():
     return TransactionPartnerUser(
         user=User(id=1, is_bot=False, first_name="first_name", username="username"),
+        invoice_payload="payload",
+        paid_media=[
+            PaidMediaPhoto(
+                photo=[
+                    PhotoSize(
+                        file_id="file_id", width=1, height=1, file_unique_id="file_unique_id"
+                    )
+                ]
+            )
+        ],
     )
 
 

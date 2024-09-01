@@ -280,15 +280,14 @@ class Message(MaybeInaccessibleMessage):
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`, optional): Sender of the message; empty for messages
-            sent to channels. For backward compatibility, this will contain a fake sender user in
-            non-channel chats, if the message was sent on behalf of a chat.
-        sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
-            chat. For example, the channel itself for channel posts, the supergroup itself for
-            messages from anonymous group administrators, the linked channel for messages
-            automatically forwarded to the discussion group. For backward compatibility,
-            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
-            sent on behalf of a chat.
+        from_user (:class:`telegram.User`, optional): Sender of the message; may be empty for
+            messages sent to channels. For backward compatibility, if the message was sent on
+            behalf of a chat, the field contains a fake sender user in non-channel chats.
+        sender_chat (:class:`telegram.Chat`, optional): Sender of the message when sent on behalf
+            of a chat. For example, the supergroup itself for messages sent by its anonymous
+            administrators or a linked channel for messages automatically forwarded to the
+            channel's discussion group. For backward compatibility, if the message was sent on
+            behalf of a chat, the field from contains a fake sender user in non-channel chats.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
@@ -591,15 +590,14 @@ class Message(MaybeInaccessibleMessage):
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
-            sent to channels. For backward compatibility, this will contain a fake sender user in
-            non-channel chats, if the message was sent on behalf of a chat.
-        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
-            chat. For example, the channel itself for channel posts, the supergroup itself for
-            messages from anonymous group administrators, the linked channel for messages
-            automatically forwarded to the discussion group. For backward compatibility,
-            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
-            sent on behalf of a chat.
+        from_user (:class:`telegram.User`): Optional. Sender of the message; may be empty for
+            messages sent to channels. For backward compatibility, if the message was sent on
+            behalf of a chat, the field contains a fake sender user in non-channel chats.
+        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message when sent on behalf
+            of a chat. For example, the supergroup itself for messages sent by its anonymous
+            administrators or a linked channel for messages automatically forwarded to the
+            channel's discussion group. For backward compatibility, if the message was sent on
+            behalf of a chat, the field from contains a fake sender user in non-channel chats.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
