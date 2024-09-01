@@ -44,7 +44,7 @@ def photo_file():
         yield f
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 async def photolist(bot, chat_id):
     async def func():
         with data_file("telegram.jpg").open("rb") as f:

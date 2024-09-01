@@ -43,7 +43,7 @@ def animation_file():
         yield f
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 async def animation(bot, chat_id):
     with data_file("game.gif").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
         return (

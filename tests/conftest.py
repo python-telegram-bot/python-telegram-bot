@@ -103,11 +103,6 @@ def pytest_collection_modifyitems(items: List[pytest.Item]):
 # session. See https://github.com/pytest-dev/pytest-asyncio/issues/68 for more details.
 @pytest.fixture(scope="session")
 def event_loop(request):
-    # ever since ProactorEventLoop became the default in Win 3.8+, the app crashes after the loop
-    # is closed. Hence, we use SelectorEventLoop on Windows to avoid this. See
-    # https://github.com/python/cpython/issues/83413, https://github.com/encode/httpx/issues/914
-    if sys.platform.startswith("win"):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     return asyncio.get_event_loop_policy().new_event_loop()
     # loop.close() # instead of closing here, do that at the every end of the test session
 

@@ -181,6 +181,8 @@ markers = [
     "req",
 ]
 asyncio_mode = "auto"
+# Define the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be session
+asyncio_default_fixture_loop_scope = "session"
 log_format = "%(funcName)s - Line %(lineno)d - %(message)s"
 # log_level = "DEBUG"  # uncomment to see DEBUG logs
 

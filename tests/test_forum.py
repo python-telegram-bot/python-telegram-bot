@@ -39,14 +39,14 @@ TEST_TOPIC_ICON_COLOR = 0x6FB9F0
 TEST_TOPIC_NAME = "Sad bot true: real stories"
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 async def emoji_id(bot):
     emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
     first_sticker = emoji_sticker_list[0]
     return first_sticker.custom_emoji_id
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 async def forum_topic_object(forum_group_id, emoji_id):
     return ForumTopic(
         message_thread_id=forum_group_id,
@@ -56,7 +56,7 @@ async def forum_topic_object(forum_group_id, emoji_id):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def real_topic(bot, emoji_id, forum_group_id):
     result = await bot.create_forum_topic(
         chat_id=forum_group_id,
