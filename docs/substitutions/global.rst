@@ -60,9 +60,11 @@
 
 .. |removed_thumb_note| replace:: Removed the deprecated argument and attribute ``thumb``.
 
-.. |removed_thumb_url_note| replace:: Removed the deprecated argument and attribute ``thumb_url``.
+.. |removed_thumb_url_note| replace:: Removed the deprecated argument and attribute ``thumb_url`` which made thumbnail_url mandatory.
 
 .. |removed_thumb_wildcard_note| replace:: Removed the deprecated arguments and attributes ``thumb_*``.
+
+.. |thumbnail_url_mandatory| replace:: Removal of the deprecated argument ``thumb_url`` made ``thumbnail_url`` mandatory.
 
 .. |async_context_manager| replace:: Asynchronous context manager which
 

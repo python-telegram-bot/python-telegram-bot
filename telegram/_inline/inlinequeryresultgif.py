@@ -50,16 +50,14 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_width (:obj:`int`, optional): Width of the GIF.
         gif_height (:obj:`int`, optional): Height of the GIF.
         gif_duration (:obj:`int`, optional): Duration of the GIF in seconds.
-        thumbnail_url (:obj:`str`, optional): URL of the static (JPEG or GIF) or animated (MPEG4)
+        thumbnail_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4)
             thumbnail for the result.
 
-            Warning:
-                The Bot API does **not** define this as an optional argument. It is formally
-                optional for backwards compatibility with the deprecated :paramref:`thumb_url`.
-                If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
-                :class:`ValueError` will be raised.
-
             .. versionadded:: 20.2
+
+            ..versionchanged:: 20.5
+              |thumbnail_url_mandatory|
+
         thumbnail_mime_type (:obj:`str`, optional): MIME type of the thumbnail, must be one of
             ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
 
@@ -81,10 +79,6 @@ class InlineQueryResultGif(InlineQueryResult):
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
             .. versionadded:: 21.3
-
-    Raises:
-        :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
-            supplied or if both are supplied and are not equal.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GIF`.
