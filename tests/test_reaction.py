@@ -28,6 +28,7 @@ from telegram import (
     ReactionType,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
+    ReactionTypePaid,
 )
 from telegram.constants import ReactionEmoji
 from tests.auxil.slots import mro_slots
@@ -46,6 +47,10 @@ def reaction_type_custom_emoji():
 
 def reaction_type_emoji():
     return ReactionTypeEmoji(RTDefaults.normal_emoji)
+
+
+def reaction_type_paid():
+    return ReactionTypePaid()
 
 
 def make_json_dict(instance: ReactionType, include_optional_args: bool = False) -> dict:
@@ -89,7 +94,7 @@ def iter_args(instance: ReactionType, de_json_inst: ReactionType, include_option
             yield inst_at, json_at
 
 
-@pytest.fixture()
+@pytest.fixture
 def reaction_type(request):
     return request.param()
 
@@ -99,6 +104,7 @@ def reaction_type(request):
     [
         reaction_type_custom_emoji,
         reaction_type_emoji,
+        reaction_type_paid,
     ],
     indirect=True,
 )
@@ -112,6 +118,7 @@ class TestReactionTypesWithoutRequest:
     def test_de_json_required_args(self, bot, reaction_type):
         cls = reaction_type.__class__
         assert cls.de_json(None, bot) is None
+        assert ReactionType.de_json({}, bot) is None
 
         json_dict = make_json_dict(reaction_type)
         const_reaction_type = ReactionType.de_json(json_dict, bot)
@@ -155,7 +162,7 @@ class TestReactionTypesWithoutRequest:
         assert reaction_type_dict["type"] == reaction_type.type
         if reaction_type.type == ReactionType.EMOJI:
             assert reaction_type_dict["emoji"] == reaction_type.emoji
-        else:
+        elif reaction_type.type == ReactionType.CUSTOM_EMOJI:
             assert reaction_type_dict["custom_emoji_id"] == reaction_type.custom_emoji_id
 
         for slot in reaction_type.__slots__:  # additional verification for the optional args

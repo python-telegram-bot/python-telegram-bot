@@ -280,15 +280,14 @@ class Message(MaybeInaccessibleMessage):
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`, optional): Sender of the message; empty for messages
-            sent to channels. For backward compatibility, this will contain a fake sender user in
-            non-channel chats, if the message was sent on behalf of a chat.
-        sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
-            chat. For example, the channel itself for channel posts, the supergroup itself for
-            messages from anonymous group administrators, the linked channel for messages
-            automatically forwarded to the discussion group. For backward compatibility,
-            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
-            sent on behalf of a chat.
+        from_user (:class:`telegram.User`, optional): Sender of the message; may be empty for
+            messages sent to channels. For backward compatibility, if the message was sent on
+            behalf of a chat, the field contains a fake sender user in non-channel chats.
+        sender_chat (:class:`telegram.Chat`, optional): Sender of the message when sent on behalf
+            of a chat. For example, the supergroup itself for messages sent by its anonymous
+            administrators or a linked channel for messages automatically forwarded to the
+            channel's discussion group. For backward compatibility, if the message was sent on
+            behalf of a chat, the field from contains a fake sender user in non-channel chats.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
@@ -591,15 +590,14 @@ class Message(MaybeInaccessibleMessage):
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
-            sent to channels. For backward compatibility, this will contain a fake sender user in
-            non-channel chats, if the message was sent on behalf of a chat.
-        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
-            chat. For example, the channel itself for channel posts, the supergroup itself for
-            messages from anonymous group administrators, the linked channel for messages
-            automatically forwarded to the discussion group. For backward compatibility,
-            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
-            sent on behalf of a chat.
+        from_user (:class:`telegram.User`): Optional. Sender of the message; may be empty for
+            messages sent to channels. For backward compatibility, if the message was sent on
+            behalf of a chat, the field contains a fake sender user in non-channel chats.
+        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message when sent on behalf
+            of a chat. For example, the supergroup itself for messages sent by its anonymous
+            administrators or a linked channel for messages automatically forwarded to the
+            channel's discussion group. For backward compatibility, if the message was sent on
+            behalf of a chat, the field from contains a fake sender user in non-channel chats.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
@@ -4106,10 +4104,17 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.pin_chat_message(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
+
+        .. versionchanged:: NEXT.VERSION
+            Now also passes :attr:`business_connection_id` to
+            :meth:`telegram.Bot.pin_chat_message`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4118,6 +4123,7 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().pin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             disable_notification=disable_notification,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4138,10 +4144,17 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.unpin_chat_message(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
+
+        .. versionchanged:: NEXT.VERSION
+            Now also passes :attr:`business_connection_id` to
+            :meth:`telegram.Bot.pin_chat_message`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4150,6 +4163,7 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().unpin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

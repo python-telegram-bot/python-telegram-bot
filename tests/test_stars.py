@@ -24,6 +24,8 @@ import pytest
 
 from telegram import (
     Dice,
+    PaidMediaPhoto,
+    PhotoSize,
     RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
@@ -49,12 +51,12 @@ def withdrawal_state_succeeded():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def withdrawal_state_failed():
     return RevenueWithdrawalStateFailed()
 
 
-@pytest.fixture()
+@pytest.fixture
 def withdrawal_state_pending():
     return RevenueWithdrawalStatePending()
 
@@ -62,10 +64,20 @@ def withdrawal_state_pending():
 def transaction_partner_user():
     return TransactionPartnerUser(
         user=User(id=1, is_bot=False, first_name="first_name", username="username"),
+        invoice_payload="payload",
+        paid_media=[
+            PaidMediaPhoto(
+                photo=[
+                    PhotoSize(
+                        file_id="file_id", width=1, height=1, file_unique_id="file_unique_id"
+                    )
+                ]
+            )
+        ],
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def transaction_partner_other():
     return TransactionPartnerOther()
 
@@ -86,7 +98,7 @@ def star_transaction():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def star_transactions():
     return StarTransactions(
         transactions=[

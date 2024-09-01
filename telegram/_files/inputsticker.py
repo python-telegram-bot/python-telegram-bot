@@ -41,7 +41,8 @@ class InputSticker(TelegramObject):
         order of the arguments has changed.
 
     Args:
-        sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`): The
+        sticker (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+            | :class:`pathlib.Path`): The
             added sticker. |uploadinputnopath| Animated and video stickers can't be uploaded via
             HTTP URL.
         emoji_list (Sequence[:obj:`str`]): Sequence of

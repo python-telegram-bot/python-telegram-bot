@@ -88,7 +88,6 @@ class TGConstXRefRole(PyXRefRole):
                 refnode.rawsource,
                 CONSTANTS_ROLE,
             )
-            return title, target
         except Exception as exc:
             sphinx_logger.exception(
                 "%s:%d: WARNING: Did not convert reference %s due to an exception.",
@@ -97,4 +96,6 @@ class TGConstXRefRole(PyXRefRole):
                 refnode.rawsource,
                 exc_info=exc,
             )
+            return title, target
+        else:
             return title, target

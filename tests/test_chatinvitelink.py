@@ -42,6 +42,8 @@ def invite_link(creator):
         member_limit=TestChatInviteLinkBase.member_limit,
         name=TestChatInviteLinkBase.name,
         pending_join_request_count=TestChatInviteLinkBase.pending_join_request_count,
+        subscription_period=TestChatInviteLinkBase.subscription_period,
+        subscription_price=TestChatInviteLinkBase.subscription_price,
     )
 
 
@@ -54,6 +56,8 @@ class TestChatInviteLinkBase:
     member_limit = 42
     name = "LinkName"
     pending_join_request_count = 42
+    subscription_period = 43
+    subscription_price = 44
 
 
 class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
@@ -91,6 +95,8 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
             "member_limit": self.member_limit,
             "name": self.name,
             "pending_join_request_count": str(self.pending_join_request_count),
+            "subscription_period": self.subscription_period,
+            "subscription_price": self.subscription_price,
         }
 
         invite_link = ChatInviteLink.de_json(json_dict, bot)
@@ -106,6 +112,8 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         assert invite_link.member_limit == self.member_limit
         assert invite_link.name == self.name
         assert invite_link.pending_join_request_count == self.pending_join_request_count
+        assert invite_link.subscription_period == self.subscription_period
+        assert invite_link.subscription_price == self.subscription_price
 
     def test_de_json_localization(self, tz_bot, bot, raw_bot, creator):
         json_dict = {
@@ -146,6 +154,8 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         assert invite_link_dict["member_limit"] == self.member_limit
         assert invite_link_dict["name"] == self.name
         assert invite_link_dict["pending_join_request_count"] == self.pending_join_request_count
+        assert invite_link_dict["subscription_period"] == self.subscription_period
+        assert invite_link_dict["subscription_price"] == self.subscription_price
 
     def test_equality(self):
         a = ChatInviteLink("link", User(1, "", False), True, True, True)

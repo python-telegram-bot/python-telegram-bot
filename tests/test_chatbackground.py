@@ -146,7 +146,7 @@ def iter_args(
             yield inst_at, json_at
 
 
-@pytest.fixture()
+@pytest.fixture
 def background_type(request):
     return request.param()
 
@@ -254,7 +254,7 @@ class TestBackgroundTypeWithoutRequest:
         assert hash(f) != hash(c)
 
 
-@pytest.fixture()
+@pytest.fixture
 def background_fill(request):
     return request.param()
 

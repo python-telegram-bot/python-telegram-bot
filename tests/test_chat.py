@@ -889,6 +889,54 @@ class TestChatWithoutRequest(TestChatBase):
         monkeypatch.setattr(chat.get_bot(), "revoke_chat_invite_link", make_assertion)
         assert await chat.revoke_invite_link(invite_link=link)
 
+    async def test_create_subscription_invite_link(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["subscription_price"] == 42
+                and kwargs["subscription_period"] == 42
+            )
+
+        assert check_shortcut_signature(
+            Chat.create_subscription_invite_link,
+            Bot.create_chat_subscription_invite_link,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.create_subscription_invite_link,
+            chat.get_bot(),
+            "create_chat_subscription_invite_link",
+        )
+        assert await check_defaults_handling(chat.create_subscription_invite_link, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "create_chat_subscription_invite_link", make_assertion)
+        assert await chat.create_subscription_invite_link(
+            subscription_price=42, subscription_period=42
+        )
+
+    async def test_edit_subscription_invite_link(self, monkeypatch, chat):
+        link = "ThisIsALink"
+
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["invite_link"] == link
+
+        assert check_shortcut_signature(
+            Chat.edit_subscription_invite_link,
+            Bot.edit_chat_subscription_invite_link,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.edit_subscription_invite_link,
+            chat.get_bot(),
+            "edit_chat_subscription_invite_link",
+        )
+        assert await check_defaults_handling(chat.edit_subscription_invite_link, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "edit_chat_subscription_invite_link", make_assertion)
+        assert await chat.edit_subscription_invite_link(invite_link=link)
+
     async def test_instance_method_get_menu_button(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == chat.id

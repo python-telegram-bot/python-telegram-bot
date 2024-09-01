@@ -130,6 +130,7 @@ Available Types
     telegram.reactiontype
     telegram.reactiontypecustomemoji
     telegram.reactiontypeemoji
+    telegram.reactiontypepaid
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.replyparameters

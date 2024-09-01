@@ -115,10 +115,10 @@ class BaseRequest(
         """
         try:
             await self.initialize()
-            return self
-        except Exception as exc:
+        except Exception:
             await self.shutdown()
-            raise exc
+            raise
+        return self
 
     async def __aexit__(
         self,
@@ -339,8 +339,8 @@ class BaseRequest(
                 connect_timeout=connect_timeout,
                 pool_timeout=pool_timeout,
             )
-        except TelegramError as exc:
-            raise exc
+        except TelegramError:
+            raise
         except Exception as exc:
             raise NetworkError(f"Unknown error in HTTP implementation: {exc!r}") from exc
 
@@ -408,7 +408,7 @@ class BaseRequest(
         try:
             return json.loads(decoded_s)
         except ValueError as exc:
-            _LOGGER.error('Can not load invalid JSON data: "%s"', decoded_s)
+            _LOGGER.exception('Can not load invalid JSON data: "%s"', decoded_s)
             raise TelegramError("Invalid server response") from exc
 
     @abc.abstractmethod

@@ -414,7 +414,7 @@ class TelegramObject:
             obj = cls(**data, api_kwargs=api_kwargs)
         except TypeError as exc:
             if "__init__() got an unexpected keyword argument" not in str(exc):
-                raise exc
+                raise
 
             if cls.__INIT_PARAMS_CHECK is not cls:
                 signature = inspect.signature(cls)

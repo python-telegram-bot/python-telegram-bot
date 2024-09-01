@@ -65,7 +65,7 @@ def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture()
+@pytest.fixture
 def callback_query(bot):
     update = Update(0, callback_query=CallbackQuery(2, User(1, "", False), None, data="test data"))
     update._unfreeze()

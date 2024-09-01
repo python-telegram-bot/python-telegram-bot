@@ -188,7 +188,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
         user_data: Type[ADict] = dict,
     ):
         if not issubclass(context, CallbackContext):
-            raise ValueError("context must be a subclass of CallbackContext.")
+            raise TypeError("context must be a subclass of CallbackContext.")
 
         # We make all those only accessible via properties because we don't currently support
         # changing this at runtime, so overriding the attributes doesn't make sense

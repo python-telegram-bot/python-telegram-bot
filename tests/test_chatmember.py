@@ -101,7 +101,7 @@ def chat_member_administrator():
 
 
 def chat_member_member():
-    return ChatMemberMember(CMDefaults.user)
+    return ChatMemberMember(CMDefaults.user, until_date=CMDefaults.until_date)
 
 
 def chat_member_restricted():
@@ -181,7 +181,7 @@ def iter_args(instance: ChatMember, de_json_inst: ChatMember, include_optional: 
             yield inst_at, json_at
 
 
-@pytest.fixture()
+@pytest.fixture
 def chat_member_type(request):
     return request.param()
 
@@ -230,7 +230,9 @@ class TestChatMemberTypesWithoutRequest:
 
     def test_de_json_chatmemberbanned_localization(self, chat_member_type, tz_bot, bot, raw_bot):
         # We only test two classes because the other three don't have datetimes in them.
-        if isinstance(chat_member_type, (ChatMemberBanned, ChatMemberRestricted)):
+        if isinstance(
+            chat_member_type, (ChatMemberBanned, ChatMemberRestricted, ChatMemberMember)
+        ):
             json_dict = make_json_dict(chat_member_type, include_optional_args=True)
             chatmember_raw = ChatMember.de_json(json_dict, raw_bot)
             chatmember_bot = ChatMember.de_json(json_dict, bot)
