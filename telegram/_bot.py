@@ -4428,18 +4428,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
 
-        Note:
-            1. You will not be able to receive updates using :meth:`get_updates` for long as an
-               outgoing webhook is set up.
-            2. To use a self-signed certificate, you need to upload your public key certificate
-               using certificate parameter. Please upload as InputFile, sending a String will not
-               work.
-            3. Ports currently supported for Webhooks:
-               :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
-
-            If you're having any trouble setting up webhooks, please check out this `guide to
-            Webhooks`_.
-
         .. seealso:: :meth:`telegram.ext.Application.run_webhook`,
             :meth:`telegram.ext.Updater.start_webhook`
 
