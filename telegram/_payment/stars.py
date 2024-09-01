@@ -327,7 +327,7 @@ class TransactionPartnerUser(TransactionPartner):
         paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
             media bought by the user.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
@@ -337,7 +337,7 @@ class TransactionPartnerUser(TransactionPartner):
         paid_media (Tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
             media bought by the user.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
     """
 
     __slots__ = (

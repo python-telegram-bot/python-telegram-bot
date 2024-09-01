@@ -6145,7 +6145,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): Unique identifier of the business
                 connection on behalf of which the message will be pinned.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.5
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6198,7 +6198,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): Unique identifier of the business
                 connection on behalf of which the message will be unpinned.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.5
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -9229,7 +9229,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.5
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -9294,7 +9294,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         right. The link can be edited using the :meth:`edit_chat_subscription_invite_link` or
         revoked using the :meth:`revoke_chat_invite_link`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.5
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -9350,7 +9350,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to edit a subscription invite link created by the bot. The bot must have
         :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.5
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|

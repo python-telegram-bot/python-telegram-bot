@@ -72,12 +72,12 @@ class ChatInviteLink(TelegramObject):
         subscription_period (:obj:`int`, optional): The number of seconds the subscription will be
             active for before the next payment.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
         subscription_price (:obj:`int`, optional): The amount of Telegram Stars a user must pay
             initially and after each subsequent subscription period to be a member of the chat
             using the link.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
 
     Attributes:
         invite_link (:obj:`str`): The invite link. If the link was created by another chat
@@ -109,12 +109,12 @@ class ChatInviteLink(TelegramObject):
         subscription_period (:obj:`int`): Optional. The number of seconds the subscription will be
             active for before the next payment.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
         subscription_price (:obj:`int`): Optional. The amount of Telegram Stars a user must pay
             initially and after each subsequent subscription period to be a member of the chat
             using the link.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
 
     """
 

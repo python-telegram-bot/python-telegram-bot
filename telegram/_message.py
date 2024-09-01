@@ -4112,7 +4112,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.5
             Now also passes :attr:`business_connection_id` to
             :meth:`telegram.Bot.pin_chat_message`.
 
@@ -4152,7 +4152,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.5
             Now also passes :attr:`business_connection_id` to
             :meth:`telegram.Bot.pin_chat_message`.
 

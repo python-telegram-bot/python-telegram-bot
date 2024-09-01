@@ -262,7 +262,7 @@ class MessageEntity(TelegramObject):
             The :paramref:`entities` are *not* modified in place. The function returns a sequence
             of new objects.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.5
 
         Args:
             by (:obj:`str` | :obj:`int`): Either the amount to shift the offset by or
@@ -329,7 +329,7 @@ class MessageEntity(TelegramObject):
             The entities are *not* modified in place. The function returns a
             new sequence of objects.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.5
 
         Args:
             *args (Tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`]] | \

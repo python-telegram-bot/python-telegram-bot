@@ -58,7 +58,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
           `~telegram.CallbackQuery.game_short_name` or :attr:`~telegram.CallbackQuery.data`
           matching the defined pattern will be handled
 
-          .. versionadded:: NEXT.VERSION
+          .. versionadded:: 21.5
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
@@ -100,7 +100,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             :attr:`telegram.CallbackQuery.game_short_name` to determine if an update should be
             handled by this handler.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.

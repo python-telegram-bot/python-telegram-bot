@@ -2687,7 +2687,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.create_chat_subscription_invite_link`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.5
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -2724,7 +2724,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_chat_subscription_invite_link`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.5
 
         Returns:
             :class:`telegram.ChatInviteLink`

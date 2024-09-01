@@ -35,7 +35,7 @@ class ReactionType(TelegramObject):
     and :class:`telegram.ReactionTypePaid`.
 
     .. versionadded:: 20.8
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.5
 
         Added paid reaction.
 
@@ -59,7 +59,7 @@ class ReactionType(TelegramObject):
     PAID: Final[constants.ReactionType] = constants.ReactionType.PAID
     """:const:`telegram.constants.ReactionType.PAID`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.5
     """
 
     def __init__(
@@ -174,7 +174,7 @@ class ReactionTypePaid(ReactionType):
     """
     The reaction is paid.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.5
 
     Attributes:
         type (:obj:`str`): Type of the reaction,

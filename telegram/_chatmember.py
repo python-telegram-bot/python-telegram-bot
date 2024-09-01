@@ -395,7 +395,7 @@ class ChatMemberMember(ChatMember):
         until_date (:class:`datetime.datetime`, optional): Date when the user's subscription will
             expire.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -404,7 +404,7 @@ class ChatMemberMember(ChatMember):
         until_date (:class:`datetime.datetime`): Optional. Date when the user's subscription will
             expire.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.5
 
     """
 

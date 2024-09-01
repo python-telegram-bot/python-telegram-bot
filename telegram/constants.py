@@ -2907,7 +2907,7 @@ class ReactionType(StringEnum):
     PAID = "paid"
     """:obj:`str`: A :class:`telegram.ReactionType` with a paid reaction.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.5
     """
 
 
@@ -3110,7 +3110,7 @@ class ChatSubscriptionLimit(IntEnum):
     :paramref:`telegram.Bot.create_chat_subscription_invite_link.subscription_price`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.5
     """
 
     __slots__ = ()

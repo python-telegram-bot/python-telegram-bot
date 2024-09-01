@@ -4,6 +4,58 @@
 Changelog
 =========
 
+Version 21.5
+============
+
+*Released 2024-09-01*
+
+This is the technical changelog for version 21.5. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for Bot API 7.9 (:pr:`4429`)
+- Full Support for Bot API 7.8 (:pr:`4408`)
+
+New Features
+------------
+
+- Add ``MessageEntity.shift_entities`` and ``MessageEntity.concatenate`` (:pr:`4376` closes :issue:`4372`)
+- Add Parameter ``game_pattern`` to ``CallbackQueryHandler`` (:pr:`4353` by `jainamoswal <https://github.com/jainamoswal>`_ closes :issue:`4269`)
+- Add Parameter ``read_file_handle`` to ``InputFile`` (:pr:`4388` closes :issue:`4339`)
+
+Documentation Improvements
+--------------------------
+
+- Bugfix for "Available In" Admonitions (:pr:`4413`)
+- Documentation Improvements (:pr:`4400` closes :issue:`4446`, :pr:`4448` by `Palaptin <https://github.com/Palaptin>`_)
+- Document Return Types of ``RequestData`` Members (:pr:`4396`)
+- Add Introductory Paragraphs to Telegram Types Subsections (:pr:`4389` by `mohdyusuf2312 <https://github.com/mohdyusuf2312>`_ closes :issue:`4380`)
+- Start Adapting to RTD Addons (:pr:`4386`)
+
+Minor and Internal Changes
+---------------------------
+
+- Remove Surplus Logging from ``Updater`` Network Loop (:pr:`4432` by `MartinHjelmare <https://github.com/MartinHjelmare>`_)
+- Add Internal Constants for Encodings (:pr:`4378` by `elpekenin <https://github.com/elpekenin>`_)
+- Improve PyPI Automation (:pr:`4375` closes :issue:`4373`)
+- Update Test Suite to New Test Channel Setup (:pr:`4435`)
+- Improve Fixture Usage in ``test_message.py`` (:pr:`4431` by `Palaptin <https://github.com/Palaptin>`_)
+- Update Python 3.13 Test Suite to RC1 (:pr:`4415`)
+- Bump ``ruff`` and Add New Rules (:pr:`4416`)
+
+Dependency Updates
+------------------
+
+- Update ``cachetools`` requirement from <5.5.0,>=5.3.3 to >=5.3.3,<5.6.0 (:pr:`4437`)
+- Bump ``sphinx`` from 7.4.7 to 8.0.2 and ``furo`` from 2024.7.18 to 2024.8.6 (:pr:`4412`)
+- Bump ``test-summary/action`` from 2.3 to 2.4 (:pr:`4410`)
+- Bump ``pytest`` from 8.2.2 to 8.3.2 (:pr:`4403`)
+- Bump ``dependabot/fetch-metadata`` from 2.1.0 to 2.2.0 (:pr:`4411`)
+- Update ``cachetools`` requirement from ~=5.3.3 to >=5.3.3,<5.5.0 (:pr:`4390`)
+- Bump ``sphinx`` from 7.3.7 to 7.4.7 (:pr:`4395`)
+- Bump ``furo`` from 2024.5.6 to 2024.7.18 (:pr:`4392`)
+
 Version 21.4
 ============
 
