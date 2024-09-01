@@ -131,7 +131,7 @@ class RequestData:
     def multipart_data(self) -> UploadFileDict:
         """Gives the files contained in this object as mapping of part name to encoded content.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.5
             Content may now be a file handle.
         """
         multipart_data: UploadFileDict = {}

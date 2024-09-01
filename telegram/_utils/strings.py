@@ -33,7 +33,7 @@ from telegram._utils.enum import StringEnum
 class TextEncoding(StringEnum):
     """This enum contains encoding schemes for text.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.5
     """
 
     __slots__ = ()
