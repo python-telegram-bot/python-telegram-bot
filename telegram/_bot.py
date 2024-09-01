@@ -5008,7 +5008,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             payload (:obj:`str`): Bot-defined invoice payload.
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
-                displayed to the user, use for your internal processes.
+                displayed to the user, use it for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
@@ -7969,7 +7969,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             payload (:obj:`str`): Bot-defined invoice payload.
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
-                displayed to the user, use for your internal processes.
+                displayed to the user, use it for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
