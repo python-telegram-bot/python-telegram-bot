@@ -4428,18 +4428,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
 
-        Note:
-            1. You will not be able to receive updates using :meth:`get_updates` for long as an
-               outgoing webhook is set up.
-            2. To use a self-signed certificate, you need to upload your public key certificate
-               using certificate parameter. Please upload as InputFile, sending a String will not
-               work.
-            3. Ports currently supported for Webhooks:
-               :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
-
-            If you're having any trouble setting up webhooks, please check out this `guide to
-            Webhooks`_.
-
         .. seealso:: :meth:`telegram.ext.Application.run_webhook`,
             :meth:`telegram.ext.Updater.start_webhook`
 
@@ -5020,7 +5008,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             payload (:obj:`str`): Bot-defined invoice payload.
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
-                displayed to the user, use for your internal processes.
+                displayed to the user, use it for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
@@ -5786,10 +5774,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to edit.
+            invite_link (:obj:`str` | :class:`telegram.ChatInviteLink`): The invite link to edit.
 
                 .. versionchanged:: 20.0
-                    Now also accepts :obj:`telegram.ChatInviteLink` instances.
+                    Now also accepts :class:`telegram.ChatInviteLink` instances.
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
@@ -5858,10 +5846,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to revoke.
+            invite_link (:obj:`str` | :class:`telegram.ChatInviteLink`): The invite link to revoke.
 
                 .. versionchanged:: 20.0
-                    Now also accepts :obj:`telegram.ChatInviteLink` instances.
+                    Now also accepts :class:`telegram.ChatInviteLink` instances.
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -7403,8 +7391,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
-            rights (:obj:`telegram.ChatAdministratorRights`, optional): A
-                :obj:`telegram.ChatAdministratorRights` object describing new default administrator
+            rights (:class:`telegram.ChatAdministratorRights`, optional): A
+                :class:`telegram.ChatAdministratorRights` object describing new default
+                administrator
                 rights. If not specified, the default administrator rights will be cleared.
             for_channels (:obj:`bool`, optional): Pass :obj:`True` to change the default
                 administrator rights of the bot in channels. Otherwise, the default administrator
@@ -7414,7 +7403,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :obj:`bool`: Returns :obj:`True` on success.
 
         Raises:
-            :obj:`telegram.error.TelegramError`
+            :exc:`telegram.error.TelegramError`
         """
         data: JSONDict = {"rights": rights, "for_channels": for_channels}
 
@@ -7980,7 +7969,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             payload (:obj:`str`): Bot-defined invoice payload.
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
-                displayed to the user, use for your internal processes.
+                displayed to the user, use it for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
@@ -9078,7 +9067,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             user_id (:obj:`int`): User identifier of the sticker set owner.
             name (:obj:`str`): Sticker set name.
             old_sticker (:obj:`str`): File identifier of the replaced sticker.
-            sticker (:obj:`telegram.InputSticker`): An object with information about the added
+            sticker (:class:`telegram.InputSticker`): An object with information about the added
                 sticker. If exactly the same sticker had already been added to the set, then the
                 set remains unchanged.
 
