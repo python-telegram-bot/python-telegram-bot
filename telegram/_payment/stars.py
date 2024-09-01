@@ -23,6 +23,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
 
 from telegram import constants
+from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
@@ -310,20 +311,33 @@ class TransactionPartnerUser(TransactionPartner):
     Args:
         user (:class:`telegram.User`): Information about the user.
         invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
+        paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
+            media bought by the user.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
         user (:class:`telegram.User`): Information about the user.
         invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
+        paid_media (Tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
+            media bought by the user.
+
+            .. versionadded:: NEXT.VERSION
     """
 
-    __slots__ = ("invoice_payload", "user")
+    __slots__ = (
+        "invoice_payload",
+        "paid_media",
+        "user",
+    )
 
     def __init__(
         self,
         user: "User",
         invoice_payload: Optional[str] = None,
+        paid_media: Optional[Sequence[PaidMedia]] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -332,6 +346,7 @@ class TransactionPartnerUser(TransactionPartner):
         with self._unfrozen():
             self.user: User = user
             self.invoice_payload: Optional[str] = invoice_payload
+            self.paid_media: Optional[Tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
             self._id_attrs = (
                 self.type,
                 self.user,
@@ -347,6 +362,7 @@ class TransactionPartnerUser(TransactionPartner):
             return None
 
         data["user"] = User.de_json(data.get("user"), bot)
+        data["paid_media"] = PaidMedia.de_list(data.get("paid_media"), bot=bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 

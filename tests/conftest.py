@@ -206,6 +206,11 @@ def provider_token(bot_info):
     return bot_info["payment_provider_token"]
 
 
+@pytest.fixture(scope="session")
+def subscription_channel_id(bot_info):
+    return bot_info["subscription_channel_id"]
+
+
 @pytest.fixture
 async def app(bot_info):
     # We build a new bot each time so that we use `app` in a context manager without problems
