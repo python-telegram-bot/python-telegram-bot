@@ -19,10 +19,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains the Telegram Business related classes."""
 
-from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
-
 import zoneinfo
+from datetime import date, datetime, time
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._chat import Chat
 from telegram._files.location import Location
@@ -466,7 +465,7 @@ class BusinessOpeningHours(TelegramObject):
 
         Args:
             target_date (:class:`datetime.date`): The date for which to get the opening hours.
-            tzinfo (:class:`zoneinfo.ZoneInfo`, optional): The timezone to use for the opening hours.  If :obj:`None`, the time zone of the business is used, i.e. :attr:`time_zone_name`. Defaults to :obj:`None`.
+            tzinfo (:class:`zoneinfo.ZoneInfo`, optional): The timezone to use for the opening hours. If :obj:`None`, the time zone of the business is used, i.e. :attr:`time_zone_name`. Defaults to :obj:`None`.
 
         Returns:
             Tuple[Tuple[:class:`datetime.datetime`, :class:`datetime.datetime`], ...]: A tuple of tuples containing the opening and closing times for the day.
@@ -503,20 +502,16 @@ class BusinessOpeningHours(TelegramObject):
         if target_datetime.tzinfo is not None:
             target_datetime = target_datetime.astimezone(zoneinfo.ZoneInfo(self.time_zone_name))
 
-        return any(
-            time_to_minutes(
-                target_datetime.weekday(), target_datetime.hour, target_datetime.minute
-            )
-            >= time_to_minutes(*interval.opening_time)
-            or time_to_minutes(
-                target_datetime.weekday(), target_datetime.hour, target_datetime.minute
-            )
-            <= time_to_minutes(*interval.closing_time)
-            if time_to_minutes(*interval.closing_time) < time_to_minutes(*interval.opening_time)
-            else time_to_minutes(*interval.opening_time)
-            <= time_to_minutes(
-                target_datetime.weekday(), target_datetime.hour, target_datetime.minute
-            )
-            <= time_to_minutes(*interval.closing_time)
-            for interval in self.opening_hours
+        target_time_as_minutes = time_to_minutes(
+            target_datetime.weekday(), target_datetime.hour, target_datetime.minute
         )
+
+        for interval in self.opening_hours:
+            if (
+                time_to_minutes(*interval.opening_time)
+                <= target_time_as_minutes
+                <= time_to_minutes(*interval.closing_time)
+            ):
+                return True
+
+        return False
