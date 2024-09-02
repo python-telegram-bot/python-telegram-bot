@@ -36,7 +36,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def video_note_file():
     with data_file("telegram2.mp4").open("rb") as f:
         yield f

@@ -107,7 +107,7 @@ from ._files.test_photo import photo_file
 from .auxil.build_messages import make_message
 
 
-@pytest.fixture()
+@pytest.fixture
 async def message(bot, chat_id):  # mostly used in tests for edit_message
     out = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
@@ -2207,6 +2207,8 @@ class TestBotWithoutRequest:
 
         await bot.send_message(2, "text", business_connection_id=42)
         await bot.stop_poll(chat_id=1, message_id=2, business_connection_id=42)
+        await bot.pin_chat_message(chat_id=1, message_id=2, business_connection_id=42)
+        await bot.unpin_chat_message(chat_id=1, business_connection_id=42)
 
     async def test_message_effect_id_argument(self, bot, monkeypatch):
         """We can't test every single method easily, so we just test one. Our linting will catch
@@ -2262,6 +2264,21 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot.request, "do_request", do_request)
         obj = await bot.get_star_transactions(offset=3)
         assert isinstance(obj, StarTransactions)
+
+    async def test_create_chat_subscription_invite_link(
+        self,
+        monkeypatch,
+        bot,
+    ):
+        # Since the chat invite link object does not say if the sub args are passed we can
+        # only check here
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("subscription_period") == 2592000
+            assert request_data.parameters.get("subscription_price") == 6
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        await bot.create_chat_subscription_invite_link(1234, 2592000, 6)
 
 
 class TestBotWithRequest:
@@ -3091,7 +3108,7 @@ class TestBotWithRequest:
     async def test_get_chat_member(self, bot, channel_id, chat_id):
         chat_member = await bot.get_chat_member(channel_id, chat_id)
 
-        assert chat_member.status == "administrator"
+        assert chat_member.status == "creator"
         assert chat_member.user.first_name == "PTB"
         assert chat_member.user.last_name == "Test user"
 
@@ -3265,7 +3282,7 @@ class TestBotWithRequest:
         with pytest.raises(BadRequest, match="Not enough rights"):
             assert await bot.promote_chat_member(
                 channel_id,
-                95205500,
+                1325859552,
                 is_anonymous=True,
                 can_change_info=True,
                 can_post_messages=True,
@@ -3288,7 +3305,7 @@ class TestBotWithRequest:
             data = args[1]
             return (
                 data.get("chat_id") == channel_id
-                and data.get("user_id") == 95205500
+                and data.get("user_id") == 1325859552
                 and data.get("is_anonymous") == 1
                 and data.get("can_change_info") == 2
                 and data.get("can_post_messages") == 3
@@ -3309,7 +3326,7 @@ class TestBotWithRequest:
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.promote_chat_member(
             channel_id,
-            95205500,
+            1325859552,
             is_anonymous=1,
             can_change_info=2,
             can_post_messages=3,
@@ -4259,3 +4276,23 @@ class TestBotWithRequest:
         transactions = await bot.get_star_transactions(limit=1)
         assert isinstance(transactions, StarTransactions)
         assert len(transactions.transactions) == 0
+
+    async def test_create_edit_chat_subscription_link(
+        self, bot, subscription_channel_id, channel_id
+    ):
+        sub_link = await bot.create_chat_subscription_invite_link(
+            subscription_channel_id,
+            name="sub_name",
+            subscription_period=2592000,
+            subscription_price=13,
+        )
+        assert sub_link.name == "sub_name"
+        assert sub_link.subscription_period == 2592000
+        assert sub_link.subscription_price == 13
+
+        edited_link = await bot.edit_chat_subscription_invite_link(
+            chat_id=subscription_channel_id, invite_link=sub_link, name="sub_name_2"
+        )
+        assert edited_link.name == "sub_name_2"
+        assert sub_link.subscription_period == 2592000
+        assert sub_link.subscription_price == 13

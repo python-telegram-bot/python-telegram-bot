@@ -20,16 +20,19 @@
 
 import copy
 import itertools
-from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence
+from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot
+
+_SEM = Sequence["MessageEntity"]
 
 
 class MessageEntity(TelegramObject):
@@ -145,9 +148,7 @@ class MessageEntity(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     @staticmethod
-    def adjust_message_entities_to_utf_16(
-        text: str, entities: Sequence["MessageEntity"]
-    ) -> Sequence["MessageEntity"]:
+    def adjust_message_entities_to_utf_16(text: str, entities: _SEM) -> _SEM:
         """Utility functionality for converting the offset and length of entities from
         Unicode (:obj:`str`) to UTF-16 (``utf-16-le`` encoded :obj:`bytes`).
 
@@ -203,9 +204,9 @@ class MessageEntity(TelegramObject):
         for i, position in enumerate(positions):
             last_position = positions[i - 1] if i > 0 else 0
             text_slice = text[last_position:position]
-            accumulated_length += len(text_slice.encode("utf-16-le")) // 2
+            accumulated_length += len(text_slice.encode(TextEncoding.UTF_16_LE)) // 2
             position_translation[position] = accumulated_length
-        # get the final output entites
+        # get the final output entities
         out = []
         for entity in entities:
             translated_positions = position_translation[entity.offset]
@@ -218,6 +219,143 @@ class MessageEntity(TelegramObject):
                 new_entity.length = translated_length
             out.append(new_entity)
         return out
+
+    @staticmethod
+    def shift_entities(by: Union[str, int], entities: _SEM) -> _SEM:
+        """Utility functionality for shifting the offset of entities by a given amount.
+
+        Examples:
+            Shifting by an integer amount:
+
+            .. code-block:: python
+
+                text = "Hello, world!"
+                entities = [
+                    MessageEntity(offset=0, length=5, type=MessageEntity.BOLD),
+                    MessageEntity(offset=7, length=5, type=MessageEntity.ITALIC),
+                ]
+                shifted_entities = MessageEntity.shift_entities(1, entities)
+                await bot.send_message(
+                    chat_id=123,
+                    text="!" + text,
+                    entities=shifted_entities,
+                )
+
+            Shifting using a string:
+
+            .. code-block:: python
+
+                text = "Hello, world!"
+                prefix = "𝄢"
+                entities = [
+                    MessageEntity(offset=0, length=5, type=MessageEntity.BOLD),
+                    MessageEntity(offset=7, length=5, type=MessageEntity.ITALIC),
+                ]
+                shifted_entities = MessageEntity.shift_entities(prefix, entities)
+                await bot.send_message(
+                    chat_id=123,
+                    text=prefix + text,
+                    entities=shifted_entities,
+                )
+
+        Tip:
+            The :paramref:`entities` are *not* modified in place. The function returns a sequence
+            of new objects.
+
+        .. versionadded:: 21.5
+
+        Args:
+            by (:obj:`str` | :obj:`int`): Either the amount to shift the offset by or
+                a string whose length will be used as the amount to shift the offset by. In this
+                case, UTF-16 encoding will be used to calculate the length.
+            entities (Sequence[:class:`telegram.MessageEntity`]): Sequence of entities
+
+        Returns:
+            Sequence[:class:`telegram.MessageEntity`]: Sequence of entities with the offset shifted
+        """
+        effective_shift = by if isinstance(by, int) else len(by.encode("utf-16-le")) // 2
+
+        out = []
+        for entity in entities:
+            new_entity = copy.copy(entity)
+            with new_entity._unfrozen():
+                new_entity.offset += effective_shift
+            out.append(new_entity)
+        return out
+
+    @classmethod
+    def concatenate(
+        cls,
+        *args: Union[Tuple[str, _SEM], Tuple[str, _SEM, bool]],
+    ) -> Tuple[str, _SEM]:
+        """Utility functionality for concatenating two text along with their formatting entities.
+
+        Tip:
+            This function is useful for prefixing an already formatted text with a new text and its
+            formatting entities. In particular, it automatically correctly handles UTF-16 encoding.
+
+        Examples:
+            This example shows a callback function that can be used to add a prefix and suffix to
+            the message in a :class:`~telegram.ext.CallbackQueryHandler`:
+
+            .. code-block:: python
+
+                async def prefix_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+                    prefix = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍 | "
+                    prefix_entities = [
+                        MessageEntity(offset=2, length=4, type=MessageEntity.BOLD),
+                        MessageEntity(offset=9, length=6, type=MessageEntity.ITALIC),
+                        MessageEntity(offset=28, length=3, type=MessageEntity.UNDERLINE),
+                    ]
+                    suffix = " | 𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
+                    suffix_entities = [
+                        MessageEntity(offset=5, length=4, type=MessageEntity.BOLD),
+                        MessageEntity(offset=12, length=6, type=MessageEntity.ITALIC),
+                        MessageEntity(offset=31, length=3, type=MessageEntity.UNDERLINE),
+                    ]
+
+                    message = update.effective_message
+                    first = (prefix, prefix_entities, True)
+                    second = (message.text, message.entities)
+                    third = (suffix, suffix_entities, True)
+
+                    new_text, new_entities = MessageEntity.concatenate(first, second, third)
+                    await update.callback_query.edit_message_text(
+                        text=new_text,
+                        entities=new_entities,
+                    )
+
+        Hint:
+            The entities are *not* modified in place. The function returns a
+            new sequence of objects.
+
+        .. versionadded:: 21.5
+
+        Args:
+            *args (Tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`]] | \
+                Tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`], :obj:`bool`]):
+                Arbitrary number of tuples containing the text and its entities to concatenate.
+                If the last element of the tuple is a :obj:`bool`, it is used to determine whether
+                to adjust the entities to UTF-16 via
+                :meth:`adjust_message_entities_to_utf_16`. UTF-16 adjustment is disabled by
+                default.
+
+        Returns:
+            Tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`]]: The concatenated text
+            and its entities
+        """
+        output_text = ""
+        output_entities: List[MessageEntity] = []
+        for arg in args:
+            text, entities = arg[0], arg[1]
+
+            if len(arg) > 2 and arg[2] is True:
+                entities = cls.adjust_message_entities_to_utf_16(text, entities)
+
+            output_entities.extend(cls.shift_entities(output_text, entities))
+            output_text += text
+
+        return output_text, output_entities
 
     ALL_TYPES: Final[List[str]] = list(constants.MessageEntityType)
     """List[:obj:`str`]: A list of all available message entity types."""

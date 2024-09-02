@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Publish to Test PyPI
 
 on:
   # manually trigger the workflow
@@ -34,14 +34,14 @@ jobs:
           TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
           echo "TAG=$TAG" >> $GITHUB_OUTPUT
 
-  publish-to-pypi:
-    name: Publish to PyPI
+  publish-to-test-pypi:
+    name: Publish to Test PyPI
     needs:
       - build
     runs-on: ubuntu-latest
     environment:
-      name: release_pypi
-      url: https://pypi.org/p/python-telegram-bot
+      name: release_test_pypi
+      url: https://test.pypi.org/p/python-telegram-bot
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -51,14 +51,16 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-      - name: Publish to PyPI
+      - name: Publish to Test PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
 
   compute-signatures:
     name: Compute SHA1 Sums and Sign with Sigstore
     runs-on: ubuntu-latest
     needs:
-      - publish-to-pypi
+      - publish-to-test-pypi
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for sigstore
@@ -88,8 +90,8 @@ jobs:
           name: python-package-distributions-and-signatures
           path: dist/
 
-  github-release:
-    name: Upload to GitHub Release
+  github-test-release:
+    name: Upload to GitHub Release Draft
     needs:
       - build
       - compute-signatures
@@ -109,13 +111,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           TAG: ${{ needs.build.outputs.TAG }}
-        # Create a tag and a GitHub Release. The description can be changed later, as for now
+        # Create a GitHub Release *draft*. The description can be changed later, as for now
         # we don't define it through this workflow.
         run: >-
           gh release create
           '${{ env.TAG }}'
           --repo '${{ github.repository }}'
           --generate-notes
+          --draft
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}

@@ -37,7 +37,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def animation_file():
     with data_file("game.gif").open("rb") as f:
         yield f

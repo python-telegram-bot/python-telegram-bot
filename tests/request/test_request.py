@@ -30,7 +30,9 @@ import httpx
 import pytest
 from httpx import AsyncHTTPTransport
 
+from telegram import InputFile
 from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.strings import TextEncoding
 from telegram.error import (
     BadRequest,
     ChatMigrated,
@@ -47,6 +49,7 @@ from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.slots import mro_slots
 
@@ -71,7 +74,7 @@ def mocker_factory(
     return make_assertion
 
 
-@pytest.fixture()
+@pytest.fixture
 async def httpx_request():
     async with NonchalantHttpxRequest() as rq:
         yield rq
@@ -247,7 +250,7 @@ class TestRequestWithoutRequest:
         else:
             match = "Unknown HTTPError"
 
-        server_response = json.dumps(response_data).encode("utf-8")
+        server_response = json.dumps(response_data).encode(TextEncoding.UTF_8)
 
         monkeypatch.setattr(
             httpx_request,
@@ -820,3 +823,15 @@ class TestHTTPXRequestWithRequest:
             task_2.exception()
         except (asyncio.CancelledError, asyncio.InvalidStateError):
             pass
+
+    async def test_input_file_postponed_read(self, bot, chat_id):
+        """Here we test that `read_file_handle=False` is correctly handled by HTTPXRequest.
+        Since manually building the RequestData object has no real benefit, we simply use the Bot
+        for that.
+        """
+        message = await bot.send_document(
+            document=InputFile(data_file("telegram.jpg").open("rb"), read_file_handle=False),
+            chat_id=chat_id,
+        )
+        assert message.document
+        assert message.document.file_name == "telegram.jpg"

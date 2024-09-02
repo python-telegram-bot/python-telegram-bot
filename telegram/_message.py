@@ -68,6 +68,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
     CorrectOptionID,
     FileInput,
@@ -279,15 +280,14 @@ class Message(MaybeInaccessibleMessage):
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`, optional): Sender of the message; empty for messages
-            sent to channels. For backward compatibility, this will contain a fake sender user in
-            non-channel chats, if the message was sent on behalf of a chat.
-        sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
-            chat. For example, the channel itself for channel posts, the supergroup itself for
-            messages from anonymous group administrators, the linked channel for messages
-            automatically forwarded to the discussion group. For backward compatibility,
-            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
-            sent on behalf of a chat.
+        from_user (:class:`telegram.User`, optional): Sender of the message; may be empty for
+            messages sent to channels. For backward compatibility, if the message was sent on
+            behalf of a chat, the field contains a fake sender user in non-channel chats.
+        sender_chat (:class:`telegram.Chat`, optional): Sender of the message when sent on behalf
+            of a chat. For example, the supergroup itself for messages sent by its anonymous
+            administrators or a linked channel for messages automatically forwarded to the
+            channel's discussion group. For backward compatibility, if the message was sent on
+            behalf of a chat, the field from contains a fake sender user in non-channel chats.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
@@ -358,7 +358,7 @@ class Message(MaybeInaccessibleMessage):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
-            `More about games >> <https://core.telegram.org/bots/api#games>`_.
+            :ref:`More about games >> <games-tree>`.
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -431,10 +431,10 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            :ref:`More about payments >> <payments-tree>`.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            :ref:`More about payments >> <payments-tree>`.
         connected_website (:obj:`str`, optional): The domain name of the website on which the user
             has logged in.
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
@@ -569,36 +569,35 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
-        sender_business_bot (:obj:`telegram.User`, optional): The bot that actually sent the
+        sender_business_bot (:class:`telegram.User`, optional): The bot that actually sent the
             message on behalf of the business account. Available only for outgoing messages sent
             on behalf of the connected business account.
 
             .. versionadded:: 21.1
 
-        chat_background_set  (:obj:`telegram.ChatBackground`, optional): Service message: chat
+        chat_background_set  (:class:`telegram.ChatBackground`, optional): Service message: chat
             background set.
 
             .. versionadded:: 21.2
-        paid_media (:obj:`telegram.PaidMediaInfo`, optional): Message contains paid media;
+        paid_media (:class:`telegram.PaidMediaInfo`, optional): Message contains paid media;
             information about the paid media.
 
             .. versionadded:: 21.4
-        refunded_payment (:obj:`telegram.RefundedPayment`, optional): Message is a service message
-            about a refunded payment, information about the payment.
+        refunded_payment (:class:`telegram.RefundedPayment`, optional): Message is a service
+            message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
-            sent to channels. For backward compatibility, this will contain a fake sender user in
-            non-channel chats, if the message was sent on behalf of a chat.
-        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
-            chat. For example, the channel itself for channel posts, the supergroup itself for
-            messages from anonymous group administrators, the linked channel for messages
-            automatically forwarded to the discussion group. For backward compatibility,
-            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
-            sent on behalf of a chat.
+        from_user (:class:`telegram.User`): Optional. Sender of the message; may be empty for
+            messages sent to channels. For backward compatibility, if the message was sent on
+            behalf of a chat, the field contains a fake sender user in non-channel chats.
+        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message when sent on behalf
+            of a chat. For example, the supergroup itself for messages sent by its anonymous
+            administrators or a linked channel for messages automatically forwarded to the
+            channel's discussion group. For backward compatibility, if the message was sent on
+            behalf of a chat, the field from contains a fake sender user in non-channel chats.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
@@ -675,7 +674,7 @@ class Message(MaybeInaccessibleMessage):
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
-            `More about games >> <https://core.telegram.org/bots/api#games>`_.
+            :ref:`More about games >> <games-tree>`.
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
@@ -757,10 +756,10 @@ class Message(MaybeInaccessibleMessage):
                 :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            :ref:`More about payments >> <payments-tree>`.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
             message about a successful payment, information about the payment.
-            `More about payments >> <https://core.telegram.org/bots/api#payments>`_.
+            :ref:`More about payments >> <payments-tree>`.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
@@ -896,22 +895,22 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
-        sender_business_bot (:obj:`telegram.User`): Optional. The bot that actually sent the
+        sender_business_bot (:class:`telegram.User`): Optional. The bot that actually sent the
             message on behalf of the business account. Available only for outgoing messages sent
             on behalf of the connected business account.
 
             .. versionadded:: 21.1
 
-        chat_background_set (:obj:`telegram.ChatBackground`): Optional. Service message: chat
+        chat_background_set (:class:`telegram.ChatBackground`): Optional. Service message: chat
             background set
 
             .. versionadded:: 21.2
-        paid_media (:obj:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
+        paid_media (:class:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
             information about the paid media.
 
             .. versionadded:: 21.4
-        refunded_payment (:obj:`telegram.RefundedPayment`): Optional. Message is a service message
-            about a refunded payment, information about the payment.
+        refunded_payment (:class:`telegram.RefundedPayment`): Optional. Message is a service
+            message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
 
@@ -1516,8 +1515,8 @@ class Message(MaybeInaccessibleMessage):
             raise RuntimeError("This message has neither text nor caption.")
 
         # Telegram wants the position in UTF-16 code units, so we have to calculate in that space
-        utf16_text = text.encode("utf-16-le")
-        utf16_quote = quote.encode("utf-16-le")
+        utf16_text = text.encode(TextEncoding.UTF_16_LE)
+        utf16_quote = quote.encode(TextEncoding.UTF_16_LE)
         effective_index = index or 0
 
         matches = list(re.finditer(re.escape(utf16_quote), utf16_text))
@@ -4105,10 +4104,17 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.pin_chat_message(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
+
+        .. versionchanged:: 21.5
+            Now also passes :attr:`business_connection_id` to
+            :meth:`telegram.Bot.pin_chat_message`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4117,6 +4123,7 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().pin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             disable_notification=disable_notification,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4137,10 +4144,17 @@ class Message(MaybeInaccessibleMessage):
         """Shortcut for::
 
               await bot.unpin_chat_message(
-                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+                  chat_id=message.chat_id,
+                  message_id=message.message_id,
+                  business_connection_id=message.business_connection_id,
+                  *args, **kwargs
               )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
+
+        .. versionchanged:: 21.5
+            Now also passes :attr:`business_connection_id` to
+            :meth:`telegram.Bot.pin_chat_message`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4149,6 +4163,7 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().unpin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4479,7 +4494,7 @@ class Message(MaybeInaccessibleMessage):
         if message_text is None:
             return None
 
-        utf_16_text = message_text.encode("utf-16-le")
+        utf_16_text = message_text.encode(TextEncoding.UTF_16_LE)
         html_text = ""
         last_offset = 0
 
@@ -4543,7 +4558,9 @@ class Message(MaybeInaccessibleMessage):
             # text is part of the parent entity
             html_text += (
                 escape(
-                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode("utf-16-le")
+                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode(
+                        TextEncoding.UTF_16_LE
+                    )
                 )
                 + insert
             )
@@ -4551,7 +4568,7 @@ class Message(MaybeInaccessibleMessage):
             last_offset = entity.offset - offset + entity.length
 
         # see comment above
-        html_text += escape(utf_16_text[last_offset * 2 :].decode("utf-16-le"))
+        html_text += escape(utf_16_text[last_offset * 2 :].decode(TextEncoding.UTF_16_LE))
 
         return html_text
 
@@ -4680,7 +4697,7 @@ class Message(MaybeInaccessibleMessage):
         if message_text is None:
             return None
 
-        utf_16_text = message_text.encode("utf-16-le")
+        utf_16_text = message_text.encode(TextEncoding.UTF_16_LE)
         markdown_text = ""
         last_offset = 0
 
@@ -4773,7 +4790,7 @@ class Message(MaybeInaccessibleMessage):
             markdown_text += (
                 escape_markdown(
                     utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode(
-                        "utf-16-le"
+                        TextEncoding.UTF_16_LE
                     ),
                     version=version,
                 )
@@ -4784,7 +4801,7 @@ class Message(MaybeInaccessibleMessage):
 
         # see comment above
         markdown_text += escape_markdown(
-            utf_16_text[last_offset * 2 :].decode("utf-16-le"),
+            utf_16_text[last_offset * 2 :].decode(TextEncoding.UTF_16_LE),
             version=version,
         )
 

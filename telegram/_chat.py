@@ -905,6 +905,7 @@ class _ChatBase(TelegramObject):
         self,
         message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -932,11 +933,13 @@ class _ChatBase(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
         )
 
     async def unpin_message(
         self,
         message_id: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -963,6 +966,7 @@ class _ChatBase(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             message_id=message_id,
+            business_connection_id=business_connection_id,
         )
 
     async def unpin_all_messages(
@@ -2662,6 +2666,81 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def create_subscription_invite_link(
+        self,
+        subscription_period: int,
+        subscription_price: int,
+        name: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "ChatInviteLink":
+        """Shortcut for::
+
+            await bot.create_chat_subscription_invite_link(
+                chat_id=update.effective_chat.id, *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.create_chat_subscription_invite_link`.
+
+        .. versionadded:: 21.5
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+        """
+        return await self.get_bot().create_chat_subscription_invite_link(
+            chat_id=self.id,
+            subscription_period=subscription_period,
+            subscription_price=subscription_price,
+            name=name,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def edit_subscription_invite_link(
+        self,
+        invite_link: Union[str, "ChatInviteLink"],
+        name: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "ChatInviteLink":
+        """Shortcut for::
+
+            await bot.edit_chat_subscription_invite_link(
+                chat_id=update.effective_chat.id, *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_chat_subscription_invite_link`.
+
+        .. versionadded:: 21.5
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        """
+        return await self.get_bot().edit_chat_subscription_invite_link(
+            chat_id=self.id,
+            invite_link=invite_link,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            name=name,
+        )
+
     async def approve_join_request(
         self,
         user_id: int,
@@ -3270,6 +3349,7 @@ class _ChatBase(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         reply_markup: Optional[ReplyMarkup] = None,
+        business_connection_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3310,6 +3390,7 @@ class _ChatBase(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
         )
 
 

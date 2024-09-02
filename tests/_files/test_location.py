@@ -235,7 +235,7 @@ class TestLocationWithRequest:
         assert protected.has_protected_content
         assert not unprotected.has_protected_content
 
-    @pytest.mark.xfail()
+    @pytest.mark.xfail
     async def test_send_live_location(self, bot, chat_id):
         message = await bot.send_location(
             chat_id=chat_id,

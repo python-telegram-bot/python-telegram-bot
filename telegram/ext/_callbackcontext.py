@@ -272,7 +272,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 )
             self.bot.callback_data_cache.drop_data(callback_query)
         else:
-            raise RuntimeError("telegram.Bot does not allow for arbitrary callback data.")
+            raise RuntimeError(  # noqa: TRY004
+                "telegram.Bot does not allow for arbitrary callback data."
+            )
 
     @classmethod
     def from_error(

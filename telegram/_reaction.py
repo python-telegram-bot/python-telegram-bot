@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents a Telegram ReactionType."""
-from typing import TYPE_CHECKING, Final, Literal, Optional, Union
+
+from typing import TYPE_CHECKING, Dict, Final, Literal, Optional, Type, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -30,16 +31,22 @@ if TYPE_CHECKING:
 
 class ReactionType(TelegramObject):
     """Base class for Telegram ReactionType Objects.
-    There exist :class:`telegram.ReactionTypeEmoji` and :class:`telegram.ReactionTypeCustomEmoji`.
+    There exist :class:`telegram.ReactionTypeEmoji`, :class:`telegram.ReactionTypeCustomEmoji`
+    and :class:`telegram.ReactionTypePaid`.
 
     .. versionadded:: 20.8
+    .. versionchanged:: 21.5
+
+        Added paid reaction.
 
     Args:
         type (:obj:`str`): Type of the reaction. Can be
-            :attr:`~telegram.ReactionType.EMOJI` or :attr:`~telegram.ReactionType.CUSTOM_EMOJI`.
+            :attr:`~telegram.ReactionType.EMOJI`, :attr:`~telegram.ReactionType.CUSTOM_EMOJI` or
+            :attr:`~telegram.ReactionType.PAID`.
     Attributes:
         type (:obj:`str`): Type of the reaction. Can be
-            :attr:`~telegram.ReactionType.EMOJI` or :attr:`~telegram.ReactionType.CUSTOM_EMOJI`.
+            :attr:`~telegram.ReactionType.EMOJI`, :attr:`~telegram.ReactionType.CUSTOM_EMOJI` or
+            :attr:`~telegram.ReactionType.PAID`.
 
     """
 
@@ -49,11 +56,16 @@ class ReactionType(TelegramObject):
     """:const:`telegram.constants.ReactionType.EMOJI`"""
     CUSTOM_EMOJI: Final[constants.ReactionType] = constants.ReactionType.CUSTOM_EMOJI
     """:const:`telegram.constants.ReactionType.CUSTOM_EMOJI`"""
+    PAID: Final[constants.ReactionType] = constants.ReactionType.PAID
+    """:const:`telegram.constants.ReactionType.PAID`
+
+    .. versionadded:: 21.5
+    """
 
     def __init__(
         self,
         type: Union[  # pylint: disable=redefined-builtin
-            Literal["emoji", "custom_emoji"], constants.ReactionType
+            Literal["emoji", "custom_emoji", "paid"], constants.ReactionType
         ],
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -71,14 +83,20 @@ class ReactionType(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
+        if data is None:
             return None
 
-        if cls is ReactionType and data.get("type") in [cls.EMOJI, cls.CUSTOM_EMOJI]:
-            reaction_type = data.pop("type")
-            if reaction_type == cls.EMOJI:
-                return ReactionTypeEmoji.de_json(data=data, bot=bot)
-            return ReactionTypeCustomEmoji.de_json(data=data, bot=bot)
+        if not data and cls is ReactionType:
+            return None
+
+        _class_mapping: Dict[str, Type[ReactionType]] = {
+            cls.EMOJI: ReactionTypeEmoji,
+            cls.CUSTOM_EMOJI: ReactionTypeCustomEmoji,
+            cls.PAID: ReactionTypePaid,
+        }
+
+        if cls is ReactionType and data.get("type") in _class_mapping:
+            return _class_mapping[data.pop("type")].de_json(data, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -150,6 +168,24 @@ class ReactionTypeCustomEmoji(ReactionType):
         with self._unfrozen():
             self.custom_emoji_id: str = custom_emoji_id
             self._id_attrs = (self.custom_emoji_id,)
+
+
+class ReactionTypePaid(ReactionType):
+    """
+    The reaction is paid.
+
+    .. versionadded:: 21.5
+
+    Attributes:
+        type (:obj:`str`): Type of the reaction,
+            always :tg-const:`telegram.ReactionType.PAID`.
+    """
+
+    __slots__ = ()
+
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+        super().__init__(type=ReactionType.PAID, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class ReactionCount(TelegramObject):

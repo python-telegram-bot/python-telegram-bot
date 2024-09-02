@@ -69,6 +69,16 @@ class ChatInviteLink(TelegramObject):
             created using this link.
 
             .. versionadded:: 13.8
+        subscription_period (:obj:`int`, optional): The number of seconds the subscription will be
+            active for before the next payment.
+
+            .. versionadded:: 21.5
+        subscription_price (:obj:`int`, optional): The amount of Telegram Stars a user must pay
+            initially and after each subsequent subscription period to be a member of the chat
+            using the link.
+
+            .. versionadded:: 21.5
+
     Attributes:
         invite_link (:obj:`str`): The invite link. If the link was created by another chat
             administrator, then the second part of the link will be replaced with ``'…'``.
@@ -96,6 +106,15 @@ class ChatInviteLink(TelegramObject):
             created using this link.
 
             .. versionadded:: 13.8
+        subscription_period (:obj:`int`): Optional. The number of seconds the subscription will be
+            active for before the next payment.
+
+            .. versionadded:: 21.5
+        subscription_price (:obj:`int`): Optional. The amount of Telegram Stars a user must pay
+            initially and after each subsequent subscription period to be a member of the chat
+            using the link.
+
+            .. versionadded:: 21.5
 
     """
 
@@ -109,6 +128,8 @@ class ChatInviteLink(TelegramObject):
         "member_limit",
         "name",
         "pending_join_request_count",
+        "subscription_period",
+        "subscription_price",
     )
 
     def __init__(
@@ -122,6 +143,8 @@ class ChatInviteLink(TelegramObject):
         member_limit: Optional[int] = None,
         name: Optional[str] = None,
         pending_join_request_count: Optional[int] = None,
+        subscription_period: Optional[int] = None,
+        subscription_price: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -140,6 +163,9 @@ class ChatInviteLink(TelegramObject):
         self.pending_join_request_count: Optional[int] = (
             int(pending_join_request_count) if pending_join_request_count is not None else None
         )
+        self.subscription_period: Optional[int] = subscription_period
+        self.subscription_price: Optional[int] = subscription_price
+
         self._id_attrs = (
             self.invite_link,
             self.creates_join_request,

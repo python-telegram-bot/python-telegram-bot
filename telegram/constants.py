@@ -54,6 +54,7 @@ __all__ = [
     "ChatLimit",
     "ChatMemberStatus",
     "ChatPhotoSize",
+    "ChatSubscriptionLimit",
     "ChatType",
     "ContactLimit",
     "CustomEmojiStickerLimit",
@@ -151,7 +152,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=7)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=9)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -2903,6 +2904,11 @@ class ReactionType(StringEnum):
     """:obj:`str`: A :class:`telegram.ReactionType` with a normal emoji."""
     CUSTOM_EMOJI = "custom_emoji"
     """:obj:`str`: A :class:`telegram.ReactionType` with a custom emoji."""
+    PAID = "paid"
+    """:obj:`str`: A :class:`telegram.ReactionType` with a paid reaction.
+
+    .. versionadded:: 21.5
+    """
 
 
 class ReactionEmoji(StringEnum):
@@ -3096,3 +3102,22 @@ class BackgroundFillType(StringEnum):
     """:obj:`str`: A :class:`telegram.BackgroundFill` with gradient fill."""
     FREEFORM_GRADIENT = "freeform_gradient"
     """:obj:`str`: A :class:`telegram.BackgroundFill` with freeform_gradient fill."""
+
+
+class ChatSubscriptionLimit(IntEnum):
+    """This enum contains limitations for
+    :paramref:`telegram.Bot.create_chat_subscription_invite_link.subscription_period` and
+    :paramref:`telegram.Bot.create_chat_subscription_invite_link.subscription_price`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 21.5
+    """
+
+    __slots__ = ()
+
+    SUBSCRIPTION_PERIOD = 2592000
+    """:obj:`int`: The number of seconds the subscription will be active."""
+    MIN_PRICE = 1
+    """:obj:`int`: Amount of stars a user pays, minimum amount the subscription can be set to."""
+    MAX_PRICE = 2500
+    """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to."""

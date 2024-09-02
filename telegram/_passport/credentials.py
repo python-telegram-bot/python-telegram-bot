@@ -39,6 +39,7 @@ except ImportError:
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
 from telegram.error import PassportDecryptionError
 
@@ -98,7 +99,7 @@ def decrypt(secret, hash, data):
 @no_type_check
 def decrypt_json(secret, hash, data):
     """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
-    return json.loads(decrypt(secret, hash, data).decode("utf-8"))
+    return json.loads(decrypt(secret, hash, data).decode(TextEncoding.UTF_8))
 
 
 class EncryptedCredentials(TelegramObject):
@@ -111,7 +112,7 @@ class EncryptedCredentials(TelegramObject):
 
     Note:
         This object is decrypted only when originating from
-        :obj:`telegram.PassportData.decrypted_credentials`.
+        :attr:`telegram.PassportData.decrypted_credentials`.
 
     Args:
         data (:class:`telegram.Credentials` | :obj:`str`): Decrypted data with unique user's

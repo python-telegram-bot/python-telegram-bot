@@ -31,7 +31,7 @@ from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def callback_data_cache(bot):
     return CallbackDataCache(bot)
 

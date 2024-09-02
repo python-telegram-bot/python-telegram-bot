@@ -21,6 +21,7 @@ import json
 from typing import Any, Dict, List, Optional, Union, final
 from urllib.parse import urlencode
 
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import UploadFileDict
 from telegram.request._requestparameter import RequestParameter
 
@@ -54,6 +55,9 @@ class RequestData:
         a single object of type :obj:`int`, :obj:`float`, :obj:`str` or :obj:`bool` or any
         (possibly nested) composition of lists, tuples and dictionaries, where each entry, key
         and value is of one of the mentioned types.
+
+        Returns:
+            Dict[:obj:`str`, Union[:obj:`str`, :obj:`int`, List[any], Dict[any, any]]]
         """
         return {
             param.name: param.value  # type: ignore[misc]
@@ -70,6 +74,9 @@ class RequestData:
             By default, this property uses the standard library's :func:`json.dumps`.
             To use a custom library for JSON encoding, you can directly encode the keys of
             :attr:`parameters` - note that string valued keys should not be JSON encoded.
+
+        Returns:
+            Dict[:obj:`str`, :obj:`str`]
         """
         return {
             param.name: param.json_value
@@ -83,6 +90,9 @@ class RequestData:
         Args:
             encode_kwargs (Dict[:obj:`str`, any], optional): Additional keyword arguments to pass
                 along to :func:`urllib.parse.urlencode`.
+
+        Returns:
+            :obj:`str`
         """
         if encode_kwargs:
             return urlencode(self.json_parameters, **encode_kwargs)
@@ -96,6 +106,9 @@ class RequestData:
             url (:obj:`str`): The URL the parameters will be attached to.
             encode_kwargs (Dict[:obj:`str`, any], optional): Additional keyword arguments to pass
                 along to :func:`urllib.parse.urlencode`.
+
+        Returns:
+            :obj:`str`
         """
         url_parameters = self.url_encoded_parameters(encode_kwargs=encode_kwargs)
         return f"{url}?{url_parameters}"
@@ -108,12 +121,19 @@ class RequestData:
             By default, this property uses the standard library's :func:`json.dumps`.
             To use a custom library for JSON encoding, you can directly encode the keys of
             :attr:`parameters` - note that string valued keys should not be JSON encoded.
+
+        Returns:
+            :obj:`bytes`
         """
-        return json.dumps(self.json_parameters).encode("utf-8")
+        return json.dumps(self.json_parameters).encode(TextEncoding.UTF_8)
 
     @property
     def multipart_data(self) -> UploadFileDict:
-        """Gives the files contained in this object as mapping of part name to encoded content."""
+        """Gives the files contained in this object as mapping of part name to encoded content.
+
+        .. versionchanged:: 21.5
+            Content may now be a file handle.
+        """
         multipart_data: UploadFileDict = {}
         for param in self._parameters:
             m_data = param.multipart_data

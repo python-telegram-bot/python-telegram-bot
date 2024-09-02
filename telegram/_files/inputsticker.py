@@ -41,14 +41,15 @@ class InputSticker(TelegramObject):
         order of the arguments has changed.
 
     Args:
-        sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`): The
+        sticker (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+            | :class:`pathlib.Path`): The
             added sticker. |uploadinputnopath| Animated and video stickers can't be uploaded via
             HTTP URL.
         emoji_list (Sequence[:obj:`str`]): Sequence of
             :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI` -
             :tg-const:`telegram.constants.StickerLimit.MAX_STICKER_EMOJI` emoji associated with the
             sticker.
-        mask_position (:obj:`telegram.MaskPosition`, optional): Position where the mask should be
+        mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask should be
             placed on faces. For ":tg-const:`telegram.constants.StickerType.MASK`" stickers only.
         keywords (Sequence[:obj:`str`], optional): Sequence of
             0-:tg-const:`telegram.constants.StickerLimit.MAX_SEARCH_KEYWORDS` search keywords
@@ -70,7 +71,7 @@ class InputSticker(TelegramObject):
             :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI` -
             :tg-const:`telegram.constants.StickerLimit.MAX_STICKER_EMOJI` emoji associated with the
             sticker.
-        mask_position (:obj:`telegram.MaskPosition`): Optional. Position where the mask should be
+        mask_position (:class:`telegram.MaskPosition`): Optional. Position where the mask should be
             placed on faces. For ":tg-const:`telegram.constants.StickerType.MASK`" stickers only.
         keywords (Tuple[:obj:`str`]): Optional. Tuple of
             0-:tg-const:`telegram.constants.StickerLimit.MAX_SEARCH_KEYWORDS` search keywords

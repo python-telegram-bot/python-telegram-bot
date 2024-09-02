@@ -26,6 +26,7 @@ from typing import AsyncContextManager, Final, List, Optional, Tuple, Type, Type
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings import warn
 from telegram._version import __version__ as ptb_ver
@@ -114,10 +115,10 @@ class BaseRequest(
         """
         try:
             await self.initialize()
-            return self
-        except Exception as exc:
+        except Exception:
             await self.shutdown()
-            raise exc
+            raise
+        return self
 
     async def __aexit__(
         self,
@@ -338,8 +339,8 @@ class BaseRequest(
                 connect_timeout=connect_timeout,
                 pool_timeout=pool_timeout,
             )
-        except TelegramError as exc:
-            raise exc
+        except TelegramError:
+            raise
         except Exception as exc:
             raise NetworkError(f"Unknown error in HTTP implementation: {exc!r}") from exc
 
@@ -403,11 +404,11 @@ class BaseRequest(
         Raises:
             TelegramError: If loading the JSON data failed
         """
-        decoded_s = payload.decode("utf-8", "replace")
+        decoded_s = payload.decode(TextEncoding.UTF_8, "replace")
         try:
             return json.loads(decoded_s)
         except ValueError as exc:
-            _LOGGER.error('Can not load invalid JSON data: "%s"', decoded_s)
+            _LOGGER.exception('Can not load invalid JSON data: "%s"', decoded_s)
             raise TelegramError("Invalid server response") from exc
 
     @abc.abstractmethod
