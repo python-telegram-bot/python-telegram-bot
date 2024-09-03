@@ -37,15 +37,14 @@ from telegram import (
     Update,
     User,
 )
-from telegram.ext import ApplicationBuilder, Defaults, Updater
-from telegram.ext.filters import MessageFilter, UpdateFilter
+from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
-from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
+from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.timezones import BasicTimezone
 
 if TEST_WITH_OPT_DEPS:
@@ -121,6 +120,15 @@ def bot_info() -> Dict[str, str]:
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
     async with make_bot(bot_info) as _bot:
+        yield _bot
+
+
+@pytest.fixture(scope="session")
+async def offline_bot(bot_info):
+    """Makes an offline Bot instance with the given bot_info
+    Note that in tests/ext we also override the `bot` fixture to return the offline bot instead.
+    """
+    async with make_bot(bot_info, offline=True) as _bot:
         yield _bot
 
 
@@ -212,28 +220,6 @@ def subscription_channel_id(bot_info):
 
 
 @pytest.fixture
-async def app(bot_info):
-    # We build a new bot each time so that we use `app` in a context manager without problems
-    application = (
-        ApplicationBuilder().bot(make_bot(bot_info)).application_class(PytestApplication).build()
-    )
-    yield application
-    if application.running:
-        await application.stop()
-        await application.shutdown()
-
-
-@pytest.fixture
-async def updater(bot_info):
-    # We build a new bot each time so that we use `updater` in a context manager without problems
-    up = Updater(bot=make_bot(bot_info), update_queue=asyncio.Queue())
-    yield up
-    if up.running:
-        await up.stop()
-        await up.shutdown()
-
-
-@pytest.fixture
 def thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
@@ -243,23 +229,6 @@ def thumb_file():
 def class_thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
-
-
-@pytest.fixture(
-    scope="class",
-    params=[{"class": MessageFilter}, {"class": UpdateFilter}],
-    ids=["MessageFilter", "UpdateFilter"],
-)
-def mock_filter(request):
-    class MockFilter(request.param["class"]):
-        def __init__(self):
-            super().__init__()
-            self.tested = False
-
-        def filter(self, _):
-            self.tested = True
-
-    return MockFilter()
 
 
 def _get_false_update_fixture_decorator_params():

@@ -35,7 +35,7 @@ from tests.auxil.build_messages import make_message, make_message_update
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.files import TEST_DATA_PATH, data_file
 from tests.auxil.networking import send_webhook_message
-from tests.auxil.pytest_classes import PytestBot, make_bot
+from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
 
 UNIX_AVAILABLE = False
@@ -246,13 +246,12 @@ class TestUpdater:
             await asyncio.sleep(0.1)
             return []
 
-        orig_del_webhook = updater.bot.delete_webhook
-
         async def delete_webhook(*args, **kwargs):
             # Dropping pending updates is done by passing the parameter to delete_webhook
             if kwargs.get("drop_pending_updates"):
                 self.message_count += 1
-            return await orig_del_webhook(*args, **kwargs)
+            await asyncio.sleep(0)
+            return True
 
         monkeypatch.setattr(updater.bot, "get_updates", get_updates)
         monkeypatch.setattr(updater.bot, "delete_webhook", delete_webhook)
@@ -264,7 +263,6 @@ class TestUpdater:
             await updates.join()
             await updater.stop()
             assert not updater.running
-            assert not (await updater.bot.get_webhook_info()).url
             if drop_pending_updates:
                 assert self.message_count == 1
             else:
@@ -281,7 +279,6 @@ class TestUpdater:
             await updates.join()
             await updater.stop()
             assert not updater.running
-            assert not (await updater.bot.get_webhook_info()).url
 
         self.received = []
         self.message_count = 0
@@ -505,7 +502,7 @@ class TestUpdater:
         async with updater:
             # Patch within the context so that updater.bot.initialize can still be called
             # by the context manager
-            monkeypatch.setattr(HTTPXRequest, "do_request", do_request)
+            monkeypatch.setattr(updater.bot.request, "do_request", do_request)
 
             if exception_class == InvalidToken:
                 with pytest.raises(InvalidToken, match="1"):
@@ -705,14 +702,23 @@ class TestUpdater:
         "unix", [None, "file_path", "socket_object"] if UNIX_AVAILABLE else [None]
     )
     async def test_webhook_basic(
-        self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
+        self,
+        monkeypatch,
+        updater,
+        drop_pending_updates,
+        ext_bot,
+        secret_token,
+        unix,
+        file_path,
+        one_time_bot,
+        on_time_raw_bot,
     ):
         # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
-            updater.bot = ExtBot(updater.bot.token)
+            updater.bot = one_time_bot
         if not ext_bot and type(updater.bot) is not Bot:
-            updater.bot = PytestBot(updater.bot.token)
+            updater.bot = on_time_raw_bot
 
         async def delete_webhook(*args, **kwargs):
             # Dropping pending updates is done by passing the parameter to delete_webhook
