@@ -25,16 +25,16 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def force_reply():
-    return ForceReply(TestForceReplyBase.selective, TestForceReplyBase.input_field_placeholder)
+    return ForceReply(ForceReplyTestBase.selective, ForceReplyTestBase.input_field_placeholder)
 
 
-class TestForceReplyBase:
+class ForceReplyTestBase:
     force_reply = True
     selective = True
     input_field_placeholder = "force replies can be annoying if not used properly"
 
 
-class TestForceReplyWithoutRequest(TestForceReplyBase):
+class TestForceReplyWithoutRequest(ForceReplyTestBase):
     def test_slot_behaviour(self, force_reply):
         for attr in force_reply.__slots__:
             assert getattr(force_reply, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -69,7 +69,7 @@ class TestForceReplyWithoutRequest(TestForceReplyBase):
         assert hash(a) != hash(d)
 
 
-class TestForceReplyWithRequest(TestForceReplyBase):
+class TestForceReplyWithRequest(ForceReplyTestBase):
     async def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
         message = await bot.send_message(chat_id, "text", reply_markup=force_reply)
         assert message.text == "text"

@@ -49,7 +49,7 @@ async def audio(bot, chat_id):
         return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumbnail=thumb)).audio
 
 
-class TestAudioBase:
+class AudioTestBase:
     caption = "Test *audio*"
     performer = "Leandro Toledo"
     title = "Teste"
@@ -67,7 +67,7 @@ class TestAudioBase:
     audio_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestAudioWithoutRequest(TestAudioBase):
+class TestAudioWithoutRequest(AudioTestBase):
     def test_slot_behaviour(self, audio):
         for attr in audio.__slots__:
             assert getattr(audio, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -222,7 +222,7 @@ class TestAudioWithoutRequest(TestAudioBase):
         await default_bot.send_audio(chat_id, audio, reply_parameters=ReplyParameters(**kwargs))
 
 
-class TestAudioWithRequest(TestAudioBase):
+class TestAudioWithRequest(AudioTestBase):
     async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
         message = await bot.send_audio(
             chat_id,

@@ -49,7 +49,7 @@ async def voice(bot, chat_id):
         return (await bot.send_voice(chat_id, voice=f, read_timeout=50)).voice
 
 
-class TestVoiceBase:
+class VoiceTestBase:
     duration = 3
     mime_type = "audio/ogg"
     file_size = 9199
@@ -59,7 +59,7 @@ class TestVoiceBase:
     voice_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVoiceWithoutRequest(TestVoiceBase):
+class TestVoiceWithoutRequest(VoiceTestBase):
     def test_slot_behaviour(self, voice):
         for attr in voice.__slots__:
             assert getattr(voice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -203,7 +203,7 @@ class TestVoiceWithoutRequest(TestVoiceBase):
         await default_bot.send_voice(chat_id, voice, reply_parameters=ReplyParameters(**kwargs))
 
 
-class TestVoiceWithRequest(TestVoiceBase):
+class TestVoiceWithRequest(VoiceTestBase):
     async def test_send_all_args(self, bot, chat_id, voice_file, voice):
         message = await bot.send_voice(
             chat_id,

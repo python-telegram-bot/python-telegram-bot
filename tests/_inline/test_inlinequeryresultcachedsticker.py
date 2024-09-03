@@ -31,14 +31,14 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_sticker():
     return InlineQueryResultCachedSticker(
-        TestInlineQueryResultCachedStickerBase.id_,
-        TestInlineQueryResultCachedStickerBase.sticker_file_id,
-        input_message_content=TestInlineQueryResultCachedStickerBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedStickerBase.reply_markup,
+        InlineQueryResultCachedStickerTestBase.id_,
+        InlineQueryResultCachedStickerTestBase.sticker_file_id,
+        input_message_content=InlineQueryResultCachedStickerTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedStickerTestBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedStickerBase:
+class InlineQueryResultCachedStickerTestBase:
     id_ = "id"
     type_ = "sticker"
     sticker_file_id = "sticker file id"
@@ -46,7 +46,7 @@ class TestInlineQueryResultCachedStickerBase:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultCachedStickerWithoutRequest(TestInlineQueryResultCachedStickerBase):
+class TestInlineQueryResultCachedStickerWithoutRequest(InlineQueryResultCachedStickerTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_sticker):
         inst = inline_query_result_cached_sticker
         for attr in inst.__slots__:

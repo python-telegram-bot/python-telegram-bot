@@ -32,21 +32,21 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def contact():
     return Contact(
-        TestContactBase.phone_number,
-        TestContactBase.first_name,
-        TestContactBase.last_name,
-        TestContactBase.user_id,
+        ContactTestBase.phone_number,
+        ContactTestBase.first_name,
+        ContactTestBase.last_name,
+        ContactTestBase.user_id,
     )
 
 
-class TestContactBase:
+class ContactTestBase:
     phone_number = "+11234567890"
     first_name = "Leandro"
     last_name = "Toledo"
     user_id = 23
 
 
-class TestContactWithoutRequest(TestContactBase):
+class TestContactWithoutRequest(ContactTestBase):
     def test_slot_behaviour(self, contact):
         for attr in contact.__slots__:
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -156,7 +156,7 @@ class TestContactWithoutRequest(TestContactBase):
         )
 
 
-class TestContactWithRequest(TestContactBase):
+class TestContactWithRequest(ContactTestBase):
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
         [

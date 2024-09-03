@@ -84,20 +84,20 @@ def menu_button(scope_class_and_type):
     return scope_class_and_type[0].de_json(
         {
             "type": scope_class_and_type[1],
-            "text": TestMenuButtonselfBase.text,
-            "web_app": TestMenuButtonselfBase.web_app.to_dict(),
+            "text": MenuButtonTestBase.text,
+            "web_app": MenuButtonTestBase.web_app.to_dict(),
         },
         bot=None,
     )
 
 
-class TestMenuButtonselfBase:
+class MenuButtonTestBase:
     text = "button_text"
     web_app = WebAppInfo(url="https://python-telegram-bot.org/web_app")
 
 
 # All the scope types are very similar, so we test everything via parametrization
-class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
+class TestMenuButtonWithoutRequest(MenuButtonTestBase):
     def test_slot_behaviour(self, menu_button):
         for attr in menu_button.__slots__:
             assert getattr(menu_button, attr, "err") != "err", f"got extra slot '{attr}'"

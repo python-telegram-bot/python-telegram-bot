@@ -61,7 +61,7 @@ async def sticker(bot, chat_id):
         sticker = (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
         # necessary to properly test needs_repainting
         with sticker._unfrozen():
-            sticker.needs_repainting = TestStickerBase.needs_repainting
+            sticker.needs_repainting = StickerTestBase.needs_repainting
         return sticker
 
 
@@ -89,7 +89,7 @@ def video_sticker(bot, chat_id):
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
-class TestStickerBase:
+class StickerTestBase:
     # sticker_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.webp'
     # Serving sticker from gh since our server sends wrong content_type
     sticker_file_url = (
@@ -116,7 +116,7 @@ class TestStickerBase:
     premium_animation = File("this_is_an_id", "this_is_an_unique_id")
 
 
-class TestStickerWithoutRequest(TestStickerBase):
+class TestStickerWithoutRequest(StickerTestBase):
     def test_slot_behaviour(self, sticker):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -345,7 +345,7 @@ class TestStickerWithoutRequest(TestStickerBase):
         )
 
 
-class TestStickerWithRequest(TestStickerBase):
+class TestStickerWithRequest(StickerTestBase):
     async def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
         message = await bot.send_sticker(
             chat_id, sticker=sticker_file, disable_notification=False, protect_content=True
@@ -572,7 +572,7 @@ def sticker_set_thumb_file():
         yield file
 
 
-class TestStickerSetBase:
+class StickerSetTestBase:
     title = "Test stickers"
     stickers = [Sticker("file_id", "file_un_id", 512, 512, True, True, Sticker.REGULAR)]
     name = "NOTAREALNAME"
@@ -580,7 +580,7 @@ class TestStickerSetBase:
     contains_masks = True
 
 
-class TestStickerSetWithoutRequest(TestStickerSetBase):
+class TestStickerSetWithoutRequest(StickerSetTestBase):
     def test_slot_behaviour(self):
         inst = StickerSet("this", "is", self.stickers, "not")
         for attr in inst.__slots__:
@@ -1064,21 +1064,21 @@ class TestStickerSetWithRequest:
 @pytest.fixture(scope="module")
 def mask_position():
     return MaskPosition(
-        TestMaskPositionBase.point,
-        TestMaskPositionBase.x_shift,
-        TestMaskPositionBase.y_shift,
-        TestMaskPositionBase.scale,
+        MaskPositionTestBase.point,
+        MaskPositionTestBase.x_shift,
+        MaskPositionTestBase.y_shift,
+        MaskPositionTestBase.scale,
     )
 
 
-class TestMaskPositionBase:
+class MaskPositionTestBase:
     point = MaskPosition.EYES
     x_shift = -1
     y_shift = 1
     scale = 2
 
 
-class TestMaskPositionWithoutRequest(TestMaskPositionBase):
+class TestMaskPositionWithoutRequest(MaskPositionTestBase):
     def test_slot_behaviour(self, mask_position):
         inst = mask_position
         for attr in inst.__slots__:
@@ -1130,7 +1130,7 @@ class TestMaskPositionWithoutRequest(TestMaskPositionBase):
         assert hash(a) != hash(e)
 
 
-class TestMaskPositionWithRequest(TestMaskPositionBase):
+class TestMaskPositionWithRequest(MaskPositionTestBase):
     async def test_create_new_mask_sticker_set(self, bot, chat_id, sticker_file, mask_position):
         name = f"masks_by_{bot.username}"
         try:

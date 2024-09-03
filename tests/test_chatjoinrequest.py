@@ -38,18 +38,18 @@ def time():
 @pytest.fixture(scope="module")
 def chat_join_request(bot, time):
     cjr = ChatJoinRequest(
-        chat=TestChatJoinRequestBase.chat,
-        from_user=TestChatJoinRequestBase.from_user,
+        chat=ChatJoinRequestTestBase.chat,
+        from_user=ChatJoinRequestTestBase.from_user,
         date=time,
-        bio=TestChatJoinRequestBase.bio,
-        invite_link=TestChatJoinRequestBase.invite_link,
-        user_chat_id=TestChatJoinRequestBase.from_user.id,
+        bio=ChatJoinRequestTestBase.bio,
+        invite_link=ChatJoinRequestTestBase.invite_link,
+        user_chat_id=ChatJoinRequestTestBase.from_user.id,
     )
     cjr.set_bot(bot)
     return cjr
 
 
-class TestChatJoinRequestBase:
+class ChatJoinRequestTestBase:
     chat = Chat(1, Chat.SUPERGROUP)
     from_user = User(2, "first_name", False)
     bio = "bio"
@@ -63,7 +63,7 @@ class TestChatJoinRequestBase:
     )
 
 
-class TestChatJoinRequestWithoutRequest(TestChatJoinRequestBase):
+class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
     def test_slot_behaviour(self, chat_join_request):
         inst = chat_join_request
         for attr in inst.__slots__:

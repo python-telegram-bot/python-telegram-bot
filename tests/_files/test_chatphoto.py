@@ -52,7 +52,7 @@ async def chat_photo(bot, super_group_id):
     )
 
 
-class TestChatPhotoBase:
+class ChatPhotoTestBase:
     chatphoto_small_file_id = "smallCgADAQADngIAAuyVeEez0xRovKi9VAI"
     chatphoto_big_file_id = "bigCgADAQADngIAAuyVeEez0xRovKi9VAI"
     chatphoto_small_file_unique_id = "smalladc3145fd2e84d95b64d68eaa22aa33e"
@@ -60,7 +60,7 @@ class TestChatPhotoBase:
     chatphoto_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.jpg"
 
 
-class TestChatPhotoWithoutRequest(TestChatPhotoBase):
+class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
     def test_slot_behaviour(self, chat_photo):
         for attr in chat_photo.__slots__:
             assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"

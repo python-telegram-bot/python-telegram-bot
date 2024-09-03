@@ -33,20 +33,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_audio():
     return InlineQueryResultAudio(
-        TestInlineQueryResultAudioBase.id_,
-        TestInlineQueryResultAudioBase.audio_url,
-        TestInlineQueryResultAudioBase.title,
-        performer=TestInlineQueryResultAudioBase.performer,
-        audio_duration=TestInlineQueryResultAudioBase.audio_duration,
-        caption=TestInlineQueryResultAudioBase.caption,
-        parse_mode=TestInlineQueryResultAudioBase.parse_mode,
-        caption_entities=TestInlineQueryResultAudioBase.caption_entities,
-        input_message_content=TestInlineQueryResultAudioBase.input_message_content,
-        reply_markup=TestInlineQueryResultAudioBase.reply_markup,
+        InlineQueryResultAudioTestBase.id_,
+        InlineQueryResultAudioTestBase.audio_url,
+        InlineQueryResultAudioTestBase.title,
+        performer=InlineQueryResultAudioTestBase.performer,
+        audio_duration=InlineQueryResultAudioTestBase.audio_duration,
+        caption=InlineQueryResultAudioTestBase.caption,
+        parse_mode=InlineQueryResultAudioTestBase.parse_mode,
+        caption_entities=InlineQueryResultAudioTestBase.caption_entities,
+        input_message_content=InlineQueryResultAudioTestBase.input_message_content,
+        reply_markup=InlineQueryResultAudioTestBase.reply_markup,
     )
 
 
-class TestInlineQueryResultAudioBase:
+class InlineQueryResultAudioTestBase:
     id_ = "id"
     type_ = "audio"
     audio_url = "audio url"
@@ -60,7 +60,7 @@ class TestInlineQueryResultAudioBase:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultAudioWithoutRequest(TestInlineQueryResultAudioBase):
+class TestInlineQueryResultAudioWithoutRequest(InlineQueryResultAudioTestBase):
     def test_slot_behaviour(self, inline_query_result_audio):
         inst = inline_query_result_audio
         for attr in inst.__slots__:

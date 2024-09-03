@@ -26,18 +26,18 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def game():
     game = Game(
-        TestGameBase.title,
-        TestGameBase.description,
-        TestGameBase.photo,
-        text=TestGameBase.text,
-        text_entities=TestGameBase.text_entities,
-        animation=TestGameBase.animation,
+        GameTestBase.title,
+        GameTestBase.description,
+        GameTestBase.photo,
+        text=GameTestBase.text,
+        text_entities=GameTestBase.text_entities,
+        animation=GameTestBase.animation,
     )
     game._unfreeze()
     return game
 
 
-class TestGameBase:
+class GameTestBase:
     title = "Python-telegram-bot Test Game"
     description = "description"
     photo = [PhotoSize("Blah", "ElseBlah", 640, 360, file_size=0)]
@@ -49,7 +49,7 @@ class TestGameBase:
     animation = Animation("blah", "unique_id", 320, 180, 1)
 
 
-class TestGameWithoutRequest(TestGameBase):
+class TestGameWithoutRequest(GameTestBase):
     def test_slot_behaviour(self, game):
         for attr in game.__slots__:
             assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"

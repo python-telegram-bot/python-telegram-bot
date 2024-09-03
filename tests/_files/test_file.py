@@ -31,10 +31,10 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def file(bot):
     file = File(
-        TestFileBase.file_id,
-        TestFileBase.file_unique_id,
-        file_path=TestFileBase.file_path,
-        file_size=TestFileBase.file_size,
+        FileTestBase.file_id,
+        FileTestBase.file_unique_id,
+        file_path=FileTestBase.file_path,
+        file_size=FileTestBase.file_size,
     )
     file.set_bot(bot)
     file._unfreeze()
@@ -51,10 +51,10 @@ def encrypted_file(bot):
         "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
     )
     ef = File(
-        TestFileBase.file_id,
-        TestFileBase.file_unique_id,
-        TestFileBase.file_size,
-        TestFileBase.file_path,
+        FileTestBase.file_id,
+        FileTestBase.file_unique_id,
+        FileTestBase.file_size,
+        FileTestBase.file_path,
     )
     ef.set_bot(bot)
     ef.set_credentials(fc)
@@ -69,9 +69,9 @@ def encrypted_local_file(bot):
         "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
     )
     ef = File(
-        TestFileBase.file_id,
-        TestFileBase.file_unique_id,
-        TestFileBase.file_size,
+        FileTestBase.file_id,
+        FileTestBase.file_unique_id,
+        FileTestBase.file_size,
         file_path=str(data_file("image_encrypted.jpg")),
     )
     ef.set_bot(bot)
@@ -82,16 +82,16 @@ def encrypted_local_file(bot):
 @pytest.fixture(scope="module")
 def local_file(bot):
     file = File(
-        TestFileBase.file_id,
-        TestFileBase.file_unique_id,
+        FileTestBase.file_id,
+        FileTestBase.file_unique_id,
         file_path=str(data_file("local_file.txt")),
-        file_size=TestFileBase.file_size,
+        file_size=FileTestBase.file_size,
     )
     file.set_bot(bot)
     return file
 
 
-class TestFileBase:
+class FileTestBase:
     file_id = "NOTVALIDDOESNOTMATTER"
     file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_path = (
@@ -101,7 +101,7 @@ class TestFileBase:
     file_content = "Saint-Saëns".encode()  # Intentionally contains unicode chars.
 
 
-class TestFileWithoutRequest(TestFileBase):
+class TestFileWithoutRequest(FileTestBase):
     def test_slot_behaviour(self, file):
         for attr in file.__slots__:
             assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -273,7 +273,7 @@ class TestFileWithoutRequest(TestFileBase):
         assert buf2[: len(buf)] == buf
 
 
-class TestFileWithRequest(TestFileBase):
+class TestFileWithRequest(FileTestBase):
     async def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
             await bot.get_file(file_id="")

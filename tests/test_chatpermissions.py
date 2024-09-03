@@ -43,7 +43,7 @@ def chat_permissions():
     )
 
 
-class TestChatPermissionsBase:
+class ChatPermissionsTestBase:
     can_send_messages = True
     can_send_polls = True
     can_send_other_messages = False
@@ -60,7 +60,7 @@ class TestChatPermissionsBase:
     can_send_voice_notes = None
 
 
-class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
+class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
     def test_slot_behaviour(self, chat_permissions):
         inst = chat_permissions
         for attr in inst.__slots__:

@@ -34,20 +34,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def chat(bot):
     chat = Chat(
-        TestChatBase.id_,
-        title=TestChatBase.title,
-        type=TestChatBase.type_,
-        username=TestChatBase.username,
+        ChatTestBase.id_,
+        title=ChatTestBase.title,
+        type=ChatTestBase.type_,
+        username=ChatTestBase.username,
         is_forum=True,
-        first_name=TestChatBase.first_name,
-        last_name=TestChatBase.last_name,
+        first_name=ChatTestBase.first_name,
+        last_name=ChatTestBase.last_name,
     )
     chat.set_bot(bot)
     chat._unfreeze()
     return chat
 
 
-class TestChatBase:
+class ChatTestBase:
     id_ = -28767330
     title = "ToledosPalaceBot - Group"
     type_ = "group"
@@ -57,7 +57,7 @@ class TestChatBase:
     last_name = "last"
 
 
-class TestChatWithoutRequest(TestChatBase):
+class TestChatWithoutRequest(ChatTestBase):
     def test_slot_behaviour(self, chat):
         for attr in chat.__slots__:
             assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"

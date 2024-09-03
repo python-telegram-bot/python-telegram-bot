@@ -25,16 +25,16 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def input_location_message_content():
     return InputLocationMessageContent(
-        TestInputLocationMessageContentBase.latitude,
-        TestInputLocationMessageContentBase.longitude,
-        live_period=TestInputLocationMessageContentBase.live_period,
-        horizontal_accuracy=TestInputLocationMessageContentBase.horizontal_accuracy,
-        heading=TestInputLocationMessageContentBase.heading,
-        proximity_alert_radius=TestInputLocationMessageContentBase.proximity_alert_radius,
+        InputLocationMessageContentTestBase.latitude,
+        InputLocationMessageContentTestBase.longitude,
+        live_period=InputLocationMessageContentTestBase.live_period,
+        horizontal_accuracy=InputLocationMessageContentTestBase.horizontal_accuracy,
+        heading=InputLocationMessageContentTestBase.heading,
+        proximity_alert_radius=InputLocationMessageContentTestBase.proximity_alert_radius,
     )
 
 
-class TestInputLocationMessageContentBase:
+class InputLocationMessageContentTestBase:
     latitude = -23.691288
     longitude = -46.788279
     live_period = 80
@@ -43,7 +43,7 @@ class TestInputLocationMessageContentBase:
     proximity_alert_radius = 999
 
 
-class TestInputLocationMessageContentWithoutRequest(TestInputLocationMessageContentBase):
+class TestInputLocationMessageContentWithoutRequest(InputLocationMessageContentTestBase):
     def test_slot_behaviour(self, input_location_message_content):
         inst = input_location_message_content
         for attr in inst.__slots__:

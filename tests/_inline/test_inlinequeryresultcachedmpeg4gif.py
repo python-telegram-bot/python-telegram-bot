@@ -32,19 +32,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_mpeg4_gif():
     return InlineQueryResultCachedMpeg4Gif(
-        TestInlineQueryResultCachedMpeg4GifBase.id_,
-        TestInlineQueryResultCachedMpeg4GifBase.mpeg4_file_id,
-        title=TestInlineQueryResultCachedMpeg4GifBase.title,
-        caption=TestInlineQueryResultCachedMpeg4GifBase.caption,
-        parse_mode=TestInlineQueryResultCachedMpeg4GifBase.parse_mode,
-        caption_entities=TestInlineQueryResultCachedMpeg4GifBase.caption_entities,
-        input_message_content=TestInlineQueryResultCachedMpeg4GifBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedMpeg4GifBase.reply_markup,
-        show_caption_above_media=TestInlineQueryResultCachedMpeg4GifBase.show_caption_above_media,
+        InlineQueryResultCachedMpeg4GifTestBase.id_,
+        InlineQueryResultCachedMpeg4GifTestBase.mpeg4_file_id,
+        title=InlineQueryResultCachedMpeg4GifTestBase.title,
+        caption=InlineQueryResultCachedMpeg4GifTestBase.caption,
+        parse_mode=InlineQueryResultCachedMpeg4GifTestBase.parse_mode,
+        caption_entities=InlineQueryResultCachedMpeg4GifTestBase.caption_entities,
+        input_message_content=InlineQueryResultCachedMpeg4GifTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedMpeg4GifTestBase.reply_markup,
+        show_caption_above_media=InlineQueryResultCachedMpeg4GifTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultCachedMpeg4GifBase:
+class InlineQueryResultCachedMpeg4GifTestBase:
     id_ = "id"
     type_ = "mpeg4_gif"
     mpeg4_file_id = "mpeg4 file id"
@@ -57,7 +57,7 @@ class TestInlineQueryResultCachedMpeg4GifBase:
     show_caption_above_media = True
 
 
-class TestInlineQueryResultCachedMpeg4GifWithoutRequest(TestInlineQueryResultCachedMpeg4GifBase):
+class TestInlineQueryResultCachedMpeg4GifWithoutRequest(InlineQueryResultCachedMpeg4GifTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_mpeg4_gif):
         inst = inline_query_result_cached_mpeg4_gif
         for attr in inst.__slots__:

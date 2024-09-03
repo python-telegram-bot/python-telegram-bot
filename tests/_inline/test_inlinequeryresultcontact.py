@@ -31,19 +31,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_contact():
     return InlineQueryResultContact(
-        TestInlineQueryResultContactBase.id_,
-        TestInlineQueryResultContactBase.phone_number,
-        TestInlineQueryResultContactBase.first_name,
-        last_name=TestInlineQueryResultContactBase.last_name,
-        thumbnail_url=TestInlineQueryResultContactBase.thumbnail_url,
-        thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
-        thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
-        input_message_content=TestInlineQueryResultContactBase.input_message_content,
-        reply_markup=TestInlineQueryResultContactBase.reply_markup,
+        InlineQueryResultContactTestBase.id_,
+        InlineQueryResultContactTestBase.phone_number,
+        InlineQueryResultContactTestBase.first_name,
+        last_name=InlineQueryResultContactTestBase.last_name,
+        thumbnail_url=InlineQueryResultContactTestBase.thumbnail_url,
+        thumbnail_width=InlineQueryResultContactTestBase.thumbnail_width,
+        thumbnail_height=InlineQueryResultContactTestBase.thumbnail_height,
+        input_message_content=InlineQueryResultContactTestBase.input_message_content,
+        reply_markup=InlineQueryResultContactTestBase.reply_markup,
     )
 
 
-class TestInlineQueryResultContactBase:
+class InlineQueryResultContactTestBase:
     id_ = "id"
     type_ = "contact"
     phone_number = "phone_number"
@@ -56,7 +56,7 @@ class TestInlineQueryResultContactBase:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBase):
+class TestInlineQueryResultContactWithoutRequest(InlineQueryResultContactTestBase):
     def test_slot_behaviour(self, inline_query_result_contact):
         inst = inline_query_result_contact
         for attr in inst.__slots__:
