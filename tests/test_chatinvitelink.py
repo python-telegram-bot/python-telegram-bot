@@ -33,21 +33,21 @@ def creator():
 @pytest.fixture(scope="module")
 def invite_link(creator):
     return ChatInviteLink(
-        TestChatInviteLinkBase.link,
+        ChatInviteLinkTestBase.link,
         creator,
-        TestChatInviteLinkBase.creates_join_request,
-        TestChatInviteLinkBase.primary,
-        TestChatInviteLinkBase.revoked,
-        expire_date=TestChatInviteLinkBase.expire_date,
-        member_limit=TestChatInviteLinkBase.member_limit,
-        name=TestChatInviteLinkBase.name,
-        pending_join_request_count=TestChatInviteLinkBase.pending_join_request_count,
-        subscription_period=TestChatInviteLinkBase.subscription_period,
-        subscription_price=TestChatInviteLinkBase.subscription_price,
+        ChatInviteLinkTestBase.creates_join_request,
+        ChatInviteLinkTestBase.primary,
+        ChatInviteLinkTestBase.revoked,
+        expire_date=ChatInviteLinkTestBase.expire_date,
+        member_limit=ChatInviteLinkTestBase.member_limit,
+        name=ChatInviteLinkTestBase.name,
+        pending_join_request_count=ChatInviteLinkTestBase.pending_join_request_count,
+        subscription_period=ChatInviteLinkTestBase.subscription_period,
+        subscription_price=ChatInviteLinkTestBase.subscription_price,
     )
 
 
-class TestChatInviteLinkBase:
+class ChatInviteLinkTestBase:
     link = "thisialink"
     creates_join_request = False
     primary = True
@@ -60,7 +60,7 @@ class TestChatInviteLinkBase:
     subscription_price = 44
 
 
-class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
+class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
     def test_slot_behaviour(self, invite_link):
         for attr in invite_link.__slots__:
             assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"

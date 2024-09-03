@@ -28,11 +28,11 @@ def dice(request):
     return Dice(value=5, emoji=request.param)
 
 
-class TestDiceBase:
+class DiceTestBase:
     value = 4
 
 
-class TestDiceWithoutRequest(TestDiceBase):
+class TestDiceWithoutRequest(DiceTestBase):
     def test_slot_behaviour(self, dice):
         for attr in dice.__slots__:
             assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"

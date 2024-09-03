@@ -31,17 +31,17 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def venue():
     return Venue(
-        TestVenueBase.location,
-        TestVenueBase.title,
-        TestVenueBase.address,
-        foursquare_id=TestVenueBase.foursquare_id,
-        foursquare_type=TestVenueBase.foursquare_type,
-        google_place_id=TestVenueBase.google_place_id,
-        google_place_type=TestVenueBase.google_place_type,
+        VenueTestBase.location,
+        VenueTestBase.title,
+        VenueTestBase.address,
+        foursquare_id=VenueTestBase.foursquare_id,
+        foursquare_type=VenueTestBase.foursquare_type,
+        google_place_id=VenueTestBase.google_place_id,
+        google_place_type=VenueTestBase.google_place_type,
     )
 
 
-class TestVenueBase:
+class VenueTestBase:
     location = Location(longitude=-46.788279, latitude=-23.691288)
     title = "title"
     address = "address"
@@ -51,7 +51,7 @@ class TestVenueBase:
     google_place_type = "google place type"
 
 
-class TestVenueWithoutRequest(TestVenueBase):
+class TestVenueWithoutRequest(VenueTestBase):
     def test_slot_behaviour(self, venue):
         for attr in venue.__slots__:
             assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -171,7 +171,7 @@ class TestVenueWithoutRequest(TestVenueBase):
         )
 
 
-class TestVenueWithRequest(TestVenueBase):
+class TestVenueWithRequest(VenueTestBase):
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
         [

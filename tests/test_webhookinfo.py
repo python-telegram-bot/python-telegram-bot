@@ -29,18 +29,18 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def webhook_info():
     return WebhookInfo(
-        url=TestWebhookInfoBase.url,
-        has_custom_certificate=TestWebhookInfoBase.has_custom_certificate,
-        pending_update_count=TestWebhookInfoBase.pending_update_count,
-        ip_address=TestWebhookInfoBase.ip_address,
-        last_error_date=TestWebhookInfoBase.last_error_date,
-        max_connections=TestWebhookInfoBase.max_connections,
-        allowed_updates=TestWebhookInfoBase.allowed_updates,
-        last_synchronization_error_date=TestWebhookInfoBase.last_synchronization_error_date,
+        url=WebhookInfoTestBase.url,
+        has_custom_certificate=WebhookInfoTestBase.has_custom_certificate,
+        pending_update_count=WebhookInfoTestBase.pending_update_count,
+        ip_address=WebhookInfoTestBase.ip_address,
+        last_error_date=WebhookInfoTestBase.last_error_date,
+        max_connections=WebhookInfoTestBase.max_connections,
+        allowed_updates=WebhookInfoTestBase.allowed_updates,
+        last_synchronization_error_date=WebhookInfoTestBase.last_synchronization_error_date,
     )
 
 
-class TestWebhookInfoBase:
+class WebhookInfoTestBase:
     url = "http://www.google.com"
     has_custom_certificate = False
     pending_update_count = 5
@@ -51,7 +51,7 @@ class TestWebhookInfoBase:
     last_synchronization_error_date = time.time()
 
 
-class TestWebhookInfoWithoutRequest(TestWebhookInfoBase):
+class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
     def test_slot_behaviour(self, webhook_info):
         for attr in webhook_info.__slots__:
             assert getattr(webhook_info, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -220,7 +220,7 @@ def passport_data(bot):
     return PassportData.de_json(RAW_PASSPORT_DATA, bot=bot)
 
 
-class TestPassportBase:
+class PassportTestBase:
     driver_license_selfie_file_id = "DgADBAADEQQAAkopgFNr6oi-wISRtAI"
     driver_license_selfie_file_unique_id = "d4e390cca57b4da5a65322b304762a12"
     driver_license_front_side_file_id = "DgADBAADxwMAApnQgVPK2-ckL2eXVAI"
@@ -243,7 +243,7 @@ class TestPassportBase:
     driver_license_selfie_credentials_secret = "tivdId6RNYNsvXYPppdzrbxOBuBOr9wXRPDcCvnXU7E="
 
 
-class TestPassportWithoutRequest(TestPassportBase):
+class TestPassportWithoutRequest(PassportTestBase):
     def test_slot_behaviour(self, passport_data):
         inst = passport_data
         for attr in inst.__slots__:

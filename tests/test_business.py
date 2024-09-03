@@ -36,7 +36,7 @@ from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
 
 
-class TestBusinessBase:
+class BusinessTestBase:
     id_ = "123"
     user = User(123, "test_user", False)
     user_chat_id = 123
@@ -62,58 +62,58 @@ class TestBusinessBase:
 @pytest.fixture(scope="module")
 def business_connection():
     return BusinessConnection(
-        TestBusinessBase.id_,
-        TestBusinessBase.user,
-        TestBusinessBase.user_chat_id,
-        TestBusinessBase.date,
-        TestBusinessBase.can_reply,
-        TestBusinessBase.is_enabled,
+        BusinessTestBase.id_,
+        BusinessTestBase.user,
+        BusinessTestBase.user_chat_id,
+        BusinessTestBase.date,
+        BusinessTestBase.can_reply,
+        BusinessTestBase.is_enabled,
     )
 
 
 @pytest.fixture(scope="module")
 def business_messages_deleted():
     return BusinessMessagesDeleted(
-        TestBusinessBase.business_connection_id,
-        TestBusinessBase.chat,
-        TestBusinessBase.message_ids,
+        BusinessTestBase.business_connection_id,
+        BusinessTestBase.chat,
+        BusinessTestBase.message_ids,
     )
 
 
 @pytest.fixture(scope="module")
 def business_intro():
     return BusinessIntro(
-        TestBusinessBase.title,
-        TestBusinessBase.message,
-        TestBusinessBase.sticker,
+        BusinessTestBase.title,
+        BusinessTestBase.message,
+        BusinessTestBase.sticker,
     )
 
 
 @pytest.fixture(scope="module")
 def business_location():
     return BusinessLocation(
-        TestBusinessBase.address,
-        TestBusinessBase.location,
+        BusinessTestBase.address,
+        BusinessTestBase.location,
     )
 
 
 @pytest.fixture(scope="module")
 def business_opening_hours_interval():
     return BusinessOpeningHoursInterval(
-        TestBusinessBase.opening_minute,
-        TestBusinessBase.closing_minute,
+        BusinessTestBase.opening_minute,
+        BusinessTestBase.closing_minute,
     )
 
 
 @pytest.fixture(scope="module")
 def business_opening_hours():
     return BusinessOpeningHours(
-        TestBusinessBase.time_zone_name,
-        TestBusinessBase.opening_hours,
+        BusinessTestBase.time_zone_name,
+        BusinessTestBase.opening_hours,
     )
 
 
-class TestBusinessConnectionWithoutRequest(TestBusinessBase):
+class TestBusinessConnectionWithoutRequest(BusinessTestBase):
     def test_slots(self, business_connection):
         bc = business_connection
         for attr in bc.__slots__:
@@ -188,7 +188,7 @@ class TestBusinessConnectionWithoutRequest(TestBusinessBase):
         assert hash(bc1) != hash(bc3)
 
 
-class TestBusinessMessagesDeleted(TestBusinessBase):
+class TestBusinessMessagesDeleted(BusinessTestBase):
     def test_slots(self, business_messages_deleted):
         bmd = business_messages_deleted
         for attr in bmd.__slots__:
@@ -227,7 +227,7 @@ class TestBusinessMessagesDeleted(TestBusinessBase):
         assert hash(bmd1) != hash(bmd3)
 
 
-class TestBusinessIntroWithoutRequest(TestBusinessBase):
+class TestBusinessIntroWithoutRequest(BusinessTestBase):
     def test_slot_behaviour(self, business_intro):
         intro = business_intro
         for attr in intro.__slots__:
@@ -267,7 +267,7 @@ class TestBusinessIntroWithoutRequest(TestBusinessBase):
         assert hash(intro1) != hash(intro3)
 
 
-class TestBusinessLocationWithoutRequest(TestBusinessBase):
+class TestBusinessLocationWithoutRequest(BusinessTestBase):
     def test_slot_behaviour(self, business_location):
         inst = business_location
         for attr in inst.__slots__:
@@ -304,7 +304,7 @@ class TestBusinessLocationWithoutRequest(TestBusinessBase):
         assert hash(blc1) != hash(blc3)
 
 
-class TestBusinessOpeningHoursIntervalWithoutRequest(TestBusinessBase):
+class TestBusinessOpeningHoursIntervalWithoutRequest(BusinessTestBase):
     def test_slot_behaviour(self, business_opening_hours_interval):
         inst = business_opening_hours_interval
         for attr in inst.__slots__:
@@ -375,7 +375,7 @@ class TestBusinessOpeningHoursIntervalWithoutRequest(TestBusinessBase):
         assert cached is closing_time
 
 
-class TestBusinessOpeningHoursWithoutRequest(TestBusinessBase):
+class TestBusinessOpeningHoursWithoutRequest(BusinessTestBase):
     def test_slot_behaviour(self, business_opening_hours):
         inst = business_opening_hours
         for attr in inst.__slots__:

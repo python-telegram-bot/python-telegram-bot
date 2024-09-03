@@ -25,14 +25,14 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def sent_web_app_message():
-    return SentWebAppMessage(inline_message_id=TestSentWebAppMessageBase.inline_message_id)
+    return SentWebAppMessage(inline_message_id=SentWebAppMessageTestBase.inline_message_id)
 
 
-class TestSentWebAppMessageBase:
+class SentWebAppMessageTestBase:
     inline_message_id = "123"
 
 
-class TestSentWebAppMessageWithoutRequest(TestSentWebAppMessageBase):
+class TestSentWebAppMessageWithoutRequest(SentWebAppMessageTestBase):
     def test_slot_behaviour(self, sent_web_app_message):
         inst = sent_web_app_message
         for attr in inst.__slots__:

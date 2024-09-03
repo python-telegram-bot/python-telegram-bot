@@ -24,15 +24,15 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def story():
-    return Story(TestStoryBase.chat, TestStoryBase.id)
+    return Story(StoryTestBase.chat, StoryTestBase.id)
 
 
-class TestStoryBase:
+class StoryTestBase:
     chat = Chat(1, "")
     id = 0
 
 
-class TestStoryWithoutRequest(TestStoryBase):
+class TestStoryWithoutRequest(StoryTestBase):
     def test_slot_behaviour(self, story):
         for attr in story.__slots__:
             assert getattr(story, attr, "err") != "err", f"got extra slot '{attr}'"

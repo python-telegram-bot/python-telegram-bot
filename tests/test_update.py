@@ -212,14 +212,14 @@ ids = (*all_types, "callback_query_without_message")
 
 @pytest.fixture(scope="module", params=params, ids=ids)
 def update(request):
-    return Update(update_id=TestUpdateBase.update_id, **request.param)
+    return Update(update_id=UpdateTestBase.update_id, **request.param)
 
 
-class TestUpdateBase:
+class UpdateTestBase:
     update_id = 868573637
 
 
-class TestUpdateWithoutRequest(TestUpdateBase):
+class TestUpdateWithoutRequest(UpdateTestBase):
     def test_slot_behaviour(self):
         update = Update(self.update_id)
         for attr in update.__slots__:

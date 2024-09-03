@@ -25,20 +25,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def passport_element_error_unspecified():
     return PassportElementErrorUnspecified(
-        TestPassportElementErrorUnspecifiedBase.type_,
-        TestPassportElementErrorUnspecifiedBase.element_hash,
-        TestPassportElementErrorUnspecifiedBase.message,
+        PassportElementErrorUnspecifiedTestBase.type_,
+        PassportElementErrorUnspecifiedTestBase.element_hash,
+        PassportElementErrorUnspecifiedTestBase.message,
     )
 
 
-class TestPassportElementErrorUnspecifiedBase:
+class PassportElementErrorUnspecifiedTestBase:
     source = "unspecified"
     type_ = "test_type"
     element_hash = "element_hash"
     message = "Error message"
 
 
-class TestPassportElementErrorUnspecifiedWithoutRequest(TestPassportElementErrorUnspecifiedBase):
+class TestPassportElementErrorUnspecifiedWithoutRequest(PassportElementErrorUnspecifiedTestBase):
     def test_slot_behaviour(self, passport_element_error_unspecified):
         inst = passport_element_error_unspecified
         for attr in inst.__slots__:

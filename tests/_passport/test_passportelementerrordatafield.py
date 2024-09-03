@@ -25,14 +25,14 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def passport_element_error_data_field():
     return PassportElementErrorDataField(
-        TestPassportElementErrorDataFieldBase.type_,
-        TestPassportElementErrorDataFieldBase.field_name,
-        TestPassportElementErrorDataFieldBase.data_hash,
-        TestPassportElementErrorDataFieldBase.message,
+        PassportElementErrorDataFieldTestBase.type_,
+        PassportElementErrorDataFieldTestBase.field_name,
+        PassportElementErrorDataFieldTestBase.data_hash,
+        PassportElementErrorDataFieldTestBase.message,
     )
 
 
-class TestPassportElementErrorDataFieldBase:
+class PassportElementErrorDataFieldTestBase:
     source = "data"
     type_ = "test_type"
     field_name = "test_field"
@@ -40,7 +40,7 @@ class TestPassportElementErrorDataFieldBase:
     message = "Error message"
 
 
-class TestPassportElementErrorDataFieldWithoutRequest(TestPassportElementErrorDataFieldBase):
+class TestPassportElementErrorDataFieldWithoutRequest(PassportElementErrorDataFieldTestBase):
     def test_slot_behaviour(self, passport_element_error_data_field):
         inst = passport_element_error_data_field
         for attr in inst.__slots__:

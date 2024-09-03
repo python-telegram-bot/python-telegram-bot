@@ -41,14 +41,14 @@ def message_entity(request):
     return MessageEntity(type_, 1, 3, url=url, user=user, language=language)
 
 
-class TestMessageEntityBase:
+class MessageEntityTestBase:
     type_ = "url"
     offset = 1
     length = 2
     url = "url"
 
 
-class TestMessageEntityWithoutRequest(TestMessageEntityBase):
+class TestMessageEntityWithoutRequest(MessageEntityTestBase):
     def test_slot_behaviour(self, message_entity):
         inst = message_entity
         for attr in inst.__slots__:

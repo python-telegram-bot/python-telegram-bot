@@ -30,20 +30,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_game():
     return InlineQueryResultGame(
-        TestInlineQueryResultGameBase.id_,
-        TestInlineQueryResultGameBase.game_short_name,
-        reply_markup=TestInlineQueryResultGameBase.reply_markup,
+        InlineQueryResultGameTestBase.id_,
+        InlineQueryResultGameTestBase.game_short_name,
+        reply_markup=InlineQueryResultGameTestBase.reply_markup,
     )
 
 
-class TestInlineQueryResultGameBase:
+class InlineQueryResultGameTestBase:
     id_ = "id"
     type_ = "game"
     game_short_name = "game short name"
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultGameWithoutRequest(TestInlineQueryResultGameBase):
+class TestInlineQueryResultGameWithoutRequest(InlineQueryResultGameTestBase):
     def test_slot_behaviour(self, inline_query_result_game):
         inst = inline_query_result_game
         for attr in inst.__slots__:

@@ -42,47 +42,47 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def chat_full_info(bot):
     chat = ChatFullInfo(
-        TestChatFullInfoBase.id_,
-        type=TestChatFullInfoBase.type_,
-        accent_color_id=TestChatFullInfoBase.accent_color_id,
-        max_reaction_count=TestChatFullInfoBase.max_reaction_count,
-        title=TestChatFullInfoBase.title,
-        username=TestChatFullInfoBase.username,
-        sticker_set_name=TestChatFullInfoBase.sticker_set_name,
-        can_set_sticker_set=TestChatFullInfoBase.can_set_sticker_set,
-        permissions=TestChatFullInfoBase.permissions,
-        slow_mode_delay=TestChatFullInfoBase.slow_mode_delay,
-        bio=TestChatFullInfoBase.bio,
-        linked_chat_id=TestChatFullInfoBase.linked_chat_id,
-        location=TestChatFullInfoBase.location,
-        has_private_forwards=TestChatFullInfoBase.has_private_forwards,
-        has_protected_content=TestChatFullInfoBase.has_protected_content,
-        has_visible_history=TestChatFullInfoBase.has_visible_history,
-        join_to_send_messages=TestChatFullInfoBase.join_to_send_messages,
-        join_by_request=TestChatFullInfoBase.join_by_request,
+        ChatFullInfoTestBase.id_,
+        type=ChatFullInfoTestBase.type_,
+        accent_color_id=ChatFullInfoTestBase.accent_color_id,
+        max_reaction_count=ChatFullInfoTestBase.max_reaction_count,
+        title=ChatFullInfoTestBase.title,
+        username=ChatFullInfoTestBase.username,
+        sticker_set_name=ChatFullInfoTestBase.sticker_set_name,
+        can_set_sticker_set=ChatFullInfoTestBase.can_set_sticker_set,
+        permissions=ChatFullInfoTestBase.permissions,
+        slow_mode_delay=ChatFullInfoTestBase.slow_mode_delay,
+        bio=ChatFullInfoTestBase.bio,
+        linked_chat_id=ChatFullInfoTestBase.linked_chat_id,
+        location=ChatFullInfoTestBase.location,
+        has_private_forwards=ChatFullInfoTestBase.has_private_forwards,
+        has_protected_content=ChatFullInfoTestBase.has_protected_content,
+        has_visible_history=ChatFullInfoTestBase.has_visible_history,
+        join_to_send_messages=ChatFullInfoTestBase.join_to_send_messages,
+        join_by_request=ChatFullInfoTestBase.join_by_request,
         has_restricted_voice_and_video_messages=(
-            TestChatFullInfoBase.has_restricted_voice_and_video_messages
+            ChatFullInfoTestBase.has_restricted_voice_and_video_messages
         ),
-        is_forum=TestChatFullInfoBase.is_forum,
-        active_usernames=TestChatFullInfoBase.active_usernames,
-        emoji_status_custom_emoji_id=TestChatFullInfoBase.emoji_status_custom_emoji_id,
-        emoji_status_expiration_date=TestChatFullInfoBase.emoji_status_expiration_date,
-        has_aggressive_anti_spam_enabled=TestChatFullInfoBase.has_aggressive_anti_spam_enabled,
-        has_hidden_members=TestChatFullInfoBase.has_hidden_members,
-        available_reactions=TestChatFullInfoBase.available_reactions,
-        background_custom_emoji_id=TestChatFullInfoBase.background_custom_emoji_id,
-        profile_accent_color_id=TestChatFullInfoBase.profile_accent_color_id,
-        profile_background_custom_emoji_id=TestChatFullInfoBase.profile_background_custom_emoji_id,
-        unrestrict_boost_count=TestChatFullInfoBase.unrestrict_boost_count,
-        custom_emoji_sticker_set_name=TestChatFullInfoBase.custom_emoji_sticker_set_name,
-        business_intro=TestChatFullInfoBase.business_intro,
-        business_location=TestChatFullInfoBase.business_location,
-        business_opening_hours=TestChatFullInfoBase.business_opening_hours,
-        birthdate=TestChatFullInfoBase.birthdate,
-        personal_chat=TestChatFullInfoBase.personal_chat,
-        first_name=TestChatFullInfoBase.first_name,
-        last_name=TestChatFullInfoBase.last_name,
-        can_send_paid_media=TestChatFullInfoBase.can_send_paid_media,
+        is_forum=ChatFullInfoTestBase.is_forum,
+        active_usernames=ChatFullInfoTestBase.active_usernames,
+        emoji_status_custom_emoji_id=ChatFullInfoTestBase.emoji_status_custom_emoji_id,
+        emoji_status_expiration_date=ChatFullInfoTestBase.emoji_status_expiration_date,
+        has_aggressive_anti_spam_enabled=ChatFullInfoTestBase.has_aggressive_anti_spam_enabled,
+        has_hidden_members=ChatFullInfoTestBase.has_hidden_members,
+        available_reactions=ChatFullInfoTestBase.available_reactions,
+        background_custom_emoji_id=ChatFullInfoTestBase.background_custom_emoji_id,
+        profile_accent_color_id=ChatFullInfoTestBase.profile_accent_color_id,
+        profile_background_custom_emoji_id=ChatFullInfoTestBase.profile_background_custom_emoji_id,
+        unrestrict_boost_count=ChatFullInfoTestBase.unrestrict_boost_count,
+        custom_emoji_sticker_set_name=ChatFullInfoTestBase.custom_emoji_sticker_set_name,
+        business_intro=ChatFullInfoTestBase.business_intro,
+        business_location=ChatFullInfoTestBase.business_location,
+        business_opening_hours=ChatFullInfoTestBase.business_opening_hours,
+        birthdate=ChatFullInfoTestBase.birthdate,
+        personal_chat=ChatFullInfoTestBase.personal_chat,
+        first_name=ChatFullInfoTestBase.first_name,
+        last_name=ChatFullInfoTestBase.last_name,
+        can_send_paid_media=ChatFullInfoTestBase.can_send_paid_media,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -90,7 +90,7 @@ def chat_full_info(bot):
 
 
 # Shortcut methods are tested in test_chat.py.
-class TestChatFullInfoBase:
+class ChatFullInfoTestBase:
     id_ = -28767330
     max_reaction_count = 2
     title = "ToledosPalaceBot - Group"
@@ -142,7 +142,7 @@ class TestChatFullInfoBase:
     can_send_paid_media = True
 
 
-class TestChatFullInfoWithoutRequest(TestChatFullInfoBase):
+class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
     def test_slot_behaviour(self, chat_full_info):
         cfi = chat_full_info
         for attr in cfi.__slots__:
