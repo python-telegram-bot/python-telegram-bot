@@ -41,16 +41,16 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def external_reply_info():
     return ExternalReplyInfo(
-        origin=TestExternalReplyInfoBase.origin,
-        chat=TestExternalReplyInfoBase.chat,
-        message_id=TestExternalReplyInfoBase.message_id,
-        link_preview_options=TestExternalReplyInfoBase.link_preview_options,
-        giveaway=TestExternalReplyInfoBase.giveaway,
-        paid_media=TestExternalReplyInfoBase.paid_media,
+        origin=ExternalReplyInfoTestBase.origin,
+        chat=ExternalReplyInfoTestBase.chat,
+        message_id=ExternalReplyInfoTestBase.message_id,
+        link_preview_options=ExternalReplyInfoTestBase.link_preview_options,
+        giveaway=ExternalReplyInfoTestBase.giveaway,
+        paid_media=ExternalReplyInfoTestBase.paid_media,
     )
 
 
-class TestExternalReplyInfoBase:
+class ExternalReplyInfoTestBase:
     origin = MessageOriginUser(
         dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0), User(1, "user", False)
     )
@@ -65,7 +65,7 @@ class TestExternalReplyInfoBase:
     paid_media = PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])
 
 
-class TestExternalReplyInfoWithoutRequest(TestExternalReplyInfoBase):
+class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
     def test_slot_behaviour(self, external_reply_info):
         for attr in external_reply_info.__slots__:
             assert getattr(external_reply_info, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -128,14 +128,14 @@ class TestExternalReplyInfoWithoutRequest(TestExternalReplyInfoBase):
 @pytest.fixture(scope="module")
 def text_quote():
     return TextQuote(
-        text=TestTextQuoteBase.text,
-        position=TestTextQuoteBase.position,
-        entities=TestTextQuoteBase.entities,
-        is_manual=TestTextQuoteBase.is_manual,
+        text=TextQuoteTestBase.text,
+        position=TextQuoteTestBase.position,
+        entities=TextQuoteTestBase.entities,
+        is_manual=TextQuoteTestBase.is_manual,
     )
 
 
-class TestTextQuoteBase:
+class TextQuoteTestBase:
     text = "text"
     position = 1
     entities = [
@@ -145,7 +145,7 @@ class TestTextQuoteBase:
     is_manual = True
 
 
-class TestTextQuoteWithoutRequest(TestTextQuoteBase):
+class TestTextQuoteWithoutRequest(TextQuoteTestBase):
     def test_slot_behaviour(self, text_quote):
         for attr in text_quote.__slots__:
             assert getattr(text_quote, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -202,17 +202,17 @@ class TestTextQuoteWithoutRequest(TestTextQuoteBase):
 @pytest.fixture(scope="module")
 def reply_parameters():
     return ReplyParameters(
-        message_id=TestReplyParametersBase.message_id,
-        chat_id=TestReplyParametersBase.chat_id,
-        allow_sending_without_reply=TestReplyParametersBase.allow_sending_without_reply,
-        quote=TestReplyParametersBase.quote,
-        quote_parse_mode=TestReplyParametersBase.quote_parse_mode,
-        quote_entities=TestReplyParametersBase.quote_entities,
-        quote_position=TestReplyParametersBase.quote_position,
+        message_id=ReplyParametersTestBase.message_id,
+        chat_id=ReplyParametersTestBase.chat_id,
+        allow_sending_without_reply=ReplyParametersTestBase.allow_sending_without_reply,
+        quote=ReplyParametersTestBase.quote,
+        quote_parse_mode=ReplyParametersTestBase.quote_parse_mode,
+        quote_entities=ReplyParametersTestBase.quote_entities,
+        quote_position=ReplyParametersTestBase.quote_position,
     )
 
 
-class TestReplyParametersBase:
+class ReplyParametersTestBase:
     message_id = 123
     chat_id = 456
     allow_sending_without_reply = True
@@ -225,7 +225,7 @@ class TestReplyParametersBase:
     quote_position = 5
 
 
-class TestReplyParametersWithoutRequest(TestReplyParametersBase):
+class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
     def test_slot_behaviour(self, reply_parameters):
         for attr in reply_parameters.__slots__:
             assert getattr(reply_parameters, attr, "err") != "err", f"got extra slot '{attr}'"

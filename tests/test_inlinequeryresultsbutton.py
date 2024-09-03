@@ -25,19 +25,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_results_button():
     return InlineQueryResultsButton(
-        text=TestInlineQueryResultsButtonBase.text,
-        start_parameter=TestInlineQueryResultsButtonBase.start_parameter,
-        web_app=TestInlineQueryResultsButtonBase.web_app,
+        text=InlineQueryResultsButtonTestBase.text,
+        start_parameter=InlineQueryResultsButtonTestBase.start_parameter,
+        web_app=InlineQueryResultsButtonTestBase.web_app,
     )
 
 
-class TestInlineQueryResultsButtonBase:
+class InlineQueryResultsButtonTestBase:
     text = "text"
     start_parameter = "start_parameter"
     web_app = WebAppInfo(url="https://python-telegram-bot.org")
 
 
-class TestInlineQueryResultsButtonWithoutRequest(TestInlineQueryResultsButtonBase):
+class TestInlineQueryResultsButtonWithoutRequest(InlineQueryResultsButtonTestBase):
     def test_slot_behaviour(self, inline_query_results_button):
         inst = inline_query_results_button
         for attr in inst.__slots__:

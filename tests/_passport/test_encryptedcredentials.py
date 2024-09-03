@@ -26,19 +26,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def encrypted_credentials():
     return EncryptedCredentials(
-        TestEncryptedCredentialsBase.data,
-        TestEncryptedCredentialsBase.hash,
-        TestEncryptedCredentialsBase.secret,
+        EncryptedCredentialsTestBase.data,
+        EncryptedCredentialsTestBase.hash,
+        EncryptedCredentialsTestBase.secret,
     )
 
 
-class TestEncryptedCredentialsBase:
+class EncryptedCredentialsTestBase:
     data = "data"
     hash = "hash"
     secret = "secret"
 
 
-class TestEncryptedCredentialsWithoutRequest(TestEncryptedCredentialsBase):
+class TestEncryptedCredentialsWithoutRequest(EncryptedCredentialsTestBase):
     def test_slot_behaviour(self, encrypted_credentials):
         inst = encrypted_credentials
         for attr in inst.__slots__:

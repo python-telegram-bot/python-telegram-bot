@@ -51,7 +51,7 @@ async def animation(bot, chat_id):
         ).animation
 
 
-class TestAnimationBase:
+class AnimationTestBase:
     animation_file_id = "CgADAQADngIAAuyVeEez0xRovKi9VAI"
     animation_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     width = 320
@@ -66,7 +66,7 @@ class TestAnimationBase:
     caption = "Test *animation*"
 
 
-class TestAnimationWithoutRequest(TestAnimationBase):
+class TestAnimationWithoutRequest(AnimationTestBase):
     def test_slot_behaviour(self, animation):
         for attr in animation.__slots__:
             assert getattr(animation, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -219,7 +219,7 @@ class TestAnimationWithoutRequest(TestAnimationBase):
         )
 
 
-class TestAnimationWithRequest(TestAnimationBase):
+class TestAnimationWithRequest(AnimationTestBase):
     async def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
         message = await bot.send_animation(
             chat_id,

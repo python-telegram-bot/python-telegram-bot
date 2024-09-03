@@ -25,15 +25,15 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def chat_location():
-    return ChatLocation(TestChatLocationBase.location, TestChatLocationBase.address)
+    return ChatLocation(ChatLocationTestBase.location, ChatLocationTestBase.address)
 
 
-class TestChatLocationBase:
+class ChatLocationTestBase:
     location = Location(123, 456)
     address = "The Shire"
 
 
-class TestChatLocationWithoutRequest(TestChatLocationBase):
+class TestChatLocationWithoutRequest(ChatLocationTestBase):
     def test_slot_behaviour(self, chat_location):
         inst = chat_location
         for attr in inst.__slots__:

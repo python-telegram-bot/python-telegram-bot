@@ -31,23 +31,23 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_location():
     return InlineQueryResultLocation(
-        TestInlineQueryResultLocationBase.id_,
-        TestInlineQueryResultLocationBase.latitude,
-        TestInlineQueryResultLocationBase.longitude,
-        TestInlineQueryResultLocationBase.title,
-        live_period=TestInlineQueryResultLocationBase.live_period,
-        thumbnail_url=TestInlineQueryResultLocationBase.thumbnail_url,
-        thumbnail_width=TestInlineQueryResultLocationBase.thumbnail_width,
-        thumbnail_height=TestInlineQueryResultLocationBase.thumbnail_height,
-        input_message_content=TestInlineQueryResultLocationBase.input_message_content,
-        reply_markup=TestInlineQueryResultLocationBase.reply_markup,
-        horizontal_accuracy=TestInlineQueryResultLocationBase.horizontal_accuracy,
-        heading=TestInlineQueryResultLocationBase.heading,
-        proximity_alert_radius=TestInlineQueryResultLocationBase.proximity_alert_radius,
+        InlineQueryResultLocationTestBase.id_,
+        InlineQueryResultLocationTestBase.latitude,
+        InlineQueryResultLocationTestBase.longitude,
+        InlineQueryResultLocationTestBase.title,
+        live_period=InlineQueryResultLocationTestBase.live_period,
+        thumbnail_url=InlineQueryResultLocationTestBase.thumbnail_url,
+        thumbnail_width=InlineQueryResultLocationTestBase.thumbnail_width,
+        thumbnail_height=InlineQueryResultLocationTestBase.thumbnail_height,
+        input_message_content=InlineQueryResultLocationTestBase.input_message_content,
+        reply_markup=InlineQueryResultLocationTestBase.reply_markup,
+        horizontal_accuracy=InlineQueryResultLocationTestBase.horizontal_accuracy,
+        heading=InlineQueryResultLocationTestBase.heading,
+        proximity_alert_radius=InlineQueryResultLocationTestBase.proximity_alert_radius,
     )
 
 
-class TestInlineQueryResultLocationBase:
+class InlineQueryResultLocationTestBase:
     id_ = "id"
     type_ = "location"
     latitude = 0.0
@@ -64,7 +64,7 @@ class TestInlineQueryResultLocationBase:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultLocationWithoutRequest(TestInlineQueryResultLocationBase):
+class TestInlineQueryResultLocationWithoutRequest(InlineQueryResultLocationTestBase):
     def test_slot_behaviour(self, inline_query_result_location):
         inst = inline_query_result_location
         for attr in inst.__slots__:

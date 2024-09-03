@@ -25,15 +25,15 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def link_preview_options():
     return LinkPreviewOptions(
-        is_disabled=TestLinkPreviewOptionsBase.is_disabled,
-        url=TestLinkPreviewOptionsBase.url,
-        prefer_small_media=TestLinkPreviewOptionsBase.prefer_small_media,
-        prefer_large_media=TestLinkPreviewOptionsBase.prefer_large_media,
-        show_above_text=TestLinkPreviewOptionsBase.show_above_text,
+        is_disabled=LinkPreviewOptionsTestBase.is_disabled,
+        url=LinkPreviewOptionsTestBase.url,
+        prefer_small_media=LinkPreviewOptionsTestBase.prefer_small_media,
+        prefer_large_media=LinkPreviewOptionsTestBase.prefer_large_media,
+        show_above_text=LinkPreviewOptionsTestBase.show_above_text,
     )
 
 
-class TestLinkPreviewOptionsBase:
+class LinkPreviewOptionsTestBase:
     is_disabled = True
     url = "https://www.example.com"
     prefer_small_media = True
@@ -41,7 +41,7 @@ class TestLinkPreviewOptionsBase:
     show_above_text = True
 
 
-class TestLinkPreviewOptionsWithoutRequest(TestLinkPreviewOptionsBase):
+class TestLinkPreviewOptionsWithoutRequest(LinkPreviewOptionsTestBase):
     def test_slot_behaviour(self, link_preview_options):
         a = link_preview_options
         for attr in a.__slots__:

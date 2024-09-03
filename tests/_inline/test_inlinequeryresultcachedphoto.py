@@ -32,20 +32,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_photo():
     return InlineQueryResultCachedPhoto(
-        TestInlineQueryResultCachedPhotoBase.id_,
-        TestInlineQueryResultCachedPhotoBase.photo_file_id,
-        title=TestInlineQueryResultCachedPhotoBase.title,
-        description=TestInlineQueryResultCachedPhotoBase.description,
-        caption=TestInlineQueryResultCachedPhotoBase.caption,
-        parse_mode=TestInlineQueryResultCachedPhotoBase.parse_mode,
-        caption_entities=TestInlineQueryResultCachedPhotoBase.caption_entities,
-        input_message_content=TestInlineQueryResultCachedPhotoBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedPhotoBase.reply_markup,
-        show_caption_above_media=TestInlineQueryResultCachedPhotoBase.show_caption_above_media,
+        InlineQueryResultCachedPhotoTestBase.id_,
+        InlineQueryResultCachedPhotoTestBase.photo_file_id,
+        title=InlineQueryResultCachedPhotoTestBase.title,
+        description=InlineQueryResultCachedPhotoTestBase.description,
+        caption=InlineQueryResultCachedPhotoTestBase.caption,
+        parse_mode=InlineQueryResultCachedPhotoTestBase.parse_mode,
+        caption_entities=InlineQueryResultCachedPhotoTestBase.caption_entities,
+        input_message_content=InlineQueryResultCachedPhotoTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedPhotoTestBase.reply_markup,
+        show_caption_above_media=InlineQueryResultCachedPhotoTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultCachedPhotoBase:
+class InlineQueryResultCachedPhotoTestBase:
     id_ = "id"
     type_ = "photo"
     photo_file_id = "photo file id"
@@ -59,7 +59,7 @@ class TestInlineQueryResultCachedPhotoBase:
     show_caption_above_media = True
 
 
-class TestInlineQueryResultCachedPhotoWithoutRequest(TestInlineQueryResultCachedPhotoBase):
+class TestInlineQueryResultCachedPhotoWithoutRequest(InlineQueryResultCachedPhotoTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_photo):
         inst = inline_query_result_cached_photo
         for attr in inst.__slots__:

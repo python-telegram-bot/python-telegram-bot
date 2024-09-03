@@ -25,21 +25,21 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def order_info():
     return OrderInfo(
-        TestOrderInfoBase.name,
-        TestOrderInfoBase.phone_number,
-        TestOrderInfoBase.email,
-        TestOrderInfoBase.shipping_address,
+        OrderInfoTestBase.name,
+        OrderInfoTestBase.phone_number,
+        OrderInfoTestBase.email,
+        OrderInfoTestBase.shipping_address,
     )
 
 
-class TestOrderInfoBase:
+class OrderInfoTestBase:
     name = "name"
     phone_number = "phone_number"
     email = "email"
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
 
-class TestOrderInfoWithoutRequest(TestOrderInfoBase):
+class TestOrderInfoWithoutRequest(OrderInfoTestBase):
     def test_slot_behaviour(self, order_info):
         for attr in order_info.__slots__:
             assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -25,15 +25,15 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def web_app_data():
-    return WebAppData(data=TestWebAppDataBase.data, button_text=TestWebAppDataBase.button_text)
+    return WebAppData(data=WebAppDataTestBase.data, button_text=WebAppDataTestBase.button_text)
 
 
-class TestWebAppDataBase:
+class WebAppDataTestBase:
     data = "data"
     button_text = "button_text"
 
 
-class TestWebAppDataWithoutRequest(TestWebAppDataBase):
+class TestWebAppDataWithoutRequest(WebAppDataTestBase):
     def test_slot_behaviour(self, web_app_data):
         for attr in web_app_data.__slots__:
             assert getattr(web_app_data, attr, "err") != "err", f"got extra slot '{attr}'"

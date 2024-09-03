@@ -34,20 +34,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_article():
     return InlineQueryResultArticle(
-        TestInlineQueryResultArticleBase.id_,
-        TestInlineQueryResultArticleBase.title,
-        input_message_content=TestInlineQueryResultArticleBase.input_message_content,
-        reply_markup=TestInlineQueryResultArticleBase.reply_markup,
-        url=TestInlineQueryResultArticleBase.url,
-        hide_url=TestInlineQueryResultArticleBase.hide_url,
-        description=TestInlineQueryResultArticleBase.description,
-        thumbnail_url=TestInlineQueryResultArticleBase.thumbnail_url,
-        thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
-        thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
+        InlineQueryResultArticleTestBase.id_,
+        InlineQueryResultArticleTestBase.title,
+        input_message_content=InlineQueryResultArticleTestBase.input_message_content,
+        reply_markup=InlineQueryResultArticleTestBase.reply_markup,
+        url=InlineQueryResultArticleTestBase.url,
+        hide_url=InlineQueryResultArticleTestBase.hide_url,
+        description=InlineQueryResultArticleTestBase.description,
+        thumbnail_url=InlineQueryResultArticleTestBase.thumbnail_url,
+        thumbnail_height=InlineQueryResultArticleTestBase.thumbnail_height,
+        thumbnail_width=InlineQueryResultArticleTestBase.thumbnail_width,
     )
 
 
-class TestInlineQueryResultArticleBase:
+class InlineQueryResultArticleTestBase:
     id_ = "id"
     type_ = "article"
     title = "title"
@@ -61,7 +61,7 @@ class TestInlineQueryResultArticleBase:
     thumbnail_width = 15
 
 
-class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBase):
+class TestInlineQueryResultArticleWithoutRequest(InlineQueryResultArticleTestBase):
     def test_slot_behaviour(self, inline_query_result_article):
         inst = inline_query_result_article
         for attr in inst.__slots__:

@@ -31,16 +31,16 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def location():
     return Location(
-        latitude=TestLocationBase.latitude,
-        longitude=TestLocationBase.longitude,
-        horizontal_accuracy=TestLocationBase.horizontal_accuracy,
-        live_period=TestLocationBase.live_period,
-        heading=TestLocationBase.live_period,
-        proximity_alert_radius=TestLocationBase.proximity_alert_radius,
+        latitude=LocationTestBase.latitude,
+        longitude=LocationTestBase.longitude,
+        horizontal_accuracy=LocationTestBase.horizontal_accuracy,
+        live_period=LocationTestBase.live_period,
+        heading=LocationTestBase.live_period,
+        proximity_alert_radius=LocationTestBase.proximity_alert_radius,
     )
 
 
-class TestLocationBase:
+class LocationTestBase:
     latitude = -23.691288
     longitude = -46.788279
     horizontal_accuracy = 999
@@ -49,7 +49,7 @@ class TestLocationBase:
     proximity_alert_radius = 50
 
 
-class TestLocationWithoutRequest(TestLocationBase):
+class TestLocationWithoutRequest(LocationTestBase):
     def test_slot_behaviour(self, location):
         for attr in location.__slots__:
             assert getattr(location, attr, "err") != "err", f"got extra slot '{attr}'"

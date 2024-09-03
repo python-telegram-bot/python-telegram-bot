@@ -28,15 +28,15 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def input_poll_option():
     out = InputPollOption(
-        text=TestInputPollOptionBase.text,
-        text_parse_mode=TestInputPollOptionBase.text_parse_mode,
-        text_entities=TestInputPollOptionBase.text_entities,
+        text=InputPollOptionTestBase.text,
+        text_parse_mode=InputPollOptionTestBase.text_parse_mode,
+        text_entities=InputPollOptionTestBase.text_entities,
     )
     out._unfreeze()
     return out
 
 
-class TestInputPollOptionBase:
+class InputPollOptionTestBase:
     text = "test option"
     text_parse_mode = "MarkdownV2"
     text_entities = [
@@ -45,7 +45,7 @@ class TestInputPollOptionBase:
     ]
 
 
-class TestInputPollOptionWithoutRequest(TestInputPollOptionBase):
+class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
     def test_slot_behaviour(self, input_poll_option):
         for attr in input_poll_option.__slots__:
             assert getattr(input_poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -106,15 +106,15 @@ class TestInputPollOptionWithoutRequest(TestInputPollOptionBase):
 @pytest.fixture(scope="module")
 def poll_option():
     out = PollOption(
-        text=TestPollOptionBase.text,
-        voter_count=TestPollOptionBase.voter_count,
-        text_entities=TestPollOptionBase.text_entities,
+        text=PollOptionTestBase.text,
+        voter_count=PollOptionTestBase.voter_count,
+        text_entities=PollOptionTestBase.text_entities,
     )
     out._unfreeze()
     return out
 
 
-class TestPollOptionBase:
+class PollOptionTestBase:
     text = "test option"
     voter_count = 3
     text_entities = [
@@ -123,7 +123,7 @@ class TestPollOptionBase:
     ]
 
 
-class TestPollOptionWithoutRequest(TestPollOptionBase):
+class TestPollOptionWithoutRequest(PollOptionTestBase):
     def test_slot_behaviour(self, poll_option):
         for attr in poll_option.__slots__:
             assert getattr(poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -198,21 +198,21 @@ class TestPollOptionWithoutRequest(TestPollOptionBase):
 @pytest.fixture(scope="module")
 def poll_answer():
     return PollAnswer(
-        TestPollAnswerBase.poll_id,
-        TestPollAnswerBase.option_ids,
-        TestPollAnswerBase.user,
-        TestPollAnswerBase.voter_chat,
+        PollAnswerTestBase.poll_id,
+        PollAnswerTestBase.option_ids,
+        PollAnswerTestBase.user,
+        PollAnswerTestBase.voter_chat,
     )
 
 
-class TestPollAnswerBase:
+class PollAnswerTestBase:
     poll_id = "id"
     option_ids = [2]
     user = User(1, "", False)
     voter_chat = Chat(1, "")
 
 
-class TestPollAnswerWithoutRequest(TestPollAnswerBase):
+class TestPollAnswerWithoutRequest(PollAnswerTestBase):
     def test_de_json(self):
         json_dict = {
             "poll_id": self.poll_id,
@@ -264,25 +264,25 @@ class TestPollAnswerWithoutRequest(TestPollAnswerBase):
 @pytest.fixture(scope="module")
 def poll():
     poll = Poll(
-        TestPollBase.id_,
-        TestPollBase.question,
-        TestPollBase.options,
-        TestPollBase.total_voter_count,
-        TestPollBase.is_closed,
-        TestPollBase.is_anonymous,
-        TestPollBase.type,
-        TestPollBase.allows_multiple_answers,
-        explanation=TestPollBase.explanation,
-        explanation_entities=TestPollBase.explanation_entities,
-        open_period=TestPollBase.open_period,
-        close_date=TestPollBase.close_date,
-        question_entities=TestPollBase.question_entities,
+        PollTestBase.id_,
+        PollTestBase.question,
+        PollTestBase.options,
+        PollTestBase.total_voter_count,
+        PollTestBase.is_closed,
+        PollTestBase.is_anonymous,
+        PollTestBase.type,
+        PollTestBase.allows_multiple_answers,
+        explanation=PollTestBase.explanation,
+        explanation_entities=PollTestBase.explanation_entities,
+        open_period=PollTestBase.open_period,
+        close_date=PollTestBase.close_date,
+        question_entities=PollTestBase.question_entities,
     )
     poll._unfreeze()
     return poll
 
 
-class TestPollBase:
+class PollTestBase:
     id_ = "id"
     question = "Test Question?"
     options = [PollOption("test", 10), PollOption("test2", 11)]
@@ -304,7 +304,7 @@ class TestPollBase:
     ]
 
 
-class TestPollWithoutRequest(TestPollBase):
+class TestPollWithoutRequest(PollTestBase):
     def test_de_json(self, bot):
         json_dict = {
             "id": self.id_,

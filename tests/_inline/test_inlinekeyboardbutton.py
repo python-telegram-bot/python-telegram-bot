@@ -32,24 +32,24 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_keyboard_button():
     return InlineKeyboardButton(
-        TestInlineKeyboardButtonBase.text,
-        url=TestInlineKeyboardButtonBase.url,
-        callback_data=TestInlineKeyboardButtonBase.callback_data,
-        switch_inline_query=TestInlineKeyboardButtonBase.switch_inline_query,
+        InlineKeyboardButtonTestBase.text,
+        url=InlineKeyboardButtonTestBase.url,
+        callback_data=InlineKeyboardButtonTestBase.callback_data,
+        switch_inline_query=InlineKeyboardButtonTestBase.switch_inline_query,
         switch_inline_query_current_chat=(
-            TestInlineKeyboardButtonBase.switch_inline_query_current_chat
+            InlineKeyboardButtonTestBase.switch_inline_query_current_chat
         ),
-        callback_game=TestInlineKeyboardButtonBase.callback_game,
-        pay=TestInlineKeyboardButtonBase.pay,
-        login_url=TestInlineKeyboardButtonBase.login_url,
-        web_app=TestInlineKeyboardButtonBase.web_app,
+        callback_game=InlineKeyboardButtonTestBase.callback_game,
+        pay=InlineKeyboardButtonTestBase.pay,
+        login_url=InlineKeyboardButtonTestBase.login_url,
+        web_app=InlineKeyboardButtonTestBase.web_app,
         switch_inline_query_chosen_chat=(
-            TestInlineKeyboardButtonBase.switch_inline_query_chosen_chat
+            InlineKeyboardButtonTestBase.switch_inline_query_chosen_chat
         ),
     )
 
 
-class TestInlineKeyboardButtonBase:
+class InlineKeyboardButtonTestBase:
     text = "text"
     url = "url"
     callback_data = "callback data"
@@ -62,7 +62,7 @@ class TestInlineKeyboardButtonBase:
     switch_inline_query_chosen_chat = SwitchInlineQueryChosenChat("a_bot", True, False, True, True)
 
 
-class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
+class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
     def test_slot_behaviour(self, inline_keyboard_button):
         inst = inline_keyboard_button
         for attr in inst.__slots__:

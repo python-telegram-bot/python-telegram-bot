@@ -96,33 +96,33 @@ def paid_media(pm_scope_class_and_type):
     return pm_scope_class_and_type[0].de_json(
         {
             "type": pm_scope_class_and_type[1],
-            "width": TestPaidMediaBase.width,
-            "height": TestPaidMediaBase.height,
-            "duration": TestPaidMediaBase.duration,
-            "video": TestPaidMediaBase.video.to_dict(),
-            "photo": [p.to_dict() for p in TestPaidMediaBase.photo],
+            "width": PaidMediaTestBase.width,
+            "height": PaidMediaTestBase.height,
+            "duration": PaidMediaTestBase.duration,
+            "video": PaidMediaTestBase.video.to_dict(),
+            "photo": [p.to_dict() for p in PaidMediaTestBase.photo],
         },
         bot=None,
     )
 
 
 def paid_media_video():
-    return PaidMediaVideo(video=TestPaidMediaBase.video)
+    return PaidMediaVideo(video=PaidMediaTestBase.video)
 
 
 def paid_media_photo():
-    return PaidMediaPhoto(photo=TestPaidMediaBase.photo)
+    return PaidMediaPhoto(photo=PaidMediaTestBase.photo)
 
 
 @pytest.fixture(scope="module")
 def paid_media_info():
     return PaidMediaInfo(
-        star_count=TestPaidMediaInfoBase.star_count,
+        star_count=PaidMediaInfoTestBase.star_count,
         paid_media=[paid_media_video(), paid_media_photo()],
     )
 
 
-class TestPaidMediaBase:
+class PaidMediaTestBase:
     width = 640
     height = 480
     duration = 60
@@ -143,7 +143,7 @@ class TestPaidMediaBase:
     )
 
 
-class TestPaidMediaWithoutRequest(TestPaidMediaBase):
+class TestPaidMediaWithoutRequest(PaidMediaTestBase):
     def test_slot_behaviour(self, paid_media):
         inst = paid_media
         for attr in inst.__slots__:
@@ -280,12 +280,12 @@ class TestPaidMediaWithoutRequest(TestPaidMediaBase):
             assert hash(c) != hash(f)
 
 
-class TestPaidMediaInfoBase:
+class PaidMediaInfoTestBase:
     star_count = 200
     paid_media = [paid_media_video(), paid_media_photo()]
 
 
-class TestPaidMediaInfoWithoutRequest(TestPaidMediaInfoBase):
+class TestPaidMediaInfoWithoutRequest(PaidMediaInfoTestBase):
     def test_slot_behaviour(self, paid_media_info):
         inst = paid_media_info
         for attr in inst.__slots__:

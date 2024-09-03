@@ -32,19 +32,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_gif():
     return InlineQueryResultCachedGif(
-        TestInlineQueryResultCachedGifBase.id_,
-        TestInlineQueryResultCachedGifBase.gif_file_id,
-        title=TestInlineQueryResultCachedGifBase.title,
-        caption=TestInlineQueryResultCachedGifBase.caption,
-        parse_mode=TestInlineQueryResultCachedGifBase.parse_mode,
-        caption_entities=TestInlineQueryResultCachedGifBase.caption_entities,
-        input_message_content=TestInlineQueryResultCachedGifBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedGifBase.reply_markup,
-        show_caption_above_media=TestInlineQueryResultCachedGifBase.show_caption_above_media,
+        InlineQueryResultCachedGifTestBase.id_,
+        InlineQueryResultCachedGifTestBase.gif_file_id,
+        title=InlineQueryResultCachedGifTestBase.title,
+        caption=InlineQueryResultCachedGifTestBase.caption,
+        parse_mode=InlineQueryResultCachedGifTestBase.parse_mode,
+        caption_entities=InlineQueryResultCachedGifTestBase.caption_entities,
+        input_message_content=InlineQueryResultCachedGifTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedGifTestBase.reply_markup,
+        show_caption_above_media=InlineQueryResultCachedGifTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultCachedGifBase:
+class InlineQueryResultCachedGifTestBase:
     id_ = "id"
     type_ = "gif"
     gif_file_id = "gif file id"
@@ -57,7 +57,7 @@ class TestInlineQueryResultCachedGifBase:
     show_caption_above_media = True
 
 
-class TestInlineQueryResultCachedGifWithoutRequest(TestInlineQueryResultCachedGifBase):
+class TestInlineQueryResultCachedGifWithoutRequest(InlineQueryResultCachedGifTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_gif):
         inst = inline_query_result_cached_gif
         for attr in inst.__slots__:
