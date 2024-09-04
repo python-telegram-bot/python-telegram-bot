@@ -60,10 +60,19 @@ class NonchalantHttpxRequest(HTTPXRequest):
             pytest.xfail(f"Ignoring TimedOut error: {e}")
 
 
-class OfflineHTTPXRequest(HTTPXRequest):
+class OfflineRequest(BaseRequest):
     """This Request class disallows making requests to Telegram's servers.
     Use this in tests that should not depend on the network.
     """
+
+    async def initialize(self) -> None:
+        pass
+
+    async def shutdown(self) -> None:
+        pass
+
+    def __init__(self, *args, **kwargs):
+        pass
 
     async def do_request(
         self,
@@ -75,7 +84,7 @@ class OfflineHTTPXRequest(HTTPXRequest):
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
     ) -> Tuple[int, bytes]:
-        raise RuntimeError("OfflineHTTPXRequest: Network access disallowed")
+        raise RuntimeError("OfflineRequest: Network access disallowed")
 
 
 async def expect_bad_request(func, message, reason):

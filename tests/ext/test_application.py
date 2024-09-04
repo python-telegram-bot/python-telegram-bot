@@ -432,7 +432,7 @@ class TestApplication:
 
     @pytest.mark.parametrize("job_queue", [True, False])
     @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
-    async def test_start_stop_processing_updates(self, one_time_bot, job_queue):
+    async def test_start_stop_processing_updates(self, one_time_bot, job_queue, monkeypatch):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
         if job_queue:
             app = ApplicationBuilder().bot(one_time_bot).build()
@@ -441,6 +441,16 @@ class TestApplication:
 
         async def callback(u, c):
             self.received = u
+
+        async def get_updates(*args, **kwargs):
+            await asyncio.sleep(0)
+            return []
+
+        async def delete_webhook(*args, **kwargs):
+            return True
+
+        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
 
         assert not app.running
         assert not app.updater.running
@@ -473,6 +483,8 @@ class TestApplication:
                 await app.updater.start_polling()
             except TelegramError:
                 pytest.xfail("start_polling timed out")
+            except BaseException as e:
+                pytest.fail(f"Unexpected exception: {e}")
             else:
                 await app.stop()
             assert not app.running
@@ -2161,6 +2173,11 @@ class TestApplication:
             .build()
         )
 
+        async def delete_webhook(*args, **kwargs):
+            return True
+
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+
         app.run_polling(close_loop=False)
 
         # This checks two things:
@@ -2221,6 +2238,9 @@ class TestApplication:
             await asyncio.sleep(0)
             return []
 
+        async def delete_webhook(*args, **kwargs):
+            return True
+
         for cls, method, entry in [
             (Application, "initialize", "app_initialize"),
             (Application, "start", "app_start"),
@@ -2250,6 +2270,7 @@ class TestApplication:
             .build()
         )
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
 
         app.add_handler(TypeHandler(object, update_logger_callback), group=-10)
         app.add_handler(TypeHandler(object, handler_callback))
@@ -2312,6 +2333,9 @@ class TestApplication:
 
             return _after_shutdown
 
+        async def delete_webhook(*args, **kwargs):
+            return True
+
         monkeypatch.setattr(Application, method, raise_method)
         monkeypatch.setattr(
             Application,
@@ -2322,6 +2346,8 @@ class TestApplication:
             Updater, "shutdown", call_after(Updater.shutdown, after_shutdown("updater"))
         )
         app = ApplicationBuilder().bot(one_time_bot).build()
+
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
         with pytest.raises(RuntimeError, match="Test Exception"):
             app.run_polling(close_loop=False)
 

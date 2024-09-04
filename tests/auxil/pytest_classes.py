@@ -25,7 +25,7 @@ from telegram.ext import Application, ExtBot, Updater
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
-from tests.auxil.networking import NonchalantHttpxRequest, OfflineHTTPXRequest
+from tests.auxil.networking import NonchalantHttpxRequest, OfflineRequest
 
 
 def _get_bot_user(token: str) -> User:
@@ -101,7 +101,7 @@ def make_bot(bot_info=None, offline: bool = False, **kwargs):
     private_key = kwargs.pop("private_key", PRIVATE_KEY)
     kwargs.pop("token", None)
 
-    request_class = OfflineHTTPXRequest if offline else NonchalantHttpxRequest
+    request_class = OfflineRequest if offline else NonchalantHttpxRequest
 
     return PytestExtBot(
         token=token,

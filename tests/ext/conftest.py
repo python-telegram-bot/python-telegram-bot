@@ -6,7 +6,7 @@ from telegram.ext import ApplicationBuilder, Updater
 from telegram.ext.filters import MessageFilter, UpdateFilter
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
-from tests.auxil.networking import OfflineHTTPXRequest
+from tests.auxil.networking import OfflineRequest
 from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
 
 # This module overrides the bot fixtures defined in the global conftest.py to use the offline bot.
@@ -63,8 +63,8 @@ async def raw_bot(bot_info):
     async with PytestBot(
         bot_info["token"],
         private_key=PRIVATE_KEY if TEST_WITH_OPT_DEPS else None,
-        request=OfflineHTTPXRequest(8),
-        get_updates_request=OfflineHTTPXRequest(1),
+        request=OfflineRequest(),
+        get_updates_request=OfflineRequest(),
     ) as _bot:
         yield _bot
 
@@ -75,8 +75,8 @@ async def on_time_raw_bot(bot_info):
     return PytestBot(
         bot_info["token"],
         private_key=PRIVATE_KEY if TEST_WITH_OPT_DEPS else None,
-        request=OfflineHTTPXRequest(8),
-        get_updates_request=OfflineHTTPXRequest(1),
+        request=OfflineRequest(),
+        get_updates_request=OfflineRequest(),
     )
 
 
