@@ -711,14 +711,14 @@ class TestUpdater:
         unix,
         file_path,
         one_time_bot,
-        on_time_raw_bot,
+        one_time_raw_bot,
     ):
         # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
             updater.bot = one_time_bot
         if not ext_bot and type(updater.bot) is not Bot:
-            updater.bot = on_time_raw_bot
+            updater.bot = one_time_raw_bot
 
         async def delete_webhook(*args, **kwargs):
             # Dropping pending updates is done by passing the parameter to delete_webhook

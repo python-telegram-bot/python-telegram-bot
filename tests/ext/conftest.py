@@ -70,7 +70,7 @@ async def raw_bot(bot_info):
 
 
 @pytest.fixture
-async def on_time_raw_bot(bot_info):
+async def one_time_raw_bot(bot_info):
     """Makes an regular Bot instance with the given bot_info"""
     return PytestBot(
         bot_info["token"],
