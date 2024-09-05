@@ -92,6 +92,7 @@ telegram.jpg
 
 # virtual env
 venv*
+*env/
 
 # environment manager:
 .mise.toml
