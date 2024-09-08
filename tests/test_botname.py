@@ -24,14 +24,14 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def bot_name(bot):
-    return BotName(TestBotNameBase.name)
+    return BotName(BotNameTestBase.name)
 
 
-class TestBotNameBase:
+class BotNameTestBase:
     name = "This is a test name"
 
 
-class TestBotNameWithoutRequest(TestBotNameBase):
+class TestBotNameWithoutRequest(BotNameTestBase):
     def test_slot_behaviour(self, bot_name):
         for attr in bot_name.__slots__:
             assert getattr(bot_name, attr, "err") != "err", f"got extra slot '{attr}'"

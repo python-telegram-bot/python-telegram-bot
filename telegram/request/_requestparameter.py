@@ -79,7 +79,7 @@ class RequestParameter:
     def multipart_data(self) -> Optional[UploadFileDict]:
         """A dict with the file data to upload, if any.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.5
             Content may now be a file handle.
         """
         if not self.input_files:

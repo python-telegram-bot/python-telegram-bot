@@ -26,32 +26,32 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def input_invoice_message_content():
     return InputInvoiceMessageContent(
-        title=TestInputInvoiceMessageContentBase.title,
-        description=TestInputInvoiceMessageContentBase.description,
-        payload=TestInputInvoiceMessageContentBase.payload,
-        provider_token=TestInputInvoiceMessageContentBase.provider_token,
-        currency=TestInputInvoiceMessageContentBase.currency,
-        prices=TestInputInvoiceMessageContentBase.prices,
-        max_tip_amount=TestInputInvoiceMessageContentBase.max_tip_amount,
-        suggested_tip_amounts=TestInputInvoiceMessageContentBase.suggested_tip_amounts,
-        provider_data=TestInputInvoiceMessageContentBase.provider_data,
-        photo_url=TestInputInvoiceMessageContentBase.photo_url,
-        photo_size=TestInputInvoiceMessageContentBase.photo_size,
-        photo_width=TestInputInvoiceMessageContentBase.photo_width,
-        photo_height=TestInputInvoiceMessageContentBase.photo_height,
-        need_name=TestInputInvoiceMessageContentBase.need_name,
-        need_phone_number=TestInputInvoiceMessageContentBase.need_phone_number,
-        need_email=TestInputInvoiceMessageContentBase.need_email,
-        need_shipping_address=TestInputInvoiceMessageContentBase.need_shipping_address,
+        title=InputInvoiceMessageContentTestBase.title,
+        description=InputInvoiceMessageContentTestBase.description,
+        payload=InputInvoiceMessageContentTestBase.payload,
+        provider_token=InputInvoiceMessageContentTestBase.provider_token,
+        currency=InputInvoiceMessageContentTestBase.currency,
+        prices=InputInvoiceMessageContentTestBase.prices,
+        max_tip_amount=InputInvoiceMessageContentTestBase.max_tip_amount,
+        suggested_tip_amounts=InputInvoiceMessageContentTestBase.suggested_tip_amounts,
+        provider_data=InputInvoiceMessageContentTestBase.provider_data,
+        photo_url=InputInvoiceMessageContentTestBase.photo_url,
+        photo_size=InputInvoiceMessageContentTestBase.photo_size,
+        photo_width=InputInvoiceMessageContentTestBase.photo_width,
+        photo_height=InputInvoiceMessageContentTestBase.photo_height,
+        need_name=InputInvoiceMessageContentTestBase.need_name,
+        need_phone_number=InputInvoiceMessageContentTestBase.need_phone_number,
+        need_email=InputInvoiceMessageContentTestBase.need_email,
+        need_shipping_address=InputInvoiceMessageContentTestBase.need_shipping_address,
         send_phone_number_to_provider=(
-            TestInputInvoiceMessageContentBase.send_phone_number_to_provider
+            InputInvoiceMessageContentTestBase.send_phone_number_to_provider
         ),
-        send_email_to_provider=TestInputInvoiceMessageContentBase.send_email_to_provider,
-        is_flexible=TestInputInvoiceMessageContentBase.is_flexible,
+        send_email_to_provider=InputInvoiceMessageContentTestBase.send_email_to_provider,
+        is_flexible=InputInvoiceMessageContentTestBase.is_flexible,
     )
 
 
-class TestInputInvoiceMessageContentBase:
+class InputInvoiceMessageContentTestBase:
     title = "invoice title"
     description = "invoice description"
     payload = "invoice payload"
@@ -74,7 +74,7 @@ class TestInputInvoiceMessageContentBase:
     is_flexible = True
 
 
-class TestInputInvoiceMessageContentWithoutRequest(TestInputInvoiceMessageContentBase):
+class TestInputInvoiceMessageContentWithoutRequest(InputInvoiceMessageContentTestBase):
     def test_slot_behaviour(self, input_invoice_message_content):
         inst = input_invoice_message_content
         for attr in inst.__slots__:

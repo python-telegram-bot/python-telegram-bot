@@ -25,21 +25,21 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def login_url():
     return LoginUrl(
-        url=TestLoginUrlBase.url,
-        forward_text=TestLoginUrlBase.forward_text,
-        bot_username=TestLoginUrlBase.bot_username,
-        request_write_access=TestLoginUrlBase.request_write_access,
+        url=LoginUrlTestBase.url,
+        forward_text=LoginUrlTestBase.forward_text,
+        bot_username=LoginUrlTestBase.bot_username,
+        request_write_access=LoginUrlTestBase.request_write_access,
     )
 
 
-class TestLoginUrlBase:
+class LoginUrlTestBase:
     url = "http://www.google.com"
     forward_text = "Send me forward!"
     bot_username = "botname"
     request_write_access = True
 
 
-class TestLoginUrlWithoutRequest(TestLoginUrlBase):
+class TestLoginUrlWithoutRequest(LoginUrlTestBase):
     def test_slot_behaviour(self, login_url):
         for attr in login_url.__slots__:
             assert getattr(login_url, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -280,15 +280,14 @@ class Message(MaybeInaccessibleMessage):
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`, optional): Sender of the message; empty for messages
-            sent to channels. For backward compatibility, this will contain a fake sender user in
-            non-channel chats, if the message was sent on behalf of a chat.
-        sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
-            chat. For example, the channel itself for channel posts, the supergroup itself for
-            messages from anonymous group administrators, the linked channel for messages
-            automatically forwarded to the discussion group. For backward compatibility,
-            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
-            sent on behalf of a chat.
+        from_user (:class:`telegram.User`, optional): Sender of the message; may be empty for
+            messages sent to channels. For backward compatibility, if the message was sent on
+            behalf of a chat, the field contains a fake sender user in non-channel chats.
+        sender_chat (:class:`telegram.Chat`, optional): Sender of the message when sent on behalf
+            of a chat. For example, the supergroup itself for messages sent by its anonymous
+            administrators or a linked channel for messages automatically forwarded to the
+            channel's discussion group. For backward compatibility, if the message was sent on
+            behalf of a chat, the field from contains a fake sender user in non-channel chats.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
@@ -570,36 +569,35 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
-        sender_business_bot (:obj:`telegram.User`, optional): The bot that actually sent the
+        sender_business_bot (:class:`telegram.User`, optional): The bot that actually sent the
             message on behalf of the business account. Available only for outgoing messages sent
             on behalf of the connected business account.
 
             .. versionadded:: 21.1
 
-        chat_background_set  (:obj:`telegram.ChatBackground`, optional): Service message: chat
+        chat_background_set  (:class:`telegram.ChatBackground`, optional): Service message: chat
             background set.
 
             .. versionadded:: 21.2
-        paid_media (:obj:`telegram.PaidMediaInfo`, optional): Message contains paid media;
+        paid_media (:class:`telegram.PaidMediaInfo`, optional): Message contains paid media;
             information about the paid media.
 
             .. versionadded:: 21.4
-        refunded_payment (:obj:`telegram.RefundedPayment`, optional): Message is a service message
-            about a refunded payment, information about the payment.
+        refunded_payment (:class:`telegram.RefundedPayment`, optional): Message is a service
+            message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
-            sent to channels. For backward compatibility, this will contain a fake sender user in
-            non-channel chats, if the message was sent on behalf of a chat.
-        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
-            chat. For example, the channel itself for channel posts, the supergroup itself for
-            messages from anonymous group administrators, the linked channel for messages
-            automatically forwarded to the discussion group. For backward compatibility,
-            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
-            sent on behalf of a chat.
+        from_user (:class:`telegram.User`): Optional. Sender of the message; may be empty for
+            messages sent to channels. For backward compatibility, if the message was sent on
+            behalf of a chat, the field contains a fake sender user in non-channel chats.
+        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message when sent on behalf
+            of a chat. For example, the supergroup itself for messages sent by its anonymous
+            administrators or a linked channel for messages automatically forwarded to the
+            channel's discussion group. For backward compatibility, if the message was sent on
+            behalf of a chat, the field from contains a fake sender user in non-channel chats.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
@@ -897,22 +895,22 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
-        sender_business_bot (:obj:`telegram.User`): Optional. The bot that actually sent the
+        sender_business_bot (:class:`telegram.User`): Optional. The bot that actually sent the
             message on behalf of the business account. Available only for outgoing messages sent
             on behalf of the connected business account.
 
             .. versionadded:: 21.1
 
-        chat_background_set (:obj:`telegram.ChatBackground`): Optional. Service message: chat
+        chat_background_set (:class:`telegram.ChatBackground`): Optional. Service message: chat
             background set
 
             .. versionadded:: 21.2
-        paid_media (:obj:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
+        paid_media (:class:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
             information about the paid media.
 
             .. versionadded:: 21.4
-        refunded_payment (:obj:`telegram.RefundedPayment`): Optional. Message is a service message
-            about a refunded payment, information about the payment.
+        refunded_payment (:class:`telegram.RefundedPayment`): Optional. Message is a service
+            message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
 
@@ -4114,7 +4112,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.5
             Now also passes :attr:`business_connection_id` to
             :meth:`telegram.Bot.pin_chat_message`.
 
@@ -4154,7 +4152,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.5
             Now also passes :attr:`business_connection_id` to
             :meth:`telegram.Bot.pin_chat_message`.
 

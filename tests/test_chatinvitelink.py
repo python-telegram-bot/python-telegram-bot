@@ -33,19 +33,21 @@ def creator():
 @pytest.fixture(scope="module")
 def invite_link(creator):
     return ChatInviteLink(
-        TestChatInviteLinkBase.link,
+        ChatInviteLinkTestBase.link,
         creator,
-        TestChatInviteLinkBase.creates_join_request,
-        TestChatInviteLinkBase.primary,
-        TestChatInviteLinkBase.revoked,
-        expire_date=TestChatInviteLinkBase.expire_date,
-        member_limit=TestChatInviteLinkBase.member_limit,
-        name=TestChatInviteLinkBase.name,
-        pending_join_request_count=TestChatInviteLinkBase.pending_join_request_count,
+        ChatInviteLinkTestBase.creates_join_request,
+        ChatInviteLinkTestBase.primary,
+        ChatInviteLinkTestBase.revoked,
+        expire_date=ChatInviteLinkTestBase.expire_date,
+        member_limit=ChatInviteLinkTestBase.member_limit,
+        name=ChatInviteLinkTestBase.name,
+        pending_join_request_count=ChatInviteLinkTestBase.pending_join_request_count,
+        subscription_period=ChatInviteLinkTestBase.subscription_period,
+        subscription_price=ChatInviteLinkTestBase.subscription_price,
     )
 
 
-class TestChatInviteLinkBase:
+class ChatInviteLinkTestBase:
     link = "thisialink"
     creates_join_request = False
     primary = True
@@ -54,9 +56,11 @@ class TestChatInviteLinkBase:
     member_limit = 42
     name = "LinkName"
     pending_join_request_count = 42
+    subscription_period = 43
+    subscription_price = 44
 
 
-class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
+class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
     def test_slot_behaviour(self, invite_link):
         for attr in invite_link.__slots__:
             assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -91,6 +95,8 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
             "member_limit": self.member_limit,
             "name": self.name,
             "pending_join_request_count": str(self.pending_join_request_count),
+            "subscription_period": self.subscription_period,
+            "subscription_price": self.subscription_price,
         }
 
         invite_link = ChatInviteLink.de_json(json_dict, bot)
@@ -106,6 +112,8 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         assert invite_link.member_limit == self.member_limit
         assert invite_link.name == self.name
         assert invite_link.pending_join_request_count == self.pending_join_request_count
+        assert invite_link.subscription_period == self.subscription_period
+        assert invite_link.subscription_price == self.subscription_price
 
     def test_de_json_localization(self, tz_bot, bot, raw_bot, creator):
         json_dict = {
@@ -146,6 +154,8 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         assert invite_link_dict["member_limit"] == self.member_limit
         assert invite_link_dict["name"] == self.name
         assert invite_link_dict["pending_join_request_count"] == self.pending_join_request_count
+        assert invite_link_dict["subscription_period"] == self.subscription_period
+        assert invite_link_dict["subscription_price"] == self.subscription_price
 
     def test_equality(self):
         a = ChatInviteLink("link", User(1, "", False), True, True, True)

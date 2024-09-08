@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
+
 import datetime
 from typing import TYPE_CHECKING, Dict, Final, Optional, Type
 
@@ -391,24 +392,34 @@ class ChatMemberMember(ChatMember):
 
     Args:
         user (:class:`telegram.User`): Information about the user.
+        until_date (:class:`datetime.datetime`, optional): Date when the user's subscription will
+            expire.
+
+            .. versionadded:: 21.5
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.MEMBER`.
         user (:class:`telegram.User`): Information about the user.
+        until_date (:class:`datetime.datetime`): Optional. Date when the user's subscription will
+            expire.
+
+            .. versionadded:: 21.5
 
     """
 
-    __slots__ = ()
+    __slots__ = ("until_date",)
 
     def __init__(
         self,
         user: User,
+        until_date: Optional[datetime.datetime] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
-        self._freeze()
+        with self._unfrozen():
+            self.until_date: Optional[datetime.datetime] = until_date
 
 
 class ChatMemberRestricted(ChatMember):

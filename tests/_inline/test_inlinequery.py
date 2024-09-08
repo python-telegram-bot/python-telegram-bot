@@ -31,17 +31,17 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query(bot):
     ilq = InlineQuery(
-        TestInlineQueryBase.id_,
-        TestInlineQueryBase.from_user,
-        TestInlineQueryBase.query,
-        TestInlineQueryBase.offset,
-        location=TestInlineQueryBase.location,
+        InlineQueryTestBase.id_,
+        InlineQueryTestBase.from_user,
+        InlineQueryTestBase.query,
+        InlineQueryTestBase.offset,
+        location=InlineQueryTestBase.location,
     )
     ilq.set_bot(bot)
     return ilq
 
 
-class TestInlineQueryBase:
+class InlineQueryTestBase:
     id_ = 1234
     from_user = User(1, "First name", False)
     query = "query text"
@@ -49,7 +49,7 @@ class TestInlineQueryBase:
     location = Location(8.8, 53.1)
 
 
-class TestInlineQueryWithoutRequest(TestInlineQueryBase):
+class TestInlineQueryWithoutRequest(InlineQueryTestBase):
     def test_slot_behaviour(self, inline_query):
         for attr in inline_query.__slots__:
             assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"

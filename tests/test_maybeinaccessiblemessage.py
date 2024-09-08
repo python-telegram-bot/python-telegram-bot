@@ -29,19 +29,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="class")
 def maybe_inaccessible_message():
     return MaybeInaccessibleMessage(
-        TestMaybeInaccessibleMessageBase.chat,
-        TestMaybeInaccessibleMessageBase.message_id,
-        TestMaybeInaccessibleMessageBase.date,
+        MaybeInaccessibleMessageTestBase.chat,
+        MaybeInaccessibleMessageTestBase.message_id,
+        MaybeInaccessibleMessageTestBase.date,
     )
 
 
-class TestMaybeInaccessibleMessageBase:
+class MaybeInaccessibleMessageTestBase:
     chat = Chat(1, "title")
     message_id = 123
     date = dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0)
 
 
-class TestMaybeInaccessibleMessageWithoutRequest(TestMaybeInaccessibleMessageBase):
+class TestMaybeInaccessibleMessageWithoutRequest(MaybeInaccessibleMessageTestBase):
     def test_slot_behaviour(self, maybe_inaccessible_message):
         for attr in maybe_inaccessible_message.__slots__:
             assert (

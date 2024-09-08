@@ -55,20 +55,12 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumbnail_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the video.
 
-            Warning:
-                The Bot API does **not** define this as an optional argument. It is formally
-                optional for backwards compatibility with the deprecated :paramref:`thumb_url`.
-                If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
-                :class:`ValueError` will be raised.
-
             .. versionadded:: 20.2
-        title (:obj:`str`, optional): Title for the result.
 
-            Warning:
-                The Bot API does **not** define this as an optional argument. It is formally
-                optional to ensure backwards compatibility of :paramref:`thumbnail_url` with the
-                deprecated :paramref:`thumb_url`, which required that :paramref:`thumbnail_url`
-                become optional. :class:`TypeError` will be raised if no ``title`` is passed.
+            ..versionchanged:: 20.5
+              |thumbnail_url_mandatory|
+
+        title (:obj:`str`): Title for the result.
         caption (:obj:`str`, optional): Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
@@ -91,11 +83,6 @@ class InlineQueryResultVideo(InlineQueryResult):
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
             .. versionadded:: 21.3
-
-    Raises:
-        :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
-            supplied or if both are supplied and are not equal.
-        :class:`TypeError`: If no :paramref:`title` is passed.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.

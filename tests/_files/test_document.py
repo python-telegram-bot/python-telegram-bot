@@ -49,7 +49,7 @@ async def document(bot, chat_id):
         return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
 
 
-class TestDocumentBase:
+class DocumentTestBase:
     caption = "DocumentTest - *Caption*"
     document_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.gif"
     file_size = 12948
@@ -62,7 +62,7 @@ class TestDocumentBase:
     document_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestDocumentWithoutRequest(TestDocumentBase):
+class TestDocumentWithoutRequest(DocumentTestBase):
     def test_slot_behaviour(self, document):
         for attr in document.__slots__:
             assert getattr(document, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -218,7 +218,7 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert await document.get_file()
 
 
-class TestDocumentWithRequest(TestDocumentBase):
+class TestDocumentWithRequest(DocumentTestBase):
     async def test_error_send_empty_file(self, bot, chat_id):
         with Path(os.devnull).open("rb") as f, pytest.raises(TelegramError):
             await bot.send_document(chat_id=chat_id, document=f)

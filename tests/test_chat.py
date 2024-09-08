@@ -34,20 +34,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def chat(bot):
     chat = Chat(
-        TestChatBase.id_,
-        title=TestChatBase.title,
-        type=TestChatBase.type_,
-        username=TestChatBase.username,
+        ChatTestBase.id_,
+        title=ChatTestBase.title,
+        type=ChatTestBase.type_,
+        username=ChatTestBase.username,
         is_forum=True,
-        first_name=TestChatBase.first_name,
-        last_name=TestChatBase.last_name,
+        first_name=ChatTestBase.first_name,
+        last_name=ChatTestBase.last_name,
     )
     chat.set_bot(bot)
     chat._unfreeze()
     return chat
 
 
-class TestChatBase:
+class ChatTestBase:
     id_ = -28767330
     title = "ToledosPalaceBot - Group"
     type_ = "group"
@@ -57,7 +57,7 @@ class TestChatBase:
     last_name = "last"
 
 
-class TestChatWithoutRequest(TestChatBase):
+class TestChatWithoutRequest(ChatTestBase):
     def test_slot_behaviour(self, chat):
         for attr in chat.__slots__:
             assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -888,6 +888,54 @@ class TestChatWithoutRequest(TestChatBase):
 
         monkeypatch.setattr(chat.get_bot(), "revoke_chat_invite_link", make_assertion)
         assert await chat.revoke_invite_link(invite_link=link)
+
+    async def test_create_subscription_invite_link(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["subscription_price"] == 42
+                and kwargs["subscription_period"] == 42
+            )
+
+        assert check_shortcut_signature(
+            Chat.create_subscription_invite_link,
+            Bot.create_chat_subscription_invite_link,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.create_subscription_invite_link,
+            chat.get_bot(),
+            "create_chat_subscription_invite_link",
+        )
+        assert await check_defaults_handling(chat.create_subscription_invite_link, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "create_chat_subscription_invite_link", make_assertion)
+        assert await chat.create_subscription_invite_link(
+            subscription_price=42, subscription_period=42
+        )
+
+    async def test_edit_subscription_invite_link(self, monkeypatch, chat):
+        link = "ThisIsALink"
+
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["invite_link"] == link
+
+        assert check_shortcut_signature(
+            Chat.edit_subscription_invite_link,
+            Bot.edit_chat_subscription_invite_link,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.edit_subscription_invite_link,
+            chat.get_bot(),
+            "edit_chat_subscription_invite_link",
+        )
+        assert await check_defaults_handling(chat.edit_subscription_invite_link, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "edit_chat_subscription_invite_link", make_assertion)
+        assert await chat.edit_subscription_invite_link(invite_link=link)
 
     async def test_instance_method_get_menu_button(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):

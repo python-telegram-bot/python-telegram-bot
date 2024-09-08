@@ -24,6 +24,8 @@ import pytest
 
 from telegram import (
     Dice,
+    PaidMediaPhoto,
+    PhotoSize,
     RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
@@ -62,6 +64,16 @@ def withdrawal_state_pending():
 def transaction_partner_user():
     return TransactionPartnerUser(
         user=User(id=1, is_bot=False, first_name="first_name", username="username"),
+        invoice_payload="payload",
+        paid_media=[
+            PaidMediaPhoto(
+                photo=[
+                    PhotoSize(
+                        file_id="file_id", width=1, height=1, file_unique_id="file_unique_id"
+                    )
+                ]
+            )
+        ],
     )
 
 
@@ -153,9 +165,9 @@ def transaction_partner(tp_scope_class_and_type):
     return tp_scope_class_and_type[0].de_json(
         {
             "type": tp_scope_class_and_type[1],
-            "invoice_payload": TestTransactionPartnerBase.invoice_payload,
-            "withdrawal_state": TestTransactionPartnerBase.withdrawal_state.to_dict(),
-            "user": TestTransactionPartnerBase.user.to_dict(),
+            "invoice_payload": TransactionPartnerTestBase.invoice_payload,
+            "withdrawal_state": TransactionPartnerTestBase.withdrawal_state.to_dict(),
+            "user": TransactionPartnerTestBase.user.to_dict(),
         },
         bot=None,
     )
@@ -213,14 +225,14 @@ def revenue_withdrawal_state(rws_scope_class_and_type):
     return rws_scope_class_and_type[0].de_json(
         {
             "type": rws_scope_class_and_type[1],
-            "date": to_timestamp(TestRevenueWithdrawalStateBase.date),
-            "url": TestRevenueWithdrawalStateBase.url,
+            "date": to_timestamp(RevenueWithdrawalStateTestBase.date),
+            "url": RevenueWithdrawalStateTestBase.url,
         },
         bot=None,
     )
 
 
-class TestStarTransactionBase:
+class StarTransactionTestBase:
     id = "2"
     amount = 2
     date = to_timestamp(datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC))
@@ -234,7 +246,7 @@ class TestStarTransactionBase:
     receiver = TransactionPartnerOther()
 
 
-class TestStarTransactionWithoutRequest(TestStarTransactionBase):
+class TestStarTransactionWithoutRequest(StarTransactionTestBase):
     def test_slot_behaviour(self):
         inst = star_transaction()
         for attr in inst.__slots__:
@@ -320,11 +332,11 @@ class TestStarTransactionWithoutRequest(TestStarTransactionBase):
         assert hash(a) != hash(c)
 
 
-class TestStarTransactionsBase:
+class StarTransactionsTestBase:
     transactions = [star_transaction(), star_transaction()]
 
 
-class TestStarTransactionsWithoutRequest(TestStarTransactionsBase):
+class TestStarTransactionsWithoutRequest(StarTransactionsTestBase):
     def test_slot_behaviour(self, star_transactions):
         inst = star_transactions
         for attr in inst.__slots__:
@@ -365,13 +377,13 @@ class TestStarTransactionsWithoutRequest(TestStarTransactionsBase):
         assert hash(a) != hash(c)
 
 
-class TestTransactionPartnerBase:
+class TransactionPartnerTestBase:
     withdrawal_state = withdrawal_state_succeeded()
     user = transaction_partner_user().user
     invoice_payload = "payload"
 
 
-class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
+class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
     def test_slot_behaviour(self, transaction_partner):
         inst = transaction_partner
         for attr in inst.__slots__:
@@ -482,12 +494,12 @@ class TestTransactionPartnerWithoutRequest(TestTransactionPartnerBase):
             assert hash(c) != hash(f)
 
 
-class TestRevenueWithdrawalStateBase:
+class RevenueWithdrawalStateTestBase:
     date = datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)
     url = "url"
 
 
-class TestRevenueWithdrawalStateWithoutRequest(TestRevenueWithdrawalStateBase):
+class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
     def test_slot_behaviour(self, revenue_withdrawal_state):
         inst = revenue_withdrawal_state
         for attr in inst.__slots__:

@@ -31,23 +31,23 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="class")
 def passport_file(bot):
     pf = PassportFile(
-        file_id=TestPassportFileBase.file_id,
-        file_unique_id=TestPassportFileBase.file_unique_id,
-        file_size=TestPassportFileBase.file_size,
-        file_date=TestPassportFileBase.file_date,
+        file_id=PassportFileTestBase.file_id,
+        file_unique_id=PassportFileTestBase.file_unique_id,
+        file_size=PassportFileTestBase.file_size,
+        file_date=PassportFileTestBase.file_date,
     )
     pf.set_bot(bot)
     return pf
 
 
-class TestPassportFileBase:
+class PassportFileTestBase:
     file_id = "data"
     file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_size = 50
     file_date = 1532879128
 
 
-class TestPassportFileWithoutRequest(TestPassportFileBase):
+class TestPassportFileWithoutRequest(PassportFileTestBase):
     def test_slot_behaviour(self, passport_file):
         inst = passport_file
         for attr in inst.__slots__:

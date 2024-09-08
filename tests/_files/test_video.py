@@ -49,7 +49,7 @@ async def video(bot, chat_id):
         return (await bot.send_video(chat_id, video=f, read_timeout=50)).video
 
 
-class TestVideoBase:
+class VideoTestBase:
     width = 360
     height = 640
     duration = 5
@@ -66,7 +66,7 @@ class TestVideoBase:
     video_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVideoWithoutRequest(TestVideoBase):
+class TestVideoWithoutRequest(VideoTestBase):
     def test_slot_behaviour(self, video):
         for attr in video.__slots__:
             assert getattr(video, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -229,7 +229,7 @@ class TestVideoWithoutRequest(TestVideoBase):
         await default_bot.send_video(chat_id, video, reply_parameters=ReplyParameters(**kwargs))
 
 
-class TestVideoWithRequest(TestVideoBase):
+class TestVideoWithRequest(VideoTestBase):
     async def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
         message = await bot.send_video(
             chat_id,

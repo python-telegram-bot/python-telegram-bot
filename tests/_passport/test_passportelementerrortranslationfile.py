@@ -25,13 +25,13 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def passport_element_error_translation_file():
     return PassportElementErrorTranslationFile(
-        TestPassportElementErrorTranslationFileBase.type_,
-        TestPassportElementErrorTranslationFileBase.file_hash,
-        TestPassportElementErrorTranslationFileBase.message,
+        PassportElementErrorTranslationFileTestBase.type_,
+        PassportElementErrorTranslationFileTestBase.file_hash,
+        PassportElementErrorTranslationFileTestBase.message,
     )
 
 
-class TestPassportElementErrorTranslationFileBase:
+class PassportElementErrorTranslationFileTestBase:
     source = "translation_file"
     type_ = "test_type"
     file_hash = "file_hash"
@@ -39,7 +39,7 @@ class TestPassportElementErrorTranslationFileBase:
 
 
 class TestPassportElementErrorTranslationFileWithoutRequest(
-    TestPassportElementErrorTranslationFileBase
+    PassportElementErrorTranslationFileTestBase
 ):
     def test_slot_behaviour(self, passport_element_error_translation_file):
         inst = passport_element_error_translation_file

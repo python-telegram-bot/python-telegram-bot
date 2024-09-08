@@ -90,13 +90,13 @@ from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def message(bot):
     message = PytestMessage(
-        message_id=TestMessageBase.id_,
-        date=TestMessageBase.date,
-        chat=copy(TestMessageBase.chat),
-        from_user=copy(TestMessageBase.from_user),
+        message_id=MessageTestBase.id_,
+        date=MessageTestBase.date,
+        chat=copy(MessageTestBase.chat),
+        from_user=copy(MessageTestBase.from_user),
         business_connection_id="123456789",
     )
     message.set_bot(bot)
@@ -357,17 +357,17 @@ def message(bot):
 )
 def message_params(bot, request):
     message = Message(
-        message_id=TestMessageBase.id_,
-        from_user=TestMessageBase.from_user,
-        date=TestMessageBase.date,
-        chat=TestMessageBase.chat,
+        message_id=MessageTestBase.id_,
+        from_user=MessageTestBase.from_user,
+        date=MessageTestBase.date,
+        chat=MessageTestBase.chat,
         **request.param,
     )
     message.set_bot(bot)
     return message
 
 
-class TestMessageBase:
+class MessageTestBase:
     id_ = 1
     from_user = User(2, "testuser", False)
     date = datetime.utcnow()
@@ -439,7 +439,7 @@ class TestMessageBase:
     )
 
 
-class TestMessageWithoutRequest(TestMessageBase):
+class TestMessageWithoutRequest(MessageTestBase):
     @staticmethod
     async def check_quote_parsing(
         message: Message, method, bot_method_name: str, args, monkeypatch
@@ -559,10 +559,10 @@ class TestMessageWithoutRequest(TestMessageBase):
 
     def test_slot_behaviour(self):
         message = Message(
-            message_id=TestMessageBase.id_,
-            date=TestMessageBase.date,
-            chat=copy(TestMessageBase.chat),
-            from_user=copy(TestMessageBase.from_user),
+            message_id=MessageTestBase.id_,
+            date=MessageTestBase.date,
+            chat=copy(MessageTestBase.chat),
+            from_user=copy(MessageTestBase.from_user),
         )
         for attr in message.__slots__:
             assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -1193,16 +1193,20 @@ class TestMessageWithoutRequest(TestMessageBase):
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
         assert message.link == f"https://t.me/c/{3}/{message.message_id}"
 
-    def test_link_with_topics(self, message):
+    @pytest.mark.parametrize("type_", argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_topics(self, message, type_):
         message.chat.username = None
         message.chat.id = -1003
+        message.chat.type = type_
         message.is_topic_message = True
         message.message_thread_id = 123
         assert message.link == f"https://t.me/c/3/{message.message_id}?thread=123"
 
-    def test_link_with_reply(self, message):
+    @pytest.mark.parametrize("type_", argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_reply(self, message, type_):
         message.chat.username = None
         message.chat.id = -1003
+        message.chat.type = type_
         message.reply_to_message = Message(7, self.from_user, self.date, self.chat, text="Reply")
         message.message_thread_id = 123
         assert message.link == f"https://t.me/c/3/{message.message_id}?thread=123"

@@ -126,7 +126,7 @@ class Giveaway(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["Giveaway"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
@@ -262,7 +262,7 @@ class GiveawayWinners(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["GiveawayWinners"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
@@ -330,7 +330,7 @@ class GiveawayCompleted(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["GiveawayCompleted"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
