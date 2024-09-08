@@ -6,6 +6,7 @@ from telegram.ext import ApplicationBuilder, Updater
 from telegram.ext.filters import MessageFilter, UpdateFilter
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.monkeypatch import return_true
 from tests.auxil.networking import OfflineRequest
 from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
 
@@ -17,10 +18,6 @@ from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
 @pytest.fixture(scope="session")
 async def bot(bot_info, offline_bot):
     return offline_bot
-
-
-async def return_true(*args, **kwargs):
-    return True
 
 
 @pytest.fixture

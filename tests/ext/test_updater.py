@@ -33,6 +33,7 @@ from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from tests.auxil.build_messages import make_message, make_message_update
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.files import TEST_DATA_PATH, data_file
+from tests.auxil.monkeypatch import empty_get_updates, return_true
 from tests.auxil.networking import send_webhook_message
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
@@ -181,11 +182,7 @@ class TestUpdater:
         ip = "127.0.0.1"
         port = randrange(1024, 49152)  # Select random port
 
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return []
-
-        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+        monkeypatch.setattr(updater.bot, "get_updates", empty_get_updates)
 
         async with updater:
             if "webhook" in method:
@@ -381,11 +378,8 @@ class TestUpdater:
         assert log_found
 
     async def test_polling_mark_updates_as_read_failure(self, monkeypatch, updater, caplog):
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return []
 
-        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+        monkeypatch.setattr(updater.bot, "get_updates", empty_get_updates)
 
         async with updater:
             await updater.start_polling()
@@ -409,11 +403,8 @@ class TestUpdater:
         assert log_found
 
     async def test_start_polling_already_running(self, updater, monkeypatch):
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return []
 
-        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+        monkeypatch.setattr(updater.bot, "get_updates", empty_get_updates)
 
         async with updater:
             await updater.start_polling()
@@ -730,10 +721,7 @@ class TestUpdater:
                 self.message_count += 1
             return True
 
-        async def set_webhook(*args, **kwargs):
-            return True
-
-        monkeypatch.setattr(updater.bot, "set_webhook", set_webhook)
+        monkeypatch.setattr(updater.bot, "set_webhook", return_true)
         monkeypatch.setattr(updater.bot, "delete_webhook", delete_webhook)
 
         ip = "127.0.0.1"
@@ -981,10 +969,7 @@ class TestUpdater:
         extensively in test_bot.py in conjunction with get_updates."""
         updater = Updater(bot=cdc_bot, update_queue=asyncio.Queue())
 
-        async def set_webhook(*args, **kwargs):
-            return True
-
-        monkeypatch.setattr(updater.bot, "set_webhook", set_webhook)
+        monkeypatch.setattr(updater.bot, "set_webhook", return_true)
 
         try:
 

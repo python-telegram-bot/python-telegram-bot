@@ -60,6 +60,7 @@ from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.asyncio_helpers import call_after
 from tests.auxil.build_messages import make_message_update
 from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.monkeypatch import empty_get_updates, return_true
 from tests.auxil.networking import send_webhook_message
 from tests.auxil.pytest_classes import PytestApplication, PytestUpdater, make_bot
 from tests.auxil.slots import mro_slots
@@ -442,15 +443,8 @@ class TestApplication:
         async def callback(u, c):
             self.received = u
 
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return []
-
-        async def delete_webhook(*args, **kwargs):
-            return True
-
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         assert not app.running
         assert not app.updater.running
@@ -1529,11 +1523,6 @@ class TestApplication:
     def test_run_polling_timeout_deprecation_warnings(
         self, timeout_name, monkeypatch, recwarn, app
     ):
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
-
         def thread_target():
             waited = 0
             while not app.running:
@@ -1546,7 +1535,7 @@ class TestApplication:
 
             os.kill(os.getpid(), signal.SIGINT)
 
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1573,11 +1562,6 @@ class TestApplication:
     def test_run_polling_post_init(self, one_time_bot, monkeypatch):
         events = []
 
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
-
         def thread_target():
             waited = 0
             while not app.running:
@@ -1591,9 +1575,6 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
-        async def delete_webhook(*args, **kwargs):
-            return True
-
         app = (
             Application.builder()
             .application_class(PytestApplication)
@@ -1602,7 +1583,7 @@ class TestApplication:
             .build()
         )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(
             app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
         )
@@ -1611,7 +1592,7 @@ class TestApplication:
             "start_polling",
             call_after(app.updater.start_polling, lambda _: events.append("start_polling")),
         )
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1626,11 +1607,6 @@ class TestApplication:
     def test_run_polling_post_shutdown(self, one_time_bot, monkeypatch):
         events = []
 
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
-
         def thread_target():
             waited = 0
             while not app.running:
@@ -1640,9 +1616,6 @@ class TestApplication:
                     pytest.fail("App apparently won't start")
 
             os.kill(os.getpid(), signal.SIGINT)
-
-        async def delete_webhook(*args, **kwargs):
-            return True
 
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
@@ -1655,7 +1628,7 @@ class TestApplication:
             .build()
         )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(
             app, "shutdown", call_after(app.shutdown, lambda _: events.append("shutdown"))
         )
@@ -1664,7 +1637,7 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1683,11 +1656,6 @@ class TestApplication:
     def test_run_polling_post_stop(self, one_time_bot, monkeypatch):
         events = []
 
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
-
         def thread_target():
             waited = 0
             while not app.running:
@@ -1697,9 +1665,6 @@ class TestApplication:
                     pytest.fail("App apparently won't start")
 
             os.kill(os.getpid(), signal.SIGINT)
-
-        async def delete_webhook(*args, **kwargs):
-            return True
 
         async def post_stop(app: Application) -> None:
             events.append("post_stop")
@@ -1712,7 +1677,7 @@ class TestApplication:
             .build()
         )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(app, "stop", call_after(app.stop, lambda _: events.append("stop")))
         monkeypatch.setattr(
             app.updater,
@@ -1724,7 +1689,7 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1884,9 +1849,6 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
-        async def return_true(*args, **kwargs):
-            return True
-
         app = (
             Application.builder()
             .post_init(post_init)
@@ -1942,9 +1904,6 @@ class TestApplication:
 
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
-
-        async def return_true(*args, **kwargs):
-            return True
 
         app = (
             Application.builder()
@@ -2005,9 +1964,6 @@ class TestApplication:
 
         async def post_stop(app: Application) -> None:
             events.append("post_stop")
-
-        async def return_true(*args, **kwargs):
-            return True
 
         app = (
             Application.builder()
@@ -2210,13 +2166,6 @@ class TestApplication:
         async def callback(*args, **kwargs):
             called_callbacks.add(kwargs["name"])
 
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return []
-
-        async def delete_webhook(*args, **kwargs):
-            return True
-
         for cls, method, entry in [
             (Application, "initialize", "app_initialize"),
             (Application, "start", "app_start"),
@@ -2245,8 +2194,8 @@ class TestApplication:
             .post_shutdown(functools.partial(callback, name="post_shutdown"))
             .build()
         )
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         app.add_handler(TypeHandler(object, update_logger_callback), group=-10)
         app.add_handler(TypeHandler(object, handler_callback))
@@ -2309,13 +2258,6 @@ class TestApplication:
 
             return _after_shutdown
 
-        async def delete_webhook(*args, **kwargs):
-            return True
-
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return []
-
         monkeypatch.setattr(Application, method, raise_method)
         monkeypatch.setattr(
             Application,
@@ -2326,8 +2268,8 @@ class TestApplication:
             Updater, "shutdown", call_after(Updater.shutdown, after_shutdown("updater"))
         )
         app = ApplicationBuilder().bot(one_time_bot).build()
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
 
         with pytest.raises(RuntimeError, match="Test Exception"):
             app.run_polling(close_loop=False)
@@ -2426,12 +2368,8 @@ class TestApplication:
 
         loop = asyncio.get_event_loop()
 
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return []
-
         monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test)
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
 
         def abort_app():
             raise SystemExit
@@ -2509,10 +2447,6 @@ class TestApplication:
         called_stop_running = threading.Event()
         assertions = {}
 
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return []
-
         async def post_init(app):
             # Simply calling app.update_queue.put_nowait(method) in the thread_target doesn't work
             # for some reason (probably threading magic), so we use an event from the thread_target
@@ -2523,9 +2457,6 @@ class TestApplication:
 
             app.create_task(task(app))
 
-        async def return_true(*args, **kwargs):
-            return True
-
         app = (
             ApplicationBuilder()
             .application_class(PytestApplication)
@@ -2533,7 +2464,7 @@ class TestApplication:
             .post_init(post_init)
             .build()
         )
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
 
         events = []
         monkeypatch.setattr(
