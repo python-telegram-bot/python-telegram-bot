@@ -330,21 +330,26 @@ class GiveawayCompleted(TelegramObject):
         unclaimed_prize_count (:obj:`int`, optional): Number of undistributed prizes
         giveaway_message (:class:`telegram.Message`, optional): Message with the giveaway that was
             completed, if it wasn't deleted
+        is_star_giveaway (:obj:`bool`, optional): True, if the giveaway is a Telegram Star
+            giveaway. Otherwise, currently, the giveaway is a Telegram Premium giveaway.
 
     Attributes:
         winner_count (:obj:`int`): Number of winners in the giveaway
         unclaimed_prize_count (:obj:`int`): Optional. Number of undistributed prizes
         giveaway_message (:class:`telegram.Message`): Optional. Message with the giveaway that was
             completed, if it wasn't deleted
+        is_star_giveaway (:obj:`bool`): Optional. True, if the giveaway is a Telegram Star
+            giveaway. Otherwise, currently, the giveaway is a Telegram Premium giveaway.
     """
 
-    __slots__ = ("giveaway_message", "unclaimed_prize_count", "winner_count")
+    __slots__ = ("giveaway_message", "is_star_giveaway", "unclaimed_prize_count", "winner_count")
 
     def __init__(
         self,
         winner_count: int,
         unclaimed_prize_count: Optional[int] = None,
         giveaway_message: Optional["Message"] = None,
+        is_star_giveaway: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -353,6 +358,7 @@ class GiveawayCompleted(TelegramObject):
         self.winner_count: int = winner_count
         self.unclaimed_prize_count: Optional[int] = unclaimed_prize_count
         self.giveaway_message: Optional[Message] = giveaway_message
+        self.is_star_giveaway: Optional[bool] = is_star_giveaway
 
         self._id_attrs = (
             self.winner_count,

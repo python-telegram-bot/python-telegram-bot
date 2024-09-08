@@ -373,12 +373,14 @@ def giveaway_completed():
         winner_count=TestGiveawayCompletedWithoutRequest.winner_count,
         unclaimed_prize_count=TestGiveawayCompletedWithoutRequest.unclaimed_prize_count,
         giveaway_message=TestGiveawayCompletedWithoutRequest.giveaway_message,
+        is_star_giveaway=TestGiveawayCompletedWithoutRequest.is_star_giveaway,
     )
 
 
 class TestGiveawayCompletedWithoutRequest:
     winner_count = 42
     unclaimed_prize_count = 4
+    is_star_giveaway = True
     giveaway_message = Message(
         message_id=1,
         date=dtm.datetime.now(dtm.timezone.utc),
@@ -399,6 +401,7 @@ class TestGiveawayCompletedWithoutRequest:
             "winner_count": self.winner_count,
             "unclaimed_prize_count": self.unclaimed_prize_count,
             "giveaway_message": self.giveaway_message.to_dict(),
+            "is_star_giveaway": self.is_star_giveaway,
         }
 
         giveaway_completed = GiveawayCompleted.de_json(json_dict, bot)
@@ -407,6 +410,7 @@ class TestGiveawayCompletedWithoutRequest:
         assert giveaway_completed.winner_count == self.winner_count
         assert giveaway_completed.unclaimed_prize_count == self.unclaimed_prize_count
         assert giveaway_completed.giveaway_message == self.giveaway_message
+        assert giveaway_completed.is_star_giveaway == self.is_star_giveaway
 
         assert GiveawayCompleted.de_json(None, bot) is None
 
@@ -417,6 +421,7 @@ class TestGiveawayCompletedWithoutRequest:
         assert giveaway_completed_dict["winner_count"] == self.winner_count
         assert giveaway_completed_dict["unclaimed_prize_count"] == self.unclaimed_prize_count
         assert giveaway_completed_dict["giveaway_message"] == self.giveaway_message.to_dict()
+        assert giveaway_completed_dict["is_star_giveaway"] == self.is_star_giveaway
 
     def test_equality(self, giveaway_completed):
         a = giveaway_completed
@@ -424,6 +429,7 @@ class TestGiveawayCompletedWithoutRequest:
             winner_count=self.winner_count,
             unclaimed_prize_count=self.unclaimed_prize_count,
             giveaway_message=self.giveaway_message,
+            is_star_giveaway=self.is_star_giveaway,
         )
         c = GiveawayCompleted(
             winner_count=self.winner_count + 30,
