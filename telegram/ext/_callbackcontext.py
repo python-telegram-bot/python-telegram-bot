@@ -50,7 +50,7 @@ _STORING_DATA_WIKI = (
     "/wiki/Storing-bot%2C-user-and-chat-related-data"
 )
 
-# something like poor mans "tying.Self" for py<3.11
+# something like poor mans "typing.Self" for py<3.11
 ST = TypeVar("ST", bound="CallbackContext[Any, Any, Any, Any]")
 
 
