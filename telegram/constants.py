@@ -2795,6 +2795,8 @@ class InvoiceLimit(IntEnum):
       :meth:`telegram.Bot.send_invoice`.
     * :paramref:`~telegram.Bot.create_invoice_link.payload` parameter of
       :meth:`telegram.Bot.create_invoice_link`.
+    * :paramref:`~telegram.Bot.send_paid_media.payload` parameter of
+      :meth:`telegram.Bot.send_paid_media`.
     """
     MAX_TIP_AMOUNTS = 4
     """:obj:`int`: Maximum length of a :obj:`Sequence` passed as:

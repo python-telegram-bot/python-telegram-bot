@@ -74,6 +74,7 @@ def transaction_partner_user():
                 ]
             )
         ],
+        paid_media_payload="payload",
     )
 
 
