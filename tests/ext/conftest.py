@@ -19,8 +19,12 @@ async def bot(bot_info, offline_bot):
     return offline_bot
 
 
+async def return_true(*args, **kwargs):
+    return True
+
+
 @pytest.fixture
-async def app(bot_info):
+async def app(bot_info, monkeypatch):
     # We build a new bot each time so that we use `app` in a context manager without problems
     application = (
         ApplicationBuilder()
@@ -28,6 +32,8 @@ async def app(bot_info):
         .application_class(PytestApplication)
         .build()
     )
+    monkeypatch.setattr(application.bot, "delete_webhook", return_true)
+    monkeypatch.setattr(application.bot, "set_webhook", return_true)
     yield application
     if application.running:
         await application.stop()
@@ -35,9 +41,11 @@ async def app(bot_info):
 
 
 @pytest.fixture
-async def updater(bot_info):
+async def updater(bot_info, monkeypatch):
     # We build a new bot each time so that we use `updater` in a context manager without problems
     up = Updater(bot=make_bot(bot_info, offline=True), update_queue=asyncio.Queue())
+    monkeypatch.setattr(up.bot, "delete_webhook", return_true)
+    monkeypatch.setattr(up.bot, "set_webhook", return_true)
     yield up
     if up.running:
         await up.stop()

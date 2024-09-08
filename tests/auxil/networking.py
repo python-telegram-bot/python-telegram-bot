@@ -84,7 +84,7 @@ class OfflineRequest(BaseRequest):
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
     ) -> Tuple[int, bytes]:
-        raise RuntimeError("OfflineRequest: Network access disallowed")
+        pytest.fail("OfflineRequest: Network access disallowed in this test")
 
 
 async def expect_bad_request(func, message, reason):
