@@ -371,8 +371,8 @@ def main() -> None:
         entry_points=[CommandHandler("start", start)],
         states={
             SHOWING: [CallbackQueryHandler(start, pattern="^" + str(END) + "$")],
-            SELECTING_ACTION: selection_handlers,
-            SELECTING_LEVEL: selection_handlers,
+            SELECTING_ACTION: selection_handlers,  # type: ignore[dict-item]
+            SELECTING_LEVEL: selection_handlers,  # type: ignore[dict-item]
             DESCRIBING_SELF: [description_conv],
             STOPPING: [CommandHandler("start", start)],
         },
