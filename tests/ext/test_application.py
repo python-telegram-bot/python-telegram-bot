@@ -1591,6 +1591,9 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
+        async def delete_webhook(*args, **kwargs):
+            return True
+
         app = (
             Application.builder()
             .application_class(PytestApplication)
@@ -1608,6 +1611,7 @@ class TestApplication:
             "start_polling",
             call_after(app.updater.start_polling, lambda _: events.append("start_polling")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1637,6 +1641,9 @@ class TestApplication:
 
             os.kill(os.getpid(), signal.SIGINT)
 
+        async def delete_webhook(*args, **kwargs):
+            return True
+
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
 
@@ -1657,6 +1664,7 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1690,6 +1698,9 @@ class TestApplication:
 
             os.kill(os.getpid(), signal.SIGINT)
 
+        async def delete_webhook(*args, **kwargs):
+            return True
+
         async def post_stop(app: Application) -> None:
             events.append("post_stop")
 
@@ -1713,6 +1724,7 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1872,6 +1884,9 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
+        async def return_true(*args, **kwargs):
+            return True
+
         app = (
             Application.builder()
             .post_init(post_init)
@@ -1889,6 +1904,8 @@ class TestApplication:
             "start_webhook",
             call_after(app.updater.start_webhook, lambda _: events.append("start_webhook")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+        monkeypatch.setattr(app.bot, "set_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1926,6 +1943,9 @@ class TestApplication:
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
 
+        async def return_true(*args, **kwargs):
+            return True
+
         app = (
             Application.builder()
             .application_class(PytestApplication)
@@ -1943,6 +1963,8 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+        monkeypatch.setattr(app.bot, "set_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1984,6 +2006,9 @@ class TestApplication:
         async def post_stop(app: Application) -> None:
             events.append("post_stop")
 
+        async def return_true(*args, **kwargs):
+            return True
+
         app = (
             Application.builder()
             .application_class(PytestApplication)
@@ -2004,6 +2029,8 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+        monkeypatch.setattr(app.bot, "set_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
