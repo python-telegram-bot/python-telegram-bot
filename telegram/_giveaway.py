@@ -57,7 +57,8 @@ class Giveaway(TelegramObject):
             come. If empty, then all users can participate in the giveaway. Users with a phone
             number that was bought on Fragment can always participate in giveaways.
         premium_subscription_month_count (:obj:`int`, optional): The number of months the Telegram
-            Premium subscription won from the giveaway will be active for.
+            Premium subscription won from the giveaway will be active for; for Telegram Premium
+            giveaways only.
 
     Attributes:
         chats (Sequence[:class:`telegram.Chat`]): The list of chats which the user must join to
@@ -76,7 +77,8 @@ class Giveaway(TelegramObject):
             come. If empty, then all users can participate in the giveaway. Users with a phone
             number that was bought on Fragment can always participate in giveaways.
         premium_subscription_month_count (:obj:`int`): Optional. The number of months the Telegram
-            Premium subscription won from the giveaway will be active for.
+            Premium subscription won from the giveaway will be active for; for Telegram Premium
+            giveaways only.
     """
 
     __slots__ = (
