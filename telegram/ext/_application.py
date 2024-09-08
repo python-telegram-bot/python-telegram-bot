@@ -323,7 +323,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
-        self.handlers: Dict[int, List[BaseHandler[Any, CCT]]] = {}
+        self.handlers: Dict[int, List[BaseHandler[Any, CCT, Any]]] = {}
         self.error_handlers: Dict[
             HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
         ] = {}
@@ -1352,7 +1352,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             # (in __create_task_callback)
             self._mark_for_persistence_update(update=update)
 
-    def add_handler(self, handler: BaseHandler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
+    def add_handler(self, handler: BaseHandler[Any, CCT, Any], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
 
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
@@ -1420,8 +1420,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     def add_handlers(
         self,
         handlers: Union[
-            Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]],
-            Dict[int, Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]]],
+            Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]],
+            Dict[int, Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]]],
         ],
         group: Union[int, DefaultValue[int]] = _DEFAULT_0,
     ) -> None:
@@ -1469,7 +1469,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 "dictionary where the keys are groups and values are sequences of handlers."
             )
 
-    def remove_handler(self, handler: BaseHandler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
+    def remove_handler(
+        self, handler: BaseHandler[Any, CCT, Any], group: int = DEFAULT_GROUP
+    ) -> None:
         """Remove a handler from the specified group.
 
         Args:

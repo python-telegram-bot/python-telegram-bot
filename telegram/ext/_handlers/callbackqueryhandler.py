@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class CallbackQueryHandler(BaseHandler[Update, CCT]):
+class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram
     :attr:`callback queries <telegram.Update.callback_query>`. Optionally based on a regex.
 
@@ -125,7 +125,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
     __slots__ = ("game_pattern", "pattern")
 
     def __init__(
-        self,
+        self: "CallbackQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         pattern: Optional[
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]

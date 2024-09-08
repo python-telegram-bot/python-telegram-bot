@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class StringRegexHandler(BaseHandler[str, CCT]):
+class StringRegexHandler(BaseHandler[str, CCT, RT]):
     """Handler class to handle string updates based on a regex which checks the update content.
 
     Read the documentation of the :mod:`re` module for more information. The :func:`re.match`
@@ -74,7 +74,7 @@ class StringRegexHandler(BaseHandler[str, CCT]):
     __slots__ = ("pattern",)
 
     def __init__(
-        self,
+        self: "StringRegexHandler[CCT, RT]",
         pattern: Union[str, Pattern[str]],
         callback: HandlerCallback[str, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
