@@ -66,14 +66,14 @@ class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
             assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
 
-    def test_de_json(self, bot, chat_photo):
+    def test_de_json(self, offline_bot, chat_photo):
         json_dict = {
             "small_file_id": self.chatphoto_small_file_id,
             "big_file_id": self.chatphoto_big_file_id,
             "small_file_unique_id": self.chatphoto_small_file_unique_id,
             "big_file_unique_id": self.chatphoto_big_file_unique_id,
         }
-        chat_photo = ChatPhoto.de_json(json_dict, bot)
+        chat_photo = ChatPhoto.de_json(json_dict, offline_bot)
         assert chat_photo.api_kwargs == {}
         assert chat_photo.small_file_id == self.chatphoto_small_file_id
         assert chat_photo.big_file_id == self.chatphoto_big_file_id
@@ -121,12 +121,14 @@ class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
+    async def test_send_with_chat_photo(
+        self, monkeypatch, offline_bot, super_group_id, chat_photo
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters["photo"] == chat_photo.to_dict()
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        message = await offline_bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
         assert message
 
     async def test_get_small_file_instance_method(self, monkeypatch, chat_photo):

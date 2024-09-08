@@ -192,7 +192,9 @@ class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
         with pytest.raises(ValueError, match="should be a sequence of sequences"):
             InlineKeyboardMarkup([[[InlineKeyboardButton("only_2d_array_is_allowed", "1")]]])
 
-    async def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
+    async def test_expected_values_empty_switch(
+        self, inline_keyboard_markup, offline_bot, monkeypatch
+    ):
         async def make_assertion(
             url,
             data,
@@ -224,8 +226,8 @@ class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
         inline_keyboard_markup.inline_keyboard[0][1].callback_data = None
         inline_keyboard_markup.inline_keyboard[0][1].switch_inline_query_current_chat = ""
 
-        monkeypatch.setattr(bot, "_send_message", make_assertion)
-        await bot.send_message(123, "test", reply_markup=inline_keyboard_markup)
+        monkeypatch.setattr(offline_bot, "_send_message", make_assertion)
+        await offline_bot.send_message(123, "test", reply_markup=inline_keyboard_markup)
 
 
 class TestInlineKeyborardMarkupWithRequest(InlineKeyboardMarkupTestBase):

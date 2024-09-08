@@ -49,16 +49,16 @@ class TestChosenInlineResultWithoutRequest(ChosenInlineResultTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json_required(self, bot, user):
+    def test_de_json_required(self, offline_bot, user):
         json_dict = {"result_id": self.result_id, "from": user.to_dict(), "query": self.query}
-        result = ChosenInlineResult.de_json(json_dict, bot)
+        result = ChosenInlineResult.de_json(json_dict, offline_bot)
         assert result.api_kwargs == {}
 
         assert result.result_id == self.result_id
         assert result.from_user == user
         assert result.query == self.query
 
-    def test_de_json_all(self, bot, user):
+    def test_de_json_all(self, offline_bot, user):
         loc = Location(-42.003, 34.004)
         json_dict = {
             "result_id": self.result_id,
@@ -67,7 +67,7 @@ class TestChosenInlineResultWithoutRequest(ChosenInlineResultTestBase):
             "location": loc.to_dict(),
             "inline_message_id": "a random id",
         }
-        result = ChosenInlineResult.de_json(json_dict, bot)
+        result = ChosenInlineResult.de_json(json_dict, offline_bot)
         assert result.api_kwargs == {}
 
         assert result.result_id == self.result_id

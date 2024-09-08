@@ -54,21 +54,21 @@ class TestShippingQueryWithoutRequest(ShippingQueryTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "invoice_payload": self.invoice_payload,
             "from": self.from_user.to_dict(),
             "shipping_address": self.shipping_address.to_dict(),
         }
-        shipping_query = ShippingQuery.de_json(json_dict, bot)
+        shipping_query = ShippingQuery.de_json(json_dict, offline_bot)
         assert shipping_query.api_kwargs == {}
 
         assert shipping_query.id == self.id_
         assert shipping_query.invoice_payload == self.invoice_payload
         assert shipping_query.from_user == self.from_user
         assert shipping_query.shipping_address == self.shipping_address
-        assert shipping_query.get_bot() is bot
+        assert shipping_query.get_bot() is offline_bot
 
     def test_to_dict(self, shipping_query):
         shipping_query_dict = shipping_query.to_dict()

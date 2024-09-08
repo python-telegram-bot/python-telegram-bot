@@ -139,7 +139,7 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
         assert bc.api_kwargs == {}
         assert isinstance(bc, BusinessConnection)
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "id": self.id_,
             "user": self.user.to_dict(),
@@ -148,7 +148,7 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
             "can_reply": self.can_reply,
             "is_enabled": self.is_enabled,
         }
-        chat_bot = BusinessConnection.de_json(json_dict, bot)
+        chat_bot = BusinessConnection.de_json(json_dict, offline_bot)
         chat_bot_raw = BusinessConnection.de_json(json_dict, raw_bot)
         chat_bot_tz = BusinessConnection.de_json(json_dict, tz_bot)
 

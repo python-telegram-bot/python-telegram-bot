@@ -94,7 +94,7 @@ class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
             assert getattr(callback_query, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "from": self.from_user.to_dict(),
@@ -104,7 +104,7 @@ class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
             "inline_message_id": self.inline_message_id,
             "game_short_name": self.game_short_name,
         }
-        callback_query = CallbackQuery.de_json(json_dict, bot)
+        callback_query = CallbackQuery.de_json(json_dict, offline_bot)
         assert callback_query.api_kwargs == {}
 
         assert callback_query.id == self.id_

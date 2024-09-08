@@ -40,12 +40,12 @@ class TestChatLocationWithoutRequest(ChatLocationTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "location": self.location.to_dict(),
             "address": self.address,
         }
-        chat_location = ChatLocation.de_json(json_dict, bot)
+        chat_location = ChatLocation.de_json(json_dict, offline_bot)
         assert chat_location.api_kwargs == {}
 
         assert chat_location.location == self.location

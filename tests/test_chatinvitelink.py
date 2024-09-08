@@ -66,7 +66,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invite_link)) == len(set(mro_slots(invite_link))), "duplicate slot"
 
-    def test_de_json_required_args(self, bot, creator):
+    def test_de_json_required_args(self, offline_bot, creator):
         json_dict = {
             "invite_link": self.link,
             "creator": creator.to_dict(),
@@ -75,7 +75,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             "is_revoked": self.revoked,
         }
 
-        invite_link = ChatInviteLink.de_json(json_dict, bot)
+        invite_link = ChatInviteLink.de_json(json_dict, offline_bot)
         assert invite_link.api_kwargs == {}
 
         assert invite_link.invite_link == self.link
@@ -84,7 +84,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
         assert invite_link.is_primary == self.primary
         assert invite_link.is_revoked == self.revoked
 
-    def test_de_json_all_args(self, bot, creator):
+    def test_de_json_all_args(self, offline_bot, creator):
         json_dict = {
             "invite_link": self.link,
             "creator": creator.to_dict(),
@@ -99,7 +99,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             "subscription_price": self.subscription_price,
         }
 
-        invite_link = ChatInviteLink.de_json(json_dict, bot)
+        invite_link = ChatInviteLink.de_json(json_dict, offline_bot)
         assert invite_link.api_kwargs == {}
 
         assert invite_link.invite_link == self.link
@@ -115,7 +115,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
         assert invite_link.subscription_period == self.subscription_period
         assert invite_link.subscription_price == self.subscription_price
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot, creator):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, creator):
         json_dict = {
             "invite_link": self.link,
             "creator": creator.to_dict(),
@@ -129,7 +129,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
         }
 
         invite_link_raw = ChatInviteLink.de_json(json_dict, raw_bot)
-        invite_link_bot = ChatInviteLink.de_json(json_dict, bot)
+        invite_link_bot = ChatInviteLink.de_json(json_dict, offline_bot)
         invite_link_tz = ChatInviteLink.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable

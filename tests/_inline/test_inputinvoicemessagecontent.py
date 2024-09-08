@@ -203,8 +203,8 @@ class TestInputInvoiceMessageContentWithoutRequest(InputInvoiceMessageContentTes
             == input_invoice_message_content.is_flexible
         )
 
-    def test_de_json(self, bot):
-        assert InputInvoiceMessageContent.de_json({}, bot=bot) is None
+    def test_de_json(self, offline_bot):
+        assert InputInvoiceMessageContent.de_json({}, bot=offline_bot) is None
 
         json_dict = {
             "title": self.title,
@@ -229,7 +229,9 @@ class TestInputInvoiceMessageContentWithoutRequest(InputInvoiceMessageContentTes
             "is_flexible": self.is_flexible,
         }
 
-        input_invoice_message_content = InputInvoiceMessageContent.de_json(json_dict, bot=bot)
+        input_invoice_message_content = InputInvoiceMessageContent.de_json(
+            json_dict, bot=offline_bot
+        )
         assert input_invoice_message_content.api_kwargs == {}
 
         assert input_invoice_message_content.title == self.title

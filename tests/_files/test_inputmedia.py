@@ -655,7 +655,7 @@ def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
 class TestSendMediaGroupWithoutRequest:
     async def test_send_media_group_throws_error_with_group_caption_and_individual_captions(
         self,
-        bot,
+        offline_bot,
         chat_id,
         media_group,
         media_group_no_caption_only_caption_entities,
@@ -670,11 +670,11 @@ class TestSendMediaGroupWithoutRequest:
                 ValueError,
                 match="You can only supply either group caption or media with captions.",
             ):
-                await bot.send_media_group(chat_id, group, caption="foo")
+                await offline_bot.send_media_group(chat_id, group, caption="foo")
 
     async def test_send_media_group_custom_filename(
         self,
-        bot,
+        offline_bot,
         chat_id,
         photo_file,  # noqa: F811
         animation_file,  # noqa: F811
@@ -690,7 +690,7 @@ class TestSendMediaGroupWithoutRequest:
             if result is True:
                 raise Exception("Test was successful")
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
         media = [
             InputMediaAnimation(animation_file, filename="custom_filename"),
@@ -700,10 +700,10 @@ class TestSendMediaGroupWithoutRequest:
         ]
 
         with pytest.raises(Exception, match="Test was successful"):
-            await bot.send_media_group(chat_id, media)
+            await offline_bot.send_media_group(chat_id, media)
 
     async def test_send_media_group_with_thumbs(
-        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+        self, offline_bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
         async def make_assertion(method, url, request_data: RequestData, *args, **kwargs):
             nonlocal input_video
@@ -715,13 +715,13 @@ class TestSendMediaGroupWithoutRequest:
             result = video_check and thumb_check
             raise Exception(f"Test was {'successful' if result else 'failing'}")
 
-        monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "_request_wrapper", make_assertion)
         input_video = InputMediaVideo(video_file, thumbnail=photo_file)
         with pytest.raises(Exception, match="Test was successful"):
-            await bot.send_media_group(chat_id, [input_video, input_video])
+            await offline_bot.send_media_group(chat_id, [input_video, input_video])
 
     async def test_edit_message_media_with_thumb(
-        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+        self, offline_bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
         async def make_assertion(
             method: str, url: str, request_data: Optional[RequestData] = None, *args, **kwargs
@@ -734,10 +734,12 @@ class TestSendMediaGroupWithoutRequest:
             result = video_check and thumb_check
             raise Exception(f"Test was {'successful' if result else 'failing'}")
 
-        monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "_request_wrapper", make_assertion)
         input_video = InputMediaVideo(video_file, thumbnail=photo_file)
         with pytest.raises(Exception, match="Test was successful"):
-            await bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
+            await offline_bot.edit_message_media(
+                chat_id=chat_id, message_id=123, media=input_video
+            )
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),

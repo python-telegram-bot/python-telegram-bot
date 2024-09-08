@@ -305,7 +305,7 @@ class PollTestBase:
 
 
 class TestPollWithoutRequest(PollTestBase):
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "question": self.question,
@@ -321,7 +321,7 @@ class TestPollWithoutRequest(PollTestBase):
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
         }
-        poll = Poll.de_json(json_dict, bot)
+        poll = Poll.de_json(json_dict, offline_bot)
         assert poll.api_kwargs == {}
 
         assert poll.id == self.id_
@@ -343,7 +343,7 @@ class TestPollWithoutRequest(PollTestBase):
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
         assert poll.question_entities == tuple(self.question_entities)
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
             "id": self.id_,
             "question": self.question,
@@ -361,7 +361,7 @@ class TestPollWithoutRequest(PollTestBase):
         }
 
         poll_raw = Poll.de_json(json_dict, raw_bot)
-        poll_bot = Poll.de_json(json_dict, bot)
+        poll_bot = Poll.de_json(json_dict, offline_bot)
         poll_bot_tz = Poll.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable

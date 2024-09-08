@@ -50,7 +50,7 @@ class TestShippingAddressWithoutRequest(ShippingAddressTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "country_code": self.country_code,
             "state": self.state,
@@ -59,7 +59,7 @@ class TestShippingAddressWithoutRequest(ShippingAddressTestBase):
             "street_line2": self.street_line2,
             "post_code": self.post_code,
         }
-        shipping_address = ShippingAddress.de_json(json_dict, bot)
+        shipping_address = ShippingAddress.de_json(json_dict, offline_bot)
         assert shipping_address.api_kwargs == {}
 
         assert shipping_address.country_code == self.country_code

@@ -55,9 +55,9 @@ class TestMessageEntityWithoutRequest(MessageEntityTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"type": self.type_, "offset": self.offset, "length": self.length}
-        entity = MessageEntity.de_json(json_dict, bot)
+        entity = MessageEntity.de_json(json_dict, offline_bot)
         assert entity.api_kwargs == {}
 
         assert entity.type == self.type_
