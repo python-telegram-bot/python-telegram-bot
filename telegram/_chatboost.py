@@ -197,7 +197,8 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
     Args:
         giveaway_message_id (:obj:`int`): Identifier of a message in the chat with the giveaway;
             the message could have been deleted already. May be 0 if the message isn't sent yet.
-        user (:class:`telegram.User`, optional): User that won the prize in the giveaway if any.
+        user (:class:`telegram.User`, optional): User that won the prize in the giveaway if any;
+            for Telegram Premium giveaways only.
         prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be split between
             giveaway winners; for Telegram Star giveaways only.
 
