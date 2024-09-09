@@ -393,7 +393,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         return build_repr_with_selected_attrs(self, token=self.token)
 
     @property
-    def token(self) -> str:
+    def token(self):
         """:obj:`str`: Bot's unique authentication token.
 
         .. versionadded:: 20.0

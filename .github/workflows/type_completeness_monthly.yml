@@ -1,0 +1,27 @@
+name: Check Type Completeness
+on:
+  schedule:
+    # Run first friday of the month at 03:17 - odd time to spread load on GitHub Actions
+    - cron: '17 3 1-7 * 5'
+  pull_request:
+    # for demo only
+    branches:
+      - master
+
+jobs:
+  test-type-completeness:
+    name:   test-type-completeness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Bibo-Joshi/pyright-type-completeness@1.0.0
+        with:
+          package-name: telegram
+          python-version: 3.12
+          pyright-version: ~=1.1.367
+      - name: Check Output
+        # Fail the workflow if the "base-completeness-score" is less than 1
+        run: |
+            if [ $(jq '.base-completeness-score' /tmp/pyright-type-completeness-output.json) -lt 1 ]; then
+            echo "Type completeness score is less than 1"
+            exit 1
+            fi
