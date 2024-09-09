@@ -19,9 +19,14 @@ jobs:
           python-version: 3.12
           pyright-version: ~=1.1.367
       - name: Check Output
-        # Fail the workflow if the "base-completeness-score" of the previous step is less than 1
-        run: |
-            if [ $(echo "${{ steps.pyright-type-completeness.outputs.base-completeness-score }}" | bc) -lt 1 ]; then
-                echo "Type completeness score is less than 1"
-                exit 1
-            fi
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            completeness = ${{ steps.pyright-type-completeness.outputs.base-completeness-score }}
+            if completeness > 1:
+                exit(0)
+            
+            text = f"Type Completeness Decreased to {completeness}. ❌")
+            error(text)
+            set_summamry(text)
+            exit(1)
