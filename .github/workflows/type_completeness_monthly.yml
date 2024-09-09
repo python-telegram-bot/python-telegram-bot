@@ -1,4 +1,4 @@
-name: Check Type Completeness
+name: Check Type Completeness Monthly Run
 on:
   schedule:
     # Run first friday of the month at 03:17 - odd time to spread load on GitHub Actions
@@ -19,9 +19,9 @@ jobs:
           python-version: 3.12
           pyright-version: ~=1.1.367
       - name: Check Output
-        # Fail the workflow if the "base-completeness-score" is less than 1
+        # Fail the workflow if the "base-completeness-score" of the previous step is less than 1
         run: |
-            if [ $(jq '.base-completeness-score' /tmp/pyright-type-completeness-output.json) -lt 1 ]; then
-            echo "Type completeness score is less than 1"
-            exit 1
+            if [ $(echo "${{ steps.pyright-type-completeness.outputs.base-completeness-score }}" | bc) -lt 1 ]; then
+                echo "Type completeness score is less than 1"
+                exit 1
             fi
