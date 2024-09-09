@@ -194,7 +194,6 @@ class TestGiveawayCreatedWithoutRequest:
 
         gac = GiveawayCreated.de_json(json_dict, bot)
         assert gac.api_kwargs == {}
-
         assert gac.prize_star_count == self.prize_star_count
 
         assert Giveaway.de_json(None, bot) is None

@@ -326,6 +326,8 @@ class TransactionPartnerUser(TransactionPartner):
         invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
         paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
             media bought by the user.
+
+            .. versionadded:: 21.5
         paid_media_payload (:obj:`str`, optional): Optional. Bot-specified paid media payload.
 
             .. versionadded:: NEXT.VERSION
@@ -337,6 +339,8 @@ class TransactionPartnerUser(TransactionPartner):
         invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
         paid_media (Tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
             media bought by the user.
+
+            .. versionadded:: 21.5
         paid_media_payload (:obj:`str`): Optional. Optional. Bot-specified paid media payload.
 
             .. versionadded:: NEXT.VERSION
