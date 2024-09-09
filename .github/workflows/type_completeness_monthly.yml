@@ -20,13 +20,18 @@ jobs:
           pyright-version: ~=1.1.367
       - name: Check Output
         uses: jannekem/run-python-script-action@v1
+        env:
+          TYPE_COMPLETENESS: ${{ steps.pyright-type-completeness.outputs.base-completeness-score }}
         with:
           script: |
-            completeness = ${{ steps.pyright-type-completeness.outputs.base-completeness-score }}
+            import os
+            
+            completeness = int(os.getenv("TYPE_COMPLETENESS"))
+            
             if completeness > 1:
                 exit(0)
             
             text = f"Type Completeness Decreased to {completeness}. ❌"
             error(text)
-            set_summamry(text)
+            set_summary(text)
             exit(1)
