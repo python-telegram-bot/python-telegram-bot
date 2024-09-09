@@ -297,10 +297,10 @@ class PaidMediaPurchased(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`from_user` and :attr:`paid_media_payload` are equal.
 
-    .. versionadded:: NEXT.VERSION
-
     Note:
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         from_user (:class:`telegram.User`): User who purchased the media.

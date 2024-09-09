@@ -399,7 +399,8 @@ class Update(TelegramObject):
     PURCHASED_PAID_MEDIA: Final[str] = constants.UpdateType.PURCHASED_PAID_MEDIA
     """:const:`telegram.constants.UpdateType.PURCHASED_PAID_MEDIA`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: NEXT.VERSION
+    """
 
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.

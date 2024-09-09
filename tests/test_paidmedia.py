@@ -356,6 +356,7 @@ class TestPaidMediaPurchasedWithoutRequest(PaidMediaPurchasedTestBase):
         pmp_none = PaidMediaPurchased.de_json(None, bot)
         assert pmp.from_user == self.from_user
         assert pmp.paid_media_payload == self.paid_media_payload
+        assert pmp.api_kwargs == {}
         assert pmp_none is None
 
     def test_to_dict(self, paid_media_purchased):
