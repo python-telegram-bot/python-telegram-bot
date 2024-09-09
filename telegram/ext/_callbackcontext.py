@@ -29,7 +29,6 @@ from typing import (
     NoReturn,
     Optional,
     Type,
-    TypeVar,
     Union,
 )
 
@@ -49,9 +48,6 @@ _STORING_DATA_WIKI = (
     "https://github.com/python-telegram-bot/python-telegram-bot"
     "/wiki/Storing-bot%2C-user-and-chat-related-data"
 )
-
-# something like poor mans "typing.Self" for py<3.11
-ST = TypeVar("ST", bound="CallbackContext[Any, Any, Any, Any]")
 
 
 class CallbackContext(Generic[BT, UD, CD, BD]):
@@ -137,24 +133,24 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     )
 
     def __init__(
-        self: ST,
-        application: "Application[BT, ST, UD, CD, BD, Any]",
+        self: "CCT",
+        application: "Application[BT, CCT, UD, CD, BD, Any]",
         chat_id: Optional[int] = None,
         user_id: Optional[int] = None,
     ):
-        self._application: Application[BT, ST, UD, CD, BD, Any] = application
+        self._application: Application[BT, CCT, UD, CD, BD, Any] = application
         self._chat_id: Optional[int] = chat_id
         self._user_id: Optional[int] = user_id
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
-        self.job: Optional[Job[Any]] = None
+        self.job: Optional[Job[CCT]] = None
         self.coroutine: Optional[
             Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
 
     @property
-    def application(self) -> "Application[BT, ST, UD, CD, BD, Any]":
+    def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
         """:class:`telegram.ext.Application`: The application associated with this context."""
         return self._application
 
@@ -402,7 +398,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> Optional["JobQueue[ST]"]:
+    def job_queue(self) -> Optional["JobQueue[CCT]"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
         :class:`telegram.ext.Application`.

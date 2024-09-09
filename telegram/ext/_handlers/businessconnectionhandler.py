@@ -29,7 +29,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 RT = TypeVar("RT")
 
 
-class BusinessConnectionHandler(BaseHandler[Update, CCT, RT]):
+class BusinessConnectionHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram
     :attr:`Business Connections <telegram.Update.business_connection>`.
 
@@ -65,7 +65,7 @@ class BusinessConnectionHandler(BaseHandler[Update, CCT, RT]):
     )
 
     def __init__(
-        self: "BusinessConnectionHandler[CCT, RT]",
+        self,
         callback: HandlerCallback[Update, CCT, RT],
         user_id: Optional[SCT[int]] = None,
         username: Optional[SCT[str]] = None,

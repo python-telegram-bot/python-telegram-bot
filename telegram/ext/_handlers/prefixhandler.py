@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class PrefixHandler(BaseHandler[Update, CCT, RT]):
+class PrefixHandler(BaseHandler[Update, CCT]):
     """Handler class to handle custom prefix commands.
 
     This is an intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
@@ -123,7 +123,7 @@ class PrefixHandler(BaseHandler[Update, CCT, RT]):
     __slots__ = ("commands", "filters")
 
     def __init__(
-        self: "PrefixHandler[CCT, RT]",
+        self,
         prefix: SCT[str],
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],

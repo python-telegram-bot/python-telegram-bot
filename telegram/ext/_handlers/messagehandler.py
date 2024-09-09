@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class MessageHandler(BaseHandler[Update, CCT, RT]):
+class MessageHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram messages. They might contain text, media or status
     updates.
 
@@ -75,7 +75,7 @@ class MessageHandler(BaseHandler[Update, CCT, RT]):
     __slots__ = ("filters",)
 
     def __init__(
-        self: "MessageHandler[CCT, RT]",
+        self,
         filters: Optional[filters_module.BaseFilter],
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,

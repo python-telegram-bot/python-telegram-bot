@@ -21,10 +21,10 @@
 
 from telegram import Update
 from telegram.ext._handlers.basehandler import BaseHandler
-from telegram.ext._utils.types import CCT, RT
+from telegram.ext._utils.types import CCT
 
 
-class ShippingQueryHandler(BaseHandler[Update, CCT, RT]):
+class ShippingQueryHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram :attr:`telegram.Update.shipping_query`.
 
     Warning:

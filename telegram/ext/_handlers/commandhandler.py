@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class CommandHandler(BaseHandler[Update, CCT, RT]):
+class CommandHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
@@ -118,7 +118,7 @@ class CommandHandler(BaseHandler[Update, CCT, RT]):
     __slots__ = ("commands", "filters", "has_args")
 
     def __init__(
-        self: "CommandHandler[CCT, RT]",
+        self,
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
         filters: Optional[filters_module.BaseFilter] = None,

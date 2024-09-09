@@ -28,7 +28,7 @@ from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 
-class ChatJoinRequestHandler(BaseHandler[Update, CCT, RT]):
+class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram updates that contain
     :attr:`telegram.Update.chat_join_request`.
 
@@ -81,7 +81,7 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT, RT]):
     )
 
     def __init__(
-        self: "ChatJoinRequestHandler[CCT, RT]",
+        self,
         callback: HandlerCallback[Update, CCT, RT],
         chat_id: Optional[SCT[int]] = None,
         username: Optional[SCT[str]] = None,

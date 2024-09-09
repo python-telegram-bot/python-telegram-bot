@@ -28,7 +28,7 @@ from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 
-class MessageReactionHandler(BaseHandler[Update, CCT, RT]):
+class MessageReactionHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a message reaction.
 
     Note:
@@ -110,7 +110,7 @@ class MessageReactionHandler(BaseHandler[Update, CCT, RT]):
     and :attr:`telegram.Update.message_reaction_count`."""
 
     def __init__(
-        self: "MessageReactionHandler[CCT, RT]",
+        self,
         callback: HandlerCallback[Update, CCT, RT],
         chat_id: Optional[SCT[int]] = None,
         chat_username: Optional[SCT[str]] = None,
