@@ -26,6 +26,8 @@ jobs:
           script: |
             import os
             
+            print(f"Type Completeness: {os.getenv('TYPE_COMPLETENESS')}")
+            set_summary(f"Type Completeness: {os.getenv('TYPE_COMPLETENESS')}")
             completeness = int(os.getenv("TYPE_COMPLETENESS"))
             
             if completeness > 1:
