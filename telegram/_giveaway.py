@@ -173,7 +173,9 @@ class GiveawayCreated(TelegramObject):
 
     __slots__ = ("prize_star_count",)
 
-    def __init__(self, prize_star_count: Optional[int], *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(
+        self, prize_star_count: Optional[int] = None, *, api_kwargs: Optional[JSONDict] = None
+    ):
         super().__init__(api_kwargs=api_kwargs)
         self.prize_star_count: Optional[int] = prize_star_count
 
