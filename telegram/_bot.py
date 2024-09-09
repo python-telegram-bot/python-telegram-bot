@@ -9211,7 +9211,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 Telegram Star proceeds from this media will be credited to the chat's balance.
                 Otherwise, they will be credited to the bot's balance.
             star_count (:obj:`int`): The number of Telegram Stars that must be paid to buy access
-                to the media.
+                to the media; :tg-const:`telegram.constants.InvoiceLimit.MIN_STAR_COUNT` -
+                :tg-const:`telegram.constants.InvoiceLimit.MAX_STAR_COUNT`.
             media (Sequence[:class:`telegram.InputPaidMedia`]): A list describing the media to be
                 sent; up to :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
             caption (:obj:`str`, optional): Caption of the media to be sent,
