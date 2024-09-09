@@ -119,7 +119,6 @@ if GITHUB_ACTION and JOB_INDEX == 0:
             return
 
         if "bot" in request.fixturenames:
-            print(request.fixturenames)
             pytest.fail(
                 f"Test function {request.function} in test class {name} should not have a `bot` "
                 f"fixture. Use `offline_bot` instead."

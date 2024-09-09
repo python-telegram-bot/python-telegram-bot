@@ -99,7 +99,7 @@ from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
-from tests.auxil.networking import NonchalantHttpxRequest, expect_bad_request
+from tests.auxil.networking import OfflineRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
 
@@ -255,7 +255,7 @@ class TestBotWithoutRequest:
         async def stop(*args, **kwargs):
             self.test_flag.append("stop")
 
-        temp_bot = PytestBot(token=offline_bot.token, request=NonchalantHttpxRequest())
+        temp_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
         orig_stop = temp_bot.request.shutdown
 
         try:
@@ -735,7 +735,7 @@ class TestBotWithoutRequest:
                         "id": "123",
                         "type": "document",
                         "document_url": (
-                            "https://raw.githubusercontent.com/python-telegram-offline_bot"
+                            "https://raw.githubusercontent.com/python-telegram-bot"
                             "/logos/master/logo/png/ptb-logo_240.png"
                         ),
                         "mime_type": "image/png",
@@ -753,7 +753,7 @@ class TestBotWithoutRequest:
             else:
                 button_dict = {
                     "text": "button_text",
-                    "web_app": {"url": "https://python-telegram-offline_bot.org"},
+                    "web_app": {"url": "https://python-telegram-bot.org"},
                 }
 
             expected["button"] = button_dict
@@ -766,7 +766,7 @@ class TestBotWithoutRequest:
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
-                    "https://raw.githubusercontent.com/python-telegram-offline_bot/logos/master/"
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
                     "logo/png/ptb-logo_240.png"
                 ),
                 title="test_result",
@@ -782,7 +782,7 @@ class TestBotWithoutRequest:
             )
         elif button_type == "web_app":
             button = InlineQueryResultsButton(
-                text="button_text", web_app=WebAppInfo("https://python-telegram-offline_bot.org")
+                text="button_text", web_app=WebAppInfo("https://python-telegram-bot.org")
             )
         else:
             button = None
@@ -843,7 +843,7 @@ class TestBotWithoutRequest:
                         "type": "document",
                         "document_url": (
                             "https://raw.githubusercontent.com/"
-                            "python-telegram-offline_bot/logos/master/logo/png/"
+                            "python-telegram-bot/logos/master/logo/png/"
                             "ptb-logo_240.png"
                         ),
                         "mime_type": "image/png",
@@ -863,7 +863,7 @@ class TestBotWithoutRequest:
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
-                    "https://raw.githubusercontent.com/python-telegram-offline_bot/logos/master/"
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
                     "logo/png/ptb-logo_240.png"
                 ),
                 title="test_result",
@@ -935,7 +935,7 @@ class TestBotWithoutRequest:
                         "type": InlineQueryResultType.DOCUMENT,
                         "document_url": (
                             "https://raw.githubusercontent.com/"
-                            "python-telegram-offline_bot/logos/master/logo/png/"
+                            "python-telegram-bot/logos/master/logo/png/"
                             "ptb-logo_240.png"
                         ),
                         "mime_type": "image/png",
@@ -962,7 +962,7 @@ class TestBotWithoutRequest:
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
-                    "https://raw.githubusercontent.com/python-telegram-offline_bot/logos/master/"
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
                     "logo/png/ptb-logo_240.png"
                 ),
                 title="test_result",
@@ -1729,7 +1729,7 @@ class TestBotWithoutRequest:
         try:
             replace_button = InlineKeyboardButton(text="replace", callback_data="replace_test")
             no_replace_button = InlineKeyboardButton(
-                text="no_replace", url="http://python-telegram-offline_bot.org/"
+                text="no_replace", url="http://python-telegram-bot.org/"
             )
             reply_markup = InlineKeyboardMarkup.from_row(
                 [
@@ -1747,7 +1747,7 @@ class TestBotWithoutRequest:
                 ),
                 InlineQueryResultVoice(
                     "22",
-                    "https://python-telegram-offline_bot.org/static/testfiles/telegram.ogg",
+                    "https://python-telegram-bot.org/static/testfiles/telegram.ogg",
                     title="second",
                 ),
             ]

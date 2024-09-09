@@ -85,9 +85,9 @@ async def httpx_request():
 )
 class TestNoSocksHTTP2WithoutRequest:
     async def test_init(self, offline_bot):
-        with pytest.raises(RuntimeError, match=r"python-telegram-offline_bot\[socks\]"):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[socks\]"):
             HTTPXRequest(proxy="socks5://foo")
-        with pytest.raises(RuntimeError, match=r"python-telegram-offline_bot\[http2\]"):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[http2\]"):
             HTTPXRequest(http_version="2")
 
 
