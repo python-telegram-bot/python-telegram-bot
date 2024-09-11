@@ -31,23 +31,23 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def shipping_query(bot):
     sq = ShippingQuery(
-        TestShippingQueryBase.id_,
-        TestShippingQueryBase.from_user,
-        TestShippingQueryBase.invoice_payload,
-        TestShippingQueryBase.shipping_address,
+        ShippingQueryTestBase.id_,
+        ShippingQueryTestBase.from_user,
+        ShippingQueryTestBase.invoice_payload,
+        ShippingQueryTestBase.shipping_address,
     )
     sq.set_bot(bot)
     return sq
 
 
-class TestShippingQueryBase:
+class ShippingQueryTestBase:
     id_ = "5"
     invoice_payload = "invoice_payload"
     from_user = User(0, "", False)
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
 
-class TestShippingQueryWithoutRequest(TestShippingQueryBase):
+class TestShippingQueryWithoutRequest(ShippingQueryTestBase):
     def test_slot_behaviour(self, shipping_query):
         inst = shipping_query
         for attr in inst.__slots__:

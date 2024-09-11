@@ -24,7 +24,7 @@ from telegram import Birthdate
 from tests.auxil.slots import mro_slots
 
 
-class TestBirthdateBase:
+class BirthdateTestBase:
     day = 1
     month = 1
     year = 2022
@@ -32,10 +32,10 @@ class TestBirthdateBase:
 
 @pytest.fixture(scope="module")
 def birthdate():
-    return Birthdate(TestBirthdateBase.day, TestBirthdateBase.month, TestBirthdateBase.year)
+    return Birthdate(BirthdateTestBase.day, BirthdateTestBase.month, BirthdateTestBase.year)
 
 
-class TestBirthdateWithoutRequest(TestBirthdateBase):
+class TestBirthdateWithoutRequest(BirthdateTestBase):
     def test_slot_behaviour(self, birthdate):
         for attr in birthdate.__slots__:
             assert getattr(birthdate, attr, "err") != "err", f"got extra slot '{attr}'"

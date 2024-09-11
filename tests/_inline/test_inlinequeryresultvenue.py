@@ -31,24 +31,24 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_venue():
     return InlineQueryResultVenue(
-        TestInlineQueryResultVenueBase.id_,
-        TestInlineQueryResultVenueBase.latitude,
-        TestInlineQueryResultVenueBase.longitude,
-        TestInlineQueryResultVenueBase.title,
-        TestInlineQueryResultVenueBase.address,
-        foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
-        foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
-        thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
-        thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
-        thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
-        input_message_content=TestInlineQueryResultVenueBase.input_message_content,
-        reply_markup=TestInlineQueryResultVenueBase.reply_markup,
-        google_place_id=TestInlineQueryResultVenueBase.google_place_id,
-        google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+        InlineQueryResultVenueTestBase.id_,
+        InlineQueryResultVenueTestBase.latitude,
+        InlineQueryResultVenueTestBase.longitude,
+        InlineQueryResultVenueTestBase.title,
+        InlineQueryResultVenueTestBase.address,
+        foursquare_id=InlineQueryResultVenueTestBase.foursquare_id,
+        foursquare_type=InlineQueryResultVenueTestBase.foursquare_type,
+        thumbnail_url=InlineQueryResultVenueTestBase.thumbnail_url,
+        thumbnail_width=InlineQueryResultVenueTestBase.thumbnail_width,
+        thumbnail_height=InlineQueryResultVenueTestBase.thumbnail_height,
+        input_message_content=InlineQueryResultVenueTestBase.input_message_content,
+        reply_markup=InlineQueryResultVenueTestBase.reply_markup,
+        google_place_id=InlineQueryResultVenueTestBase.google_place_id,
+        google_place_type=InlineQueryResultVenueTestBase.google_place_type,
     )
 
 
-class TestInlineQueryResultVenueBase:
+class InlineQueryResultVenueTestBase:
     id_ = "id"
     type_ = "venue"
     latitude = "latitude"
@@ -66,7 +66,7 @@ class TestInlineQueryResultVenueBase:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultVenueWithoutRequest(TestInlineQueryResultVenueBase):
+class TestInlineQueryResultVenueWithoutRequest(InlineQueryResultVenueTestBase):
     def test_slot_behaviour(self, inline_query_result_venue):
         inst = inline_query_result_venue
         for attr in inst.__slots__:

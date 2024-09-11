@@ -25,19 +25,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def proximity_alert_triggered():
     return ProximityAlertTriggered(
-        TestProximityAlertTriggeredBase.traveler,
-        TestProximityAlertTriggeredBase.watcher,
-        TestProximityAlertTriggeredBase.distance,
+        ProximityAlertTriggeredTestBase.traveler,
+        ProximityAlertTriggeredTestBase.watcher,
+        ProximityAlertTriggeredTestBase.distance,
     )
 
 
-class TestProximityAlertTriggeredBase:
+class ProximityAlertTriggeredTestBase:
     traveler = User(1, "foo", False)
     watcher = User(2, "bar", False)
     distance = 42
 
 
-class TestProximityAlertTriggeredWithoutRequest(TestProximityAlertTriggeredBase):
+class TestProximityAlertTriggeredWithoutRequest(ProximityAlertTriggeredTestBase):
     def test_slot_behaviour(self, proximity_alert_triggered):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:

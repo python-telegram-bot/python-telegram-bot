@@ -31,10 +31,10 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def inline_keyboard_markup():
-    return InlineKeyboardMarkup(TestInlineKeyboardMarkupBase.inline_keyboard)
+    return InlineKeyboardMarkup(InlineKeyboardMarkupTestBase.inline_keyboard)
 
 
-class TestInlineKeyboardMarkupBase:
+class InlineKeyboardMarkupTestBase:
     inline_keyboard = [
         [
             InlineKeyboardButton(text="button1", callback_data="data1"),
@@ -43,7 +43,7 @@ class TestInlineKeyboardMarkupBase:
     ]
 
 
-class TestInlineKeyboardMarkupWithoutRequest(TestInlineKeyboardMarkupBase):
+class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
     def test_slot_behaviour(self, inline_keyboard_markup):
         inst = inline_keyboard_markup
         for attr in inst.__slots__:
@@ -228,7 +228,7 @@ class TestInlineKeyboardMarkupWithoutRequest(TestInlineKeyboardMarkupBase):
         await bot.send_message(123, "test", reply_markup=inline_keyboard_markup)
 
 
-class TestInlineKeyborardMarkupWithRequest(TestInlineKeyboardMarkupBase):
+class TestInlineKeyborardMarkupWithRequest(InlineKeyboardMarkupTestBase):
     async def test_send_message_with_inline_keyboard_markup(
         self, bot, chat_id, inline_keyboard_markup
     ):

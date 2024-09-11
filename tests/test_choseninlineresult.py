@@ -33,16 +33,16 @@ def user():
 @pytest.fixture(scope="module")
 def chosen_inline_result(user):
     return ChosenInlineResult(
-        TestChosenInlineResultBase.result_id, user, TestChosenInlineResultBase.query
+        ChosenInlineResultTestBase.result_id, user, ChosenInlineResultTestBase.query
     )
 
 
-class TestChosenInlineResultBase:
+class ChosenInlineResultTestBase:
     result_id = "result id"
     query = "query text"
 
 
-class TestChosenInlineResultWithoutRequest(TestChosenInlineResultBase):
+class TestChosenInlineResultWithoutRequest(ChosenInlineResultTestBase):
     def test_slot_behaviour(self, chosen_inline_result):
         inst = chosen_inline_result
         for attr in inst.__slots__:

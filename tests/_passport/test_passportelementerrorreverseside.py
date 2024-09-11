@@ -25,20 +25,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def passport_element_error_reverse_side():
     return PassportElementErrorReverseSide(
-        TestPassportElementErrorReverseSideBase.type_,
-        TestPassportElementErrorReverseSideBase.file_hash,
-        TestPassportElementErrorReverseSideBase.message,
+        PassportElementErrorReverseSideTestBase.type_,
+        PassportElementErrorReverseSideTestBase.file_hash,
+        PassportElementErrorReverseSideTestBase.message,
     )
 
 
-class TestPassportElementErrorReverseSideBase:
+class PassportElementErrorReverseSideTestBase:
     source = "reverse_side"
     type_ = "test_type"
     file_hash = "file_hash"
     message = "Error message"
 
 
-class TestPassportElementErrorReverseSideWithoutRequest(TestPassportElementErrorReverseSideBase):
+class TestPassportElementErrorReverseSideWithoutRequest(PassportElementErrorReverseSideTestBase):
     def test_slot_behaviour(self, passport_element_error_reverse_side):
         inst = passport_element_error_reverse_side
         for attr in inst.__slots__:

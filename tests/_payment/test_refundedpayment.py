@@ -25,15 +25,15 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def refunded_payment():
     return RefundedPayment(
-        TestRefundedPaymentBase.currency,
-        TestRefundedPaymentBase.total_amount,
-        TestRefundedPaymentBase.invoice_payload,
-        TestRefundedPaymentBase.telegram_payment_charge_id,
-        TestRefundedPaymentBase.provider_payment_charge_id,
+        RefundedPaymentTestBase.currency,
+        RefundedPaymentTestBase.total_amount,
+        RefundedPaymentTestBase.invoice_payload,
+        RefundedPaymentTestBase.telegram_payment_charge_id,
+        RefundedPaymentTestBase.provider_payment_charge_id,
     )
 
 
-class TestRefundedPaymentBase:
+class RefundedPaymentTestBase:
     invoice_payload = "invoice_payload"
     currency = "EUR"
     total_amount = 100
@@ -41,7 +41,7 @@ class TestRefundedPaymentBase:
     provider_payment_charge_id = "provider_payment_charge_id"
 
 
-class TestRefundedPaymentWithoutRequest(TestRefundedPaymentBase):
+class TestRefundedPaymentWithoutRequest(RefundedPaymentTestBase):
     def test_slot_behaviour(self, refunded_payment):
         inst = refunded_payment
         for attr in inst.__slots__:

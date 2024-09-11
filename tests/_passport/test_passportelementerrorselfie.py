@@ -25,20 +25,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def passport_element_error_selfie():
     return PassportElementErrorSelfie(
-        TestPassportElementErrorSelfieBase.type_,
-        TestPassportElementErrorSelfieBase.file_hash,
-        TestPassportElementErrorSelfieBase.message,
+        PassportElementErrorSelfieTestBase.type_,
+        PassportElementErrorSelfieTestBase.file_hash,
+        PassportElementErrorSelfieTestBase.message,
     )
 
 
-class TestPassportElementErrorSelfieBase:
+class PassportElementErrorSelfieTestBase:
     source = "selfie"
     type_ = "test_type"
     file_hash = "file_hash"
     message = "Error message"
 
 
-class TestPassportElementErrorSelfieWithoutRequest(TestPassportElementErrorSelfieBase):
+class TestPassportElementErrorSelfieWithoutRequest(PassportElementErrorSelfieTestBase):
     def test_slot_behaviour(self, passport_element_error_selfie):
         inst = passport_element_error_selfie
         for attr in inst.__slots__:

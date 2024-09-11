@@ -24,15 +24,15 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def labeled_price():
-    return LabeledPrice(TestLabeledPriceBase.label, TestLabeledPriceBase.amount)
+    return LabeledPrice(LabeledPriceTestBase.label, LabeledPriceTestBase.amount)
 
 
-class TestLabeledPriceBase:
+class LabeledPriceTestBase:
     label = "label"
     amount = 100
 
 
-class TestLabeledPriceWithoutRequest(TestLabeledPriceBase):
+class TestLabeledPriceWithoutRequest(LabeledPriceTestBase):
     def test_slot_behaviour(self, labeled_price):
         inst = labeled_price
         for attr in inst.__slots__:

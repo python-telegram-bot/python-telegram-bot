@@ -25,14 +25,14 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def keyboard_button_poll_type():
-    return KeyboardButtonPollType(TestKeyboardButtonPollTypeBase.type)
+    return KeyboardButtonPollType(KeyboardButtonPollTypeTestBase.type)
 
 
-class TestKeyboardButtonPollTypeBase:
+class KeyboardButtonPollTypeTestBase:
     type = Poll.QUIZ
 
 
-class TestKeyboardButtonPollTypeWithoutRequest(TestKeyboardButtonPollTypeBase):
+class TestKeyboardButtonPollTypeWithoutRequest(KeyboardButtonPollTypeTestBase):
     def test_slot_behaviour(self, keyboard_button_poll_type):
         inst = keyboard_button_poll_type
         for attr in inst.__slots__:

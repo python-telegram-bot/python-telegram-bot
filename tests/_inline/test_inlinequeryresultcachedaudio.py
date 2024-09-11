@@ -33,17 +33,17 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_audio():
     return InlineQueryResultCachedAudio(
-        TestInlineQueryResultCachedAudioBase.id_,
-        TestInlineQueryResultCachedAudioBase.audio_file_id,
-        caption=TestInlineQueryResultCachedAudioBase.caption,
-        parse_mode=TestInlineQueryResultCachedAudioBase.parse_mode,
-        caption_entities=TestInlineQueryResultCachedAudioBase.caption_entities,
-        input_message_content=TestInlineQueryResultCachedAudioBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedAudioBase.reply_markup,
+        InlineQueryResultCachedAudioTestBase.id_,
+        InlineQueryResultCachedAudioTestBase.audio_file_id,
+        caption=InlineQueryResultCachedAudioTestBase.caption,
+        parse_mode=InlineQueryResultCachedAudioTestBase.parse_mode,
+        caption_entities=InlineQueryResultCachedAudioTestBase.caption_entities,
+        input_message_content=InlineQueryResultCachedAudioTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedAudioTestBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedAudioBase:
+class InlineQueryResultCachedAudioTestBase:
     id_ = "id"
     type_ = "audio"
     audio_file_id = "audio file id"
@@ -54,7 +54,7 @@ class TestInlineQueryResultCachedAudioBase:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultCachedAudioWithoutRequest(TestInlineQueryResultCachedAudioBase):
+class TestInlineQueryResultCachedAudioWithoutRequest(InlineQueryResultCachedAudioTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_audio):
         inst = inline_query_result_cached_audio
         for attr in inst.__slots__:

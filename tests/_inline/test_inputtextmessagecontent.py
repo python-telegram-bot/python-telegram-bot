@@ -26,14 +26,14 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def input_text_message_content():
     return InputTextMessageContent(
-        TestInputTextMessageContentBase.message_text,
-        parse_mode=TestInputTextMessageContentBase.parse_mode,
-        entities=TestInputTextMessageContentBase.entities,
-        link_preview_options=TestInputTextMessageContentBase.link_preview_options,
+        InputTextMessageContentTestBase.message_text,
+        parse_mode=InputTextMessageContentTestBase.parse_mode,
+        entities=InputTextMessageContentTestBase.entities,
+        link_preview_options=InputTextMessageContentTestBase.link_preview_options,
     )
 
 
-class TestInputTextMessageContentBase:
+class InputTextMessageContentTestBase:
     message_text = "*message text*"
     parse_mode = ParseMode.MARKDOWN
     entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
@@ -41,7 +41,7 @@ class TestInputTextMessageContentBase:
     link_preview_options = LinkPreviewOptions(False, url="https://python-telegram-bot.org")
 
 
-class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase):
+class TestInputTextMessageContentWithoutRequest(InputTextMessageContentTestBase):
     def test_slot_behaviour(self, input_text_message_content):
         inst = input_text_message_content
         for attr in inst.__slots__:

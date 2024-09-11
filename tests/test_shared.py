@@ -25,16 +25,16 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="class")
 def users_shared():
-    return UsersShared(TestUsersSharedBase.request_id, users=TestUsersSharedBase.users)
+    return UsersShared(UsersSharedTestBase.request_id, users=UsersSharedTestBase.users)
 
 
-class TestUsersSharedBase:
+class UsersSharedTestBase:
     request_id = 789
     user_ids = (101112, 101113)
     users = (SharedUser(101112, "user1"), SharedUser(101113, "user2"))
 
 
-class TestUsersSharedWithoutRequest(TestUsersSharedBase):
+class TestUsersSharedWithoutRequest(UsersSharedTestBase):
     def test_slot_behaviour(self, users_shared):
         for attr in users_shared.__slots__:
             assert getattr(users_shared, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -85,17 +85,17 @@ class TestUsersSharedWithoutRequest(TestUsersSharedBase):
 @pytest.fixture(scope="class")
 def chat_shared():
     return ChatShared(
-        TestChatSharedBase.request_id,
-        TestChatSharedBase.chat_id,
+        ChatSharedTestBase.request_id,
+        ChatSharedTestBase.chat_id,
     )
 
 
-class TestChatSharedBase:
+class ChatSharedTestBase:
     request_id = 131415
     chat_id = 161718
 
 
-class TestChatSharedWithoutRequest(TestChatSharedBase):
+class TestChatSharedWithoutRequest(ChatSharedTestBase):
     def test_slot_behaviour(self, chat_shared):
         for attr in chat_shared.__slots__:
             assert getattr(chat_shared, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -143,15 +143,15 @@ class TestChatSharedWithoutRequest(TestChatSharedBase):
 @pytest.fixture(scope="class")
 def shared_user():
     return SharedUser(
-        TestSharedUserBase.user_id,
-        TestSharedUserBase.first_name,
-        last_name=TestSharedUserBase.last_name,
-        username=TestSharedUserBase.username,
-        photo=TestSharedUserBase.photo,
+        SharedUserTestBase.user_id,
+        SharedUserTestBase.first_name,
+        last_name=SharedUserTestBase.last_name,
+        username=SharedUserTestBase.username,
+        photo=SharedUserTestBase.photo,
     )
 
 
-class TestSharedUserBase:
+class SharedUserTestBase:
     user_id = 101112
     first_name = "first"
     last_name = "last"
@@ -162,7 +162,7 @@ class TestSharedUserBase:
     )
 
 
-class TestSharedUserWithoutRequest(TestSharedUserBase):
+class TestSharedUserWithoutRequest(SharedUserTestBase):
     def test_slot_behaviour(self, shared_user):
         for attr in shared_user.__slots__:
             assert getattr(shared_user, attr, "err") != "err", f"got extra slot '{attr}'"
