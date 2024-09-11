@@ -336,5 +336,5 @@ class PaidMediaPurchased(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data=data.get("from"), bot=bot)
+        data["from_user"] = User.de_json(data=data.pop("from"), bot=bot)
         return super().de_json(data=data, bot=bot)
