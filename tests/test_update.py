@@ -40,6 +40,7 @@ from telegram import (
     Message,
     MessageReactionCountUpdated,
     MessageReactionUpdated,
+    PaidMediaPurchased,
     Poll,
     PollAnswer,
     PollOption,
@@ -143,6 +144,11 @@ business_message = Message(
     User(1, "", False),
 )
 
+purchased_paid_media = PaidMediaPurchased(
+    from_user=User(1, "", False),
+    paid_media_payload="payload",
+)
+
 
 params = [
     {"message": message},
@@ -178,6 +184,7 @@ params = [
     {"deleted_business_messages": deleted_business_messages},
     {"business_message": business_message},
     {"edited_business_message": business_message},
+    {"purchased_paid_media": purchased_paid_media},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -205,6 +212,7 @@ all_types = (
     "deleted_business_messages",
     "business_message",
     "edited_business_message",
+    "purchased_paid_media",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -290,6 +298,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
             or update.poll is not None
             or update.poll_answer is not None
             or update.business_connection is not None
+            or update.purchased_paid_media is not None
         ):
             assert chat.id == 1
         else:
@@ -403,6 +412,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
             or update.message_reaction_count is not None
             or update.deleted_business_messages is not None
             or update.business_connection is not None
+            or update.purchased_paid_media is not None
         ):
             assert eff_message.message_id == message.message_id
         else:

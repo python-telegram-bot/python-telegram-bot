@@ -27,8 +27,10 @@ from telegram import (
     PaidMediaInfo,
     PaidMediaPhoto,
     PaidMediaPreview,
+    PaidMediaPurchased,
     PaidMediaVideo,
     PhotoSize,
+    User,
     Video,
 )
 from telegram.constants import PaidMediaType
@@ -119,6 +121,14 @@ def paid_media_info():
     return PaidMediaInfo(
         star_count=PaidMediaInfoTestBase.star_count,
         paid_media=[paid_media_video(), paid_media_photo()],
+    )
+
+
+@pytest.fixture(scope="module")
+def paid_media_purchased():
+    return PaidMediaPurchased(
+        from_user=PaidMediaPurchasedTestBase.from_user,
+        paid_media_payload=PaidMediaPurchasedTestBase.paid_media_payload,
     )
 
 
@@ -323,3 +333,54 @@ class TestPaidMediaInfoWithoutRequest(PaidMediaInfoTestBase):
 
         assert pmi1 != pmi3
         assert hash(pmi1) != hash(pmi3)
+
+
+class PaidMediaPurchasedTestBase:
+    from_user = User(1, "user", False)
+    paid_media_payload = "payload"
+
+
+class TestPaidMediaPurchasedWithoutRequest(PaidMediaPurchasedTestBase):
+    def test_slot_behaviour(self, paid_media_purchased):
+        inst = paid_media_purchased
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, bot):
+        json_dict = {
+            "from": self.from_user.to_dict(),
+            "paid_media_payload": self.paid_media_payload,
+        }
+        pmp = PaidMediaPurchased.de_json(json_dict, bot)
+        pmp_none = PaidMediaPurchased.de_json(None, bot)
+        assert pmp.from_user == self.from_user
+        assert pmp.paid_media_payload == self.paid_media_payload
+        assert pmp.api_kwargs == {}
+        assert pmp_none is None
+
+    def test_to_dict(self, paid_media_purchased):
+        assert paid_media_purchased.to_dict() == {
+            "from": self.from_user.to_dict(),
+            "paid_media_payload": self.paid_media_payload,
+        }
+
+    def test_equality(self):
+        pmp1 = PaidMediaPurchased(
+            from_user=self.from_user,
+            paid_media_payload=self.paid_media_payload,
+        )
+        pmp2 = PaidMediaPurchased(
+            from_user=self.from_user,
+            paid_media_payload=self.paid_media_payload,
+        )
+        pmp3 = PaidMediaPurchased(
+            from_user=User(2, "user", False),
+            paid_media_payload="other",
+        )
+
+        assert pmp1 == pmp2
+        assert hash(pmp1) == hash(pmp2)
+
+        assert pmp1 != pmp3
+        assert hash(pmp1) != hash(pmp3)

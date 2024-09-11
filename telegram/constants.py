@@ -2779,6 +2779,11 @@ class UpdateType(StringEnum):
 
     .. versionadded:: 21.1
     """
+    PURCHASED_PAID_MEDIA = "purchased_paid_media"
+    """:obj:`str`: Updates with :attr:`telegram.Update.purchased_paid_media`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InvoiceLimit(IntEnum):
