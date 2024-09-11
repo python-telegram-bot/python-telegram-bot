@@ -104,12 +104,18 @@ if GITHUB_ACTION and JOB_INDEX == 0:
     # matrix entries
     @pytest.fixture(autouse=True)
     def _disallow_requests_in_without_request_tests(request):
-        """This fixture prevents tests that don't require requests from using the online-bot."""
+        """This fixture prevents tests that don't require requests from using the online-bot.
+        This is a sane-effort approach on trying to prevent requests from being made in the
+        *WithoutRequest classes. Note that we can not prevent all requests, as one can still
+        manually build a `Bot` object or use `httpx` directly. See #4317 and #4465 for some
+        discussion.
+        """
 
         if type(request).__name__ == "SubRequest":
-            # We want to allow *WithoutRequest test classes to use fixtures that do use requests,
-            # e.g. `animation` and so on. Unfortunately the `SubRequest` class is not public, so
-            # we check only the name for less dependency on pytests internal structure.
+            # Some fixtures used in the *WithoutRequests test classes do use requests, e.g.
+            # `animation`. Separating that would be too much effort, hence we allow that.
+            # Unfortunately the `SubRequest` class is not public, so we check only the name for
+            # less dependency on pytest's internal structure.
             return
 
         if not request.cls:
