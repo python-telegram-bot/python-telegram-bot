@@ -60,7 +60,7 @@ class TestPreCheckoutQueryWithoutRequest(PreCheckoutQueryTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "invoice_payload": self.invoice_payload,
@@ -70,10 +70,10 @@ class TestPreCheckoutQueryWithoutRequest(PreCheckoutQueryTestBase):
             "from": self.from_user.to_dict(),
             "order_info": self.order_info.to_dict(),
         }
-        pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
+        pre_checkout_query = PreCheckoutQuery.de_json(json_dict, offline_bot)
         assert pre_checkout_query.api_kwargs == {}
 
-        assert pre_checkout_query.get_bot() is bot
+        assert pre_checkout_query.get_bot() is offline_bot
         assert pre_checkout_query.id == self.id_
         assert pre_checkout_query.invoice_payload == self.invoice_payload
         assert pre_checkout_query.shipping_option_id == self.shipping_option_id

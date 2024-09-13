@@ -84,7 +84,7 @@ class TestAnimationWithoutRequest(AnimationTestBase):
         assert animation.file_name.startswith("game.gif") == self.file_name.startswith("game.gif")
         assert isinstance(animation.thumbnail, PhotoSize)
 
-    def test_de_json(self, bot, animation):
+    def test_de_json(self, offline_bot, animation):
         json_dict = {
             "file_id": self.animation_file_id,
             "file_unique_id": self.animation_file_unique_id,
@@ -96,7 +96,7 @@ class TestAnimationWithoutRequest(AnimationTestBase):
             "mime_type": self.mime_type,
             "file_size": self.file_size,
         }
-        animation = Animation.de_json(json_dict, bot)
+        animation = Animation.de_json(json_dict, offline_bot)
         assert animation.api_kwargs == {}
         assert animation.file_id == self.animation_file_id
         assert animation.file_unique_id == self.animation_file_unique_id
@@ -140,18 +140,22 @@ class TestAnimationWithoutRequest(AnimationTestBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
+    async def test_send_animation_custom_filename(
+        self, offline_bot, chat_id, animation_file, monkeypatch
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_animation(chat_id, animation_file, filename="custom_filename")
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_animation(
+            chat_id, animation_file, filename="custom_filename"
+        )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_animation_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_send_animation_local_files(self, monkeypatch, offline_bot, chat_id, local_mode):
         try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
+            offline_bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local Bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
             expected = file.as_uri()
@@ -167,18 +171,18 @@ class TestAnimationWithoutRequest(AnimationTestBase):
                         data.get("thumbnail"), InputFile
                     )
 
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_animation(chat_id, file, thumbnail=file)
+            monkeypatch.setattr(offline_bot, "_post", make_assertion)
+            await offline_bot.send_animation(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
-            bot._local_mode = False
+            offline_bot._local_mode = False
 
-    async def test_send_with_animation(self, monkeypatch, bot, chat_id, animation):
+    async def test_send_with_animation(self, monkeypatch, offline_bot, chat_id, animation):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["animation"] == animation.file_id
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_animation(animation=animation, chat_id=chat_id)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_animation(animation=animation, chat_id=chat_id)
 
     async def test_get_file_instance_method(self, monkeypatch, animation):
         async def make_assertion(*_, **kwargs):

@@ -51,16 +51,16 @@ class TestInlineQueryResultsButtonWithoutRequest(InlineQueryResultsButtonTestBas
         assert inline_query_results_button_dict["start_parameter"] == self.start_parameter
         assert inline_query_results_button_dict["web_app"] == self.web_app.to_dict()
 
-    def test_de_json(self, bot):
-        assert InlineQueryResultsButton.de_json(None, bot) is None
-        assert InlineQueryResultsButton.de_json({}, bot) is None
+    def test_de_json(self, offline_bot):
+        assert InlineQueryResultsButton.de_json(None, offline_bot) is None
+        assert InlineQueryResultsButton.de_json({}, offline_bot) is None
 
         json_dict = {
             "text": self.text,
             "start_parameter": self.start_parameter,
             "web_app": self.web_app.to_dict(),
         }
-        inline_query_results_button = InlineQueryResultsButton.de_json(json_dict, bot)
+        inline_query_results_button = InlineQueryResultsButton.de_json(json_dict, offline_bot)
 
         assert inline_query_results_button.text == self.text
         assert inline_query_results_button.start_parameter == self.start_parameter

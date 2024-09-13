@@ -150,7 +150,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
 
         assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "title": self.title,
@@ -194,7 +194,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "last_name": self.last_name,
             "can_send_paid_media": self.can_send_paid_media,
         }
-        cfi = ChatFullInfo.de_json(json_dict, bot)
+        cfi = ChatFullInfo.de_json(json_dict, offline_bot)
         assert cfi.id == self.id_
         assert cfi.title == self.title
         assert cfi.type == self.type_
@@ -239,7 +239,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi.max_reaction_count == self.max_reaction_count
         assert cfi.can_send_paid_media == self.can_send_paid_media
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "id": self.id_,
             "type": self.type_,
@@ -247,7 +247,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "max_reaction_count": self.max_reaction_count,
             "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
         }
-        cfi_bot = ChatFullInfo.de_json(json_dict, bot)
+        cfi_bot = ChatFullInfo.de_json(json_dict, offline_bot)
         cfi_bot_raw = ChatFullInfo.de_json(json_dict, raw_bot)
         cfi_bot_tz = ChatFullInfo.de_json(json_dict, tz_bot)
 

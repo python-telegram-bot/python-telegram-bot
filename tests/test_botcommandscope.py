@@ -125,14 +125,14 @@ class TestBotCommandScopeWithoutRequest:
             set(mro_slots(bot_command_scope))
         ), "duplicate slot"
 
-    def test_de_json(self, bot, scope_class_and_type, chat_id):
+    def test_de_json(self, offline_bot, scope_class_and_type, chat_id):
         cls = scope_class_and_type[0]
         type_ = scope_class_and_type[1]
 
-        assert cls.de_json({}, bot) is None
+        assert cls.de_json({}, offline_bot) is None
 
         json_dict = {"type": type_, "chat_id": chat_id, "user_id": 42}
-        bot_command_scope = BotCommandScope.de_json(json_dict, bot)
+        bot_command_scope = BotCommandScope.de_json(json_dict, offline_bot)
         assert set(bot_command_scope.api_kwargs.keys()) == {"chat_id", "user_id"} - set(
             cls.__slots__
         )
@@ -145,18 +145,18 @@ class TestBotCommandScopeWithoutRequest:
         if "user_id" in cls.__slots__:
             assert bot_command_scope.user_id == 42
 
-    def test_de_json_invalid_type(self, bot):
+    def test_de_json_invalid_type(self, offline_bot):
         json_dict = {"type": "invalid", "chat_id": chat_id, "user_id": 42}
-        bot_command_scope = BotCommandScope.de_json(json_dict, bot)
+        bot_command_scope = BotCommandScope.de_json(json_dict, offline_bot)
 
         assert type(bot_command_scope) is BotCommandScope
         assert bot_command_scope.type == "invalid"
 
-    def test_de_json_subclass(self, scope_class, bot, chat_id):
+    def test_de_json_subclass(self, scope_class, offline_bot, chat_id):
         """This makes sure that e.g. BotCommandScopeDefault(data) never returns a
         BotCommandScopeChat instance."""
         json_dict = {"type": "invalid", "chat_id": chat_id, "user_id": 42}
-        assert type(scope_class.de_json(json_dict, bot)) is scope_class
+        assert type(scope_class.de_json(json_dict, offline_bot)) is scope_class
 
     def test_to_dict(self, bot_command_scope):
         bot_command_scope_dict = bot_command_scope.to_dict()
@@ -172,7 +172,7 @@ class TestBotCommandScopeWithoutRequest:
         assert type(BotCommandScope("default").type) is BotCommandScopeType
         assert BotCommandScope("unknown").type == "unknown"
 
-    def test_equality(self, bot_command_scope, bot):
+    def test_equality(self, bot_command_scope, offline_bot):
         a = BotCommandScope("base_type")
         b = BotCommandScope("base_type")
         c = bot_command_scope
@@ -200,7 +200,7 @@ class TestBotCommandScopeWithoutRequest:
         if hasattr(c, "chat_id"):
             json_dict = c.to_dict()
             json_dict["chat_id"] = 0
-            f = c.__class__.de_json(json_dict, bot)
+            f = c.__class__.de_json(json_dict, offline_bot)
 
             assert c != f
             assert hash(c) != hash(f)
@@ -208,7 +208,7 @@ class TestBotCommandScopeWithoutRequest:
         if hasattr(c, "user_id"):
             json_dict = c.to_dict()
             json_dict["user_id"] = 0
-            g = c.__class__.de_json(json_dict, bot)
+            g = c.__class__.de_json(json_dict, offline_bot)
 
             assert c != g
             assert hash(c) != hash(g)

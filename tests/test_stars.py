@@ -253,7 +253,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id,
             "amount": self.amount,
@@ -261,8 +261,8 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
             "source": self.source.to_dict(),
             "receiver": self.receiver.to_dict(),
         }
-        st = StarTransaction.de_json(json_dict, bot)
-        st_none = StarTransaction.de_json(None, bot)
+        st = StarTransaction.de_json(json_dict, offline_bot)
+        st_none = StarTransaction.de_json(None, offline_bot)
         assert st.api_kwargs == {}
         assert st.id == self.id
         assert st.amount == self.amount
@@ -271,10 +271,10 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         assert st.receiver == self.receiver
         assert st_none is None
 
-    def test_de_json_star_transaction_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_star_transaction_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = star_transaction().to_dict()
         st_raw = StarTransaction.de_json(json_dict, raw_bot)
-        st_bot = StarTransaction.de_json(json_dict, bot)
+        st_bot = StarTransaction.de_json(json_dict, offline_bot)
         st_tz = StarTransaction.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -343,12 +343,12 @@ class TestStarTransactionsWithoutRequest(StarTransactionsTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "transactions": [t.to_dict() for t in self.transactions],
         }
-        st = StarTransactions.de_json(json_dict, bot)
-        st_none = StarTransactions.de_json(None, bot)
+        st = StarTransactions.de_json(json_dict, offline_bot)
+        st_none = StarTransactions.de_json(None, offline_bot)
         assert st.api_kwargs == {}
         assert st.transactions == tuple(self.transactions)
         assert st_none is None
@@ -390,7 +390,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot, tp_scope_class_and_type):
+    def test_de_json(self, offline_bot, tp_scope_class_and_type):
         cls = tp_scope_class_and_type[0]
         type_ = tp_scope_class_and_type[1]
 
@@ -400,7 +400,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
         }
-        tp = TransactionPartner.de_json(json_dict, bot)
+        tp = TransactionPartner.de_json(json_dict, offline_bot)
         assert set(tp.api_kwargs.keys()) == {"user", "withdrawal_state", "invoice_payload"} - set(
             cls.__slots__
         )
@@ -414,17 +414,17 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             assert tp.user == self.user
             assert tp.invoice_payload == self.invoice_payload
 
-        assert cls.de_json(None, bot) is None
-        assert TransactionPartner.de_json({}, bot) is None
+        assert cls.de_json(None, offline_bot) is None
+        assert TransactionPartner.de_json({}, offline_bot) is None
 
-    def test_de_json_invalid_type(self, bot):
+    def test_de_json_invalid_type(self, offline_bot):
         json_dict = {
             "type": "invalid",
             "invoice_payload": self.invoice_payload,
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
         }
-        tp = TransactionPartner.de_json(json_dict, bot)
+        tp = TransactionPartner.de_json(json_dict, offline_bot)
         assert tp.api_kwargs == {
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
@@ -434,7 +434,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
         assert type(tp) is TransactionPartner
         assert tp.type == "invalid"
 
-    def test_de_json_subclass(self, tp_scope_class, bot):
+    def test_de_json_subclass(self, tp_scope_class, offline_bot):
         """This makes sure that e.g. TransactionPartnerUser(data) never returns a
         TransactionPartnerFragment instance."""
         json_dict = {
@@ -443,7 +443,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
         }
-        assert type(tp_scope_class.de_json(json_dict, bot)) is tp_scope_class
+        assert type(tp_scope_class.de_json(json_dict, offline_bot)) is tp_scope_class
 
     def test_to_dict(self, transaction_partner):
         tp_dict = transaction_partner.to_dict()
@@ -460,7 +460,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
         assert type(TransactionPartner("other").type) is TransactionPartnerType
         assert TransactionPartner("unknown").type == "unknown"
 
-    def test_equality(self, transaction_partner, bot):
+    def test_equality(self, transaction_partner, offline_bot):
         a = TransactionPartner("base_type")
         b = TransactionPartner("base_type")
         c = transaction_partner
@@ -488,7 +488,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
         if hasattr(c, "user"):
             json_dict = c.to_dict()
             json_dict["user"] = User(2, "something", True).to_dict()
-            f = c.__class__.de_json(json_dict, bot)
+            f = c.__class__.de_json(json_dict, offline_bot)
 
             assert c != f
             assert hash(c) != hash(f)
@@ -506,7 +506,7 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot, rws_scope_class_and_type):
+    def test_de_json(self, offline_bot, rws_scope_class_and_type):
         cls = rws_scope_class_and_type[0]
         type_ = rws_scope_class_and_type[1]
 
@@ -515,7 +515,7 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
             "date": to_timestamp(self.date),
             "url": self.url,
         }
-        rws = RevenueWithdrawalState.de_json(json_dict, bot)
+        rws = RevenueWithdrawalState.de_json(json_dict, offline_bot)
         assert set(rws.api_kwargs.keys()) == {"date", "url"} - set(cls.__slots__)
 
         assert isinstance(rws, RevenueWithdrawalState)
@@ -526,16 +526,16 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
         if "url" in cls.__slots__:
             assert rws.url == self.url
 
-        assert cls.de_json(None, bot) is None
-        assert RevenueWithdrawalState.de_json({}, bot) is None
+        assert cls.de_json(None, offline_bot) is None
+        assert RevenueWithdrawalState.de_json({}, offline_bot) is None
 
-    def test_de_json_invalid_type(self, bot):
+    def test_de_json_invalid_type(self, offline_bot):
         json_dict = {
             "type": "invalid",
             "date": to_timestamp(self.date),
             "url": self.url,
         }
-        rws = RevenueWithdrawalState.de_json(json_dict, bot)
+        rws = RevenueWithdrawalState.de_json(json_dict, offline_bot)
         assert rws.api_kwargs == {
             "date": to_timestamp(self.date),
             "url": self.url,
@@ -544,7 +544,7 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
         assert type(rws) is RevenueWithdrawalState
         assert rws.type == "invalid"
 
-    def test_de_json_subclass(self, rws_scope_class, bot):
+    def test_de_json_subclass(self, rws_scope_class, offline_bot):
         """This makes sure that e.g. RevenueWithdrawalState(data) never returns a
         RevenueWithdrawalStateFailed instance."""
         json_dict = {
@@ -552,7 +552,7 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
             "date": to_timestamp(self.date),
             "url": self.url,
         }
-        assert type(rws_scope_class.de_json(json_dict, bot)) is rws_scope_class
+        assert type(rws_scope_class.de_json(json_dict, offline_bot)) is rws_scope_class
 
     def test_to_dict(self, revenue_withdrawal_state):
         rws_dict = revenue_withdrawal_state.to_dict()
@@ -568,7 +568,7 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
         assert type(RevenueWithdrawalState("failed").type) is RevenueWithdrawalStateType
         assert RevenueWithdrawalState("unknown").type == "unknown"
 
-    def test_equality(self, revenue_withdrawal_state, bot):
+    def test_equality(self, revenue_withdrawal_state, offline_bot):
         a = RevenueWithdrawalState("base_type")
         b = RevenueWithdrawalState("base_type")
         c = revenue_withdrawal_state
@@ -596,7 +596,7 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
         if hasattr(c, "url"):
             json_dict = c.to_dict()
             json_dict["url"] = "something"
-            f = c.__class__.de_json(json_dict, bot)
+            f = c.__class__.de_json(json_dict, offline_bot)
 
             assert c == f
             assert hash(c) == hash(f)
@@ -604,7 +604,7 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
         if hasattr(c, "date"):
             json_dict = c.to_dict()
             json_dict["date"] = to_timestamp(datetime.datetime.utcnow())
-            f = c.__class__.de_json(json_dict, bot)
+            f = c.__class__.de_json(json_dict, offline_bot)
 
             assert c != f
             assert hash(c) != hash(f)

@@ -168,12 +168,12 @@ class TestBackgroundTypeWithoutRequest:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json_required_args(self, bot, background_type):
+    def test_de_json_required_args(self, offline_bot, background_type):
         cls = background_type.__class__
-        assert cls.de_json({}, bot) is None
+        assert cls.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(background_type)
-        const_background_type = BackgroundType.de_json(json_dict, bot)
+        const_background_type = BackgroundType.de_json(json_dict, offline_bot)
         assert const_background_type.api_kwargs == {}
 
         assert isinstance(const_background_type, BackgroundType)
@@ -181,9 +181,9 @@ class TestBackgroundTypeWithoutRequest:
         for bg_type_at, const_bg_type_at in iter_args(background_type, const_background_type):
             assert bg_type_at == const_bg_type_at
 
-    def test_de_json_all_args(self, bot, background_type):
+    def test_de_json_all_args(self, offline_bot, background_type):
         json_dict = make_json_dict(background_type, include_optional_args=True)
-        const_background_type = BackgroundType.de_json(json_dict, bot)
+        const_background_type = BackgroundType.de_json(json_dict, offline_bot)
 
         assert const_background_type.api_kwargs == {}
 
@@ -194,19 +194,19 @@ class TestBackgroundTypeWithoutRequest:
         ):
             assert bg_type_at == const_bg_type_at
 
-    def test_de_json_invalid_type(self, background_type, bot):
+    def test_de_json_invalid_type(self, background_type, offline_bot):
         json_dict = {"type": "invalid", "theme_name": BTDefaults.theme_name}
-        background_type = BackgroundType.de_json(json_dict, bot)
+        background_type = BackgroundType.de_json(json_dict, offline_bot)
 
         assert type(background_type) is BackgroundType
         assert background_type.type == "invalid"
 
-    def test_de_json_subclass(self, background_type, bot, chat_id):
-        """This makes sure that e.g. BackgroundTypeFill(data, bot) never returns a
+    def test_de_json_subclass(self, background_type, offline_bot, chat_id):
+        """This makes sure that e.g. BackgroundTypeFill(data, offline_bot) never returns a
         BackgroundTypeWallpaper instance."""
         cls = background_type.__class__
         json_dict = make_json_dict(background_type, True)
-        assert type(cls.de_json(json_dict, bot)) is cls
+        assert type(cls.de_json(json_dict, offline_bot)) is cls
 
     def test_to_dict(self, background_type):
         bg_type_dict = background_type.to_dict()
@@ -275,12 +275,12 @@ class TestBackgroundFillWithoutRequest:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json_required_args(self, bot, background_fill):
+    def test_de_json_required_args(self, offline_bot, background_fill):
         cls = background_fill.__class__
-        assert cls.de_json({}, bot) is None
+        assert cls.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(background_fill)
-        const_background_fill = BackgroundFill.de_json(json_dict, bot)
+        const_background_fill = BackgroundFill.de_json(json_dict, offline_bot)
         assert const_background_fill.api_kwargs == {}
 
         assert isinstance(const_background_fill, BackgroundFill)
@@ -288,9 +288,9 @@ class TestBackgroundFillWithoutRequest:
         for bg_fill_at, const_bg_fill_at in iter_args(background_fill, const_background_fill):
             assert bg_fill_at == const_bg_fill_at
 
-    def test_de_json_all_args(self, bot, background_fill):
+    def test_de_json_all_args(self, offline_bot, background_fill):
         json_dict = make_json_dict(background_fill, include_optional_args=True)
-        const_background_fill = BackgroundFill.de_json(json_dict, bot)
+        const_background_fill = BackgroundFill.de_json(json_dict, offline_bot)
 
         assert const_background_fill.api_kwargs == {}
 
@@ -301,19 +301,19 @@ class TestBackgroundFillWithoutRequest:
         ):
             assert bg_fill_at == const_bg_fill_at
 
-    def test_de_json_invalid_type(self, background_fill, bot):
+    def test_de_json_invalid_type(self, background_fill, offline_bot):
         json_dict = {"type": "invalid", "theme_name": BTDefaults.theme_name}
-        background_fill = BackgroundFill.de_json(json_dict, bot)
+        background_fill = BackgroundFill.de_json(json_dict, offline_bot)
 
         assert type(background_fill) is BackgroundFill
         assert background_fill.type == "invalid"
 
-    def test_de_json_subclass(self, background_fill, bot):
-        """This makes sure that e.g. BackgroundFillSolid(data, bot) never returns a
+    def test_de_json_subclass(self, background_fill, offline_bot):
+        """This makes sure that e.g. BackgroundFillSolid(data, offline_bot) never returns a
         BackgroundFillGradient instance."""
         cls = background_fill.__class__
         json_dict = make_json_dict(background_fill, True)
-        assert type(cls.de_json(json_dict, bot)) is cls
+        assert type(cls.de_json(json_dict, offline_bot)) is cls
 
     def test_to_dict(self, background_fill):
         bg_fill_dict = background_fill.to_dict()

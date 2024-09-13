@@ -63,7 +63,7 @@ class TestChatWithoutRequest(ChatTestBase):
             assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "title": self.title,
@@ -73,7 +73,7 @@ class TestChatWithoutRequest(ChatTestBase):
             "first_name": self.first_name,
             "last_name": self.last_name,
         }
-        chat = Chat.de_json(json_dict, bot)
+        chat = Chat.de_json(json_dict, offline_bot)
 
         assert chat.id == self.id_
         assert chat.title == self.title

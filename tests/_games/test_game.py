@@ -55,20 +55,20 @@ class TestGameWithoutRequest(GameTestBase):
             assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(game)) == len(set(mro_slots(game))), "duplicate slot"
 
-    def test_de_json_required(self, bot):
+    def test_de_json_required(self, offline_bot):
         json_dict = {
             "title": self.title,
             "description": self.description,
             "photo": [self.photo[0].to_dict()],
         }
-        game = Game.de_json(json_dict, bot)
+        game = Game.de_json(json_dict, offline_bot)
         assert game.api_kwargs == {}
 
         assert game.title == self.title
         assert game.description == self.description
         assert game.photo == tuple(self.photo)
 
-    def test_de_json_all(self, bot):
+    def test_de_json_all(self, offline_bot):
         json_dict = {
             "title": self.title,
             "description": self.description,
@@ -77,7 +77,7 @@ class TestGameWithoutRequest(GameTestBase):
             "text_entities": [self.text_entities[0].to_dict()],
             "animation": self.animation.to_dict(),
         }
-        game = Game.de_json(json_dict, bot)
+        game = Game.de_json(json_dict, offline_bot)
         assert game.api_kwargs == {}
 
         assert game.title == self.title
