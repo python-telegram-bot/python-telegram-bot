@@ -134,6 +134,37 @@ class TestRequestWithoutRequest:
             assert getattr(inst, at, "err") != "err", f"got extra slot '{at}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
+    def test_httpx_kwargs(self, monkeypatch):
+        self.test_flag = {}
+
+        orig_init = httpx.AsyncClient.__init__
+
+        class Client(httpx.AsyncClient):
+            def __init__(*args, **kwargs):
+                orig_init(*args, **kwargs)
+                self.test_flag["args"] = args
+                self.test_flag["kwargs"] = kwargs
+
+        monkeypatch.setattr(httpx, "AsyncClient", Client)
+
+        HTTPXRequest(
+            connect_timeout=1,
+            connection_pool_size=42,
+            http_version="2",
+            httpx_kwargs={
+                "timeout": httpx.Timeout(7),
+                "limits": httpx.Limits(max_connections=7),
+                "http1": True,
+                "verify": False,
+            },
+        )
+        kwargs = self.test_flag["kwargs"]
+
+        assert kwargs["timeout"].connect == 7
+        assert kwargs["limits"].max_connections == 7
+        assert kwargs["http1"] is True
+        assert kwargs["verify"] is False
+
     async def test_context_manager(self, monkeypatch):
         async def initialize():
             self.test_flag = ["initialize"]

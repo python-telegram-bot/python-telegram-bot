@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
-from typing import Collection, Optional, Tuple, Union
+from typing import Any, Collection, Dict, Optional, Tuple, Union
 
 import httpx
 
@@ -122,6 +122,20 @@ class HTTPXRequest(BaseRequest):
             :meth:`do_request`. Defaults to ``20`` seconds.
 
             .. versionadded:: 21.0
+        httpx_kwargs (Dict[:obj:`str`, Any], optional): Additional keyword arguments to be passed
+            to the `httpx.AsyncClient <https://www.python-httpx.org/api/#asyncclient>`_
+            constructor.
+
+            Warning:
+                This parameter is intended for advanced users that want to fine-tune the behavior
+                of the underlying ``httpx`` client. The values passed here will override all the
+                defaults set by ``python-telegram-bot`` and all other parameters passed to
+                :class:`HTTPXRequest`. The only exception is the :paramref:`media_write_timeout`
+                parameter, which is not passed to the client constructor.
+                No runtime warnings will be issued about parameters that are overridden in this
+                way.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -139,6 +153,7 @@ class HTTPXRequest(BaseRequest):
         socket_options: Optional[Collection[SocketOpt]] = None,
         proxy: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
         media_write_timeout: Optional[float] = 20.0,
+        httpx_kwargs: Optional[Dict[str, Any]] = None,
     ):
         if proxy_url is not None and proxy is not None:
             raise ValueError("The parameters `proxy_url` and `proxy` are mutually exclusive.")
@@ -183,6 +198,7 @@ class HTTPXRequest(BaseRequest):
             "limits": limits,
             "transport": transport,
             **http_kwargs,
+            **(httpx_kwargs or {}),
         }
 
         try:
@@ -221,7 +237,7 @@ class HTTPXRequest(BaseRequest):
         return self._client.timeout.read
 
     def _build_client(self) -> httpx.AsyncClient:
-        return httpx.AsyncClient(**self._client_kwargs)  # type: ignore[arg-type]
+        return httpx.AsyncClient(**self._client_kwargs)
 
     async def initialize(self) -> None:
         """See :meth:`BaseRequest.initialize`."""
