@@ -3,10 +3,6 @@ on:
   schedule:
     # Run first friday of the month at 03:17 - odd time to spread load on GitHub Actions
     - cron: '17 3 1-7 * 5'
-  pull_request:
-    # for demo only
-    branches:
-      - master
 
 jobs:
   test-type-completeness:
