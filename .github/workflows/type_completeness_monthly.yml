@@ -28,8 +28,6 @@ jobs:
             import os
             completeness = float(os.getenv("TYPE_COMPLETENESS"))
             
-            set_summary(f"Type Completeness: {completeness}")
-            
             if completeness >= 1:
                 exit(0)
             
