@@ -59,20 +59,20 @@ class TestMaybeInaccessibleMessageWithoutRequest(MaybeInaccessibleMessageTestBas
         assert maybe_inaccessible_message_dict["message_id"] == self.message_id
         assert maybe_inaccessible_message_dict["date"] == to_timestamp(self.date)
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
             "message_id": self.message_id,
             "date": to_timestamp(self.date),
         }
-        maybe_inaccessible_message = MaybeInaccessibleMessage.de_json(json_dict, bot)
+        maybe_inaccessible_message = MaybeInaccessibleMessage.de_json(json_dict, offline_bot)
         assert maybe_inaccessible_message.api_kwargs == {}
 
         assert maybe_inaccessible_message.chat == self.chat
         assert maybe_inaccessible_message.message_id == self.message_id
         assert maybe_inaccessible_message.date == self.date
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
             "message_id": self.message_id,
@@ -80,7 +80,7 @@ class TestMaybeInaccessibleMessageWithoutRequest(MaybeInaccessibleMessageTestBas
         }
 
         maybe_inaccessible_message_raw = MaybeInaccessibleMessage.de_json(json_dict, raw_bot)
-        maybe_inaccessible_message_bot = MaybeInaccessibleMessage.de_json(json_dict, bot)
+        maybe_inaccessible_message_bot = MaybeInaccessibleMessage.de_json(json_dict, offline_bot)
         maybe_inaccessible_message_bot_tz = MaybeInaccessibleMessage.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -95,14 +95,14 @@ class TestMaybeInaccessibleMessageWithoutRequest(MaybeInaccessibleMessageTestBas
         assert maybe_inaccessible_message_bot.date.tzinfo == UTC
         assert maybe_inaccessible_message_bot_tz_offset == tz_bot_offset
 
-    def test_de_json_zero_date(self, bot):
+    def test_de_json_zero_date(self, offline_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
             "message_id": self.message_id,
             "date": 0,
         }
 
-        maybe_inaccessible_message = MaybeInaccessibleMessage.de_json(json_dict, bot)
+        maybe_inaccessible_message = MaybeInaccessibleMessage.de_json(json_dict, offline_bot)
         assert maybe_inaccessible_message.date == ZERO_DATE
         assert maybe_inaccessible_message.date is ZERO_DATE
 

@@ -86,8 +86,8 @@ class TestForumTopicWithoutRequest:
         assert forum_topic_object.name == TEST_TOPIC_NAME
         assert forum_topic_object.icon_custom_emoji_id == emoji_id
 
-    def test_de_json(self, bot, emoji_id, forum_group_id):
-        assert ForumTopic.de_json(None, bot=bot) is None
+    def test_de_json(self, offline_bot, emoji_id, forum_group_id):
+        assert ForumTopic.de_json(None, bot=offline_bot) is None
 
         json_dict = {
             "message_thread_id": forum_group_id,
@@ -95,7 +95,7 @@ class TestForumTopicWithoutRequest:
             "icon_color": TEST_TOPIC_ICON_COLOR,
             "icon_custom_emoji_id": emoji_id,
         }
-        topic = ForumTopic.de_json(json_dict, bot)
+        topic = ForumTopic.de_json(json_dict, offline_bot)
         assert topic.api_kwargs == {}
 
         assert topic.message_thread_id == forum_group_id
@@ -333,11 +333,11 @@ class TestForumTopicCreatedWithoutRequest:
         assert topic_created.icon_color == TEST_TOPIC_ICON_COLOR
         assert topic_created.name == TEST_TOPIC_NAME
 
-    def test_de_json(self, bot):
-        assert ForumTopicCreated.de_json(None, bot=bot) is None
+    def test_de_json(self, offline_bot):
+        assert ForumTopicCreated.de_json(None, bot=offline_bot) is None
 
         json_dict = {"icon_color": TEST_TOPIC_ICON_COLOR, "name": TEST_TOPIC_NAME}
-        action = ForumTopicCreated.de_json(json_dict, bot)
+        action = ForumTopicCreated.de_json(json_dict, offline_bot)
         assert action.api_kwargs == {}
 
         assert action.icon_color == TEST_TOPIC_ICON_COLOR

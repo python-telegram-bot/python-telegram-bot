@@ -105,9 +105,9 @@ class TestVideoChatParticipantsInvitedWithoutRequest:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self, user1, user2, bot):
+    def test_de_json(self, user1, user2, offline_bot):
         json_data = {"users": [user1.to_dict(), user2.to_dict()]}
-        video_chat_participants = VideoChatParticipantsInvited.de_json(json_data, bot)
+        video_chat_participants = VideoChatParticipantsInvited.de_json(json_data, offline_bot)
         assert video_chat_participants.api_kwargs == {}
 
         assert isinstance(video_chat_participants.users, tuple)
@@ -161,20 +161,20 @@ class TestVideoChatScheduledWithoutRequest:
     def test_expected_values(self):
         assert VideoChatScheduled(self.start_date).start_date == self.start_date
 
-    def test_de_json(self, bot):
-        assert VideoChatScheduled.de_json({}, bot=bot) is None
+    def test_de_json(self, offline_bot):
+        assert VideoChatScheduled.de_json({}, bot=offline_bot) is None
 
         json_dict = {"start_date": to_timestamp(self.start_date)}
-        video_chat_scheduled = VideoChatScheduled.de_json(json_dict, bot)
+        video_chat_scheduled = VideoChatScheduled.de_json(json_dict, offline_bot)
         assert video_chat_scheduled.api_kwargs == {}
 
         assert abs(video_chat_scheduled.start_date - self.start_date) < dtm.timedelta(seconds=1)
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {"start_date": to_timestamp(self.start_date)}
 
         videochat_raw = VideoChatScheduled.de_json(json_dict, raw_bot)
-        videochat_bot = VideoChatScheduled.de_json(json_dict, bot)
+        videochat_bot = VideoChatScheduled.de_json(json_dict, offline_bot)
         videochat_tz = VideoChatScheduled.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable

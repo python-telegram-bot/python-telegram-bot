@@ -45,14 +45,14 @@ class TestOrderInfoWithoutRequest(OrderInfoTestBase):
             assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(order_info)) == len(set(mro_slots(order_info))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "name": self.name,
             "phone_number": self.phone_number,
             "email": self.email,
             "shipping_address": self.shipping_address.to_dict(),
         }
-        order_info = OrderInfo.de_json(json_dict, bot)
+        order_info = OrderInfo.de_json(json_dict, offline_bot)
         assert order_info.api_kwargs == {}
 
         assert order_info.name == self.name

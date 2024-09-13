@@ -107,14 +107,14 @@ class TestFileWithoutRequest(FileTestBase):
             assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.file_id,
             "file_unique_id": self.file_unique_id,
             "file_path": self.file_path,
             "file_size": self.file_size,
         }
-        new_file = File.de_json(json_dict, bot)
+        new_file = File.de_json(json_dict, offline_bot)
         assert new_file.api_kwargs == {}
 
         assert new_file.file_id == self.file_id
@@ -131,11 +131,11 @@ class TestFileWithoutRequest(FileTestBase):
         assert file_dict["file_path"] == file.file_path
         assert file_dict["file_size"] == file.file_size
 
-    def test_equality(self, bot):
-        a = File(self.file_id, self.file_unique_id, bot)
-        b = File("", self.file_unique_id, bot)
+    def test_equality(self, offline_bot):
+        a = File(self.file_id, self.file_unique_id, offline_bot)
+        b = File("", self.file_unique_id, offline_bot)
         c = File(self.file_id, self.file_unique_id, None)
-        d = File("", "", bot)
+        d = File("", "", offline_bot)
         e = Voice(self.file_id, self.file_unique_id, 0)
 
         assert a == b
@@ -223,7 +223,7 @@ class TestFileWithoutRequest(FileTestBase):
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
 
-    async def test_download_encrypted(self, monkeypatch, bot, encrypted_file):
+    async def test_download_encrypted(self, monkeypatch, offline_bot, encrypted_file):
         async def test(*args, **kwargs):
             return data_file("image_encrypted.jpg").read_bytes()
 

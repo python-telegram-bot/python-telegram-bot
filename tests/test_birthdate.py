@@ -48,9 +48,9 @@ class TestBirthdateWithoutRequest(BirthdateTestBase):
         assert bd_dict["month"] == self.month
         assert bd_dict["year"] == self.year
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"day": self.day, "month": self.month, "year": self.year}
-        bd = Birthdate.de_json(json_dict, bot)
+        bd = Birthdate.de_json(json_dict, offline_bot)
         assert isinstance(bd, Birthdate)
         assert bd.day == self.day
         assert bd.month == self.month

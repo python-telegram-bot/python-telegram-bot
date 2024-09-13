@@ -39,9 +39,9 @@ from telegram import (
 )
 from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE
-from tests.auxil.ci_bots import BOT_INFO_PROVIDER
+from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY
-from tests.auxil.envvars import RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTION, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestBot, make_bot
@@ -96,6 +96,39 @@ def pytest_collection_modifyitems(items: List[pytest.Item]):
             name="no_req"
         ):
             parent.add_marker(pytest.mark.no_req)
+
+
+if GITHUB_ACTION and JOB_INDEX == 0:
+    # let's not slow down the tests too much with these additional checks
+    # that's why we run them only in GitHub actions and only on *one* of the several test
+    # matrix entries
+    @pytest.fixture(autouse=True)
+    def _disallow_requests_in_without_request_tests(request):
+        """This fixture prevents tests that don't require requests from using the online-bot.
+        This is a sane-effort approach on trying to prevent requests from being made in the
+        *WithoutRequest classes. Note that we can not prevent all requests, as one can still
+        manually build a `Bot` object or use `httpx` directly. See #4317 and #4465 for some
+        discussion.
+        """
+
+        if type(request).__name__ == "SubRequest":
+            # Some fixtures used in the *WithoutRequests test classes do use requests, e.g.
+            # `animation`. Separating that would be too much effort, hence we allow that.
+            # Unfortunately the `SubRequest` class is not public, so we check only the name for
+            # less dependency on pytest's internal structure.
+            return
+
+        if not request.cls:
+            return
+        name = request.cls.__name__
+        if not name.endswith("WithoutRequest") or not request.fixturenames:
+            return
+
+        if "bot" in request.fixturenames:
+            pytest.fail(
+                f"Test function {request.function} in test class {name} should not have a `bot` "
+                f"fixture. Use `offline_bot` instead."
+            )
 
 
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be

@@ -72,7 +72,7 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
             == self.last_synchronization_error_date
         )
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "url": self.url,
             "has_custom_certificate": self.has_custom_certificate,
@@ -83,7 +83,7 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
             "ip_address": self.ip_address,
             "last_synchronization_error_date": self.last_synchronization_error_date,
         }
-        webhook_info = WebhookInfo.de_json(json_dict, bot)
+        webhook_info = WebhookInfo.de_json(json_dict, offline_bot)
         assert webhook_info.api_kwargs == {}
 
         assert webhook_info.url == self.url
@@ -99,10 +99,10 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
             self.last_synchronization_error_date
         )
 
-        none = WebhookInfo.de_json(None, bot)
+        none = WebhookInfo.de_json(None, offline_bot)
         assert none is None
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "url": self.url,
             "has_custom_certificate": self.has_custom_certificate,
@@ -113,7 +113,7 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
             "ip_address": self.ip_address,
             "last_synchronization_error_date": self.last_synchronization_error_date,
         }
-        webhook_info_bot = WebhookInfo.de_json(json_dict, bot)
+        webhook_info_bot = WebhookInfo.de_json(json_dict, offline_bot)
         webhook_info_raw = WebhookInfo.de_json(json_dict, raw_bot)
         webhook_info_tz = WebhookInfo.de_json(json_dict, tz_bot)
 

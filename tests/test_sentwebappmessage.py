@@ -45,7 +45,7 @@ class TestSentWebAppMessageWithoutRequest(SentWebAppMessageTestBase):
         assert isinstance(sent_web_app_message_dict, dict)
         assert sent_web_app_message_dict["inline_message_id"] == self.inline_message_id
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         data = {"inline_message_id": self.inline_message_id}
         m = SentWebAppMessage.de_json(data, None)
         assert m.api_kwargs == {}
