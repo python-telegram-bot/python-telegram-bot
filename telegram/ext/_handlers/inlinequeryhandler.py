@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class InlineQueryHandler(BaseHandler[Update, CCT]):
+class InlineQueryHandler(BaseHandler[Update, CCT, RT]):
     """
     BaseHandler class to handle Telegram updates that contain a
     :attr:`telegram.Update.inline_query`.
@@ -87,7 +87,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
     __slots__ = ("chat_types", "pattern")
 
     def __init__(
-        self,
+        self: "InlineQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         pattern: Optional[Union[str, Pattern[str]]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
