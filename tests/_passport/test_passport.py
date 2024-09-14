@@ -390,8 +390,8 @@ class TestPassportWithoutRequest(PassportTestBase):
         assert email.type == "email"
         assert email.email == "fb3e3i47zt@dispostable.com"
 
-    def test_de_json_and_to_dict(self, bot):
-        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot)
+    def test_de_json_and_to_dict(self, offline_bot):
+        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, offline_bot)
         assert passport_data.api_kwargs == {}
         assert passport_data.to_dict() == RAW_PASSPORT_DATA
 
@@ -414,14 +414,14 @@ class TestPassportWithoutRequest(PassportTestBase):
         assert a != c
         assert hash(a) != hash(c)
 
-    def test_bot_init_invalid_key(self, bot):
+    def test_bot_init_invalid_key(self, offline_bot):
         with pytest.raises(TypeError):
-            Bot(bot.token, private_key="Invalid key!")
+            Bot(offline_bot.token, private_key="Invalid key!")
 
         with pytest.raises(ValueError, match="Could not deserialize key data"):
-            Bot(bot.token, private_key=b"Invalid key!")
+            Bot(offline_bot.token, private_key=b"Invalid key!")
 
-    def test_all_types(self, passport_data, bot, all_passport_data):
+    def test_all_types(self, passport_data, offline_bot, all_passport_data):
         credentials = passport_data.decrypted_credentials.to_dict()
 
         # Copy credentials from other types to all types so we can decrypt everything
@@ -446,46 +446,46 @@ class TestPassportWithoutRequest(PassportTestBase):
                 # Replaced below
                 "credentials": {"data": "data", "hash": "hash", "secret": "secret"},
             },
-            bot=bot,
+            bot=offline_bot,
         )
         assert new.api_kwargs == {}
 
-        new.credentials._decrypted_data = Credentials.de_json(credentials, bot)
+        new.credentials._decrypted_data = Credentials.de_json(credentials, offline_bot)
         assert new.credentials.api_kwargs == {}
 
         assert isinstance(new, PassportData)
         assert new.decrypted_data
 
-    async def test_passport_data_okay_with_non_crypto_bot(self, bot):
-        async with make_bot(token=bot.token) as b:
+    async def test_passport_data_okay_with_non_crypto_bot(self, offline_bot):
+        async with make_bot(token=offline_bot.token) as b:
             assert PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
 
-    def test_wrong_hash(self, bot):
+    def test_wrong_hash(self, offline_bot):
         data = deepcopy(RAW_PASSPORT_DATA)
         data["credentials"]["hash"] = "bm90Y29ycmVjdGhhc2g="  # Not correct hash
-        passport_data = PassportData.de_json(data, bot=bot)
+        passport_data = PassportData.de_json(data, bot=offline_bot)
         with pytest.raises(PassportDecryptionError):
             assert passport_data.decrypted_data
 
-    async def test_wrong_key(self, bot):
+    async def test_wrong_key(self, offline_bot):
         short_key = (
             b"-----BEGIN RSA PRIVATE"
             b" KEY-----\r\nMIIBOQIBAAJBAKU+OZ2jJm7sCA/ec4gngNZhXYPu+DZ/TAwSMl0W7vAPXAsLplBk\r\nO8l6IBHx8N0ZC4Bc65mO3b2G8YAzqndyqH8CAwEAAQJAWOx3jQFzeVXDsOaBPdAk\r\nYTncXVeIc6tlfUl9mOLyinSbRNCy1XicOiOZFgH1rRKOGIC1235QmqxFvdecySoY\r\nwQIhAOFeGgeX9CrEPuSsd9+kqUcA2avCwqdQgSdy2qggRFyJAiEAu7QHT8JQSkHU\r\nDELfzrzc24AhjyG0z1DpGZArM8COascCIDK42SboXj3Z2UXiQ0CEcMzYNiVgOisq\r\nBUd5pBi+2mPxAiAM5Z7G/Sv1HjbKrOGh29o0/sXPhtpckEuj5QMC6E0gywIgFY6S\r\nNjwrAA+cMmsgY0O2fAzEKkDc5YiFsiXaGaSS4eA=\r\n-----END"
             b" RSA PRIVATE KEY-----"
         )
-        async with make_bot(token=bot.token, private_key=short_key) as b:
+        async with make_bot(token=offline_bot.token, private_key=short_key) as b:
             passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
             with pytest.raises(PassportDecryptionError):
                 assert passport_data.decrypted_data
 
-        async with make_bot(token=bot.token, private_key=short_key) as b:
+        async with make_bot(token=offline_bot.token, private_key=short_key) as b:
             passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
             with pytest.raises(PassportDecryptionError):
                 assert passport_data.decrypted_data
 
     async def test_mocked_download_passport_file(self, passport_data, monkeypatch):
-        # The files are not coming from our test bot, therefore the file id is invalid/wrong
-        # when coming from this bot, so we monkeypatch the call, to make sure that Bot.get_file
+        # The files are not coming from our test offline_bot, therefore the file id is invalid/wrong
+        # when coming from this offline_bot, so we monkeypatch the call, to make sure that Bot.get_file
         # at least gets called
         # TODO: Actually download a passport file in a test
         selfie = passport_data.decrypted_data[1].selfie
@@ -501,7 +501,9 @@ class TestPassportWithoutRequest(PassportTestBase):
         assert file._credentials.file_hash == self.driver_license_selfie_credentials_file_hash
         assert file._credentials.secret == self.driver_license_selfie_credentials_secret
 
-    async def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
+    async def test_mocked_set_passport_data_errors(
+        self, monkeypatch, offline_bot, chat_id, passport_data
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.parameters
             return (
@@ -514,8 +516,8 @@ class TestPassportWithoutRequest(PassportTestBase):
                 == passport_data.decrypted_credentials.secure_data.driver_license.data.data_hash
             )
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.set_passport_data_errors(
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        message = await offline_bot.set_passport_data_errors(
             chat_id,
             [
                 PassportElementErrorSelfie(

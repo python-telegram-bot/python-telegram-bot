@@ -74,7 +74,7 @@ class TestApplicationBuilder:
         arguments = inspect.signature(HTTPXRequest.__init__).parameters.keys()
         prefix = "get_updates_" if get_updates else ""
         for argument in arguments:
-            if argument == "self":
+            if argument in ("self", "httpx_kwargs"):
                 continue
             if argument == "media_write_timeout" and get_updates:
                 # get_updates never makes media requests

@@ -57,14 +57,14 @@ class TestKeyboardButtonRequestUsersWithoutRequest(KeyboardButtonRequestUsersTes
         assert request_users_dict["user_is_premium"] == self.user_is_premium
         assert request_users_dict["max_quantity"] == self.max_quantity
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "request_id": self.request_id,
             "user_is_bot": self.user_is_bot,
             "user_is_premium": self.user_is_premium,
             "max_quantity": self.max_quantity,
         }
-        request_users = KeyboardButtonRequestUsers.de_json(json_dict, bot)
+        request_users = KeyboardButtonRequestUsers.de_json(json_dict, offline_bot)
         assert request_users.api_kwargs == {}
 
         assert request_users.request_id == self.request_id
@@ -158,7 +158,7 @@ class TestKeyboardButtonRequestChatWithoutRequest(KeyboardButtonRequestChatTestB
         )
         assert request_chat_dict["bot_is_member"] == self.bot_is_member
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "request_id": self.request_id,
             "chat_is_channel": self.chat_is_channel,
@@ -168,7 +168,7 @@ class TestKeyboardButtonRequestChatWithoutRequest(KeyboardButtonRequestChatTestB
             "bot_administrator_rights": self.bot_administrator_rights.to_dict(),
             "bot_is_member": self.bot_is_member,
         }
-        request_chat = KeyboardButtonRequestChat.de_json(json_dict, bot)
+        request_chat = KeyboardButtonRequestChat.de_json(json_dict, offline_bot)
         assert request_chat.api_kwargs == {}
 
         assert request_chat.request_id == self.request_id
@@ -179,7 +179,7 @@ class TestKeyboardButtonRequestChatWithoutRequest(KeyboardButtonRequestChatTestB
         assert request_chat.bot_administrator_rights == self.bot_administrator_rights
         assert request_chat.bot_is_member == self.bot_is_member
 
-        empty_chat = KeyboardButtonRequestChat.de_json({}, bot)
+        empty_chat = KeyboardButtonRequestChat.de_json({}, offline_bot)
         assert empty_chat is None
 
     def test_equality(self):

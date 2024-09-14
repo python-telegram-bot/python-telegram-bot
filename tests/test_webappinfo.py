@@ -44,9 +44,9 @@ class TestWebAppInfoWithoutRequest(WebAppInfoTestBase):
         assert isinstance(web_app_info_dict, dict)
         assert web_app_info_dict["url"] == self.url
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"url": self.url}
-        web_app_info = WebAppInfo.de_json(json_dict, bot)
+        web_app_info = WebAppInfo.de_json(json_dict, offline_bot)
         assert web_app_info.api_kwargs == {}
 
         assert web_app_info.url == self.url

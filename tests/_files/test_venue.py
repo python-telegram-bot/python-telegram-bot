@@ -57,7 +57,7 @@ class TestVenueWithoutRequest(VenueTestBase):
             assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(venue)) == len(set(mro_slots(venue))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "location": self.location.to_dict(),
             "title": self.title,
@@ -67,7 +67,7 @@ class TestVenueWithoutRequest(VenueTestBase):
             "google_place_id": self.google_place_id,
             "google_place_type": self.google_place_type,
         }
-        venue = Venue.de_json(json_dict, bot)
+        venue = Venue.de_json(json_dict, offline_bot)
         assert venue.api_kwargs == {}
 
         assert venue.location == self.location
@@ -110,13 +110,13 @@ class TestVenueWithoutRequest(VenueTestBase):
         assert a != d2
         assert hash(a) != hash(d2)
 
-    async def test_send_venue_without_required(self, bot, chat_id):
+    async def test_send_venue_without_required(self, offline_bot, chat_id):
         with pytest.raises(ValueError, match="Either venue or latitude, longitude, address and"):
-            await bot.send_venue(chat_id=chat_id)
+            await offline_bot.send_venue(chat_id=chat_id)
 
-    async def test_send_venue_mutually_exclusive(self, bot, chat_id, venue):
+    async def test_send_venue_mutually_exclusive(self, offline_bot, chat_id, venue):
         with pytest.raises(ValueError, match="Not both"):
-            await bot.send_venue(
+            await offline_bot.send_venue(
                 chat_id=chat_id,
                 latitude=1,
                 longitude=1,
@@ -125,7 +125,7 @@ class TestVenueWithoutRequest(VenueTestBase):
                 venue=venue,
             )
 
-    async def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
+    async def test_send_with_venue(self, monkeypatch, offline_bot, chat_id, venue):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
             return (
@@ -139,8 +139,8 @@ class TestVenueWithoutRequest(VenueTestBase):
                 and data["google_place_type"] == self.google_place_type
             )
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_venue(chat_id, venue=venue)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        message = await offline_bot.send_venue(chat_id, venue=venue)
         assert message
 
     @pytest.mark.parametrize(

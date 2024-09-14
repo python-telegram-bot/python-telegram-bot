@@ -52,7 +52,7 @@ class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "invoice_payload": self.invoice_payload,
             "shipping_option_id": self.shipping_option_id,
@@ -62,7 +62,7 @@ class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
             "telegram_payment_charge_id": self.telegram_payment_charge_id,
             "provider_payment_charge_id": self.provider_payment_charge_id,
         }
-        successful_payment = SuccessfulPayment.de_json(json_dict, bot)
+        successful_payment = SuccessfulPayment.de_json(json_dict, offline_bot)
         assert successful_payment.api_kwargs == {}
 
         assert successful_payment.invoice_payload == self.invoice_payload

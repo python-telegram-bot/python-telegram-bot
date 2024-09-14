@@ -68,7 +68,7 @@ class TestGiveawayWithoutRequest:
             assert getattr(giveaway, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(giveaway)) == len(set(mro_slots(giveaway))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "chats": [chat.to_dict() for chat in self.chats],
             "winners_selection_date": to_timestamp(self.winners_selection_date),
@@ -81,7 +81,7 @@ class TestGiveawayWithoutRequest:
             "prize_star_count": self.prize_star_count,
         }
 
-        giveaway = Giveaway.de_json(json_dict, bot)
+        giveaway = Giveaway.de_json(json_dict, offline_bot)
         assert giveaway.api_kwargs == {}
 
         assert giveaway.chats == tuple(self.chats)
@@ -94,9 +94,9 @@ class TestGiveawayWithoutRequest:
         assert giveaway.premium_subscription_month_count == self.premium_subscription_month_count
         assert giveaway.prize_star_count == self.prize_star_count
 
-        assert Giveaway.de_json(None, bot) is None
+        assert Giveaway.de_json(None, offline_bot) is None
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
             "chats": [chat.to_dict() for chat in self.chats],
             "winners_selection_date": to_timestamp(self.winners_selection_date),
@@ -110,7 +110,7 @@ class TestGiveawayWithoutRequest:
         }
 
         giveaway_raw = Giveaway.de_json(json_dict, raw_bot)
-        giveaway_bot = Giveaway.de_json(json_dict, bot)
+        giveaway_bot = Giveaway.de_json(json_dict, offline_bot)
         giveaway_bot_tz = Giveaway.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -246,7 +246,7 @@ class TestGiveawayWinnersWithoutRequest:
             set(mro_slots(giveaway_winners))
         ), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
             "giveaway_message_id": self.giveaway_message_id,
@@ -262,7 +262,7 @@ class TestGiveawayWinnersWithoutRequest:
             "prize_star_count": self.prize_star_count,
         }
 
-        giveaway_winners = GiveawayWinners.de_json(json_dict, bot)
+        giveaway_winners = GiveawayWinners.de_json(json_dict, offline_bot)
         assert giveaway_winners.api_kwargs == {}
 
         assert giveaway_winners.chat == self.chat
@@ -281,9 +281,9 @@ class TestGiveawayWinnersWithoutRequest:
         assert giveaway_winners.prize_description == self.prize_description
         assert giveaway_winners.prize_star_count == self.prize_star_count
 
-        assert GiveawayWinners.de_json(None, bot) is None
+        assert GiveawayWinners.de_json(None, offline_bot) is None
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
             "giveaway_message_id": self.giveaway_message_id,
@@ -293,7 +293,7 @@ class TestGiveawayWinnersWithoutRequest:
         }
 
         giveaway_winners_raw = GiveawayWinners.de_json(json_dict, raw_bot)
-        giveaway_winners_bot = GiveawayWinners.de_json(json_dict, bot)
+        giveaway_winners_bot = GiveawayWinners.de_json(json_dict, offline_bot)
         giveaway_winners_bot_tz = GiveawayWinners.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -395,7 +395,7 @@ class TestGiveawayCompletedWithoutRequest:
             set(mro_slots(giveaway_completed))
         ), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "winner_count": self.winner_count,
             "unclaimed_prize_count": self.unclaimed_prize_count,
@@ -403,7 +403,7 @@ class TestGiveawayCompletedWithoutRequest:
             "is_star_giveaway": self.is_star_giveaway,
         }
 
-        giveaway_completed = GiveawayCompleted.de_json(json_dict, bot)
+        giveaway_completed = GiveawayCompleted.de_json(json_dict, offline_bot)
         assert giveaway_completed.api_kwargs == {}
 
         assert giveaway_completed.winner_count == self.winner_count
@@ -411,7 +411,7 @@ class TestGiveawayCompletedWithoutRequest:
         assert giveaway_completed.giveaway_message == self.giveaway_message
         assert giveaway_completed.is_star_giveaway == self.is_star_giveaway
 
-        assert GiveawayCompleted.de_json(None, bot) is None
+        assert GiveawayCompleted.de_json(None, offline_bot) is None
 
     def test_to_dict(self, giveaway_completed):
         giveaway_completed_dict = giveaway_completed.to_dict()

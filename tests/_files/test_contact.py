@@ -52,22 +52,22 @@ class TestContactWithoutRequest(ContactTestBase):
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"
 
-    def test_de_json_required(self, bot):
+    def test_de_json_required(self, offline_bot):
         json_dict = {"phone_number": self.phone_number, "first_name": self.first_name}
-        contact = Contact.de_json(json_dict, bot)
+        contact = Contact.de_json(json_dict, offline_bot)
         assert contact.api_kwargs == {}
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name
 
-    def test_de_json_all(self, bot):
+    def test_de_json_all(self, offline_bot):
         json_dict = {
             "phone_number": self.phone_number,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "user_id": self.user_id,
         }
-        contact = Contact.de_json(json_dict, bot)
+        contact = Contact.de_json(json_dict, offline_bot)
         assert contact.api_kwargs == {}
 
         assert contact.phone_number == self.phone_number
@@ -104,20 +104,20 @@ class TestContactWithoutRequest(ContactTestBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_send_contact_without_required(self, bot, chat_id):
+    async def test_send_contact_without_required(self, offline_bot, chat_id):
         with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
-            await bot.send_contact(chat_id=chat_id)
+            await offline_bot.send_contact(chat_id=chat_id)
 
-    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
+    async def test_send_mutually_exclusive(self, offline_bot, chat_id, contact):
         with pytest.raises(ValueError, match="Not both"):
-            await bot.send_contact(
+            await offline_bot.send_contact(
                 chat_id=chat_id,
                 contact=contact,
                 phone_number=contact.phone_number,
                 first_name=contact.first_name,
             )
 
-    async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
+    async def test_send_with_contact(self, monkeypatch, offline_bot, chat_id, contact):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
             phone = data["phone_number"] == contact.phone_number
@@ -125,8 +125,8 @@ class TestContactWithoutRequest(ContactTestBase):
             last = data["last_name"] == contact.last_name
             return phone and first and last
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_contact(contact=contact, chat_id=chat_id)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_contact(contact=contact, chat_id=chat_id)
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),

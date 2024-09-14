@@ -38,14 +38,14 @@ class TestStoryWithoutRequest(StoryTestBase):
             assert getattr(story, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(story)) == len(set(mro_slots(story))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"chat": self.chat.to_dict(), "id": self.id}
-        story = Story.de_json(json_dict, bot)
+        story = Story.de_json(json_dict, offline_bot)
         assert story.api_kwargs == {}
         assert story.chat == self.chat
         assert story.id == self.id
         assert isinstance(story, Story)
-        assert Story.de_json(None, bot) is None
+        assert Story.de_json(None, offline_bot) is None
 
     def test_to_dict(self, story):
         story_dict = story.to_dict()

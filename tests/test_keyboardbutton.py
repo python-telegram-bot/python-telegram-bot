@@ -81,7 +81,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button_dict["request_users"] == keyboard_button.request_users.to_dict()
 
     @pytest.mark.parametrize("request_user", [True, False])
-    def test_de_json(self, bot, request_user):
+    def test_de_json(self, request_user):
         json_dict = {
             "text": self.text,
             "request_location": self.request_location,

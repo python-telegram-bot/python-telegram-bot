@@ -73,7 +73,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
             set(mro_slots(external_reply_info))
         ), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "origin": self.origin.to_dict(),
             "chat": self.chat.to_dict(),
@@ -83,7 +83,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
             "paid_media": self.paid_media.to_dict(),
         }
 
-        external_reply_info = ExternalReplyInfo.de_json(json_dict, bot)
+        external_reply_info = ExternalReplyInfo.de_json(json_dict, offline_bot)
         assert external_reply_info.api_kwargs == {}
 
         assert external_reply_info.origin == self.origin
@@ -93,7 +93,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert external_reply_info.giveaway == self.giveaway
         assert external_reply_info.paid_media == self.paid_media
 
-        assert ExternalReplyInfo.de_json(None, bot) is None
+        assert ExternalReplyInfo.de_json(None, offline_bot) is None
 
     def test_to_dict(self, external_reply_info):
         ext_reply_info_dict = external_reply_info.to_dict()
@@ -151,7 +151,7 @@ class TestTextQuoteWithoutRequest(TextQuoteTestBase):
             assert getattr(text_quote, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(text_quote)) == len(set(mro_slots(text_quote))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "text": self.text,
             "position": self.position,
@@ -159,7 +159,7 @@ class TestTextQuoteWithoutRequest(TextQuoteTestBase):
             "is_manual": self.is_manual,
         }
 
-        text_quote = TextQuote.de_json(json_dict, bot)
+        text_quote = TextQuote.de_json(json_dict, offline_bot)
         assert text_quote.api_kwargs == {}
 
         assert text_quote.text == self.text
@@ -167,7 +167,7 @@ class TestTextQuoteWithoutRequest(TextQuoteTestBase):
         assert text_quote.entities == tuple(self.entities)
         assert text_quote.is_manual == self.is_manual
 
-        assert TextQuote.de_json(None, bot) is None
+        assert TextQuote.de_json(None, offline_bot) is None
 
     def test_to_dict(self, text_quote):
         text_quote_dict = text_quote.to_dict()
@@ -233,7 +233,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
             set(mro_slots(reply_parameters))
         ), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "message_id": self.message_id,
             "chat_id": self.chat_id,
@@ -244,7 +244,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
             "quote_position": self.quote_position,
         }
 
-        reply_parameters = ReplyParameters.de_json(json_dict, bot)
+        reply_parameters = ReplyParameters.de_json(json_dict, offline_bot)
         assert reply_parameters.api_kwargs == {}
 
         assert reply_parameters.message_id == self.message_id
@@ -255,7 +255,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
         assert reply_parameters.quote_entities == tuple(self.quote_entities)
         assert reply_parameters.quote_position == self.quote_position
 
-        assert ReplyParameters.de_json(None, bot) is None
+        assert ReplyParameters.de_json(None, offline_bot) is None
 
     def test_to_dict(self, reply_parameters):
         reply_parameters_dict = reply_parameters.to_dict()

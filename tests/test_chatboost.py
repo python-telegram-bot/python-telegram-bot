@@ -172,13 +172,13 @@ class TestChatBoostSourceTypesWithoutRequest:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json_required_args(self, bot, chat_boost_source):
+    def test_de_json_required_args(self, offline_bot, chat_boost_source):
         cls = chat_boost_source.__class__
-        assert cls.de_json({}, bot) is None
-        assert ChatBoost.de_json({}, bot) is None
+        assert cls.de_json({}, offline_bot) is None
+        assert ChatBoost.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(chat_boost_source)
-        const_boost_source = ChatBoostSource.de_json(json_dict, bot)
+        const_boost_source = ChatBoostSource.de_json(json_dict, offline_bot)
         assert const_boost_source.api_kwargs == {}
 
         assert isinstance(const_boost_source, ChatBoostSource)
@@ -188,9 +188,9 @@ class TestChatBoostSourceTypesWithoutRequest:
         ):
             assert chat_mem_type_at == const_chat_mem_at
 
-    def test_de_json_all_args(self, bot, chat_boost_source):
+    def test_de_json_all_args(self, offline_bot, chat_boost_source):
         json_dict = make_json_dict(chat_boost_source, include_optional_args=True)
-        const_boost_source = ChatBoostSource.de_json(json_dict, bot)
+        const_boost_source = ChatBoostSource.de_json(json_dict, offline_bot)
         assert const_boost_source.api_kwargs == {}
 
         assert isinstance(const_boost_source, ChatBoostSource)
@@ -200,19 +200,19 @@ class TestChatBoostSourceTypesWithoutRequest:
         ):
             assert c_mem_type_at == const_c_mem_at
 
-    def test_de_json_invalid_source(self, chat_boost_source, bot):
+    def test_de_json_invalid_source(self, chat_boost_source, offline_bot):
         json_dict = {"source": "invalid"}
-        chat_boost_source = ChatBoostSource.de_json(json_dict, bot)
+        chat_boost_source = ChatBoostSource.de_json(json_dict, offline_bot)
 
         assert type(chat_boost_source) is ChatBoostSource
         assert chat_boost_source.source == "invalid"
 
-    def test_de_json_subclass(self, chat_boost_source, bot):
-        """This makes sure that e.g. ChatBoostSourcePremium(data, bot) never returns a
+    def test_de_json_subclass(self, chat_boost_source, offline_bot):
+        """This makes sure that e.g. ChatBoostSourcePremium(data, offline_bot) never returns a
         ChatBoostSourceGiftCode instance."""
         cls = chat_boost_source.__class__
         json_dict = make_json_dict(chat_boost_source, True)
-        assert type(cls.de_json(json_dict, bot)) is cls
+        assert type(cls.de_json(json_dict, offline_bot)) is cls
 
     def test_to_dict(self, chat_boost_source):
         chat_boost_dict = chat_boost_source.to_dict()
@@ -265,14 +265,14 @@ class TestChatBoostWithoutRequest(ChatBoostDefaults):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot, chat_boost):
+    def test_de_json(self, offline_bot, chat_boost):
         json_dict = {
             "boost_id": "2",
             "add_date": self.date,
             "expiration_date": self.date,
             "source": self.default_source.to_dict(),
         }
-        cb = ChatBoost.de_json(json_dict, bot)
+        cb = ChatBoost.de_json(json_dict, offline_bot)
 
         assert isinstance(cb, ChatBoost)
         assert isinstance(cb.add_date, datetime.datetime)
@@ -286,7 +286,7 @@ class TestChatBoostWithoutRequest(ChatBoostDefaults):
         for slot in cb.__slots__:
             assert getattr(cb, slot) == getattr(chat_boost, slot), f"attribute {slot} differs"
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "boost_id": "2",
             "add_date": self.date,
@@ -294,7 +294,7 @@ class TestChatBoostWithoutRequest(ChatBoostDefaults):
             "source": self.default_source.to_dict(),
         }
 
-        cb_bot = ChatBoost.de_json(json_dict, bot)
+        cb_bot = ChatBoost.de_json(json_dict, offline_bot)
         cb_raw = ChatBoost.de_json(json_dict, raw_bot)
         cb_tz = ChatBoost.de_json(json_dict, tz_bot)
 
@@ -349,7 +349,7 @@ class TestChatBoostUpdatedWithoutRequest(ChatBoostDefaults):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot, chat_boost):
+    def test_de_json(self, offline_bot, chat_boost):
         json_dict = {
             "chat": self.chat.to_dict(),
             "boost": {
@@ -359,7 +359,7 @@ class TestChatBoostUpdatedWithoutRequest(ChatBoostDefaults):
                 "source": self.default_source.to_dict(),
             },
         }
-        cbu = ChatBoostUpdated.de_json(json_dict, bot)
+        cbu = ChatBoostUpdated.de_json(json_dict, offline_bot)
 
         assert isinstance(cbu, ChatBoostUpdated)
         assert cbu.chat == self.chat
@@ -422,14 +422,14 @@ class TestChatBoostRemovedWithoutRequest(ChatBoostDefaults):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot, chat_boost_removed):
+    def test_de_json(self, offline_bot, chat_boost_removed):
         json_dict = {
             "chat": self.chat.to_dict(),
             "boost_id": "2",
             "remove_date": self.date,
             "source": self.default_source.to_dict(),
         }
-        cbr = ChatBoostRemoved.de_json(json_dict, bot)
+        cbr = ChatBoostRemoved.de_json(json_dict, offline_bot)
 
         assert isinstance(cbr, ChatBoostRemoved)
         assert cbr.chat == self.chat
@@ -437,7 +437,7 @@ class TestChatBoostRemovedWithoutRequest(ChatBoostDefaults):
         assert to_timestamp(cbr.remove_date) == self.date
         assert cbr.source == self.default_source
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
             "boost_id": "2",
@@ -445,7 +445,7 @@ class TestChatBoostRemovedWithoutRequest(ChatBoostDefaults):
             "source": self.default_source.to_dict(),
         }
 
-        cbr_bot = ChatBoostRemoved.de_json(json_dict, bot)
+        cbr_bot = ChatBoostRemoved.de_json(json_dict, offline_bot)
         cbr_raw = ChatBoostRemoved.de_json(json_dict, raw_bot)
         cbr_tz = ChatBoostRemoved.de_json(json_dict, tz_bot)
 
@@ -500,7 +500,7 @@ class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot, user_chat_boosts):
+    def test_de_json(self, offline_bot, user_chat_boosts):
         json_dict = {
             "boosts": [
                 {
@@ -511,7 +511,7 @@ class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
                 }
             ]
         }
-        ucb = UserChatBoosts.de_json(json_dict, bot)
+        ucb = UserChatBoosts.de_json(json_dict, offline_bot)
 
         assert isinstance(ucb, UserChatBoosts)
         assert isinstance(ucb.boosts[0], ChatBoost)
@@ -527,7 +527,7 @@ class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
         assert isinstance(user_chat_boosts_dict["boosts"], list)
         assert user_chat_boosts_dict["boosts"][0] == user_chat_boosts.boosts[0].to_dict()
 
-    async def test_get_user_chat_boosts(self, monkeypatch, bot):
+    async def test_get_user_chat_boosts(self, monkeypatch, offline_bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
             chat_id = data["chat_id"] == "3"
@@ -536,9 +536,9 @@ class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
                 pytest.fail("I got wrong parameters in post")
             return data
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        assert await bot.get_user_chat_boosts("3", 2)
+        assert await offline_bot.get_user_chat_boosts("3", 2)
 
 
 class TestUserChatBoostsWithRequest(ChatBoostDefaults):

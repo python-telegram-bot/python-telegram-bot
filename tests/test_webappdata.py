@@ -46,9 +46,9 @@ class TestWebAppDataWithoutRequest(WebAppDataTestBase):
         assert web_app_data_dict["data"] == self.data
         assert web_app_data_dict["button_text"] == self.button_text
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"data": self.data, "button_text": self.button_text}
-        web_app_data = WebAppData.de_json(json_dict, bot)
+        web_app_data = WebAppData.de_json(json_dict, offline_bot)
         assert web_app_data.api_kwargs == {}
 
         assert web_app_data.data == self.data

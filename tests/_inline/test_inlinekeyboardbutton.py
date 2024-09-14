@@ -116,7 +116,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             == inline_keyboard_button.switch_inline_query_chosen_chat.to_dict()
         )
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "text": self.text,
             "url": self.url,
@@ -150,7 +150,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             == self.switch_inline_query_chosen_chat
         )
 
-        none = InlineKeyboardButton.de_json({}, bot)
+        none = InlineKeyboardButton.de_json({}, offline_bot)
         assert none is None
 
     def test_equality(self):

@@ -568,8 +568,8 @@ class TestMessageWithoutRequest(MessageTestBase):
             assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
 
-    def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
-        new = Message.de_json(message_params.to_dict(), bot)
+    def test_all_possibilities_de_json_and_to_dict(self, offline_bot, message_params):
+        new = Message.de_json(message_params.to_dict(), offline_bot)
         assert new.api_kwargs == {}
         assert new.to_dict() == message_params.to_dict()
 
@@ -579,7 +579,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "message_id": 12,
             "from_user": None,
@@ -589,7 +589,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         }
 
         message_raw = Message.de_json(json_dict, raw_bot)
-        message_bot = Message.de_json(json_dict, bot)
+        message_bot = Message.de_json(json_dict, offline_bot)
         message_tz = Message.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -609,7 +609,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert message_bot.edit_date.tzinfo == UTC
         assert edit_date_offset == edit_date_tz_bot_offset
 
-    def test_de_json_api_kwargs_backward_compatibility(self, bot, message_params):
+    def test_de_json_api_kwargs_backward_compatibility(self, offline_bot, message_params):
         message_dict = message_params.to_dict()
         keys = (
             "user_shared",
@@ -622,7 +622,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         )
         for key in keys:
             message_dict[key] = key
-        message = Message.de_json(message_dict, bot)
+        message = Message.de_json(message_dict, offline_bot)
         assert message.api_kwargs == {key: key for key in keys}
 
     def test_equality(self):
@@ -2653,10 +2653,10 @@ class TestMessageWithoutRequest(MessageTestBase):
         ],
     )
     async def test_default_do_quote(
-        self, bot, message, default_quote, chat_type, expected, monkeypatch
+        self, offline_bot, message, default_quote, chat_type, expected, monkeypatch
     ):
         original_bot = message.get_bot()
-        temp_bot = PytestExtBot(token=bot.token, defaults=Defaults(do_quote=default_quote))
+        temp_bot = PytestExtBot(token=offline_bot.token, defaults=Defaults(do_quote=default_quote))
         message.set_bot(temp_bot)
 
         async def make_assertion(*_, **kwargs):

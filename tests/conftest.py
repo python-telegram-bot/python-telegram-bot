@@ -37,15 +37,14 @@ from telegram import (
     Update,
     User,
 )
-from telegram.ext import ApplicationBuilder, Defaults, Updater
-from telegram.ext.filters import MessageFilter, UpdateFilter
+from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE
-from tests.auxil.ci_bots import BOT_INFO_PROVIDER
+from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY
-from tests.auxil.envvars import RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTION, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
-from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
+from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.timezones import BasicTimezone
 
 if TEST_WITH_OPT_DEPS:
@@ -99,6 +98,39 @@ def pytest_collection_modifyitems(items: List[pytest.Item]):
             parent.add_marker(pytest.mark.no_req)
 
 
+if GITHUB_ACTION and JOB_INDEX == 0:
+    # let's not slow down the tests too much with these additional checks
+    # that's why we run them only in GitHub actions and only on *one* of the several test
+    # matrix entries
+    @pytest.fixture(autouse=True)
+    def _disallow_requests_in_without_request_tests(request):
+        """This fixture prevents tests that don't require requests from using the online-bot.
+        This is a sane-effort approach on trying to prevent requests from being made in the
+        *WithoutRequest classes. Note that we can not prevent all requests, as one can still
+        manually build a `Bot` object or use `httpx` directly. See #4317 and #4465 for some
+        discussion.
+        """
+
+        if type(request).__name__ == "SubRequest":
+            # Some fixtures used in the *WithoutRequests test classes do use requests, e.g.
+            # `animation`. Separating that would be too much effort, hence we allow that.
+            # Unfortunately the `SubRequest` class is not public, so we check only the name for
+            # less dependency on pytest's internal structure.
+            return
+
+        if not request.cls:
+            return
+        name = request.cls.__name__
+        if not name.endswith("WithoutRequest") or not request.fixturenames:
+            return
+
+        if "bot" in request.fixturenames:
+            pytest.fail(
+                f"Test function {request.function} in test class {name} should not have a `bot` "
+                f"fixture. Use `offline_bot` instead."
+            )
+
+
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
 # session. See https://github.com/pytest-dev/pytest-asyncio/issues/68 for more details.
 @pytest.fixture(scope="session")
@@ -121,6 +153,15 @@ def bot_info() -> Dict[str, str]:
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
     async with make_bot(bot_info) as _bot:
+        yield _bot
+
+
+@pytest.fixture(scope="session")
+async def offline_bot(bot_info):
+    """Makes an offline Bot instance with the given bot_info
+    Note that in tests/ext we also override the `bot` fixture to return the offline bot instead.
+    """
+    async with make_bot(bot_info, offline=True) as _bot:
         yield _bot
 
 
@@ -212,28 +253,6 @@ def subscription_channel_id(bot_info):
 
 
 @pytest.fixture
-async def app(bot_info):
-    # We build a new bot each time so that we use `app` in a context manager without problems
-    application = (
-        ApplicationBuilder().bot(make_bot(bot_info)).application_class(PytestApplication).build()
-    )
-    yield application
-    if application.running:
-        await application.stop()
-        await application.shutdown()
-
-
-@pytest.fixture
-async def updater(bot_info):
-    # We build a new bot each time so that we use `updater` in a context manager without problems
-    up = Updater(bot=make_bot(bot_info), update_queue=asyncio.Queue())
-    yield up
-    if up.running:
-        await up.stop()
-        await up.shutdown()
-
-
-@pytest.fixture
 def thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
@@ -243,23 +262,6 @@ def thumb_file():
 def class_thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
-
-
-@pytest.fixture(
-    scope="class",
-    params=[{"class": MessageFilter}, {"class": UpdateFilter}],
-    ids=["MessageFilter", "UpdateFilter"],
-)
-def mock_filter(request):
-    class MockFilter(request.param["class"]):
-        def __init__(self):
-            super().__init__()
-            self.tested = False
-
-        def filter(self, _):
-            self.tested = True
-
-    return MockFilter()
 
 
 def _get_false_update_fixture_decorator_params():
