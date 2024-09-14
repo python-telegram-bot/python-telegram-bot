@@ -29,7 +29,7 @@ RT = TypeVar("RT")
 UT = TypeVar("UT")
 
 
-class TypeHandler(BaseHandler[UT, CCT]):
+class TypeHandler(BaseHandler[UT, CCT, RT]):
     """Handler class to handle updates of custom types.
 
     Warning:
@@ -70,7 +70,7 @@ class TypeHandler(BaseHandler[UT, CCT]):
     __slots__ = ("strict", "type")
 
     def __init__(
-        self,
+        self: "TypeHandler[UT, CCT, RT]",
         type: Type[UT],  # pylint: disable=redefined-builtin
         callback: HandlerCallback[UT, CCT, RT],
         strict: bool = False,

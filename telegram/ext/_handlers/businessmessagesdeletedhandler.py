@@ -29,7 +29,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 RT = TypeVar("RT")
 
 
-class BusinessMessagesDeletedHandler(BaseHandler[Update, CCT]):
+class BusinessMessagesDeletedHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle
     :attr:`deleted Telegram Business messages <telegram.Update.deleted_business_messages>`.
 
@@ -65,7 +65,7 @@ class BusinessMessagesDeletedHandler(BaseHandler[Update, CCT]):
     )
 
     def __init__(
-        self,
+        self: "BusinessMessagesDeletedHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         chat_id: Optional[SCT[int]] = None,
         username: Optional[SCT[str]] = None,

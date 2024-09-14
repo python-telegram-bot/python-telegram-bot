@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from telegram.ext import Application
 
 
-class StringCommandHandler(BaseHandler[str, CCT]):
+class StringCommandHandler(BaseHandler[str, CCT, RT]):
     """Handler class to handle string commands. Commands are string updates that start with
     ``/``. The handler will add a :obj:`list` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
@@ -71,7 +71,7 @@ class StringCommandHandler(BaseHandler[str, CCT]):
     __slots__ = ("command",)
 
     def __init__(
-        self,
+        self: "StringCommandHandler[CCT, RT]",
         command: str,
         callback: HandlerCallback[str, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,

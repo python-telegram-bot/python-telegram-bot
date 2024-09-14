@@ -31,7 +31,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 RT = TypeVar("RT")
 
 
-class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
+class PreCheckoutQueryHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram :attr:`telegram.Update.pre_checkout_query`.
 
     Warning:
@@ -73,7 +73,7 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
     __slots__ = ("pattern",)
 
     def __init__(
-        self,
+        self: "PreCheckoutQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
         pattern: Optional[Union[str, Pattern[str]]] = None,
