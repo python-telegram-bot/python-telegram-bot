@@ -31,16 +31,16 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def location():
     return Location(
-        latitude=TestLocationBase.latitude,
-        longitude=TestLocationBase.longitude,
-        horizontal_accuracy=TestLocationBase.horizontal_accuracy,
-        live_period=TestLocationBase.live_period,
-        heading=TestLocationBase.live_period,
-        proximity_alert_radius=TestLocationBase.proximity_alert_radius,
+        latitude=LocationTestBase.latitude,
+        longitude=LocationTestBase.longitude,
+        horizontal_accuracy=LocationTestBase.horizontal_accuracy,
+        live_period=LocationTestBase.live_period,
+        heading=LocationTestBase.live_period,
+        proximity_alert_radius=LocationTestBase.proximity_alert_radius,
     )
 
 
-class TestLocationBase:
+class LocationTestBase:
     latitude = -23.691288
     longitude = -46.788279
     horizontal_accuracy = 999
@@ -49,13 +49,13 @@ class TestLocationBase:
     proximity_alert_radius = 50
 
 
-class TestLocationWithoutRequest(TestLocationBase):
+class TestLocationWithoutRequest(LocationTestBase):
     def test_slot_behaviour(self, location):
         for attr in location.__slots__:
             assert getattr(location, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(location)) == len(set(mro_slots(location))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "latitude": self.latitude,
             "longitude": self.longitude,
@@ -64,7 +64,7 @@ class TestLocationWithoutRequest(TestLocationBase):
             "heading": self.heading,
             "proximity_alert_radius": self.proximity_alert_radius,
         }
-        location = Location.de_json(json_dict, bot)
+        location = Location.de_json(json_dict, offline_bot)
         assert location.api_kwargs == {}
 
         assert location.latitude == self.latitude
@@ -96,26 +96,28 @@ class TestLocationWithoutRequest(TestLocationBase):
         assert a != d
         assert hash(a) != hash(d)
 
-    async def test_send_location_without_required(self, bot, chat_id):
+    async def test_send_location_without_required(self, offline_bot, chat_id):
         with pytest.raises(ValueError, match="Either location or latitude and longitude"):
-            await bot.send_location(chat_id=chat_id)
+            await offline_bot.send_location(chat_id=chat_id)
 
-    async def test_edit_location_without_required(self, bot):
+    async def test_edit_location_without_required(self, offline_bot):
         with pytest.raises(ValueError, match="Either location or latitude and longitude"):
-            await bot.edit_message_live_location(chat_id=2, message_id=3)
+            await offline_bot.edit_message_live_location(chat_id=2, message_id=3)
 
-    async def test_send_location_with_all_args(self, bot, location):
+    async def test_send_location_with_all_args(self, offline_bot, location):
         with pytest.raises(ValueError, match="Not both"):
-            await bot.send_location(chat_id=1, latitude=2.5, longitude=4.6, location=location)
+            await offline_bot.send_location(
+                chat_id=1, latitude=2.5, longitude=4.6, location=location
+            )
 
-    async def test_edit_location_with_all_args(self, bot, location):
+    async def test_edit_location_with_all_args(self, offline_bot, location):
         with pytest.raises(ValueError, match="Not both"):
-            await bot.edit_message_live_location(
+            await offline_bot.edit_message_live_location(
                 chat_id=1, message_id=7, latitude=2.5, longitude=4.6, location=location
             )
 
     # TODO: Needs improvement with in inline sent live location.
-    async def test_edit_live_inline_message(self, monkeypatch, bot, location):
+    async def test_edit_live_inline_message(self, monkeypatch, offline_bot, location):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
             lat = data["latitude"] == str(location.latitude)
@@ -127,8 +129,8 @@ class TestLocationWithoutRequest(TestLocationBase):
             live = data["live_period"] == "900"
             return lat and lon and id_ and ha and heading and prox_alert and live
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.edit_message_live_location(
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.edit_message_live_location(
             inline_message_id=1234,
             location=location,
             horizontal_accuracy=50,
@@ -138,30 +140,30 @@ class TestLocationWithoutRequest(TestLocationBase):
         )
 
     # TODO: Needs improvement with in inline sent live location.
-    async def test_stop_live_inline_message(self, monkeypatch, bot):
+    async def test_stop_live_inline_message(self, monkeypatch, offline_bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["inline_message_id"] == "1234"
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.stop_message_live_location(inline_message_id=1234)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.stop_message_live_location(inline_message_id=1234)
 
-    async def test_send_with_location(self, monkeypatch, bot, chat_id, location):
+    async def test_send_with_location(self, monkeypatch, offline_bot, chat_id, location):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             lat = request_data.json_parameters["latitude"] == str(location.latitude)
             lon = request_data.json_parameters["longitude"] == str(location.longitude)
             return lat and lon
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_location(location=location, chat_id=chat_id)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_location(location=location, chat_id=chat_id)
 
-    async def test_edit_live_location_with_location(self, monkeypatch, bot, location):
+    async def test_edit_live_location_with_location(self, monkeypatch, offline_bot, location):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             lat = request_data.json_parameters["latitude"] == str(location.latitude)
             lon = request_data.json_parameters["longitude"] == str(location.longitude)
             return lat and lon
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.edit_message_live_location(None, None, location=location)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.edit_message_live_location(None, None, location=location)
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),

@@ -33,21 +33,21 @@ def creator():
 @pytest.fixture(scope="module")
 def invite_link(creator):
     return ChatInviteLink(
-        TestChatInviteLinkBase.link,
+        ChatInviteLinkTestBase.link,
         creator,
-        TestChatInviteLinkBase.creates_join_request,
-        TestChatInviteLinkBase.primary,
-        TestChatInviteLinkBase.revoked,
-        expire_date=TestChatInviteLinkBase.expire_date,
-        member_limit=TestChatInviteLinkBase.member_limit,
-        name=TestChatInviteLinkBase.name,
-        pending_join_request_count=TestChatInviteLinkBase.pending_join_request_count,
-        subscription_period=TestChatInviteLinkBase.subscription_period,
-        subscription_price=TestChatInviteLinkBase.subscription_price,
+        ChatInviteLinkTestBase.creates_join_request,
+        ChatInviteLinkTestBase.primary,
+        ChatInviteLinkTestBase.revoked,
+        expire_date=ChatInviteLinkTestBase.expire_date,
+        member_limit=ChatInviteLinkTestBase.member_limit,
+        name=ChatInviteLinkTestBase.name,
+        pending_join_request_count=ChatInviteLinkTestBase.pending_join_request_count,
+        subscription_period=ChatInviteLinkTestBase.subscription_period,
+        subscription_price=ChatInviteLinkTestBase.subscription_price,
     )
 
 
-class TestChatInviteLinkBase:
+class ChatInviteLinkTestBase:
     link = "thisialink"
     creates_join_request = False
     primary = True
@@ -60,13 +60,13 @@ class TestChatInviteLinkBase:
     subscription_price = 44
 
 
-class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
+class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
     def test_slot_behaviour(self, invite_link):
         for attr in invite_link.__slots__:
             assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invite_link)) == len(set(mro_slots(invite_link))), "duplicate slot"
 
-    def test_de_json_required_args(self, bot, creator):
+    def test_de_json_required_args(self, offline_bot, creator):
         json_dict = {
             "invite_link": self.link,
             "creator": creator.to_dict(),
@@ -75,7 +75,7 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
             "is_revoked": self.revoked,
         }
 
-        invite_link = ChatInviteLink.de_json(json_dict, bot)
+        invite_link = ChatInviteLink.de_json(json_dict, offline_bot)
         assert invite_link.api_kwargs == {}
 
         assert invite_link.invite_link == self.link
@@ -84,7 +84,7 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         assert invite_link.is_primary == self.primary
         assert invite_link.is_revoked == self.revoked
 
-    def test_de_json_all_args(self, bot, creator):
+    def test_de_json_all_args(self, offline_bot, creator):
         json_dict = {
             "invite_link": self.link,
             "creator": creator.to_dict(),
@@ -99,7 +99,7 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
             "subscription_price": self.subscription_price,
         }
 
-        invite_link = ChatInviteLink.de_json(json_dict, bot)
+        invite_link = ChatInviteLink.de_json(json_dict, offline_bot)
         assert invite_link.api_kwargs == {}
 
         assert invite_link.invite_link == self.link
@@ -115,7 +115,7 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         assert invite_link.subscription_period == self.subscription_period
         assert invite_link.subscription_price == self.subscription_price
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot, creator):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, creator):
         json_dict = {
             "invite_link": self.link,
             "creator": creator.to_dict(),
@@ -129,7 +129,7 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         }
 
         invite_link_raw = ChatInviteLink.de_json(json_dict, raw_bot)
-        invite_link_bot = ChatInviteLink.de_json(json_dict, bot)
+        invite_link_bot = ChatInviteLink.de_json(json_dict, offline_bot)
         invite_link_tz = ChatInviteLink.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable

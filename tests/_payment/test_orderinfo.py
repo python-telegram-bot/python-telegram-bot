@@ -25,34 +25,34 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def order_info():
     return OrderInfo(
-        TestOrderInfoBase.name,
-        TestOrderInfoBase.phone_number,
-        TestOrderInfoBase.email,
-        TestOrderInfoBase.shipping_address,
+        OrderInfoTestBase.name,
+        OrderInfoTestBase.phone_number,
+        OrderInfoTestBase.email,
+        OrderInfoTestBase.shipping_address,
     )
 
 
-class TestOrderInfoBase:
+class OrderInfoTestBase:
     name = "name"
     phone_number = "phone_number"
     email = "email"
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
 
-class TestOrderInfoWithoutRequest(TestOrderInfoBase):
+class TestOrderInfoWithoutRequest(OrderInfoTestBase):
     def test_slot_behaviour(self, order_info):
         for attr in order_info.__slots__:
             assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(order_info)) == len(set(mro_slots(order_info))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "name": self.name,
             "phone_number": self.phone_number,
             "email": self.email,
             "shipping_address": self.shipping_address.to_dict(),
         }
-        order_info = OrderInfo.de_json(json_dict, bot)
+        order_info = OrderInfo.de_json(json_dict, offline_bot)
         assert order_info.api_kwargs == {}
 
         assert order_info.name == self.name

@@ -32,24 +32,24 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_keyboard_button():
     return InlineKeyboardButton(
-        TestInlineKeyboardButtonBase.text,
-        url=TestInlineKeyboardButtonBase.url,
-        callback_data=TestInlineKeyboardButtonBase.callback_data,
-        switch_inline_query=TestInlineKeyboardButtonBase.switch_inline_query,
+        InlineKeyboardButtonTestBase.text,
+        url=InlineKeyboardButtonTestBase.url,
+        callback_data=InlineKeyboardButtonTestBase.callback_data,
+        switch_inline_query=InlineKeyboardButtonTestBase.switch_inline_query,
         switch_inline_query_current_chat=(
-            TestInlineKeyboardButtonBase.switch_inline_query_current_chat
+            InlineKeyboardButtonTestBase.switch_inline_query_current_chat
         ),
-        callback_game=TestInlineKeyboardButtonBase.callback_game,
-        pay=TestInlineKeyboardButtonBase.pay,
-        login_url=TestInlineKeyboardButtonBase.login_url,
-        web_app=TestInlineKeyboardButtonBase.web_app,
+        callback_game=InlineKeyboardButtonTestBase.callback_game,
+        pay=InlineKeyboardButtonTestBase.pay,
+        login_url=InlineKeyboardButtonTestBase.login_url,
+        web_app=InlineKeyboardButtonTestBase.web_app,
         switch_inline_query_chosen_chat=(
-            TestInlineKeyboardButtonBase.switch_inline_query_chosen_chat
+            InlineKeyboardButtonTestBase.switch_inline_query_chosen_chat
         ),
     )
 
 
-class TestInlineKeyboardButtonBase:
+class InlineKeyboardButtonTestBase:
     text = "text"
     url = "url"
     callback_data = "callback data"
@@ -62,7 +62,7 @@ class TestInlineKeyboardButtonBase:
     switch_inline_query_chosen_chat = SwitchInlineQueryChosenChat("a_bot", True, False, True, True)
 
 
-class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
+class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
     def test_slot_behaviour(self, inline_keyboard_button):
         inst = inline_keyboard_button
         for attr in inst.__slots__:
@@ -116,7 +116,7 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
             == inline_keyboard_button.switch_inline_query_chosen_chat.to_dict()
         )
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "text": self.text,
             "url": self.url,
@@ -150,7 +150,7 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
             == self.switch_inline_query_chosen_chat
         )
 
-        none = InlineKeyboardButton.de_json({}, bot)
+        none = InlineKeyboardButton.de_json({}, offline_bot)
         assert none is None
 
     def test_equality(self):

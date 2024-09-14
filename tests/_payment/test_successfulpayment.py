@@ -25,17 +25,17 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def successful_payment():
     return SuccessfulPayment(
-        TestSuccessfulPaymentBase.currency,
-        TestSuccessfulPaymentBase.total_amount,
-        TestSuccessfulPaymentBase.invoice_payload,
-        TestSuccessfulPaymentBase.telegram_payment_charge_id,
-        TestSuccessfulPaymentBase.provider_payment_charge_id,
-        shipping_option_id=TestSuccessfulPaymentBase.shipping_option_id,
-        order_info=TestSuccessfulPaymentBase.order_info,
+        SuccessfulPaymentTestBase.currency,
+        SuccessfulPaymentTestBase.total_amount,
+        SuccessfulPaymentTestBase.invoice_payload,
+        SuccessfulPaymentTestBase.telegram_payment_charge_id,
+        SuccessfulPaymentTestBase.provider_payment_charge_id,
+        shipping_option_id=SuccessfulPaymentTestBase.shipping_option_id,
+        order_info=SuccessfulPaymentTestBase.order_info,
     )
 
 
-class TestSuccessfulPaymentBase:
+class SuccessfulPaymentTestBase:
     invoice_payload = "invoice_payload"
     shipping_option_id = "shipping_option_id"
     currency = "EUR"
@@ -45,14 +45,14 @@ class TestSuccessfulPaymentBase:
     provider_payment_charge_id = "provider_payment_charge_id"
 
 
-class TestSuccessfulPaymentWithoutRequest(TestSuccessfulPaymentBase):
+class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
     def test_slot_behaviour(self, successful_payment):
         inst = successful_payment
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "invoice_payload": self.invoice_payload,
             "shipping_option_id": self.shipping_option_id,
@@ -62,7 +62,7 @@ class TestSuccessfulPaymentWithoutRequest(TestSuccessfulPaymentBase):
             "telegram_payment_charge_id": self.telegram_payment_charge_id,
             "provider_payment_charge_id": self.provider_payment_charge_id,
         }
-        successful_payment = SuccessfulPayment.de_json(json_dict, bot)
+        successful_payment = SuccessfulPayment.de_json(json_dict, offline_bot)
         assert successful_payment.api_kwargs == {}
 
         assert successful_payment.invoice_payload == self.invoice_payload

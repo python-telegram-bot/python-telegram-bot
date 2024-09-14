@@ -43,7 +43,7 @@ def chat_permissions():
     )
 
 
-class TestChatPermissionsBase:
+class ChatPermissionsTestBase:
     can_send_messages = True
     can_send_polls = True
     can_send_other_messages = False
@@ -60,14 +60,14 @@ class TestChatPermissionsBase:
     can_send_voice_notes = None
 
 
-class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
+class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
     def test_slot_behaviour(self, chat_permissions):
         inst = chat_permissions
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "can_send_messages": self.can_send_messages,
             "can_send_media_messages": "can_send_media_messages",
@@ -84,7 +84,7 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
             "can_send_video_notes": self.can_send_video_notes,
             "can_send_voice_notes": self.can_send_voice_notes,
         }
-        permissions = ChatPermissions.de_json(json_dict, bot)
+        permissions = ChatPermissions.de_json(json_dict, offline_bot)
         assert permissions.api_kwargs == {"can_send_media_messages": "can_send_media_messages"}
 
         assert permissions.can_send_messages == self.can_send_messages

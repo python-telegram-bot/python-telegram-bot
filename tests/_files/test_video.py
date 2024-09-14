@@ -49,7 +49,7 @@ async def video(bot, chat_id):
         return (await bot.send_video(chat_id, video=f, read_timeout=50)).video
 
 
-class TestVideoBase:
+class VideoTestBase:
     width = 360
     height = 640
     duration = 5
@@ -66,7 +66,7 @@ class TestVideoBase:
     video_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVideoWithoutRequest(TestVideoBase):
+class TestVideoWithoutRequest(VideoTestBase):
     def test_slot_behaviour(self, video):
         for attr in video.__slots__:
             assert getattr(video, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -93,7 +93,7 @@ class TestVideoWithoutRequest(TestVideoBase):
         assert video.file_size == self.file_size
         assert video.mime_type == self.mime_type
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.video_file_id,
             "file_unique_id": self.video_file_unique_id,
@@ -104,7 +104,7 @@ class TestVideoWithoutRequest(TestVideoBase):
             "file_size": self.file_size,
             "file_name": self.file_name,
         }
-        json_video = Video.de_json(json_dict, bot)
+        json_video = Video.de_json(json_dict, offline_bot)
         assert json_video.api_kwargs == {}
 
         assert json_video.file_id == self.video_file_id
@@ -149,30 +149,30 @@ class TestVideoWithoutRequest(TestVideoBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_error_without_required_args(self, bot, chat_id):
+    async def test_error_without_required_args(self, offline_bot, chat_id):
         with pytest.raises(TypeError):
-            await bot.send_video(chat_id=chat_id)
+            await offline_bot.send_video(chat_id=chat_id)
 
-    async def test_send_with_video(self, monkeypatch, bot, chat_id, video):
+    async def test_send_with_video(self, monkeypatch, offline_bot, chat_id, video):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["video"] == video.file_id
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_video(chat_id, video=video)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_video(chat_id, video=video)
 
-    async def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):
+    async def test_send_video_custom_filename(self, offline_bot, chat_id, video_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        assert await bot.send_video(chat_id, video_file, filename="custom_filename")
+        assert await offline_bot.send_video(chat_id, video_file, filename="custom_filename")
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_video_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_send_video_local_files(self, monkeypatch, offline_bot, chat_id, local_mode):
         try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
+            offline_bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local Bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
             expected = file.as_uri()
@@ -186,11 +186,11 @@ class TestVideoWithoutRequest(TestVideoBase):
                         data.get("thumbnail"), InputFile
                     )
 
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_video(chat_id, file, thumbnail=file)
+            monkeypatch.setattr(offline_bot, "_post", make_assertion)
+            await offline_bot.send_video(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
-            bot._local_mode = False
+            offline_bot._local_mode = False
 
     async def test_get_file_instance_method(self, monkeypatch, video):
         async def make_assertion(*_, **kwargs):
@@ -229,7 +229,7 @@ class TestVideoWithoutRequest(TestVideoBase):
         await default_bot.send_video(chat_id, video, reply_parameters=ReplyParameters(**kwargs))
 
 
-class TestVideoWithRequest(TestVideoBase):
+class TestVideoWithRequest(VideoTestBase):
     async def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
         message = await bot.send_video(
             chat_id,

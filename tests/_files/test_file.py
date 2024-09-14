@@ -31,10 +31,10 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def file(bot):
     file = File(
-        TestFileBase.file_id,
-        TestFileBase.file_unique_id,
-        file_path=TestFileBase.file_path,
-        file_size=TestFileBase.file_size,
+        FileTestBase.file_id,
+        FileTestBase.file_unique_id,
+        file_path=FileTestBase.file_path,
+        file_size=FileTestBase.file_size,
     )
     file.set_bot(bot)
     file._unfreeze()
@@ -51,10 +51,10 @@ def encrypted_file(bot):
         "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
     )
     ef = File(
-        TestFileBase.file_id,
-        TestFileBase.file_unique_id,
-        TestFileBase.file_size,
-        TestFileBase.file_path,
+        FileTestBase.file_id,
+        FileTestBase.file_unique_id,
+        FileTestBase.file_size,
+        FileTestBase.file_path,
     )
     ef.set_bot(bot)
     ef.set_credentials(fc)
@@ -69,9 +69,9 @@ def encrypted_local_file(bot):
         "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
     )
     ef = File(
-        TestFileBase.file_id,
-        TestFileBase.file_unique_id,
-        TestFileBase.file_size,
+        FileTestBase.file_id,
+        FileTestBase.file_unique_id,
+        FileTestBase.file_size,
         file_path=str(data_file("image_encrypted.jpg")),
     )
     ef.set_bot(bot)
@@ -82,16 +82,16 @@ def encrypted_local_file(bot):
 @pytest.fixture(scope="module")
 def local_file(bot):
     file = File(
-        TestFileBase.file_id,
-        TestFileBase.file_unique_id,
+        FileTestBase.file_id,
+        FileTestBase.file_unique_id,
         file_path=str(data_file("local_file.txt")),
-        file_size=TestFileBase.file_size,
+        file_size=FileTestBase.file_size,
     )
     file.set_bot(bot)
     return file
 
 
-class TestFileBase:
+class FileTestBase:
     file_id = "NOTVALIDDOESNOTMATTER"
     file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_path = (
@@ -101,20 +101,20 @@ class TestFileBase:
     file_content = "Saint-Saëns".encode()  # Intentionally contains unicode chars.
 
 
-class TestFileWithoutRequest(TestFileBase):
+class TestFileWithoutRequest(FileTestBase):
     def test_slot_behaviour(self, file):
         for attr in file.__slots__:
             assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.file_id,
             "file_unique_id": self.file_unique_id,
             "file_path": self.file_path,
             "file_size": self.file_size,
         }
-        new_file = File.de_json(json_dict, bot)
+        new_file = File.de_json(json_dict, offline_bot)
         assert new_file.api_kwargs == {}
 
         assert new_file.file_id == self.file_id
@@ -131,11 +131,11 @@ class TestFileWithoutRequest(TestFileBase):
         assert file_dict["file_path"] == file.file_path
         assert file_dict["file_size"] == file.file_size
 
-    def test_equality(self, bot):
-        a = File(self.file_id, self.file_unique_id, bot)
-        b = File("", self.file_unique_id, bot)
+    def test_equality(self, offline_bot):
+        a = File(self.file_id, self.file_unique_id, offline_bot)
+        b = File("", self.file_unique_id, offline_bot)
         c = File(self.file_id, self.file_unique_id, None)
-        d = File("", "", bot)
+        d = File("", "", offline_bot)
         e = Voice(self.file_id, self.file_unique_id, 0)
 
         assert a == b
@@ -223,7 +223,7 @@ class TestFileWithoutRequest(TestFileBase):
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
 
-    async def test_download_encrypted(self, monkeypatch, bot, encrypted_file):
+    async def test_download_encrypted(self, monkeypatch, offline_bot, encrypted_file):
         async def test(*args, **kwargs):
             return data_file("image_encrypted.jpg").read_bytes()
 
@@ -273,7 +273,7 @@ class TestFileWithoutRequest(TestFileBase):
         assert buf2[: len(buf)] == buf
 
 
-class TestFileWithRequest(TestFileBase):
+class TestFileWithRequest(FileTestBase):
     async def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
             await bot.get_file(file_id="")

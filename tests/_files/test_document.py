@@ -49,7 +49,7 @@ async def document(bot, chat_id):
         return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
 
 
-class TestDocumentBase:
+class DocumentTestBase:
     caption = "DocumentTest - *Caption*"
     document_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.gif"
     file_size = 12948
@@ -62,7 +62,7 @@ class TestDocumentBase:
     document_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestDocumentWithoutRequest(TestDocumentBase):
+class TestDocumentWithoutRequest(DocumentTestBase):
     def test_slot_behaviour(self, document):
         for attr in document.__slots__:
             assert getattr(document, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -83,7 +83,7 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert document.thumbnail.width == self.thumb_width
         assert document.thumbnail.height == self.thumb_height
 
-    def test_de_json(self, bot, document):
+    def test_de_json(self, offline_bot, document):
         json_dict = {
             "file_id": self.document_file_id,
             "file_unique_id": self.document_file_unique_id,
@@ -92,7 +92,7 @@ class TestDocumentWithoutRequest(TestDocumentBase):
             "mime_type": self.mime_type,
             "file_size": self.file_size,
         }
-        test_document = Document.de_json(json_dict, bot)
+        test_document = Document.de_json(json_dict, offline_bot)
         assert test_document.api_kwargs == {}
 
         assert test_document.file_id == self.document_file_id
@@ -128,13 +128,13 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_error_send_without_required_args(self, bot, chat_id):
+    async def test_error_send_without_required_args(self, offline_bot, chat_id):
         with pytest.raises(TypeError):
-            await bot.send_document(chat_id=chat_id)
+            await offline_bot.send_document(chat_id=chat_id)
 
     @pytest.mark.parametrize("disable_content_type_detection", [True, False, None])
     async def test_send_with_document(
-        self, monkeypatch, bot, chat_id, document, disable_content_type_detection
+        self, monkeypatch, offline_bot, chat_id, document, disable_content_type_detection
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.parameters
@@ -143,9 +143,9 @@ class TestDocumentWithoutRequest(TestDocumentBase):
             )
             return data["document"] == document.file_id and type_detection
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        message = await bot.send_document(
+        message = await offline_bot.send_document(
             document=document,
             chat_id=chat_id,
             disable_content_type_detection=disable_content_type_detection,
@@ -181,10 +181,10 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_document_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_send_document_local_files(self, monkeypatch, offline_bot, chat_id, local_mode):
         try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
+            offline_bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local Bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
             expected = file.as_uri()
@@ -200,11 +200,11 @@ class TestDocumentWithoutRequest(TestDocumentBase):
                         data.get("thumbnail"), InputFile
                     )
 
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_document(chat_id, file, thumbnail=file)
+            monkeypatch.setattr(offline_bot, "_post", make_assertion)
+            await offline_bot.send_document(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
-            bot._local_mode = False
+            offline_bot._local_mode = False
 
     async def test_get_file_instance_method(self, monkeypatch, document):
         async def make_assertion(*_, **kwargs):
@@ -218,7 +218,7 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert await document.get_file()
 
 
-class TestDocumentWithRequest(TestDocumentBase):
+class TestDocumentWithRequest(DocumentTestBase):
     async def test_error_send_empty_file(self, bot, chat_id):
         with Path(os.devnull).open("rb") as f, pytest.raises(TelegramError):
             await bot.send_document(chat_id=chat_id, document=f)

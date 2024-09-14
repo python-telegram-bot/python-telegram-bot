@@ -32,25 +32,25 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_video():
     return InlineQueryResultVideo(
-        TestInlineQueryResultVideoBase.id_,
-        TestInlineQueryResultVideoBase.video_url,
-        TestInlineQueryResultVideoBase.mime_type,
-        TestInlineQueryResultVideoBase.thumbnail_url,
-        TestInlineQueryResultVideoBase.title,
-        video_width=TestInlineQueryResultVideoBase.video_width,
-        video_height=TestInlineQueryResultVideoBase.video_height,
-        video_duration=TestInlineQueryResultVideoBase.video_duration,
-        caption=TestInlineQueryResultVideoBase.caption,
-        parse_mode=TestInlineQueryResultVideoBase.parse_mode,
-        caption_entities=TestInlineQueryResultVideoBase.caption_entities,
-        description=TestInlineQueryResultVideoBase.description,
-        input_message_content=TestInlineQueryResultVideoBase.input_message_content,
-        reply_markup=TestInlineQueryResultVideoBase.reply_markup,
-        show_caption_above_media=TestInlineQueryResultVideoBase.show_caption_above_media,
+        InlineQueryResultVideoTestBase.id_,
+        InlineQueryResultVideoTestBase.video_url,
+        InlineQueryResultVideoTestBase.mime_type,
+        InlineQueryResultVideoTestBase.thumbnail_url,
+        InlineQueryResultVideoTestBase.title,
+        video_width=InlineQueryResultVideoTestBase.video_width,
+        video_height=InlineQueryResultVideoTestBase.video_height,
+        video_duration=InlineQueryResultVideoTestBase.video_duration,
+        caption=InlineQueryResultVideoTestBase.caption,
+        parse_mode=InlineQueryResultVideoTestBase.parse_mode,
+        caption_entities=InlineQueryResultVideoTestBase.caption_entities,
+        description=InlineQueryResultVideoTestBase.description,
+        input_message_content=InlineQueryResultVideoTestBase.input_message_content,
+        reply_markup=InlineQueryResultVideoTestBase.reply_markup,
+        show_caption_above_media=InlineQueryResultVideoTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultVideoBase:
+class InlineQueryResultVideoTestBase:
     id_ = "id"
     type_ = "video"
     video_url = "video url"
@@ -69,7 +69,7 @@ class TestInlineQueryResultVideoBase:
     show_caption_above_media = True
 
 
-class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
+class TestInlineQueryResultVideoWithoutRequest(InlineQueryResultVideoTestBase):
     def test_slot_behaviour(self, inline_query_result_video):
         inst = inline_query_result_video
         for attr in inst.__slots__:

@@ -25,16 +25,16 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def shipping_address():
     return ShippingAddress(
-        TestShippingAddressBase.country_code,
-        TestShippingAddressBase.state,
-        TestShippingAddressBase.city,
-        TestShippingAddressBase.street_line1,
-        TestShippingAddressBase.street_line2,
-        TestShippingAddressBase.post_code,
+        ShippingAddressTestBase.country_code,
+        ShippingAddressTestBase.state,
+        ShippingAddressTestBase.city,
+        ShippingAddressTestBase.street_line1,
+        ShippingAddressTestBase.street_line2,
+        ShippingAddressTestBase.post_code,
     )
 
 
-class TestShippingAddressBase:
+class ShippingAddressTestBase:
     country_code = "GB"
     state = "state"
     city = "London"
@@ -43,14 +43,14 @@ class TestShippingAddressBase:
     post_code = "WC1"
 
 
-class TestShippingAddressWithoutRequest(TestShippingAddressBase):
+class TestShippingAddressWithoutRequest(ShippingAddressTestBase):
     def test_slot_behaviour(self, shipping_address):
         inst = shipping_address
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "country_code": self.country_code,
             "state": self.state,
@@ -59,7 +59,7 @@ class TestShippingAddressWithoutRequest(TestShippingAddressBase):
             "street_line2": self.street_line2,
             "post_code": self.post_code,
         }
-        shipping_address = ShippingAddress.de_json(json_dict, bot)
+        shipping_address = ShippingAddress.de_json(json_dict, offline_bot)
         assert shipping_address.api_kwargs == {}
 
         assert shipping_address.country_code == self.country_code

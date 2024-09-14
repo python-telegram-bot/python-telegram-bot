@@ -68,94 +68,94 @@ from .test_video import video, video_file  # noqa: F401
 @pytest.fixture(scope="module")
 def input_media_video(class_thumb_file):
     return InputMediaVideo(
-        media=TestInputMediaVideoBase.media,
-        caption=TestInputMediaVideoBase.caption,
-        width=TestInputMediaVideoBase.width,
-        height=TestInputMediaVideoBase.height,
-        duration=TestInputMediaVideoBase.duration,
-        parse_mode=TestInputMediaVideoBase.parse_mode,
-        caption_entities=TestInputMediaVideoBase.caption_entities,
+        media=InputMediaVideoTestBase.media,
+        caption=InputMediaVideoTestBase.caption,
+        width=InputMediaVideoTestBase.width,
+        height=InputMediaVideoTestBase.height,
+        duration=InputMediaVideoTestBase.duration,
+        parse_mode=InputMediaVideoTestBase.parse_mode,
+        caption_entities=InputMediaVideoTestBase.caption_entities,
         thumbnail=class_thumb_file,
-        supports_streaming=TestInputMediaVideoBase.supports_streaming,
-        has_spoiler=TestInputMediaVideoBase.has_spoiler,
-        show_caption_above_media=TestInputMediaVideoBase.show_caption_above_media,
+        supports_streaming=InputMediaVideoTestBase.supports_streaming,
+        has_spoiler=InputMediaVideoTestBase.has_spoiler,
+        show_caption_above_media=InputMediaVideoTestBase.show_caption_above_media,
     )
 
 
 @pytest.fixture(scope="module")
 def input_media_photo():
     return InputMediaPhoto(
-        media=TestInputMediaPhotoBase.media,
-        caption=TestInputMediaPhotoBase.caption,
-        parse_mode=TestInputMediaPhotoBase.parse_mode,
-        caption_entities=TestInputMediaPhotoBase.caption_entities,
-        has_spoiler=TestInputMediaPhotoBase.has_spoiler,
-        show_caption_above_media=TestInputMediaPhotoBase.show_caption_above_media,
+        media=InputMediaPhotoTestBase.media,
+        caption=InputMediaPhotoTestBase.caption,
+        parse_mode=InputMediaPhotoTestBase.parse_mode,
+        caption_entities=InputMediaPhotoTestBase.caption_entities,
+        has_spoiler=InputMediaPhotoTestBase.has_spoiler,
+        show_caption_above_media=InputMediaPhotoTestBase.show_caption_above_media,
     )
 
 
 @pytest.fixture(scope="module")
 def input_media_animation(class_thumb_file):
     return InputMediaAnimation(
-        media=TestInputMediaAnimationBase.media,
-        caption=TestInputMediaAnimationBase.caption,
-        parse_mode=TestInputMediaAnimationBase.parse_mode,
-        caption_entities=TestInputMediaAnimationBase.caption_entities,
-        width=TestInputMediaAnimationBase.width,
-        height=TestInputMediaAnimationBase.height,
+        media=InputMediaAnimationTestBase.media,
+        caption=InputMediaAnimationTestBase.caption,
+        parse_mode=InputMediaAnimationTestBase.parse_mode,
+        caption_entities=InputMediaAnimationTestBase.caption_entities,
+        width=InputMediaAnimationTestBase.width,
+        height=InputMediaAnimationTestBase.height,
         thumbnail=class_thumb_file,
-        duration=TestInputMediaAnimationBase.duration,
-        has_spoiler=TestInputMediaAnimationBase.has_spoiler,
-        show_caption_above_media=TestInputMediaAnimationBase.show_caption_above_media,
+        duration=InputMediaAnimationTestBase.duration,
+        has_spoiler=InputMediaAnimationTestBase.has_spoiler,
+        show_caption_above_media=InputMediaAnimationTestBase.show_caption_above_media,
     )
 
 
 @pytest.fixture(scope="module")
 def input_media_audio(class_thumb_file):
     return InputMediaAudio(
-        media=TestInputMediaAudioBase.media,
-        caption=TestInputMediaAudioBase.caption,
-        duration=TestInputMediaAudioBase.duration,
-        performer=TestInputMediaAudioBase.performer,
-        title=TestInputMediaAudioBase.title,
+        media=InputMediaAudioTestBase.media,
+        caption=InputMediaAudioTestBase.caption,
+        duration=InputMediaAudioTestBase.duration,
+        performer=InputMediaAudioTestBase.performer,
+        title=InputMediaAudioTestBase.title,
         thumbnail=class_thumb_file,
-        parse_mode=TestInputMediaAudioBase.parse_mode,
-        caption_entities=TestInputMediaAudioBase.caption_entities,
+        parse_mode=InputMediaAudioTestBase.parse_mode,
+        caption_entities=InputMediaAudioTestBase.caption_entities,
     )
 
 
 @pytest.fixture(scope="module")
 def input_media_document(class_thumb_file):
     return InputMediaDocument(
-        media=TestInputMediaDocumentBase.media,
-        caption=TestInputMediaDocumentBase.caption,
+        media=InputMediaDocumentTestBase.media,
+        caption=InputMediaDocumentTestBase.caption,
         thumbnail=class_thumb_file,
-        parse_mode=TestInputMediaDocumentBase.parse_mode,
-        caption_entities=TestInputMediaDocumentBase.caption_entities,
-        disable_content_type_detection=TestInputMediaDocumentBase.disable_content_type_detection,
+        parse_mode=InputMediaDocumentTestBase.parse_mode,
+        caption_entities=InputMediaDocumentTestBase.caption_entities,
+        disable_content_type_detection=InputMediaDocumentTestBase.disable_content_type_detection,
     )
 
 
 @pytest.fixture(scope="module")
 def input_paid_media_photo():
     return InputPaidMediaPhoto(
-        media=TestInputMediaPhotoBase.media,
+        media=InputMediaPhotoTestBase.media,
     )
 
 
 @pytest.fixture(scope="module")
 def input_paid_media_video(class_thumb_file):
     return InputPaidMediaVideo(
-        media=TestInputMediaVideoBase.media,
+        media=InputMediaVideoTestBase.media,
         thumbnail=class_thumb_file,
-        width=TestInputMediaVideoBase.width,
-        height=TestInputMediaVideoBase.height,
-        duration=TestInputMediaVideoBase.duration,
-        supports_streaming=TestInputMediaVideoBase.supports_streaming,
+        width=InputMediaVideoTestBase.width,
+        height=InputMediaVideoTestBase.height,
+        duration=InputMediaVideoTestBase.duration,
+        supports_streaming=InputMediaVideoTestBase.supports_streaming,
     )
 
 
-class TestInputMediaVideoBase:
+class InputMediaVideoTestBase:
     type_ = "video"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -169,7 +169,7 @@ class TestInputMediaVideoBase:
     show_caption_above_media = True
 
 
-class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
+class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
     def test_slot_behaviour(self, input_media_video):
         inst = input_media_video
         for attr in inst.__slots__:
@@ -258,7 +258,7 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         )
 
 
-class TestInputMediaPhotoBase:
+class InputMediaPhotoTestBase:
     type_ = "photo"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -268,7 +268,7 @@ class TestInputMediaPhotoBase:
     show_caption_above_media = True
 
 
-class TestInputMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
+class TestInputMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
     def test_slot_behaviour(self, input_media_photo):
         inst = input_media_photo
         for attr in inst.__slots__:
@@ -322,7 +322,7 @@ class TestInputMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
         assert input_media_photo.media == data_file("telegram.mp4").as_uri()
 
 
-class TestInputMediaAnimationBase:
+class InputMediaAnimationTestBase:
     type_ = "animation"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -335,7 +335,7 @@ class TestInputMediaAnimationBase:
     show_caption_above_media = True
 
 
-class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
+class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
     def test_slot_behaviour(self, input_media_animation):
         inst = input_media_animation
         for attr in inst.__slots__:
@@ -396,7 +396,7 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation.thumbnail == data_file("telegram.jpg").as_uri()
 
 
-class TestInputMediaAudioBase:
+class InputMediaAudioTestBase:
     type_ = "audio"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -407,7 +407,7 @@ class TestInputMediaAudioBase:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
 
-class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
+class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
     def test_slot_behaviour(self, input_media_audio):
         inst = input_media_audio
         for attr in inst.__slots__:
@@ -467,7 +467,7 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
         assert input_media_audio.thumbnail == data_file("telegram.jpg").as_uri()
 
 
-class TestInputMediaDocumentBase:
+class InputMediaDocumentTestBase:
     type_ = "document"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -476,7 +476,7 @@ class TestInputMediaDocumentBase:
     disable_content_type_detection = True
 
 
-class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
+class TestInputMediaDocumentWithoutRequest(InputMediaDocumentTestBase):
     def test_slot_behaviour(self, input_media_document):
         inst = input_media_document
         for attr in inst.__slots__:
@@ -535,7 +535,7 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
         assert input_media_document.thumbnail == data_file("telegram.jpg").as_uri()
 
 
-class TestInputPaidMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
+class TestInputPaidMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
     def test_slot_behaviour(self, input_paid_media_photo):
         inst = input_paid_media_photo
         for attr in inst.__slots__:
@@ -568,7 +568,7 @@ class TestInputPaidMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
         assert input_paid_media_photo.media == data_file("telegram.jpg").as_uri()
 
 
-class TestInputPaidMediaVideoWithoutRequest(TestInputMediaVideoBase):
+class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
     def test_slot_behaviour(self, input_paid_media_video):
         inst = input_paid_media_video
         for attr in inst.__slots__:
@@ -655,7 +655,7 @@ def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
 class TestSendMediaGroupWithoutRequest:
     async def test_send_media_group_throws_error_with_group_caption_and_individual_captions(
         self,
-        bot,
+        offline_bot,
         chat_id,
         media_group,
         media_group_no_caption_only_caption_entities,
@@ -670,11 +670,11 @@ class TestSendMediaGroupWithoutRequest:
                 ValueError,
                 match="You can only supply either group caption or media with captions.",
             ):
-                await bot.send_media_group(chat_id, group, caption="foo")
+                await offline_bot.send_media_group(chat_id, group, caption="foo")
 
     async def test_send_media_group_custom_filename(
         self,
-        bot,
+        offline_bot,
         chat_id,
         photo_file,  # noqa: F811
         animation_file,  # noqa: F811
@@ -690,7 +690,7 @@ class TestSendMediaGroupWithoutRequest:
             if result is True:
                 raise Exception("Test was successful")
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
         media = [
             InputMediaAnimation(animation_file, filename="custom_filename"),
@@ -700,10 +700,10 @@ class TestSendMediaGroupWithoutRequest:
         ]
 
         with pytest.raises(Exception, match="Test was successful"):
-            await bot.send_media_group(chat_id, media)
+            await offline_bot.send_media_group(chat_id, media)
 
     async def test_send_media_group_with_thumbs(
-        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+        self, offline_bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
         async def make_assertion(method, url, request_data: RequestData, *args, **kwargs):
             nonlocal input_video
@@ -715,13 +715,13 @@ class TestSendMediaGroupWithoutRequest:
             result = video_check and thumb_check
             raise Exception(f"Test was {'successful' if result else 'failing'}")
 
-        monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "_request_wrapper", make_assertion)
         input_video = InputMediaVideo(video_file, thumbnail=photo_file)
         with pytest.raises(Exception, match="Test was successful"):
-            await bot.send_media_group(chat_id, [input_video, input_video])
+            await offline_bot.send_media_group(chat_id, [input_video, input_video])
 
     async def test_edit_message_media_with_thumb(
-        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+        self, offline_bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
         async def make_assertion(
             method: str, url: str, request_data: Optional[RequestData] = None, *args, **kwargs
@@ -734,10 +734,12 @@ class TestSendMediaGroupWithoutRequest:
             result = video_check and thumb_check
             raise Exception(f"Test was {'successful' if result else 'failing'}")
 
-        monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "_request_wrapper", make_assertion)
         input_video = InputMediaVideo(video_file, thumbnail=photo_file)
         with pytest.raises(Exception, match="Test was successful"):
-            await bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
+            await offline_bot.edit_message_media(
+                chat_id=chat_id, message_id=123, media=input_video
+            )
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),

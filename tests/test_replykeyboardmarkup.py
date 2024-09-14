@@ -26,15 +26,15 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def reply_keyboard_markup():
     return ReplyKeyboardMarkup(
-        TestReplyKeyboardMarkupBase.keyboard,
-        resize_keyboard=TestReplyKeyboardMarkupBase.resize_keyboard,
-        one_time_keyboard=TestReplyKeyboardMarkupBase.one_time_keyboard,
-        selective=TestReplyKeyboardMarkupBase.selective,
-        is_persistent=TestReplyKeyboardMarkupBase.is_persistent,
+        ReplyKeyboardMarkupTestBase.keyboard,
+        resize_keyboard=ReplyKeyboardMarkupTestBase.resize_keyboard,
+        one_time_keyboard=ReplyKeyboardMarkupTestBase.one_time_keyboard,
+        selective=ReplyKeyboardMarkupTestBase.selective,
+        is_persistent=ReplyKeyboardMarkupTestBase.is_persistent,
     )
 
 
-class TestReplyKeyboardMarkupBase:
+class ReplyKeyboardMarkupTestBase:
     keyboard = [[KeyboardButton("button1"), KeyboardButton("button2")]]
     resize_keyboard = True
     one_time_keyboard = True
@@ -42,7 +42,7 @@ class TestReplyKeyboardMarkupBase:
     is_persistent = True
 
 
-class TestReplyKeyboardMarkupWithoutRequest(TestReplyKeyboardMarkupBase):
+class TestReplyKeyboardMarkupWithoutRequest(ReplyKeyboardMarkupTestBase):
     def test_slot_behaviour(self, reply_keyboard_markup):
         inst = reply_keyboard_markup
         for attr in inst.__slots__:
@@ -154,7 +154,7 @@ class TestReplyKeyboardMarkupWithoutRequest(TestReplyKeyboardMarkupBase):
         assert len(reply_keyboard_markup[1]) == 1
 
 
-class TestReplyKeyboardMarkupWithRequest(TestReplyKeyboardMarkupBase):
+class TestReplyKeyboardMarkupWithRequest(ReplyKeyboardMarkupTestBase):
     async def test_send_message_with_reply_keyboard_markup(
         self, bot, chat_id, reply_keyboard_markup
     ):

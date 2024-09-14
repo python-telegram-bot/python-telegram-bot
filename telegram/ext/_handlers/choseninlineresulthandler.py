@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from telegram.ext import Application
 
 
-class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
+class ChosenInlineResultHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram updates that contain
     :attr:`telegram.Update.chosen_inline_result`.
 
@@ -76,7 +76,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
     __slots__ = ("pattern",)
 
     def __init__(
-        self,
+        self: "ChosenInlineResultHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
         pattern: Optional[Union[str, Pattern[str]]] = None,

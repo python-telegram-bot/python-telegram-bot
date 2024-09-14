@@ -212,14 +212,14 @@ ids = (*all_types, "callback_query_without_message")
 
 @pytest.fixture(scope="module", params=params, ids=ids)
 def update(request):
-    return Update(update_id=TestUpdateBase.update_id, **request.param)
+    return Update(update_id=UpdateTestBase.update_id, **request.param)
 
 
-class TestUpdateBase:
+class UpdateTestBase:
     update_id = 868573637
 
 
-class TestUpdateWithoutRequest(TestUpdateBase):
+class TestUpdateWithoutRequest(UpdateTestBase):
     def test_slot_behaviour(self):
         update = Update(self.update_id)
         for attr in update.__slots__:
@@ -227,11 +227,11 @@ class TestUpdateWithoutRequest(TestUpdateBase):
         assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
 
     @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
-    def test_de_json(self, bot, paramdict):
+    def test_de_json(self, offline_bot, paramdict):
         json_dict = {"update_id": self.update_id}
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
-        update = Update.de_json(json_dict, bot)
+        update = Update.de_json(json_dict, offline_bot)
         assert update.api_kwargs == {}
 
         assert update.update_id == self.update_id
@@ -244,8 +244,8 @@ class TestUpdateWithoutRequest(TestUpdateBase):
                 assert getattr(update, _type) == paramdict[_type]
         assert i == 1
 
-    def test_update_de_json_empty(self, bot):
-        update = Update.de_json(None, bot)
+    def test_update_de_json_empty(self, offline_bot):
+        update = Update.de_json(None, offline_bot)
 
         assert update is None
 

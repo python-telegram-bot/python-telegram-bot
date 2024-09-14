@@ -48,7 +48,7 @@ async def video_note(bot, chat_id):
         return (await bot.send_video_note(chat_id, video_note=f, read_timeout=50)).video_note
 
 
-class TestVideoNoteBase:
+class VideoNoteTestBase:
     length = 240
     duration = 3
     file_size = 132084
@@ -60,7 +60,7 @@ class TestVideoNoteBase:
     videonote_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVideoNoteWithoutRequest(TestVideoNoteBase):
+class TestVideoNoteWithoutRequest(VideoNoteTestBase):
     def test_slot_behaviour(self, video_note):
         for attr in video_note.__slots__:
             assert getattr(video_note, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -85,7 +85,7 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert video_note.duration == self.duration
         assert video_note.file_size == self.file_size
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.videonote_file_id,
             "file_unique_id": self.videonote_file_unique_id,
@@ -93,7 +93,7 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
             "duration": self.duration,
             "file_size": self.file_size,
         }
-        json_video_note = VideoNote.de_json(json_dict, bot)
+        json_video_note = VideoNote.de_json(json_dict, offline_bot)
         assert json_video_note.api_kwargs == {}
 
         assert json_video_note.file_id == self.videonote_file_id
@@ -132,32 +132,36 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_error_without_required_args(self, bot, chat_id):
+    async def test_error_without_required_args(self, offline_bot, chat_id):
         with pytest.raises(TypeError):
-            await bot.send_video_note(chat_id=chat_id)
+            await offline_bot.send_video_note(chat_id=chat_id)
 
-    async def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
+    async def test_send_with_video_note(self, monkeypatch, offline_bot, chat_id, video_note):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["video_note"] == video_note.file_id
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_video_note(chat_id, video_note=video_note)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_video_note(chat_id, video_note=video_note)
 
     async def test_send_video_note_custom_filename(
-        self, bot, chat_id, video_note_file, monkeypatch
+        self, offline_bot, chat_id, video_note_file, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        assert await bot.send_video_note(chat_id, video_note_file, filename="custom_filename")
+        assert await offline_bot.send_video_note(
+            chat_id, video_note_file, filename="custom_filename"
+        )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_video_note_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_send_video_note_local_files(
+        self, monkeypatch, offline_bot, chat_id, local_mode
+    ):
         try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
+            offline_bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local Bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
             expected = file.as_uri()
@@ -173,11 +177,11 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
                         data.get("thumbnail"), InputFile
                     )
 
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_video_note(chat_id, file, thumbnail=file)
+            monkeypatch.setattr(offline_bot, "_post", make_assertion)
+            await offline_bot.send_video_note(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
-            bot._local_mode = False
+            offline_bot._local_mode = False
 
     async def test_get_file_instance_method(self, monkeypatch, video_note):
         async def make_assertion(*_, **kwargs):
@@ -218,7 +222,7 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         )
 
 
-class TestVideoNoteWithRequest(TestVideoNoteBase):
+class TestVideoNoteWithRequest(VideoNoteTestBase):
     async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
         message = await bot.send_video_note(
             chat_id,

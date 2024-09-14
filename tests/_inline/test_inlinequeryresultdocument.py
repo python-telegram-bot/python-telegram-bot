@@ -32,23 +32,23 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_document():
     return InlineQueryResultDocument(
-        TestInlineQueryResultDocumentBase.id_,
-        TestInlineQueryResultDocumentBase.document_url,
-        TestInlineQueryResultDocumentBase.title,
-        TestInlineQueryResultDocumentBase.mime_type,
-        caption=TestInlineQueryResultDocumentBase.caption,
-        parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
-        caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
-        description=TestInlineQueryResultDocumentBase.description,
-        thumbnail_url=TestInlineQueryResultDocumentBase.thumbnail_url,
-        thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
-        thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
-        input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
-        reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
+        InlineQueryResultDocumentTestBase.id_,
+        InlineQueryResultDocumentTestBase.document_url,
+        InlineQueryResultDocumentTestBase.title,
+        InlineQueryResultDocumentTestBase.mime_type,
+        caption=InlineQueryResultDocumentTestBase.caption,
+        parse_mode=InlineQueryResultDocumentTestBase.parse_mode,
+        caption_entities=InlineQueryResultDocumentTestBase.caption_entities,
+        description=InlineQueryResultDocumentTestBase.description,
+        thumbnail_url=InlineQueryResultDocumentTestBase.thumbnail_url,
+        thumbnail_width=InlineQueryResultDocumentTestBase.thumbnail_width,
+        thumbnail_height=InlineQueryResultDocumentTestBase.thumbnail_height,
+        input_message_content=InlineQueryResultDocumentTestBase.input_message_content,
+        reply_markup=InlineQueryResultDocumentTestBase.reply_markup,
     )
 
 
-class TestInlineQueryResultDocumentBase:
+class InlineQueryResultDocumentTestBase:
     id_ = "id"
     type_ = "document"
     document_url = "document url"
@@ -65,7 +65,7 @@ class TestInlineQueryResultDocumentBase:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentBase):
+class TestInlineQueryResultDocumentWithoutRequest(InlineQueryResultDocumentTestBase):
     def test_slot_behaviour(self, inline_query_result_document):
         inst = inline_query_result_document
         for attr in inst.__slots__:

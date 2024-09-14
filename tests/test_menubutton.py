@@ -84,31 +84,31 @@ def menu_button(scope_class_and_type):
     return scope_class_and_type[0].de_json(
         {
             "type": scope_class_and_type[1],
-            "text": TestMenuButtonselfBase.text,
-            "web_app": TestMenuButtonselfBase.web_app.to_dict(),
+            "text": MenuButtonTestBase.text,
+            "web_app": MenuButtonTestBase.web_app.to_dict(),
         },
         bot=None,
     )
 
 
-class TestMenuButtonselfBase:
+class MenuButtonTestBase:
     text = "button_text"
     web_app = WebAppInfo(url="https://python-telegram-bot.org/web_app")
 
 
 # All the scope types are very similar, so we test everything via parametrization
-class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
+class TestMenuButtonWithoutRequest(MenuButtonTestBase):
     def test_slot_behaviour(self, menu_button):
         for attr in menu_button.__slots__:
             assert getattr(menu_button, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(menu_button)) == len(set(mro_slots(menu_button))), "duplicate slot"
 
-    def test_de_json(self, bot, scope_class_and_type):
+    def test_de_json(self, offline_bot, scope_class_and_type):
         cls = scope_class_and_type[0]
         type_ = scope_class_and_type[1]
 
         json_dict = {"type": type_, "text": self.text, "web_app": self.web_app.to_dict()}
-        menu_button = MenuButton.de_json(json_dict, bot)
+        menu_button = MenuButton.de_json(json_dict, offline_bot)
         assert set(menu_button.api_kwargs.keys()) == {"text", "web_app"} - set(cls.__slots__)
 
         assert isinstance(menu_button, MenuButton)
@@ -119,22 +119,22 @@ class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
         if "text" in cls.__slots__:
             assert menu_button.text == self.text
 
-        assert cls.de_json(None, bot) is None
-        assert MenuButton.de_json({}, bot) is None
+        assert cls.de_json(None, offline_bot) is None
+        assert MenuButton.de_json({}, offline_bot) is None
 
-    def test_de_json_invalid_type(self, bot):
+    def test_de_json_invalid_type(self, offline_bot):
         json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
-        menu_button = MenuButton.de_json(json_dict, bot)
+        menu_button = MenuButton.de_json(json_dict, offline_bot)
         assert menu_button.api_kwargs == {"text": self.text, "web_app": self.web_app.to_dict()}
 
         assert type(menu_button) is MenuButton
         assert menu_button.type == "invalid"
 
-    def test_de_json_subclass(self, scope_class, bot):
+    def test_de_json_subclass(self, scope_class, offline_bot):
         """This makes sure that e.g. MenuButtonDefault(data) never returns a
         MenuButtonChat instance."""
         json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
-        assert type(scope_class.de_json(json_dict, bot)) is scope_class
+        assert type(scope_class.de_json(json_dict, offline_bot)) is scope_class
 
     def test_de_json_empty_data(self, scope_class):
         if scope_class in (MenuButtonWebApp,):
@@ -157,7 +157,7 @@ class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
         assert type(MenuButton("commands").type) is MenuButtonType
         assert MenuButton("unknown").type == "unknown"
 
-    def test_equality(self, menu_button, bot):
+    def test_equality(self, menu_button, offline_bot):
         a = MenuButton("base_type")
         b = MenuButton("base_type")
         c = menu_button
@@ -185,7 +185,7 @@ class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
         if hasattr(c, "web_app"):
             json_dict = c.to_dict()
             json_dict["web_app"] = WebAppInfo("https://foo.bar/web_app").to_dict()
-            f = c.__class__.de_json(json_dict, bot)
+            f = c.__class__.de_json(json_dict, offline_bot)
 
             assert c != f
             assert hash(c) != hash(f)
@@ -193,7 +193,7 @@ class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
         if hasattr(c, "text"):
             json_dict = c.to_dict()
             json_dict["text"] = "other text"
-            g = c.__class__.de_json(json_dict, bot)
+            g = c.__class__.de_json(json_dict, offline_bot)
 
             assert c != g
             assert hash(c) != hash(g)

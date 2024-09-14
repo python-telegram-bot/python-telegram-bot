@@ -25,19 +25,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def input_contact_message_content():
     return InputContactMessageContent(
-        TestInputContactMessageContentBase.phone_number,
-        TestInputContactMessageContentBase.first_name,
-        TestInputContactMessageContentBase.last_name,
+        InputContactMessageContentTestBase.phone_number,
+        InputContactMessageContentTestBase.first_name,
+        InputContactMessageContentTestBase.last_name,
     )
 
 
-class TestInputContactMessageContentBase:
+class InputContactMessageContentTestBase:
     phone_number = "phone number"
     first_name = "first name"
     last_name = "last name"
 
 
-class TestInputContactMessageContentWithoutRequest(TestInputContactMessageContentBase):
+class TestInputContactMessageContentWithoutRequest(InputContactMessageContentTestBase):
     def test_slot_behaviour(self, input_contact_message_content):
         inst = input_contact_message_content
         for attr in inst.__slots__:

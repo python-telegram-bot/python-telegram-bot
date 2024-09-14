@@ -32,17 +32,17 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def keyboard_button():
     return KeyboardButton(
-        TestKeyboardButtonBase.text,
-        request_location=TestKeyboardButtonBase.request_location,
-        request_contact=TestKeyboardButtonBase.request_contact,
-        request_poll=TestKeyboardButtonBase.request_poll,
-        web_app=TestKeyboardButtonBase.web_app,
-        request_chat=TestKeyboardButtonBase.request_chat,
-        request_users=TestKeyboardButtonBase.request_users,
+        KeyboardButtonTestBase.text,
+        request_location=KeyboardButtonTestBase.request_location,
+        request_contact=KeyboardButtonTestBase.request_contact,
+        request_poll=KeyboardButtonTestBase.request_poll,
+        web_app=KeyboardButtonTestBase.web_app,
+        request_chat=KeyboardButtonTestBase.request_chat,
+        request_users=KeyboardButtonTestBase.request_users,
     )
 
 
-class TestKeyboardButtonBase:
+class KeyboardButtonTestBase:
     text = "text"
     request_location = True
     request_contact = True
@@ -52,7 +52,7 @@ class TestKeyboardButtonBase:
     request_users = KeyboardButtonRequestUsers(2)
 
 
-class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
+class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
     def test_slot_behaviour(self, keyboard_button):
         inst = keyboard_button
         for attr in inst.__slots__:
@@ -81,7 +81,7 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert keyboard_button_dict["request_users"] == keyboard_button.request_users.to_dict()
 
     @pytest.mark.parametrize("request_user", [True, False])
-    def test_de_json(self, bot, request_user):
+    def test_de_json(self, request_user):
         json_dict = {
             "text": self.text,
             "request_location": self.request_location,

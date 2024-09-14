@@ -26,18 +26,18 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def game():
     game = Game(
-        TestGameBase.title,
-        TestGameBase.description,
-        TestGameBase.photo,
-        text=TestGameBase.text,
-        text_entities=TestGameBase.text_entities,
-        animation=TestGameBase.animation,
+        GameTestBase.title,
+        GameTestBase.description,
+        GameTestBase.photo,
+        text=GameTestBase.text,
+        text_entities=GameTestBase.text_entities,
+        animation=GameTestBase.animation,
     )
     game._unfreeze()
     return game
 
 
-class TestGameBase:
+class GameTestBase:
     title = "Python-telegram-bot Test Game"
     description = "description"
     photo = [PhotoSize("Blah", "ElseBlah", 640, 360, file_size=0)]
@@ -49,26 +49,26 @@ class TestGameBase:
     animation = Animation("blah", "unique_id", 320, 180, 1)
 
 
-class TestGameWithoutRequest(TestGameBase):
+class TestGameWithoutRequest(GameTestBase):
     def test_slot_behaviour(self, game):
         for attr in game.__slots__:
             assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(game)) == len(set(mro_slots(game))), "duplicate slot"
 
-    def test_de_json_required(self, bot):
+    def test_de_json_required(self, offline_bot):
         json_dict = {
             "title": self.title,
             "description": self.description,
             "photo": [self.photo[0].to_dict()],
         }
-        game = Game.de_json(json_dict, bot)
+        game = Game.de_json(json_dict, offline_bot)
         assert game.api_kwargs == {}
 
         assert game.title == self.title
         assert game.description == self.description
         assert game.photo == tuple(self.photo)
 
-    def test_de_json_all(self, bot):
+    def test_de_json_all(self, offline_bot):
         json_dict = {
             "title": self.title,
             "description": self.description,
@@ -77,7 +77,7 @@ class TestGameWithoutRequest(TestGameBase):
             "text_entities": [self.text_entities[0].to_dict()],
             "animation": self.animation.to_dict(),
         }
-        game = Game.de_json(json_dict, bot)
+        game = Game.de_json(json_dict, offline_bot)
         assert game.api_kwargs == {}
 
         assert game.title == self.title
