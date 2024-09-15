@@ -16,10 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import zoneinfo
 from datetime import date, datetime
 
 import pytest
-import zoneinfo
 
 from telegram import (
     BusinessConnection,

@@ -19,10 +19,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains the Telegram Business related classes."""
 
-from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
-
 import zoneinfo
+from datetime import date as dt
+from datetime import datetime, time
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._chat import Chat
 from telegram._files.location import Location
@@ -457,7 +457,7 @@ class BusinessOpeningHours(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     def get_opening_hours_for_day(
-        self, target_date: date, tzinfo: Optional[zoneinfo.ZoneInfo] = None
+        self, target_date: dt, tzinfo: Optional[zoneinfo.ZoneInfo] = None
     ) -> Tuple[Tuple[datetime, datetime], ...]:
         """
         Get the opening hours for a specific day.
@@ -480,12 +480,8 @@ class BusinessOpeningHours(TelegramObject):
         output = []
 
         for interval in self.opening_hours:
-            opening_time = datetime.combine(
-                target_date, time(*interval.opening_time[1:]), tzinfo
-            )
-            closing_time = datetime.combine(
-                target_date, time(*interval.closing_time[1:]), tzinfo
-            )
+            opening_time = datetime.combine(target_date, time(*interval.opening_time[1:]), tzinfo)
+            closing_time = datetime.combine(target_date, time(*interval.closing_time[1:]), tzinfo)
 
             output.append((opening_time, closing_time))
 
@@ -510,9 +506,7 @@ class BusinessOpeningHours(TelegramObject):
             return (weekday * 24 * 60) + (hour * 60) + minute
 
         if target_datetime.tzinfo is not None:
-            target_datetime = target_datetime.astimezone(
-                zoneinfo.ZoneInfo(self.time_zone_name)
-            )
+            target_datetime = target_datetime.astimezone(zoneinfo.ZoneInfo(self.time_zone_name))
 
         target_time_as_minutes = time_to_minutes(
             target_datetime.weekday(), target_datetime.hour, target_datetime.minute

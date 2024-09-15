@@ -144,6 +144,10 @@ select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
+# CAN BE REMOVED AFTER SUPPORT FOR PYTHON 3.8 IS DROPPED
+[tool.ruff.lint.isort]
+extra-standard-library = ["zoneinfo"]
+
 # PYLINT:
 [tool.pylint."messages control"]
 enable = ["useless-suppression"]
