@@ -18,19 +18,17 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains the PaidMediaPurchased class."""
 
-from typing import Optional, TypeVar
+from typing import Optional
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import SCT, DVType
 from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
-from telegram.ext._utils.types import CCT, HandlerCallback
-
-RT = TypeVar("RT")
+from telegram.ext._utils.types import CCT, RT, HandlerCallback
 
 
-class PaidMediaPurchasedHandler(BaseHandler[Update, CCT]):
+class PaidMediaPurchasedHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram
     :attr:`purchased paid media <telegram.Update.purchased_paid_media>`.
 
@@ -66,7 +64,7 @@ class PaidMediaPurchasedHandler(BaseHandler[Update, CCT]):
     )
 
     def __init__(
-        self,
+        self: "PaidMediaPurchasedHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         user_id: Optional[SCT[int]] = None,
         username: Optional[SCT[str]] = None,
