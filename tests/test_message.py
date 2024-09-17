@@ -236,7 +236,7 @@ def message(bot):
                 winner_count=5,
             )
         },
-        {"giveaway_created": GiveawayCreated()},
+        {"giveaway_created": GiveawayCreated(prize_star_count=99)},
         {
             "giveaway_winners": GiveawayWinners(
                 chat=Chat(1, Chat.CHANNEL),

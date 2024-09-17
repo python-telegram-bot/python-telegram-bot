@@ -180,6 +180,7 @@ __all__ = (
     "PaidMediaInfo",
     "PaidMediaPhoto",
     "PaidMediaPreview",
+    "PaidMediaPurchased",
     "PaidMediaVideo",
     "PassportData",
     "PassportElementError",
@@ -419,7 +420,14 @@ from ._messageorigin import (
     MessageOriginUser,
 )
 from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
-from ._paidmedia import PaidMedia, PaidMediaInfo, PaidMediaPhoto, PaidMediaPreview, PaidMediaVideo
+from ._paidmedia import (
+    PaidMedia,
+    PaidMediaInfo,
+    PaidMediaPhoto,
+    PaidMediaPreview,
+    PaidMediaPurchased,
+    PaidMediaVideo,
+)
 from ._passport.credentials import (
     Credentials,
     DataCredentials,

@@ -120,6 +120,7 @@ Available Types
     telegram.paidmediainfo
     telegram.paidmediaphoto
     telegram.paidmediapreview
+    telegram.paidmediapurchased
     telegram.paidmediavideo
     telegram.photosize
     telegram.poll
