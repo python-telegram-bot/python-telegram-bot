@@ -97,3 +97,9 @@ jobs:
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1
+        if: ${{ !cancelled() }}
+        with:
+          files: .test_report_no_optionals.xml,.test_report_optionals.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
