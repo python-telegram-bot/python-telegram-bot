@@ -25,7 +25,7 @@ from tests.auxil.networking import expect_bad_request
 
 
 @pytest.fixture(scope="session")
-async def animation(bot, chat_id, aiolib):
+async def animation(bot, chat_id):
     with data_file("game.gif").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
         return (
             await bot.send_animation(chat_id, animation=f, read_timeout=50, thumbnail=thumb)
@@ -65,7 +65,7 @@ async def animated_sticker_set(bot):
 
 
 @pytest.fixture(scope="session")
-async def audio(bot, chat_id, aiolib):
+async def audio(bot, chat_id):
     with data_file("telegram.mp3").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
         return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumbnail=thumb)).audio
 
@@ -77,7 +77,7 @@ def audio_file():
 
 
 @pytest.fixture(scope="session")
-async def document(bot, chat_id, aiolib):
+async def document(bot, chat_id):
     with data_file("telegram.png").open("rb") as f:
         return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
 
@@ -100,7 +100,7 @@ def photo_file():
 
 
 @pytest.fixture(scope="session")
-async def photolist(bot, chat_id, aiolib):
+async def photolist(bot, chat_id):
     async def func():
         with data_file("telegram.jpg").open("rb") as f:
             return (await bot.send_photo(chat_id, photo=f, read_timeout=50)).photo
@@ -152,7 +152,7 @@ def thumb(photolist):
 
 
 @pytest.fixture(scope="session")
-async def video(bot, chat_id, aiolib):
+async def video(bot, chat_id):
     with data_file("telegram.mp4").open("rb") as f:
         return (await bot.send_video(chat_id, video=f, read_timeout=50)).video
 
