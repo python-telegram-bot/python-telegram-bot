@@ -330,7 +330,7 @@ class TransactionPartnerUser(TransactionPartner):
             .. versionadded:: 21.5
         paid_media_payload (:obj:`str`, optional): Optional. Bot-specified paid media payload.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
@@ -343,7 +343,7 @@ class TransactionPartnerUser(TransactionPartner):
             .. versionadded:: 21.5
         paid_media_payload (:obj:`str`): Optional. Optional. Bot-specified paid media payload.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
 
     """
 

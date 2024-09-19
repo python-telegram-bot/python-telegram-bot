@@ -9220,7 +9220,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 0-:tg-const:`telegram.constants.InvoiceLimit.MAX_PAYLOAD_LENGTH` bytes. This will
                 not be displayed to the user, use it for your internal processes.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.6
             caption (:obj:`str`, optional): Caption of the media to be sent,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
             parse_mode (:obj:`str`, optional): |parse_mode|

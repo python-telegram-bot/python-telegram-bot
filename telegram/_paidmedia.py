@@ -300,7 +300,7 @@ class PaidMediaPurchased(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.6
 
     Args:
         from_user (:class:`telegram.User`): User who purchased the media.

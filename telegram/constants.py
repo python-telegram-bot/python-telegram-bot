@@ -2782,7 +2782,7 @@ class UpdateType(StringEnum):
     PURCHASED_PAID_MEDIA = "purchased_paid_media"
     """:obj:`str`: Updates with :attr:`telegram.Update.purchased_paid_media`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.6
     """
 
 
@@ -2871,14 +2871,14 @@ class InvoiceLimit(IntEnum):
     passed as :paramref:`~telegram.Bot.send_paid_media.star_count` parameter of
     :meth:`telegram.Bot.send_paid_media`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.6
     """
     MAX_STAR_COUNT = 2500
     """:obj:`int`: Maximum amount of starts that must be paid to buy access to a paid media
     passed as :paramref:`~telegram.Bot.send_paid_media.star_count` parameter of
     :meth:`telegram.Bot.send_paid_media`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.6
     """
 
 

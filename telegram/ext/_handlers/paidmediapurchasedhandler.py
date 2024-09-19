@@ -32,7 +32,7 @@ class PaidMediaPurchasedHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram
     :attr:`purchased paid media <telegram.Update.purchased_paid_media>`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.6
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

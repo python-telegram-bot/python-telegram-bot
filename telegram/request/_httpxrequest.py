@@ -135,7 +135,7 @@ class HTTPXRequest(BaseRequest):
                 No runtime warnings will be issued about parameters that are overridden in this
                 way.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
 
     """
 
