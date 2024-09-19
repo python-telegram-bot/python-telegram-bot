@@ -160,7 +160,7 @@ class Update(TelegramObject):
         purchased_paid_media (:class:`telegram.PaidMediaPurchased`, optional): A user purchased
             paid media with a non-empty payload sent by the bot in a non-channel chat.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
 
 
     Attributes:
@@ -273,7 +273,7 @@ class Update(TelegramObject):
         purchased_paid_media (:class:`telegram.PaidMediaPurchased`): Optional. A user purchased
             paid media with a non-empty payload sent by the bot in a non-channel chat.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
     """
 
     __slots__ = (
@@ -399,7 +399,7 @@ class Update(TelegramObject):
     PURCHASED_PAID_MEDIA: Final[str] = constants.UpdateType.PURCHASED_PAID_MEDIA
     """:const:`telegram.constants.UpdateType.PURCHASED_PAID_MEDIA`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.6
     """
 
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
@@ -496,7 +496,7 @@ class Update(TelegramObject):
             This property now also considers :attr:`business_connection`, :attr:`business_message`
             and :attr:`edited_business_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.6
             This property now also considers :attr:`purchased_paid_media`.
 
         Example:

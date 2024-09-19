@@ -202,7 +202,7 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
         prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be split between
             giveaway winners; for Telegram Star giveaways only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
         is_unclaimed (:obj:`bool`, optional): :obj:`True`, if the giveaway was completed, but
             there was no user to win the prize.
 
@@ -215,7 +215,7 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
         prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be split between
             giveaway winners; for Telegram Star giveaways only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
         is_unclaimed (:obj:`bool`): Optional. :obj:`True`, if the giveaway was completed, but
             there was no user to win the prize.
     """

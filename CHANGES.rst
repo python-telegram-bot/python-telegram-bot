@@ -4,6 +4,37 @@
 Changelog
 =========
 
+Version 21.6
+============
+
+*Released 2024-09-19*
+
+This is the technical changelog for version 21.6. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+New Features
+------------
+
+- Full Support for Bot API 7.10 (:pr:`4461` closes :issue:`4459`, :pr:`4460`, :pr:`4463` by `aelkheir <https://github.com/aelkheir>`_, :pr:`4464`)
+- Add Parameter ``httpx_kwargs`` to ``HTTPXRequest`` (:pr:`4451` closes :issue:`4424`)
+
+Minor Changes
+-------------
+
+- Improve Type Completeness (:pr:`4466`)
+
+Internal Changes
+----------------
+
+- Update Python 3.13 Test Suite to RC2 (:pr:`4471`)
+- Enforce the ``offline_bot`` Fixture in ``Test*WithoutRequest`` (:pr:`4465`)
+- Make Tests for ``telegram.ext`` Independent of Networking (:pr:`4454`)
+- Rename Testing Base Classes (:pr:`4453`)
+
+Dependency Updates
+------------------
+
+- Bump ``pytest`` from 8.3.2 to 8.3.3 (:pr:`4475`)
+
 Version 21.5
 ============
 

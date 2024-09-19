@@ -59,7 +59,7 @@ class Giveaway(TelegramObject):
         prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be split between
             giveaway winners; for Telegram Star giveaways only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
         premium_subscription_month_count (:obj:`int`, optional): The number of months the Telegram
             Premium subscription won from the giveaway will be active for; for Telegram Premium
             giveaways only.
@@ -83,7 +83,7 @@ class Giveaway(TelegramObject):
         prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be split between
             giveaway winners; for Telegram Star giveaways only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
         premium_subscription_month_count (:obj:`int`): Optional. The number of months the Telegram
             Premium subscription won from the giveaway will be active for; for Telegram Premium
             giveaways only.
@@ -163,13 +163,13 @@ class GiveawayCreated(TelegramObject):
         prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be
             split between giveaway winners; for Telegram Star giveaways only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
 
     Attributes:
         prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be
             split between giveaway winners; for Telegram Star giveaways only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
 
     """
 
@@ -204,7 +204,7 @@ class GiveawayWinners(TelegramObject):
         prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be split between
             giveaway winners; for Telegram Star giveaways only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
         additional_chat_count (:obj:`int`, optional): The number of other chats the user had to
             join in order to be eligible for the giveaway
         premium_subscription_month_count (:obj:`int`, optional): The number of months the Telegram
@@ -229,7 +229,7 @@ class GiveawayWinners(TelegramObject):
         prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be split between
             giveaway winners; for Telegram Star giveaways only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
         premium_subscription_month_count (:obj:`int`): Optional. The number of months the Telegram
             Premium subscription won from the giveaway will be active for
         unclaimed_prize_count (:obj:`int`): Optional. Number of undistributed prizes
@@ -337,7 +337,7 @@ class GiveawayCompleted(TelegramObject):
         is_star_giveaway (:obj:`bool`, optional): :obj:`True`, if the giveaway is a Telegram Star
             giveaway. Otherwise, currently, the giveaway is a Telegram Premium giveaway.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
     Attributes:
         winner_count (:obj:`int`): Number of winners in the giveaway
         unclaimed_prize_count (:obj:`int`): Optional. Number of undistributed prizes
@@ -346,7 +346,7 @@ class GiveawayCompleted(TelegramObject):
         is_star_giveaway (:obj:`bool`): Optional. :obj:`True`, if the giveaway is a Telegram Star
             giveaway. Otherwise, currently, the giveaway is a Telegram Premium giveaway.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.6
     """
 
     __slots__ = ("giveaway_message", "is_star_giveaway", "unclaimed_prize_count", "winner_count")
