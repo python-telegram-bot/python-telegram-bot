@@ -986,6 +986,16 @@ class MaskPositionTestBase:
     scale = 2
 
 
+@pytest.fixture(scope="module")
+def mask_position():
+    return MaskPosition(
+        MaskPositionTestBase.point,
+        MaskPositionTestBase.x_shift,
+        MaskPositionTestBase.y_shift,
+        MaskPositionTestBase.scale,
+    )
+
+
 class TestMaskPositionWithoutRequest(MaskPositionTestBase):
     def test_slot_behaviour(self, mask_position):
         inst = mask_position

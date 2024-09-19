@@ -19,9 +19,7 @@
 """Module to provide fixtures most of which are used in test_inputmedia.py."""
 import pytest
 
-from telegram import MaskPosition
 from telegram.error import BadRequest
-from tests._files.test_sticker import MaskPositionTestBase, StickerTestBase
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 
@@ -90,16 +88,6 @@ def document_file():
         yield f
 
 
-@pytest.fixture(scope="module")
-def mask_position():
-    return MaskPosition(
-        MaskPositionTestBase.point,
-        MaskPositionTestBase.x_shift,
-        MaskPositionTestBase.y_shift,
-        MaskPositionTestBase.scale,
-    )
-
-
 @pytest.fixture(scope="session")
 def photo(photolist):
     return photolist[-1]
@@ -128,7 +116,7 @@ async def sticker(bot, chat_id):
         sticker = (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
         # necessary to properly test needs_repainting
         with sticker._unfrozen():
-            sticker.needs_repainting = StickerTestBase.needs_repainting
+            sticker.needs_repainting = True
         return sticker
 
 
