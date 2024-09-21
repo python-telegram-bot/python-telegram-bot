@@ -2863,9 +2863,12 @@ class TestBotWithRequest:
         assert message.entities == tuple(entities)
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_edit_message_text_default_parse_mode(self, default_bot, message):
+    async def test_edit_message_text_default_parse_mode(self, default_bot, chat_id):
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
+
+        # can't use `message` fixture as that would change its value
+        message = await default_bot.send_message(chat_id, "dummy text")
 
         message = await default_bot.edit_message_text(
             text=test_markdown_string,
@@ -2937,9 +2940,15 @@ class TestBotWithRequest:
     # edit_message_media is tested in test_inputmedia
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_edit_message_caption_default_parse_mode(self, default_bot, media_message):
+    async def test_edit_message_caption_default_parse_mode(self, default_bot, chat_id):
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
+
+        # can't use `media_message` fixture as that would change its value
+        with data_file("telegram.ogg").open("rb") as f:
+            media_message = await default_bot.send_voice(
+                chat_id, voice=f, caption="my caption", read_timeout=10
+            )
 
         message = await default_bot.edit_message_caption(
             caption=test_markdown_string,
