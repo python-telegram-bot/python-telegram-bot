@@ -49,46 +49,6 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture
-def sticker_file():
-    with data_file("telegram.webp").open("rb") as file:
-        yield file
-
-
-@pytest.fixture(scope="module")
-async def sticker(bot, chat_id):
-    with data_file("telegram.webp").open("rb") as f:
-        sticker = (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
-        # necessary to properly test needs_repainting
-        with sticker._unfrozen():
-            sticker.needs_repainting = StickerTestBase.needs_repainting
-        return sticker
-
-
-@pytest.fixture
-def animated_sticker_file():
-    with data_file("telegram_animated_sticker.tgs").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def animated_sticker(bot, chat_id):
-    with data_file("telegram_animated_sticker.tgs").open("rb") as f:
-        return (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
-
-
-@pytest.fixture
-def video_sticker_file():
-    with data_file("telegram_video_sticker.webm").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-def video_sticker(bot, chat_id):
-    with data_file("telegram_video_sticker.webm").open("rb") as f:
-        return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
-
-
 class StickerTestBase:
     # sticker_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.webp'
     # Serving sticker from gh since our server sends wrong content_type
@@ -522,54 +482,6 @@ class TestStickerWithRequest(StickerTestBase):
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, "")
-
-
-@pytest.fixture
-async def sticker_set(bot):
-    ss = await bot.get_sticker_set(f"test_by_{bot.username}")
-    if len(ss.stickers) > 100:
-        try:
-            for i in range(1, 50):
-                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest as e:
-            if e.message == "Stickerset_not_modified":
-                return ss
-            raise Exception("stickerset is growing too large.") from None
-    return ss
-
-
-@pytest.fixture
-async def animated_sticker_set(bot):
-    ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
-    if len(ss.stickers) > 100:
-        try:
-            for i in range(1, 50):
-                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest as e:
-            if e.message == "Stickerset_not_modified":
-                return ss
-            raise Exception("stickerset is growing too large.") from None
-    return ss
-
-
-@pytest.fixture
-async def video_sticker_set(bot):
-    ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
-    if len(ss.stickers) > 100:
-        try:
-            for i in range(1, 50):
-                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest as e:
-            if e.message == "Stickerset_not_modified":
-                return ss
-            raise Exception("stickerset is growing too large.") from None
-    return ss
-
-
-@pytest.fixture
-def sticker_set_thumb_file():
-    with data_file("sticker_set_thumb.png").open("rb") as file:
-        yield file
 
 
 class StickerSetTestBase:
@@ -1067,6 +979,13 @@ class TestStickerSetWithRequest:
         )
 
 
+class MaskPositionTestBase:
+    point = MaskPosition.EYES
+    x_shift = -1
+    y_shift = 1
+    scale = 2
+
+
 @pytest.fixture(scope="module")
 def mask_position():
     return MaskPosition(
@@ -1075,13 +994,6 @@ def mask_position():
         MaskPositionTestBase.y_shift,
         MaskPositionTestBase.scale,
     )
-
-
-class MaskPositionTestBase:
-    point = MaskPosition.EYES
-    x_shift = -1
-    y_shift = 1
-    scale = 2
 
 
 class TestMaskPositionWithoutRequest(MaskPositionTestBase):
