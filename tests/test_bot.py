@@ -1564,7 +1564,7 @@ class TestBotWithoutRequest:
         [(True, 1024), (False, 1024), (0, 0), (None, None)],
     )
     async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
-        async with make_bot(bot_info, arbitrary_callback_data=acd_in) as acd_bot:
+        async with make_bot(bot_info, arbitrary_callback_data=acd_in, offline=True) as acd_bot:
             if acd_in is not False:
                 assert acd_bot.callback_data_cache.maxsize == maxsize
             else:

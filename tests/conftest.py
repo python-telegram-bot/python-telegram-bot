@@ -152,7 +152,7 @@ def bot_info() -> Dict[str, str]:
 @pytest.fixture(scope="session")
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
-    async with make_bot(bot_info) as _bot:
+    async with make_bot(bot_info, offline=False) as _bot:
         yield _bot
 
 
@@ -168,13 +168,13 @@ async def offline_bot(bot_info):
 @pytest.fixture
 def one_time_bot(bot_info):
     """A function scoped bot since the session bot would shutdown when `async with app` finishes"""
-    return make_bot(bot_info)
+    return make_bot(bot_info, offline=False)
 
 
 @pytest.fixture(scope="session")
 async def cdc_bot(bot_info):
     """Makes an ExtBot instance with the given bot_info that uses arbitrary callback_data"""
-    async with make_bot(bot_info, arbitrary_callback_data=True) as _bot:
+    async with make_bot(bot_info, arbitrary_callback_data=True, offline=False) as _bot:
         yield _bot
 
 
@@ -204,7 +204,7 @@ async def default_bot(request, bot_info):
     # If the bot is already created, return it. Else make a new one.
     default_bot = _default_bots.get(defaults)
     if default_bot is None:
-        default_bot = make_bot(bot_info, defaults=defaults)
+        default_bot = make_bot(bot_info, defaults=defaults, offline=False)
         await default_bot.initialize()
         _default_bots[defaults] = default_bot  # Defaults object is hashable
     return default_bot
@@ -216,7 +216,7 @@ async def tz_bot(timezone, bot_info):
     try:  # If the bot is already created, return it. Saves time since get_me is not called again.
         return _default_bots[defaults]
     except KeyError:
-        default_bot = make_bot(bot_info, defaults=defaults)
+        default_bot = make_bot(bot_info, defaults=defaults, offline=False)
         await default_bot.initialize()
         _default_bots[defaults] = default_bot
         return default_bot

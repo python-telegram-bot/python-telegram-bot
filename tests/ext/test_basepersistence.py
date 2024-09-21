@@ -24,6 +24,7 @@ import functools
 import logging
 import sys
 import time
+from http import HTTPStatus
 from pathlib import Path
 from typing import NamedTuple, Optional
 
@@ -43,8 +44,9 @@ from telegram.ext import (
     PersistenceInput,
     filters,
 )
+from telegram.request import HTTPXRequest
 from telegram.warnings import PTBUserWarning
-from tests.auxil.build_messages import make_message_update
+from tests.auxil.build_messages import make_message, make_message_update
 from tests.auxil.pytest_classes import PytestApplication, make_bot
 from tests.auxil.slots import mro_slots
 
@@ -245,9 +247,9 @@ def build_papp(
         persistence = TrackingPersistence(store_data=store_data, fill_data=fill_data)
 
     if bot_info is not None:
-        bot = make_bot(bot_info, arbitrary_callback_data=True)
+        bot = make_bot(bot_info, arbitrary_callback_data=True, offline=False)
     else:
-        bot = make_bot(token=token, arbitrary_callback_data=True)
+        bot = make_bot(token=token, arbitrary_callback_data=True, offline=False)
     return (
         ApplicationBuilder()
         .bot(bot)
@@ -262,7 +264,7 @@ def build_conversation_handler(name: str, persistent: bool = True) -> BaseHandle
 
 
 @pytest.fixture
-def papp(request, bot_info) -> Application:
+def papp(request, bot_info, monkeypatch) -> Application:
     papp_input = request.param
     store_data = {}
     if papp_input.bot_data is not None:
@@ -273,6 +275,11 @@ def papp(request, bot_info) -> Application:
         store_data["user_data"] = papp_input.user_data
     if papp_input.callback_data is not None:
         store_data["callback_data"] = papp_input.callback_data
+
+    async def do_request(*args, **kwargs):
+        return HTTPStatus.OK, make_message(text="text")
+
+    monkeypatch.setattr(HTTPXRequest, "do_request", do_request)
 
     app = build_papp(
         bot_info=bot_info,
