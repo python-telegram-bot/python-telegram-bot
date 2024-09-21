@@ -45,10 +45,12 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_inline_tabs",
     "sphinxcontrib.mermaid",
-    # Temporary. See #4387
-    "sphinx_build_compatibility.extension",
     "sphinx_search.extension",
 ]
+
+# Temporary. See #4387
+if os.environ.get("READTHEDOCS", "") == "True":
+    extensions.append("sphinx_build_compatibility.extension")
 
 # For shorter links to Wiki in docstrings
 extlinks = {
