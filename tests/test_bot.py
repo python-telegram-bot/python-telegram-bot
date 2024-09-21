@@ -90,7 +90,7 @@ from telegram.constants import (
     ParseMode,
     ReactionEmoji,
 )
-from telegram.error import BadRequest, EndPointNotFound, InvalidToken, NetworkError
+from telegram.error import BadRequest, EndPointNotFound, InvalidToken
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
@@ -2264,6 +2264,19 @@ class TestBotWithoutRequest:
         obj = await offline_bot.get_business_connection(business_connection_id=bci)
         assert isinstance(obj, BusinessConnection)
 
+    async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs["chat_id"] == chat_id
+                and kwargs["action"] == "action"
+                and kwargs["message_thread_id"] == 1
+                and kwargs["business_connection_id"] == 3
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        assert await bot.send_chat_action(chat_id, "action", 1, 3)
+
     async def test_refund_star_payment(self, offline_bot, monkeypatch):
         # can't make actual request so we just test that the correct data is passed
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -2395,8 +2408,6 @@ class TestBotWithRequest:
 
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text="will be deleted")
-        await asyncio.sleep(2)
-
         assert await bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
 
     async def test_delete_message_old_message(self, bot, chat_id):
@@ -2487,18 +2498,6 @@ class TestBotWithRequest:
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
         assert message.has_protected_content
-
-    async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
-        async def make_assertion(*args, **_):
-            kwargs = args[1]
-            return (
-                kwargs["chat_id"] == chat_id
-                and kwargs["action"] == "action"
-                and kwargs["message_thread_id"] == 1
-            )
-
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        assert await bot.send_chat_action(chat_id, "action", 1)
 
     # TODO: Add bot to group to test polls too
     @pytest.mark.parametrize(
@@ -3106,9 +3105,6 @@ class TestBotWithRequest:
 
     async def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match="Chat not found"):
-            await bot.leave_chat(-123456)
-
-        with pytest.raises(NetworkError, match="Chat not found"):
             await bot.leave_chat(-123456)
 
     async def test_get_chat(self, bot, super_group_id):
