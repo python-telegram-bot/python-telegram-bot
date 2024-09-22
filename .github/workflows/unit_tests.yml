@@ -37,7 +37,7 @@ jobs:
           python -W ignore -m pip install -U pytest-cov
           python -W ignore -m pip install .
           python -W ignore -m pip install -r requirements-unit-tests.txt
-          python -W ignore -m pip install pytest-xdist[psutil]
+          python -W ignore -m pip install pytest-xdist
 
       - name: Test with pytest
         # We run 4 different suites here
@@ -63,10 +63,10 @@ jobs:
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
           pip install .[all]
-          # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
-          # worker. Increasing number of workers has little effect on test duration, but it seems
-          # to increase flakyness, specially on python 3.7 with --dist=loadgroup.
-          pytest -v --cov --cov-append -n auto --dist loadfile --junit-xml=.test_report_optionals_junit.xml
+          # `-n auto --dist worksteal` uses pytest-xdist to run tests on multiple CPU
+          # workers. Increasing number of workers has little effect on test duration, but it seems
+          # to increase flakyness.
+          pytest -v --cov --cov-append -n auto --dist worksteal --junit-xml=.test_report_optionals_junit.xml
           main_status=$?
           # exit with non-zero status if any of the two pytest runs failed
           exit $(( ${opt_dep_status} || ${main_status} ))
