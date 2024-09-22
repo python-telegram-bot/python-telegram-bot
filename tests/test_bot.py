@@ -3007,7 +3007,6 @@ class TestBotWithRequest:
     async def test_edit_reply_markup_inline(self):
         pass
 
-    @pytest.mark.xdist_group("getUpdates_and_webhook")
     # TODO: Actually send updates to the test bot so this can be tested properly
     async def test_get_updates(self, bot):
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
@@ -3074,7 +3073,6 @@ class TestBotWithRequest:
         await bot.get_updates(read_timeout=read_timeout, timeout=timeout)
         assert caught_read_timeout == expected
 
-    @pytest.mark.xdist_group("getUpdates_and_webhook")
     @pytest.mark.parametrize("use_ip", [True, False])
     # local file path as file_input is tested below in test_set_webhook_params
     @pytest.mark.parametrize("file_input", ["bytes", "file_handle"])
@@ -3209,10 +3207,8 @@ class TestBotWithRequest:
         protected = await default_bot.send_game(chat_id, "test_game", protect_content=val)
         assert protected.has_protected_content is val
 
-    @pytest.mark.xdist_group("game")
     @xfail
-    async def test_set_game_score_1(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+    async def test_set_game_score_and_high_scores(self, bot, chat_id):
         # First, test setting a score.
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3229,10 +3225,6 @@ class TestBotWithRequest:
         assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text != game.game.text
 
-    @pytest.mark.xdist_group("game")
-    @xfail
-    async def test_set_game_score_2(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test setting a score higher than previous
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3252,10 +3244,6 @@ class TestBotWithRequest:
         assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text == game.game.text
 
-    @pytest.mark.xdist_group("game")
-    @xfail
-    async def test_set_game_score_3(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test setting a score lower than previous (should raise error)
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3267,10 +3255,6 @@ class TestBotWithRequest:
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
-    @pytest.mark.xdist_group("game")
-    @xfail
-    async def test_set_game_score_4(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test force setting a lower score
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3295,9 +3279,6 @@ class TestBotWithRequest:
         game2 = await bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @pytest.mark.xdist_group("game")
-    @xfail
-    async def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
