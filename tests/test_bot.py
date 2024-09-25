@@ -2372,15 +2372,12 @@ class TestBotWithRequest:
         assert all("can't be forwarded" in str(exc) for exc in result)
 
     async def test_forward_messages(self, bot, chat_id):
-        tasks = asyncio.gather(
-            bot.send_message(chat_id, text="will be forwarded"),
-            bot.send_message(chat_id, text="will be forwarded"),
-        )
-
-        msg1, msg2 = await tasks
+        # not using gather here to have deteriminically ordered message_ids
+        msg1 = await bot.send_message(chat_id, text="will be forwarded")
+        msg2 = await bot.send_message(chat_id, text="will be forwarded")
 
         forward_messages = await bot.forward_messages(
-            chat_id, from_chat_id=chat_id, message_ids=sorted((msg1.message_id, msg2.message_id))
+            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
         )
 
         assert isinstance(forward_messages, tuple)
@@ -3939,14 +3936,12 @@ class TestBotWithRequest:
             assert len(message.caption_entities) == 0
 
     async def test_copy_messages(self, bot, chat_id):
-        tasks = asyncio.gather(
-            bot.send_message(chat_id, text="will be copied 1"),
-            bot.send_message(chat_id, text="will be copied 2"),
-        )
-        msg1, msg2 = await tasks
+        # not using gather here to have deterministically ordered message_ids
+        msg1 = await bot.send_message(chat_id, text="will be copied 1")
+        msg2 = await bot.send_message(chat_id, text="will be copied 2")
 
         copy_messages = await bot.copy_messages(
-            chat_id, from_chat_id=chat_id, message_ids=sorted((msg1.message_id, msg2.message_id))
+            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
         )
         assert isinstance(copy_messages, tuple)
 
@@ -4079,6 +4074,10 @@ class TestBotWithRequest:
             assert data == "callback_data"
 
             cfi = await bot.get_chat(channel_id)
+
+            if not cfi.pinned_message:
+                pytest.xfail("Pinning messages is not always reliable on TG")
+
             assert cfi.pinned_message == message
             assert cfi.pinned_message.reply_markup == reply_markup
             assert await message.unpin()  # (not placed in finally block since msg can be unbound)
