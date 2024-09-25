@@ -361,13 +361,13 @@ class TestBotWithoutRequest:
             "link",
         ],
     )
-    async def test_get_me_and_properties_not_initialized(self, offline_bot: Bot, attribute):
-        offline_bot = Bot(token=offline_bot.token)
+    async def test_get_me_and_properties_not_initialized(self, attribute):
+        bot = make_bot(offline=True, token="randomtoken")
         try:
             with pytest.raises(RuntimeError, match="not properly initialized"):
-                offline_bot[attribute]
+                bot[attribute]
         finally:
-            await offline_bot.shutdown()
+            await bot.shutdown()
 
     async def test_get_me_and_properties(self, offline_bot):
         get_me_bot = await ExtBot(offline_bot.token).get_me()
@@ -1564,7 +1564,7 @@ class TestBotWithoutRequest:
         [(True, 1024), (False, 1024), (0, 0), (None, None)],
     )
     async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
-        async with make_bot(bot_info, arbitrary_callback_data=acd_in) as acd_bot:
+        async with make_bot(bot_info, arbitrary_callback_data=acd_in, offline=True) as acd_bot:
             if acd_in is not False:
                 assert acd_bot.callback_data_cache.maxsize == maxsize
             else:

@@ -93,7 +93,7 @@ class PytestUpdater(Updater):
     pass
 
 
-def make_bot(bot_info=None, offline: bool = False, **kwargs):
+def make_bot(bot_info=None, offline: bool = True, **kwargs):
     """
     Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """

@@ -211,7 +211,7 @@ class TestCallbackContext:
             app.bot = bot
 
     async def test_drop_callback_data(self, bot, chat_id):
-        new_bot = make_bot(token=bot.token, arbitrary_callback_data=True)
+        new_bot = make_bot(token=bot.token, arbitrary_callback_data=True, offline=False)
         app = ApplicationBuilder().bot(new_bot).build()
 
         update = Update(
