@@ -4054,7 +4054,7 @@ class TestBotWithRequest:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    async def test_get_chat_arbitrary_callback_data(self, channel_id, cdc_bot):
+    async def test_get_chat_arbitrary_callback_data(self, chat_id, cdc_bot):
         bot = cdc_bot
 
         try:
@@ -4063,7 +4063,7 @@ class TestBotWithRequest:
             )
 
             message = await bot.send_message(
-                channel_id, text="get_chat_arbitrary_callback_data", reply_markup=reply_markup
+                chat_id, text="get_chat_arbitrary_callback_data", reply_markup=reply_markup
             )
             await message.pin()
 
@@ -4073,7 +4073,7 @@ class TestBotWithRequest:
             )
             assert data == "callback_data"
 
-            cfi = await bot.get_chat(channel_id)
+            cfi = await bot.get_chat(chat_id)
 
             if not cfi.pinned_message:
                 pytest.xfail("Pinning messages is not always reliable on TG")
