@@ -2892,15 +2892,16 @@ class TestBotWithRequest:
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
 
+        suffix = " edited"
         message = await default_bot.edit_message_text(
-            text=test_markdown_string,
+            text=test_markdown_string + suffix,
             chat_id=message.chat_id,
             message_id=message.message_id,
             parse_mode="HTML",
             disable_web_page_preview=True,
         )
-        assert message.text == test_markdown_string
-        assert message.text_markdown == escape_markdown(test_markdown_string)
+        assert message.text == test_markdown_string + suffix
+        assert message.text_markdown == escape_markdown(test_markdown_string) + suffix
 
     @pytest.mark.skip(reason="need reference to an inline message")
     async def test_edit_message_text_inline(self):
