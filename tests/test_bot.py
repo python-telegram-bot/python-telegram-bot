@@ -106,17 +106,26 @@ from tests.auxil.slots import mro_slots
 from .auxil.build_messages import make_message
 
 
-@pytest.fixture(scope="module")
-async def message(bot, chat_id):  # mostly used in tests for edit_message
-    out = await bot.send_message(
+@pytest.fixture
+async def one_time_message(bot, chat_id):
+    # mostly used in tests for edit_message and hence can't be reused
+    return await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
     )
-    out._unfreeze()
-    return out
 
 
 @pytest.fixture(scope="module")
+async def static_message(bot, chat_id):
+    # must not be edited to keep tests independent! We only use bot.send_message so that
+    # we have a valid message_id to e.g. reply to
+    return await bot.send_message(
+        chat_id, "Text", disable_web_page_preview=True, disable_notification=True
+    )
+
+
+@pytest.fixture
 async def media_message(bot, chat_id):
+    # mostly used in tests for edit_message and hence can't be reused
     with data_file("telegram.ogg").open("rb") as f:
         return await bot.send_voice(chat_id, voice=f, caption="my caption", read_timeout=10)
 
@@ -1971,7 +1980,7 @@ class TestBotWithoutRequest:
         indirect=["default_bot"],
     )
     async def test_send_message_default_quote_parse_mode(
-        self, default_bot, chat_id, message, custom, monkeypatch
+        self, default_bot, chat_id, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -1984,9 +1993,7 @@ class TestBotWithoutRequest:
             kwargs["quote_parse_mode"] = custom
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
-        await default_bot.send_message(
-            chat_id, message, reply_parameters=ReplyParameters(**kwargs)
-        )
+        await default_bot.send_message(chat_id, "test", reply_parameters=ReplyParameters(**kwargs))
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
@@ -2339,13 +2346,13 @@ class TestBotWithRequest:
         async with test_bot:
             await test_bot.get_me()
 
-    async def test_forward_message(self, bot, chat_id, message):
+    async def test_forward_message(self, bot, chat_id, static_message):
         forward_message = await bot.forward_message(
-            chat_id, from_chat_id=chat_id, message_id=message.message_id
+            chat_id, from_chat_id=chat_id, message_id=static_message.message_id
         )
 
-        assert forward_message.text == message.text
-        assert forward_message.forward_origin.sender_user == message.from_user
+        assert forward_message.text == static_message.text
+        assert forward_message.forward_origin.sender_user == static_message.from_user
         assert isinstance(forward_message.forward_origin.date, dtm.datetime)
 
     async def test_forward_protected_message(self, bot, chat_id):
@@ -2831,18 +2838,18 @@ class TestBotWithRequest:
         assert user_profile_photos.total_count == 1
         assert user_profile_photos.photos[0][0].file_size == 5403
 
-    async def test_edit_message_text(self, bot, message):
+    async def test_edit_message_text(self, bot, one_time_message):
         message = await bot.edit_message_text(
             text="new_text",
-            chat_id=message.chat_id,
-            message_id=message.message_id,
+            chat_id=one_time_message.chat_id,
+            message_id=one_time_message.message_id,
             parse_mode="HTML",
             disable_web_page_preview=True,
         )
 
         assert message.text == "new_text"
 
-    async def test_edit_message_text_entities(self, bot, message):
+    async def test_edit_message_text_entities(self, bot, one_time_message):
         test_string = "Italic Bold Code"
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
@@ -2851,8 +2858,8 @@ class TestBotWithRequest:
         ]
         message = await bot.edit_message_text(
             text=test_string,
-            chat_id=message.chat_id,
-            message_id=message.message_id,
+            chat_id=one_time_message.chat_id,
+            message_id=one_time_message.message_id,
             entities=entities,
         )
 
@@ -2860,17 +2867,16 @@ class TestBotWithRequest:
         assert message.entities == tuple(entities)
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_edit_message_text_default_parse_mode(self, default_bot, chat_id):
+    async def test_edit_message_text_default_parse_mode(
+        self, default_bot, chat_id, one_time_message
+    ):
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
 
-        # can't use `message` fixture as that would change its value
-        message = await default_bot.send_message(chat_id, "dummy text")
-
         message = await default_bot.edit_message_text(
             text=test_markdown_string,
-            chat_id=message.chat_id,
-            message_id=message.message_id,
+            chat_id=one_time_message.chat_id,
+            message_id=one_time_message.message_id,
             disable_web_page_preview=True,
         )
         assert message.text_markdown == test_markdown_string
@@ -2886,21 +2892,16 @@ class TestBotWithRequest:
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
 
+        suffix = " edited"
         message = await default_bot.edit_message_text(
-            text=test_markdown_string,
-            chat_id=message.chat_id,
-            message_id=message.message_id,
-            disable_web_page_preview=True,
-        )
-        message = await default_bot.edit_message_text(
-            text=test_markdown_string,
+            text=test_markdown_string + suffix,
             chat_id=message.chat_id,
             message_id=message.message_id,
             parse_mode="HTML",
             disable_web_page_preview=True,
         )
-        assert message.text == test_markdown_string
-        assert message.text_markdown == escape_markdown(test_markdown_string)
+        assert message.text == test_markdown_string + suffix
+        assert message.text_markdown == escape_markdown(test_markdown_string) + suffix
 
     @pytest.mark.skip(reason="need reference to an inline message")
     async def test_edit_message_text_inline(self):
@@ -2937,15 +2938,9 @@ class TestBotWithRequest:
     # edit_message_media is tested in test_inputmedia
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_edit_message_caption_default_parse_mode(self, default_bot, chat_id):
+    async def test_edit_message_caption_default_parse_mode(self, default_bot, media_message):
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
-
-        # can't use `media_message` fixture as that would change its value
-        with data_file("telegram.ogg").open("rb") as f:
-            media_message = await default_bot.send_voice(
-                chat_id, voice=f, caption="my caption", read_timeout=10
-            )
 
         message = await default_bot.edit_message_caption(
             caption=test_markdown_string,
@@ -2992,10 +2987,12 @@ class TestBotWithRequest:
     async def test_edit_message_caption_inline(self):
         pass
 
-    async def test_edit_reply_markup(self, bot, message):
+    async def test_edit_reply_markup(self, bot, one_time_message):
         new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
         message = await bot.edit_message_reply_markup(
-            chat_id=message.chat_id, message_id=message.message_id, reply_markup=new_markup
+            chat_id=one_time_message.chat_id,
+            message_id=one_time_message.message_id,
+            reply_markup=new_markup,
         )
 
         assert message is not True
@@ -4181,9 +4178,9 @@ class TestBotWithRequest:
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
 
-    async def test_set_message_reaction(self, bot, chat_id, message):
+    async def test_set_message_reaction(self, bot, chat_id, static_message):
         assert await bot.set_message_reaction(
-            chat_id, message.message_id, ReactionEmoji.THUMBS_DOWN, True
+            chat_id, static_message.message_id, ReactionEmoji.THUMBS_DOWN, True
         )
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
