@@ -60,7 +60,7 @@ class RequestData:
             Dict[:obj:`str`, Union[:obj:`str`, :obj:`int`, List[any], Dict[any, any]]]
         """
         return {
-            param.name: param.value  # type: ignore[misc]
+            param.name: param.value
             for param in self._parameters
             if param.value is not None
         }
@@ -94,9 +94,7 @@ class RequestData:
         Returns:
             :obj:`str`
         """
-        if encode_kwargs:
-            return urlencode(self.json_parameters, **encode_kwargs)
-        return urlencode(self.json_parameters)
+        return urlencode(self.json_parameters, **(encode_kwargs or {}))
 
     def parametrized_url(self, url: str, encode_kwargs: Optional[Dict[str, Any]] = None) -> str:
         """Shortcut for attaching the return value of :meth:`url_encoded_parameters` to the
@@ -110,8 +108,7 @@ class RequestData:
         Returns:
             :obj:`str`
         """
-        url_parameters = self.url_encoded_parameters(encode_kwargs=encode_kwargs)
-        return f"{url}?{url_parameters}"
+        return f"{url}?{self.url_encoded_parameters(encode_kwargs=encode_kwargs)}"
 
     @property
     def json_payload(self) -> bytes:
@@ -136,7 +133,6 @@ class RequestData:
         """
         multipart_data: UploadFileDict = {}
         for param in self._parameters:
-            m_data = param.multipart_data
-            if m_data:
-                multipart_data.update(m_data)
+            if param.multipart_data:
+                multipart_data.update(param.multipart_data)
         return multipart_data
