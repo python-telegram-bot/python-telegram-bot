@@ -18,6 +18,7 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that holds the parameters of a request to the Bot API."""
 import json
+import logging
 from typing import Any, Dict, List, Optional, Union, final
 from urllib.parse import urlencode
 
