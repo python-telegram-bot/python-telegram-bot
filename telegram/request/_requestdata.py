@@ -16,7 +16,10 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a class that holds the parameters of a request to the Bot API."""
+
+"""
+This module contains a class that holds the parameters of a request to the Bot API.
+"""
 import json
 import logging
 from typing import Any, Dict, List, Optional, Union, final
@@ -29,7 +32,8 @@ from telegram.request._requestparameter import RequestParameter
 
 @final
 class RequestData:
-    """Instances of this class collect the data needed for one request to the Bot API, including
+    """
+    Instances of this class collect the data needed for one request to the Bot API, including
     all parameters and files to be sent along with the request.
 
     .. versionadded:: 20.0
@@ -52,33 +56,29 @@ class RequestData:
 
     @property
     def parameters(self) -> Dict[str, Union[str, int, List[Any], Dict[Any, Any]]]:
-        """Gives the parameters as mapping of parameter name to the parameter value, which can be
-        a single object of type :obj:`int`, :obj:`float`, :obj:`str` or :obj:`bool` or any
-        (possibly nested) composition of lists, tuples and dictionaries, where each entry, key
-        and value is of one of the mentioned types.
+        """
+        Gives the parameters as mapping of parameter name to the parameter value.
 
         Returns:
             Dict[:obj:`str`, Union[:obj:`str`, :obj:`int`, List[any], Dict[any, any]]]
         """
-    return {
-        param.name: param.value
-        for param in self._parameters
-        if param.value is not None and isinstance(param.value, (str, int, list, dict))
-    } or {
-        param.name: logging.warning(f"Unexpected type for the value of '{param.name}': {type(param.value)}") or param.value
-        for param in self._parameters
-        if param.value is not None and not isinstance(param.value, (str, int, list, dict))
-    }
+        
+        return {
+            param.name: param.value
+            for param in self._parameters
+            if param.value is not None and isinstance(param.value, (str, int, list, dict))
+        } or {
+            param.name: logging.warning(
+                "Unexpected type for the value of '%s': %s", param.name, type(param.value)
+            ) or param.value
+            for param in self._parameters
+            if param.value is not None and not isinstance(param.value, (str, int, list, dict))
+        }
 
     @property
     def json_parameters(self) -> Dict[str, str]:
-        """Gives the parameters as mapping of parameter name to the respective JSON encoded
-        value.
-
-        Tip:
-            By default, this property uses the standard library's :func:`json.dumps`.
-            To use a custom library for JSON encoding, you can directly encode the keys of
-            :attr:`parameters` - note that string valued keys should not be JSON encoded.
+        """
+        Gives the parameters as mapping of parameter name to the respective JSON encoded value.
 
         Returns:
             Dict[:obj:`str`, :obj:`str`]
@@ -90,7 +90,8 @@ class RequestData:
         }
 
     def url_encoded_parameters(self, encode_kwargs: Optional[Dict[str, Any]] = None) -> str:
-        """Encodes the parameters with :func:`urllib.parse.urlencode`.
+        """
+        Encodes the parameters with :func:`urllib.parse.urlencode`.
 
         Args:
             encode_kwargs (Dict[:obj:`str`, any], optional): Additional keyword arguments to pass
@@ -102,8 +103,8 @@ class RequestData:
         return urlencode(self.json_parameters, **(encode_kwargs or {}))
 
     def parametrized_url(self, url: str, encode_kwargs: Optional[Dict[str, Any]] = None) -> str:
-        """Shortcut for attaching the return value of :meth:`url_encoded_parameters` to the
-        :paramref:`url`.
+        """
+        Shortcut for attaching the return value of :meth:`url_encoded_parameters` to the :paramref:`url`.
 
         Args:
             url (:obj:`str`): The URL the parameters will be attached to.
@@ -117,12 +118,8 @@ class RequestData:
 
     @property
     def json_payload(self) -> bytes:
-        """The :attr:`parameters` as UTF-8 encoded JSON payload.
-
-        Tip:
-            By default, this property uses the standard library's :func:`json.dumps`.
-            To use a custom library for JSON encoding, you can directly encode the keys of
-            :attr:`parameters` - note that string valued keys should not be JSON encoded.
+        """
+        The :attr:`parameters` as UTF-8 encoded JSON payload.
 
         Returns:
             :obj:`bytes`
@@ -131,7 +128,8 @@ class RequestData:
 
     @property
     def multipart_data(self) -> UploadFileDict:
-        """Gives the files contained in this object as mapping of part name to encoded content.
+        """
+        Gives the files contained in this object as mapping of part name to encoded content.
 
         .. versionchanged:: 21.5
             Content may now be a file handle.
