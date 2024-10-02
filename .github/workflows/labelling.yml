@@ -11,7 +11,7 @@ jobs:
       pull-requests: write # for srvaroa/labeler to add labels in PR
     runs-on: ubuntu-latest
     steps:
-    - uses: srvaroa/labeler@v1.10.1
+    - uses: srvaroa/labeler@v1.11.0
       # Config file at .github/labeler.yml
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

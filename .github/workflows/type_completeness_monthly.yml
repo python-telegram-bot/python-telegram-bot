@@ -9,7 +9,7 @@ jobs:
     name:   test-type-completeness
     runs-on: ubuntu-latest
     steps:
-      - uses: Bibo-Joshi/pyright-type-completeness@1.0.0
+      - uses: Bibo-Joshi/pyright-type-completeness@1.0.1
         id: pyright-type-completeness
         with:
           package-name: telegram
