@@ -60,9 +60,13 @@ class RequestData:
             Dict[:obj:`str`, Union[:obj:`str`, :obj:`int`, List[any], Dict[any, any]]]
         """
         return {
-            param.name: param.value
-            for param in self._parameters
-            if param.value is not None and isinstance(param.value, (str, int, list, dict))
+        param.name: param.value
+        for param in self._parameters
+        if param.value is not None and isinstance(param.value, (str, int, list, dict))
+        } or {
+        param.name: logging.warning(f"Unexpected type for the value of '{param.name}': {type(param.value)}") or param.value
+        for param in self._parameters
+        if param.value is not None and not isinstance(param.value, (str, int, list, dict))
         }
 
     @property
