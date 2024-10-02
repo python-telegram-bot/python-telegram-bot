@@ -62,8 +62,8 @@ class RequestData:
         return {
             param.name: param.value
             for param in self._parameters
-            if param.value is not None
-        }
+            if param.value is not None and isinstance(param.value, (str, int, list, dict))
+}
 
     @property
     def json_parameters(self) -> Dict[str, str]:
