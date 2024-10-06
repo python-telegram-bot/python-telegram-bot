@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-# This module is intentionally named without "test_" prefix.
-# These tests are supposed to be run on GitHub when building docs.
-# The tests require Python 3.9+ (just like AdmonitionInserter being tested),
-# so they cannot be included in the main suite while older versions of Python are supported.
+"""
+This module is intentionally named without "test_" prefix.
+These tests are supposed to be run on GitHub when building docs.
+The tests require Python 3.10+ (just like AdmonitionInserter being tested),
+so they cannot be included in the main suite while older versions of Python are supported.
+"""
 
 import collections.abc
 
