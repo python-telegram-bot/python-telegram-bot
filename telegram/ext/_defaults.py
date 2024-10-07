@@ -118,7 +118,7 @@ class Defaults:
         show_caption_above_media (:obj:`bool`, optional): Indicates whether the caption should be
         shown above the media. Defaults to `None`.
 
-            .. versionadded:: 21.7
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -424,6 +424,6 @@ class Defaults:
         """:obj:`bool`: Optional. Indicates whether the caption should be
         shown above the media. Defaults to `None`.
 
-        .. versionadded:: 21.7
+        .. versionadded:: NEXT.VERSION
         """
         return self._show_caption_above_media
