@@ -114,6 +114,11 @@ class Defaults:
         do_quote(:obj:`bool`, optional): |reply_quote|
 
             .. versionadded:: 20.8
+
+        show_caption_above_media (:obj:`bool`, optional): Indicates whether the caption should be
+        shown above the media. Defaults to `None`.
+
+            .. versionadded:: 21.7
     """
 
     __slots__ = (
@@ -125,6 +130,7 @@ class Defaults:
         "_link_preview_options",
         "_parse_mode",
         "_protect_content",
+        "_show_caption_above_media",
         "_tzinfo",
     )
 
@@ -140,6 +146,7 @@ class Defaults:
         protect_content: Optional[bool] = None,
         link_preview_options: Optional["LinkPreviewOptions"] = None,
         do_quote: Optional[bool] = None,
+        show_caption_above_media: Optional[bool] = None,
     ):
         self._parse_mode: Optional[str] = parse_mode
         self._disable_notification: Optional[bool] = disable_notification
@@ -147,6 +154,7 @@ class Defaults:
         self._tzinfo: datetime.tzinfo = tzinfo
         self._block: bool = block
         self._protect_content: Optional[bool] = protect_content
+        self._show_caption_above_media: Optional[bool] = show_caption_above_media
 
         if disable_web_page_preview is not None and link_preview_options is not None:
             raise ValueError(
@@ -190,6 +198,7 @@ class Defaults:
             "parse_mode",
             "protect_content",
             "question_parse_mode",
+            "show_caption_above_media",
         ):
             value = getattr(self, kwarg)
             if value is not None:
@@ -409,3 +418,12 @@ class Defaults:
         .. versionadded:: 20.8
         """
         return self._do_quote
+
+    @property
+    def show_caption_above_media(self) -> Optional[bool]:
+        """:obj:`bool`: Optional. Indicates whether the caption should be
+        shown above the media. Defaults to `None`.
+
+        .. versionadded:: 21.7
+        """
+        return self._show_caption_above_media
