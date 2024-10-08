@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-PAPER         =
+PAPER         = a4   # Default value set to 'a4'ensuring it is always used unless overridden.
 BUILDDIR      = build
 
 # User-friendly check for sphinx-build
@@ -15,7 +15,7 @@ endif
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source -j auto
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(if $(PAPER),$(PAPEROPT_$(PAPER))) $(SPHINXOPTS) source -j auto
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 
@@ -57,7 +57,6 @@ html:
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 rebuild: clean html
-
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo
