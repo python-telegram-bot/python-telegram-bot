@@ -19,7 +19,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains the Telegram Business related classes."""
 
-from datetime import datetime
+import zoneinfo
+from datetime import date as dt
+from datetime import datetime, time
 from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._chat import Chat
@@ -453,3 +455,69 @@ class BusinessOpeningHours(TelegramObject):
         )
 
         return super().de_json(data=data, bot=bot)
+
+    def get_opening_hours_for_day(
+        self, target_date: dt, tzinfo: Optional[zoneinfo.ZoneInfo] = None
+    ) -> Tuple[Tuple[datetime, datetime], ...]:
+        """
+        Get the opening hours for a specific day.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            target_date (:class:`datetime.date`): The date for which to get the opening hours.
+            tzinfo (:class:`zoneinfo.ZoneInfo`, optional): The timezone to use for opening hours.
+                If :obj:`None`, the time zone of the business is used, i.e. :attr:`time_zone_name`.
+                Defaults to :obj:`None`.
+
+        Returns:
+            Tuple[Tuple[:class:`datetime.datetime`, :class:`datetime.datetime`], ...]:
+                A tuple of tuples containing the opening and closing times for the day.
+        """
+        if tzinfo is None:
+            tzinfo = zoneinfo.ZoneInfo(self.time_zone_name)
+
+        output = []
+
+        for interval in self.opening_hours:
+            opening_time = datetime.combine(target_date, time(*interval.opening_time[1:]), tzinfo)
+            closing_time = datetime.combine(target_date, time(*interval.closing_time[1:]), tzinfo)
+
+            output.append((opening_time, closing_time))
+
+        return tuple(output)
+
+    def is_open(self, target_datetime: datetime) -> bool:
+        """
+        Check if the business is open at the given time.
+        If the given time is time zone naive, the time zone of the business is used.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            target_dt (:class:`datetime.datetime`): The time to check if the business is open.
+
+        Returns:
+            :obj:`bool`: :obj:`True`, if the business is open at the given time.
+                :obj:`False` otherwise.
+        """
+
+        def time_to_minutes(weekday: int, hour: int, minute: int) -> int:
+            return (weekday * 24 * 60) + (hour * 60) + minute
+
+        if target_datetime.tzinfo is not None:
+            target_datetime = target_datetime.astimezone(zoneinfo.ZoneInfo(self.time_zone_name))
+
+        target_time_as_minutes = time_to_minutes(
+            target_datetime.weekday(), target_datetime.hour, target_datetime.minute
+        )
+
+        for interval in self.opening_hours:
+            if (
+                time_to_minutes(*interval.opening_time)
+                <= target_time_as_minutes
+                <= time_to_minutes(*interval.closing_time)
+            ):
+                return True
+
+        return False
