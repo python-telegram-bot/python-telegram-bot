@@ -85,10 +85,10 @@ class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], AB
         """
         try:
             await self.initialize()
-            return self
-        except Exception as exc:
+        except Exception:
             await self.shutdown()
-            raise exc
+            raise
+        return self
 
     async def __aexit__(
         self,

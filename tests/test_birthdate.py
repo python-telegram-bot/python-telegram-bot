@@ -24,7 +24,7 @@ from telegram import Birthdate
 from tests.auxil.slots import mro_slots
 
 
-class TestBirthdateBase:
+class BirthdateTestBase:
     day = 1
     month = 1
     year = 2022
@@ -32,10 +32,10 @@ class TestBirthdateBase:
 
 @pytest.fixture(scope="module")
 def birthdate():
-    return Birthdate(TestBirthdateBase.day, TestBirthdateBase.month, TestBirthdateBase.year)
+    return Birthdate(BirthdateTestBase.day, BirthdateTestBase.month, BirthdateTestBase.year)
 
 
-class TestBirthdateWithoutRequest(TestBirthdateBase):
+class TestBirthdateWithoutRequest(BirthdateTestBase):
     def test_slot_behaviour(self, birthdate):
         for attr in birthdate.__slots__:
             assert getattr(birthdate, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -48,9 +48,9 @@ class TestBirthdateWithoutRequest(TestBirthdateBase):
         assert bd_dict["month"] == self.month
         assert bd_dict["year"] == self.year
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"day": self.day, "month": self.month, "year": self.year}
-        bd = Birthdate.de_json(json_dict, bot)
+        bd = Birthdate.de_json(json_dict, offline_bot)
         assert isinstance(bd, Birthdate)
         assert bd.day == self.day
         assert bd.month == self.month

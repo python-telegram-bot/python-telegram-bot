@@ -4,7 +4,7 @@
 build
 
 # For the test suite
-pytest==8.2.2
+pytest==8.3.3
 
 # needed because pytest doesn't come with native support for coroutines as tests
 pytest-asyncio==0.21.2

@@ -93,14 +93,13 @@ class ExternalReplyInfo(TelegramObject):
             about the contact.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value.
         game (:Class:`telegram.Game`. optional): Message is a game, information about the game.
-            `More about games >> <https://core.telegram.org/bots/api#games>`_.
+            :ref:`More about games >> <games-tree>`.
         giveaway (:class:`telegram.Giveaway`, optional): Message is a scheduled giveaway,
             information about the giveaway.
         giveaway_winners (:class:`telegram.GiveawayWinners`, optional): A giveaway with public
             winners was completed.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
-            information about the invoice. `More about payments >>
-            <https://core.telegram.org/bots/api#payments>`_.
+            information about the invoice. :ref:`More about payments >> <payments-tree>`.
         location (:class:`telegram.Location`, optional): Message is a shared location, information
             about the location.
         poll (:class:`telegram.Poll`, optional): Message is a native poll, information about the
@@ -143,14 +142,13 @@ class ExternalReplyInfo(TelegramObject):
             about the contact.
         dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.
         game (:Class:`telegram.Game`): Optional. Message is a game, information about the game.
-            `More about games >> <https://core.telegram.org/bots/api#games>`_.
+            :ref:`More about games >> <games-tree>`.
         giveaway (:class:`telegram.Giveaway`): Optional. Message is a scheduled giveaway,
             information about the giveaway.
         giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
             winners was completed.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
-            information about the invoice. `More about payments >>
-            <https://core.telegram.org/bots/api#payments>`_.
+            information about the invoice. :ref:`More about payments >> <payments-tree>`.
         location (:class:`telegram.Location`): Optional. Message is a shared location, information
             about the location.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll, information about the
@@ -253,7 +251,7 @@ class ExternalReplyInfo(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["ExternalReplyInfo"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
@@ -302,7 +300,8 @@ class TextQuote(TelegramObject):
             message.
         position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
             units as specified by the sender.
-        entities (Sequence[:obj:`telegram.MessageEntity`], optional): Special entities that appear
+        entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities that
+            appear
             in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
             custom_emoji entities are kept in quotes.
         is_manual (:obj:`bool`, optional): :obj:`True`, if the quote was chosen manually by the
@@ -313,7 +312,7 @@ class TextQuote(TelegramObject):
             message.
         position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
             units as specified by the sender.
-        entities (tuple[:obj:`telegram.MessageEntity`]): Optional. Special entities that appear
+        entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that appear
             in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
             custom_emoji entities are kept in quotes.
         is_manual (:obj:`bool`): Optional. :obj:`True`, if the quote was chosen manually by the
@@ -354,7 +353,7 @@ class TextQuote(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["TextQuote"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
@@ -390,7 +389,8 @@ class ReplyParameters(TelegramObject):
         quote_parse_mode (:obj:`str`, optional): Mode for parsing entities in the quote. See
             :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
             more details.
-        quote_entities (Sequence[:obj:`telegram.MessageEntity`], optional): A JSON-serialized list
+        quote_entities (Sequence[:class:`telegram.MessageEntity`], optional): A JSON-serialized
+            list
             of special entities that appear in the quote. It can be specified instead of
             :paramref:`quote_parse_mode`.
         quote_position (:obj:`int`, optional): Position of the quote in the original message in
@@ -412,8 +412,8 @@ class ReplyParameters(TelegramObject):
         quote_parse_mode (:obj:`str`): Optional. Mode for parsing entities in the quote. See
             :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
             more details.
-        quote_entities (tuple[:obj:`telegram.MessageEntity`]): Optional. A JSON-serialized list of
-            special entities that appear in the quote. It can be specified instead of
+        quote_entities (tuple[:class:`telegram.MessageEntity`]): Optional. A JSON-serialized list
+            of special entities that appear in the quote. It can be specified instead of
             :paramref:`quote_parse_mode`.
         quote_position (:obj:`int`): Optional. Position of the quote in the original message in
             UTF-16 code units.
@@ -461,7 +461,7 @@ class ReplyParameters(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["ReplyParameters"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:

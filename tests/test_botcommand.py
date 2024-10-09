@@ -37,15 +37,15 @@ class TestBotCommandWithoutRequest:
             assert getattr(bot_command, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(bot_command)) == len(set(mro_slots(bot_command))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"command": self.command, "description": self.description}
-        bot_command = BotCommand.de_json(json_dict, bot)
+        bot_command = BotCommand.de_json(json_dict, offline_bot)
         assert bot_command.api_kwargs == {}
 
         assert bot_command.command == self.command
         assert bot_command.description == self.description
 
-        assert BotCommand.de_json(None, bot) is None
+        assert BotCommand.de_json(None, offline_bot) is None
 
     def test_to_dict(self, bot_command):
         bot_command_dict = bot_command.to_dict()

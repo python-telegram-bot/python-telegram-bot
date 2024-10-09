@@ -120,6 +120,7 @@ Available Types
     telegram.paidmediainfo
     telegram.paidmediaphoto
     telegram.paidmediapreview
+    telegram.paidmediapurchased
     telegram.paidmediavideo
     telegram.photosize
     telegram.poll
@@ -130,6 +131,7 @@ Available Types
     telegram.reactiontype
     telegram.reactiontypecustomemoji
     telegram.reactiontypeemoji
+    telegram.reactiontypepaid
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.replyparameters

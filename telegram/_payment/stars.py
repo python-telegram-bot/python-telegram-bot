@@ -24,6 +24,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
+from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
@@ -75,6 +76,17 @@ class RevenueWithdrawalState(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["RevenueWithdrawalState"]:
+        """Converts JSON data to the appropriate :class:`RevenueWithdrawalState` object, i.e. takes
+        care of selecting the correct subclass.
+
+        Args:
+            data (dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with this object.
+
+        Returns:
+            The Telegram object.
+
+        """
         data = cls._parse_data(data)
 
         if not data:
@@ -151,6 +163,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["RevenueWithdrawalStateSucceeded"]:
+        """See :meth:`telegram.RevenueWithdrawalState.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
@@ -261,13 +274,13 @@ class TransactionPartnerFragment(TransactionPartner):
     .. versionadded:: 21.4
 
     Args:
-        withdrawal_state (:obj:`telegram.RevenueWithdrawalState`, optional): State of the
+        withdrawal_state (:class:`telegram.RevenueWithdrawalState`, optional): State of the
             transaction if the transaction is outgoing.
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.FRAGMENT`.
-        withdrawal_state (:obj:`telegram.RevenueWithdrawalState`): Optional. State of the
+        withdrawal_state (:class:`telegram.RevenueWithdrawalState`): Optional. State of the
             transaction if the transaction is outgoing.
     """
 
@@ -288,6 +301,7 @@ class TransactionPartnerFragment(TransactionPartner):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["TransactionPartnerFragment"]:
+        """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
@@ -311,20 +325,37 @@ class TransactionPartnerUser(TransactionPartner):
     Args:
         user (:class:`telegram.User`): Information about the user.
         invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
+        paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
+            media bought by the user.
+
+            .. versionadded:: 21.5
+        paid_media_payload (:obj:`str`, optional): Optional. Bot-specified paid media payload.
+
+            .. versionadded:: 21.6
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
         user (:class:`telegram.User`): Information about the user.
         invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
+        paid_media (tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
+            media bought by the user.
+
+            .. versionadded:: 21.5
+        paid_media_payload (:obj:`str`): Optional. Optional. Bot-specified paid media payload.
+
+            .. versionadded:: 21.6
+
     """
 
-    __slots__ = ("invoice_payload", "user")
+    __slots__ = ("invoice_payload", "paid_media", "paid_media_payload", "user")
 
     def __init__(
         self,
         user: "User",
         invoice_payload: Optional[str] = None,
+        paid_media: Optional[Sequence[PaidMedia]] = None,
+        paid_media_payload: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -333,6 +364,8 @@ class TransactionPartnerUser(TransactionPartner):
         with self._unfrozen():
             self.user: User = user
             self.invoice_payload: Optional[str] = invoice_payload
+            self.paid_media: Optional[tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
+            self.paid_media_payload: Optional[str] = paid_media_payload
             self._id_attrs = (
                 self.type,
                 self.user,
@@ -342,12 +375,14 @@ class TransactionPartnerUser(TransactionPartner):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["TransactionPartnerUser"]:
+        """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
         data["user"] = User.de_json(data.get("user"), bot)
+        data["paid_media"] = PaidMedia.de_list(data.get("paid_media"), bot=bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
@@ -453,6 +488,7 @@ class StarTransaction(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["StarTransaction"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
@@ -499,6 +535,7 @@ class StarTransactions(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["StarTransactions"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:

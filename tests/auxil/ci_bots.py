@@ -22,30 +22,35 @@ import json
 import os
 import random
 
+from telegram._utils.strings import TextEncoding
+
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine
 # These bots are only able to talk in our test chats, so they are quite useless for other
 # purposes than testing.
 FALLBACKS = (
     "W3sidG9rZW4iOiAiNTc5Njk0NzE0OkFBRnBLOHc2emtrVXJENHhTZVl3RjNNTzhlLTRHcm1jeTdjIiwgInBheW1lbnRfc"
-    "HJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TmpRME5qWmxOekk1WWpKaSIsICJjaGF0X2 lkIjogIjY3NTY2N"
-    "jIyNCIsICJzdXBlcl9ncm91cF9pZCI6ICItMTAwMTMxMDkxMTEzNSIsICJmb3J1bV9ncm91cF9pZCI6ICItMTAwMTgzOD"
-    "AwNDU3NyIsICJjaGFubmVsX2lkIjogIkBweXRob250ZWxlZ3JhbWJvdHRlc3RzIi wgIm5hbWUiOiAiUFRCIHRlc3RzIG"
-    "ZhbGxiYWNrIDEiLCAidXNlcm5hbWUiOiAiQHB0Yl9mYWxsYmFja18xX2JvdCJ9LCB7InRva2VuIjogIjU1ODE5NDA2Njp"
-    "BQUZ3RFBJRmx6R1VsQ2FXSHRUT0VYNFJGclg4dTlETXFmbyIsIC JwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY"
-    "4NTA2MzpURVNUOllqRXdPRFF3TVRGbU5EY3kiLCAiY2hhdF9pZCI6ICI2NzU2NjYyMjQiLCAic3VwZXJfZ3JvdXBfaWQi"
-    "OiAiLTEwMDEyMjEyMTY4MzAiLCAiZm9ydW1fZ3 JvdXBfaWQiOiAiLTEwMDE4NTc4NDgzMTQiLCAiY2hhbm5lbF9pZCI6"
-    "ICJAcHl0aG9udGVsZWdyYW1ib3R0ZXN0cyIsICJuYW1lIjogIlBUQiB0ZXN0cyBmYWxsYmFjayAyIiwgInVzZXJuYW1lI"
-    "jogIkBwdGJfZmFsbGJhY2tfMl9ib3QifV0="
+    "HJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TmpRME5qWmxOekk1WWpKaSIsICJjaGF0X2lkIjogIjY3NTY2Nj"
+    "IyNCIsICJzdXBlcl9ncm91cF9pZCI6ICItMTAwMTMxMDkxMTEzNSIsICJmb3J1bV9ncm91cF9pZCI6ICItMTAwMTgzODA"
+    "wNDU3NyIsICJjaGFubmVsX2lkIjogIkBweXRob250ZWxlZ3JhbWJvdHRlc3RzIiwgIm5hbWUiOiAiUFRCIHRlc3RzIGZh"
+    "bGxiYWNrIDEiLCAidXNlcm5hbWUiOiAiQHB0Yl9mYWxsYmFja18xX2JvdCIsICJzdWJzY3JpcHRpb25fY2hhbm5lbF9pZ"
+    "CI6IC0xMDAyMjI5NjQ5MzAzfSwgeyJ0b2tlbiI6ICI1NTgxOTQwNjY6QUFGd0RQSUZsekdVbENhV0h0VE9FWDRSRnJYOH"
+    "U5RE1xZm8iLCAicGF5bWVudF9wcm92aWRlcl90b2tlbiI6ICIyODQ2ODUwNjM6VEVTVDpZakV3T0RRd01URm1ORGN5Iiw"
+    "gImNoYXRfaWQiOiAiNjc1NjY2MjI0IiwgInN1cGVyX2dyb3VwX2lkIjogIi0xMDAxMjIxMjE2ODMwIiwgImZvcnVtX2dy"
+    "b3VwX2lkIjogIi0xMDAxODU3ODQ4MzE0IiwgImNoYW5uZWxfaWQiOiAiQHB5dGhvbnRlbGVncmFtYm90dGVzdHMiLCAib"
+    "mFtZSI6ICJQVEIgdGVzdHMgZmFsbGJhY2sgMiIsICJ1c2VybmFtZSI6ICJAcHRiX2ZhbGxiYWNrXzJfYm90IiwgInN1Yn"
+    "NjcmlwdGlvbl9jaGFubmVsX2lkIjogLTEwMDIyMjk2NDkzMDN9XQ=="
 )
 
 GITHUB_ACTION = os.getenv("GITHUB_ACTION", None)
 BOTS = os.getenv("BOTS", None)
 JOB_INDEX = os.getenv("JOB_INDEX", None)
 if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
-    BOTS = json.loads(base64.b64decode(BOTS).decode("utf-8"))
+    BOTS = json.loads(base64.b64decode(BOTS).decode(TextEncoding.UTF_8))
     JOB_INDEX = int(JOB_INDEX)
 
-FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode("utf-8"))  # type: list[dict[str, str]]
+FALLBACKS = json.loads(
+    base64.b64decode(FALLBACKS).decode(TextEncoding.UTF_8)
+)  # type: list[dict[str, str]]
 
 
 class BotInfoProvider:

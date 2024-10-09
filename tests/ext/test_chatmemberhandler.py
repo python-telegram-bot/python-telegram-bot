@@ -81,7 +81,7 @@ def chat_member_updated():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def chat_member(bot, chat_member_updated):
     update = Update(0, my_chat_member=chat_member_updated)
     update._unfreeze()

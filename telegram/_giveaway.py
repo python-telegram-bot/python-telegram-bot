@@ -57,8 +57,13 @@ class Giveaway(TelegramObject):
             country codes indicating the countries from which eligible users for the giveaway must
             come. If empty, then all users can participate in the giveaway. Users with a phone
             number that was bought on Fragment can always participate in giveaways.
+        prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be split between
+            giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
         premium_subscription_month_count (:obj:`int`, optional): The number of months the Telegram
-            Premium subscription won from the giveaway will be active for.
+            Premium subscription won from the giveaway will be active for; for Telegram Premium
+            giveaways only.
 
     Attributes:
         chats (Sequence[:class:`telegram.Chat`]): The list of chats which the user must join to
@@ -76,8 +81,13 @@ class Giveaway(TelegramObject):
             country codes indicating the countries from which eligible users for the giveaway must
             come. If empty, then all users can participate in the giveaway. Users with a phone
             number that was bought on Fragment can always participate in giveaways.
+        prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be split between
+            giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
         premium_subscription_month_count (:obj:`int`): Optional. The number of months the Telegram
-            Premium subscription won from the giveaway will be active for.
+            Premium subscription won from the giveaway will be active for; for Telegram Premium
+            giveaways only.
     """
 
     __slots__ = (
@@ -87,6 +97,7 @@ class Giveaway(TelegramObject):
         "only_new_members",
         "premium_subscription_month_count",
         "prize_description",
+        "prize_star_count",
         "winner_count",
         "winners_selection_date",
     )
@@ -101,6 +112,7 @@ class Giveaway(TelegramObject):
         prize_description: Optional[str] = None,
         country_codes: Optional[Sequence[str]] = None,
         premium_subscription_month_count: Optional[int] = None,
+        prize_star_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -114,6 +126,7 @@ class Giveaway(TelegramObject):
         self.prize_description: Optional[str] = prize_description
         self.country_codes: tuple[str, ...] = parse_sequence_arg(country_codes)
         self.premium_subscription_month_count: Optional[int] = premium_subscription_month_count
+        self.prize_star_count: Optional[int] = prize_star_count
 
         self._id_attrs = (
             self.chats,
@@ -127,7 +140,7 @@ class Giveaway(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["Giveaway"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
@@ -146,13 +159,28 @@ class Giveaway(TelegramObject):
 
 class GiveawayCreated(TelegramObject):
     """This object represents a service message about the creation of a scheduled giveaway.
-    Currently holds no information.
+
+    Args:
+        prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be
+            split between giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
+
+    Attributes:
+        prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be
+            split between giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
+
     """
 
-    __slots__ = ()
+    __slots__ = ("prize_star_count",)
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(
+        self, prize_star_count: Optional[int] = None, *, api_kwargs: Optional[JSONDict] = None
+    ):
         super().__init__(api_kwargs=api_kwargs)
+        self.prize_star_count: Optional[int] = prize_star_count
 
         self._freeze()
 
@@ -174,6 +202,10 @@ class GiveawayWinners(TelegramObject):
         winner_count (:obj:`int`): Total number of winners in the giveaway
         winners	(Sequence[:class:`telegram.User`]): List of up to
             :tg-const:`telegram.constants.GiveawayLimit.MAX_WINNERS` winners of the giveaway
+        prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be split between
+            giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
         additional_chat_count (:obj:`int`, optional): The number of other chats the user had to
             join in order to be eligible for the giveaway
         premium_subscription_month_count (:obj:`int`, optional): The number of months the Telegram
@@ -195,6 +227,10 @@ class GiveawayWinners(TelegramObject):
             :tg-const:`telegram.constants.GiveawayLimit.MAX_WINNERS` winners of the giveaway
         additional_chat_count (:obj:`int`): Optional. The number of other chats the user had to
             join in order to be eligible for the giveaway
+        prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be split between
+            giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
         premium_subscription_month_count (:obj:`int`): Optional. The number of months the Telegram
             Premium subscription won from the giveaway will be active for
         unclaimed_prize_count (:obj:`int`): Optional. Number of undistributed prizes
@@ -212,6 +248,7 @@ class GiveawayWinners(TelegramObject):
         "only_new_members",
         "premium_subscription_month_count",
         "prize_description",
+        "prize_star_count",
         "unclaimed_prize_count",
         "was_refunded",
         "winner_count",
@@ -232,6 +269,7 @@ class GiveawayWinners(TelegramObject):
         only_new_members: Optional[bool] = None,
         was_refunded: Optional[bool] = None,
         prize_description: Optional[str] = None,
+        prize_star_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -248,6 +286,7 @@ class GiveawayWinners(TelegramObject):
         self.only_new_members: Optional[bool] = only_new_members
         self.was_refunded: Optional[bool] = was_refunded
         self.prize_description: Optional[str] = prize_description
+        self.prize_star_count: Optional[int] = prize_star_count
 
         self._id_attrs = (
             self.chat,
@@ -263,7 +302,7 @@ class GiveawayWinners(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["GiveawayWinners"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:
@@ -296,21 +335,29 @@ class GiveawayCompleted(TelegramObject):
         unclaimed_prize_count (:obj:`int`, optional): Number of undistributed prizes
         giveaway_message (:class:`telegram.Message`, optional): Message with the giveaway that was
             completed, if it wasn't deleted
+        is_star_giveaway (:obj:`bool`, optional): :obj:`True`, if the giveaway is a Telegram Star
+            giveaway. Otherwise, currently, the giveaway is a Telegram Premium giveaway.
 
+            .. versionadded:: 21.6
     Attributes:
         winner_count (:obj:`int`): Number of winners in the giveaway
         unclaimed_prize_count (:obj:`int`): Optional. Number of undistributed prizes
         giveaway_message (:class:`telegram.Message`): Optional. Message with the giveaway that was
             completed, if it wasn't deleted
+        is_star_giveaway (:obj:`bool`): Optional. :obj:`True`, if the giveaway is a Telegram Star
+            giveaway. Otherwise, currently, the giveaway is a Telegram Premium giveaway.
+
+            .. versionadded:: 21.6
     """
 
-    __slots__ = ("giveaway_message", "unclaimed_prize_count", "winner_count")
+    __slots__ = ("giveaway_message", "is_star_giveaway", "unclaimed_prize_count", "winner_count")
 
     def __init__(
         self,
         winner_count: int,
         unclaimed_prize_count: Optional[int] = None,
         giveaway_message: Optional["Message"] = None,
+        is_star_giveaway: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -319,6 +366,7 @@ class GiveawayCompleted(TelegramObject):
         self.winner_count: int = winner_count
         self.unclaimed_prize_count: Optional[int] = unclaimed_prize_count
         self.giveaway_message: Optional[Message] = giveaway_message
+        self.is_star_giveaway: Optional[bool] = is_star_giveaway
 
         self._id_attrs = (
             self.winner_count,
@@ -331,7 +379,7 @@ class GiveawayCompleted(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional["GiveawayCompleted"]:
-        """See :obj:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if data is None:

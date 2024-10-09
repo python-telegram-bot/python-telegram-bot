@@ -40,7 +40,7 @@ class TestContextTypes:
         assert ct.chat_data is float
         assert ct.user_data is bool
 
-        with pytest.raises(ValueError, match="subclass of CallbackContext"):
+        with pytest.raises(TypeError, match="subclass of CallbackContext"):
             ContextTypes(context=bool)
 
     def test_data_assignment(self):

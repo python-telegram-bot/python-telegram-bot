@@ -1,5 +1,10 @@
+.. _payments-tree:
+
 Payments
 --------
+
+Your bot can accept payments from Telegram users. Please see the `introduction to payments <https://core.telegram.org/bots/payments>`_ for more details on the process and how to set up payments for your bot.
+
 
 .. toctree::
     :titlesonly:

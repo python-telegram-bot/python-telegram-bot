@@ -1,0 +1,132 @@
+name: Publish to Test PyPI
+
+on:
+  # manually trigger the workflow
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Distribution
+    runs-on: ubuntu-latest
+    outputs:
+      TAG: ${{ steps.get_tag.outputs.TAG }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install pypa/build
+        run: >-
+          python3 -m pip install build --user
+      - name: Build a binary wheel and a source tarball
+        run: python3 -m build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Get Tag Name
+        id: get_tag
+        run: |
+          pip install .
+          TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+
+  publish-to-test-pypi:
+    name: Publish to Test PyPI
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    environment:
+      name: release_test_pypi
+      url: https://test.pypi.org/p/python-telegram-bot
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  compute-signatures:
+    name: Compute SHA1 Sums and Sign with Sigstore
+    runs-on: ubuntu-latest
+    needs:
+      - publish-to-test-pypi
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for sigstore
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Compute SHA1 Sums
+        run: |
+          # Compute SHA1 sum of the distribution packages and save it to a file with the same name,
+          # but with .sha1 extension
+          for file in dist/*; do
+              sha1sum $file > $file.sha1
+          done
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - name: Store the distribution packages and signatures
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions-and-signatures
+          path: dist/
+
+  github-test-release:
+    name: Upload to GitHub Release Draft
+    needs:
+      - build
+      - compute-signatures
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # IMPORTANT: mandatory for making GitHub Releases
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions-and-signatures
+          path: dist/
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.build.outputs.TAG }}
+        # Create a GitHub Release *draft*. The description can be changed later, as for now
+        # we don't define it through this workflow.
+        run: >-
+          gh release create
+          '${{ env.TAG }}'
+          --repo '${{ github.repository }}'
+          --generate-notes
+          --draft
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.build.outputs.TAG }}
+        # Upload to GitHub Release using the `gh` CLI.
+        # `dist/` contains the built packages, and the
+        # sigstore-produced signatures and certificates.
+        run: >-
+          gh release upload
+          '${{ env.TAG }}' dist/**
+          --repo '${{ github.repository }}'

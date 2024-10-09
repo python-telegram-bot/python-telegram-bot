@@ -31,19 +31,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def pre_checkout_query(bot):
     pcq = PreCheckoutQuery(
-        TestPreCheckoutQueryBase.id_,
-        TestPreCheckoutQueryBase.from_user,
-        TestPreCheckoutQueryBase.currency,
-        TestPreCheckoutQueryBase.total_amount,
-        TestPreCheckoutQueryBase.invoice_payload,
-        shipping_option_id=TestPreCheckoutQueryBase.shipping_option_id,
-        order_info=TestPreCheckoutQueryBase.order_info,
+        PreCheckoutQueryTestBase.id_,
+        PreCheckoutQueryTestBase.from_user,
+        PreCheckoutQueryTestBase.currency,
+        PreCheckoutQueryTestBase.total_amount,
+        PreCheckoutQueryTestBase.invoice_payload,
+        shipping_option_id=PreCheckoutQueryTestBase.shipping_option_id,
+        order_info=PreCheckoutQueryTestBase.order_info,
     )
     pcq.set_bot(bot)
     return pcq
 
 
-class TestPreCheckoutQueryBase:
+class PreCheckoutQueryTestBase:
     id_ = 5
     invoice_payload = "invoice_payload"
     shipping_option_id = "shipping_option_id"
@@ -53,14 +53,14 @@ class TestPreCheckoutQueryBase:
     order_info = OrderInfo()
 
 
-class TestPreCheckoutQueryWithoutRequest(TestPreCheckoutQueryBase):
+class TestPreCheckoutQueryWithoutRequest(PreCheckoutQueryTestBase):
     def test_slot_behaviour(self, pre_checkout_query):
         inst = pre_checkout_query
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "invoice_payload": self.invoice_payload,
@@ -70,10 +70,10 @@ class TestPreCheckoutQueryWithoutRequest(TestPreCheckoutQueryBase):
             "from": self.from_user.to_dict(),
             "order_info": self.order_info.to_dict(),
         }
-        pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
+        pre_checkout_query = PreCheckoutQuery.de_json(json_dict, offline_bot)
         assert pre_checkout_query.api_kwargs == {}
 
-        assert pre_checkout_query.get_bot() is bot
+        assert pre_checkout_query.get_bot() is offline_bot
         assert pre_checkout_query.id == self.id_
         assert pre_checkout_query.invoice_payload == self.invoice_payload
         assert pre_checkout_query.shipping_option_id == self.shipping_option_id

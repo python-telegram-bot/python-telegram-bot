@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
+
 from collections.abc import Awaitable, Generator
 from re import Match
-from typing import TYPE_CHECKING, Any, Generic, NoReturn, Optional, Union
+from typing import TYPE_CHECKING, Any, Generic, NoReturn, Optional, TypeVar, Union
 
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
@@ -37,6 +38,9 @@ _STORING_DATA_WIKI = (
     "https://github.com/python-telegram-bot/python-telegram-bot"
     "/wiki/Storing-bot%2C-user-and-chat-related-data"
 )
+
+# something like poor mans "typing.Self" for py<3.11
+ST = TypeVar("ST", bound="CallbackContext[Any, Any, Any, Any]")
 
 
 class CallbackContext(Generic[BT, UD, CD, BD]):
@@ -122,24 +126,24 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     )
 
     def __init__(
-        self: "CCT",
-        application: "Application[BT, CCT, UD, CD, BD, Any]",
+        self: ST,
+        application: "Application[BT, ST, UD, CD, BD, Any]",
         chat_id: Optional[int] = None,
         user_id: Optional[int] = None,
     ):
-        self._application: Application[BT, CCT, UD, CD, BD, Any] = application
+        self._application: Application[BT, ST, UD, CD, BD, Any] = application
         self._chat_id: Optional[int] = chat_id
         self._user_id: Optional[int] = user_id
         self.args: Optional[list[str]] = None
         self.matches: Optional[list[Match[str]]] = None
         self.error: Optional[Exception] = None
-        self.job: Optional[Job[CCT]] = None
+        self.job: Optional[Job[Any]] = None
         self.coroutine: Optional[
             Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
 
     @property
-    def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
+    def application(self) -> "Application[BT, ST, UD, CD, BD, Any]":
         """:class:`telegram.ext.Application`: The application associated with this context."""
         return self._application
 
@@ -261,7 +265,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 )
             self.bot.callback_data_cache.drop_data(callback_query)
         else:
-            raise RuntimeError("telegram.Bot does not allow for arbitrary callback data.")
+            raise RuntimeError(  # noqa: TRY004
+                "telegram.Bot does not allow for arbitrary callback data."
+            )
 
     @classmethod
     def from_error(
@@ -385,7 +391,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> Optional["JobQueue[CCT]"]:
+    def job_queue(self) -> Optional["JobQueue[ST]"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
         :class:`telegram.ext.Application`.

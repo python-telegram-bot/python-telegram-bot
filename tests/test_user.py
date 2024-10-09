@@ -31,43 +31,45 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def json_dict():
     return {
-        "id": TestUserBase.id_,
-        "is_bot": TestUserBase.is_bot,
-        "first_name": TestUserBase.first_name,
-        "last_name": TestUserBase.last_name,
-        "username": TestUserBase.username,
-        "language_code": TestUserBase.language_code,
-        "can_join_groups": TestUserBase.can_join_groups,
-        "can_read_all_group_messages": TestUserBase.can_read_all_group_messages,
-        "supports_inline_queries": TestUserBase.supports_inline_queries,
-        "is_premium": TestUserBase.is_premium,
-        "added_to_attachment_menu": TestUserBase.added_to_attachment_menu,
-        "can_connect_to_business": TestUserBase.can_connect_to_business,
+        "id": UserTestBase.id_,
+        "is_bot": UserTestBase.is_bot,
+        "first_name": UserTestBase.first_name,
+        "last_name": UserTestBase.last_name,
+        "username": UserTestBase.username,
+        "language_code": UserTestBase.language_code,
+        "can_join_groups": UserTestBase.can_join_groups,
+        "can_read_all_group_messages": UserTestBase.can_read_all_group_messages,
+        "supports_inline_queries": UserTestBase.supports_inline_queries,
+        "is_premium": UserTestBase.is_premium,
+        "added_to_attachment_menu": UserTestBase.added_to_attachment_menu,
+        "can_connect_to_business": UserTestBase.can_connect_to_business,
+        "has_main_web_app": UserTestBase.has_main_web_app,
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def user(bot):
     user = User(
-        id=TestUserBase.id_,
-        first_name=TestUserBase.first_name,
-        is_bot=TestUserBase.is_bot,
-        last_name=TestUserBase.last_name,
-        username=TestUserBase.username,
-        language_code=TestUserBase.language_code,
-        can_join_groups=TestUserBase.can_join_groups,
-        can_read_all_group_messages=TestUserBase.can_read_all_group_messages,
-        supports_inline_queries=TestUserBase.supports_inline_queries,
-        is_premium=TestUserBase.is_premium,
-        added_to_attachment_menu=TestUserBase.added_to_attachment_menu,
-        can_connect_to_business=TestUserBase.can_connect_to_business,
+        id=UserTestBase.id_,
+        first_name=UserTestBase.first_name,
+        is_bot=UserTestBase.is_bot,
+        last_name=UserTestBase.last_name,
+        username=UserTestBase.username,
+        language_code=UserTestBase.language_code,
+        can_join_groups=UserTestBase.can_join_groups,
+        can_read_all_group_messages=UserTestBase.can_read_all_group_messages,
+        supports_inline_queries=UserTestBase.supports_inline_queries,
+        is_premium=UserTestBase.is_premium,
+        added_to_attachment_menu=UserTestBase.added_to_attachment_menu,
+        can_connect_to_business=UserTestBase.can_connect_to_business,
+        has_main_web_app=UserTestBase.has_main_web_app,
     )
     user.set_bot(bot)
     user._unfreeze()
     return user
 
 
-class TestUserBase:
+class UserTestBase:
     id_ = 1
     is_bot = True
     first_name = "first\u2022name"
@@ -80,16 +82,17 @@ class TestUserBase:
     is_premium = True
     added_to_attachment_menu = False
     can_connect_to_business = True
+    has_main_web_app = False
 
 
-class TestUserWithoutRequest(TestUserBase):
+class TestUserWithoutRequest(UserTestBase):
     def test_slot_behaviour(self, user):
         for attr in user.__slots__:
             assert getattr(user, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(user)) == len(set(mro_slots(user))), "duplicate slot"
 
-    def test_de_json(self, json_dict, bot):
-        user = User.de_json(json_dict, bot)
+    def test_de_json(self, json_dict, offline_bot):
+        user = User.de_json(json_dict, offline_bot)
         assert user.api_kwargs == {}
 
         assert user.id == self.id_
@@ -104,6 +107,7 @@ class TestUserWithoutRequest(TestUserBase):
         assert user.is_premium == self.is_premium
         assert user.added_to_attachment_menu == self.added_to_attachment_menu
         assert user.can_connect_to_business == self.can_connect_to_business
+        assert user.has_main_web_app == self.has_main_web_app
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -121,6 +125,7 @@ class TestUserWithoutRequest(TestUserBase):
         assert user_dict["is_premium"] == user.is_premium
         assert user_dict["added_to_attachment_menu"] == user.added_to_attachment_menu
         assert user_dict["can_connect_to_business"] == user.can_connect_to_business
+        assert user_dict["has_main_web_app"] == user.has_main_web_app
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)

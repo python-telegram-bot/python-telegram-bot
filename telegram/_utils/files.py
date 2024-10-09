@@ -61,12 +61,19 @@ def load_file(
     except AttributeError:
         return None, cast(Union[bytes, "InputFile", str, Path], obj)
 
-    if hasattr(obj, "name") and not isinstance(obj.name, int):
-        filename = Path(obj.name).name
-    else:
-        filename = None
+    filename = guess_file_name(obj)
 
     return filename, contents
+
+
+def guess_file_name(obj: FileInput) -> Optional[str]:
+    """If the input is a file handle, read name and return it. Otherwise, return
+    the input unchanged.
+    """
+    if hasattr(obj, "name") and not isinstance(obj.name, int):
+        return Path(obj.name).name
+
+    return None
 
 
 def is_local_file(obj: Optional[FilePathInput]) -> bool:
@@ -110,8 +117,8 @@ def parse_file_input(  # pylint: disable=too-many-return-statements
       attribute.
 
     Args:
-        file_input (:obj:`str` | :obj:`bytes` | :term:`file object` | Telegram media object): The
-            input to parse.
+        file_input (:obj:`str` | :obj:`bytes` | :term:`file object` | :class:`~telegram.InputFile`\
+            | Telegram media object): The input to parse.
         tg_type (:obj:`type`, optional): The Telegram media type the input can be. E.g.
             :class:`telegram.Animation`.
         filename (:obj:`str`, optional): The filename. Only relevant in case an

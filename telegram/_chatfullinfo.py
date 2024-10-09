@@ -79,7 +79,7 @@ class ChatFullInfo(_ChatBase):
             #collectible-usernames>`_; for private chats, supergroups and channels.
 
             .. versionadded:: 20.0
-        birthdate (:obj:`telegram.Birthdate`, optional): For private chats,
+        birthdate (:class:`telegram.Birthdate`, optional): For private chats,
             the date of birth of the user.
 
             .. versionadded:: 21.1
@@ -95,8 +95,8 @@ class ChatFullInfo(_ChatBase):
             chats with business accounts, the opening hours of the business.
 
             .. versionadded:: 21.1
-        personal_chat (:obj:`telegram.Chat`, optional): For private chats, the personal channel of
-            the user.
+        personal_chat (:class:`telegram.Chat`, optional): For private chats, the personal channel
+            of the user.
 
             .. versionadded:: 21.1
         available_reactions (Sequence[:class:`telegram.ReactionType`], optional): List of available
@@ -233,7 +233,7 @@ class ChatFullInfo(_ChatBase):
             obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
-        birthdate (:obj:`telegram.Birthdate`): Optional. For private chats,
+        birthdate (:class:`telegram.Birthdate`): Optional. For private chats,
             the date of birth of the user.
 
             .. versionadded:: 21.1
@@ -249,8 +249,8 @@ class ChatFullInfo(_ChatBase):
             chats with business accounts, the opening hours of the business.
 
             .. versionadded:: 21.1
-        personal_chat (:obj:`telegram.Chat`): Optional. For private chats, the personal channel of
-            the user.
+        personal_chat (:class:`telegram.Chat`): Optional. For private chats, the personal channel
+            of the user.
 
             .. versionadded:: 21.1
         available_reactions (tuple[:class:`telegram.ReactionType`]): Optional. List of available

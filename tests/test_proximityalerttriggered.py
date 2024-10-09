@@ -25,32 +25,32 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def proximity_alert_triggered():
     return ProximityAlertTriggered(
-        TestProximityAlertTriggeredBase.traveler,
-        TestProximityAlertTriggeredBase.watcher,
-        TestProximityAlertTriggeredBase.distance,
+        ProximityAlertTriggeredTestBase.traveler,
+        ProximityAlertTriggeredTestBase.watcher,
+        ProximityAlertTriggeredTestBase.distance,
     )
 
 
-class TestProximityAlertTriggeredBase:
+class ProximityAlertTriggeredTestBase:
     traveler = User(1, "foo", False)
     watcher = User(2, "bar", False)
     distance = 42
 
 
-class TestProximityAlertTriggeredWithoutRequest(TestProximityAlertTriggeredBase):
+class TestProximityAlertTriggeredWithoutRequest(ProximityAlertTriggeredTestBase):
     def test_slot_behaviour(self, proximity_alert_triggered):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "traveler": self.traveler.to_dict(),
             "watcher": self.watcher.to_dict(),
             "distance": self.distance,
         }
-        proximity_alert_triggered = ProximityAlertTriggered.de_json(json_dict, bot)
+        proximity_alert_triggered = ProximityAlertTriggered.de_json(json_dict, offline_bot)
         assert proximity_alert_triggered.api_kwargs == {}
 
         assert proximity_alert_triggered.traveler == self.traveler

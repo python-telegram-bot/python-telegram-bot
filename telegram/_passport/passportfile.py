@@ -203,7 +203,7 @@ class PassportFile(TelegramObject):
         """
         Wrapper over :meth:`telegram.Bot.get_file`. Will automatically assign the correct
         credentials to the returned :class:`telegram.File` if originating from
-        :obj:`telegram.PassportData.decrypted_data`.
+        :attr:`telegram.PassportData.decrypted_data`.
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 

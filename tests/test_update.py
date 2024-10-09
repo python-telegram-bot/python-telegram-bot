@@ -40,6 +40,7 @@ from telegram import (
     Message,
     MessageReactionCountUpdated,
     MessageReactionUpdated,
+    PaidMediaPurchased,
     Poll,
     PollAnswer,
     PollOption,
@@ -143,6 +144,11 @@ business_message = Message(
     User(1, "", False),
 )
 
+purchased_paid_media = PaidMediaPurchased(
+    from_user=User(1, "", False),
+    paid_media_payload="payload",
+)
+
 
 params = [
     {"message": message},
@@ -178,6 +184,7 @@ params = [
     {"deleted_business_messages": deleted_business_messages},
     {"business_message": business_message},
     {"edited_business_message": business_message},
+    {"purchased_paid_media": purchased_paid_media},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -205,6 +212,7 @@ all_types = (
     "deleted_business_messages",
     "business_message",
     "edited_business_message",
+    "purchased_paid_media",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -212,14 +220,14 @@ ids = (*all_types, "callback_query_without_message")
 
 @pytest.fixture(scope="module", params=params, ids=ids)
 def update(request):
-    return Update(update_id=TestUpdateBase.update_id, **request.param)
+    return Update(update_id=UpdateTestBase.update_id, **request.param)
 
 
-class TestUpdateBase:
+class UpdateTestBase:
     update_id = 868573637
 
 
-class TestUpdateWithoutRequest(TestUpdateBase):
+class TestUpdateWithoutRequest(UpdateTestBase):
     def test_slot_behaviour(self):
         update = Update(self.update_id)
         for attr in update.__slots__:
@@ -227,11 +235,11 @@ class TestUpdateWithoutRequest(TestUpdateBase):
         assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
 
     @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
-    def test_de_json(self, bot, paramdict):
+    def test_de_json(self, offline_bot, paramdict):
         json_dict = {"update_id": self.update_id}
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
-        update = Update.de_json(json_dict, bot)
+        update = Update.de_json(json_dict, offline_bot)
         assert update.api_kwargs == {}
 
         assert update.update_id == self.update_id
@@ -244,8 +252,8 @@ class TestUpdateWithoutRequest(TestUpdateBase):
                 assert getattr(update, _type) == paramdict[_type]
         assert i == 1
 
-    def test_update_de_json_empty(self, bot):
-        update = Update.de_json(None, bot)
+    def test_update_de_json_empty(self, offline_bot):
+        update = Update.de_json(None, offline_bot)
 
         assert update is None
 
@@ -290,6 +298,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.poll is not None
             or update.poll_answer is not None
             or update.business_connection is not None
+            or update.purchased_paid_media is not None
         ):
             assert chat.id == 1
         else:
@@ -403,6 +412,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.message_reaction_count is not None
             or update.deleted_business_messages is not None
             or update.business_connection is not None
+            or update.purchased_paid_media is not None
         ):
             assert eff_message.message_id == message.message_id
         else:

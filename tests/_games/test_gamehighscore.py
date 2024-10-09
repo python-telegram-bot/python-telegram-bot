@@ -26,36 +26,36 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def game_highscore():
     return GameHighScore(
-        TestGameHighScoreBase.position, TestGameHighScoreBase.user, TestGameHighScoreBase.score
+        GameHighScoreTestBase.position, GameHighScoreTestBase.user, GameHighScoreTestBase.score
     )
 
 
-class TestGameHighScoreBase:
+class GameHighScoreTestBase:
     position = 12
     user = User(2, "test user", False)
     score = 42
 
 
-class TestGameHighScoreWithoutRequest(TestGameHighScoreBase):
+class TestGameHighScoreWithoutRequest(GameHighScoreTestBase):
     def test_slot_behaviour(self, game_highscore):
         for attr in game_highscore.__slots__:
             assert getattr(game_highscore, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(game_highscore)) == len(set(mro_slots(game_highscore))), "same slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "position": self.position,
             "user": self.user.to_dict(),
             "score": self.score,
         }
-        highscore = GameHighScore.de_json(json_dict, bot)
+        highscore = GameHighScore.de_json(json_dict, offline_bot)
         assert highscore.api_kwargs == {}
 
         assert highscore.position == self.position
         assert highscore.user == self.user
         assert highscore.score == self.score
 
-        assert GameHighScore.de_json(None, bot) is None
+        assert GameHighScore.de_json(None, offline_bot) is None
 
     def test_to_dict(self, game_highscore):
         game_highscore_dict = game_highscore.to_dict()

@@ -31,15 +31,15 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def invoice():
     return Invoice(
-        TestInvoiceBase.title,
-        TestInvoiceBase.description,
-        TestInvoiceBase.start_parameter,
-        TestInvoiceBase.currency,
-        TestInvoiceBase.total_amount,
+        InvoiceTestBase.title,
+        InvoiceTestBase.description,
+        InvoiceTestBase.start_parameter,
+        InvoiceTestBase.currency,
+        InvoiceTestBase.total_amount,
     )
 
 
-class TestInvoiceBase:
+class InvoiceTestBase:
     payload = "payload"
     prices = [LabeledPrice("Fish", 100), LabeledPrice("Fish Tax", 1000)]
     provider_data = """{"test":"test"}"""
@@ -52,13 +52,13 @@ class TestInvoiceBase:
     suggested_tip_amounts = [13, 42]
 
 
-class TestInvoiceWithoutRequest(TestInvoiceBase):
+class TestInvoiceWithoutRequest(InvoiceTestBase):
     def test_slot_behaviour(self, invoice):
         for attr in invoice.__slots__:
             assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invoice)) == len(set(mro_slots(invoice))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         invoice_json = Invoice.de_json(
             {
                 "title": self.title,
@@ -67,7 +67,7 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
                 "currency": self.currency,
                 "total_amount": self.total_amount,
             },
-            bot,
+            offline_bot,
         )
         assert invoice_json.api_kwargs == {}
 
@@ -87,15 +87,15 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
         assert invoice_dict["currency"] == invoice.currency
         assert invoice_dict["total_amount"] == invoice.total_amount
 
-    async def test_send_invoice_all_args_mock(self, bot, monkeypatch):
+    async def test_send_invoice_all_args_mock(self, offline_bot, monkeypatch):
         # We do this one as safety guard to make sure that we pass all of the optional
         # parameters correctly because #2526 went unnoticed for 3 years …
         async def make_assertion(*args, **_):
             kwargs = args[1]
             return all(kwargs[key] == key for key in kwargs)
 
-        monkeypatch.setattr(bot, "_send_message", make_assertion)
-        assert await bot.send_invoice(
+        monkeypatch.setattr(offline_bot, "_send_message", make_assertion)
+        assert await offline_bot.send_invoice(
             chat_id="chat_id",
             title="title",
             description="description",
@@ -122,13 +122,13 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
             protect_content=True,
         )
 
-    async def test_send_all_args_create_invoice_link(self, bot, monkeypatch):
+    async def test_send_all_args_create_invoice_link(self, offline_bot, monkeypatch):
         async def make_assertion(*args, **_):
             kwargs = args[1]
             return all(kwargs[i] == i for i in kwargs)
 
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        assert await bot.create_invoice_link(
+        monkeypatch.setattr(offline_bot, "_post", make_assertion)
+        assert await offline_bot.create_invoice_link(
             title="title",
             description="description",
             payload="payload",
@@ -151,13 +151,15 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
             is_flexible="is_flexible",
         )
 
-    async def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
+    async def test_send_object_as_provider_data(
+        self, monkeypatch, offline_bot, chat_id, provider_token
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["provider_data"] == '{"test_data": 123456789}'
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        assert await bot.send_invoice(
+        assert await offline_bot.send_invoice(
             chat_id,
             self.title,
             self.description,
@@ -219,7 +221,7 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
         assert hash(a) != hash(d)
 
 
-class TestInvoiceWithRequest(TestInvoiceBase):
+class TestInvoiceWithRequest(InvoiceTestBase):
     async def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = await bot.send_invoice(
             chat_id=chat_id,

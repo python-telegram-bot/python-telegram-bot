@@ -25,14 +25,14 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def web_app_info():
-    return WebAppInfo(url=TestWebAppInfoBase.url)
+    return WebAppInfo(url=WebAppInfoTestBase.url)
 
 
-class TestWebAppInfoBase:
+class WebAppInfoTestBase:
     url = "https://www.example.com"
 
 
-class TestWebAppInfoWithoutRequest(TestWebAppInfoBase):
+class TestWebAppInfoWithoutRequest(WebAppInfoTestBase):
     def test_slot_behaviour(self, web_app_info):
         for attr in web_app_info.__slots__:
             assert getattr(web_app_info, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -44,9 +44,9 @@ class TestWebAppInfoWithoutRequest(TestWebAppInfoBase):
         assert isinstance(web_app_info_dict, dict)
         assert web_app_info_dict["url"] == self.url
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"url": self.url}
-        web_app_info = WebAppInfo.de_json(json_dict, bot)
+        web_app_info = WebAppInfo.de_json(json_dict, offline_bot)
         assert web_app_info.api_kwargs == {}
 
         assert web_app_info.url == self.url

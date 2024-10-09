@@ -68,7 +68,7 @@ def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture()
+@pytest.fixture
 def inline_query(bot):
     update = Update(
         0,

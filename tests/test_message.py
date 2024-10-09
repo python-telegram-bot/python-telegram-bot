@@ -90,13 +90,13 @@ from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def message(bot):
     message = PytestMessage(
-        message_id=TestMessageBase.id_,
-        date=TestMessageBase.date,
-        chat=copy(TestMessageBase.chat),
-        from_user=copy(TestMessageBase.from_user),
+        message_id=MessageTestBase.id_,
+        date=MessageTestBase.date,
+        chat=copy(MessageTestBase.chat),
+        from_user=copy(MessageTestBase.from_user),
         business_connection_id="123456789",
     )
     message.set_bot(bot)
@@ -236,7 +236,7 @@ def message(bot):
                 winner_count=5,
             )
         },
-        {"giveaway_created": GiveawayCreated()},
+        {"giveaway_created": GiveawayCreated(prize_star_count=99)},
         {
             "giveaway_winners": GiveawayWinners(
                 chat=Chat(1, Chat.CHANNEL),
@@ -357,17 +357,17 @@ def message(bot):
 )
 def message_params(bot, request):
     message = Message(
-        message_id=TestMessageBase.id_,
-        from_user=TestMessageBase.from_user,
-        date=TestMessageBase.date,
-        chat=TestMessageBase.chat,
+        message_id=MessageTestBase.id_,
+        from_user=MessageTestBase.from_user,
+        date=MessageTestBase.date,
+        chat=MessageTestBase.chat,
         **request.param,
     )
     message.set_bot(bot)
     return message
 
 
-class TestMessageBase:
+class MessageTestBase:
     id_ = 1
     from_user = User(2, "testuser", False)
     date = datetime.utcnow()
@@ -439,7 +439,7 @@ class TestMessageBase:
     )
 
 
-class TestMessageWithoutRequest(TestMessageBase):
+class TestMessageWithoutRequest(MessageTestBase):
     @staticmethod
     async def check_quote_parsing(
         message: Message, method, bot_method_name: str, args, monkeypatch
@@ -559,17 +559,17 @@ class TestMessageWithoutRequest(TestMessageBase):
 
     def test_slot_behaviour(self):
         message = Message(
-            message_id=TestMessageBase.id_,
-            date=TestMessageBase.date,
-            chat=copy(TestMessageBase.chat),
-            from_user=copy(TestMessageBase.from_user),
+            message_id=MessageTestBase.id_,
+            date=MessageTestBase.date,
+            chat=copy(MessageTestBase.chat),
+            from_user=copy(MessageTestBase.from_user),
         )
         for attr in message.__slots__:
             assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
 
-    def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
-        new = Message.de_json(message_params.to_dict(), bot)
+    def test_all_possibilities_de_json_and_to_dict(self, offline_bot, message_params):
+        new = Message.de_json(message_params.to_dict(), offline_bot)
         assert new.api_kwargs == {}
         assert new.to_dict() == message_params.to_dict()
 
@@ -579,7 +579,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "message_id": 12,
             "from_user": None,
@@ -589,7 +589,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         }
 
         message_raw = Message.de_json(json_dict, raw_bot)
-        message_bot = Message.de_json(json_dict, bot)
+        message_bot = Message.de_json(json_dict, offline_bot)
         message_tz = Message.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -609,7 +609,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert message_bot.edit_date.tzinfo == UTC
         assert edit_date_offset == edit_date_tz_bot_offset
 
-    def test_de_json_api_kwargs_backward_compatibility(self, bot, message_params):
+    def test_de_json_api_kwargs_backward_compatibility(self, offline_bot, message_params):
         message_dict = message_params.to_dict()
         keys = (
             "user_shared",
@@ -622,7 +622,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         )
         for key in keys:
             message_dict[key] = key
-        message = Message.de_json(message_dict, bot)
+        message = Message.de_json(message_dict, offline_bot)
         assert message.api_kwargs == {key: key for key in keys}
 
     def test_equality(self):
@@ -1193,16 +1193,20 @@ class TestMessageWithoutRequest(TestMessageBase):
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
         assert message.link == f"https://t.me/c/{3}/{message.message_id}"
 
-    def test_link_with_topics(self, message):
+    @pytest.mark.parametrize("type_", argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_topics(self, message, type_):
         message.chat.username = None
         message.chat.id = -1003
+        message.chat.type = type_
         message.is_topic_message = True
         message.message_thread_id = 123
         assert message.link == f"https://t.me/c/3/{message.message_id}?thread=123"
 
-    def test_link_with_reply(self, message):
+    @pytest.mark.parametrize("type_", argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_reply(self, message, type_):
         message.chat.username = None
         message.chat.id = -1003
+        message.chat.type = type_
         message.reply_to_message = Message(7, self.from_user, self.date, self.chat, text="Reply")
         message.message_thread_id = 123
         assert message.link == f"https://t.me/c/3/{message.message_id}?thread=123"
@@ -2592,9 +2596,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             return chat_id and message_id
 
         assert check_shortcut_signature(
-            Message.pin, Bot.pin_chat_message, ["chat_id", "message_id"], []
+            Message.pin,
+            Bot.pin_chat_message,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
         )
-        assert await check_shortcut_call(message.pin, message.get_bot(), "pin_chat_message")
+        assert await check_shortcut_call(
+            message.pin,
+            message.get_bot(),
+            "pin_chat_message",
+            shortcut_kwargs=["chat_id", "message_id", "business_connection_id"],
+        )
         assert await check_defaults_handling(message.pin, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "pin_chat_message", make_assertion)
@@ -2607,13 +2619,16 @@ class TestMessageWithoutRequest(TestMessageBase):
             return chat_id and message_id
 
         assert check_shortcut_signature(
-            Message.unpin, Bot.unpin_chat_message, ["chat_id", "message_id"], []
+            Message.unpin,
+            Bot.unpin_chat_message,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
         )
         assert await check_shortcut_call(
             message.unpin,
             message.get_bot(),
             "unpin_chat_message",
-            shortcut_kwargs=["chat_id", "message_id"],
+            shortcut_kwargs=["chat_id", "message_id", "business_connection_id"],
         )
         assert await check_defaults_handling(message.unpin, message.get_bot())
 
@@ -2638,10 +2653,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         ],
     )
     async def test_default_do_quote(
-        self, bot, message, default_quote, chat_type, expected, monkeypatch
+        self, offline_bot, message, default_quote, chat_type, expected, monkeypatch
     ):
         original_bot = message.get_bot()
-        temp_bot = PytestExtBot(token=bot.token, defaults=Defaults(do_quote=default_quote))
+        temp_bot = PytestExtBot(token=offline_bot.token, defaults=Defaults(do_quote=default_quote))
         message.set_bot(temp_bot)
 
         async def make_assertion(*_, **kwargs):

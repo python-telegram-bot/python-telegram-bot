@@ -28,6 +28,7 @@ from telegram import (
     ReactionType,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
+    ReactionTypePaid,
 )
 from telegram.constants import ReactionEmoji
 from tests.auxil.slots import mro_slots
@@ -46,6 +47,10 @@ def reaction_type_custom_emoji():
 
 def reaction_type_emoji():
     return ReactionTypeEmoji(RTDefaults.normal_emoji)
+
+
+def reaction_type_paid():
+    return ReactionTypePaid()
 
 
 def make_json_dict(instance: ReactionType, include_optional_args: bool = False) -> dict:
@@ -89,7 +94,7 @@ def iter_args(instance: ReactionType, de_json_inst: ReactionType, include_option
             yield inst_at, json_at
 
 
-@pytest.fixture()
+@pytest.fixture
 def reaction_type(request):
     return request.param()
 
@@ -99,6 +104,7 @@ def reaction_type(request):
     [
         reaction_type_custom_emoji,
         reaction_type_emoji,
+        reaction_type_paid,
     ],
     indirect=True,
 )
@@ -109,12 +115,13 @@ class TestReactionTypesWithoutRequest:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json_required_args(self, bot, reaction_type):
+    def test_de_json_required_args(self, offline_bot, reaction_type):
         cls = reaction_type.__class__
-        assert cls.de_json(None, bot) is None
+        assert cls.de_json(None, offline_bot) is None
+        assert ReactionType.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(reaction_type)
-        const_reaction_type = ReactionType.de_json(json_dict, bot)
+        const_reaction_type = ReactionType.de_json(json_dict, offline_bot)
         assert const_reaction_type.api_kwargs == {}
 
         assert isinstance(const_reaction_type, ReactionType)
@@ -124,9 +131,9 @@ class TestReactionTypesWithoutRequest:
         ):
             assert reaction_type_at == const_reaction_type_at
 
-    def test_de_json_all_args(self, bot, reaction_type):
+    def test_de_json_all_args(self, offline_bot, reaction_type):
         json_dict = make_json_dict(reaction_type, include_optional_args=True)
-        const_reaction_type = ReactionType.de_json(json_dict, bot)
+        const_reaction_type = ReactionType.de_json(json_dict, offline_bot)
         assert const_reaction_type.api_kwargs == {}
 
         assert isinstance(const_reaction_type, ReactionType)
@@ -134,19 +141,19 @@ class TestReactionTypesWithoutRequest:
         for c_mem_type_at, const_c_mem_at in iter_args(reaction_type, const_reaction_type, True):
             assert c_mem_type_at == const_c_mem_at
 
-    def test_de_json_invalid_type(self, bot, reaction_type):
+    def test_de_json_invalid_type(self, offline_bot, reaction_type):
         json_dict = {"type": "invalid"}
-        reaction_type = ReactionType.de_json(json_dict, bot)
+        reaction_type = ReactionType.de_json(json_dict, offline_bot)
 
         assert type(reaction_type) is ReactionType
         assert reaction_type.type == "invalid"
 
-    def test_de_json_subclass(self, reaction_type, bot, chat_id):
-        """This makes sure that e.g. ReactionTypeEmoji(data, bot) never returns a
+    def test_de_json_subclass(self, reaction_type, offline_bot, chat_id):
+        """This makes sure that e.g. ReactionTypeEmoji(data, offline_bot) never returns a
         ReactionTypeCustomEmoji instance."""
         cls = reaction_type.__class__
         json_dict = make_json_dict(reaction_type, True)
-        assert type(cls.de_json(json_dict, bot)) is cls
+        assert type(cls.de_json(json_dict, offline_bot)) is cls
 
     def test_to_dict(self, reaction_type):
         reaction_type_dict = reaction_type.to_dict()
@@ -155,7 +162,7 @@ class TestReactionTypesWithoutRequest:
         assert reaction_type_dict["type"] == reaction_type.type
         if reaction_type.type == ReactionType.EMOJI:
             assert reaction_type_dict["emoji"] == reaction_type.emoji
-        else:
+        elif reaction_type.type == ReactionType.CUSTOM_EMOJI:
             assert reaction_type_dict["custom_emoji_id"] == reaction_type.custom_emoji_id
 
         for slot in reaction_type.__slots__:  # additional verification for the optional args
@@ -230,13 +237,13 @@ class TestReactionCountWithoutRequest:
             set(mro_slots(reaction_count))
         ), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "type": self.type.to_dict(),
             "total_count": self.total_count,
         }
 
-        reaction_count = ReactionCount.de_json(json_dict, bot)
+        reaction_count = ReactionCount.de_json(json_dict, offline_bot)
         assert reaction_count.api_kwargs == {}
 
         assert isinstance(reaction_count, ReactionCount)
@@ -245,7 +252,7 @@ class TestReactionCountWithoutRequest:
         assert reaction_count.type.emoji == self.type.emoji
         assert reaction_count.total_count == self.total_count
 
-        assert ReactionCount.de_json(None, bot) is None
+        assert ReactionCount.de_json(None, offline_bot) is None
 
     def test_to_dict(self, reaction_count):
         reaction_count_dict = reaction_count.to_dict()

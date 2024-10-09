@@ -72,7 +72,7 @@ ReplyMarkup = Union[
 .. versionadded:: 20.0
 """
 
-FieldTuple = tuple[str, bytes, str]
+FieldTuple = tuple[str, Union[bytes, IO[bytes]], str]
 """Alias for return type of `InputFile.field_tuple`."""
 UploadFileDict = dict[str, FieldTuple]
 """Dictionary containing file data to be uploaded to the API."""

@@ -48,7 +48,7 @@ class InputInvoiceMessageContent(InputMessageContent):
         payload (:obj:`str`): Bot-defined invoice payload.
             :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
             :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be displayed
-            to the user, use for your internal processes.
+            to the user, use it for your internal processes.
         provider_token (:obj:`str`): Payment provider token, obtained via
             `@Botfather <https://t.me/Botfather>`_. Pass an empty string for payments in
             |tg_stars|.
@@ -116,7 +116,7 @@ class InputInvoiceMessageContent(InputMessageContent):
         payload (:obj:`str`): Bot-defined invoice payload.
             :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
             :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be displayed
-            to the user, use for your internal processes.
+            to the user, use it for your internal processes.
         provider_token (:obj:`str`): Payment provider token, obtained via
             `@Botfather <https://t.me/Botfather>`_. Pass an empty string for payments in `Telegram
             Stars <https://t.me/BotNews/90>`_.

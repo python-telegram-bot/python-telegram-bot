@@ -117,7 +117,7 @@ PTB_EXTRA_PARAMS = {
     "PassportElementError": {"source", "type", "message"},
     "InputMedia": {"caption", "caption_entities", "media", "media_type", "parse_mode"},
     "InputMedia(Animation|Audio|Document|Photo|Video|VideoNote|Voice)": {"filename"},
-    "InputFile": {"attach", "filename", "obj"},
+    "InputFile": {"attach", "filename", "obj", "read_file_handle"},
     "MaybeInaccessibleMessage": {"date", "message_id", "chat"},  # attributes common to all subcls
     "ChatBoostSource": {"source"},  # attributes common to all subclasses
     "MessageOrigin": {"type", "date"},  # attributes common to all subclasses

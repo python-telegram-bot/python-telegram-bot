@@ -306,7 +306,7 @@ class Application(
         self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
-        self.handlers: dict[int, list[BaseHandler[Any, CCT]]] = {}
+        self.handlers: dict[int, list[BaseHandler[Any, CCT, Any]]] = {}
         self.error_handlers: dict[
             HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
         ] = {}
@@ -367,10 +367,10 @@ class Application(
         """
         try:
             await self.initialize()
-            return self
-        except Exception as exc:
+        except Exception:
             await self.shutdown()
-            raise exc
+            raise
+        return self
 
     async def __aexit__(
         self,
@@ -629,9 +629,9 @@ class Application(
             )
             _LOGGER.info("Application started")
 
-        except Exception as exc:
+        except Exception:
             self._running = False
-            raise exc
+            raise
 
     async def stop(self) -> None:
         """Stops the process after processing any pending updates or tasks created by
@@ -1210,7 +1210,7 @@ class Application(
                 await self.process_error(update=update, error=exception, coroutine=coroutine)
 
             # Raise exception so that it can be set on the task and retrieved by task.exception()
-            raise exception
+            raise
         finally:
             self._mark_for_persistence_update(update=update)
 
@@ -1335,7 +1335,7 @@ class Application(
             # (in __create_task_callback)
             self._mark_for_persistence_update(update=update)
 
-    def add_handler(self, handler: BaseHandler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
+    def add_handler(self, handler: BaseHandler[Any, CCT, Any], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
 
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
@@ -1403,8 +1403,8 @@ class Application(
     def add_handlers(
         self,
         handlers: Union[
-            Union[list[BaseHandler[Any, CCT]], tuple[BaseHandler[Any, CCT]]],
-            dict[int, Union[list[BaseHandler[Any, CCT]], tuple[BaseHandler[Any, CCT]]]],
+            Union[list[BaseHandler[Any, CCT, Any]], tuple[BaseHandler[Any, CCT, Any]]],
+            dict[int, Union[list[BaseHandler[Any, CCT, Any]], tuple[BaseHandler[Any, CCT, Any]]]],
         ],
         group: Union[int, DefaultValue[int]] = _DEFAULT_0,
     ) -> None:
@@ -1428,14 +1428,16 @@ class Application(
                 1: [CallbackQueryHandler(...), CommandHandler(...)]
             }
 
+        Raises:
+            :exc:`TypeError`: If the combination of arguments is invalid.
         """
         if isinstance(handlers, dict) and not isinstance(group, DefaultValue):
-            raise ValueError("The `group` argument can only be used with a sequence of handlers.")
+            raise TypeError("The `group` argument can only be used with a sequence of handlers.")
 
         if isinstance(handlers, dict):
             for handler_group, grp_handlers in handlers.items():
                 if not isinstance(grp_handlers, (list, tuple)):
-                    raise ValueError(f"Handlers for group {handler_group} must be a list or tuple")
+                    raise TypeError(f"Handlers for group {handler_group} must be a list or tuple")
 
                 for handler in grp_handlers:
                     self.add_handler(handler, handler_group)
@@ -1445,12 +1447,14 @@ class Application(
                 self.add_handler(handler, DefaultValue.get_value(group))
 
         else:
-            raise ValueError(
+            raise TypeError(
                 "The `handlers` argument must be a sequence of handlers or a "
                 "dictionary where the keys are groups and values are sequences of handlers."
             )
 
-    def remove_handler(self, handler: BaseHandler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
+    def remove_handler(
+        self, handler: BaseHandler[Any, CCT, Any], group: int = DEFAULT_GROUP
+    ) -> None:
         """Remove a handler from the specified group.
 
         Args:
@@ -1627,9 +1631,10 @@ class Application(
                     self.__update_persistence_event.wait(),
                     timeout=self.persistence.update_interval,
                 )
-                return
             except asyncio.TimeoutError:
                 pass
+            else:
+                return
 
             # putting this *after* the wait_for so we don't immediately update on startup as
             # that would make little sense

@@ -23,10 +23,10 @@ from typing import Final, Optional
 from telegram import Update
 from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
-from telegram.ext._utils.types import CCT, HandlerCallback
+from telegram.ext._utils.types import CCT, RT, HandlerCallback
 
 
-class ChatBoostHandler(BaseHandler[Update, CCT]):
+class ChatBoostHandler(BaseHandler[Update, CCT, RT]):
     """
     Handler class to handle Telegram updates that contain a chat boost.
 
@@ -84,8 +84,8 @@ class ChatBoostHandler(BaseHandler[Update, CCT]):
     and :attr:`telegram.Update.removed_chat_boost`."""
 
     def __init__(
-        self,
-        callback: HandlerCallback[Update, CCT, None],
+        self: "ChatBoostHandler[CCT, RT]",
+        callback: HandlerCallback[Update, CCT, RT],
         chat_boost_types: int = CHAT_BOOST,
         chat_id: Optional[int] = None,
         chat_username: Optional[str] = None,

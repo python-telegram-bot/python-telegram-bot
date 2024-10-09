@@ -48,6 +48,7 @@ def giveaway():
         premium_subscription_month_count=(
             TestGiveawayWithoutRequest.premium_subscription_month_count
         ),
+        prize_star_count=TestGiveawayWithoutRequest.prize_star_count,
     )
 
 
@@ -60,13 +61,14 @@ class TestGiveawayWithoutRequest:
     prize_description = "prize_description"
     country_codes = ["DE", "US"]
     premium_subscription_month_count = 3
+    prize_star_count = 99
 
     def test_slot_behaviour(self, giveaway):
         for attr in giveaway.__slots__:
             assert getattr(giveaway, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(giveaway)) == len(set(mro_slots(giveaway))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "chats": [chat.to_dict() for chat in self.chats],
             "winners_selection_date": to_timestamp(self.winners_selection_date),
@@ -76,9 +78,10 @@ class TestGiveawayWithoutRequest:
             "prize_description": self.prize_description,
             "country_codes": self.country_codes,
             "premium_subscription_month_count": self.premium_subscription_month_count,
+            "prize_star_count": self.prize_star_count,
         }
 
-        giveaway = Giveaway.de_json(json_dict, bot)
+        giveaway = Giveaway.de_json(json_dict, offline_bot)
         assert giveaway.api_kwargs == {}
 
         assert giveaway.chats == tuple(self.chats)
@@ -89,10 +92,11 @@ class TestGiveawayWithoutRequest:
         assert giveaway.prize_description == self.prize_description
         assert giveaway.country_codes == tuple(self.country_codes)
         assert giveaway.premium_subscription_month_count == self.premium_subscription_month_count
+        assert giveaway.prize_star_count == self.prize_star_count
 
-        assert Giveaway.de_json(None, bot) is None
+        assert Giveaway.de_json(None, offline_bot) is None
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
             "chats": [chat.to_dict() for chat in self.chats],
             "winners_selection_date": to_timestamp(self.winners_selection_date),
@@ -102,10 +106,11 @@ class TestGiveawayWithoutRequest:
             "prize_description": self.prize_description,
             "country_codes": self.country_codes,
             "premium_subscription_month_count": self.premium_subscription_month_count,
+            "prize_star_count": self.prize_star_count,
         }
 
         giveaway_raw = Giveaway.de_json(json_dict, raw_bot)
-        giveaway_bot = Giveaway.de_json(json_dict, bot)
+        giveaway_bot = Giveaway.de_json(json_dict, offline_bot)
         giveaway_bot_tz = Giveaway.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -133,6 +138,7 @@ class TestGiveawayWithoutRequest:
             giveaway_dict["premium_subscription_month_count"]
             == self.premium_subscription_month_count
         )
+        assert giveaway_dict["prize_star_count"] == self.prize_star_count
 
     def test_equality(self, giveaway):
         a = giveaway
@@ -164,14 +170,39 @@ class TestGiveawayWithoutRequest:
         assert hash(a) != hash(e)
 
 
+@pytest.fixture(scope="module")
+def giveaway_created():
+    return GiveawayCreated(
+        prize_star_count=TestGiveawayCreatedWithoutRequest.prize_star_count,
+    )
+
+
 class TestGiveawayCreatedWithoutRequest:
-    def test_slot_behaviour(self):
-        giveaway_created = GiveawayCreated()
+    prize_star_count = 99
+
+    def test_slot_behaviour(self, giveaway_created):
         for attr in giveaway_created.__slots__:
             assert getattr(giveaway_created, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(giveaway_created)) == len(
             set(mro_slots(giveaway_created))
         ), "duplicate slot"
+
+    def test_de_json(self, bot):
+        json_dict = {
+            "prize_star_count": self.prize_star_count,
+        }
+
+        gac = GiveawayCreated.de_json(json_dict, bot)
+        assert gac.api_kwargs == {}
+        assert gac.prize_star_count == self.prize_star_count
+
+        assert Giveaway.de_json(None, bot) is None
+
+    def test_to_dict(self, giveaway_created):
+        gac_dict = giveaway_created.to_dict()
+
+        assert isinstance(gac_dict, dict)
+        assert gac_dict["prize_star_count"] == self.prize_star_count
 
 
 @pytest.fixture(scope="module")
@@ -190,6 +221,7 @@ def giveaway_winners():
         additional_chat_count=TestGiveawayWinnersWithoutRequest.additional_chat_count,
         unclaimed_prize_count=TestGiveawayWinnersWithoutRequest.unclaimed_prize_count,
         was_refunded=TestGiveawayWinnersWithoutRequest.was_refunded,
+        prize_star_count=TestGiveawayWinnersWithoutRequest.prize_star_count,
     )
 
 
@@ -205,6 +237,7 @@ class TestGiveawayWinnersWithoutRequest:
     only_new_members = True
     was_refunded = True
     prize_description = "prize_description"
+    prize_star_count = 99
 
     def test_slot_behaviour(self, giveaway_winners):
         for attr in giveaway_winners.__slots__:
@@ -213,7 +246,7 @@ class TestGiveawayWinnersWithoutRequest:
             set(mro_slots(giveaway_winners))
         ), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
             "giveaway_message_id": self.giveaway_message_id,
@@ -226,9 +259,10 @@ class TestGiveawayWinnersWithoutRequest:
             "only_new_members": self.only_new_members,
             "was_refunded": self.was_refunded,
             "prize_description": self.prize_description,
+            "prize_star_count": self.prize_star_count,
         }
 
-        giveaway_winners = GiveawayWinners.de_json(json_dict, bot)
+        giveaway_winners = GiveawayWinners.de_json(json_dict, offline_bot)
         assert giveaway_winners.api_kwargs == {}
 
         assert giveaway_winners.chat == self.chat
@@ -245,10 +279,11 @@ class TestGiveawayWinnersWithoutRequest:
         assert giveaway_winners.only_new_members == self.only_new_members
         assert giveaway_winners.was_refunded == self.was_refunded
         assert giveaway_winners.prize_description == self.prize_description
+        assert giveaway_winners.prize_star_count == self.prize_star_count
 
-        assert GiveawayWinners.de_json(None, bot) is None
+        assert GiveawayWinners.de_json(None, offline_bot) is None
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
             "giveaway_message_id": self.giveaway_message_id,
@@ -258,7 +293,7 @@ class TestGiveawayWinnersWithoutRequest:
         }
 
         giveaway_winners_raw = GiveawayWinners.de_json(json_dict, raw_bot)
-        giveaway_winners_bot = GiveawayWinners.de_json(json_dict, bot)
+        giveaway_winners_bot = GiveawayWinners.de_json(json_dict, offline_bot)
         giveaway_winners_bot_tz = GiveawayWinners.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -291,6 +326,7 @@ class TestGiveawayWinnersWithoutRequest:
         assert giveaway_winners_dict["only_new_members"] == self.only_new_members
         assert giveaway_winners_dict["was_refunded"] == self.was_refunded
         assert giveaway_winners_dict["prize_description"] == self.prize_description
+        assert giveaway_winners_dict["prize_star_count"] == self.prize_star_count
 
     def test_equality(self, giveaway_winners):
         a = giveaway_winners
@@ -336,12 +372,14 @@ def giveaway_completed():
         winner_count=TestGiveawayCompletedWithoutRequest.winner_count,
         unclaimed_prize_count=TestGiveawayCompletedWithoutRequest.unclaimed_prize_count,
         giveaway_message=TestGiveawayCompletedWithoutRequest.giveaway_message,
+        is_star_giveaway=TestGiveawayCompletedWithoutRequest.is_star_giveaway,
     )
 
 
 class TestGiveawayCompletedWithoutRequest:
     winner_count = 42
     unclaimed_prize_count = 4
+    is_star_giveaway = True
     giveaway_message = Message(
         message_id=1,
         date=dtm.datetime.now(dtm.timezone.utc),
@@ -357,21 +395,23 @@ class TestGiveawayCompletedWithoutRequest:
             set(mro_slots(giveaway_completed))
         ), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "winner_count": self.winner_count,
             "unclaimed_prize_count": self.unclaimed_prize_count,
             "giveaway_message": self.giveaway_message.to_dict(),
+            "is_star_giveaway": self.is_star_giveaway,
         }
 
-        giveaway_completed = GiveawayCompleted.de_json(json_dict, bot)
+        giveaway_completed = GiveawayCompleted.de_json(json_dict, offline_bot)
         assert giveaway_completed.api_kwargs == {}
 
         assert giveaway_completed.winner_count == self.winner_count
         assert giveaway_completed.unclaimed_prize_count == self.unclaimed_prize_count
         assert giveaway_completed.giveaway_message == self.giveaway_message
+        assert giveaway_completed.is_star_giveaway == self.is_star_giveaway
 
-        assert GiveawayCompleted.de_json(None, bot) is None
+        assert GiveawayCompleted.de_json(None, offline_bot) is None
 
     def test_to_dict(self, giveaway_completed):
         giveaway_completed_dict = giveaway_completed.to_dict()
@@ -380,6 +420,7 @@ class TestGiveawayCompletedWithoutRequest:
         assert giveaway_completed_dict["winner_count"] == self.winner_count
         assert giveaway_completed_dict["unclaimed_prize_count"] == self.unclaimed_prize_count
         assert giveaway_completed_dict["giveaway_message"] == self.giveaway_message.to_dict()
+        assert giveaway_completed_dict["is_star_giveaway"] == self.is_star_giveaway
 
     def test_equality(self, giveaway_completed):
         a = giveaway_completed
@@ -387,6 +428,7 @@ class TestGiveawayCompletedWithoutRequest:
             winner_count=self.winner_count,
             unclaimed_prize_count=self.unclaimed_prize_count,
             giveaway_message=self.giveaway_message,
+            is_star_giveaway=self.is_star_giveaway,
         )
         c = GiveawayCompleted(
             winner_count=self.winner_count + 30,

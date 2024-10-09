@@ -67,7 +67,7 @@ def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture()
+@pytest.fixture
 def poll_answer(bot):
     return Update(0, poll_answer=PollAnswer(1, [0, 1], User(2, "test user", False), Chat(1, "")))
 

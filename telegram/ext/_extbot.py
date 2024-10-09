@@ -633,7 +633,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
-        timeout: Optional[int] = None,
+        timeout: Optional[int] = None,  # noqa: ASYNC109
         allowed_updates: Optional[Sequence[str]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2234,6 +2234,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Union[str, int],
         message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2250,6 +2251,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            business_connection_id=business_connection_id,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
@@ -3735,6 +3737,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[str, int],
         message_id: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3750,6 +3753,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            business_connection_id=business_connection_id,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
@@ -4226,6 +4230,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         reply_markup: Optional[ReplyMarkup] = None,
+        business_connection_id: Optional[str] = None,
+        payload: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -4250,6 +4256,58 @@ class ExtBot(Bot, Generic[RLARGS]):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_to_message_id=reply_to_message_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            business_connection_id=business_connection_id,
+            payload=payload,
+        )
+
+    async def create_chat_subscription_invite_link(
+        self,
+        chat_id: Union[str, int],
+        subscription_period: int,
+        subscription_price: int,
+        name: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> ChatInviteLink:
+        return await super().create_chat_subscription_invite_link(
+            chat_id=chat_id,
+            subscription_period=subscription_period,
+            subscription_price=subscription_price,
+            name=name,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def edit_chat_subscription_invite_link(
+        self,
+        chat_id: Union[str, int],
+        invite_link: Union[str, "ChatInviteLink"],
+        name: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> ChatInviteLink:
+        return await super().edit_chat_subscription_invite_link(
+            chat_id=chat_id,
+            invite_link=invite_link,
+            name=name,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4380,4 +4438,6 @@ class ExtBot(Bot, Generic[RLARGS]):
     replaceStickerInSet = replace_sticker_in_set
     refundStarPayment = refund_star_payment
     getStarTransactions = get_star_transactions
+    createChatSubscriptionInviteLink = create_chat_subscription_invite_link
+    editChatSubscriptionInviteLink = edit_chat_subscription_invite_link
     sendPaidMedia = send_paid_media

@@ -42,7 +42,7 @@ from telegram.ext._utils.types import CCT, ConversationDict, ConversationKey
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
-_CheckUpdateType = tuple[object, ConversationKey, BaseHandler[Update, CCT], object]
+_CheckUpdateType = tuple[object, ConversationKey, BaseHandler[Update, CCT, object], object]
 
 _LOGGER = get_logger(__name__, class_name="ConversationHandler")
 
@@ -106,7 +106,7 @@ class PendingState:
         return res
 
 
-class ConversationHandler(BaseHandler[Update, CCT]):
+class ConversationHandler(BaseHandler[Update, CCT, object]):
     """
     A handler to hold a conversation with a single or multiple users through Telegram updates by
     managing three collections of other handlers.
@@ -283,10 +283,10 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
     # pylint: disable=super-init-not-called
     def __init__(
-        self,
-        entry_points: list[BaseHandler[Update, CCT]],
-        states: dict[object, list[BaseHandler[Update, CCT]]],
-        fallbacks: list[BaseHandler[Update, CCT]],
+        self: "ConversationHandler[CCT]",
+        entry_points: list[BaseHandler[Update, CCT, object]],
+        states: dict[object, list[BaseHandler[Update, CCT, object]]],
+        fallbacks: list[BaseHandler[Update, CCT, object]],
         allow_reentry: bool = False,
         per_chat: bool = True,
         per_user: bool = True,
@@ -311,9 +311,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         # Store the actual setting in a protected variable instead
         self._block: DVType[bool] = block
 
-        self._entry_points: list[BaseHandler[Update, CCT]] = entry_points
-        self._states: dict[object, list[BaseHandler[Update, CCT]]] = states
-        self._fallbacks: list[BaseHandler[Update, CCT]] = fallbacks
+        self._entry_points: list[BaseHandler[Update, CCT, object]] = entry_points
+        self._states: dict[object, list[BaseHandler[Update, CCT, object]]] = states
+        self._fallbacks: list[BaseHandler[Update, CCT, object]] = fallbacks
 
         self._allow_reentry: bool = allow_reentry
         self._per_user: bool = per_user
@@ -346,7 +346,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 stacklevel=2,
             )
 
-        all_handlers: list[BaseHandler[Update, CCT]] = []
+        all_handlers: list[BaseHandler[Update, CCT, object]] = []
         all_handlers.extend(entry_points)
         all_handlers.extend(fallbacks)
 
@@ -453,7 +453,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         )
 
     @property
-    def entry_points(self) -> list[BaseHandler[Update, CCT]]:
+    def entry_points(self) -> list[BaseHandler[Update, CCT, object]]:
         """list[:class:`telegram.ext.BaseHandler`]: A list of :obj:`BaseHandler` objects that can
         trigger the start of the conversation.
         """
@@ -466,7 +466,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         )
 
     @property
-    def states(self) -> dict[object, list[BaseHandler[Update, CCT]]]:
+    def states(self) -> dict[object, list[BaseHandler[Update, CCT, object]]]:
         """dict[:obj:`object`, list[:class:`telegram.ext.BaseHandler`]]: A :obj:`dict` that
         defines the different states of conversation a user can be in and one or more
         associated :obj:`BaseHandler` objects that should be used in that state.
@@ -478,7 +478,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         raise AttributeError("You can not assign a new value to states after initialization.")
 
     @property
-    def fallbacks(self) -> list[BaseHandler[Update, CCT]]:
+    def fallbacks(self) -> list[BaseHandler[Update, CCT, object]]:
         """list[:class:`telegram.ext.BaseHandler`]: A list of handlers that might be used if
         the user is in a conversation, but every handler for their current state returned
         :obj:`False` on :meth:`check_update`.

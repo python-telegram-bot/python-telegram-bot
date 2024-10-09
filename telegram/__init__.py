@@ -180,6 +180,7 @@ __all__ = (
     "PaidMediaInfo",
     "PaidMediaPhoto",
     "PaidMediaPreview",
+    "PaidMediaPurchased",
     "PaidMediaVideo",
     "PassportData",
     "PassportElementError",
@@ -204,6 +205,7 @@ __all__ = (
     "ReactionType",
     "ReactionTypeCustomEmoji",
     "ReactionTypeEmoji",
+    "ReactionTypePaid",
     "RefundedPayment",
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
@@ -418,7 +420,14 @@ from ._messageorigin import (
     MessageOriginUser,
 )
 from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
-from ._paidmedia import PaidMedia, PaidMediaInfo, PaidMediaPhoto, PaidMediaPreview, PaidMediaVideo
+from ._paidmedia import (
+    PaidMedia,
+    PaidMediaInfo,
+    PaidMediaPhoto,
+    PaidMediaPreview,
+    PaidMediaPurchased,
+    PaidMediaVideo,
+)
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -467,7 +476,13 @@ from ._payment.stars import (
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import InputPollOption, Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
-from ._reaction import ReactionCount, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from ._reaction import (
+    ReactionCount,
+    ReactionType,
+    ReactionTypeCustomEmoji,
+    ReactionTypeEmoji,
+    ReactionTypePaid,
+)
 from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
