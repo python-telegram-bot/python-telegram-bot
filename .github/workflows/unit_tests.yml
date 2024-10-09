@@ -37,7 +37,7 @@ jobs:
           python -W ignore -m pip install -U pytest-cov
           python -W ignore -m pip install .
           python -W ignore -m pip install -r requirements-unit-tests.txt
-          python -W ignore -m pip install pytest-xdist[psutil]
+          python -W ignore -m pip install pytest-xdist
 
       - name: Test with pytest
         # We run 4 different suites here
@@ -57,21 +57,17 @@ jobs:
           # - without socks support
           # - without http2 support
           TO_TEST="test_no_passport.py or test_datetime.py or test_defaults.py or test_jobqueue.py or test_applicationbuilder.py or test_ratelimiter.py or test_updater.py or test_callbackdatacache.py or test_request.py"
-          pytest -v --cov -k "${TO_TEST}"
-          # Rerun only failed tests (--lf), and don't run any tests if none failed (--lfnf=none)
-          pytest -v --cov --cov-append -k "${TO_TEST}" --lf --lfnf=none --junit-xml=.test_report_no_optionals.xml
-          # No tests were selected, convert returned status code to 0
-          opt_dep_status=$(( $? == 5 ? 0 : $? ))
+          pytest -v --cov -k "${TO_TEST}" --junit-xml=.test_report_no_optionals_junit.xml
+          opt_dep_status=$?
 
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
           pip install .[all]
-          # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
-          # worker. Increasing number of workers has little effect on test duration, but it seems
-          # to increase flakyness, specially on python 3.7 with --dist=loadgroup.
-          pytest -v --cov --cov-append -n auto --dist loadfile
-          pytest -v --cov --cov-append -n auto --dist loadfile --lf --lfnf=none --junit-xml=.test_report_optionals.xml
-          main_status=$(( $? == 5 ? 0 : $? ))
+          # `-n auto --dist worksteal` uses pytest-xdist to run tests on multiple CPU
+          # workers. Increasing number of workers has little effect on test duration, but it seems
+          # to increase flakyness.
+          pytest -v --cov --cov-append -n auto --dist worksteal --junit-xml=.test_report_optionals_junit.xml
+          main_status=$?
           # exit with non-zero status if any of the two pytest runs failed
           exit $(( ${opt_dep_status} || ${main_status} ))
         env:
@@ -87,8 +83,8 @@ jobs:
         if: always()  # always run, even if tests fail
         with:
           paths: |
-            .test_report_no_optionals.xml
-            .test_report_optionals.xml
+            .test_report_no_optionals_junit.xml
+            .test_report_optionals_junit.xml
 
       - name: Submit coverage
         uses: codecov/codecov-action@v4
@@ -96,4 +92,10 @@ jobs:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1
+        if: ${{ !cancelled() }}
+        with:
+          files: .test_report_no_optionals_junit.xml,.test_report_optionals_junit.xml
           token: ${{ secrets.CODECOV_TOKEN }}

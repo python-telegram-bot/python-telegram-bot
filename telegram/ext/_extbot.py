@@ -4235,6 +4235,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         business_connection_id: Optional[str] = None,
+        payload: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -4265,6 +4266,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             business_connection_id=business_connection_id,
+            payload=payload,
         )
 
     async def create_chat_subscription_invite_link(

@@ -30,6 +30,7 @@ from telegram._choseninlineresult import ChosenInlineResult
 from telegram._inline.inlinequery import InlineQuery
 from telegram._message import Message
 from telegram._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
+from telegram._paidmedia import PaidMediaPurchased
 from telegram._payment.precheckoutquery import PreCheckoutQuery
 from telegram._payment.shippingquery import ShippingQuery
 from telegram._poll import Poll, PollAnswer
@@ -156,6 +157,11 @@ class Update(TelegramObject):
 
             .. versionadded:: 21.1
 
+        purchased_paid_media (:class:`telegram.PaidMediaPurchased`, optional): A user purchased
+            paid media with a non-empty payload sent by the bot in a non-channel chat.
+
+            .. versionadded:: 21.6
+
 
     Attributes:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
@@ -263,6 +269,11 @@ class Update(TelegramObject):
             were deleted from a connected business account.
 
             .. versionadded:: 21.1
+
+        purchased_paid_media (:class:`telegram.PaidMediaPurchased`): Optional. A user purchased
+            paid media with a non-empty payload sent by the bot in a non-channel chat.
+
+            .. versionadded:: 21.6
     """
 
     __slots__ = (
@@ -290,6 +301,7 @@ class Update(TelegramObject):
         "poll",
         "poll_answer",
         "pre_checkout_query",
+        "purchased_paid_media",
         "removed_chat_boost",
         "shipping_query",
         "update_id",
@@ -383,6 +395,13 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.DELETED_BUSINESS_MESSAGES`
 
     .. versionadded:: 21.1"""
+
+    PURCHASED_PAID_MEDIA: Final[str] = constants.UpdateType.PURCHASED_PAID_MEDIA
+    """:const:`telegram.constants.UpdateType.PURCHASED_PAID_MEDIA`
+
+    .. versionadded:: 21.6
+    """
+
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.
 
@@ -413,6 +432,7 @@ class Update(TelegramObject):
         business_message: Optional[Message] = None,
         edited_business_message: Optional[Message] = None,
         deleted_business_messages: Optional[BusinessMessagesDeleted] = None,
+        purchased_paid_media: Optional[PaidMediaPurchased] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -444,6 +464,7 @@ class Update(TelegramObject):
         self.deleted_business_messages: Optional[BusinessMessagesDeleted] = (
             deleted_business_messages
         )
+        self.purchased_paid_media: Optional[PaidMediaPurchased] = purchased_paid_media
 
         self._effective_user: Optional[User] = None
         self._effective_sender: Optional[Union[User, Chat]] = None
@@ -474,6 +495,9 @@ class Update(TelegramObject):
         .. versionchanged:: 21.1
             This property now also considers :attr:`business_connection`, :attr:`business_message`
             and :attr:`edited_business_message`.
+
+        .. versionchanged:: 21.6
+            This property now also considers :attr:`purchased_paid_media`.
 
         Example:
             * If :attr:`message` is present, this will give
@@ -530,6 +554,9 @@ class Update(TelegramObject):
 
         elif self.business_connection:
             user = self.business_connection.user
+
+        elif self.purchased_paid_media:
+            user = self.purchased_paid_media.from_user
 
         self._effective_user = user
         return user
@@ -601,7 +628,8 @@ class Update(TelegramObject):
         This is the case, if :attr:`inline_query`,
         :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
         :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
-        :attr:`poll_answer`, or :attr:`business_connection` is present.
+        :attr:`poll_answer`, :attr:`business_connection`, or :attr:`purchased_paid_media`
+        is present.
 
         .. versionchanged:: 21.1
             This property now also considers :attr:`business_message`,
@@ -767,6 +795,9 @@ class Update(TelegramObject):
         data["edited_business_message"] = Message.de_json(data.get("edited_business_message"), bot)
         data["deleted_business_messages"] = BusinessMessagesDeleted.de_json(
             data.get("deleted_business_messages"), bot
+        )
+        data["purchased_paid_media"] = PaidMediaPurchased.de_json(
+            data.get("purchased_paid_media"), bot
         )
 
         return super().de_json(data=data, bot=bot)

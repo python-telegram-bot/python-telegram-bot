@@ -9193,6 +9193,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reply_parameters: Optional["ReplyParameters"] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         business_connection_id: Optional[str] = None,
+        payload: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -9211,9 +9212,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 Telegram Star proceeds from this media will be credited to the chat's balance.
                 Otherwise, they will be credited to the bot's balance.
             star_count (:obj:`int`): The number of Telegram Stars that must be paid to buy access
-                to the media.
+                to the media; :tg-const:`telegram.constants.InvoiceLimit.MIN_STAR_COUNT` -
+                :tg-const:`telegram.constants.InvoiceLimit.MAX_STAR_COUNT`.
             media (Sequence[:class:`telegram.InputPaidMedia`]): A list describing the media to be
                 sent; up to :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
+            payload (:obj:`str`, optional): Bot-defined paid media payload,
+                0-:tg-const:`telegram.constants.InvoiceLimit.MAX_PAYLOAD_LENGTH` bytes. This will
+                not be displayed to the user, use it for your internal processes.
+
+                .. versionadded:: 21.6
             caption (:obj:`str`, optional): Caption of the media to be sent,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
             parse_mode (:obj:`str`, optional): |parse_mode|
@@ -9252,6 +9259,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "star_count": star_count,
             "media": media,
             "show_caption_above_media": show_caption_above_media,
+            "payload": payload,
         }
 
         return await self._send_message(

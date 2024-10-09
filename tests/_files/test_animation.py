@@ -37,20 +37,6 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture
-def animation_file():
-    with data_file("game.gif").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def animation(bot, chat_id):
-    with data_file("game.gif").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
-        return (
-            await bot.send_animation(chat_id, animation=f, read_timeout=50, thumbnail=thumb)
-        ).animation
-
-
 class AnimationTestBase:
     animation_file_id = "CgADAQADngIAAuyVeEez0xRovKi9VAI"
     animation_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
@@ -247,7 +233,8 @@ class TestAnimationWithRequest(AnimationTestBase):
         assert message.animation.file_unique_id
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
-        assert message.animation.file_size == animation.file_size
+        # TGs reported file size is not reliable
+        assert isinstance(message.animation.file_size, int)
         assert message.animation.thumbnail.width == self.width
         assert message.animation.thumbnail.height == self.height
         assert message.has_protected_content

@@ -187,15 +187,22 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
 
 class ChatBoostSourceGiveaway(ChatBoostSource):
     """
-    The boost was obtained by the creation of a Telegram Premium giveaway. This boosts the chat 4
-    times for the duration of the corresponding Telegram Premium subscription.
+    The boost was obtained by the creation of a Telegram Premium giveaway or a Telegram Star.
+    This boosts the chat 4 times for the duration of the corresponding Telegram Premium
+    subscription for Telegram Premium giveaways and :attr:`prize_star_count` / 500 times for
+    one year for Telegram Star giveaways.
 
     .. versionadded:: 20.8
 
     Args:
         giveaway_message_id (:obj:`int`): Identifier of a message in the chat with the giveaway;
             the message could have been deleted already. May be 0 if the message isn't sent yet.
-        user (:class:`telegram.User`, optional): User that won the prize in the giveaway if any.
+        user (:class:`telegram.User`, optional): User that won the prize in the giveaway if any;
+            for Telegram Premium giveaways only.
+        prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be split between
+            giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
         is_unclaimed (:obj:`bool`, optional): :obj:`True`, if the giveaway was completed, but
             there was no user to win the prize.
 
@@ -205,17 +212,22 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
         giveaway_message_id (:obj:`int`): Identifier of a message in the chat with the giveaway;
             the message could have been deleted already. May be 0 if the message isn't sent yet.
         user (:class:`telegram.User`): Optional. User that won the prize in the giveaway if any.
+        prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be split between
+            giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
         is_unclaimed (:obj:`bool`): Optional. :obj:`True`, if the giveaway was completed, but
             there was no user to win the prize.
     """
 
-    __slots__ = ("giveaway_message_id", "is_unclaimed", "user")
+    __slots__ = ("giveaway_message_id", "is_unclaimed", "prize_star_count", "user")
 
     def __init__(
         self,
         giveaway_message_id: int,
         user: Optional[User] = None,
         is_unclaimed: Optional[bool] = None,
+        prize_star_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -224,6 +236,7 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
         with self._unfrozen():
             self.giveaway_message_id: int = giveaway_message_id
             self.user: Optional[User] = user
+            self.prize_star_count: Optional[int] = prize_star_count
             self.is_unclaimed: Optional[bool] = is_unclaimed
 
 

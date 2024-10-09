@@ -328,6 +328,9 @@ class TransactionPartnerUser(TransactionPartner):
             media bought by the user.
 
             .. versionadded:: 21.5
+        paid_media_payload (:obj:`str`, optional): Optional. Bot-specified paid media payload.
+
+            .. versionadded:: 21.6
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
@@ -338,19 +341,20 @@ class TransactionPartnerUser(TransactionPartner):
             media bought by the user.
 
             .. versionadded:: 21.5
+        paid_media_payload (:obj:`str`): Optional. Optional. Bot-specified paid media payload.
+
+            .. versionadded:: 21.6
+
     """
 
-    __slots__ = (
-        "invoice_payload",
-        "paid_media",
-        "user",
-    )
+    __slots__ = ("invoice_payload", "paid_media", "paid_media_payload", "user")
 
     def __init__(
         self,
         user: "User",
         invoice_payload: Optional[str] = None,
         paid_media: Optional[Sequence[PaidMedia]] = None,
+        paid_media_payload: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -360,6 +364,7 @@ class TransactionPartnerUser(TransactionPartner):
             self.user: User = user
             self.invoice_payload: Optional[str] = invoice_payload
             self.paid_media: Optional[Tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
+            self.paid_media_payload: Optional[str] = paid_media_payload
             self._id_attrs = (
                 self.type,
                 self.user,

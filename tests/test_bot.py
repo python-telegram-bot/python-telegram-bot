@@ -90,7 +90,7 @@ from telegram.constants import (
     ParseMode,
     ReactionEmoji,
 )
-from telegram.error import BadRequest, EndPointNotFound, InvalidToken, NetworkError
+from telegram.error import BadRequest, EndPointNotFound, InvalidToken
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
@@ -103,21 +103,29 @@ from tests.auxil.networking import OfflineRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
 
-from ._files.test_photo import photo_file
 from .auxil.build_messages import make_message
 
 
 @pytest.fixture
-async def message(bot, chat_id):  # mostly used in tests for edit_message
-    out = await bot.send_message(
+async def one_time_message(bot, chat_id):
+    # mostly used in tests for edit_message and hence can't be reused
+    return await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
     )
-    out._unfreeze()
-    return out
 
 
 @pytest.fixture(scope="module")
+async def static_message(bot, chat_id):
+    # must not be edited to keep tests independent! We only use bot.send_message so that
+    # we have a valid message_id to e.g. reply to
+    return await bot.send_message(
+        chat_id, "Text", disable_web_page_preview=True, disable_notification=True
+    )
+
+
+@pytest.fixture
 async def media_message(bot, chat_id):
+    # mostly used in tests for edit_message and hence can't be reused
     with data_file("telegram.ogg").open("rb") as f:
         return await bot.send_voice(chat_id, voice=f, caption="my caption", read_timeout=10)
 
@@ -362,13 +370,13 @@ class TestBotWithoutRequest:
             "link",
         ],
     )
-    async def test_get_me_and_properties_not_initialized(self, offline_bot: Bot, attribute):
-        offline_bot = Bot(token=offline_bot.token)
+    async def test_get_me_and_properties_not_initialized(self, attribute):
+        bot = make_bot(offline=True, token="randomtoken")
         try:
             with pytest.raises(RuntimeError, match="not properly initialized"):
-                offline_bot[attribute]
+                bot[attribute]
         finally:
-            await offline_bot.shutdown()
+            await bot.shutdown()
 
     async def test_get_me_and_properties(self, offline_bot):
         get_me_bot = await ExtBot(offline_bot.token).get_me()
@@ -1128,7 +1136,7 @@ class TestBotWithoutRequest:
             )
 
         # Test with send media group
-        media = InputMediaPhoto(photo_file)
+        media = InputMediaPhoto("")
         with pytest.raises(ValueError, match="`reply_to_message_id` and"):
             await offline_bot.send_media_group(
                 chat_id, media, reply_to_message_id=1, reply_parameters=True
@@ -1565,7 +1573,7 @@ class TestBotWithoutRequest:
         [(True, 1024), (False, 1024), (0, 0), (None, None)],
     )
     async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
-        async with make_bot(bot_info, arbitrary_callback_data=acd_in) as acd_bot:
+        async with make_bot(bot_info, arbitrary_callback_data=acd_in, offline=True) as acd_bot:
             if acd_in is not False:
                 assert acd_bot.callback_data_cache.maxsize == maxsize
             else:
@@ -1972,7 +1980,7 @@ class TestBotWithoutRequest:
         indirect=["default_bot"],
     )
     async def test_send_message_default_quote_parse_mode(
-        self, default_bot, chat_id, message, custom, monkeypatch
+        self, default_bot, chat_id, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -1985,9 +1993,7 @@ class TestBotWithoutRequest:
             kwargs["quote_parse_mode"] = custom
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
-        await default_bot.send_message(
-            chat_id, message, reply_parameters=ReplyParameters(**kwargs)
-        )
+        await default_bot.send_message(chat_id, "test", reply_parameters=ReplyParameters(**kwargs))
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
@@ -2265,6 +2271,19 @@ class TestBotWithoutRequest:
         obj = await offline_bot.get_business_connection(business_connection_id=bci)
         assert isinstance(obj, BusinessConnection)
 
+    async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs["chat_id"] == chat_id
+                and kwargs["action"] == "action"
+                and kwargs["message_thread_id"] == 1
+                and kwargs["business_connection_id"] == 3
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        assert await bot.send_chat_action(chat_id, "action", 1, 3)
+
     async def test_refund_star_payment(self, offline_bot, monkeypatch):
         # can't make actual request so we just test that the correct data is passed
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -2327,13 +2346,13 @@ class TestBotWithRequest:
         async with test_bot:
             await test_bot.get_me()
 
-    async def test_forward_message(self, bot, chat_id, message):
+    async def test_forward_message(self, bot, chat_id, static_message):
         forward_message = await bot.forward_message(
-            chat_id, from_chat_id=chat_id, message_id=message.message_id
+            chat_id, from_chat_id=chat_id, message_id=static_message.message_id
         )
 
-        assert forward_message.text == message.text
-        assert forward_message.forward_origin.sender_user == message.from_user
+        assert forward_message.text == static_message.text
+        assert forward_message.forward_origin.sender_user == static_message.from_user
         assert isinstance(forward_message.forward_origin.date, dtm.datetime)
 
     async def test_forward_protected_message(self, bot, chat_id):
@@ -2360,15 +2379,12 @@ class TestBotWithRequest:
         assert all("can't be forwarded" in str(exc) for exc in result)
 
     async def test_forward_messages(self, bot, chat_id):
-        tasks = asyncio.gather(
-            bot.send_message(chat_id, text="will be forwarded"),
-            bot.send_message(chat_id, text="will be forwarded"),
-        )
-
-        msg1, msg2 = await tasks
+        # not using gather here to have deteriminically ordered message_ids
+        msg1 = await bot.send_message(chat_id, text="will be forwarded")
+        msg2 = await bot.send_message(chat_id, text="will be forwarded")
 
         forward_messages = await bot.forward_messages(
-            chat_id, from_chat_id=chat_id, message_ids=sorted((msg1.message_id, msg2.message_id))
+            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
         )
 
         assert isinstance(forward_messages, tuple)
@@ -2396,8 +2412,6 @@ class TestBotWithRequest:
 
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text="will be deleted")
-        await asyncio.sleep(2)
-
         assert await bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
 
     async def test_delete_message_old_message(self, bot, chat_id):
@@ -2488,18 +2502,6 @@ class TestBotWithRequest:
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
         assert message.has_protected_content
-
-    async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
-        async def make_assertion(*args, **_):
-            kwargs = args[1]
-            return (
-                kwargs["chat_id"] == chat_id
-                and kwargs["action"] == "action"
-                and kwargs["message_thread_id"] == 1
-            )
-
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        assert await bot.send_chat_action(chat_id, "action", 1)
 
     # TODO: Add bot to group to test polls too
     @pytest.mark.parametrize(
@@ -2836,18 +2838,18 @@ class TestBotWithRequest:
         assert user_profile_photos.total_count == 1
         assert user_profile_photos.photos[0][0].file_size == 5403
 
-    async def test_edit_message_text(self, bot, message):
+    async def test_edit_message_text(self, bot, one_time_message):
         message = await bot.edit_message_text(
             text="new_text",
-            chat_id=message.chat_id,
-            message_id=message.message_id,
+            chat_id=one_time_message.chat_id,
+            message_id=one_time_message.message_id,
             parse_mode="HTML",
             disable_web_page_preview=True,
         )
 
         assert message.text == "new_text"
 
-    async def test_edit_message_text_entities(self, bot, message):
+    async def test_edit_message_text_entities(self, bot, one_time_message):
         test_string = "Italic Bold Code"
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
@@ -2856,8 +2858,8 @@ class TestBotWithRequest:
         ]
         message = await bot.edit_message_text(
             text=test_string,
-            chat_id=message.chat_id,
-            message_id=message.message_id,
+            chat_id=one_time_message.chat_id,
+            message_id=one_time_message.message_id,
             entities=entities,
         )
 
@@ -2865,14 +2867,16 @@ class TestBotWithRequest:
         assert message.entities == tuple(entities)
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_edit_message_text_default_parse_mode(self, default_bot, message):
+    async def test_edit_message_text_default_parse_mode(
+        self, default_bot, chat_id, one_time_message
+    ):
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
 
         message = await default_bot.edit_message_text(
             text=test_markdown_string,
-            chat_id=message.chat_id,
-            message_id=message.message_id,
+            chat_id=one_time_message.chat_id,
+            message_id=one_time_message.message_id,
             disable_web_page_preview=True,
         )
         assert message.text_markdown == test_markdown_string
@@ -2888,21 +2892,16 @@ class TestBotWithRequest:
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
 
+        suffix = " edited"
         message = await default_bot.edit_message_text(
-            text=test_markdown_string,
-            chat_id=message.chat_id,
-            message_id=message.message_id,
-            disable_web_page_preview=True,
-        )
-        message = await default_bot.edit_message_text(
-            text=test_markdown_string,
+            text=test_markdown_string + suffix,
             chat_id=message.chat_id,
             message_id=message.message_id,
             parse_mode="HTML",
             disable_web_page_preview=True,
         )
-        assert message.text == test_markdown_string
-        assert message.text_markdown == escape_markdown(test_markdown_string)
+        assert message.text == test_markdown_string + suffix
+        assert message.text_markdown == escape_markdown(test_markdown_string) + suffix
 
     @pytest.mark.skip(reason="need reference to an inline message")
     async def test_edit_message_text_inline(self):
@@ -2988,10 +2987,12 @@ class TestBotWithRequest:
     async def test_edit_message_caption_inline(self):
         pass
 
-    async def test_edit_reply_markup(self, bot, message):
+    async def test_edit_reply_markup(self, bot, one_time_message):
         new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
         message = await bot.edit_message_reply_markup(
-            chat_id=message.chat_id, message_id=message.message_id, reply_markup=new_markup
+            chat_id=one_time_message.chat_id,
+            message_id=one_time_message.message_id,
+            reply_markup=new_markup,
         )
 
         assert message is not True
@@ -3000,7 +3001,6 @@ class TestBotWithRequest:
     async def test_edit_reply_markup_inline(self):
         pass
 
-    @pytest.mark.xdist_group("getUpdates_and_webhook")
     # TODO: Actually send updates to the test bot so this can be tested properly
     async def test_get_updates(self, bot):
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
@@ -3067,7 +3067,6 @@ class TestBotWithRequest:
         await bot.get_updates(read_timeout=read_timeout, timeout=timeout)
         assert caught_read_timeout == expected
 
-    @pytest.mark.xdist_group("getUpdates_and_webhook")
     @pytest.mark.parametrize("use_ip", [True, False])
     # local file path as file_input is tested below in test_set_webhook_params
     @pytest.mark.parametrize("file_input", ["bytes", "file_handle"])
@@ -3107,9 +3106,6 @@ class TestBotWithRequest:
 
     async def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match="Chat not found"):
-            await bot.leave_chat(-123456)
-
-        with pytest.raises(NetworkError, match="Chat not found"):
             await bot.leave_chat(-123456)
 
     async def test_get_chat(self, bot, super_group_id):
@@ -3205,10 +3201,8 @@ class TestBotWithRequest:
         protected = await default_bot.send_game(chat_id, "test_game", protect_content=val)
         assert protected.has_protected_content is val
 
-    @pytest.mark.xdist_group("game")
     @xfail
-    async def test_set_game_score_1(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+    async def test_set_game_score_and_high_scores(self, bot, chat_id):
         # First, test setting a score.
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3225,10 +3219,6 @@ class TestBotWithRequest:
         assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text != game.game.text
 
-    @pytest.mark.xdist_group("game")
-    @xfail
-    async def test_set_game_score_2(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test setting a score higher than previous
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3248,10 +3238,6 @@ class TestBotWithRequest:
         assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text == game.game.text
 
-    @pytest.mark.xdist_group("game")
-    @xfail
-    async def test_set_game_score_3(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test setting a score lower than previous (should raise error)
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3263,10 +3249,6 @@ class TestBotWithRequest:
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
-    @pytest.mark.xdist_group("game")
-    @xfail
-    async def test_set_game_score_4(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test force setting a lower score
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3291,9 +3273,6 @@ class TestBotWithRequest:
         game2 = await bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @pytest.mark.xdist_group("game")
-    @xfail
-    async def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for
         game_short_name = "test_game"
         game = await bot.send_game(chat_id, game_short_name)
@@ -3954,14 +3933,12 @@ class TestBotWithRequest:
             assert len(message.caption_entities) == 0
 
     async def test_copy_messages(self, bot, chat_id):
-        tasks = asyncio.gather(
-            bot.send_message(chat_id, text="will be copied 1"),
-            bot.send_message(chat_id, text="will be copied 2"),
-        )
-        msg1, msg2 = await tasks
+        # not using gather here to have deterministically ordered message_ids
+        msg1 = await bot.send_message(chat_id, text="will be copied 1")
+        msg2 = await bot.send_message(chat_id, text="will be copied 2")
 
         copy_messages = await bot.copy_messages(
-            chat_id, from_chat_id=chat_id, message_ids=sorted((msg1.message_id, msg2.message_id))
+            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
         )
         assert isinstance(copy_messages, tuple)
 
@@ -4074,7 +4051,7 @@ class TestBotWithRequest:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    async def test_get_chat_arbitrary_callback_data(self, channel_id, cdc_bot):
+    async def test_get_chat_arbitrary_callback_data(self, chat_id, cdc_bot):
         bot = cdc_bot
 
         try:
@@ -4083,7 +4060,7 @@ class TestBotWithRequest:
             )
 
             message = await bot.send_message(
-                channel_id, text="get_chat_arbitrary_callback_data", reply_markup=reply_markup
+                chat_id, text="get_chat_arbitrary_callback_data", reply_markup=reply_markup
             )
             await message.pin()
 
@@ -4093,7 +4070,11 @@ class TestBotWithRequest:
             )
             assert data == "callback_data"
 
-            cfi = await bot.get_chat(channel_id)
+            cfi = await bot.get_chat(chat_id)
+
+            if not cfi.pinned_message:
+                pytest.xfail("Pinning messages is not always reliable on TG")
+
             assert cfi.pinned_message == message
             assert cfi.pinned_message.reply_markup == reply_markup
             assert await message.unpin()  # (not placed in finally block since msg can be unbound)
@@ -4197,9 +4178,9 @@ class TestBotWithRequest:
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
 
-    async def test_set_message_reaction(self, bot, chat_id, message):
+    async def test_set_message_reaction(self, bot, chat_id, static_message):
         assert await bot.set_message_reaction(
-            chat_id, message.message_id, ReactionEmoji.THUMBS_DOWN, True
+            chat_id, static_message.message_id, ReactionEmoji.THUMBS_DOWN, True
         )
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])

@@ -24,6 +24,7 @@ from telegram import constants
 from telegram._files.photosize import PhotoSize
 from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
@@ -287,4 +288,53 @@ class PaidMediaInfo(TelegramObject):
             return None
 
         data["paid_media"] = PaidMedia.de_list(data.get("paid_media"), bot=bot)
+        return super().de_json(data=data, bot=bot)
+
+
+class PaidMediaPurchased(TelegramObject):
+    """This object contains information about a paid media purchase.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`from_user` and :attr:`paid_media_payload` are equal.
+
+    Note:
+        In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
+
+    .. versionadded:: 21.6
+
+    Args:
+        from_user (:class:`telegram.User`): User who purchased the media.
+        paid_media_payload (:obj:`str`): Bot-specified paid media payload.
+
+    Attributes:
+        from_user (:class:`telegram.User`): User who purchased the media.
+        paid_media_payload (:obj:`str`): Bot-specified paid media payload.
+    """
+
+    __slots__ = ("from_user", "paid_media_payload")
+
+    def __init__(
+        self,
+        from_user: "User",
+        paid_media_payload: str,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
+        self.from_user: User = from_user
+        self.paid_media_payload: str = paid_media_payload
+
+        self._id_attrs = (self.from_user, self.paid_media_payload)
+        self._freeze()
+
+    @classmethod
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["PaidMediaPurchased"]:
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["from_user"] = User.de_json(data=data.pop("from"), bot=bot)
         return super().de_json(data=data, bot=bot)

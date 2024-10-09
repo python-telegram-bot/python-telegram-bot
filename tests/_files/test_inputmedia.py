@@ -38,31 +38,13 @@ from telegram import (
     ReplyParameters,
 )
 from telegram.constants import InputMediaType, ParseMode
-
-# noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
 from telegram.request import RequestData
-from tests._files.test_animation import animation, animation_file  # noqa: F401
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
 
-# noinspection PyUnresolvedReferences
-from tests.test_forum import emoji_id, real_topic  # noqa: F401
-
 from ..auxil.build_messages import make_message
-
-# noinspection PyUnresolvedReferences
-from .test_audio import audio, audio_file  # noqa: F401
-
-# noinspection PyUnresolvedReferences
-from .test_document import document, document_file  # noqa: F401
-
-# noinspection PyUnresolvedReferences
-from .test_photo import photo, photo_file, photolist, thumb  # noqa: F401
-
-# noinspection PyUnresolvedReferences
-from .test_video import video, video_file  # noqa: F401
 
 
 @pytest.fixture(scope="module")
@@ -213,7 +195,7 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
             == input_media_video.show_caption_above_media
         )
 
-    def test_with_video(self, video):  # noqa: F811
+    def test_with_video(self, video):
         # fixture found in test_video
         input_media_video = InputMediaVideo(video, caption="test 3")
         assert input_media_video.type == self.type_
@@ -223,7 +205,7 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video.duration == video.duration
         assert input_media_video.caption == "test 3"
 
-    def test_with_video_file(self, video_file):  # noqa: F811
+    def test_with_video_file(self, video_file):
         # fixture found in test_video
         input_media_video = InputMediaVideo(video_file, caption="test 3")
         assert input_media_video.type == self.type_
@@ -303,14 +285,14 @@ class TestInputMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
             == input_media_photo.show_caption_above_media
         )
 
-    def test_with_photo(self, photo):  # noqa: F811
+    def test_with_photo(self, photo):
         # fixture found in test_photo
         input_media_photo = InputMediaPhoto(photo, caption="test 2")
         assert input_media_photo.type == self.type_
         assert input_media_photo.media == photo.file_id
         assert input_media_photo.caption == "test 2"
 
-    def test_with_photo_file(self, photo_file):  # noqa: F811
+    def test_with_photo_file(self, photo_file):
         # fixture found in test_photo
         input_media_photo = InputMediaPhoto(photo_file, caption="test 2")
         assert input_media_photo.type == self.type_
@@ -374,14 +356,14 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
             == input_media_animation.show_caption_above_media
         )
 
-    def test_with_animation(self, animation):  # noqa: F811
+    def test_with_animation(self, animation):
         # fixture found in test_animation
         input_media_animation = InputMediaAnimation(animation, caption="test 2")
         assert input_media_animation.type == self.type_
         assert input_media_animation.media == animation.file_id
         assert input_media_animation.caption == "test 2"
 
-    def test_with_animation_file(self, animation_file):  # noqa: F811
+    def test_with_animation_file(self, animation_file):
         # fixture found in test_animation
         input_media_animation = InputMediaAnimation(animation_file, caption="test 2")
         assert input_media_animation.type == self.type_
@@ -442,7 +424,7 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
             ce.to_dict() for ce in input_media_audio.caption_entities
         ]
 
-    def test_with_audio(self, audio):  # noqa: F811
+    def test_with_audio(self, audio):
         # fixture found in test_audio
         input_media_audio = InputMediaAudio(audio, caption="test 3")
         assert input_media_audio.type == self.type_
@@ -452,7 +434,7 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
         assert input_media_audio.title == audio.title
         assert input_media_audio.caption == "test 3"
 
-    def test_with_audio_file(self, audio_file):  # noqa: F811
+    def test_with_audio_file(self, audio_file):
         # fixture found in test_audio
         input_media_audio = InputMediaAudio(audio_file, caption="test 3")
         assert input_media_audio.type == self.type_
@@ -513,14 +495,14 @@ class TestInputMediaDocumentWithoutRequest(InputMediaDocumentTestBase):
             == input_media_document.disable_content_type_detection
         )
 
-    def test_with_document(self, document):  # noqa: F811
+    def test_with_document(self, document):
         # fixture found in test_document
         input_media_document = InputMediaDocument(document, caption="test 3")
         assert input_media_document.type == self.type_
         assert input_media_document.media == document.file_id
         assert input_media_document.caption == "test 3"
 
-    def test_with_document_file(self, document_file):  # noqa: F811
+    def test_with_document_file(self, document_file):
         # fixture found in test_document
         input_media_document = InputMediaDocument(document_file, caption="test 3")
         assert input_media_document.type == self.type_
@@ -551,13 +533,13 @@ class TestInputPaidMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
         assert input_paid_media_photo_dict["type"] == input_paid_media_photo.type
         assert input_paid_media_photo_dict["media"] == input_paid_media_photo.media
 
-    def test_with_photo(self, photo):  # noqa: F811
+    def test_with_photo(self, photo):
         # fixture found in test_photo
         input_paid_media_photo = InputPaidMediaPhoto(photo)
         assert input_paid_media_photo.type == self.type_
         assert input_paid_media_photo.media == photo.file_id
 
-    def test_with_photo_file(self, photo_file):  # noqa: F811
+    def test_with_photo_file(self, photo_file):
         # fixture found in test_photo
         input_paid_media_photo = InputPaidMediaPhoto(photo_file)
         assert input_paid_media_photo.type == self.type_
@@ -597,7 +579,7 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
         )
         assert input_paid_media_video_dict["thumbnail"] == input_paid_media_video.thumbnail
 
-    def test_with_video(self, video):  # noqa: F811
+    def test_with_video(self, video):
         # fixture found in test_video
         input_paid_media_video = InputPaidMediaVideo(video)
         assert input_paid_media_video.type == self.type_
@@ -606,7 +588,7 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_paid_media_video.height == video.height
         assert input_paid_media_video.duration == video.duration
 
-    def test_with_video_file(self, video_file):  # noqa: F811
+    def test_with_video_file(self, video_file):
         # fixture found in test_video
         input_paid_media_video = InputPaidMediaVideo(video_file)
         assert input_paid_media_video.type == self.type_
@@ -621,7 +603,7 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
 
 
 @pytest.fixture(scope="module")
-def media_group(photo, thumb):  # noqa: F811
+def media_group(photo, thumb):
     return [
         InputMediaPhoto(photo, caption="*photo* 1", parse_mode="Markdown"),
         InputMediaPhoto(thumb, caption="<b>photo</b> 2", parse_mode="HTML"),
@@ -632,12 +614,12 @@ def media_group(photo, thumb):  # noqa: F811
 
 
 @pytest.fixture(scope="module")
-def media_group_no_caption_args(photo, thumb):  # noqa: F811
+def media_group_no_caption_args(photo, thumb):
     return [InputMediaPhoto(photo), InputMediaPhoto(thumb), InputMediaPhoto(photo)]
 
 
 @pytest.fixture(scope="module")
-def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
+def media_group_no_caption_only_caption_entities(photo, thumb):
     return [
         InputMediaPhoto(photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
         InputMediaPhoto(photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
@@ -645,7 +627,7 @@ def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
 
 
 @pytest.fixture(scope="module")
-def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
+def media_group_no_caption_only_parse_mode(photo, thumb):
     return [
         InputMediaPhoto(photo, parse_mode="Markdown"),
         InputMediaPhoto(thumb, parse_mode="HTML"),
@@ -676,10 +658,10 @@ class TestSendMediaGroupWithoutRequest:
         self,
         offline_bot,
         chat_id,
-        photo_file,  # noqa: F811
-        animation_file,  # noqa: F811
-        audio_file,  # noqa: F811
-        video_file,  # noqa: F811
+        photo_file,
+        animation_file,
+        audio_file,
+        video_file,
         monkeypatch,
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -703,7 +685,7 @@ class TestSendMediaGroupWithoutRequest:
             await offline_bot.send_media_group(chat_id, media)
 
     async def test_send_media_group_with_thumbs(
-        self, offline_bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+        self, offline_bot, chat_id, video_file, photo_file, monkeypatch
     ):
         async def make_assertion(method, url, request_data: RequestData, *args, **kwargs):
             nonlocal input_video
@@ -721,7 +703,7 @@ class TestSendMediaGroupWithoutRequest:
             await offline_bot.send_media_group(chat_id, [input_video, input_video])
 
     async def test_edit_message_media_with_thumb(
-        self, offline_bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+        self, offline_bot, chat_id, video_file, photo_file, monkeypatch
     ):
         async def make_assertion(
             method: str, url: str, request_data: Optional[RequestData] = None, *args, **kwargs
@@ -792,9 +774,7 @@ class TestSendMediaGroupWithRequest:
             mes.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),) for mes in messages
         )
 
-    async def test_send_media_group_new_files(
-        self, bot, chat_id, video_file, photo_file  # noqa: F811
-    ):
+    async def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file):
         async def func():
             return await bot.send_media_group(
                 chat_id,
@@ -830,7 +810,7 @@ class TestSendMediaGroupWithRequest:
         assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
 
     async def test_send_media_group_with_message_thread_id(
-        self, bot, real_topic, forum_group_id, media_group  # noqa: F811
+        self, bot, real_topic, forum_group_id, media_group
     ):
         messages = await bot.send_media_group(
             forum_group_id,
@@ -929,9 +909,7 @@ class TestSendMediaGroupWithRequest:
             )
             assert all(mes.has_protected_content for mes in messages)
 
-    async def test_send_media_group_with_spoiler(
-        self, bot, chat_id, photo_file, video_file  # noqa: F811
-    ):
+    async def test_send_media_group_with_spoiler(self, bot, chat_id, photo_file, video_file):
         # Media groups can't contain Animations, so that is tested in test_animation.py
         media = [
             InputMediaPhoto(photo_file, has_spoiler=True),
@@ -1074,11 +1052,11 @@ class TestSendMediaGroupWithRequest:
         chat_id,
         default_bot,
         media_type,
-        animation,  # noqa: F811
-        document,  # noqa: F811
-        audio,  # noqa: F811
-        photo,  # noqa: F811
-        video,  # noqa: F811
+        animation,
+        document,
+        audio,
+        photo,
+        video,
     ):
         html_caption = "<b>bold</b> <i>italic</i> <code>code</code>"
         markdown_caption = "*bold* _italic_ `code`"
@@ -1153,7 +1131,7 @@ class TestSendMediaGroupWithRequest:
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode
 
-    async def test_send_paid_media(self, bot, channel_id, photo_file, video_file):  # noqa: F811
+    async def test_send_paid_media(self, bot, channel_id, photo_file, video_file):
         msg = await bot.send_paid_media(
             chat_id=channel_id,
             star_count=20,

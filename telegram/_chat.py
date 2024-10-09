@@ -3350,6 +3350,7 @@ class _ChatBase(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         business_connection_id: Optional[str] = None,
+        payload: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3391,6 +3392,7 @@ class _ChatBase(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            payload=payload,
         )
 
 

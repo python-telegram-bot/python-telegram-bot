@@ -50,6 +50,7 @@ class ChatBoostDefaults:
     user = User(1, "user", False)
     date = to_timestamp(datetime.datetime.utcnow())
     default_source = ChatBoostSourcePremium(user)
+    prize_star_count = 99
 
 
 @pytest.fixture(scope="module")
@@ -91,6 +92,7 @@ def chat_boost_source_giveaway():
         user=ChatBoostDefaults.user,
         giveaway_message_id=ChatBoostDefaults.giveaway_message_id,
         is_unclaimed=ChatBoostDefaults.is_unclaimed,
+        prize_star_count=ChatBoostDefaults.prize_star_count,
     )
 
 

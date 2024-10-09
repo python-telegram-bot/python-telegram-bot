@@ -40,7 +40,7 @@ from telegram import (
 from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
-from tests.auxil.constants import PRIVATE_KEY
+from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.envvars import GITHUB_ACTION, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
@@ -152,7 +152,7 @@ def bot_info() -> Dict[str, str]:
 @pytest.fixture(scope="session")
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
-    async with make_bot(bot_info) as _bot:
+    async with make_bot(bot_info, offline=False) as _bot:
         yield _bot
 
 
@@ -168,13 +168,13 @@ async def offline_bot(bot_info):
 @pytest.fixture
 def one_time_bot(bot_info):
     """A function scoped bot since the session bot would shutdown when `async with app` finishes"""
-    return make_bot(bot_info)
+    return make_bot(bot_info, offline=False)
 
 
 @pytest.fixture(scope="session")
 async def cdc_bot(bot_info):
     """Makes an ExtBot instance with the given bot_info that uses arbitrary callback_data"""
-    async with make_bot(bot_info, arbitrary_callback_data=True) as _bot:
+    async with make_bot(bot_info, arbitrary_callback_data=True, offline=False) as _bot:
         yield _bot
 
 
@@ -204,7 +204,7 @@ async def default_bot(request, bot_info):
     # If the bot is already created, return it. Else make a new one.
     default_bot = _default_bots.get(defaults)
     if default_bot is None:
-        default_bot = make_bot(bot_info, defaults=defaults)
+        default_bot = make_bot(bot_info, defaults=defaults, offline=False)
         await default_bot.initialize()
         _default_bots[defaults] = default_bot  # Defaults object is hashable
     return default_bot
@@ -216,7 +216,7 @@ async def tz_bot(timezone, bot_info):
     try:  # If the bot is already created, return it. Saves time since get_me is not called again.
         return _default_bots[defaults]
     except KeyError:
-        default_bot = make_bot(bot_info, defaults=defaults)
+        default_bot = make_bot(bot_info, defaults=defaults, offline=False)
         await default_bot.initialize()
         _default_bots[defaults] = default_bot
         return default_bot
@@ -262,6 +262,30 @@ def thumb_file():
 def class_thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
+
+
+@pytest.fixture(scope="session")
+async def emoji_id(bot):
+    emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
+    first_sticker = emoji_sticker_list[0]
+    return first_sticker.custom_emoji_id
+
+
+@pytest.fixture
+async def real_topic(bot, emoji_id, forum_group_id):
+    result = await bot.create_forum_topic(
+        chat_id=forum_group_id,
+        name=TEST_TOPIC_NAME,
+        icon_color=TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id=emoji_id,
+    )
+
+    yield result
+
+    result = await bot.delete_forum_topic(
+        chat_id=forum_group_id, message_thread_id=result.message_thread_id
+    )
+    assert result is True, "Topic was not deleted"
 
 
 def _get_false_update_fixture_decorator_params():
