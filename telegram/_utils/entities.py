@@ -23,7 +23,8 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from typing import Dict, Optional, Sequence
+from collections.abc import Sequence
+from typing import Optional
 
 from telegram._messageentity import MessageEntity
 from telegram._utils.strings import TextEncoding
@@ -47,7 +48,7 @@ def parse_message_entity(text: str, entity: MessageEntity) -> str:
 
 def parse_message_entities(
     text: str, entities: Sequence[MessageEntity], types: Optional[Sequence[str]] = None
-) -> Dict[MessageEntity, str]:
+) -> dict[MessageEntity, str]:
     """
     Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
     It contains entities filtered by their ``type`` attribute as
@@ -55,13 +56,13 @@ def parse_message_entities(
 
     Args:
         text (:obj:`str`): The text to extract the entity from.
-        entities (List[:class:`telegram.MessageEntity`]): The entities to extract the text from.
-        types (List[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+        entities (list[:class:`telegram.MessageEntity`]): The entities to extract the text from.
+        types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
             ``type`` attribute of an entity is contained in this list, it will be returned.
             Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
 
     Returns:
-        Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+        dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
         the text that belongs to them, calculated based on UTF-16 codepoints.
     """
     if types is None:

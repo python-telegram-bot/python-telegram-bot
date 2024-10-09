@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents a Telegram ReactionType."""
 
-from typing import TYPE_CHECKING, Dict, Final, Literal, Optional, Type, Union
+from typing import TYPE_CHECKING, Final, Literal, Optional, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -89,7 +89,7 @@ class ReactionType(TelegramObject):
         if not data and cls is ReactionType:
             return None
 
-        _class_mapping: Dict[str, Type[ReactionType]] = {
+        _class_mapping: dict[str, type[ReactionType]] = {
             cls.EMOJI: ReactionTypeEmoji,
             cls.CUSTOM_EMOJI: ReactionTypeCustomEmoji,
             cls.PAID: ReactionTypePaid,

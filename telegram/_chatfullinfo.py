@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatFullInfo."""
+from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Optional
 
 from telegram._birthdate import Birthdate
 from telegram._chat import Chat, _ChatBase
@@ -224,7 +225,7 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 20.0
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
-        active_usernames (Tuple[:obj:`str`]): Optional. If set, the list of all `active chat
+        active_usernames (tuple[:obj:`str`]): Optional. If set, the list of all `active chat
             usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
             #collectible-usernames>`_; for private chats, supergroups and channels.
 
@@ -252,7 +253,7 @@ class ChatFullInfo(_ChatBase):
             of the user.
 
             .. versionadded:: 21.1
-        available_reactions (Tuple[:class:`telegram.ReactionType`]): Optional. List of available
+        available_reactions (tuple[:class:`telegram.ReactionType`]): Optional. List of available
             reactions allowed in the chat. If omitted, then all of
             :const:`telegram.constants.ReactionEmoji` are allowed.
 
@@ -483,14 +484,14 @@ class ChatFullInfo(_ChatBase):
             self.has_restricted_voice_and_video_messages: Optional[bool] = (
                 has_restricted_voice_and_video_messages
             )
-            self.active_usernames: Tuple[str, ...] = parse_sequence_arg(active_usernames)
+            self.active_usernames: tuple[str, ...] = parse_sequence_arg(active_usernames)
             self.emoji_status_custom_emoji_id: Optional[str] = emoji_status_custom_emoji_id
             self.emoji_status_expiration_date: Optional[datetime] = emoji_status_expiration_date
             self.has_aggressive_anti_spam_enabled: Optional[bool] = (
                 has_aggressive_anti_spam_enabled
             )
             self.has_hidden_members: Optional[bool] = has_hidden_members
-            self.available_reactions: Optional[Tuple[ReactionType, ...]] = parse_sequence_arg(
+            self.available_reactions: Optional[tuple[ReactionType, ...]] = parse_sequence_arg(
                 available_reactions
             )
             self.accent_color_id: Optional[int] = accent_color_id

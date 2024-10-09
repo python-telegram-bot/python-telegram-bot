@@ -24,7 +24,7 @@ from pathlib import Path
 from socket import socket
 from ssl import SSLContext
 from types import TracebackType
-from typing import TYPE_CHECKING, Optional, Type, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 # Instead of checking for ImportError here, we do that in `updater.py`, where we import from
 # this module. Doing it here would be tricky, as the classes below subclass tornado classes
@@ -210,7 +210,7 @@ class TelegramHandler(tornado.web.RequestHandler):
 
     def log_exception(
         self,
-        typ: Optional[Type[BaseException]],
+        typ: Optional[type[BaseException]],
         value: Optional[BaseException],
         tb: Optional[TracebackType],
     ) -> None:

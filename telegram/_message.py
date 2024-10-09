@@ -21,8 +21,9 @@
 
 import datetime
 import re
+from collections.abc import Sequence
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, TypedDict, Union
+from typing import TYPE_CHECKING, Optional, TypedDict, Union
 
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
@@ -629,7 +630,7 @@ class Message(MaybeInaccessibleMessage):
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
-        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
+        entities (tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
             This list is empty if the message does not contain entities.
@@ -648,7 +649,7 @@ class Message(MaybeInaccessibleMessage):
 
             ..versionadded:: 21.3
 
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
+        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
             methods for how to use properly. This list is empty if the message does not contain
@@ -675,7 +676,7 @@ class Message(MaybeInaccessibleMessage):
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
             :ref:`More about games >> <games-tree>`.
-        photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
+        photo (tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -703,7 +704,7 @@ class Message(MaybeInaccessibleMessage):
             about the video message.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        new_chat_members (Tuple[:class:`telegram.User`]): Optional. New members that were added
+        new_chat_members (tuple[:class:`telegram.User`]): Optional. New members that were added
             to the group or supergroup and information about them (the bot itself may be one of
             these members). This list is empty if the message does not contain new chat members.
 
@@ -722,7 +723,7 @@ class Message(MaybeInaccessibleMessage):
         left_chat_member (:class:`telegram.User`): Optional. A member was removed from the group,
             information about them (this member may be the bot itself).
         new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
-        new_chat_photo (Tuple[:class:`telegram.PhotoSize`]): A chat photo was changed to
+        new_chat_photo (tuple[:class:`telegram.PhotoSize`]): A chat photo was changed to
             this value. This list is empty if the message does not contain a new chat photo.
 
             .. versionchanged:: 20.0
@@ -1118,12 +1119,12 @@ class Message(MaybeInaccessibleMessage):
             self.edit_date: Optional[datetime.datetime] = edit_date
             self.has_protected_content: Optional[bool] = has_protected_content
             self.text: Optional[str] = text
-            self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.audio: Optional[Audio] = audio
             self.game: Optional[Game] = game
             self.document: Optional[Document] = document
-            self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+            self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
             self.sticker: Optional[Sticker] = sticker
             self.video: Optional[Video] = video
             self.voice: Optional[Voice] = voice
@@ -1132,10 +1133,10 @@ class Message(MaybeInaccessibleMessage):
             self.contact: Optional[Contact] = contact
             self.location: Optional[Location] = location
             self.venue: Optional[Venue] = venue
-            self.new_chat_members: Tuple[User, ...] = parse_sequence_arg(new_chat_members)
+            self.new_chat_members: tuple[User, ...] = parse_sequence_arg(new_chat_members)
             self.left_chat_member: Optional[User] = left_chat_member
             self.new_chat_title: Optional[str] = new_chat_title
-            self.new_chat_photo: Tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
+            self.new_chat_photo: tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
             self.delete_chat_photo: Optional[bool] = bool(delete_chat_photo)
             self.group_chat_created: Optional[bool] = bool(group_chat_created)
             self.supergroup_chat_created: Optional[bool] = bool(supergroup_chat_created)
@@ -1406,7 +1407,7 @@ class Message(MaybeInaccessibleMessage):
         * :class:`telegram.Invoice`
         * :class:`telegram.Location`
         * :class:`telegram.PassportData`
-        * List[:class:`telegram.PhotoSize`]
+        * list[:class:`telegram.PhotoSize`]
         * :class:`telegram.PaidMediaInfo`
         * :class:`telegram.Poll`
         * :class:`telegram.Sticker`
@@ -1478,7 +1479,7 @@ class Message(MaybeInaccessibleMessage):
 
     def compute_quote_position_and_entities(
         self, quote: str, index: Optional[int] = None
-    ) -> Tuple[int, Optional[Tuple[MessageEntity, ...]]]:
+    ) -> tuple[int, Optional[tuple[MessageEntity, ...]]]:
         """
         Use this function to compute position and entities of a quote in the message text or
         caption. Useful for filling the parameters
@@ -1504,7 +1505,7 @@ class Message(MaybeInaccessibleMessage):
                 message. If not specified, the first occurrence is used.
 
         Returns:
-            Tuple[:obj:`int`, :obj:`None` | Tuple[:class:`~telegram.MessageEntity`, ...]]: On
+            tuple[:obj:`int`, :obj:`None` | tuple[:class:`~telegram.MessageEntity`, ...]]: On
             success, a tuple containing information about quote position and entities is returned.
 
         Raises:
@@ -1647,7 +1648,7 @@ class Message(MaybeInaccessibleMessage):
         quote: Optional[bool],
         reply_to_message_id: Optional[int],
         reply_parameters: Optional["ReplyParameters"],
-    ) -> Tuple[Union[str, int], ReplyParameters]:
+    ) -> tuple[Union[str, int], ReplyParameters]:
         if quote and do_quote:
             raise ValueError("The arguments `quote` and `do_quote` are mutually exclusive")
 
@@ -2048,7 +2049,7 @@ class Message(MaybeInaccessibleMessage):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-    ) -> Tuple["Message", ...]:
+    ) -> tuple["Message", ...]:
         """Shortcut for::
 
              await bot.send_media_group(
@@ -2075,7 +2076,7 @@ class Message(MaybeInaccessibleMessage):
                 .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.Message`]: An array of the sent Messages.
+            tuple[:class:`telegram.Message`]: An array of the sent Messages.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -3989,7 +3990,7 @@ class Message(MaybeInaccessibleMessage):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["GameHighScore", ...]:
+    ) -> tuple["GameHighScore", ...]:
         """Shortcut for::
 
              await bot.get_game_high_scores(
@@ -4005,7 +4006,7 @@ class Message(MaybeInaccessibleMessage):
             behaviour is undocumented and might be changed by Telegram.
 
         Returns:
-            Tuple[:class:`telegram.GameHighScore`]
+            tuple[:class:`telegram.GameHighScore`]
         """
         return await self.get_bot().get_game_high_scores(
             chat_id=self.chat_id,
@@ -4431,7 +4432,7 @@ class Message(MaybeInaccessibleMessage):
 
         return parse_message_entity(self.caption, entity)
 
-    def parse_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
+    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their
@@ -4444,21 +4445,21 @@ class Message(MaybeInaccessibleMessage):
             See :attr:`parse_entity` for more info.
 
         Args:
-            types (List[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
+            types (list[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
                 strings. If the ``type`` attribute of an entity is contained in this list, it will
                 be returned. Defaults to a list of all types. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
 
         Returns:
-            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """
         return parse_message_entities(self.text, self.entities, types=types)
 
     def parse_caption_entities(
-        self, types: Optional[List[str]] = None
-    ) -> Dict[MessageEntity, str]:
+        self, types: Optional[list[str]] = None
+    ) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message's caption filtered by their
@@ -4471,13 +4472,13 @@ class Message(MaybeInaccessibleMessage):
             codepoints. See :attr:`parse_entity` for more info.
 
         Args:
-            types (List[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
+            types (list[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
                 strings. If the ``type`` attribute of an entity is contained in this list, it will
                 be returned. Defaults to a list of all types. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
 
         Returns:
-            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """
@@ -4487,7 +4488,7 @@ class Message(MaybeInaccessibleMessage):
     def _parse_html(
         cls,
         message_text: Optional[str],
-        entities: Dict[MessageEntity, str],
+        entities: dict[MessageEntity, str],
         urled: bool = False,
         offset: int = 0,
     ) -> Optional[str]:
@@ -4676,7 +4677,7 @@ class Message(MaybeInaccessibleMessage):
     def _parse_markdown(
         cls,
         message_text: Optional[str],
-        entities: Dict[MessageEntity, str],
+        entities: dict[MessageEntity, str],
         urled: bool = False,
         version: MarkdownVersion = 1,
         offset: int = 0,

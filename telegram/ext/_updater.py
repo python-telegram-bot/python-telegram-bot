@@ -20,20 +20,10 @@
 import asyncio
 import contextlib
 import ssl
+from collections.abc import Coroutine
 from pathlib import Path
 from types import TracebackType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    AsyncContextManager,
-    Callable,
-    Coroutine,
-    List,
-    Optional,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_80, DEFAULT_IP, DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
@@ -58,7 +48,7 @@ _UpdaterType = TypeVar("_UpdaterType", bound="Updater")  # pylint: disable=inval
 _LOGGER = get_logger(__name__)
 
 
-class Updater(AsyncContextManager["Updater"]):
+class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
     """This class fetches updates for the bot either via long polling or by starting a webhook
     server. Received updates are enqueued into the :attr:`update_queue` and may be fetched from
     there to handle them appropriately.
@@ -152,7 +142,7 @@ class Updater(AsyncContextManager["Updater"]):
 
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]],
+        exc_type: Optional[type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
@@ -220,7 +210,7 @@ class Updater(AsyncContextManager["Updater"]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        allowed_updates: Optional[List[str]] = None,
+        allowed_updates: Optional[list[str]] = None,
         drop_pending_updates: Optional[bool] = None,
         error_callback: Optional[Callable[[TelegramError], None]] = None,
     ) -> "asyncio.Queue[object]":
@@ -275,7 +265,7 @@ class Updater(AsyncContextManager["Updater"]):
                     Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
-            allowed_updates (List[:obj:`str`], optional): Passed to
+            allowed_updates (list[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
@@ -354,7 +344,7 @@ class Updater(AsyncContextManager["Updater"]):
         pool_timeout: ODVInput[float],
         bootstrap_retries: int,
         drop_pending_updates: Optional[bool],
-        allowed_updates: Optional[List[str]],
+        allowed_updates: Optional[list[str]],
         ready: asyncio.Event,
         error_callback: Optional[Callable[[TelegramError], None]],
     ) -> None:
@@ -467,7 +457,7 @@ class Updater(AsyncContextManager["Updater"]):
         key: Optional[Union[str, Path]] = None,
         bootstrap_retries: int = 0,
         webhook_url: Optional[str] = None,
-        allowed_updates: Optional[List[str]] = None,
+        allowed_updates: Optional[list[str]] = None,
         drop_pending_updates: Optional[bool] = None,
         ip_address: Optional[str] = None,
         max_connections: int = 40,
@@ -526,7 +516,7 @@ class Updater(AsyncContextManager["Updater"]):
                 Defaults to :obj:`None`.
 
                 .. versionadded :: 13.4
-            allowed_updates (List[:obj:`str`], optional): Passed to
+            allowed_updates (list[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`. Defaults to :obj:`None`.
             max_connections (:obj:`int`, optional): Passed to
                 :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
@@ -634,7 +624,7 @@ class Updater(AsyncContextManager["Updater"]):
         port: int,
         url_path: str,
         bootstrap_retries: int,
-        allowed_updates: Optional[List[str]],
+        allowed_updates: Optional[list[str]],
         cert: Optional[Union[str, Path]] = None,
         key: Optional[Union[str, Path]] = None,
         drop_pending_updates: Optional[bool] = None,
@@ -777,7 +767,7 @@ class Updater(AsyncContextManager["Updater"]):
         self,
         max_retries: int,
         webhook_url: Optional[str],
-        allowed_updates: Optional[List[str]],
+        allowed_updates: Optional[list[str]],
         drop_pending_updates: Optional[bool] = None,
         cert: Optional[bytes] = None,
         bootstrap_interval: float = 1,

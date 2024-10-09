@@ -104,22 +104,9 @@ __all__ = (
 import mimetypes
 import re
 from abc import ABC, abstractmethod
-from typing import (
-    Collection,
-    Dict,
-    FrozenSet,
-    Iterable,
-    List,
-    Match,
-    NoReturn,
-    Optional,
-    Pattern,
-    Sequence,
-    Set,
-    Tuple,
-    Union,
-    cast,
-)
+from collections.abc import Collection, Iterable, Sequence
+from re import Match, Pattern
+from typing import NoReturn, Optional, Union, cast
 
 from telegram import Chat as TGChat
 from telegram import (
@@ -320,7 +307,7 @@ class MessageFilter(BaseFilter):
             update (:class:`telegram.Update`): The update to check.
 
         Returns:
-            :obj:`bool` | Dict[:obj:`str`, :obj:`list`] | :obj:`None`: If the update should be
+            :obj:`bool` | dict[:obj:`str`, :obj:`list`] | :obj:`None`: If the update should be
             handled by this filter, returns :obj:`True` or a dict with lists, in case the filter
             is a data filter. If the update should not be handled by this filter, :obj:`False` or
             :obj:`None`.
@@ -361,7 +348,7 @@ class UpdateFilter(BaseFilter):
             update (:class:`telegram.Update`): The update to check.
 
         Returns:
-            :obj:`bool` | Dict[:obj:`str`, :obj:`list`] | :obj:`None`: If the update should be
+            :obj:`bool` | dict[:obj:`str`, :obj:`list`] | :obj:`None`: If the update should be
             handled by this filter, returns :obj:`True` or a dict with lists, in case the filter
             is a data filter. If the update should not be handled by this filter, :obj:`False` or
             :obj:`None`.
@@ -441,7 +428,7 @@ class _MergedFilter(UpdateFilter):
             self.data_filter = True
 
     @staticmethod
-    def _merge(base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> FilterDataDict:
+    def _merge(base_output: Union[bool, dict], comp_output: Union[bool, dict]) -> FilterDataDict:
         base = base_output if isinstance(base_output, dict) else {}
         comp = comp_output if isinstance(comp_output, dict) else {}
         for k in comp:
@@ -585,13 +572,13 @@ class Caption(MessageFilter):
         :attr:`telegram.ext.filters.CAPTION`
 
     Args:
-        strings (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
+        strings (list[:obj:`str`] | tuple[:obj:`str`], optional): Which captions to allow. Only
             exact matches are allowed. If not specified, will allow any message with a caption.
     """
 
     __slots__ = ("strings",)
 
-    def __init__(self, strings: Optional[Union[List[str], Tuple[str, ...]]] = None):
+    def __init__(self, strings: Optional[Union[list[str], tuple[str, ...]]] = None):
         self.strings: Optional[Sequence[str]] = strings
         super().__init__(name=f"filters.Caption({strings})" if strings else "filters.CAPTION")
 
@@ -660,7 +647,7 @@ class CaptionRegex(MessageFilter):
         self.pattern: Pattern[str] = pattern
         super().__init__(name=f"filters.CaptionRegex({self.pattern})", data_filter=True)
 
-    def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
+    def filter(self, message: Message) -> Optional[dict[str, list[Match[str]]]]:
         if message.caption and (match := self.pattern.search(message.caption)):
             return {"matches": [match]}
         return {}
@@ -686,8 +673,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._username_name: str = "username"
         self.allow_empty: bool = allow_empty
 
-        self._chat_ids: Set[int] = set()
-        self._usernames: Set[str] = set()
+        self._chat_ids: set[int] = set()
+        self._usernames: set[str] = set()
 
         self._set_chat_ids(chat_id)
         self._set_usernames(username)
@@ -712,7 +699,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._usernames = set(parse_username(username))
 
     @property
-    def chat_ids(self) -> FrozenSet[int]:
+    def chat_ids(self) -> frozenset[int]:
         return frozenset(self._chat_ids)
 
     @chat_ids.setter
@@ -720,7 +707,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._set_chat_ids(chat_id)
 
     @property
-    def usernames(self) -> FrozenSet[str]:
+    def usernames(self) -> frozenset[str]:
         """Which username(s) to allow through.
 
         Warning:
@@ -1617,7 +1604,7 @@ class Language(MessageFilter):
             lang = cast(str, lang)
             self.lang: Sequence[str] = [lang]
         else:
-            lang = cast(List[str], lang)
+            lang = cast(list[str], lang)
             self.lang = lang
         super().__init__(name=f"filters.Language({self.lang})")
 
@@ -1795,7 +1782,7 @@ class Regex(MessageFilter):
         self.pattern: Pattern[str] = pattern
         super().__init__(name=f"filters.Regex({self.pattern})", data_filter=True)
 
-    def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
+    def filter(self, message: Message) -> Optional[dict[str, list[Match[str]]]]:
         if message.text and (match := self.pattern.search(message.text)):
             return {"matches": [match]}
         return {}
@@ -2440,7 +2427,7 @@ class SuccessfulPayment(MessageFilter):
         :attr:`telegram.ext.filters.SUCCESSFUL_PAYMENT`
 
     Args:
-        invoice_payloads (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which
+        invoice_payloads (list[:obj:`str`] | tuple[:obj:`str`], optional): Which
             invoice payloads to allow. Only exact matches are allowed. If not
             specified, will allow any invoice payload.
 
@@ -2449,7 +2436,7 @@ class SuccessfulPayment(MessageFilter):
 
     __slots__ = ("invoice_payloads",)
 
-    def __init__(self, invoice_payloads: Optional[Union[List[str], Tuple[str, ...]]] = None):
+    def __init__(self, invoice_payloads: Optional[Union[list[str], tuple[str, ...]]] = None):
         self.invoice_payloads: Optional[Sequence[str]] = invoice_payloads
         super().__init__(
             name=(
@@ -2498,13 +2485,13 @@ class Text(MessageFilter):
           commands.
 
     Args:
-        strings (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
+        strings (list[:obj:`str`] | tuple[:obj:`str`], optional): Which messages to allow. Only
             exact matches are allowed. If not specified, will allow any text message.
     """
 
     __slots__ = ("strings",)
 
-    def __init__(self, strings: Optional[Union[List[str], Tuple[str, ...]]] = None):
+    def __init__(self, strings: Optional[Union[list[str], tuple[str, ...]]] = None):
         self.strings: Optional[Sequence[str]] = strings
         super().__init__(name=f"filters.Text({strings})" if strings else "filters.TEXT")
 
@@ -2694,7 +2681,7 @@ class User(_ChatUserBaseFilter):
         return message.from_user
 
     @property
-    def user_ids(self) -> FrozenSet[int]:
+    def user_ids(self) -> frozenset[int]:
         """
         Which user ID(s) to allow through.
 
@@ -2832,7 +2819,7 @@ class ViaBot(_ChatUserBaseFilter):
         return message.via_bot
 
     @property
-    def bot_ids(self) -> FrozenSet[int]:
+    def bot_ids(self) -> frozenset[int]:
         """
         Which bot ID(s) to allow through.
 

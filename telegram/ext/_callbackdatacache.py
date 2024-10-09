@@ -18,8 +18,9 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackDataCache class."""
 import time
+from collections.abc import MutableMapping
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, MutableMapping, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Optional, Union, cast
 from uuid import uuid4
 
 try:
@@ -70,7 +71,7 @@ class InvalidCallbackData(TelegramError):
         )
         self.callback_data: Optional[str] = callback_data
 
-    def __reduce__(self) -> Tuple[type, Tuple[Optional[str]]]:  # type: ignore[override]
+    def __reduce__(self) -> tuple[type, tuple[Optional[str]]]:  # type: ignore[override]
         """Defines how to serialize the exception for pickle. See
         :py:meth:`object.__reduce__` for more info.
 
@@ -87,7 +88,7 @@ class _KeyboardData:
         self,
         keyboard_uuid: str,
         access_time: Optional[float] = None,
-        button_data: Optional[Dict[str, object]] = None,
+        button_data: Optional[dict[str, object]] = None,
     ):
         self.keyboard_uuid = keyboard_uuid
         self.button_data = button_data or {}
@@ -97,7 +98,7 @@ class _KeyboardData:
         """Updates the access time with the current time."""
         self.access_time = time.time()
 
-    def to_tuple(self) -> Tuple[str, float, Dict[str, object]]:
+    def to_tuple(self) -> tuple[str, float, dict[str, object]]:
         """Gives a tuple representation consisting of the keyboard uuid, the access time and the
         button data.
         """
@@ -140,8 +141,8 @@ class CallbackDataCache:
         maxsize (:obj:`int`, optional): Maximum number of items in each of the internal mappings.
             Defaults to ``1024``.
 
-        persistent_data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-        Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
+        persistent_data (tuple[list[tuple[:obj:`str`, :obj:`float`, \
+        dict[:obj:`str`, :class:`object`]]], dict[:obj:`str`, :obj:`str`]], optional): \
         Data to initialize the cache with, as returned by \
         :meth:`telegram.ext.BasePersistence.get_callback_data`.
 
@@ -181,8 +182,8 @@ class CallbackDataCache:
         .. versionadded:: 20.0
 
         Args:
-            persistent_data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-            Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
+            persistent_data (tuple[list[tuple[:obj:`str`, :obj:`float`, \
+            dict[:obj:`str`, :class:`object`]]], dict[:obj:`str`, :obj:`str`]], optional): \
             Data to load, as returned by \
             :meth:`telegram.ext.BasePersistence.get_callback_data`.
         """
@@ -205,8 +206,8 @@ class CallbackDataCache:
 
     @property
     def persistence_data(self) -> CDCData:
-        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]],
-        Dict[:obj:`str`, :obj:`str`]]: The data that needs to be persisted to allow
+        """tuple[list[tuple[:obj:`str`, :obj:`float`, dict[:obj:`str`, :class:`object`]]],
+        dict[:obj:`str`, :obj:`str`]]: The data that needs to be persisted to allow
         caching callback data across bot reboots.
         """
         # While building a list/dict from the LRUCaches has linear runtime (in the number of
@@ -269,7 +270,7 @@ class CallbackDataCache:
 
     def __get_keyboard_uuid_and_button_data(
         self, callback_data: str
-    ) -> Union[Tuple[str, object], Tuple[None, InvalidCallbackData]]:
+    ) -> Union[tuple[str, object], tuple[None, InvalidCallbackData]]:
         keyboard, button = self.extract_uuids(callback_data)
         try:
             # we get the values before calling update() in case KeyErrors are raised
@@ -283,7 +284,7 @@ class CallbackDataCache:
         return keyboard, button_data
 
     @staticmethod
-    def extract_uuids(callback_data: str) -> Tuple[str, str]:
+    def extract_uuids(callback_data: str) -> tuple[str, str]:
         """Extracts the keyboard uuid and the button uuid from the given :paramref:`callback_data`.
 
         Args:

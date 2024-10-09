@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects used for request chats/users service messages."""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
@@ -59,7 +60,7 @@ class UsersShared(TelegramObject):
 
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
-        users (Tuple[:class:`telegram.SharedUser`]): Information about users shared with the
+        users (tuple[:class:`telegram.SharedUser`]): Information about users shared with the
             bot.
 
             .. versionadded:: 21.1
@@ -76,7 +77,7 @@ class UsersShared(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.request_id: int = request_id
-        self.users: Tuple[SharedUser, ...] = parse_sequence_arg(users)
+        self.users: tuple[SharedUser, ...] = parse_sequence_arg(users)
 
         self._id_attrs = (self.request_id, self.users)
 
@@ -144,7 +145,7 @@ class ChatShared(TelegramObject):
             the bot and available.
 
             .. versionadded:: 21.1
-        photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Available sizes of the chat photo,
+        photo (tuple[:class:`telegram.PhotoSize`]): Optional. Available sizes of the chat photo,
             if the photo was requested by the bot
 
             .. versionadded:: 21.1
@@ -167,7 +168,7 @@ class ChatShared(TelegramObject):
         self.chat_id: int = chat_id
         self.title: Optional[str] = title
         self.username: Optional[str] = username
-        self.photo: Optional[Tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
+        self.photo: Optional[tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
 
         self._id_attrs = (self.request_id, self.chat_id)
 
@@ -226,7 +227,7 @@ class SharedUser(TelegramObject):
             bot.
         username (:obj:`str`): Optional. Username of the user, if the username was requested by the
             bot.
-        photo (Tuple[:class:`telegram.PhotoSize`]): Available sizes of the chat photo, if
+        photo (tuple[:class:`telegram.PhotoSize`]): Available sizes of the chat photo, if
             the photo was requested by the bot. This list is empty if the photo was not requsted.
     """
 
@@ -247,7 +248,7 @@ class SharedUser(TelegramObject):
         self.first_name: Optional[str] = first_name
         self.last_name: Optional[str] = last_name
         self.username: Optional[str] = username
-        self.photo: Optional[Tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
+        self.photo: Optional[tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
 
         self._id_attrs = (self.user_id,)
 

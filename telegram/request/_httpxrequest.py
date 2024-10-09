@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
-from typing import Any, Collection, Dict, Optional, Tuple, Union
+from collections.abc import Collection
+from typing import Any, Optional, Union
 
 import httpx
 
@@ -122,7 +123,7 @@ class HTTPXRequest(BaseRequest):
             :meth:`do_request`. Defaults to ``20`` seconds.
 
             .. versionadded:: 21.0
-        httpx_kwargs (Dict[:obj:`str`, Any], optional): Additional keyword arguments to be passed
+        httpx_kwargs (dict[:obj:`str`, Any], optional): Additional keyword arguments to be passed
             to the `httpx.AsyncClient <https://www.python-httpx.org/api/#asyncclient>`_
             constructor.
 
@@ -153,7 +154,7 @@ class HTTPXRequest(BaseRequest):
         socket_options: Optional[Collection[SocketOpt]] = None,
         proxy: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
         media_write_timeout: Optional[float] = 20.0,
-        httpx_kwargs: Optional[Dict[str, Any]] = None,
+        httpx_kwargs: Optional[dict[str, Any]] = None,
     ):
         if proxy_url is not None and proxy is not None:
             raise ValueError("The parameters `proxy_url` and `proxy` are mutually exclusive.")
@@ -261,7 +262,7 @@ class HTTPXRequest(BaseRequest):
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
-    ) -> Tuple[int, bytes]:
+    ) -> tuple[int, bytes]:
         """See :meth:`BaseRequest.do_request`."""
         if self._client.is_closed:
             raise RuntimeError("This HTTPXRequest is not initialized!")

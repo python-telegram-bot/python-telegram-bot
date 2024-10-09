@@ -20,20 +20,7 @@
 import asyncio
 import datetime
 from dataclasses import dataclass
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Final,
-    Generic,
-    List,
-    NoReturn,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, Final, Generic, NoReturn, Optional, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
@@ -55,7 +42,7 @@ from telegram.ext._utils.types import CCT, ConversationDict, ConversationKey
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
-_CheckUpdateType = Tuple[object, ConversationKey, BaseHandler[Update, CCT, object], object]
+_CheckUpdateType = tuple[object, ConversationKey, BaseHandler[Update, CCT, object], object]
 
 _LOGGER = get_logger(__name__, class_name="ConversationHandler")
 
@@ -192,16 +179,16 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         * :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
 
     Args:
-        entry_points (List[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
+        entry_points (list[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
             objects that
             can trigger the start of the conversation. The first handler whose :meth:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
             handled.
-        states (Dict[:obj:`object`, List[:class:`telegram.ext.BaseHandler`]]): A :obj:`dict` that
+        states (dict[:obj:`object`, list[:class:`telegram.ext.BaseHandler`]]): A :obj:`dict` that
             defines the different states of conversation a user can be in and one or more
             associated :obj:`BaseHandler` objects that should be used in that state. The first
             handler whose :meth:`check_update` method returns :obj:`True` will be used.
-        fallbacks (List[:class:`telegram.ext.BaseHandler`]): A list of handlers that might be used
+        fallbacks (list[:class:`telegram.ext.BaseHandler`]): A list of handlers that might be used
             if the user is in a conversation, but every handler for their current state returned
             :obj:`False` on :meth:`check_update`. The first handler which :meth:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
@@ -238,7 +225,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
 
             .. versionchanged:: 20.0
                 Was previously named as ``persistence``.
-        map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
+        map_to_parent (dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
             used to instruct a child conversation handler to transition into a mapped state on
             its parent conversation handler in place of a specified nested state.
         block (:obj:`bool`, optional): Pass :obj:`False` or :obj:`True` to set a default value for
@@ -297,9 +284,9 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
     # pylint: disable=super-init-not-called
     def __init__(
         self: "ConversationHandler[CCT]",
-        entry_points: List[BaseHandler[Update, CCT, object]],
-        states: Dict[object, List[BaseHandler[Update, CCT, object]]],
-        fallbacks: List[BaseHandler[Update, CCT, object]],
+        entry_points: list[BaseHandler[Update, CCT, object]],
+        states: dict[object, list[BaseHandler[Update, CCT, object]]],
+        fallbacks: list[BaseHandler[Update, CCT, object]],
         allow_reentry: bool = False,
         per_chat: bool = True,
         per_user: bool = True,
@@ -307,7 +294,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         conversation_timeout: Optional[Union[float, datetime.timedelta]] = None,
         name: Optional[str] = None,
         persistent: bool = False,
-        map_to_parent: Optional[Dict[object, object]] = None,
+        map_to_parent: Optional[dict[object, object]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         # these imports need to be here because of circular import error otherwise
@@ -324,9 +311,9 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         # Store the actual setting in a protected variable instead
         self._block: DVType[bool] = block
 
-        self._entry_points: List[BaseHandler[Update, CCT, object]] = entry_points
-        self._states: Dict[object, List[BaseHandler[Update, CCT, object]]] = states
-        self._fallbacks: List[BaseHandler[Update, CCT, object]] = fallbacks
+        self._entry_points: list[BaseHandler[Update, CCT, object]] = entry_points
+        self._states: dict[object, list[BaseHandler[Update, CCT, object]]] = states
+        self._fallbacks: list[BaseHandler[Update, CCT, object]] = fallbacks
 
         self._allow_reentry: bool = allow_reentry
         self._per_user: bool = per_user
@@ -336,14 +323,14 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
             conversation_timeout
         )
         self._name: Optional[str] = name
-        self._map_to_parent: Optional[Dict[object, object]] = map_to_parent
+        self._map_to_parent: Optional[dict[object, object]] = map_to_parent
 
         # if conversation_timeout is used, this dict is used to schedule a job which runs when the
         # conv has timed out.
-        self.timeout_jobs: Dict[ConversationKey, Job[Any]] = {}
+        self.timeout_jobs: dict[ConversationKey, Job[Any]] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
-        self._child_conversations: Set[ConversationHandler] = set()
+        self._child_conversations: set[ConversationHandler] = set()
 
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
@@ -359,7 +346,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
                 stacklevel=2,
             )
 
-        all_handlers: List[BaseHandler[Update, CCT, object]] = []
+        all_handlers: list[BaseHandler[Update, CCT, object]] = []
         all_handlers.extend(entry_points)
         all_handlers.extend(fallbacks)
 
@@ -466,8 +453,8 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         )
 
     @property
-    def entry_points(self) -> List[BaseHandler[Update, CCT, object]]:
-        """List[:class:`telegram.ext.BaseHandler`]: A list of :obj:`BaseHandler` objects that can
+    def entry_points(self) -> list[BaseHandler[Update, CCT, object]]:
+        """list[:class:`telegram.ext.BaseHandler`]: A list of :obj:`BaseHandler` objects that can
         trigger the start of the conversation.
         """
         return self._entry_points
@@ -479,8 +466,8 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         )
 
     @property
-    def states(self) -> Dict[object, List[BaseHandler[Update, CCT, object]]]:
-        """Dict[:obj:`object`, List[:class:`telegram.ext.BaseHandler`]]: A :obj:`dict` that
+    def states(self) -> dict[object, list[BaseHandler[Update, CCT, object]]]:
+        """dict[:obj:`object`, list[:class:`telegram.ext.BaseHandler`]]: A :obj:`dict` that
         defines the different states of conversation a user can be in and one or more
         associated :obj:`BaseHandler` objects that should be used in that state.
         """
@@ -491,8 +478,8 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         raise AttributeError("You can not assign a new value to states after initialization.")
 
     @property
-    def fallbacks(self) -> List[BaseHandler[Update, CCT, object]]:
-        """List[:class:`telegram.ext.BaseHandler`]: A list of handlers that might be used if
+    def fallbacks(self) -> list[BaseHandler[Update, CCT, object]]:
+        """list[:class:`telegram.ext.BaseHandler`]: A list of handlers that might be used if
         the user is in a conversation, but every handler for their current state returned
         :obj:`False` on :meth:`check_update`.
         """
@@ -578,8 +565,8 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         raise AttributeError("You can not assign a new value to persistent after initialization.")
 
     @property
-    def map_to_parent(self) -> Optional[Dict[object, object]]:
-        """Dict[:obj:`object`, :obj:`object`]: Optional. A :obj:`dict` that can be
+    def map_to_parent(self) -> Optional[dict[object, object]]:
+        """dict[:obj:`object`, :obj:`object`]: Optional. A :obj:`dict` that can be
         used to instruct a nested :class:`ConversationHandler` to transition into a mapped state on
         its parent :class:`ConversationHandler` in place of a specified nested state.
         """
@@ -593,7 +580,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
 
     async def _initialize_persistence(
         self, application: "Application"
-    ) -> Dict[str, TrackingDict[ConversationKey, object]]:
+    ) -> dict[str, TrackingDict[ConversationKey, object]]:
         """Initializes the persistence for this handler and its child conversations.
         While this method is marked as protected, we expect it to be called by the
         Application/parent conversations. It's just protected to hide it from users.
@@ -648,7 +635,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         chat = update.effective_chat
         user = update.effective_user
 
-        key: List[Union[int, str]] = []
+        key: list[Union[int, str]] = []
 
         if self.per_chat:
             if chat is None:

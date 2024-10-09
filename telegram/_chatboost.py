@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram ChatBoosts."""
 
+from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._chat import Chat
@@ -119,7 +120,7 @@ class ChatBoostSource(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type[ChatBoostSource]] = {
+        _class_mapping: dict[str, type[ChatBoostSource]] = {
             cls.PREMIUM: ChatBoostSourcePremium,
             cls.GIFT_CODE: ChatBoostSourceGiftCode,
             cls.GIVEAWAY: ChatBoostSourceGiveaway,
@@ -431,7 +432,7 @@ class UserChatBoosts(TelegramObject):
             user.
 
     Attributes:
-        boosts (Tuple[:class:`telegram.ChatBoost`]): List of boosts added to the chat by the user.
+        boosts (tuple[:class:`telegram.ChatBoost`]): List of boosts added to the chat by the user.
     """
 
     __slots__ = ("boosts",)
@@ -444,7 +445,7 @@ class UserChatBoosts(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.boosts: Tuple[ChatBoost, ...] = parse_sequence_arg(boosts)
+        self.boosts: tuple[ChatBoost, ...] = parse_sequence_arg(boosts)
 
         self._id_attrs = (self.boosts,)
         self._freeze()

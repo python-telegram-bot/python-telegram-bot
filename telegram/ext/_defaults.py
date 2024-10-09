@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
 import datetime
-from typing import Any, Dict, NoReturn, Optional, final
+from typing import Any, NoReturn, Optional, final
 
 from telegram import LinkPreviewOptions
 from telegram._utils.datetime import UTC
@@ -228,7 +228,7 @@ class Defaults:
         return False
 
     @property
-    def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003
+    def api_defaults(self) -> dict[str, Any]:  # skip-cq: PY-D0003
         return self._api_defaults
 
     @property

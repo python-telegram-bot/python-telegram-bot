@@ -130,7 +130,7 @@ class InputFile:
             Content may now be a file handle.
 
         Returns:
-            Tuple[:obj:`str`, :obj:`bytes` | :class:`IO`, :obj:`str`]:
+            tuple[:obj:`str`, :obj:`bytes` | :class:`IO`, :obj:`str`]:
         """
         return self.filename, self.input_file_content, self.mimetype
 

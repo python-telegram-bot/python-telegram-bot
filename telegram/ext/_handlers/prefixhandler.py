@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PrefixHandler class."""
 import itertools
-from typing import TYPE_CHECKING, Any, Dict, FrozenSet, List, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -108,7 +108,7 @@ class PrefixHandler(BaseHandler[Update, CCT, RT]):
             .. seealso:: :wiki:`Concurrency`
 
     Attributes:
-        commands (FrozenSet[:obj:`str`]): The commands that this handler will listen for, i.e. the
+        commands (frozenset[:obj:`str`]): The commands that this handler will listen for, i.e. the
             combinations of :paramref:`prefix` and :paramref:`command`.
         callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
@@ -136,7 +136,7 @@ class PrefixHandler(BaseHandler[Update, CCT, RT]):
 
         commands = {command.lower()} if isinstance(command, str) else {x.lower() for x in command}
 
-        self.commands: FrozenSet[str] = frozenset(
+        self.commands: frozenset[str] = frozenset(
             p + c for p, c in itertools.product(prefixes, commands)
         )
         self.filters: filters_module.BaseFilter = (
@@ -145,7 +145,7 @@ class PrefixHandler(BaseHandler[Update, CCT, RT]):
 
     def check_update(
         self, update: object
-    ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict[Any, Any]]]]]]:
+    ) -> Optional[Union[bool, tuple[list[str], Optional[Union[bool, dict[Any, Any]]]]]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -173,7 +173,7 @@ class PrefixHandler(BaseHandler[Update, CCT, RT]):
         context: CCT,
         update: Update,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
+        check_result: Optional[Union[bool, tuple[list[str], Optional[bool]]]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single
         whitespaces and add output of data filters to :attr:`CallbackContext` as well.

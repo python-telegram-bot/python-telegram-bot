@@ -12,7 +12,7 @@ bot.
 
 import logging
 from collections import defaultdict
-from typing import DefaultDict, Optional, Set
+from typing import Optional
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
@@ -40,7 +40,7 @@ class ChatData:
     """Custom class for chat_data. Here we store data per message."""
 
     def __init__(self) -> None:
-        self.clicks_per_message: DefaultDict[int, int] = defaultdict(int)
+        self.clicks_per_message: defaultdict[int, int] = defaultdict(int)
 
 
 # The [ExtBot, dict, ChatData, dict] is for type checkers like mypy
@@ -57,7 +57,7 @@ class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
         self._message_id: Optional[int] = None
 
     @property
-    def bot_user_ids(self) -> Set[int]:
+    def bot_user_ids(self) -> set[int]:
         """Custom shortcut to access a value stored in the bot_data dict"""
         return self.bot_data.setdefault("user_ids", set())
 

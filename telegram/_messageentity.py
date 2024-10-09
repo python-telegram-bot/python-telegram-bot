@@ -20,7 +20,8 @@
 
 import copy
 import itertools
-from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -200,7 +201,7 @@ class MessageEntity(TelegramObject):
         accumulated_length = 0
         # calculate the length of each slice text[:position] in utf-16 accordingly,
         # store the position translations
-        position_translation: Dict[int, int] = {}
+        position_translation: dict[int, int] = {}
         for i, position in enumerate(positions):
             last_position = positions[i - 1] if i > 0 else 0
             text_slice = text[last_position:position]
@@ -286,8 +287,8 @@ class MessageEntity(TelegramObject):
     @classmethod
     def concatenate(
         cls,
-        *args: Union[Tuple[str, _SEM], Tuple[str, _SEM, bool]],
-    ) -> Tuple[str, _SEM]:
+        *args: Union[tuple[str, _SEM], tuple[str, _SEM, bool]],
+    ) -> tuple[str, _SEM]:
         """Utility functionality for concatenating two text along with their formatting entities.
 
         Tip:
@@ -332,8 +333,8 @@ class MessageEntity(TelegramObject):
         .. versionadded:: 21.5
 
         Args:
-            *args (Tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`]] | \
-                Tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`], :obj:`bool`]):
+            *args (tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`]] | \
+                tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`], :obj:`bool`]):
                 Arbitrary number of tuples containing the text and its entities to concatenate.
                 If the last element of the tuple is a :obj:`bool`, it is used to determine whether
                 to adjust the entities to UTF-16 via
@@ -341,11 +342,11 @@ class MessageEntity(TelegramObject):
                 default.
 
         Returns:
-            Tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`]]: The concatenated text
+            tuple[:obj:`str`, Sequence[:class:`telegram.MessageEntity`]]: The concatenated text
             and its entities
         """
         output_text = ""
-        output_entities: List[MessageEntity] = []
+        output_entities: list[MessageEntity] = []
         for arg in args:
             text, entities = arg[0], arg[1]
 
@@ -357,8 +358,8 @@ class MessageEntity(TelegramObject):
 
         return output_text, output_entities
 
-    ALL_TYPES: Final[List[str]] = list(constants.MessageEntityType)
-    """List[:obj:`str`]: A list of all available message entity types."""
+    ALL_TYPES: Final[list[str]] = list(constants.MessageEntityType)
+    """list[:obj:`str`]: A list of all available message entity types."""
     BLOCKQUOTE: Final[str] = constants.MessageEntityType.BLOCKQUOTE
     """:const:`telegram.constants.MessageEntityType.BLOCKQUOTE`
 

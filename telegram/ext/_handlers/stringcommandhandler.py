@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the StringCommandHandler class."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
@@ -79,14 +79,14 @@ class StringCommandHandler(BaseHandler[str, CCT, RT]):
         super().__init__(callback, block=block)
         self.command: str = command
 
-    def check_update(self, update: object) -> Optional[List[str]]:
+    def check_update(self, update: object) -> Optional[list[str]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:obj:`object`): The incoming update.
 
         Returns:
-            List[:obj:`str`]: List containing the text command split on whitespace.
+            list[:obj:`str`]: List containing the text command split on whitespace.
 
         """
         if isinstance(update, str) and update.startswith("/"):
@@ -100,7 +100,7 @@ class StringCommandHandler(BaseHandler[str, CCT, RT]):
         context: CCT,
         update: str,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Optional[List[str]],
+        check_result: Optional[list[str]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single
         whitespaces.

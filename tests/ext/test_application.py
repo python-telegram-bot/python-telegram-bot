@@ -302,15 +302,19 @@ class TestApplication:
         )
 
         if updater:
-            async with ApplicationBuilder().bot(one_time_bot).concurrent_updates(
-                update_processor
-            ).build():
+            async with (
+                ApplicationBuilder().bot(one_time_bot).concurrent_updates(update_processor).build()
+            ):
                 pass
             assert self.test_flag == {"bot", "update_processor", "updater"}
         else:
-            async with ApplicationBuilder().bot(one_time_bot).updater(None).concurrent_updates(
-                update_processor
-            ).build():
+            async with (
+                ApplicationBuilder()
+                .bot(one_time_bot)
+                .updater(None)
+                .concurrent_updates(update_processor)
+                .build()
+            ):
                 pass
             assert self.test_flag == {"bot", "update_processor"}
 

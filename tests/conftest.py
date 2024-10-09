@@ -21,7 +21,6 @@ import datetime
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List
 from uuid import uuid4
 
 import pytest
@@ -76,7 +75,7 @@ def no_rerun_after_xfail_or_flood(error, name, test: pytest.Function, plugin):
     return not (xfail_present or did_we_flood)
 
 
-def pytest_collection_modifyitems(items: List[pytest.Item]):
+def pytest_collection_modifyitems(items: list[pytest.Item]):
     """Here we add a flaky marker to all request making tests and a (no_)req marker to the rest."""
     for item in items:  # items are the test methods
         parent = item.parent  # Get the parent of the item (class, or module if defined outside)
@@ -145,7 +144,7 @@ def event_loop(request):
 
 
 @pytest.fixture(scope="session")
-def bot_info() -> Dict[str, str]:
+def bot_info() -> dict[str, str]:
     return BOT_INFO_PROVIDER.get_info()
 
 

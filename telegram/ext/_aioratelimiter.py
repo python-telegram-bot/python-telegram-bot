@@ -22,7 +22,8 @@ library.
 import asyncio
 import contextlib
 import sys
-from typing import Any, AsyncIterator, Callable, Coroutine, Dict, List, Optional, Union
+from collections.abc import AsyncIterator, Coroutine
+from typing import Any, Callable, Optional, Union
 
 try:
     from aiolimiter import AsyncLimiter
@@ -152,7 +153,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
             self._group_max_rate = 0
             self._group_time_period = 0
 
-        self._group_limiters: Dict[Union[str, int], AsyncLimiter] = {}
+        self._group_limiters: dict[Union[str, int], AsyncLimiter] = {}
         self._max_retries: int = max_retries
         self._retry_after_event = asyncio.Event()
         self._retry_after_event.set()
@@ -187,10 +188,10 @@ class AIORateLimiter(BaseRateLimiter[int]):
         self,
         chat: bool,
         group: Union[str, int, bool],
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, list[JSONDict]]]],
         args: Any,
-        kwargs: Dict[str, Any],
-    ) -> Union[bool, JSONDict, List[JSONDict]]:
+        kwargs: dict[str, Any],
+    ) -> Union[bool, JSONDict, list[JSONDict]]:
         base_context = self._base_limiter if (chat and self._base_limiter) else null_context()
         group_context = (
             self._get_group_limiter(group) if group and self._group_max_rate else null_context()
@@ -205,13 +206,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
     # mypy doesn't understand that the last run of the for loop raises an exception
     async def process_request(
         self,
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, list[JSONDict]]]],
         args: Any,
-        kwargs: Dict[str, Any],
+        kwargs: dict[str, Any],
         endpoint: str,  # noqa: ARG002
-        data: Dict[str, Any],
+        data: dict[str, Any],
         rate_limit_args: Optional[int],
-    ) -> Union[bool, JSONDict, List[JSONDict]]:
+    ) -> Union[bool, JSONDict, list[JSONDict]]:
         """
         Processes a request by applying rate limiting.
 

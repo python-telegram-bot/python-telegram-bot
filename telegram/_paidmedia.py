@@ -18,7 +18,8 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent paid media in Telegram."""
 
-from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._files.photosize import PhotoSize
@@ -81,7 +82,7 @@ class PaidMedia(TelegramObject):
         care of selecting the correct subclass.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (dict[:obj:`str`, ...]): The JSON data.
             bot (:class:`telegram.Bot`, optional): The bot associated with this object.
 
         Returns:
@@ -96,7 +97,7 @@ class PaidMedia(TelegramObject):
         if not data and cls is PaidMedia:
             return None
 
-        _class_mapping: Dict[str, Type[PaidMedia]] = {
+        _class_mapping: dict[str, type[PaidMedia]] = {
             cls.PREVIEW: PaidMediaPreview,
             cls.PHOTO: PaidMediaPhoto,
             cls.VIDEO: PaidMediaVideo,
@@ -165,7 +166,7 @@ class PaidMediaPhoto(PaidMedia):
 
     Attributes:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PHOTO`.
-        photo (Tuple[:class:`telegram.PhotoSize`]): The photo.
+        photo (tuple[:class:`telegram.PhotoSize`]): The photo.
     """
 
     __slots__ = ("photo",)
@@ -179,7 +180,7 @@ class PaidMediaPhoto(PaidMedia):
         super().__init__(type=PaidMedia.PHOTO, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+            self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
 
             self._id_attrs = (self.type, self.photo)
 
@@ -259,7 +260,7 @@ class PaidMediaInfo(TelegramObject):
     Attributes:
         star_count (:obj:`int`): The number of Telegram Stars that must be paid to buy access to
             the media.
-        paid_media (Tuple[:class:`telegram.PaidMedia`]): Information about the paid media.
+        paid_media (tuple[:class:`telegram.PaidMedia`]): Information about the paid media.
     """
 
     __slots__ = ("paid_media", "star_count")
@@ -273,7 +274,7 @@ class PaidMediaInfo(TelegramObject):
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.star_count: int = star_count
-        self.paid_media: Tuple[PaidMedia, ...] = parse_sequence_arg(paid_media)
+        self.paid_media: tuple[PaidMedia, ...] = parse_sequence_arg(paid_media)
 
         self._id_attrs = (self.star_count, self.paid_media)
         self._freeze()

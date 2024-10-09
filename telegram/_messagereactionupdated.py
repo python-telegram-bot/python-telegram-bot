@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageReaction Update."""
+from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
 from telegram._reaction import ReactionCount, ReactionType
@@ -54,7 +55,7 @@ class MessageReactionCountUpdated(TelegramObject):
         message_id (:obj:`int`): Unique message identifier inside the chat.
         date (:class:`datetime.datetime`): Date of the change in Unix time
             |datetime_localization|
-        reactions (Tuple[:class:`telegram.ReactionCount`]): List of reactions that are present on
+        reactions (tuple[:class:`telegram.ReactionCount`]): List of reactions that are present on
             the message
     """
 
@@ -79,7 +80,7 @@ class MessageReactionCountUpdated(TelegramObject):
         self.chat: Chat = chat
         self.message_id: int = message_id
         self.date: datetime = date
-        self.reactions: Tuple[ReactionCount, ...] = parse_sequence_arg(reactions)
+        self.reactions: tuple[ReactionCount, ...] = parse_sequence_arg(reactions)
 
         self._id_attrs = (self.chat, self.message_id, self.date, self.reactions)
         self._freeze()
@@ -132,9 +133,9 @@ class MessageReactionUpdated(TelegramObject):
         message_id (:obj:`int`): Unique message identifier inside the chat.
         date (:class:`datetime.datetime`): Date of the change in Unix time.
             |datetime_localization|
-        old_reaction (Tuple[:class:`telegram.ReactionType`]): Previous list of reaction types
+        old_reaction (tuple[:class:`telegram.ReactionType`]): Previous list of reaction types
             that were set by the user.
-        new_reaction (Tuple[:class:`telegram.ReactionType`]): New list of reaction types that
+        new_reaction (tuple[:class:`telegram.ReactionType`]): New list of reaction types that
             were set by the user.
         user (:class:`telegram.User`): Optional. The user that changed the reaction, if the user
             isn't anonymous.
@@ -169,8 +170,8 @@ class MessageReactionUpdated(TelegramObject):
         self.chat: Chat = chat
         self.message_id: int = message_id
         self.date: datetime = date
-        self.old_reaction: Tuple[ReactionType, ...] = parse_sequence_arg(old_reaction)
-        self.new_reaction: Tuple[ReactionType, ...] = parse_sequence_arg(new_reaction)
+        self.old_reaction: tuple[ReactionType, ...] = parse_sequence_arg(old_reaction)
+        self.new_reaction: tuple[ReactionType, ...] = parse_sequence_arg(new_reaction)
 
         # Optional
         self.user: Optional[User] = user

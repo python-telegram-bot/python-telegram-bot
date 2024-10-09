@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that represents a Telegram InputInvoiceMessageContent."""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._payment.labeledprice import LabeledPrice
@@ -122,7 +123,7 @@ class InputInvoiceMessageContent(InputMessageContent):
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_.
             Pass ``XTR`` for payments in |tg_stars|.
-        prices (Tuple[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
+        prices (tuple[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
             components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
             etc.). Must contain exactly one item for payments in |tg_stars|.
 
@@ -135,7 +136,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
             shows the number of digits past the decimal point for each currency (2 for the majority
             of currencies). Defaults to ``0``. Not supported for payments in |tg_stars|.
-        suggested_tip_amounts (Tuple[:obj:`int`]): Optional. An array of suggested
+        suggested_tip_amounts (tuple[:obj:`int`]): Optional. An array of suggested
             amounts of tip in the *smallest units* of the currency (integer, **not** float/double).
             At most 4 suggested tip amounts can be specified. The suggested tip amounts must be
             positive, passed in a strictly increased order and must not exceed
@@ -226,10 +227,10 @@ class InputInvoiceMessageContent(InputMessageContent):
             self.payload: str = payload
             self.provider_token: Optional[str] = provider_token
             self.currency: str = currency
-            self.prices: Tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
+            self.prices: tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
             # Optionals
             self.max_tip_amount: Optional[int] = max_tip_amount
-            self.suggested_tip_amounts: Tuple[int, ...] = parse_sequence_arg(suggested_tip_amounts)
+            self.suggested_tip_amounts: tuple[int, ...] = parse_sequence_arg(suggested_tip_amounts)
             self.provider_data: Optional[str] = provider_data
             self.photo_url: Optional[str] = photo_url
             self.photo_size: Optional[int] = photo_size

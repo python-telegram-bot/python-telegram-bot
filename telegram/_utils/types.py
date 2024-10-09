@@ -23,19 +23,9 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+from collections.abc import Collection
 from pathlib import Path
-from typing import (
-    IO,
-    TYPE_CHECKING,
-    Any,
-    Collection,
-    Dict,
-    Literal,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import IO, TYPE_CHECKING, Any, Literal, Optional, TypeVar, Union
 
 if TYPE_CHECKING:
     from telegram import (
@@ -57,7 +47,7 @@ FileInput = Union[FilePathInput, FileLike, bytes, str]
 """Valid input for passing files to Telegram. Either a file id as string, a file like object,
 a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes`."""
 
-JSONDict = Dict[str, Any]
+JSONDict = dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
 
 DVValueType = TypeVar("DVValueType")  # pylint: disable=invalid-name
@@ -82,9 +72,9 @@ ReplyMarkup = Union[
 .. versionadded:: 20.0
 """
 
-FieldTuple = Tuple[str, Union[bytes, IO[bytes]], str]
+FieldTuple = tuple[str, Union[bytes, IO[bytes]], str]
 """Alias for return type of `InputFile.field_tuple`."""
-UploadFileDict = Dict[str, FieldTuple]
+UploadFileDict = dict[str, FieldTuple]
 """Dictionary containing file data to be uploaded to the API."""
 
 HTTPVersion = Literal["1.1", "2.0", "2"]
@@ -97,7 +87,7 @@ CorrectOptionID = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 MarkdownVersion = Literal[1, 2]
 
 SocketOpt = Union[
-    Tuple[int, int, int],
-    Tuple[int, int, Union[bytes, bytearray]],
-    Tuple[int, int, None, int],
+    tuple[int, int, int],
+    tuple[int, int, Union[bytes, bytearray]],
+    tuple[int, int, None, int],
 ]

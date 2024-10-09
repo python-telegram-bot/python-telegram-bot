@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -47,7 +48,7 @@ class ShippingOption(TelegramObject):
     Attributes:
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.
-        prices (Tuple[:class:`telegram.LabeledPrice`]): List of price portions.
+        prices (tuple[:class:`telegram.LabeledPrice`]): List of price portions.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -68,7 +69,7 @@ class ShippingOption(TelegramObject):
 
         self.id: str = id
         self.title: str = title
-        self.prices: Tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
+        self.prices: tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
 
         self._id_attrs = (self.id,)
 

@@ -19,9 +19,10 @@
 """This module contains an abstract class to make POST and GET requests."""
 import abc
 import json
+from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
-from typing import AsyncContextManager, Final, List, Optional, Tuple, Type, TypeVar, Union, final
+from typing import Final, Optional, TypeVar, Union, final
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.defaultvalue import DefaultValue
@@ -49,7 +50,7 @@ _LOGGER = get_logger(__name__, class_name="BaseRequest")
 
 
 class BaseRequest(
-    AsyncContextManager["BaseRequest"],
+    AbstractAsyncContextManager["BaseRequest"],
     abc.ABC,
 ):
     """Abstract interface class that allows python-telegram-bot to make requests to the Bot API.
@@ -122,7 +123,7 @@ class BaseRequest(
 
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]],
+        exc_type: Optional[type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
@@ -166,7 +167,7 @@ class BaseRequest(
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[JSONDict, List[JSONDict], bool]:
+    ) -> Union[JSONDict, list[JSONDict], bool]:
         """Makes a request to the Bot API handles the return code and parses the answer.
 
         Warning:
@@ -421,7 +422,7 @@ class BaseRequest(
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Tuple[int, bytes]:
+    ) -> tuple[int, bytes]:
         """Makes a request to the Bot API. Must be implemented by a subclass.
 
         Warning:
@@ -451,6 +452,6 @@ class BaseRequest(
                 :attr:`DEFAULT_NONE`.
 
         Returns:
-            Tuple[:obj:`int`, :obj:`bytes`]: The HTTP return code & the payload part of the server
+            tuple[:obj:`int`, :obj:`bytes`]: The HTTP return code & the payload part of the server
             response.
         """

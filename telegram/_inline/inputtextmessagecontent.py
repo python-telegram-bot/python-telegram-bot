@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
@@ -75,7 +76,7 @@ class InputTextMessageContent(InputMessageContent):
             :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
+        entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
@@ -107,7 +108,7 @@ class InputTextMessageContent(InputMessageContent):
             self.message_text: str = message_text
             # Optionals
             self.parse_mode: ODVInput[str] = parse_mode
-            self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+            self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
             self.link_preview_options: ODVInput[LinkPreviewOptions] = parse_lpo_and_dwpp(
                 disable_web_page_preview, link_preview_options
             )

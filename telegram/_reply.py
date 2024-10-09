@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This modules contains objects that represents Telegram Replies"""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -124,7 +125,7 @@ class ExternalReplyInfo(TelegramObject):
             file.
         document (:class:`telegram.Document`): Optional. Message is a general file, information
             about the file.
-        photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available sizes
+        photo (tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available sizes
             of the photo.
         sticker (:class:`telegram.Sticker`): Optional. Message is a sticker, information about the
             sticker.
@@ -224,7 +225,7 @@ class ExternalReplyInfo(TelegramObject):
         self.animation: Optional[Animation] = animation
         self.audio: Optional[Audio] = audio
         self.document: Optional[Document] = document
-        self.photo: Optional[Tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
+        self.photo: Optional[tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
         self.sticker: Optional[Sticker] = sticker
         self.story: Optional[Story] = story
         self.video: Optional[Video] = video
@@ -311,7 +312,7 @@ class TextQuote(TelegramObject):
             message.
         position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
             units as specified by the sender.
-        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that appear
+        entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that appear
             in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
             custom_emoji entities are kept in quotes.
         is_manual (:obj:`bool`): Optional. :obj:`True`, if the quote was chosen manually by the
@@ -338,7 +339,7 @@ class TextQuote(TelegramObject):
 
         self.text: str = text
         self.position: int = position
-        self.entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(entities)
+        self.entities: Optional[tuple[MessageEntity, ...]] = parse_sequence_arg(entities)
         self.is_manual: Optional[bool] = is_manual
 
         self._id_attrs = (
@@ -411,7 +412,7 @@ class ReplyParameters(TelegramObject):
         quote_parse_mode (:obj:`str`): Optional. Mode for parsing entities in the quote. See
             :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
             more details.
-        quote_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. A JSON-serialized list
+        quote_entities (tuple[:class:`telegram.MessageEntity`]): Optional. A JSON-serialized list
             of special entities that appear in the quote. It can be specified instead of
             :paramref:`quote_parse_mode`.
         quote_position (:obj:`int`): Optional. Position of the quote in the original message in
@@ -447,7 +448,7 @@ class ReplyParameters(TelegramObject):
         self.allow_sending_without_reply: ODVInput[bool] = allow_sending_without_reply
         self.quote: Optional[str] = quote
         self.quote_parse_mode: ODVInput[str] = quote_parse_mode
-        self.quote_entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(
+        self.quote_entities: Optional[tuple[MessageEntity, ...]] = parse_sequence_arg(
             quote_entities
         )
         self.quote_position: Optional[int] = quote_position

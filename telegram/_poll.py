@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Poll."""
 import datetime
-from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._chat import Chat
@@ -83,7 +84,7 @@ class InputPollOption(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
         self.text_parse_mode: ODVInput[str] = text_parse_mode
-        self.text_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
+        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
 
         self._id_attrs = (self.text,)
 
@@ -127,7 +128,7 @@ class PollOption(TelegramObject):
             :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
             characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
-        text_entities (Tuple[:class:`telegram.MessageEntity`]): Special entities
+        text_entities (tuple[:class:`telegram.MessageEntity`]): Special entities
             that appear in the option text. Currently, only custom emoji entities are allowed in
             poll option texts.
             This list is empty if the question does not contain entities.
@@ -149,7 +150,7 @@ class PollOption(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
         self.voter_count: int = voter_count
-        self.text_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
+        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
 
         self._id_attrs = (self.text, self.voter_count)
 
@@ -189,7 +190,7 @@ class PollOption(TelegramObject):
         """
         return parse_message_entity(self.text, entity)
 
-    def parse_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
+    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this polls question filtered by their ``type`` attribute as
@@ -203,12 +204,12 @@ class PollOption(TelegramObject):
         .. versionadded:: 21.2
 
         Args:
-            types (List[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+            types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
                     ``type`` attribute of an entity is contained in this list, it will be returned.
                     Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
 
         Returns:
-            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
         """
         return parse_message_entities(self.text, self.text_entities, types)
@@ -260,7 +261,7 @@ class PollAnswer(TelegramObject):
 
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
-        option_ids (Tuple[:obj:`int`]): Identifiers of answer options, chosen by the user. May
+        option_ids (tuple[:obj:`int`]): Identifiers of answer options, chosen by the user. May
             be empty if the user retracted their vote.
 
             .. versionchanged:: 20.0
@@ -292,7 +293,7 @@ class PollAnswer(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id: str = poll_id
         self.voter_chat: Optional[Chat] = voter_chat
-        self.option_ids: Tuple[int, ...] = parse_sequence_arg(option_ids)
+        self.option_ids: tuple[int, ...] = parse_sequence_arg(option_ids)
         self.user: Optional[User] = user
 
         self._id_attrs = (
@@ -374,7 +375,7 @@ class Poll(TelegramObject):
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
             :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-        options (Tuple[:class:`~telegram.PollOption`]): List of poll options.
+        options (tuple[:class:`~telegram.PollOption`]): List of poll options.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -389,7 +390,7 @@ class Poll(TelegramObject):
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll,
             0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
-        explanation_entities (Tuple[:class:`telegram.MessageEntity`]): Special entities
+        explanation_entities (tuple[:class:`telegram.MessageEntity`]): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
             This list is empty if the message does not contain explanation entities.
 
@@ -405,7 +406,7 @@ class Poll(TelegramObject):
 
             .. versionchanged:: 20.3
                 |datetime_localization|
-        question_entities (Tuple[:class:`telegram.MessageEntity`]): Special entities
+        question_entities (tuple[:class:`telegram.MessageEntity`]): Special entities
             that appear in the :attr:`question`. Currently, only custom emoji entities are allowed
             in poll questions.
             This list is empty if the question does not contain entities.
@@ -453,7 +454,7 @@ class Poll(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
         self.question: str = question
-        self.options: Tuple[PollOption, ...] = parse_sequence_arg(options)
+        self.options: tuple[PollOption, ...] = parse_sequence_arg(options)
         self.total_voter_count: int = total_voter_count
         self.is_closed: bool = is_closed
         self.is_anonymous: bool = is_anonymous
@@ -461,12 +462,12 @@ class Poll(TelegramObject):
         self.allows_multiple_answers: bool = allows_multiple_answers
         self.correct_option_id: Optional[int] = correct_option_id
         self.explanation: Optional[str] = explanation
-        self.explanation_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(
+        self.explanation_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
             explanation_entities
         )
         self.open_period: Optional[int] = open_period
         self.close_date: Optional[datetime.datetime] = close_date
-        self.question_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(question_entities)
+        self.question_entities: tuple[MessageEntity, ...] = parse_sequence_arg(question_entities)
 
         self._id_attrs = (self.id,)
 
@@ -516,8 +517,8 @@ class Poll(TelegramObject):
         return parse_message_entity(self.explanation, entity)
 
     def parse_explanation_entities(
-        self, types: Optional[List[str]] = None
-    ) -> Dict[MessageEntity, str]:
+        self, types: Optional[list[str]] = None
+    ) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this polls explanation filtered by their ``type`` attribute as
@@ -529,12 +530,12 @@ class Poll(TelegramObject):
             UTF-16 codepoints. See :attr:`parse_explanation_entity` for more info.
 
         Args:
-            types (List[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+            types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
                     ``type`` attribute of an entity is contained in this list, it will be returned.
                     Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
 
         Returns:
-            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         Raises:
@@ -567,8 +568,8 @@ class Poll(TelegramObject):
         return parse_message_entity(self.question, entity)
 
     def parse_question_entities(
-        self, types: Optional[List[str]] = None
-    ) -> Dict[MessageEntity, str]:
+        self, types: Optional[list[str]] = None
+    ) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this polls question filtered by their ``type`` attribute as
@@ -582,12 +583,12 @@ class Poll(TelegramObject):
             UTF-16 codepoints. See :attr:`parse_question_entity` for more info.
 
         Args:
-            types (List[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+            types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
                     ``type`` attribute of an entity is contained in this list, it will be returned.
                     Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
 
         Returns:
-            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """

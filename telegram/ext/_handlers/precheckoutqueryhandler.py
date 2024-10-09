@@ -20,7 +20,8 @@
 
 
 import re
-from typing import Optional, Pattern, TypeVar, Union
+from re import Pattern
+from typing import Optional, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE

@@ -20,7 +20,8 @@ import inspect
 import re
 import typing
 from collections import defaultdict
-from typing import Any, Iterator, Union
+from collections.abc import Iterator
+from typing import Any, Union
 
 import telegram
 import telegram.ext

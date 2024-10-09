@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
-from typing import TYPE_CHECKING, Dict, Final, Optional, Type
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -76,7 +76,7 @@ class MenuButton(TelegramObject):
         care of selecting the correct subclass.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (dict[:obj:`str`, ...]): The JSON data.
             bot (:class:`telegram.Bot`, optional): The bot associated with this object. Defaults to
                 :obj:`None`, in which case shortcut methods will not be available.
 
@@ -95,7 +95,7 @@ class MenuButton(TelegramObject):
         if not data and cls is MenuButton:
             return None
 
-        _class_mapping: Dict[str, Type[MenuButton]] = {
+        _class_mapping: dict[str, type[MenuButton]] = {
             cls.COMMANDS: MenuButtonCommands,
             cls.WEB_APP: MenuButtonWebApp,
             cls.DEFAULT: MenuButtonDefault,

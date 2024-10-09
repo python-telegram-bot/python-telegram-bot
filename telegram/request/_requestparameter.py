@@ -18,9 +18,10 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that describes a single parameter of a request to the Bot API."""
 import json
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Sequence, Tuple, final
+from typing import Optional, final
 
 from telegram._files.inputfile import InputFile
 from telegram._files.inputmedia import InputMedia, InputPaidMedia
@@ -47,13 +48,13 @@ class RequestParameter:
     Args:
         name (:obj:`str`): The name of the parameter.
         value (:obj:`object` | :obj:`None`): The value of the parameter. Must be JSON-dumpable.
-        input_files (List[:class:`telegram.InputFile`], optional): A list of files that should be
+        input_files (list[:class:`telegram.InputFile`], optional): A list of files that should be
             uploaded along with this parameter.
 
     Attributes:
         name (:obj:`str`): The name of the parameter.
         value (:obj:`object` | :obj:`None`): The value of the parameter.
-        input_files (List[:class:`telegram.InputFile` | :obj:`None`): A list of files that should
+        input_files (list[:class:`telegram.InputFile` | :obj:`None`): A list of files that should
             be uploaded along with this parameter.
     """
 
@@ -61,7 +62,7 @@ class RequestParameter:
 
     name: str
     value: object
-    input_files: Optional[List[InputFile]]
+    input_files: Optional[list[InputFile]]
 
     @property
     def json_value(self) -> Optional[str]:
@@ -92,7 +93,7 @@ class RequestParameter:
     @staticmethod
     def _value_and_input_files_from_input(  # pylint: disable=too-many-return-statements
         value: object,
-    ) -> Tuple[object, List[InputFile]]:
+    ) -> tuple[object, list[InputFile]]:
         """Converts `value` into something that we can json-dump. Returns two values:
         1. the JSON-dumpable value. May be `None` in case the value is an InputFile which must
            not be uploaded via an attach:// URI

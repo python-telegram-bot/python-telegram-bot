@@ -23,9 +23,10 @@ are required or not."""
 import inspect
 import logging
 import re
+from collections.abc import Sequence
 from datetime import datetime
 from types import FunctionType
-from typing import Any, Sequence
+from typing import Any
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import FileInput, ODVInput
