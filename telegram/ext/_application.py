@@ -1421,7 +1421,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     def add_handlers(
         self,
         handlers: Union[
-            Union[Sequence[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]],
+            Sequence[BaseHandler[Any, CCT, Any]],
             Dict[int, Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]]],
         ],
         group: Union[int, DefaultValue[int]] = _DEFAULT_0,
