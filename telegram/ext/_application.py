@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Application class."""
+
 import asyncio
 import contextlib
 import inspect
@@ -1420,7 +1421,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     def add_handlers(
         self,
         handlers: Union[
-            Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]],
+            Union[Sequence[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]],
             Dict[int, Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]]],
         ],
         group: Union[int, DefaultValue[int]] = _DEFAULT_0,
