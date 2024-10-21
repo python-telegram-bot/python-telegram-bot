@@ -88,6 +88,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `miles <https://github.com/miles170>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `Mohd Yusuf <https://github.com/mohdyusuf2312>`_
+- `Nathanael Bracy <https://github.com/servusdei2018>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `neurrone <https://github.com/neurrone>`_
 - `NikitaPirate <https://github.com/NikitaPirate>`_
