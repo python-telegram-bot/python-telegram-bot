@@ -26,6 +26,7 @@ import platform
 import signal
 import sys
 from collections import defaultdict
+from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType, TracebackType
@@ -44,7 +45,6 @@ from typing import (
     Mapping,
     NoReturn,
     Optional,
-    Sequence,
     Set,
     Tuple,
     Type,
@@ -1460,7 +1460,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 for handler in grp_handlers:
                     self.add_handler(handler, handler_group)
 
-        elif isinstance(handlers, (list, tuple)):
+        elif isinstance(handlers, Sequence):
             for handler in handlers:
                 self.add_handler(handler, DefaultValue.get_value(group))
 
