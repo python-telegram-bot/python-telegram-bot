@@ -26,7 +26,6 @@ import platform
 import signal
 import sys
 from collections import defaultdict
-from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType, TracebackType
@@ -45,6 +44,7 @@ from typing import (
     Mapping,
     NoReturn,
     Optional,
+    Sequence,
     Set,
     Tuple,
     Type,
