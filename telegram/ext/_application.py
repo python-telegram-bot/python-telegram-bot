@@ -1432,12 +1432,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         .. versionadded:: 20.0
 
         Args:
-            handlers (List[:class:`telegram.ext.BaseHandler`] | \
-                Dict[int, List[:class:`telegram.ext.BaseHandler`]]): \
+            handlers (Sequence[:class:`telegram.ext.BaseHandler`] | \
+                Dict[int, List[:class:`telegram.ext.BaseHandler`] | \
+                Tuple[:class:`telegram.ext.BaseHandler`]]):
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
-            group (:obj:`int`, optional): Specify which group the sequence of :paramref:`handlers`
-                should be added to. Defaults to ``0``.
+
+                .. versionchanged:: 21.7
+                    Accepts any :class:`collections.abc.Sequence` as input instead of just a list
+                    or tuple.
 
         Example::
 
