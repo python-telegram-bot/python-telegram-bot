@@ -1436,7 +1436,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
 
-                .. versionchanged:: 21.7
+                .. versionchanged:: NEXT.VERSION
                     Accepts any :class:`collections.abc.Sequence` as input instead of just a list
                     or tuple.
 
