@@ -46,5 +46,5 @@ def parse_username(username: Optional[SCT[str]]) -> frozenset[str]:
     if username is None:
         return frozenset()
     if isinstance(username, str):
-        return frozenset({username[1:] if username.startswith("@") else username})
-    return frozenset({usr[1:] if usr.startswith("@") else usr for usr in username})
+        return frozenset({username.removeprefix("@")})
+    return frozenset(usr.removeprefix("@") for usr in username)
