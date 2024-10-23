@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Application class."""
+
 import asyncio
 import contextlib
 import inspect
@@ -45,7 +46,6 @@ from typing import (
     Optional,
     Sequence,
     Set,
-    Tuple,
     Type,
     TypeVar,
     Union,
@@ -1420,8 +1420,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     def add_handlers(
         self,
         handlers: Union[
-            Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]],
-            Dict[int, Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]]],
+            Sequence[BaseHandler[Any, CCT, Any]],
+            Dict[int, Sequence[BaseHandler[Any, CCT, Any]]],
         ],
         group: Union[int, DefaultValue[int]] = _DEFAULT_0,
     ) -> None:
@@ -1431,10 +1431,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         .. versionadded:: 20.0
 
         Args:
-            handlers (List[:class:`telegram.ext.BaseHandler`] | \
-                Dict[int, List[:class:`telegram.ext.BaseHandler`]]): \
+            handlers (Sequence[:class:`telegram.ext.BaseHandler`] | \
+                Dict[int, Sequence[:class:`telegram.ext.BaseHandler`]]):
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
+
+                .. versionchanged:: NEXT.VERSION
+                    Accepts any :class:`collections.abc.Sequence` as input instead of just a list
+                    or tuple.
+
             group (:obj:`int`, optional): Specify which group the sequence of :paramref:`handlers`
                 should be added to. Defaults to ``0``.
 
@@ -1453,13 +1458,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         if isinstance(handlers, dict):
             for handler_group, grp_handlers in handlers.items():
-                if not isinstance(grp_handlers, (list, tuple)):
-                    raise TypeError(f"Handlers for group {handler_group} must be a list or tuple")
+                if not isinstance(grp_handlers, Sequence):
+                    raise TypeError(
+                        f"Handlers for group {handler_group} must be a sequence of handlers."
+                    )
 
                 for handler in grp_handlers:
                     self.add_handler(handler, handler_group)
 
-        elif isinstance(handlers, (list, tuple)):
+        elif isinstance(handlers, Sequence):
             for handler in handlers:
                 self.add_handler(handler, DefaultValue.get_value(group))
 
