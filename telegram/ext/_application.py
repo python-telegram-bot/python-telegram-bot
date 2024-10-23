@@ -1442,6 +1442,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     Accepts any :class:`collections.abc.Sequence` as input instead of just a list
                     or tuple.
 
+            group (:obj:`int`, optional): Specify which group the sequence of :paramref:`handlers`
+                should be added to. Defaults to ``0``.
+
         Example::
 
             app.add_handlers(handlers={
