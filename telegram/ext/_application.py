@@ -46,7 +46,6 @@ from typing import (
     Optional,
     Sequence,
     Set,
-    Tuple,
     Type,
     TypeVar,
     Union,
@@ -1422,7 +1421,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self,
         handlers: Union[
             Sequence[BaseHandler[Any, CCT, Any]],
-            Dict[int, Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]]],
+            Dict[int, Sequence[BaseHandler[Any, CCT, Any]]],
         ],
         group: Union[int, DefaultValue[int]] = _DEFAULT_0,
     ) -> None:
@@ -1433,8 +1432,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         Args:
             handlers (Sequence[:class:`telegram.ext.BaseHandler`] | \
-                Dict[int, List[:class:`telegram.ext.BaseHandler`] | \
-                Tuple[:class:`telegram.ext.BaseHandler`]]):
+                Dict[int, Sequence[:class:`telegram.ext.BaseHandler`]]):
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
 
@@ -1460,8 +1458,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         if isinstance(handlers, dict):
             for handler_group, grp_handlers in handlers.items():
-                if not isinstance(grp_handlers, (list, tuple)):
-                    raise TypeError(f"Handlers for group {handler_group} must be a list or tuple")
+                if not isinstance(grp_handlers, Sequence):
+                    raise TypeError(
+                        f"Handlers for group {handler_group} must be a sequence of handlers."
+                    )
 
                 for handler in grp_handlers:
                     self.add_handler(handler, handler_group)
