@@ -28,7 +28,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 RT = TypeVar("RT")
 UT = TypeVar("UT")
 # If this is written directly next to the type variable mypy gets confused with [valid-type]. This
-# could be reported to them but I doubt they would change this since we override a builtin type -.-
+# could be reported to them, but I doubt they would change this since we override a builtin type
 GenericUT = type[UT]
 
 
@@ -74,13 +74,13 @@ class TypeHandler(BaseHandler[UT, CCT, RT]):
 
     def __init__(
         self: "TypeHandler[UT, CCT, RT]",
-        type: GenericUT,  # pylint: disable=redefined-builtin
+        type: GenericUT[UT],  # pylint: disable=redefined-builtin
         callback: HandlerCallback[UT, CCT, RT],
         strict: bool = False,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
-        self.type: GenericUT = type
+        self.type: GenericUT[UT] = type
         self.strict: Optional[bool] = strict
 
     def check_update(self, update: object) -> bool:
