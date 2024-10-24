@@ -108,7 +108,7 @@ __all__ = [
 import datetime
 import sys
 from enum import Enum
-from typing import Final, List, NamedTuple, Optional, Tuple
+from typing import Final, NamedTuple, Optional
 
 from telegram._utils.datetime import UTC
 from telegram._utils.enum import IntEnum, StringEnum
@@ -141,8 +141,8 @@ class _AccentColor(NamedTuple):
 
     identifier: int
     name: Optional[str] = None
-    light_colors: Tuple[int, ...] = ()
-    dark_colors: Tuple[int, ...] = ()
+    light_colors: tuple[int, ...] = ()
+    dark_colors: tuple[int, ...] = ()
 
 
 #: :class:`typing.NamedTuple`: A tuple containing the two components of the version number:
@@ -162,9 +162,9 @@ BOT_API_VERSION: Final[str] = str(BOT_API_VERSION_INFO)
 
 # constants above this line are tested
 
-#: List[:obj:`int`]: Ports supported by
+#: list[:obj:`int`]: Ports supported by
 #:  :paramref:`telegram.Bot.set_webhook.url`.
-SUPPORTED_WEBHOOK_PORTS: Final[List[int]] = [443, 80, 88, 8443]
+SUPPORTED_WEBHOOK_PORTS: Final[list[int]] = [443, 80, 88, 8443]
 
 #: :obj:`datetime.datetime`, value of unix 0.
 #: This date literal is used in :class:`telegram.InaccessibleMessage`
@@ -180,9 +180,9 @@ class AccentColor(Enum):
 
     - ``identifier`` (:obj:`int`): The identifier of the accent color.
     - ``name`` (:obj:`str`): Optional. The name of the accent color.
-    - ``light_colors`` (Tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
+    - ``light_colors`` (tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
       value.
-    - ``dark_colors`` (Tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
+    - ``dark_colors`` (tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
       value.
 
     Since Telegram gives no exact specification for the accent colors, future accent colors might
@@ -2083,9 +2083,9 @@ class ProfileAccentColor(Enum):
 
     - ``identifier`` (:obj:`int`): The identifier of the accent color.
     - ``name`` (:obj:`str`): Optional. The name of the accent color.
-    - ``light_colors`` (Tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
+    - ``light_colors`` (tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
       value.
-    - ``dark_colors`` (Tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
+    - ``dark_colors`` (tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
       value.
 
     Since Telegram gives no exact specification for the accent colors, future accent colors might

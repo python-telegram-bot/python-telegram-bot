@@ -12,7 +12,7 @@ bot.
 """
 
 import logging
-from typing import Optional, Tuple
+from typing import Optional
 
 from telegram import Chat, ChatMember, ChatMemberUpdated, Update
 from telegram.constants import ParseMode
@@ -37,7 +37,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
-def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[Tuple[bool, bool]]:
+def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[tuple[bool, bool]]:
     """Takes a ChatMemberUpdated instance and extracts whether the 'old_chat_member' was a member
     of the chat and whether the 'new_chat_member' is a member of the chat. Returns None, if
     the status didn't change.

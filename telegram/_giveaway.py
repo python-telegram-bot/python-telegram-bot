@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an objects that are related to Telegram giveaways."""
 import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
@@ -41,7 +42,7 @@ class Giveaway(TelegramObject):
     .. versionadded:: 20.8
 
     Args:
-        chats (Tuple[:class:`telegram.Chat`]): The list of chats which the user must join to
+        chats (tuple[:class:`telegram.Chat`]): The list of chats which the user must join to
             participate in the giveaway.
         winners_selection_date (:class:`datetime.datetime`): The date when the giveaway winner will
             be selected. |datetime_localization|
@@ -76,7 +77,7 @@ class Giveaway(TelegramObject):
         has_public_winners (:obj:`True`): Optional. :obj:`True`, if the list of giveaway winners
             will be visible to everyone
         prize_description (:obj:`str`): Optional. Description of additional giveaway prize
-        country_codes (Tuple[:obj:`str`]): Optional. A tuple of two-letter ISO 3166-1 alpha-2
+        country_codes (tuple[:obj:`str`]): Optional. A tuple of two-letter ISO 3166-1 alpha-2
             country codes indicating the countries from which eligible users for the giveaway must
             come. If empty, then all users can participate in the giveaway. Users with a phone
             number that was bought on Fragment can always participate in giveaways.
@@ -117,13 +118,13 @@ class Giveaway(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.chats: Tuple[Chat, ...] = tuple(chats)
+        self.chats: tuple[Chat, ...] = tuple(chats)
         self.winners_selection_date: datetime.datetime = winners_selection_date
         self.winner_count: int = winner_count
         self.only_new_members: Optional[bool] = only_new_members
         self.has_public_winners: Optional[bool] = has_public_winners
         self.prize_description: Optional[str] = prize_description
-        self.country_codes: Tuple[str, ...] = parse_sequence_arg(country_codes)
+        self.country_codes: tuple[str, ...] = parse_sequence_arg(country_codes)
         self.premium_subscription_month_count: Optional[int] = premium_subscription_month_count
         self.prize_star_count: Optional[int] = prize_star_count
 
@@ -222,7 +223,7 @@ class GiveawayWinners(TelegramObject):
         winners_selection_date (:class:`datetime.datetime`): Point in time when winners of the
             giveaway were selected. |datetime_localization|
         winner_count (:obj:`int`): Total number of winners in the giveaway
-        winners	(Tuple[:class:`telegram.User`]): tuple of up to
+        winners	(tuple[:class:`telegram.User`]): tuple of up to
             :tg-const:`telegram.constants.GiveawayLimit.MAX_WINNERS` winners of the giveaway
         additional_chat_count (:obj:`int`): Optional. The number of other chats the user had to
             join in order to be eligible for the giveaway
@@ -278,7 +279,7 @@ class GiveawayWinners(TelegramObject):
         self.giveaway_message_id: int = giveaway_message_id
         self.winners_selection_date: datetime.datetime = winners_selection_date
         self.winner_count: int = winner_count
-        self.winners: Tuple[User, ...] = tuple(winners)
+        self.winners: tuple[User, ...] = tuple(winners)
         self.additional_chat_count: Optional[int] = additional_chat_count
         self.premium_subscription_month_count: Optional[int] = premium_subscription_month_count
         self.unclaimed_prize_count: Optional[int] = unclaimed_prize_count

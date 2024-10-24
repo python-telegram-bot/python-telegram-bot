@@ -19,7 +19,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from typing import TYPE_CHECKING, Callable, Final, Optional, Sequence, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Callable, Final, Optional, Union
 
 from telegram import constants
 from telegram._files.location import Location

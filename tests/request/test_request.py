@@ -22,9 +22,10 @@ import asyncio
 import json
 import logging
 from collections import defaultdict
+from collections.abc import Coroutine
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Callable, Coroutine, Tuple
+from typing import Any, Callable
 
 import httpx
 import pytest
@@ -67,7 +68,7 @@ from .test_requestdata import (  # noqa: F401
 
 def mocker_factory(
     response: bytes, return_code: int = HTTPStatus.OK
-) -> Callable[[Tuple[Any]], Coroutine[Any, Any, Tuple[int, bytes]]]:
+) -> Callable[[tuple[Any]], Coroutine[Any, Any, tuple[int, bytes]]]:
     async def make_assertion(*args, **kwargs):
         return return_code, response
 
@@ -219,8 +220,9 @@ class TestRequestWithoutRequest:
 
         monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
-        with pytest.raises(TelegramError, match="Invalid server response"), caplog.at_level(
-            logging.ERROR
+        with (
+            pytest.raises(TelegramError, match="Invalid server response"),
+            caplog.at_level(logging.ERROR),
         ):
             await httpx_request.post(None, None, None)
 
@@ -413,7 +415,7 @@ class TestRequestWithoutRequest:
             async def shutdown(self_) -> None:
                 pass
 
-            async def do_request(self_, *args, **kwargs) -> Tuple[int, bytes]:
+            async def do_request(self_, *args, **kwargs) -> tuple[int, bytes]:
                 self.test_flag = (
                     kwargs.get("read_timeout"),
                     kwargs.get("connect_timeout"),

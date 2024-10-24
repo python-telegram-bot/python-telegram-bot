@@ -18,19 +18,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
+from collections.abc import Sequence
 from copy import copy
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     Generic,
-    List,
     Optional,
-    Sequence,
-    Tuple,
-    Type,
     TypeVar,
     Union,
     cast,
@@ -267,7 +263,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     def _warn(
         cls,
         message: Union[str, PTBUserWarning],
-        category: Type[Warning] = PTBUserWarning,
+        category: type[Warning] = PTBUserWarning,
         stacklevel: int = 0,
     ) -> None:
         """We override this method to add one more level to the stacklevel, so that the warning
@@ -340,7 +336,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[bool, JSONDict, List[JSONDict]]:
+    ) -> Union[bool, JSONDict, list[JSONDict]]:
         """Order of method calls is: Bot.some_method -> Bot._post -> Bot._do_post.
         So we can override Bot._do_post to add rate limiting.
         """
@@ -421,7 +417,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             }
         )
 
-    def _insert_defaults(self, data: Dict[str, object]) -> None:
+    def _insert_defaults(self, data: dict[str, object]) -> None:
         """Inserts the defaults values for optional kwargs for which tg.ext.Defaults provides
         convenience functionality, i.e. the kwargs with a tg.utils.helpers.DefaultValue default
 
@@ -645,7 +641,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple[Update, ...]:
+    ) -> tuple[Update, ...]:
         updates = await super().get_updates(
             offset=offset,
             limit=limit,
@@ -670,7 +666,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         ],
         next_offset: Optional[str] = None,
         current_offset: Optional[str] = None,
-    ) -> Tuple[Sequence["InlineQueryResult"], Optional[str]]:
+    ) -> tuple[Sequence["InlineQueryResult"], Optional[str]]:
         """This method is called by Bot.answer_inline_query to build the actual results list.
         Overriding this to call self._replace_keyboard suffices
         """
@@ -746,7 +742,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         endpoint: str,
         api_kwargs: Optional[JSONDict] = None,
-        return_type: Optional[Type[TelegramObject]] = None,
+        return_type: Optional[type[TelegramObject]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -854,7 +850,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         # We override this method to call self._replace_keyboard
         return await super().copy_messages(
             chat_id=chat_id,
@@ -1744,7 +1740,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Tuple[MessageId, ...]:
+    ) -> tuple[MessageId, ...]:
         return await super().forward_messages(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
@@ -1769,7 +1765,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Tuple[ChatMember, ...]:
+    ) -> tuple[ChatMember, ...]:
         return await super().get_chat_administrators(
             chat_id=chat_id,
             read_timeout=read_timeout,
@@ -1872,7 +1868,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Tuple[Sticker, ...]:
+    ) -> tuple[Sticker, ...]:
         return await super().get_forum_topic_icon_stickers(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1894,7 +1890,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Tuple[GameHighScore, ...]:
+    ) -> tuple[GameHighScore, ...]:
         return await super().get_game_high_scores(
             user_id=user_id,
             chat_id=chat_id,
@@ -1936,7 +1932,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Tuple[BotCommand, ...]:
+    ) -> tuple[BotCommand, ...]:
         return await super().get_my_commands(
             scope=scope,
             language_code=language_code,
@@ -1997,7 +1993,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Tuple[Sticker, ...]:
+    ) -> tuple[Sticker, ...]:
         return await super().get_custom_emoji_stickers(
             custom_emoji_ids=custom_emoji_ids,
             read_timeout=read_timeout,
@@ -2859,7 +2855,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-    ) -> Tuple[Message, ...]:
+    ) -> tuple[Message, ...]:
         return await super().send_media_group(
             chat_id=chat_id,
             media=media,
@@ -3497,7 +3493,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_my_commands(
         self,
-        commands: Sequence[Union[BotCommand, Tuple[str, str]]],
+        commands: Sequence[Union[BotCommand, tuple[str, str]]],
         scope: Optional[BotCommandScope] = None,
         language_code: Optional[str] = None,
         *,

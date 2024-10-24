@@ -23,7 +23,7 @@ inside warnings.py.
 
 .. versionadded:: 20.2
 """
-from typing import Any, Callable, Type, Union
+from typing import Any, Callable, Union
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
@@ -56,7 +56,7 @@ def warn_about_deprecated_arg_return_new_arg(
     bot_api_version: str,
     ptb_version: str,
     stacklevel: int = 2,
-    warn_callback: Callable[[Union[str, PTBUserWarning], Type[Warning], int], None] = warn,
+    warn_callback: Callable[[Union[str, PTBUserWarning], type[Warning], int], None] = warn,
 ) -> Any:
     """A helper function for the transition in API when argument is renamed.
 

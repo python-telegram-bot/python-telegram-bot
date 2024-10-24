@@ -18,20 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Builder classes for the telegram.ext module."""
 from asyncio import Queue
+from collections.abc import Collection, Coroutine
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Collection,
-    Coroutine,
-    Dict,
-    Generic,
-    Optional,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Callable, Generic, Optional, TypeVar, Union
 
 import httpx
 
@@ -212,8 +201,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         self._persistence: ODVInput[BasePersistence] = DEFAULT_NONE
         self._context_types: DVType[ContextTypes] = DefaultValue(ContextTypes())
-        self._application_class: DVType[Type[Application]] = DefaultValue(Application)
-        self._application_kwargs: Dict[str, object] = {}
+        self._application_class: DVType[type[Application]] = DefaultValue(Application)
+        self._application_kwargs: dict[str, object] = {}
         self._update_processor: BaseUpdateProcessor = SimpleUpdateProcessor(
             max_concurrent_updates=1
         )
@@ -350,8 +339,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def application_class(
         self: BuilderType,
-        application_class: Type[Application[Any, Any, Any, Any, Any, Any]],
-        kwargs: Optional[Dict[str, object]] = None,
+        application_class: type[Application[Any, Any, Any, Any, Any, Any]],
+        kwargs: Optional[dict[str, object]] = None,
     ) -> BuilderType:
         """Sets a custom subclass instead of :class:`telegram.ext.Application`. The
         subclass's ``__init__`` should look like this
@@ -365,7 +354,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Args:
             application_class (:obj:`type`): A subclass of :class:`telegram.ext.Application`
-            kwargs (Dict[:obj:`str`, :obj:`object`], optional): Keyword arguments for the
+            kwargs (dict[:obj:`str`, :obj:`object`], optional): Keyword arguments for the
                 initialization. Defaults to an empty dict.
 
         Returns:
@@ -1397,9 +1386,9 @@ InitApplicationBuilder = (  # This is defined all the way down here so that its 
     ApplicationBuilder[  # by Pylance correctly.
         ExtBot[None],
         ContextTypes.DEFAULT_TYPE,
-        Dict[Any, Any],
-        Dict[Any, Any],
-        Dict[Any, Any],
+        dict[Any, Any],
+        dict[Any, Any],
+        dict[Any, Any],
         JobQueue[ContextTypes.DEFAULT_TYPE],
     ]
 )

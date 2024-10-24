@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -57,7 +58,7 @@ class InlineKeyboardMarkup(TelegramObject):
                 |sequenceclassargs|
 
     Attributes:
-        inline_keyboard (Tuple[Tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of
+        inline_keyboard (tuple[tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of
             button rows, each represented by a tuple of :class:`~telegram.InlineKeyboardButton`
             objects.
 
@@ -81,7 +82,7 @@ class InlineKeyboardMarkup(TelegramObject):
                 "InlineKeyboardButtons"
             )
         # Required
-        self.inline_keyboard: Tuple[Tuple[InlineKeyboardButton, ...], ...] = tuple(
+        self.inline_keyboard: tuple[tuple[InlineKeyboardButton, ...], ...] = tuple(
             tuple(row) for row in inline_keyboard
         )
 

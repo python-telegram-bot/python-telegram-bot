@@ -103,7 +103,7 @@ class TestFilters:
         # The total no. of filters is about 72 as of 31/10/21.
         # Gather all the filters to test using DFS-
         visited = []
-        classes = inspect.getmembers(filters, predicate=filter_class)  # List[Tuple[str, type]]
+        classes = inspect.getmembers(filters, predicate=filter_class)  # list[tuple[str, type]]
         stack = classes.copy()
         while stack:
             cls = stack[-1][-1]  # get last element and its class

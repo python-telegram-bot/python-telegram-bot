@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the auxiliary class ContextTypes."""
-from typing import Any, Dict, Generic, Type, overload
+from typing import Any, Generic, overload
 
 from telegram.ext._callbackcontext import CallbackContext
 from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import BD, CCT, CD, UD
 
-ADict = Dict[Any, Any]
+ADict = dict[Any, Any]
 
 
 class ContextTypes(Generic[CCT, UD, CD, BD]):
@@ -83,109 +83,109 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     ): ...
 
     @overload
-    def __init__(self: "ContextTypes[CCT, ADict, ADict, ADict]", context: Type[CCT]): ...
+    def __init__(self: "ContextTypes[CCT, ADict, ADict, ADict]", context: type[CCT]): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CallbackContext[ExtBot[Any], UD, ADict, ADict], UD, ADict, ADict]",
-        user_data: Type[UD],
+        user_data: type[UD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CallbackContext[ExtBot[Any], ADict, CD, ADict], ADict, CD, ADict]",
-        chat_data: Type[CD],
+        chat_data: type[CD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CallbackContext[ExtBot[Any], ADict, ADict, BD], ADict, ADict, BD]",
-        bot_data: Type[BD],
+        bot_data: type[BD],
     ): ...
 
     @overload
     def __init__(
-        self: "ContextTypes[CCT, UD, ADict, ADict]", context: Type[CCT], user_data: Type[UD]
+        self: "ContextTypes[CCT, UD, ADict, ADict]", context: type[CCT], user_data: type[UD]
     ): ...
 
     @overload
     def __init__(
-        self: "ContextTypes[CCT, ADict, CD, ADict]", context: Type[CCT], chat_data: Type[CD]
+        self: "ContextTypes[CCT, ADict, CD, ADict]", context: type[CCT], chat_data: type[CD]
     ): ...
 
     @overload
     def __init__(
-        self: "ContextTypes[CCT, ADict, ADict, BD]", context: Type[CCT], bot_data: Type[BD]
+        self: "ContextTypes[CCT, ADict, ADict, BD]", context: type[CCT], bot_data: type[BD]
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CallbackContext[ExtBot[Any], UD, CD, ADict], UD, CD, ADict]",
-        user_data: Type[UD],
-        chat_data: Type[CD],
+        user_data: type[UD],
+        chat_data: type[CD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CallbackContext[ExtBot[Any], UD, ADict, BD], UD, ADict, BD]",
-        user_data: Type[UD],
-        bot_data: Type[BD],
+        user_data: type[UD],
+        bot_data: type[BD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CallbackContext[ExtBot[Any], ADict, CD, BD], ADict, CD, BD]",
-        chat_data: Type[CD],
-        bot_data: Type[BD],
+        chat_data: type[CD],
+        bot_data: type[BD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CCT, UD, CD, ADict]",
-        context: Type[CCT],
-        user_data: Type[UD],
-        chat_data: Type[CD],
+        context: type[CCT],
+        user_data: type[UD],
+        chat_data: type[CD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CCT, UD, ADict, BD]",
-        context: Type[CCT],
-        user_data: Type[UD],
-        bot_data: Type[BD],
+        context: type[CCT],
+        user_data: type[UD],
+        bot_data: type[BD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CCT, ADict, CD, BD]",
-        context: Type[CCT],
-        chat_data: Type[CD],
-        bot_data: Type[BD],
+        context: type[CCT],
+        chat_data: type[CD],
+        bot_data: type[BD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CallbackContext[ExtBot[Any], UD, CD, BD], UD, CD, BD]",
-        user_data: Type[UD],
-        chat_data: Type[CD],
-        bot_data: Type[BD],
+        user_data: type[UD],
+        chat_data: type[CD],
+        bot_data: type[BD],
     ): ...
 
     @overload
     def __init__(
         self: "ContextTypes[CCT, UD, CD, BD]",
-        context: Type[CCT],
-        user_data: Type[UD],
-        chat_data: Type[CD],
-        bot_data: Type[BD],
+        context: type[CCT],
+        user_data: type[UD],
+        chat_data: type[CD],
+        bot_data: type[BD],
     ): ...
 
     def __init__(  # type: ignore[misc]
         self,
-        context: "Type[CallbackContext[ExtBot[Any], ADict, ADict, ADict]]" = CallbackContext,
-        bot_data: Type[ADict] = dict,
-        chat_data: Type[ADict] = dict,
-        user_data: Type[ADict] = dict,
+        context: "type[CallbackContext[ExtBot[Any], ADict, ADict, ADict]]" = CallbackContext,
+        bot_data: type[ADict] = dict,
+        chat_data: type[ADict] = dict,
+        user_data: type[ADict] = dict,
     ):
         if not issubclass(context, CallbackContext):
             raise TypeError("context must be a subclass of CallbackContext.")
@@ -198,28 +198,28 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
         self._user_data = user_data
 
     @property
-    def context(self) -> Type[CCT]:
+    def context(self) -> type[CCT]:
         """The type of the ``context`` argument of all (error-)handler callbacks and job
         callbacks.
         """
         return self._context  # type: ignore[return-value]
 
     @property
-    def bot_data(self) -> Type[BD]:
+    def bot_data(self) -> type[BD]:
         """The type of :attr:`context.bot_data <CallbackContext.bot_data>` of all (error-)handler
         callbacks and job callbacks.
         """
         return self._bot_data  # type: ignore[return-value]
 
     @property
-    def chat_data(self) -> Type[CD]:
+    def chat_data(self) -> type[CD]:
         """The type of :attr:`context.chat_data <CallbackContext.chat_data>` of all (error-)handler
         callbacks and job callbacks.
         """
         return self._chat_data  # type: ignore[return-value]
 
     @property
-    def user_data(self) -> Type[UD]:
+    def user_data(self) -> type[UD]:
         """The type of :attr:`context.user_data <CallbackContext.user_data>` of all (error-)handler
         callbacks and job callbacks.
         """

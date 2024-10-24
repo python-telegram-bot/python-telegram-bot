@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from typing import List, Optional
+from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -168,7 +168,7 @@ class PassportElementErrorFiles(PassportElementError):
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
+        file_hashes (list[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
 
     Attributes:
@@ -184,7 +184,7 @@ class PassportElementErrorFiles(PassportElementError):
     def __init__(
         self,
         type: str,
-        file_hashes: List[str],
+        file_hashes: list[str],
         message: str,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -192,7 +192,7 @@ class PassportElementErrorFiles(PassportElementError):
         # Required
         super().__init__("files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self._file_hashes: List[str] = file_hashes
+            self._file_hashes: list[str] = file_hashes
 
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 
@@ -203,7 +203,7 @@ class PassportElementErrorFiles(PassportElementError):
         return data
 
     @property
-    def file_hashes(self) -> List[str]:
+    def file_hashes(self) -> list[str]:
         """List of base64-encoded file hashes.
 
         .. deprecated:: 20.6
@@ -386,7 +386,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
             ``"internal_passport"``, ``"utility_bill"``, ``"bank_statement"``,
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
+        file_hashes (list[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
 
     Attributes:
@@ -403,7 +403,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     def __init__(
         self,
         type: str,
-        file_hashes: List[str],
+        file_hashes: list[str],
         message: str,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -411,7 +411,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         # Required
         super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self._file_hashes: List[str] = file_hashes
+            self._file_hashes: list[str] = file_hashes
 
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 
@@ -422,7 +422,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         return data
 
     @property
-    def file_hashes(self) -> List[str]:
+    def file_hashes(self) -> list[str]:
         """List of base64-encoded file hashes.
 
         .. deprecated:: 20.6

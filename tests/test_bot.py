@@ -27,7 +27,6 @@ import time
 from collections import defaultdict
 from http import HTTPStatus
 from io import BytesIO
-from typing import Tuple
 
 import httpx
 import pytest
@@ -334,9 +333,12 @@ class TestBotWithoutRequest:
         assert self.test_flag == "stop"
 
     async def test_equality(self):
-        async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
-            token=FALLBACKS[0]["token"]
-        ) as b, Bot(token=FALLBACKS[0]["token"]) as c, make_bot(token=FALLBACKS[1]["token"]) as d:
+        async with (
+            make_bot(token=FALLBACKS[0]["token"]) as a,
+            make_bot(token=FALLBACKS[0]["token"]) as b,
+            Bot(token=FALLBACKS[0]["token"]) as c,
+            make_bot(token=FALLBACKS[1]["token"]) as d,
+        ):
             e = Update(123456789)
             f = Bot(token=FALLBACKS[0]["token"])
 
@@ -2172,7 +2174,7 @@ class TestBotWithoutRequest:
             async def shutdown(self_) -> None:
                 pass
 
-            async def do_request(self_, *args, **kwargs) -> Tuple[int, bytes]:
+            async def do_request(self_, *args, **kwargs) -> tuple[int, bytes]:
                 nonlocal test_flag
                 test_flag = (
                     kwargs.get("read_timeout"),
