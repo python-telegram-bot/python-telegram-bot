@@ -23,6 +23,7 @@ The following wonderful people contributed directly or indirectly to this projec
 
 - `Abdelrahman <https://github.com/aelkheir>`_
 - `Abshar <https://github.com/abxhr>`_
+- `Abubakar Alaya <https://github.com/Ecode2>`_
 - `Alateas <https://github.com/alateas>`_
 - `Ales Dokshanin <https://github.com/alesdokshanin>`_
 - `Alexandre <https://github.com/xTudoS>`_
