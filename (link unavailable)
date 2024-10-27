@@ -1,0 +1,31 @@
+import logging
+from telegram.ext import Updater, CommandHandler, MessageHandler
+
+logging.basicConfig(level=logging.INFO)
+
+TOKEN = '7931936657:AAFhzYJA2uujj3clCdvFTLSqsljdTNwDv4Q
+
+def start(update, context):
+    context.bot.send_message(chat_id=(link unavailable), text='Bem-vindo ao MeuBotDeVendas!')
+
+def produtos(update, context):
+    context.bot.send_message(chat_id=(link unavailable), text='Nossos produtos:\n1. Produto A\n2. Produto B\n3. Produto C')
+
+def perguntas(update, context):
+    context.bot.send_message(chat_id=(link unavailable), text='Perguntas frequentes:\n1. Qual é o preço do Produto A?\n2. Como comprar?')
+
+def main():
+    updater = Updater(TOKEN, use_context=True)
+
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('produtos', produtos))
+    dp.add_handler(CommandHandler('perguntas', perguntas))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
+```
