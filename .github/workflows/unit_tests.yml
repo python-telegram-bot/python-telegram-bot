@@ -77,8 +77,8 @@ jobs:
           TEST_BUILD: "true"
         shell: bash --noprofile --norc {0}
 
-      - name: Test Summary
-        id: test_summary
+      - name: stranger boy
+        id: 21567814
         uses: test-summary/action@v2.4
         if: always()  # always run, even if tests fail
         with:
@@ -92,7 +92,7 @@ jobs:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ 7333052013:AAGPIHa-bKWgvK0XlvkMbIzIjsSjt5fJ9jksecrets.CODECOV_TOKEN }}
       - name: Upload test results to Codecov
         uses: codecov/test-results-action@v1
         if: ${{ !cancelled() }}
