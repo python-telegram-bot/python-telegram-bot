@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects with thumbnails"""
-from typing import TYPE_CHECKING, Optional, Type, TypeVar
+from typing import TYPE_CHECKING, Optional, TypeVar
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
@@ -82,7 +82,7 @@ class _BaseThumbedMedium(_BaseMedium):
 
     @classmethod
     def de_json(
-        cls: Type[ThumbedMT_co], data: Optional[JSONDict], bot: Optional["Bot"] = None
+        cls: type[ThumbedMT_co], data: Optional[JSONDict], bot: Optional["Bot"] = None
     ) -> Optional[ThumbedMT_co]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)

@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 
 import pytest
 from httpx import AsyncClient, AsyncHTTPTransport, Response
@@ -83,7 +83,7 @@ class OfflineRequest(BaseRequest):
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
-    ) -> Tuple[int, bytes]:
+    ) -> tuple[int, bytes]:
         pytest.fail("OfflineRequest: Network access disallowed in this test")
 
 

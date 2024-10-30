@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMemberUpdated."""
 import datetime
-from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
@@ -162,7 +162,7 @@ class ChatMemberUpdated(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def _get_attribute_difference(self, attribute: str) -> Tuple[object, object]:
+    def _get_attribute_difference(self, attribute: str) -> tuple[object, object]:
         try:
             old = self.old_chat_member[attribute]
         except KeyError:
@@ -177,9 +177,9 @@ class ChatMemberUpdated(TelegramObject):
 
     def difference(
         self,
-    ) -> Dict[
+    ) -> dict[
         str,
-        Tuple[
+        tuple[
             Union[str, bool, datetime.datetime, User], Union[str, bool, datetime.datetime, User]
         ],
     ]:
@@ -198,7 +198,7 @@ class ChatMemberUpdated(TelegramObject):
         .. versionadded:: 13.5
 
         Returns:
-            Dict[:obj:`str`, Tuple[:class:`object`, :class:`object`]]: A dictionary mapping
+            dict[:obj:`str`, tuple[:class:`object`, :class:`object`]]: A dictionary mapping
             attribute names to tuples of the form ``(old_value, new_value)``
         """
         # we first get the names of the attributes that have changed

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains objects representing Telegram bot command scopes."""
-from typing import TYPE_CHECKING, Dict, Final, Optional, Type, Union
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -91,7 +91,7 @@ class BotCommandScope(TelegramObject):
         care of selecting the correct subclass.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (dict[:obj:`str`, ...]): The JSON data.
             bot (:class:`telegram.Bot`, optional): The bot associated with this object. Defaults to
                 :obj:`None`, in which case shortcut methods will not be available.
 
@@ -107,7 +107,7 @@ class BotCommandScope(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type[BotCommandScope]] = {
+        _class_mapping: dict[str, type[BotCommandScope]] = {
             cls.DEFAULT: BotCommandScopeDefault,
             cls.ALL_PRIVATE_CHATS: BotCommandScopeAllPrivateChats,
             cls.ALL_GROUP_CHATS: BotCommandScopeAllGroupChats,

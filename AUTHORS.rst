@@ -115,6 +115,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `Shivam Saini <https://github.com/shivamsn97>`_
+- `Siloé Garcez <https://github.com/roast-lord>`_
 - `Simon Schürrle <https://github.com/SitiSchu>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `syntx <https://github.com/syntx>`_

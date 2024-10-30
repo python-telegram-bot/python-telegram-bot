@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputSticker."""
 
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._files.sticker import MaskPosition
 from telegram._telegramobject import TelegramObject
@@ -67,13 +68,13 @@ class InputSticker(TelegramObject):
 
     Attributes:
         sticker (:obj:`str` | :class:`telegram.InputFile`): The added sticker.
-        emoji_list (Tuple[:obj:`str`]): Tuple of
+        emoji_list (tuple[:obj:`str`]): Tuple of
             :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI` -
             :tg-const:`telegram.constants.StickerLimit.MAX_STICKER_EMOJI` emoji associated with the
             sticker.
         mask_position (:class:`telegram.MaskPosition`): Optional. Position where the mask should be
             placed on faces. For ":tg-const:`telegram.constants.StickerType.MASK`" stickers only.
-        keywords (Tuple[:obj:`str`]): Optional. Tuple of
+        keywords (tuple[:obj:`str`]): Optional. Tuple of
             0-:tg-const:`telegram.constants.StickerLimit.MAX_SEARCH_KEYWORDS` search keywords
             for the sticker with the total length of up to
             :tg-const:`telegram.constants.StickerLimit.MAX_KEYWORD_LENGTH` characters. For
@@ -110,9 +111,9 @@ class InputSticker(TelegramObject):
             local_mode=True,
             attach=True,
         )
-        self.emoji_list: Tuple[str, ...] = parse_sequence_arg(emoji_list)
+        self.emoji_list: tuple[str, ...] = parse_sequence_arg(emoji_list)
         self.format: str = format
         self.mask_position: Optional[MaskPosition] = mask_position
-        self.keywords: Tuple[str, ...] = parse_sequence_arg(keywords)
+        self.keywords: tuple[str, ...] = parse_sequence_arg(keywords)
 
         self._freeze()

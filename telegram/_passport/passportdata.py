@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
@@ -49,7 +50,7 @@ class PassportData(TelegramObject):
         credentials (:class:`telegram.EncryptedCredentials`)): Encrypted credentials.
 
     Attributes:
-        data (Tuple[:class:`telegram.EncryptedPassportElement`]): Array with encrypted
+        data (tuple[:class:`telegram.EncryptedPassportElement`]): Array with encrypted
             information about documents and other Telegram Passport elements that was shared with
             the bot.
 
@@ -72,10 +73,10 @@ class PassportData(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.data: Tuple[EncryptedPassportElement, ...] = parse_sequence_arg(data)
+        self.data: tuple[EncryptedPassportElement, ...] = parse_sequence_arg(data)
         self.credentials: EncryptedCredentials = credentials
 
-        self._decrypted_data: Optional[Tuple[EncryptedPassportElement]] = None
+        self._decrypted_data: Optional[tuple[EncryptedPassportElement]] = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
         self._freeze()
@@ -96,9 +97,9 @@ class PassportData(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     @property
-    def decrypted_data(self) -> Tuple[EncryptedPassportElement, ...]:
+    def decrypted_data(self) -> tuple[EncryptedPassportElement, ...]:
         """
-        Tuple[:class:`telegram.EncryptedPassportElement`]: Lazily decrypt and return information
+        tuple[:class:`telegram.EncryptedPassportElement`]: Lazily decrypt and return information
             about documents and other Telegram Passport elements which were shared with the bot.
 
         .. versionchanged:: 20.0

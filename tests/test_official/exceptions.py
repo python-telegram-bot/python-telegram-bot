@@ -57,7 +57,7 @@ class ParamTypeCheckingExceptions:
         ("reaction", False): "ReactionType",  # + str
         ("options", False): "InputPollOption",  # + str
         # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
-        ("file_hashes", True): "List[str]",
+        ("file_hashes", True): "list[str]",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are

@@ -233,7 +233,8 @@ class TestAnimationWithRequest(AnimationTestBase):
         assert message.animation.file_unique_id
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
-        assert message.animation.file_size == animation.file_size
+        # TGs reported file size is not reliable
+        assert isinstance(message.animation.file_size, int)
         assert message.animation.thumbnail.width == self.width
         assert message.animation.thumbnail.height == self.height
         assert message.has_protected_content

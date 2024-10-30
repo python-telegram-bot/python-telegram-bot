@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ChatMember."""
 
 import datetime
-from typing import TYPE_CHECKING, Dict, Final, Optional, Type
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -114,7 +114,7 @@ class ChatMember(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type[ChatMember]] = {
+        _class_mapping: dict[str, type[ChatMember]] = {
             cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
             cls.MEMBER: ChatMemberMember,

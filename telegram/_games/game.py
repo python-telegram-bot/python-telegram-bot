@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Game."""
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
@@ -65,7 +66,7 @@ class Game(TelegramObject):
     Attributes:
         title (:obj:`str`): Title of the game.
         description (:obj:`str`): Description of the game.
-        photo (Tuple[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game
+        photo (tuple[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game
             message in chats.
 
             .. versionchanged:: 20.0
@@ -76,7 +77,7 @@ class Game(TelegramObject):
             when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
             using :meth:`telegram.Bot.edit_message_text`.
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
-        text_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that
+        text_entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
             This tuple is empty if the message does not contain text entities.
 
@@ -112,10 +113,10 @@ class Game(TelegramObject):
         # Required
         self.title: str = title
         self.description: str = description
-        self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+        self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
         # Optionals
         self.text: Optional[str] = text
-        self.text_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
+        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
         self.animation: Optional[Animation] = animation
 
         self._id_attrs = (self.title, self.description, self.photo)
@@ -163,7 +164,7 @@ class Game(TelegramObject):
 
         return entity_text.decode(TextEncoding.UTF_16_LE)
 
-    def parse_text_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
+    def parse_text_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their
@@ -176,13 +177,13 @@ class Game(TelegramObject):
             See :attr:`parse_text_entity` for more info.
 
         Args:
-            types (List[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
+            types (list[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
                 strings. If the :attr:`~telegram.MessageEntity.type` attribute of an entity is
                 contained in this list, it will be returned. Defaults to
                 :attr:`telegram.MessageEntity.ALL_TYPES`.
 
         Returns:
-            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """

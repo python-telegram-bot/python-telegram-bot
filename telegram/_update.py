@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Final, List, Optional, Union
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._business import BusinessConnection, BusinessMessagesDeleted
@@ -402,8 +402,8 @@ class Update(TelegramObject):
     .. versionadded:: 21.6
     """
 
-    ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
-    """List[:obj:`str`]: A list of all available update types.
+    ALL_TYPES: Final[list[str]] = list(constants.UpdateType)
+    """list[:obj:`str`]: A list of all available update types.
 
     .. versionadded:: 13.5"""
 

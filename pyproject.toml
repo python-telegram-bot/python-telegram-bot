@@ -8,7 +8,7 @@ dynamic = ["version"]
 name = "python-telegram-bot"
 description = "We have made you a wrapper you can't refuse"
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = "LGPL-3.0-only"
 license-files = { paths = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"] }
 authors = [
@@ -31,7 +31,6 @@ classifiers = [
     "Topic :: Internet",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -192,7 +191,7 @@ disallow_untyped_defs = true
 disallow_incomplete_defs = true
 disallow_untyped_decorators = true
 show_error_codes = true
-python_version = "3.8"
+python_version = "3.9"
 
 # For some files, it's easier to just disable strict-optional all together instead of
 # cluttering the code with `# type: ignore`s or stuff like

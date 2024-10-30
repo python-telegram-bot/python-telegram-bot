@@ -25,14 +25,14 @@ Warning:
 """
 import enum as _enum
 import sys
-from typing import Type, TypeVar, Union
+from typing import TypeVar, Union
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 _Enum = TypeVar("_Enum", bound=_enum.Enum)
 
 
-def get_member(enum_cls: Type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _B]:
+def get_member(enum_cls: type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _B]:
     """Tries to call ``enum_cls(value)`` to convert the value into an enumeration member.
     If that fails, the ``default`` is returned.
     """

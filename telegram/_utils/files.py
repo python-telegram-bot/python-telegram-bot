@@ -29,7 +29,7 @@ Warning:
 """
 
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional, Tuple, Type, TypeVar, Union, cast, overload
+from typing import IO, TYPE_CHECKING, Any, Optional, TypeVar, Union, cast, overload
 
 from telegram._utils.types import FileInput, FilePathInput
 
@@ -40,16 +40,16 @@ _T = TypeVar("_T", bound=Union[bytes, "InputFile", str, Path, None])
 
 
 @overload
-def load_file(obj: IO[bytes]) -> Tuple[Optional[str], bytes]: ...
+def load_file(obj: IO[bytes]) -> tuple[Optional[str], bytes]: ...
 
 
 @overload
-def load_file(obj: _T) -> Tuple[None, _T]: ...
+def load_file(obj: _T) -> tuple[None, _T]: ...
 
 
 def load_file(
     obj: Optional[FileInput],
-) -> Tuple[Optional[str], Union[bytes, "InputFile", str, Path, None]]:
+) -> tuple[Optional[str], Union[bytes, "InputFile", str, Path, None]]:
     """If the input is a file handle, read the data and name and return it. Otherwise, return
     the input unchanged.
     """
@@ -95,7 +95,7 @@ def is_local_file(obj: Optional[FilePathInput]) -> bool:
 
 def parse_file_input(  # pylint: disable=too-many-return-statements
     file_input: Union[FileInput, "TelegramObject"],
-    tg_type: Optional[Type["TelegramObject"]] = None,
+    tg_type: Optional[type["TelegramObject"]] = None,
     filename: Optional[str] = None,
     attach: bool = False,
     local_mode: bool = False,

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Application class."""
+
 import asyncio
 import contextlib
 import inspect
@@ -25,31 +26,11 @@ import platform
 import signal
 import sys
 from collections import defaultdict
+from collections.abc import Awaitable, Coroutine, Generator, Mapping, Sequence
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType, TracebackType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    AsyncContextManager,
-    Awaitable,
-    Callable,
-    Coroutine,
-    DefaultDict,
-    Dict,
-    Generator,
-    Generic,
-    List,
-    Mapping,
-    NoReturn,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Callable, Generic, NoReturn, Optional, TypeVar, Union
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import (
@@ -132,7 +113,10 @@ class ApplicationHandlerStop(Exception):
         self.state: Optional[object] = state
 
 
-class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Application"]):
+class Application(
+    Generic[BT, CCT, UD, CD, BD, JQ],
+    contextlib.AbstractAsyncContextManager["Application"],
+):
     """This class dispatches all kinds of updates to its registered handlers, and is the entry
     point to a PTB application.
 
@@ -224,12 +208,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): The persistence class to
             store data that should be persistent over restarts.
-        handlers (Dict[:obj:`int`, List[:class:`telegram.ext.BaseHandler`]]): A dictionary mapping
+        handlers (dict[:obj:`int`, list[:class:`telegram.ext.BaseHandler`]]): A dictionary mapping
             each handler group to the list of handlers registered to that group.
 
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
-        error_handlers (Dict[:term:`coroutine function`, :obj:`bool`]): A dictionary where the keys
+        error_handlers (dict[:term:`coroutine function`, :obj:`bool`]): A dictionary where the keys
             are error handlers and the values indicate whether they are to be run blocking.
 
             .. seealso::
@@ -323,8 +307,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
-        self.handlers: Dict[int, List[BaseHandler[Any, CCT, Any]]] = {}
-        self.error_handlers: Dict[
+        self.handlers: dict[int, list[BaseHandler[Any, CCT, Any]]] = {}
+        self.error_handlers: dict[
             HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
         ] = {}
         self.post_init: Optional[
@@ -338,8 +322,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         ] = post_stop
         self._update_processor = update_processor
         self.bot_data: BD = self.context_types.bot_data()
-        self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
-        self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
+        self._user_data: defaultdict[int, UD] = defaultdict(self.context_types.user_data)
+        self._chat_data: defaultdict[int, CD] = defaultdict(self.context_types.chat_data)
         # Read only mapping
         self.user_data: Mapping[int, UD] = MappingProxyType(self._user_data)
         self.chat_data: Mapping[int, CD] = MappingProxyType(self._chat_data)
@@ -350,14 +334,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.persistence = persistence
 
         # Some bookkeeping for persistence logic
-        self._chat_ids_to_be_updated_in_persistence: Set[int] = set()
-        self._user_ids_to_be_updated_in_persistence: Set[int] = set()
-        self._chat_ids_to_be_deleted_in_persistence: Set[int] = set()
-        self._user_ids_to_be_deleted_in_persistence: Set[int] = set()
+        self._chat_ids_to_be_updated_in_persistence: set[int] = set()
+        self._user_ids_to_be_updated_in_persistence: set[int] = set()
+        self._chat_ids_to_be_deleted_in_persistence: set[int] = set()
+        self._user_ids_to_be_deleted_in_persistence: set[int] = set()
 
         # This attribute will hold references to the conversation dicts of all conversation
         # handlers so that we can extract the changed states during `update_persistence`
-        self._conversation_handler_conversations: Dict[
+        self._conversation_handler_conversations: dict[
             str, TrackingDict[ConversationKey, object]
         ] = {}
 
@@ -369,7 +353,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__update_persistence_task: Optional[asyncio.Task] = None
         self.__update_persistence_event = asyncio.Event()
         self.__update_persistence_lock = asyncio.Lock()
-        self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
+        self.__create_task_tasks: set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
         self.__stop_running_marker = asyncio.Event()
 
     async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
@@ -391,7 +375,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]],
+        exc_type: Optional[type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
@@ -762,7 +746,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        allowed_updates: Optional[List[str]] = None,
+        allowed_updates: Optional[list[str]] = None,
         drop_pending_updates: Optional[bool] = None,
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
@@ -839,7 +823,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
-            allowed_updates (List[:obj:`str`], optional): Passed to
+            allowed_updates (list[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
             close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
                 closed upon shutdown. Defaults to :obj:`True`.
@@ -904,7 +888,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         key: Optional[Union[str, Path]] = None,
         bootstrap_retries: int = 0,
         webhook_url: Optional[str] = None,
-        allowed_updates: Optional[List[str]] = None,
+        allowed_updates: Optional[list[str]] = None,
         drop_pending_updates: Optional[bool] = None,
         ip_address: Optional[str] = None,
         max_connections: int = 40,
@@ -970,7 +954,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
                 NAT, reverse proxy, etc. Default is derived from :paramref:`listen`,
                 :paramref:`port`, :paramref:`url_path`, :paramref:`cert`, and :paramref:`key`.
-            allowed_updates (List[:obj:`str`], optional): Passed to
+            allowed_updates (list[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
@@ -1420,8 +1404,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     def add_handlers(
         self,
         handlers: Union[
-            Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]],
-            Dict[int, Union[List[BaseHandler[Any, CCT, Any]], Tuple[BaseHandler[Any, CCT, Any]]]],
+            Sequence[BaseHandler[Any, CCT, Any]],
+            dict[int, Sequence[BaseHandler[Any, CCT, Any]]],
         ],
         group: Union[int, DefaultValue[int]] = _DEFAULT_0,
     ) -> None:
@@ -1431,10 +1415,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         .. versionadded:: 20.0
 
         Args:
-            handlers (List[:class:`telegram.ext.BaseHandler`] | \
-                Dict[int, List[:class:`telegram.ext.BaseHandler`]]): \
+            handlers (Sequence[:class:`telegram.ext.BaseHandler`] | \
+                dict[int, Sequence[:class:`telegram.ext.BaseHandler`]]):
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
+
+                .. versionchanged:: NEXT.VERSION
+                    Accepts any :class:`collections.abc.Sequence` as input instead of just a list
+                    or tuple.
+
             group (:obj:`int`, optional): Specify which group the sequence of :paramref:`handlers`
                 should be added to. Defaults to ``0``.
 
@@ -1453,13 +1442,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         if isinstance(handlers, dict):
             for handler_group, grp_handlers in handlers.items():
-                if not isinstance(grp_handlers, (list, tuple)):
-                    raise TypeError(f"Handlers for group {handler_group} must be a list or tuple")
+                if not isinstance(grp_handlers, Sequence):
+                    raise TypeError(
+                        f"Handlers for group {handler_group} must be a sequence of handlers."
+                    )
 
                 for handler in grp_handlers:
                     self.add_handler(handler, handler_group)
 
-        elif isinstance(handlers, (list, tuple)):
+        elif isinstance(handlers, Sequence):
             for handler in handlers:
                 self.add_handler(handler, DefaultValue.get_value(group))
 
@@ -1686,7 +1677,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         _LOGGER.debug("Starting next run of updating the persistence.")
 
-        coroutines: Set[Coroutine] = set()
+        coroutines: set[Coroutine] = set()
 
         # Mypy doesn't know that persistence.set_bot (see above) already checks that
         # self.bot is an instance of ExtBot if callback_data should be stored ...
