@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryFile, mkstemp
 
@@ -271,6 +272,14 @@ class TestFileWithoutRequest(FileTestBase):
         assert buf3 is buf2
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
+
+    async def test_download_no_file_path(self):
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_to_drive()
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_to_memory(BytesIO())
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_as_bytearray()
 
 
 class TestFileWithRequest(FileTestBase):

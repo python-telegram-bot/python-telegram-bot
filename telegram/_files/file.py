@@ -176,6 +176,9 @@ class File(TelegramObject):
             :class:`pathlib.Path`: Returns the Path object the file was downloaded to.
 
         """
+        if not self.file_path:
+            raise RuntimeError("No `file_path` available for this file. Can not download.")
+
         local_file = is_local_file(self.file_path)
         url = None if local_file else self._get_encoded_url()
 
@@ -254,13 +257,19 @@ class File(TelegramObject):
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+        Raises:
+            RuntimeError: If :attr:`file_path` is not set.
         """
+        if not self.file_path:
+            raise RuntimeError("No `file_path` available for this file. Can not download.")
+
         local_file = is_local_file(self.file_path)
         url = None if local_file else self._get_encoded_url()
         path = Path(self.file_path) if local_file else None
         if local_file:
             buf = path.read_bytes()
-        else:
+        elif url:
             buf = await self.get_bot().request.retrieve(
                 url,
                 read_timeout=read_timeout,
@@ -313,6 +322,9 @@ class File(TelegramObject):
             newly allocated :obj:`bytearray`.
 
         """
+        if not self.file_path:
+            raise RuntimeError("No `file_path` available for this file. Can not download.")
+
         if buf is None:
             buf = bytearray()
 
