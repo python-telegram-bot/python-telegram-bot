@@ -152,6 +152,9 @@ class File(TelegramObject):
             * This method was previously called ``download``. It was split into
               :meth:`download_to_drive` and :meth:`download_to_memory`.
 
+        .. versionchanged:: NEXT.VERSION
+            Raises :exc:`RuntimeError` if :attr:`file_path` is not set.
+
         Args:
             custom_path (:class:`pathlib.Path` | :obj:`str` , optional): The path where the file
                 will be saved to. If not specified, will be saved in the current working directory
@@ -174,6 +177,9 @@ class File(TelegramObject):
 
         Returns:
             :class:`pathlib.Path`: Returns the Path object the file was downloaded to.
+
+        Raises:
+            RuntimeError: If :attr:`file_path` is not set.
 
         """
         if not self.file_path:
@@ -240,6 +246,9 @@ class File(TelegramObject):
 
         .. versionadded:: 20.0
 
+        .. versionchanged:: NEXT.VERSION
+            Raises :exc:`RuntimeError` if :attr:`file_path` is not set.
+
         Args:
             out (:obj:`io.BufferedIOBase`): A file-like object. Must be opened for writing in
                 binary mode.
@@ -292,6 +301,9 @@ class File(TelegramObject):
     ) -> bytearray:
         """Download this file and return it as a bytearray.
 
+        .. versionchanged:: NEXT.VERSION
+            Raises :exc:`RuntimeError` if :attr:`file_path` is not set.
+
         Args:
             buf (:obj:`bytearray`, optional): Extend the given bytearray with the downloaded data.
 
@@ -320,6 +332,9 @@ class File(TelegramObject):
         Returns:
             :obj:`bytearray`: The same object as :paramref:`buf` if it was specified. Otherwise a
             newly allocated :obj:`bytearray`.
+
+        Raises:
+            RuntimeError: If :attr:`file_path` is not set.
 
         """
         if not self.file_path:
