@@ -48,6 +48,10 @@ extensions = [
     "sphinx_search.extension",
 ]
 
+# Temporary. See #4387
+if os.environ.get("READTHEDOCS", "") == "True":
+    extensions.append("sphinx_build_compatibility.extension")
+
 # For shorter links to Wiki in docstrings
 extlinks = {
     "wiki": ("https://github.com/python-telegram-bot/python-telegram-bot/wiki/%s", "%s"),
