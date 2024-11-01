@@ -56,8 +56,8 @@ class InputFile:
         read_file_handle (:obj:`bool`, optional): If :obj:`True` and :paramref:`obj` is a file
             handle, the data will be read from the file handle on initialization of this object.
             If :obj:`False`, the file handle will be passed on to the
-            `networking backend <telegram.request.BaseRequest.do_request>`_ which will have to
-            handle the reading. Defaults to :obj:`True`.
+            :attr:`networking backend <telegram.request.BaseRequest.do_request>` which will have
+            to handle the reading. Defaults to :obj:`True`.
 
             Tip:
                 If you upload extremely large files, you may want to set this to :obj:`False` to
