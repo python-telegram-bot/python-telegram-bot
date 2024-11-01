@@ -45,10 +45,11 @@ class MessageEntity(TelegramObject):
     considered equal, if their :attr:`type`, :attr:`offset` and :attr:`length` are equal.
 
     Args:
-        type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (@username),
-            :attr:`HASHTAG` (#hashtag), :attr:`CASHTAG` ($USD), :attr:`BOT_COMMAND`
-            (/start@jobs_bot), :attr:`URL` (https://telegram.org),
-            :attr:`EMAIL` (do-not-reply@telegram.org), :attr:`PHONE_NUMBER` (+1-212-555-0123),
+        type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (``@username``),
+            :attr:`HASHTAG` (``#hashtag`` or ``#hashtag@chatusername``), :attr:`CASHTAG` (``$USD``
+            or ``USD@chatusername``), :attr:`BOT_COMMAND` (``/start@jobs_bot``), :attr:`URL`
+            (``https://telegram.org``), :attr:`EMAIL` (``do-not-reply@telegram.org``),
+            :attr:`PHONE_NUMBER` (``+1-212-555-0123``),
             :attr:`BOLD` (**bold text**), :attr:`ITALIC` (*italic text*), :attr:`UNDERLINE`
             (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
             :attr:`BLOCKQUOTE` (block quotation), :attr:`CODE` (monowidth string), :attr:`PRE`
@@ -74,10 +75,11 @@ class MessageEntity(TelegramObject):
 
             .. versionadded:: 20.0
     Attributes:
-        type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (@username),
-            :attr:`HASHTAG` (#hashtag), :attr:`CASHTAG` ($USD), :attr:`BOT_COMMAND`
-            (/start@jobs_bot), :attr:`URL` (https://telegram.org),
-            :attr:`EMAIL` (do-not-reply@telegram.org), :attr:`PHONE_NUMBER` (+1-212-555-0123),
+        type (:obj:`str`): Type of the entity.  Can be :attr:`MENTION` (``@username``),
+            :attr:`HASHTAG` (``#hashtag`` or ``#hashtag@chatusername``), :attr:`CASHTAG` (``$USD``
+            or ``USD@chatusername``), :attr:`BOT_COMMAND` (``/start@jobs_bot``), :attr:`URL`
+            (``https://telegram.org``), :attr:`EMAIL` (``do-not-reply@telegram.org``),
+            :attr:`PHONE_NUMBER` (``+1-212-555-0123``),
             :attr:`BOLD` (**bold text**), :attr:`ITALIC` (*italic text*), :attr:`UNDERLINE`
             (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
             :attr:`BLOCKQUOTE` (block quotation), :attr:`CODE` (monowidth string), :attr:`PRE`
