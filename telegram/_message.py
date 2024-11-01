@@ -280,7 +280,10 @@ class Message(MaybeInaccessibleMessage):
           and notice that some positional arguments changed position as a result.
 
     Args:
-        message_id (:obj:`int`): Unique message identifier inside this chat.
+        message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
+            (e.g., message containing a video sent to a big chat), the server might automatically
+            schedule a message instead of sending it immediately. In such cases, this field will be
+            ``0`` and the relevant message will be unusable until it is actually sent.
         from_user (:class:`telegram.User`, optional): Sender of the message; may be empty for
             messages sent to channels. For backward compatibility, if the message was sent on
             behalf of a chat, the field contains a fake sender user in non-channel chats.
@@ -590,7 +593,10 @@ class Message(MaybeInaccessibleMessage):
             .. versionadded:: 21.4
 
     Attributes:
-        message_id (:obj:`int`): Unique message identifier inside this chat.
+        message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
+            (e.g., message containing a video sent to a big chat), the server might automatically
+            schedule a message instead of sending it immediately. In such cases, this field will be
+            ``0`` and the relevant message will be unusable until it is actually sent.
         from_user (:class:`telegram.User`): Optional. Sender of the message; may be empty for
             messages sent to channels. For backward compatibility, if the message was sent on
             behalf of a chat, the field contains a fake sender user in non-channel chats.
