@@ -3,7 +3,7 @@ on:
   schedule:
     # First day of month at 05:46 in every 2nd month
     - cron: '46 5 1 */2 *'
-  pr:
+  pull_request:
     paths:
       - .github/workflows/docs-linkcheck.yml
 
