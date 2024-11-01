@@ -3,6 +3,9 @@ on:
   schedule:
     # First day of month at 05:46 in every 2nd month
     - cron: '46 5 1 */2 *'
+  pull_request:
+    paths:
+      - .github/workflows/docs-linkcheck.yml
 
 jobs:
   test-sphinx-build:
@@ -10,7 +13,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: [3.10]
+        python-version: ['3.10']
         os: [ubuntu-latest]
       fail-fast: False
     steps:

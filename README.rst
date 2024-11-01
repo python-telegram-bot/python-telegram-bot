@@ -121,7 +121,7 @@ To enable you to verify that a release file that you downloaded was indeed provi
 
 Starting with v21.4, all releases are signed via `sigstore <https://www.sigstore.dev>`_.
 The corresponding signature files are uploaded to the `GitHub releases page`_.
-To verify the signature, please install the `sigstore Python client <https://pypi.org/project/sigstore/>`_ and follow the instructions for `verifying signatures from GitHub Actions <https://github.com/sigstore/sigstore-python#signatures-from-github-actions>`_. As input for the ``--repository`` parameter, please use the value ``python-telegram-bot/python-telegram-bot``.
+To verify the signature, please install the `sigstore Python client <https://pypi.org/project/sigstore/>`_ and follow the instructions for `verifying signatures from GitHub Actions <https://github.com/sigstore/sigstore-python?tab=readme-ov-file>`_. As input for the ``--repository`` parameter, please use the value ``python-telegram-bot/python-telegram-bot``.
 
 Earlier releases are signed with a GPG key.
 The signatures are uploaded to both the `GitHub releases page`_ and the `PyPI project <https://pypi.org/project/python-telegram-bot/>`_ and end with a suffix ``.asc``.
@@ -232,4 +232,4 @@ License
 You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_.
 Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
 
-.. _`GitHub releases page`: https://github.com/python-telegram-bot/python-telegram-bot/releases>
+.. _`GitHub releases page`: https://github.com/python-telegram-bot/python-telegram-bot/releases
