@@ -1261,14 +1261,22 @@ class InlineKeyboardButtonLimit(IntEnum):
     __slots__ = ()
 
     MIN_CALLBACK_DATA = 1
-    """:obj:`int`: Minimum value allowed for
+    """:obj:`int`: Minimum length allowed for
     :paramref:`~telegram.InlineKeyboardButton.callback_data` parameter of
     :class:`telegram.InlineKeyboardButton`
     """
     MAX_CALLBACK_DATA = 64
-    """:obj:`int`: Maximum value allowed for
+    """:obj:`int`: Maximum length allowed for
     :paramref:`~telegram.InlineKeyboardButton.callback_data` parameter of
     :class:`telegram.InlineKeyboardButton`
+    """
+    MIN_COPY_TEXT = 1
+    """:obj:`int`: Minimum length allowed for
+    :paramref:`~telegram.CopyTextButton.text` parameter of :class:`telegram.CopyTextButton`
+    """
+    MAX_COPY_TEXT = 256
+    """:obj:`int`: Maximum length allowed for
+    :paramref:`~telegram.CopyTextButton.text` parameter of :class:`telegram.CopyTextButton`
     """
 
 
