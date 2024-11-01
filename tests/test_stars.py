@@ -36,6 +36,7 @@ from telegram import (
     TransactionPartnerFragment,
     TransactionPartnerOther,
     TransactionPartnerTelegramAds,
+    TransactionPartnerTelegramApi,
     TransactionPartnerUser,
     User,
 )
@@ -78,11 +79,6 @@ def transaction_partner_user():
     )
 
 
-@pytest.fixture
-def transaction_partner_other():
-    return TransactionPartnerOther()
-
-
 def transaction_partner_fragment():
     return TransactionPartnerFragment(
         withdrawal_state=withdrawal_state_succeeded(),
@@ -114,8 +110,9 @@ def star_transactions():
     params=[
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
-        TransactionPartner.USER,
         TransactionPartner.TELEGRAM_ADS,
+        TransactionPartner.TELEGRAM_API,
+        TransactionPartner.USER,
     ],
 )
 def tp_scope_type(request):
@@ -127,14 +124,16 @@ def tp_scope_type(request):
     params=[
         TransactionPartnerFragment,
         TransactionPartnerOther,
-        TransactionPartnerUser,
         TransactionPartnerTelegramAds,
+        TransactionPartnerTelegramApi,
+        TransactionPartnerUser,
     ],
     ids=[
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
-        TransactionPartner.USER,
         TransactionPartner.TELEGRAM_ADS,
+        TransactionPartner.TELEGRAM_API,
+        TransactionPartner.USER,
     ],
 )
 def tp_scope_class(request):
@@ -146,14 +145,16 @@ def tp_scope_class(request):
     params=[
         (TransactionPartnerFragment, TransactionPartner.FRAGMENT),
         (TransactionPartnerOther, TransactionPartner.OTHER),
-        (TransactionPartnerUser, TransactionPartner.USER),
         (TransactionPartnerTelegramAds, TransactionPartner.TELEGRAM_ADS),
+        (TransactionPartnerTelegramApi, TransactionPartner.TELEGRAM_API),
+        (TransactionPartnerUser, TransactionPartner.USER),
     ],
     ids=[
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
-        TransactionPartner.USER,
         TransactionPartner.TELEGRAM_ADS,
+        TransactionPartner.TELEGRAM_API,
+        TransactionPartner.USER,
     ],
 )
 def tp_scope_class_and_type(request):
@@ -169,6 +170,7 @@ def transaction_partner(tp_scope_class_and_type):
             "invoice_payload": TransactionPartnerTestBase.invoice_payload,
             "withdrawal_state": TransactionPartnerTestBase.withdrawal_state.to_dict(),
             "user": TransactionPartnerTestBase.user.to_dict(),
+            "request_count": TransactionPartnerTestBase.request_count,
         },
         bot=None,
     )
@@ -382,6 +384,7 @@ class TransactionPartnerTestBase:
     withdrawal_state = withdrawal_state_succeeded()
     user = transaction_partner_user().user
     invoice_payload = "payload"
+    request_count = 42
 
 
 class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
@@ -400,11 +403,15 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "invoice_payload": self.invoice_payload,
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
+            "request_count": self.request_count,
         }
         tp = TransactionPartner.de_json(json_dict, offline_bot)
-        assert set(tp.api_kwargs.keys()) == {"user", "withdrawal_state", "invoice_payload"} - set(
-            cls.__slots__
-        )
+        assert set(tp.api_kwargs.keys()) == {
+            "user",
+            "withdrawal_state",
+            "invoice_payload",
+            "request_count",
+        } - set(cls.__slots__)
 
         assert isinstance(tp, TransactionPartner)
         assert type(tp) is cls
@@ -414,6 +421,8 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
         if "user" in cls.__slots__:
             assert tp.user == self.user
             assert tp.invoice_payload == self.invoice_payload
+        if "request_count" in cls.__slots__:
+            assert tp.request_count == self.request_count
 
         assert cls.de_json(None, offline_bot) is None
         assert TransactionPartner.de_json({}, offline_bot) is None
@@ -424,12 +433,14 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "invoice_payload": self.invoice_payload,
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
+            "request_count": self.request_count,
         }
         tp = TransactionPartner.de_json(json_dict, offline_bot)
         assert tp.api_kwargs == {
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
             "invoice_payload": self.invoice_payload,
+            "request_count": self.request_count,
         }
 
         assert type(tp) is TransactionPartner
@@ -443,6 +454,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "invoice_payload": self.invoice_payload,
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
+            "request_count": self.request_count,
         }
         assert type(tp_scope_class.de_json(json_dict, offline_bot)) is tp_scope_class
 
@@ -489,6 +501,14 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
         if hasattr(c, "user"):
             json_dict = c.to_dict()
             json_dict["user"] = User(2, "something", True).to_dict()
+            f = c.__class__.de_json(json_dict, offline_bot)
+
+            assert c != f
+            assert hash(c) != hash(f)
+
+        if hasattr(c, "request_count"):
+            json_dict = c.to_dict()
+            json_dict["request_count"] = 1
             f = c.__class__.de_json(json_dict, offline_bot)
 
             assert c != f

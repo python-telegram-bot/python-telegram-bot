@@ -235,6 +235,7 @@ __all__ = (
     "TransactionPartnerFragment",
     "TransactionPartnerOther",
     "TransactionPartnerTelegramAds",
+    "TransactionPartnerTelegramApi",
     "TransactionPartnerUser",
     "Update",
     "User",
@@ -471,6 +472,7 @@ from ._payment.stars import (
     TransactionPartnerFragment,
     TransactionPartnerOther,
     TransactionPartnerTelegramAds,
+    TransactionPartnerTelegramApi,
     TransactionPartnerUser,
 )
 from ._payment.successfulpayment import SuccessfulPayment
