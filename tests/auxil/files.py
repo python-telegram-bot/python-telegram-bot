@@ -18,7 +18,7 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 import logging
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, Union
 
 from telegram import Bot, File
 
@@ -34,7 +34,7 @@ class _HasGetFile(Protocol):
     async def get_file(self) -> File: ...
 
 
-async def stable_get_file(bot: Bot, obj: _HasGetFile | str) -> File:
+async def stable_get_file(bot: Bot, obj: Union[_HasGetFile, str]) -> File:
     """Temporary workaround for Telegram API returning file_path as None on first call to
     get_file. This function will attempt to get the file 3 times before raising an error.
     Remove this once https://github.com/tdlib/telegram-bot-api/issues/658 as closed."""
