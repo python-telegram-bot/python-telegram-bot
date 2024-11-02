@@ -1158,7 +1158,7 @@ class FloodLimit(IntEnum):
     """:obj:`int`: The number of messages that can be sent per second when paying with the bot's
     Telegram Star balance. See e.g. parameter
     :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` of
-    :meth:`~telegram.Bot.send_message.
+    :meth:`~telegram.Bot.send_message`.
 
     .. versionadded:: NEXT.VERSION
     """

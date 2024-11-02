@@ -94,4 +94,4 @@
 
 .. |tg_stars| replace:: `Telegram Stars <https://t.me/BotNews/90>`__
 
-.. |allow_paid_broadcast| replace:: Pass True to allow up to :tg-const:`telegram.constants.FloodLimit.PAID_MESSAGES_PER_SECOND` messages per second, ignoring `broadcasting limits <https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once>`_ for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance.
+.. |allow_paid_broadcast| replace:: Pass True to allow up to :tg-const:`telegram.constants.FloodLimit.PAID_MESSAGES_PER_SECOND` messages per second, ignoring `broadcasting limits <https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once>`__ for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance.
