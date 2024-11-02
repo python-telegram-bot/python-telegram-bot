@@ -31,7 +31,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.files import data_file
+from tests.auxil.files import data_file, stable_get_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
 
@@ -158,7 +158,10 @@ class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
 
 class TestChatPhotoWithRequest:
     async def test_get_and_download(self, bot, chat_photo, tmp_file):
-        tasks = {bot.get_file(chat_photo.small_file_id), bot.get_file(chat_photo.big_file_id)}
+        tasks = {
+            stable_get_file(bot, chat_photo.small_file_id),
+            stable_get_file(bot, chat_photo.big_file_id),
+        }
         asserts = []
 
         for task in asyncio.as_completed(tasks):

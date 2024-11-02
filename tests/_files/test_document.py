@@ -33,7 +33,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
-from tests.auxil.files import data_file
+from tests.auxil.files import data_file, stable_get_file
 from tests.auxil.slots import mro_slots
 
 
@@ -216,7 +216,7 @@ class TestDocumentWithRequest(DocumentTestBase):
             await bot.send_document(chat_id=chat_id, document="")
 
     async def test_get_and_download(self, bot, document, chat_id, tmp_file):
-        new_file = await bot.get_file(document.file_id)
+        new_file = await stable_get_file(bot, document.file_id)
 
         assert new_file.file_size == document.file_size
         assert new_file.file_unique_id == document.file_unique_id

@@ -182,21 +182,6 @@ class TestFileWithoutRequest(FileTestBase):
             os.close(file_handle)
             custom_path.unlink(missing_ok=True)
 
-    async def test_download_no_filename(self, monkeypatch, file):
-        async def test(*args, **kwargs):
-            return self.file_content
-
-        file.file_path = None
-
-        monkeypatch.setattr(file.get_bot().request, "retrieve", test)
-        out_file = await file.download_to_drive()
-
-        assert str(out_file)[-len(file.file_id) :] == file.file_id
-        try:
-            assert out_file.read_bytes() == self.file_content
-        finally:
-            out_file.unlink(missing_ok=True)
-
     async def test_download_file_obj(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content

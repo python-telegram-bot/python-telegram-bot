@@ -16,7 +16,11 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 from pathlib import Path
+from typing import Protocol
+
+from telegram import Bot, File
 
 PROJECT_ROOT_PATH = Path(__file__).parent.parent.parent.resolve()
 TEST_DATA_PATH = PROJECT_ROOT_PATH / "tests" / "data"
@@ -24,3 +28,20 @@ TEST_DATA_PATH = PROJECT_ROOT_PATH / "tests" / "data"
 
 def data_file(filename: str) -> Path:
     return TEST_DATA_PATH / filename
+
+
+class _HasGetFile(Protocol):
+    async def get_file(self) -> File: ...
+
+
+async def stable_get_file(bot: Bot, obj: _HasGetFile | str) -> File:
+    """Temporary workaround for Telegram API returning file_path as None on first call to
+    get_file. This function will attempt to get the file 3 times before raising an error.
+    Remove this once https://github.com/tdlib/telegram-bot-api/issues/658 as closed."""
+    for i in range(3):
+        file = await bot.get_file(obj) if isinstance(obj, str) else await obj.get_file()
+        if file.file_path:
+            logging.debug("File path returned by TG on attempt %s", i + 1)
+            return file
+
+    raise RuntimeError("File path not found returned by TG after 3 attempts")

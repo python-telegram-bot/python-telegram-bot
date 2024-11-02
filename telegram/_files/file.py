@@ -128,9 +128,8 @@ class File(TelegramObject):
     ) -> Path:
         """
         Download this file. By default, the file is saved in the current working directory with
-        :attr:`file_path` as file name. If the file has no filename, the file ID will be used as
-        filename. If :paramref:`custom_path` is supplied as a :obj:`str` or :obj:`pathlib.Path`,
-        it will be saved to that path.
+        :attr:`file_path` as file name. If :paramref:`custom_path` is supplied as a :obj:`str` or
+        :obj:`pathlib.Path`, it will be saved to that path.
 
         Note:
             If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
@@ -153,7 +152,9 @@ class File(TelegramObject):
               :meth:`download_to_drive` and :meth:`download_to_memory`.
 
         .. versionchanged:: NEXT.VERSION
-            Raises :exc:`RuntimeError` if :attr:`file_path` is not set.
+            Raises :exc:`RuntimeError` if :attr:`file_path` is not set. Note that files without
+            a :attr:`file_path` could never be downloaded, as this attribute is mandatory for that
+            operation.
 
         Args:
             custom_path (:class:`pathlib.Path` | :obj:`str` , optional): The path where the file
@@ -207,10 +208,8 @@ class File(TelegramObject):
             filename = Path(custom_path)
         elif local_file:
             return Path(self.file_path)
-        elif self.file_path:
-            filename = Path(Path(self.file_path).name)
         else:
-            filename = Path.cwd() / self.file_id
+            filename = Path(Path(self.file_path).name)
 
         buf = await self.get_bot().request.retrieve(
             url,
@@ -247,7 +246,9 @@ class File(TelegramObject):
         .. versionadded:: 20.0
 
         .. versionchanged:: NEXT.VERSION
-            Raises :exc:`RuntimeError` if :attr:`file_path` is not set.
+            Raises :exc:`RuntimeError` if :attr:`file_path` is not set. Note that files without
+            a :attr:`file_path` could never be downloaded, as this attribute is mandatory for that
+            operation.
 
         Args:
             out (:obj:`io.BufferedIOBase`): A file-like object. Must be opened for writing in
@@ -302,7 +303,9 @@ class File(TelegramObject):
         """Download this file and return it as a bytearray.
 
         .. versionchanged:: NEXT.VERSION
-            Raises :exc:`RuntimeError` if :attr:`file_path` is not set.
+            Raises :exc:`RuntimeError` if :attr:`file_path` is not set. Note that files without
+            a :attr:`file_path` could never be downloaded, as this attribute is mandatory for that
+            operation.
 
         Args:
             buf (:obj:`bytearray`, optional): Extend the given bytearray with the downloaded data.

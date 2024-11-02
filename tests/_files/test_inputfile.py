@@ -25,7 +25,7 @@ import pytest
 
 from telegram import InputFile
 from telegram._utils.strings import TextEncoding
-from tests.auxil.files import data_file
+from tests.auxil.files import data_file, stable_get_file
 from tests.auxil.slots import mro_slots
 
 
@@ -214,7 +214,7 @@ class TestInputFileWithRequest:
         message = await bot.send_document(chat_id, data_file("text_file.txt").read_bytes())
         out = BytesIO()
 
-        await (await message.document.get_file()).download_to_memory(out=out)
+        await (await stable_get_file(bot, message.document)).download_to_memory(out=out)
         out.seek(0)
 
         assert out.read().decode(TextEncoding.UTF_8) == "PTB Rocks! ⅞"
@@ -227,7 +227,7 @@ class TestInputFileWithRequest:
         )
         out = BytesIO()
 
-        await (await message.document.get_file()).download_to_memory(out=out)
+        await (await stable_get_file(bot, message.document)).download_to_memory(out=out)
         out.seek(0)
 
         assert out.read().decode(TextEncoding.UTF_8) == "PTB Rocks! ⅞"
