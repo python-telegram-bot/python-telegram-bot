@@ -3653,14 +3653,14 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_paid_media`.
 
+        .. versionadded:: NEXT.VERSION
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: 20.8
-
         Returns:
-            :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
+            :class:`telegram.Message`: On success, the sent message is returned.
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
