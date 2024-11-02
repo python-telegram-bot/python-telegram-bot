@@ -1154,6 +1154,14 @@ class FloodLimit(IntEnum):
     """:obj:`int`: The number of messages that can roughly be sent to a particular group within one
     minute.
     """
+    PAID_MESSAGES_PER_SECOND = 1000
+    """:obj:`int`: The number of messages that can be sent per second when paying with the bot's
+    Telegram Star balance. See e.g. parameter
+    :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` of
+    :meth:`~telegram.Bot.send_message.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class ForumIconColor(IntEnum):

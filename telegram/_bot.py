@@ -672,6 +672,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -708,33 +709,22 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 allow_sending_without_reply=allow_sending_without_reply,
             )
 
-        data["disable_notification"] = disable_notification
-        data["protect_content"] = protect_content
-        data["parse_mode"] = parse_mode
-
-        if reply_parameters is not None:
-            data["reply_parameters"] = reply_parameters
-
-        if link_preview_options is not None:
-            data["link_preview_options"] = link_preview_options
-
-        if reply_markup is not None:
-            data["reply_markup"] = reply_markup
-
-        if message_thread_id is not None:
-            data["message_thread_id"] = message_thread_id
-
-        if caption is not None:
-            data["caption"] = caption
-
-        if caption_entities is not None:
-            data["caption_entities"] = caption_entities
-
-        if business_connection_id is not None:
-            data["business_connection_id"] = business_connection_id
-
-        if message_effect_id is not None:
-            data["message_effect_id"] = message_effect_id
+        data.update(
+            {
+                "allow_paid_broadcast": allow_paid_broadcast,
+                "business_connection_id": business_connection_id,
+                "caption": caption,
+                "caption_entities": caption_entities,
+                "disable_notification": disable_notification,
+                "link_preview_options": link_preview_options,
+                "message_thread_id": message_thread_id,
+                "message_effect_id": message_effect_id,
+                "parse_mode": parse_mode,
+                "protect_content": protect_content,
+                "reply_markup": reply_markup,
+                "reply_parameters": reply_parameters,
+            }
+        )
 
         result = await self._post(
             endpoint,
@@ -925,6 +915,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -976,6 +967,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1034,6 +1028,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             link_preview_options=link_preview_options,
             reply_parameters=reply_parameters,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1283,6 +1278,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1350,6 +1346,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
                 .. versionadded:: 21.3
@@ -1413,6 +1412,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_audio(
@@ -1433,6 +1433,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1508,6 +1509,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1570,6 +1574,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_document(
@@ -1588,6 +1593,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1662,6 +1668,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1720,6 +1729,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_sticker(
@@ -1734,6 +1744,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1788,6 +1799,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1838,6 +1852,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_video(
@@ -1860,6 +1875,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1944,6 +1960,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
                 .. versionadded:: 21.3
@@ -2012,6 +2031,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_video_note(
@@ -2028,6 +2048,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2097,6 +2118,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2155,6 +2179,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_animation(
@@ -2176,6 +2201,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2254,6 +2280,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
                 .. versionadded:: 21.3
@@ -2321,6 +2350,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_voice(
@@ -2338,6 +2368,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2409,6 +2440,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2468,6 +2502,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_media_group(
@@ -2482,6 +2517,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2535,6 +2571,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2629,6 +2668,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "reply_parameters": reply_parameters,
             "business_connection_id": business_connection_id,
             "message_effect_id": message_effect_id,
+            "allow_paid_broadcast": allow_paid_broadcast,
         }
 
         result = await self._post(
@@ -2659,6 +2699,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2718,6 +2759,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2788,6 +2832,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def edit_message_live_location(
@@ -2970,6 +3015,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3025,6 +3071,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3106,6 +3155,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_contact(
@@ -3122,6 +3172,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3167,6 +3218,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3239,6 +3293,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_game(
@@ -3252,6 +3307,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3287,6 +3343,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3334,6 +3393,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_chat_action(
@@ -4974,6 +5034,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -5091,6 +5152,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -5160,6 +5224,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def answer_shipping_query(
@@ -7000,6 +7065,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Optional[Sequence["MessageEntity"]] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -7097,6 +7163,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7163,6 +7232,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def stop_poll(
@@ -7226,6 +7296,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -7275,6 +7346,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7323,6 +7397,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def get_my_default_administrator_rights(
@@ -7653,6 +7728,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -7700,6 +7776,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
                 .. versionadded:: 21.3
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7758,6 +7837,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "message_thread_id": message_thread_id,
             "reply_parameters": reply_parameters,
             "show_caption_above_media": show_caption_above_media,
+            "allow_paid_broadcast": allow_paid_broadcast,
         }
 
         result = await self._post(
@@ -9189,6 +9269,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reply_markup: Optional[ReplyMarkup] = None,
         business_connection_id: Optional[str] = None,
         payload: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -9232,6 +9313,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.5
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -9275,6 +9359,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def create_chat_subscription_invite_link(
