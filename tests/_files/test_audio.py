@@ -33,7 +33,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
-from tests.auxil.files import data_file, stable_get_file
+from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
@@ -244,7 +244,7 @@ class TestAudioWithRequest(AudioTestBase):
         assert message.has_protected_content
 
     async def test_get_and_download(self, bot, chat_id, audio, tmp_file):
-        new_file = await stable_get_file(bot, audio.file_id)
+        new_file = await bot.get_file(audio.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_unique_id == audio.file_unique_id

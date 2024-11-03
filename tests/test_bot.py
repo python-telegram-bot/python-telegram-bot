@@ -97,7 +97,7 @@ from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
-from tests.auxil.files import data_file, stable_get_file
+from tests.auxil.files import data_file
 from tests.auxil.networking import OfflineRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
@@ -4231,7 +4231,7 @@ class TestBotWithRequest:
         assert result.chat_id == int(chat_id)
         assert result.caption == "test_caption"
         out = BytesIO()
-        await (await stable_get_file(bot, result.document)).download_to_memory(out)
+        await (await result.document.get_file()).download_to_memory(out)
         out.seek(0)
         assert out.read() == data_file("telegram.png").open("rb").read()
         assert result.document.file_name == "telegram.png"
@@ -4270,7 +4270,7 @@ class TestBotWithRequest:
             assert isinstance(message, Message)
             assert message.chat_id == int(chat_id)
             out = BytesIO()
-            await (await stable_get_file(bot, message.document)).download_to_memory(out)
+            await (await message.document.get_file()).download_to_memory(out)
             out.seek(0)
             assert out.read() == data_file(file_name).open("rb").read()
             assert message.document.file_name == file_name

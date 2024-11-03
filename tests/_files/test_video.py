@@ -33,7 +33,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
-from tests.auxil.files import data_file, stable_get_file
+from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
@@ -257,7 +257,7 @@ class TestVideoWithRequest(VideoTestBase):
         assert message.show_caption_above_media
 
     async def test_get_and_download(self, bot, video, chat_id, tmp_file):
-        new_file = await stable_get_file(bot, video.file_id)
+        new_file = await bot.get_file(video.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_unique_id == video.file_unique_id

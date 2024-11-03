@@ -33,7 +33,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
-from tests.auxil.files import data_file, stable_get_file
+from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
@@ -245,7 +245,7 @@ class TestAnimationWithRequest(AnimationTestBase):
             pytest.xfail("This is a bug on Telegram's end")
 
     async def test_get_and_download(self, bot, animation, tmp_file):
-        new_file = await stable_get_file(bot, animation.file_id)
+        new_file = await bot.get_file(animation.file_id)
 
         assert new_file.file_path.startswith("https://")
 

@@ -32,7 +32,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
-from tests.auxil.files import data_file, stable_get_file
+from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
@@ -249,7 +249,7 @@ class TestVideoNoteWithRequest(VideoNoteTestBase):
         assert message.has_protected_content
 
     async def test_get_and_download(self, bot, video_note, tmp_file):
-        new_file = await stable_get_file(bot, video_note.file_id)
+        new_file = await bot.get_file(video_note.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_unique_id == video_note.file_unique_id
