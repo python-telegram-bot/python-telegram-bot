@@ -592,6 +592,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -624,6 +625,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
         if isinstance(result, Message):
             self._insert_callback_data(result)
@@ -801,6 +803,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -832,6 +835,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def copy_messages(
@@ -2398,6 +2402,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2436,6 +2441,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -2457,6 +2463,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2493,6 +2500,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_chat_action(
@@ -2535,6 +2543,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2567,6 +2576,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             business_connection_id=business_connection_id,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_dice(
@@ -2580,6 +2590,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2607,6 +2618,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_document(
@@ -2625,6 +2637,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2659,6 +2672,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_game(
@@ -2672,6 +2686,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2699,6 +2714,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_invoice(
@@ -2731,6 +2747,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2777,6 +2794,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_location(
@@ -2795,6 +2813,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2829,6 +2848,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_media_group(
@@ -2843,6 +2863,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2875,6 +2896,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             parse_mode=parse_mode,
             caption_entities=caption_entities,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_message(
@@ -2891,6 +2913,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         disable_web_page_preview: Optional[bool] = None,
         reply_to_message_id: Optional[int] = None,
@@ -2923,6 +2946,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             link_preview_options=link_preview_options,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_photo(
@@ -2940,6 +2964,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2974,6 +2999,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -3001,6 +3027,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Optional[Sequence["MessageEntity"]] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3041,6 +3068,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_sticker(
@@ -3055,6 +3083,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3083,6 +3112,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             emoji=emoji,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_venue(
@@ -3103,6 +3133,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3139,6 +3170,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_video(
@@ -3161,6 +3193,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -3200,6 +3233,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -3217,6 +3251,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3249,6 +3284,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_voice(
@@ -3266,6 +3302,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3299,6 +3336,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def set_chat_administrator_custom_title(
@@ -4232,6 +4270,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_markup: Optional[ReplyMarkup] = None,
         business_connection_id: Optional[str] = None,
         payload: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -4263,6 +4302,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             business_connection_id=business_connection_id,
             payload=payload,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def create_chat_subscription_invite_link(

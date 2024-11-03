@@ -2253,6 +2253,16 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_message(2, "text", message_effect_id=42)
 
+    async def test_allow_paid_broadcast_argument(self, offline_bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("allow_paid_broadcast") == 42
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_message(2, "text", allow_paid_broadcast=42)
+
     async def test_get_business_connection(self, offline_bot, monkeypatch):
         bci = "42"
         user = User(1, "first", False)
