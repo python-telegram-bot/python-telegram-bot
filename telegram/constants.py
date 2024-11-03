@@ -2592,12 +2592,18 @@ class TransactionPartnerType(StringEnum):
 
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""
-    USER = "user"
-    """:obj:`str`: Transaction with a user."""
     OTHER = "other"
     """:obj:`str`: Transaction with unknown source or recipient."""
     TELEGRAM_ADS = "telegram_ads"
     """:obj:`str`: Transaction with Telegram Ads."""
+    TELEGRAM_API = "telegram_api"
+    """:obj:`str`: Transaction with with payment for
+    `paid broadcasting <https://core.telegram.org/bots/api#paid-broadcasts>`_.
+
+    ..versionadded:: NEXT.VERSION
+    """
+    USER = "user"
+    """:obj:`str`: Transaction with a user."""
 
 
 class ParseMode(StringEnum):
