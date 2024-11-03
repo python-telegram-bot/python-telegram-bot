@@ -834,6 +834,7 @@ class CallbackQuery(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -881,6 +882,7 @@ class CallbackQuery(TelegramObject):
             message_thread_id=message_thread_id,
             reply_parameters=reply_parameters,
             show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     MAX_ANSWER_TEXT_LENGTH: Final[int] = (
