@@ -13,7 +13,7 @@ jobs:
           days-before-stale: 3
           days-before-close: 2
           days-before-pr-stale: -1
-          stale-issue-label: 'stale'
+          stale-issue-label: '📋 stale'
           only-labels: 'question'
           stale-issue-message: ''
           close-issue-message: 'This issue has been automatically closed due to inactivity. Feel free to comment in order to reopen or ask again in our Telegram support group at https://t.me/pythontelegrambotgroup.'
