@@ -279,7 +279,7 @@ class File(TelegramObject):
         path = Path(self.file_path) if local_file else None
         if local_file:
             buf = path.read_bytes()
-        elif url:
+        else:
             buf = await self.get_bot().request.retrieve(
                 url,
                 read_timeout=read_timeout,
