@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryFile, mkstemp
 
@@ -181,21 +182,6 @@ class TestFileWithoutRequest(FileTestBase):
             os.close(file_handle)
             custom_path.unlink(missing_ok=True)
 
-    async def test_download_no_filename(self, monkeypatch, file):
-        async def test(*args, **kwargs):
-            return self.file_content
-
-        file.file_path = None
-
-        monkeypatch.setattr(file.get_bot().request, "retrieve", test)
-        out_file = await file.download_to_drive()
-
-        assert str(out_file)[-len(file.file_id) :] == file.file_id
-        try:
-            assert out_file.read_bytes() == self.file_content
-        finally:
-            out_file.unlink(missing_ok=True)
-
     async def test_download_file_obj(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content
@@ -271,6 +257,14 @@ class TestFileWithoutRequest(FileTestBase):
         assert buf3 is buf2
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
+
+    async def test_download_no_file_path(self):
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_to_drive()
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_to_memory(BytesIO())
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_as_bytearray()
 
 
 class TestFileWithRequest(FileTestBase):
