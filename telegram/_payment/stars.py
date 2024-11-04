@@ -218,12 +218,14 @@ class TransactionPartner(TelegramObject):
 
     FRAGMENT: Final[str] = constants.TransactionPartnerType.FRAGMENT
     """:const:`telegram.constants.TransactionPartnerType.FRAGMENT`"""
-    USER: Final[str] = constants.TransactionPartnerType.USER
-    """:const:`telegram.constants.TransactionPartnerType.USER`"""
     OTHER: Final[str] = constants.TransactionPartnerType.OTHER
     """:const:`telegram.constants.TransactionPartnerType.OTHER`"""
     TELEGRAM_ADS: Final[str] = constants.TransactionPartnerType.TELEGRAM_ADS
     """:const:`telegram.constants.TransactionPartnerType.TELEGRAM_ADS`"""
+    TELEGRAM_API: Final[str] = constants.TransactionPartnerType.TELEGRAM_API
+    """:const:`telegram.constants.TransactionPartnerType.TELEGRAM_API`"""
+    USER: Final[str] = constants.TransactionPartnerType.USER
+    """:const:`telegram.constants.TransactionPartnerType.USER`"""
 
     def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
@@ -258,8 +260,9 @@ class TransactionPartner(TelegramObject):
         _class_mapping: dict[str, type[TransactionPartner]] = {
             cls.FRAGMENT: TransactionPartnerFragment,
             cls.USER: TransactionPartnerUser,
-            cls.OTHER: TransactionPartnerOther,
             cls.TELEGRAM_ADS: TransactionPartnerTelegramAds,
+            cls.TELEGRAM_API: TransactionPartnerTelegramApi,
+            cls.OTHER: TransactionPartnerOther,
         }
 
         if cls is TransactionPartner and data.get("type") in _class_mapping:
@@ -419,6 +422,35 @@ class TransactionPartnerTelegramAds(TransactionPartner):
     def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(type=TransactionPartner.TELEGRAM_ADS, api_kwargs=api_kwargs)
         self._freeze()
+
+
+class TransactionPartnerTelegramApi(TransactionPartner):
+    """Describes a transaction with payment for
+    `paid broadcasting <https://core.telegram.org/bots/api#paid-broadcasts>`_.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`request_count` is equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        request_count (:obj:`int`): The number of successful requests that exceeded regular limits
+            and were therefore billed.
+
+    Attributes:
+        type (:obj:`str`): The type of the transaction partner,
+            always :tg-const:`telegram.TransactionPartner.TELEGRAM_API`.
+        request_count (:obj:`int`): The number of successful requests that exceeded regular limits
+            and were therefore billed.
+    """
+
+    __slots__ = ("request_count",)
+
+    def __init__(self, request_count: int, *, api_kwargs: Optional[JSONDict] = None) -> None:
+        super().__init__(type=TransactionPartner.TELEGRAM_API, api_kwargs=api_kwargs)
+        with self._unfrozen():
+            self.request_count: int = request_count
+            self._id_attrs = (self.request_count,)
 
 
 class StarTransaction(TelegramObject):

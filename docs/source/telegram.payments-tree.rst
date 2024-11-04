@@ -28,4 +28,5 @@ Your bot can accept payments from Telegram users. Please see the `introduction t
     telegram.transactionpartnerfragment
     telegram.transactionpartnerother
     telegram.transactionpartnertelegramads
+    telegram.transactionpartnertelegramapi
     telegram.transactionpartneruser

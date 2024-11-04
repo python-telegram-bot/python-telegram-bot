@@ -21,6 +21,7 @@ import pytest
 
 from telegram import (
     CallbackGame,
+    CopyTextButton,
     InlineKeyboardButton,
     LoginUrl,
     SwitchInlineQueryChosenChat,
@@ -46,6 +47,7 @@ def inline_keyboard_button():
         switch_inline_query_chosen_chat=(
             InlineKeyboardButtonTestBase.switch_inline_query_chosen_chat
         ),
+        copy_text=InlineKeyboardButtonTestBase.copy_text,
     )
 
 
@@ -60,6 +62,7 @@ class InlineKeyboardButtonTestBase:
     login_url = LoginUrl("http://google.com")
     web_app = WebAppInfo(url="https://example.com")
     switch_inline_query_chosen_chat = SwitchInlineQueryChosenChat("a_bot", True, False, True, True)
+    copy_text = CopyTextButton("python-telegram-bot")
 
 
 class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
@@ -86,6 +89,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             inline_keyboard_button.switch_inline_query_chosen_chat
             == self.switch_inline_query_chosen_chat
         )
+        assert inline_keyboard_button.copy_text == self.copy_text
 
     def test_to_dict(self, inline_keyboard_button):
         inline_keyboard_button_dict = inline_keyboard_button.to_dict()
@@ -115,6 +119,9 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             inline_keyboard_button_dict["switch_inline_query_chosen_chat"]
             == inline_keyboard_button.switch_inline_query_chosen_chat.to_dict()
         )
+        assert (
+            inline_keyboard_button_dict["copy_text"] == inline_keyboard_button.copy_text.to_dict()
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -128,6 +135,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             "login_url": self.login_url.to_dict(),
             "pay": self.pay,
             "switch_inline_query_chosen_chat": self.switch_inline_query_chosen_chat.to_dict(),
+            "copy_text": self.copy_text.to_dict(),
         }
 
         inline_keyboard_button = InlineKeyboardButton.de_json(json_dict, None)
@@ -149,6 +157,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             inline_keyboard_button.switch_inline_query_chosen_chat
             == self.switch_inline_query_chosen_chat
         )
+        assert inline_keyboard_button.copy_text == self.copy_text
 
         none = InlineKeyboardButton.de_json({}, offline_bot)
         assert none is None
