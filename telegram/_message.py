@@ -3704,7 +3704,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_paid_media`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.7
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|

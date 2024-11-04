@@ -4,6 +4,56 @@
 Changelog
 =========
 
+Version 21.7
+============
+*Released 2024-11-04*
+
+This is the technical changelog for version 21.7. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for Bot API 7.11 (:pr:`4546` closes :issue:`4543`)
+- Add ``Message.reply_paid_media`` (:pr:`4551`)
+- Drop Support for Python 3.8 (:pr:`4398` by `elpekenin <https://github.com/elpekenin>`_)
+
+Minor Changes
+-------------
+
+- Allow ``Sequence`` in ``Application.add_handlers`` (:pr:`4531` by `roast-lord <https://github.com/roast-lord>`_ closes :issue:`4530`)
+- Improve Exception Handling in ``File.download_*`` (:pr:`4542`)
+- Use Stable Python 3.13 Release in Test Suite (:pr:`4535`)
+
+Documentation Improvements
+--------------------------
+
+- Documentation Improvements (:pr:`4536` by `Ecode2 <https://github.com/Ecode2>`_, :pr:`4556`)
+- Fix Linkcheck Workflow (:pr:`4545`)
+- Use ``sphinx-build-compatibility`` to Keep Sphinx Compatibility (:pr:`4492`)
+
+Internal Changes
+----------------
+
+- Improve Test Instability Caused by ``Message`` Fixtures (:pr:`4507`)
+- Stabilize Some Flaky Tests (:pr:`4500`)
+- Reduce Creation of HTTP Clients in Tests (:pr:`4493`)
+- Update ``pytest-xdist`` Usage (:pr:`4491`)
+- Fix Failing Tests by Making Them Independent (:pr:`4494`)
+- Introduce Codecov's Test Analysis (:pr:`4487`)
+- Maintenance Work on ``Bot`` Tests (:pr:`4489`)
+- Introduce ``conftest.py`` for File Related Tests (:pr:`4488`)
+- Update Issue Templates to Use Issue Types (:pr:`4553`)
+- Update Automation to Label Changes (:pr:`4552`)
+
+Dependency Updates
+------------------
+
+- Bump ``srvaroa/labeler`` from 1.11.0 to 1.11.1 (:pr:`4549`)
+- Bump ``sphinx`` from 8.0.2 to 8.1.3 (:pr:`4532`)
+- Bump ``sphinxcontrib-mermaid`` from 0.9.2 to 1.0.0 (:pr:`4529`)
+- Bump ``srvaroa/labeler`` from 1.10.1 to 1.11.0 (:pr:`4509`)
+- Bump ``Bibo-Joshi/pyright-type-completeness`` from 1.0.0 to 1.0.1 (:pr:`4510`)
+
 Version 21.6
 ============
 

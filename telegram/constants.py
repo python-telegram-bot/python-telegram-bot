@@ -1160,7 +1160,7 @@ class FloodLimit(IntEnum):
     :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` of
     :meth:`~telegram.Bot.send_message`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.7
     """
 
 
@@ -2616,7 +2616,7 @@ class TransactionPartnerType(StringEnum):
     """:obj:`str`: Transaction with with payment for
     `paid broadcasting <https://core.telegram.org/bots/api#paid-broadcasts>`_.
 
-    ..versionadded:: NEXT.VERSION
+    ..versionadded:: 21.7
     """
     USER = "user"
     """:obj:`str`: Transaction with a user."""

@@ -151,7 +151,7 @@ class File(TelegramObject):
             * This method was previously called ``download``. It was split into
               :meth:`download_to_drive` and :meth:`download_to_memory`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.7
             Raises :exc:`RuntimeError` if :attr:`file_path` is not set. Note that files without
             a :attr:`file_path` could never be downloaded, as this attribute is mandatory for that
             operation.
@@ -245,7 +245,7 @@ class File(TelegramObject):
 
         .. versionadded:: 20.0
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.7
             Raises :exc:`RuntimeError` if :attr:`file_path` is not set. Note that files without
             a :attr:`file_path` could never be downloaded, as this attribute is mandatory for that
             operation.
@@ -302,7 +302,7 @@ class File(TelegramObject):
     ) -> bytearray:
         """Download this file and return it as a bytearray.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.7
             Raises :exc:`RuntimeError` if :attr:`file_path` is not set. Note that files without
             a :attr:`file_path` could never be downloaded, as this attribute is mandatory for that
             operation.

@@ -431,7 +431,7 @@ class TransactionPartnerTelegramApi(TransactionPartner):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`request_count` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.7
 
     Args:
         request_count (:obj:`int`): The number of successful requests that exceeded regular limits
