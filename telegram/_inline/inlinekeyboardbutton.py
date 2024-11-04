@@ -127,7 +127,7 @@ class InlineKeyboardButton(TelegramObject):
         copy_text (:class:`telegram.CopyTextButton`, optional): Description of the button that
             copies the specified text to the clipboard.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.7
         callback_game (:class:`telegram.CallbackGame`, optional): Description of the game that will
             be launched when the user presses the button
 
@@ -200,7 +200,7 @@ class InlineKeyboardButton(TelegramObject):
         copy_text (:class:`telegram.CopyTextButton`): Optional. Description of the button that
             copies the specified text to the clipboard.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.7
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
             be launched when the user presses the button.
 

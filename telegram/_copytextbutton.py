@@ -30,7 +30,7 @@ class CopyTextButton(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.7
 
     Args:
         text (:obj:`str`): The text to be copied to the clipboard;

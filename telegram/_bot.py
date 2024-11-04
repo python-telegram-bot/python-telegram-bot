@@ -969,7 +969,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1348,7 +1348,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
                 .. versionadded:: 21.3
@@ -1511,7 +1511,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1670,7 +1670,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1801,7 +1801,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1962,7 +1962,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
                 .. versionadded:: 21.3
@@ -2120,7 +2120,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2282,7 +2282,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
                 .. versionadded:: 21.3
@@ -2442,7 +2442,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2573,7 +2573,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2761,7 +2761,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3073,7 +3073,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3220,7 +3220,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3345,7 +3345,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -5154,7 +5154,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7165,7 +7165,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7348,7 +7348,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7778,7 +7778,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 21.3
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -9315,7 +9315,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 21.5
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.7
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
