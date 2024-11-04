@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import contextlib
 from copy import copy
 from datetime import datetime
 
@@ -39,6 +40,7 @@ from telegram import (
     GiveawayCompleted,
     GiveawayCreated,
     GiveawayWinners,
+    InputPaidMediaPhoto,
     Invoice,
     LinkPreviewOptions,
     Location,
@@ -447,11 +449,14 @@ class TestMessageWithoutRequest(MessageTestBase):
         """Used in testing reply_* below. Makes sure that quote and do_quote are handled
         correctly
         """
-        with pytest.raises(ValueError, match="`quote` and `do_quote` are mutually exclusive"):
-            await method(*args, quote=True, do_quote=True)
+        with contextlib.suppress(TypeError):
+            # for newer methods that don't have the deprecated argument
+            with pytest.raises(ValueError, match="`quote` and `do_quote` are mutually exclusive"):
+                await method(*args, quote=True, do_quote=True)
 
-        with pytest.warns(PTBDeprecationWarning, match="`quote` parameter is deprecated"):
-            await method(*args, quote=True)
+            # for newer methods that don't have the deprecated argument
+            with pytest.warns(PTBDeprecationWarning, match="`quote` parameter is deprecated"):
+                await method(*args, quote=True)
 
         with pytest.raises(
             ValueError,
@@ -465,13 +470,16 @@ class TestMessageWithoutRequest(MessageTestBase):
         monkeypatch.setattr(message.get_bot(), bot_method_name, make_assertion)
 
         for param in ("quote", "do_quote"):
-            chat_id, reply_parameters = await method(*args, **{param: True})
-            if chat_id != message.chat.id:
-                pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
-            if reply_parameters is None or reply_parameters.message_id != message.message_id:
-                pytest.fail(
-                    f"reply_parameters is {reply_parameters} but should be {message.message_id}"
-                )
+            with contextlib.suppress(TypeError):
+                # for newer methods that don't have the deprecated argument
+                chat_id, reply_parameters = await method(*args, **{param: True})
+                if chat_id != message.chat.id:
+                    pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
+                if reply_parameters is None or reply_parameters.message_id != message.message_id:
+                    pytest.fail(
+                        f"reply_parameters is {reply_parameters} "
+                        "but should be {message.message_id}"
+                    )
 
         input_chat_id = object()
         input_reply_parameters = ReplyParameters(message_id=1, chat_id=42)
@@ -2346,6 +2354,42 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.reply_copy,
             "copy_message",
             [123456, 456789],
+            monkeypatch,
+        )
+
+    async def test_reply_paid_media(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            id_ = kwargs["chat_id"] == message.chat_id
+            media = kwargs["media"][0].media == "media"
+            star_count = kwargs["star_count"] == 5
+            return id_ and media and star_count
+
+        assert check_shortcut_signature(
+            Message.reply_paid_media,
+            Bot.send_paid_media,
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            ["do_quote", "reply_to_message_id"],
+        )
+        assert await check_shortcut_call(
+            message.reply_paid_media,
+            message.get_bot(),
+            "send_paid_media",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
+        )
+        assert await check_defaults_handling(
+            message.reply_paid_media, message.get_bot(), no_default_kwargs={"message_thread_id"}
+        )
+
+        monkeypatch.setattr(message.get_bot(), "send_paid_media", make_assertion)
+        assert await message.reply_paid_media(
+            star_count=5, media=[InputPaidMediaPhoto(media="media")]
+        )
+        await self.check_quote_parsing(
+            message,
+            message.reply_paid_media,
+            "send_paid_media",
+            ["test", [InputPaidMediaPhoto(media="media")]],
             monkeypatch,
         )
 

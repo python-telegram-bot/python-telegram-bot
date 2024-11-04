@@ -105,6 +105,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPaidMedia,
         InputPollOption,
         LabeledPrice,
         MessageId,
@@ -3664,6 +3665,77 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
+        )
+
+    async def reply_paid_media(
+        self,
+        star_count: int,
+        media: Sequence["InputPaidMedia"],
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        show_caption_above_media: Optional[bool] = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        payload: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
+        *,
+        reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_paid_media(
+                 chat_id=message.chat.id,
+                 business_connection_id=message.business_connection_id,
+                 *args,
+                 **kwargs
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_paid_media`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Keyword Args:
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent message is returned.
+
+        """
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, None, reply_to_message_id, reply_parameters
+        )
+        return await self.get_bot().send_paid_media(
+            chat_id=chat_id,
+            caption=caption,
+            star_count=star_count,
+            media=media,
+            payload=payload,
+            business_connection_id=self.business_connection_id,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            disable_notification=disable_notification,
+            reply_parameters=effective_reply_parameters,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            protect_content=protect_content,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
         )
