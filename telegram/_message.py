@@ -3682,6 +3682,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         payload: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3736,6 +3737,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def edit_text(
