@@ -1,7 +1,7 @@
-TransactionPartnerTelegramAds
+TransactionPartnerTelegramApi
 =============================
 
-.. autoclass:: telegram.TransactionPartnerTelegramAds
+.. autoclass:: telegram.TransactionPartnerTelegramApi
     :members:
     :show-inheritance:
     :inherited-members: TransactionPartner

@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
+from telegram._copytextbutton import CopyTextButton
 from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
 from telegram._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
@@ -123,6 +124,10 @@ class InlineKeyboardButton(TelegramObject):
             This offers a quick way for the user to open your bot in inline mode in the same chat
             - good for selecting something from multiple options. Not supported in channels and for
             messages sent on behalf of a Telegram Business account.
+        copy_text (:class:`telegram.CopyTextButton`, optional): Description of the button that
+            copies the specified text to the clipboard.
+
+            .. versionadded:: NEXT.VERSION
         callback_game (:class:`telegram.CallbackGame`, optional): Description of the game that will
             be launched when the user presses the button
 
@@ -192,6 +197,10 @@ class InlineKeyboardButton(TelegramObject):
             This offers a quick way for the user to open your bot in inline mode in the same chat
             - good for selecting something from multiple options. Not supported in channels and for
             messages sent on behalf of a Telegram Business account.
+        copy_text (:class:`telegram.CopyTextButton`): Optional. Description of the button that
+            copies the specified text to the clipboard.
+
+            .. versionadded:: NEXT.VERSION
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
             be launched when the user presses the button.
 
@@ -224,6 +233,7 @@ class InlineKeyboardButton(TelegramObject):
     __slots__ = (
         "callback_data",
         "callback_game",
+        "copy_text",
         "login_url",
         "pay",
         "switch_inline_query",
@@ -246,6 +256,7 @@ class InlineKeyboardButton(TelegramObject):
         login_url: Optional[LoginUrl] = None,
         web_app: Optional[WebAppInfo] = None,
         switch_inline_query_chosen_chat: Optional[SwitchInlineQueryChosenChat] = None,
+        copy_text: Optional[CopyTextButton] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -265,6 +276,7 @@ class InlineKeyboardButton(TelegramObject):
         self.switch_inline_query_chosen_chat: Optional[SwitchInlineQueryChosenChat] = (
             switch_inline_query_chosen_chat
         )
+        self.copy_text: Optional[CopyTextButton] = copy_text
         self._id_attrs = ()
         self._set_id_attrs()
 
@@ -299,6 +311,7 @@ class InlineKeyboardButton(TelegramObject):
         data["switch_inline_query_chosen_chat"] = SwitchInlineQueryChosenChat.de_json(
             data.get("switch_inline_query_chosen_chat"), bot
         )
+        data["copy_text"] = CopyTextButton.de_json(data.get("copy_text"), bot)
 
         return super().de_json(data=data, bot=bot)
 

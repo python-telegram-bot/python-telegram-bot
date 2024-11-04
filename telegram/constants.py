@@ -152,7 +152,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=10)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=11)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1154,6 +1154,14 @@ class FloodLimit(IntEnum):
     """:obj:`int`: The number of messages that can roughly be sent to a particular group within one
     minute.
     """
+    PAID_MESSAGES_PER_SECOND = 1000
+    """:obj:`int`: The number of messages that can be sent per second when paying with the bot's
+    Telegram Star balance. See e.g. parameter
+    :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` of
+    :meth:`~telegram.Bot.send_message`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class ForumIconColor(IntEnum):
@@ -1261,14 +1269,22 @@ class InlineKeyboardButtonLimit(IntEnum):
     __slots__ = ()
 
     MIN_CALLBACK_DATA = 1
-    """:obj:`int`: Minimum value allowed for
+    """:obj:`int`: Minimum length allowed for
     :paramref:`~telegram.InlineKeyboardButton.callback_data` parameter of
     :class:`telegram.InlineKeyboardButton`
     """
     MAX_CALLBACK_DATA = 64
-    """:obj:`int`: Maximum value allowed for
+    """:obj:`int`: Maximum length allowed for
     :paramref:`~telegram.InlineKeyboardButton.callback_data` parameter of
     :class:`telegram.InlineKeyboardButton`
+    """
+    MIN_COPY_TEXT = 1
+    """:obj:`int`: Minimum length allowed for
+    :paramref:`~telegram.CopyTextButton.text` parameter of :class:`telegram.CopyTextButton`
+    """
+    MAX_COPY_TEXT = 256
+    """:obj:`int`: Maximum length allowed for
+    :paramref:`~telegram.CopyTextButton.text` parameter of :class:`telegram.CopyTextButton`
     """
 
 
@@ -2592,12 +2608,18 @@ class TransactionPartnerType(StringEnum):
 
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""
-    USER = "user"
-    """:obj:`str`: Transaction with a user."""
     OTHER = "other"
     """:obj:`str`: Transaction with unknown source or recipient."""
     TELEGRAM_ADS = "telegram_ads"
     """:obj:`str`: Transaction with Telegram Ads."""
+    TELEGRAM_API = "telegram_api"
+    """:obj:`str`: Transaction with with payment for
+    `paid broadcasting <https://core.telegram.org/bots/api#paid-broadcasts>`_.
+
+    ..versionadded:: NEXT.VERSION
+    """
+    USER = "user"
+    """:obj:`str`: Transaction with a user."""
 
 
 class ParseMode(StringEnum):

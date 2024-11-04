@@ -29,6 +29,7 @@ Available Types
     telegram.chat
     telegram.chatadministratorrights
     telegram.chatbackground
+    telegram.copytextbutton
     telegram.backgroundtype
     telegram.backgroundtypefill
     telegram.backgroundtypewallpaper

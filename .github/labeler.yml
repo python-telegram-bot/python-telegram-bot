@@ -3,7 +3,7 @@
 version: 1
 
 labels:
-- label: "dependencies"
+- label: "⚙️ dependencies"
   authors: ["dependabot[bot]", "pre-commit-ci[bot]"]
-- label: "code quality ✨"
+- label: "🛠 code-quality"
   authors: ["pre-commit-ci[bot]"]

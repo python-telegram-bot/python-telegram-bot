@@ -81,6 +81,7 @@ __all__ = (
     "ChatShared",
     "ChosenInlineResult",
     "Contact",
+    "CopyTextButton",
     "Credentials",
     "DataCredentials",
     "Dice",
@@ -235,6 +236,7 @@ __all__ = (
     "TransactionPartnerFragment",
     "TransactionPartnerOther",
     "TransactionPartnerTelegramAds",
+    "TransactionPartnerTelegramApi",
     "TransactionPartnerUser",
     "Update",
     "User",
@@ -330,6 +332,7 @@ from ._chatmember import (
 from ._chatmemberupdated import ChatMemberUpdated
 from ._chatpermissions import ChatPermissions
 from ._choseninlineresult import ChosenInlineResult
+from ._copytextbutton import CopyTextButton
 from ._dice import Dice
 from ._files.animation import Animation
 from ._files.audio import Audio
@@ -471,6 +474,7 @@ from ._payment.stars import (
     TransactionPartnerFragment,
     TransactionPartnerOther,
     TransactionPartnerTelegramAds,
+    TransactionPartnerTelegramApi,
     TransactionPartnerUser,
 )
 from ._payment.successfulpayment import SuccessfulPayment
