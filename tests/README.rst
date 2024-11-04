@@ -98,7 +98,7 @@ Bots used in tests
 
 If you run the tests locally, the test setup will use one of the two public bots available. Which
 bot of the two gets chosen for the test session is random. Whereas when the tests on the
-Github Actions CI are run, the test setup allocates a different, but same bot is for every combination of Python version and
+Github Actions CI are run, the test setup allocates a different, but the same bot is allocated for every combination of Python version and
 OS. The operating systems and Python versions the CI runs the tests on can be viewed in the `corresponding workflow`_.
 
 
