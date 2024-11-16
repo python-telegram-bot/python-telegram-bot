@@ -26,7 +26,8 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-# Insert the token from your payment provider. In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
+# Insert the token from your payment provider.
+# In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
 PAYMENT_PROVIDER_TOKEN = "PAYMENT_PROVIDER_TOKEN"
 
 
@@ -40,25 +41,21 @@ async def start_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 async def start_with_shipping_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Sends an invoice which triggers a shipping query because it requests a shipping address and has flexible shipping."""
+    """Sends an invoice which triggers a shipping query."""
     chat_id = update.message.chat_id
     title = "Payment Example"
     description = "Example of a payment process using the python-telegram-bot library."
     # Unique payload to identify this payment request as being from your bot
     payload = "Custom-Payload"
-    # Set up the currency (e.g., "USD"), to get a list of supported currencies see https://core.telegram.org/bots/payments#supported-currencies
+    # Set up the currency.
+    # List of supported currencies: https://core.telegram.org/bots/payments#supported-currencies
     currency = "USD"
     # Price in dollars
     price = 1
     # Convert price to cents from dollars.
     prices = [LabeledPrice("Test", price * 100)]
-
-    # The following optional parameters can be used to request additional information:
-    # - need_name=True: Requests the user's name.
-    # - need_phone_number=True: Requests the user's phone number.
-    # - need_email=True: Requests the user's email address.
-    # - need_shipping_address=True: Requests the user's shipping address.
-    # - is_flexible=True: Allows flexible shipping prices.
+    # Optional parameters like need_shipping_address and is_flexible trigger additional user prompts
+    # https://docs.python-telegram-bot.org/en/stable/telegram.bot.html#telegram.Bot.send_invoice
     await context.bot.send_invoice(
         chat_id,
         title,
@@ -84,7 +81,6 @@ async def start_without_shipping_callback(
     description = "Example of a payment process using the python-telegram-bot library."
     # Unique payload to identify this payment request as being from your bot
     payload = "Custom-Payload"
-    # Check line 49 for supported currencies
     currency = "USD"
     # Price in dollars
     price = 1
