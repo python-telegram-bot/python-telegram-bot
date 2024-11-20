@@ -54,7 +54,7 @@ async def start_with_shipping_callback(update: Update, context: ContextTypes.DEF
     price = 1
     # Convert price to cents from dollars.
     prices = [LabeledPrice("Test", price * 100)]
-    # Optional parameters like need_shipping_address and is_flexible trigger additional user prompts
+    # Optional parameters like need_shipping_address and is_flexible trigger extra user prompts
     # https://docs.python-telegram-bot.org/en/stable/telegram.bot.html#telegram.Bot.send_invoice
     await context.bot.send_invoice(
         chat_id,
