@@ -117,7 +117,7 @@ class SuccessfulPayment(TelegramObject):
         order_info: Optional[OrderInfo] = None,
         subscription_expiration_date: Optional[dtm.datetime] = None,
         is_recurring: Optional[bool] = None,
-        is_firs_recurring: Optional[bool] = None,
+        is_first_recurring: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -131,7 +131,7 @@ class SuccessfulPayment(TelegramObject):
         self.provider_payment_charge_id: str = provider_payment_charge_id
         self.subscription_expiration_date: Optional[dtm.datetime] = subscription_expiration_date
         self.is_recurring: Optional[bool] = is_recurring
-        self.is_first_recurring: Optional[bool] = is_firs_recurring
+        self.is_first_recurring: Optional[bool] = is_first_recurring
 
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 

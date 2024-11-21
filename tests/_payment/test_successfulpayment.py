@@ -35,6 +35,9 @@ def successful_payment():
         SuccessfulPaymentTestBase.provider_payment_charge_id,
         shipping_option_id=SuccessfulPaymentTestBase.shipping_option_id,
         order_info=SuccessfulPaymentTestBase.order_info,
+        subscription_expiration_date=SuccessfulPaymentTestBase.subscription_expiration_date,
+        is_recurring=SuccessfulPaymentTestBase.is_recurring,
+        is_first_recurring=SuccessfulPaymentTestBase.is_first_recurring,
     )
 
 
