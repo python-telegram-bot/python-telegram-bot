@@ -76,6 +76,7 @@ from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
+from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -3639,6 +3640,65 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+        )
+
+    async def save_prepared_inline_message(
+        self,
+        user_id: int,
+        result: "InlineQueryResult",
+        allow_user_chats: Optional[bool] = None,
+        allow_bot_chats: Optional[bool] = None,
+        allow_group_chats: Optional[bool] = None,
+        allow_channel_chats: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> PreparedInlineMessage:
+        """Stores a message that can be sent by a user of a Mini App.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user that can use the prepared
+                message.
+            result (:class:`telegram.InlineQueryResult`): The result to store.
+            allow_user_chats (:obj:`bool`, optional): Pass :obj:`True` if the message can be sent
+                to private chats with users
+            allow_bot_chats (:obj:`bool`, optional): Pass :obj:`True` if the message can be sent
+                to private chats with bots
+            allow_group_chats (:obj:`bool`, optional): Pass :obj:`True` if the message can be sent
+                to group and supergroup chats
+            allow_channel_chats (:obj:`bool`, optional): Pass :obj:`True` if the message can be
+                sent to channels
+
+        Returns:
+            :class:`telegram.PreparedInlineMessage`: On success, the prepared message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "result": result,
+            "allow_user_chats": allow_user_chats,
+            "allow_bot_chats": allow_bot_chats,
+            "allow_group_chats": allow_group_chats,
+            "allow_channel_chats": allow_channel_chats,
+        }
+        return PreparedInlineMessage.de_json(  # type: ignore[return-value]
+            await self._post(
+                "savePreparedInlineMessage",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
         )
 
     async def get_user_profile_photos(
@@ -9531,6 +9591,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`send_chat_action`"""
     answerInlineQuery = answer_inline_query
     """Alias for :meth:`answer_inline_query`"""
+    savePreparedInlineMessage = save_prepared_inline_message
+    """Alias for :meth:`save_prepared_inline_message`"""
     getUserProfilePhotos = get_user_profile_photos
     """Alias for :meth:`get_user_profile_photos`"""
     getFile = get_file

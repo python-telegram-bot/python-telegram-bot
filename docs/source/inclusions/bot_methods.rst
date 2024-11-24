@@ -375,6 +375,8 @@
       - Used for obtaining the bot's Telegram Stars transactions
     * - :meth:`~telegram.Bot.refund_star_payment`
       - Used for refunding a payment in Telegram Stars
+    * - :meth:`~telegram.Bot.save_prepared_inline_message`
+      - Used for storing a message to be sent by a user of a Mini App
 
 .. raw:: html
 

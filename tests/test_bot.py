@@ -67,6 +67,7 @@ from telegram import (
     MessageEntity,
     Poll,
     PollOption,
+    PreparedInlineMessage,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     ReplyParameters,
@@ -2840,6 +2841,15 @@ class TestBotWithRequest:
             await bot.answer_inline_query(
                 1234, results=inline_results, next_offset=42, current_offset=51
             )
+
+    async def test_save_prepared_inline_message(self, bot, chat_id):
+        # We can't really check that the result is stored correctly, we just ensur ethat we get
+        # a proper return value
+        result = InlineQueryResultArticle(
+            id="some_id", title="title", input_message_content=InputTextMessageContent("text")
+        )
+        out = await bot.save_prepared_inline_message(chat_id, result, True, False, True, False)
+        assert isinstance(out, PreparedInlineMessage)
 
     async def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = await bot.get_user_profile_photos(chat_id)

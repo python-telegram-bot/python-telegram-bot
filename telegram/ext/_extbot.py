@@ -69,6 +69,7 @@ from telegram import (
     MessageId,
     PhotoSize,
     Poll,
+    PreparedInlineMessage,
     ReactionType,
     ReplyParameters,
     SentWebAppMessage,
@@ -976,6 +977,36 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             button=button,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def save_prepared_inline_message(
+        self,
+        user_id: int,
+        result: "InlineQueryResult",
+        allow_user_chats: Optional[bool] = None,
+        allow_bot_chats: Optional[bool] = None,
+        allow_group_chats: Optional[bool] = None,
+        allow_channel_chats: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> PreparedInlineMessage:
+        return await super().save_prepared_inline_message(
+            user_id=user_id,
+            result=result,
+            allow_user_chats=allow_user_chats,
+            allow_bot_chats=allow_bot_chats,
+            allow_group_chats=allow_group_chats,
+            allow_channel_chats=allow_channel_chats,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
@@ -4379,6 +4410,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     sendGame = send_game
     sendChatAction = send_chat_action
     answerInlineQuery = answer_inline_query
+    savePreparedInlineMessage = save_prepared_inline_message
     getUserProfilePhotos = get_user_profile_photos
     getFile = get_file
     banChatMember = ban_chat_member
