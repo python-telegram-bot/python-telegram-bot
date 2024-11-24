@@ -636,6 +636,8 @@ class TelegramObject:
 
             elif isinstance(value, datetime.datetime):
                 out[key] = to_timestamp(value)
+            elif isinstance(value, datetime.timedelta):
+                out[key] = value.total_seconds()
 
         for key in pop_keys:
             out.pop(key)
