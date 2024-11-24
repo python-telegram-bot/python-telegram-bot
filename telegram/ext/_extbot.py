@@ -3385,6 +3385,30 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_user_emoji_status(
+        self,
+        user_id: int,
+        emoji_status_custom_emoji_id: Optional[str],
+        emoji_status_expiration_date: Optional[Union[int, datetime]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_user_emoji_status(
+            user_id=user_id,
+            emoji_status_custom_emoji_id=emoji_status_custom_emoji_id,
+            emoji_status_expiration_date=emoji_status_expiration_date,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def set_chat_menu_button(
         self,
         chat_id: Optional[int] = None,
@@ -4421,6 +4445,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     deleteChatPhoto = delete_chat_photo
     setChatTitle = set_chat_title
     setChatDescription = set_chat_description
+    setUserEmojiStatus = set_user_emoji_status
     pinChatMessage = pin_chat_message
     unpinChatMessage = unpin_chat_message
     unpinAllChatMessages = unpin_all_chat_messages

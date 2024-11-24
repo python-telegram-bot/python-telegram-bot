@@ -2336,6 +2336,39 @@ class TestBotWithoutRequest:
 
         await offline_bot.create_chat_subscription_invite_link(1234, 2592000, 6)
 
+    @pytest.mark.parametrize(
+        "expiration_date", [dtm.datetime(2024, 1, 1), 1704067200], ids=["datetime", "timestamp"]
+    )
+    async def test_set_user_emoji_status_basic(self, offline_bot, monkeypatch, expiration_date):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 4242
+            assert (
+                request_data.parameters.get("emoji_status_custom_emoji_id")
+                == "emoji_status_custom_emoji_id"
+            )
+            assert request_data.parameters.get("emoji_status_expiration_date") == 1704067200
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.set_user_emoji_status(
+            4242, "emoji_status_custom_emoji_id", expiration_date
+        )
+
+    async def test_set_user_emoji_status_default_timezone(self, tz_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 4242
+            assert (
+                request_data.parameters.get("emoji_status_custom_emoji_id")
+                == "emoji_status_custom_emoji_id"
+            )
+            assert request_data.parameters.get("emoji_status_expiration_date") == to_timestamp(
+                dtm.datetime(2024, 1, 1), tzinfo=tz_bot.defaults.tzinfo
+            )
+
+        monkeypatch.setattr(tz_bot.request, "post", make_assertion)
+        await tz_bot.set_user_emoji_status(
+            4242, "emoji_status_custom_emoji_id", dtm.datetime(2024, 1, 1)
+        )
+
 
 class TestBotWithRequest:
     """

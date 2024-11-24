@@ -151,6 +151,8 @@
       - Used for setting a chat title
     * - :meth:`~telegram.Bot.set_chat_description`
       - Used for setting the description of a chat
+    * - :meth:`~telegram.Bot.set_user_emoji_status`
+      - Used for setting the users status emoji
     * - :meth:`~telegram.Bot.pin_chat_message`
       - Used for pinning a message
     * - :meth:`~telegram.Bot.unpin_chat_message`

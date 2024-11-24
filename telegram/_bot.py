@@ -3779,9 +3779,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 be unbanned, unix time. If user is banned for more than 366 days or less than 30
                 seconds from the current time they are considered to be banned forever. Applied
                 for supergroups and channels only.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             revoke_messages (:obj:`bool`, optional): Pass :obj:`True` to delete all messages from
                 the chat for the user that is being removed. If :obj:`False`, the user will be able
                 to see messages in the group that were sent before the user was removed.
@@ -5415,9 +5413,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 will be lifted for the user, unix time. If user is restricted for more than 366
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             permissions (:class:`telegram.ChatPermissions`): An object for new user
                 permissions.
             use_independent_chat_permissions (:obj:`bool`, optional): Pass :obj:`True` if chat
@@ -5761,9 +5757,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire. Integer input will be interpreted as Unix timestamp.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
@@ -5840,9 +5834,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                     Now also accepts :class:`telegram.ChatInviteLink` instances.
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
@@ -6168,6 +6160,56 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         return await self._post(
             "setChatDescription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_user_emoji_status(
+        self,
+        user_id: int,
+        emoji_status_custom_emoji_id: Optional[str],
+        emoji_status_expiration_date: Optional[Union[int, datetime]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Changes the emoji status for a given user that previously allowed the bot to manage
+        their emoji status via the Mini App method
+        `requestEmojiStatusAccess <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_
+        .
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user
+            emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of the
+            emoji status to set. Pass an empty string to remove the status.
+            emoji_status_expiration_date (Union[:obj:`int`, :obj:`datetime.datetime`], optional):
+                Expiration date of the emoji status, if any, as unix timestamp or
+                :class:`datetime.datetime` object.
+                |tz-naive-dtms|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "emoji_status_custom_emoji_id": emoji_status_custom_emoji_id,
+            "emoji_status_expiration_date": emoji_status_expiration_date,
+        }
+        return await self._post(
+            "setUserEmojiStatus",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -7127,9 +7169,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.MIN_OPEN_PERIOD` and no more than
                 :tg-const:`telegram.Poll.MAX_OPEN_PERIOD` seconds in the future.
                 Can't be used together with :paramref:`open_period`.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be
                 immediately closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -9615,6 +9655,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_chat_title`"""
     setChatDescription = set_chat_description
     """Alias for :meth:`set_chat_description`"""
+    setUserEmojiStatus = set_user_emoji_status
+    """Alias for :meth:`set_user_emoji_status`"""
     pinChatMessage = pin_chat_message
     """Alias for :meth:`pin_chat_message`"""
     unpinChatMessage = unpin_chat_message
