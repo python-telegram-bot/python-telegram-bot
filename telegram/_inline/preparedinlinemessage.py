@@ -54,13 +54,13 @@ class PreparedInlineMessage(TelegramObject):
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
-        expiration_date: Optional[dtm.datetime] = None,
+        expiration_date: dtm.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
-        self.expiration_date: Optional[dtm.datetime] = expiration_date
+        self.expiration_date: dtm.datetime = expiration_date
 
         self._id_attrs = (self.id,)
 
