@@ -71,11 +71,11 @@ class Gift(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id = id
-        self.sticker = sticker
-        self.star_count = star_count
-        self.total_count = total_count
-        self.remaining_count = remaining_count
+        self.id: str = id
+        self.sticker: Sticker = sticker
+        self.star_count: int = star_count
+        self.total_count: Optional[int] = total_count
+        self.remaining_count: Optional[int] = remaining_count
 
         self._id_attrs = (self.id,)
 
@@ -118,7 +118,7 @@ class Gifts(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.gifts = parse_sequence_arg(gifts)
+        self.gifts: tuple[Gift, ...] = parse_sequence_arg(gifts)
 
         self._id_attrs = (self.gifts,)
 
