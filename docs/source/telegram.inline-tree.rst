@@ -42,3 +42,4 @@ To enable this option, send the ``/setinline`` command to `@BotFather <https://t
     telegram.inputvenuemessagecontent
     telegram.inputcontactmessagecontent
     telegram.inputinvoicemessagecontent
+    telegram.preparedinlinemessage
