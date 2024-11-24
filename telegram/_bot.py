@@ -9266,7 +9266,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """llows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars.
+        """Allows the bot to cancel or re-enable extension of a subscription paid in Telegram
+        Stars.
 
         .. versionadded:: NEXT.VERSION
 
@@ -9281,6 +9282,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
