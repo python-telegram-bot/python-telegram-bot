@@ -90,9 +90,9 @@ class TestPreparedInlineMessageWithoutRequest(PreparedInlineMessageTestBase):
 
     def test_equality(self, prepared_inline_message):
         a = prepared_inline_message
-        b = PreparedInlineMessage(self.id)
-        c = PreparedInlineMessage(self.id, self.expiration_date)
-        d = PreparedInlineMessage("other_uid")
+        b = PreparedInlineMessage(self.id, self.expiration_date)
+        c = PreparedInlineMessage(self.id, self.expiration_date + dtm.timedelta(seconds=1))
+        d = PreparedInlineMessage("other_uid", self.expiration_date)
         e = Location(123, 456)
 
         assert a == b
