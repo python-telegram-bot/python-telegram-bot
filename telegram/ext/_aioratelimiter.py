@@ -88,6 +88,19 @@ class AIORateLimiter(BaseRateLimiter[int]):
           necessary in some cases, e.g. the bot may hit a rate limit in one group but might still
           be allowed to send messages in another group.
 
+    Tip:
+        With `Bot API 7.1 <https://core.telegram.org/bots/api-changelog#october-31-2024>`_
+        (PTB v27.1), Telegram introduced the parameter
+        :paramref:`~telegram.Bot.send_message.allow_paid_broadcast`.
+        This allows bots to send up to
+        :tg-const:`telegram.constants.FloodLimit.PAID_MESSAGES_PER_SECOND` messages per second by
+        paying a fee in Telegram Stars.
+
+        .. caution::
+            This class currently doesn't take the
+            :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` parameter into account.
+            This means that the rate limiting is applied just like for any other message.
+
     Note:
         This class is to be understood as minimal effort reference implementation.
         If you would like to handle rate limiting in a more sophisticated, fine-tuned way, we
