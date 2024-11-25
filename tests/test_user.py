@@ -720,3 +720,25 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "refund_star_payment", make_assertion)
         assert await user.refund_star_payment(telegram_payment_charge_id=42)
+
+    async def test_instance_method_send_gift(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["gift_id"] == "gift_id"
+                and kwargs["text"] == "text"
+                and kwargs["text_parse_mode"] == "text_parse_mode"
+                and kwargs["text_entities"] == "text_entities"
+            )
+
+        assert check_shortcut_signature(user.send_gift, Bot.send_gift, ["user_id"], [])
+        assert await check_shortcut_call(user.send_gift, user.get_bot(), "send_gift")
+        assert await check_defaults_handling(user.send_gift, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "send_gift", make_assertion)
+        assert await user.send_gift(
+            gift_id="gift_id",
+            text="text",
+            text_parse_mode="text_parse_mode",
+            text_entities="text_entities",
+        )
