@@ -9554,7 +9554,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         data: JSONDict = {
             "user_id": user_id,
-            "gift_id": gift_id if isinstance(gift_id, str) else gift_id.id,
+            "gift_id": gift_id.id if isinstance(gift_id, Gift) else gift_id,
             "text": text,
             "text_parse_mode": text_parse_mode,
             "text_entities": text_entities,

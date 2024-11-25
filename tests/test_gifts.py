@@ -21,6 +21,7 @@ from collections.abc import Sequence
 import pytest
 
 from telegram import BotCommand, Gift, Gifts, MessageEntity, Sticker
+from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.request import RequestData
 from tests.auxil.slots import mro_slots
 
@@ -139,6 +140,27 @@ class TestGiftWithoutRequest(GiftTestBase):
         assert await offline_bot.send_gift(
             "user_id", gift, "text", text_parse_mode="text_parse_mode", text_entities=text_entities
         )
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, "Markdown"), ("HTML", "HTML"), (None, None)],
+    )
+    async def test_send_gift_default_parse_mode(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("text_parse_mode") == expected_value
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "user_id": "user_id",
+            "gift_id": "gift_id",
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["text_parse_mode"] = passed_value
+
+        assert await default_bot.send_gift(**kwargs)
 
 
 @pytest.fixture
