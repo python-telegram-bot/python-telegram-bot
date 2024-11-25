@@ -2345,6 +2345,9 @@ class TestBotWithRequest:
     is tested in `test_callbackdatacache`
     """
 
+    # get_available_gifts, send_gift are tested in `test_gift`.
+    # No need to duplicate here.
+
     async def test_invalid_token_server_response(self):
         with pytest.raises(InvalidToken, match="The token `12` was rejected by the server."):
             async with ExtBot(token="12"):

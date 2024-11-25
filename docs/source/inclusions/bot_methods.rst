@@ -25,6 +25,8 @@
           - Used for sending documents
         * - :meth:`~telegram.Bot.send_game`
           - Used for sending a game
+        * - :meth:`~telegram.Bot.send_gift`
+          - Used for sending a gift
         * - :meth:`~telegram.Bot.send_invoice`
           - Used for sending an invoice
         * - :meth:`~telegram.Bot.send_location`
@@ -369,6 +371,8 @@
       - Used for logging out from cloud Bot API server
     * - :meth:`~telegram.Bot.get_file`
       - Used for getting basic info about a file
+    * - :meth:`~telegram.Bot.get_available_gifts`
+      - Used for getting information about gifts available for sending
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
     * - :meth:`~telegram.Bot.get_star_transactions`

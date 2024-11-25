@@ -20,7 +20,8 @@ from collections.abc import Sequence
 
 import pytest
 
-from telegram import BotCommand, Gift, Gifts, Sticker
+from telegram import BotCommand, Gift, Gifts, MessageEntity, Sticker
+from telegram.request import RequestData
 from tests.auxil.slots import mro_slots
 
 
@@ -102,6 +103,42 @@ class TestGiftWithoutRequest(GiftTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+    @pytest.mark.parametrize(
+        "gift",
+        [
+            "gift_id",
+            Gift(
+                "gift_id",
+                Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
+                5,
+                10,
+                5,
+            ),
+        ],
+        ids=["string", "Gift"],
+    )
+    async def test_send_gift(self, offline_bot, gift, monkeypatch):
+        # We can't send actual gifts, so we just check that the correct parameters are passed
+        text_entities = [
+            MessageEntity(MessageEntity.TEXT_LINK, 0, 4, "url"),
+            MessageEntity(MessageEntity.BOLD, 5, 9),
+        ]
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            user_id = request_data.parameters["user_id"] == "user_id"
+            gift_id = request_data.parameters["gift_id"] == "gift_id"
+            text = request_data.parameters["text"] == "text"
+            text_parse_mode = request_data.parameters["text_parse_mode"] == "text_parse_mode"
+            tes = request_data.parameters["text_entities"] == [
+                me.to_dict() for me in text_entities
+            ]
+            return user_id and gift_id and text and text_parse_mode and tes
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_gift(
+            "user_id", gift, "text", text_parse_mode="text_parse_mode", text_entities=text_entities
+        )
 
 
 @pytest.fixture
@@ -200,3 +237,9 @@ class TestGiftsWithoutRequest(GiftsTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+
+class TestGiftsWithRequest(GiftTestBase):
+    async def test_get_available_gifts(self, bot, chat_id):
+        # We don't control the available gifts, so we can not make any better assertions
+        assert isinstance(await bot.get_available_gifts(), Gifts)

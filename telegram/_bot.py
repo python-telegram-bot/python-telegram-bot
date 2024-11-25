@@ -75,6 +75,7 @@ from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
+from telegram._gifts import Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
@@ -9475,6 +9476,99 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
 
+    async def get_available_gifts(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Gifts:
+        """Returns the list of gifts that can be sent by the bot to users.
+        Requires no parameters.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.Gifts`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        return Gifts.de_json(  # type: ignore[return-value]
+            await self._post(
+                "getAvailableGifts",
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
+    async def send_gift(
+        self,
+        user_id: int,
+        gift_id: Union[str, Gift],
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Sends a gift to the given user.
+        The gift can't be converted to Telegram Stars by the user
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user that will receive the gift
+            gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
+                :class:`~telegram.Gift` object
+            text (:obj:`str`, optional): Text that will be shown along with the gift;
+                0-255 characters
+            text_parse_mode (:obj:`str`, optional): Mode for parsing entities.
+                See :class:`telegram.constants.ParseMode` and
+                `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
+                more details. Entities other than :attr:`~MessageEntity.BOLD`,
+                :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
+                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+            text_entities (Sequence[:class:`telegram.MessageEntity`], optional): A list of special
+                entities that appear in the gift text. It can be specified instead of
+                :paramref:`text_parse_mode`. Entities other than :attr:`~MessageEntity.BOLD`,
+                :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
+                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "gift_id": gift_id if isinstance(gift_id, str) else gift_id.id,
+            "text": text,
+            "text_parse_mode": text_parse_mode,
+            "text_entities": text_entities,
+        }
+        return await self._post(
+            "sendGift",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -9735,3 +9829,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`create_chat_subscription_invite_link`"""
     editChatSubscriptionInviteLink = edit_chat_subscription_invite_link
     """Alias for :meth:`edit_chat_subscription_invite_link`"""
+    getAvailableGifst = get_available_gifts
+    """Alias for :meth:`get_available_gifts`"""
+    sendGift = send_gift
+    """Alias for :meth:`send_gift`"""
