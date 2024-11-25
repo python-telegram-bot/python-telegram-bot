@@ -273,7 +273,7 @@ class Defaults:
     def text_parse_mode(self) -> Optional[str]:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :class:`telegram.InputPollOption` and
-        :meth:`Bot.send_gift`.
+        :meth:`telegram.Bot.send_gift`.
 
         .. versionadded:: 21.2
         """

@@ -64,6 +64,7 @@ __all__ = [
     "FloodLimit",
     "ForumIconColor",
     "ForumTopicLimit",
+    "GiftLimit",
     "GiveawayLimit",
     "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
@@ -1221,6 +1222,21 @@ class ForumIconColor(IntEnum):
 
         <div style="height:15px; width:15px; background-color:#FB6F5F;"></div>
 
+    """
+
+
+class GiftLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.send_gift`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_TEXT_LENGTH = 255
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.send_gift.text` parameter of :meth:`~telegram.Bot.send_gift`.
     """
 
 

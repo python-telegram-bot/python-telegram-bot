@@ -9531,7 +9531,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
                 :class:`~telegram.Gift` object
             text (:obj:`str`, optional): Text that will be shown along with the gift;
-                0-255 characters
+                0- :tg-const:`telegram.constants.GiftLimit.MAX_TEXT_LENGTH` characters
             text_parse_mode (:obj:`str`, optional): Mode for parsing entities.
                 See :class:`telegram.constants.ParseMode` and
                 `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
