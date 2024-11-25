@@ -9829,7 +9829,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`create_chat_subscription_invite_link`"""
     editChatSubscriptionInviteLink = edit_chat_subscription_invite_link
     """Alias for :meth:`edit_chat_subscription_invite_link`"""
-    getAvailableGifst = get_available_gifts
+    getAvailableGifts = get_available_gifts
     """Alias for :meth:`get_available_gifts`"""
     sendGift = send_gift
     """Alias for :meth:`send_gift`"""

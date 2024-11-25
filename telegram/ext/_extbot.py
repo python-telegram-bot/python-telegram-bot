@@ -4529,5 +4529,5 @@ class ExtBot(Bot, Generic[RLARGS]):
     createChatSubscriptionInviteLink = create_chat_subscription_invite_link
     editChatSubscriptionInviteLink = edit_chat_subscription_invite_link
     sendPaidMedia = send_paid_media
-    getAvailableGifst = get_available_gifts
+    getAvailableGifts = get_available_gifts
     sendGift = send_gift
