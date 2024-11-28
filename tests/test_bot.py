@@ -2321,6 +2321,22 @@ class TestBotWithoutRequest:
         obj = await offline_bot.get_star_transactions(offset=3)
         assert isinstance(obj, StarTransactions)
 
+    async def test_edit_user_star_subscription(self, offline_bot, monkeypatch):
+        """Can't properly test, so we only check that the correct values are passed"""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return (
+                request_data.parameters.get("user_id") == 42
+                and request_data.parameters.get("telegram_payment_charge_id")
+                == "telegram_payment_charge_id"
+                and request_data.parameters.get("is_canceled") is False
+            )
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.edit_user_star_subscription(
+            42, "telegram_payment_charge_id", False
+        )
+
     async def test_create_chat_subscription_invite_link(
         self,
         monkeypatch,

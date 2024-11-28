@@ -24,7 +24,7 @@ import contextlib
 import copy
 import pickle
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timedelta
 from types import TracebackType
 from typing import (
     TYPE_CHECKING,
@@ -8064,6 +8064,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
         is_flexible: Optional[bool] = None,
+        subscription_period: Optional[Union[int, timedelta]] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -8076,6 +8078,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
+            business_connection_id (:obj:`str`, optional): |business_id_str|
+
+                .. versionadded:: NEXT.VERSION
             title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
             description (:obj:`str`): Product description.
@@ -8102,6 +8107,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
+            subscription_period (:obj:`int` | :class:`datetime.timedelta`, optional): The time the
+                subscription will be active for before the next payment, either as number of
+                seconds or as :class:`datetime.timedelta` object. The currency must be set to
+                ``“XTR”`` (Telegram Stars) if the parameter is used. Currently, it must always be
+                :tg-const:`telegram.constants.InvoiceLimit.SUBSCRIPTION_PERIOD` if specified.
+
+                .. versionadded:: NEXT.VERSION
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
                 *smallest units* of the currency (integer, **not** float/double). For example, for
                 a maximum tip of ``US$ 1.45`` pass ``max_tip_amount = 145``. See the ``exp``
@@ -8167,6 +8179,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_flexible": is_flexible,
             "send_phone_number_to_provider": send_phone_number_to_provider,
             "send_email_to_provider": send_email_to_provider,
+            "subscription_period": (
+                subscription_period.total_seconds()
+                if isinstance(subscription_period, timedelta)
+                else subscription_period
+            ),
+            "business_connection_id": business_connection_id,
         }
 
         return await self._post(
@@ -9294,6 +9312,53 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def edit_user_star_subscription(
+        self,
+        user_id: int,
+        telegram_payment_charge_id: str,
+        is_canceled: bool,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Allows the bot to cancel or re-enable extension of a subscription paid in Telegram
+        Stars.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Identifier of the user whose subscription will be edited.
+            telegram_payment_charge_id (:obj:`str`): Telegram payment identifier for the
+                subscription.
+            is_canceled (:obj:`bool`): Pass :obj:`True` to cancel extension of the user
+                subscription; the subscription must be active up to the end of the current
+                subscription period. Pass :obj:`False` to allow the user to re-enable a
+                subscription that was previously canceled by the bot.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "telegram_payment_charge_id": telegram_payment_charge_id,
+            "is_canceled": is_canceled,
+        }
+        return await self._post(
+            "editUserStartSubscription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_paid_media(
         self,
         chat_id: Union[str, int],
@@ -9771,6 +9836,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`refund_star_payment`"""
     getStarTransactions = get_star_transactions
     """Alias for :meth:`get_star_transactions`"""
+    editUserStarSubscription = edit_user_star_subscription
+    """Alias for :meth:`edit_user_star_subscription`"""
     sendPaidMedia = send_paid_media
     """Alias for :meth:`send_paid_media`"""
     createChatSubscriptionInviteLink = create_chat_subscription_invite_link

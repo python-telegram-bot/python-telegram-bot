@@ -2902,6 +2902,10 @@ class InvoiceLimit(IntEnum):
 
     .. versionadded:: 21.6
     """
+    SUBSCRIPTION_PERIOD = datetime.timedelta(days=30).total_seconds()
+    """:obj:`int`: The period of time for which the subscription is active before
+    the next payment, passed as :paramref:`~telegram.Bot.create_invoice_link.subscription_period`
+    parameter of :meth:`telegram.Bot.create_invoice_link`."""
 
 
 class UserProfilePhotosLimit(IntEnum):
