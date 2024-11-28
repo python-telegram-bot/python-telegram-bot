@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram SuccessfulPayment."""
 
+import datetime as dtm
 from typing import TYPE_CHECKING, Optional
 
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -45,6 +47,17 @@ class SuccessfulPayment(TelegramObject):
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
         invoice_payload (:obj:`str`): Bot-specified invoice payload.
+        subscription_expiration_date (:class:`datetime.datetime`, optional): Expiration date of the
+            subscription; for recurring payments only.
+
+            .. versionadded:: NEXT.VERSION
+        is_recurring (:obj:`bool`, optional): True, if the payment is for a subscription.
+
+            .. versionadded:: NEXT.VERSION
+        is_first_recurring (:obj:`bool`, optional): True, if the payment is the first payment of a
+            subscription.
+
+            .. versionadded:: NEXT.VERSION
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
@@ -61,6 +74,17 @@ class SuccessfulPayment(TelegramObject):
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
         invoice_payload (:obj:`str`): Bot-specified invoice payload.
+        subscription_expiration_date (:class:`datetime.datetime`): Optional. Expiration
+            date of the subscription; for recurring payments only.
+
+            .. versionadded:: NEXT.VERSION
+        is_recurring (:obj:`bool`): Optional. True, if the payment is for a subscription.
+
+            .. versionadded:: NEXT.VERSION
+        is_first_recurring (:obj:`bool`): Optional. True, if the payment is the first payment of a
+            subscription.
+
+            .. versionadded:: NEXT.VERSION
         shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
@@ -72,9 +96,12 @@ class SuccessfulPayment(TelegramObject):
     __slots__ = (
         "currency",
         "invoice_payload",
+        "is_first_recurring",
+        "is_recurring",
         "order_info",
         "provider_payment_charge_id",
         "shipping_option_id",
+        "subscription_expiration_date",
         "telegram_payment_charge_id",
         "total_amount",
     )
@@ -88,6 +115,9 @@ class SuccessfulPayment(TelegramObject):
         provider_payment_charge_id: str,
         shipping_option_id: Optional[str] = None,
         order_info: Optional[OrderInfo] = None,
+        subscription_expiration_date: Optional[dtm.datetime] = None,
+        is_recurring: Optional[bool] = None,
+        is_first_recurring: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -99,6 +129,9 @@ class SuccessfulPayment(TelegramObject):
         self.order_info: Optional[OrderInfo] = order_info
         self.telegram_payment_charge_id: str = telegram_payment_charge_id
         self.provider_payment_charge_id: str = provider_payment_charge_id
+        self.subscription_expiration_date: Optional[dtm.datetime] = subscription_expiration_date
+        self.is_recurring: Optional[bool] = is_recurring
+        self.is_first_recurring: Optional[bool] = is_first_recurring
 
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 
@@ -115,5 +148,12 @@ class SuccessfulPayment(TelegramObject):
             return None
 
         data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
+
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+        data["subscription_expiration_date"] = from_timestamp(
+            data.get("subscription_expiration_date"), tzinfo=loc_tzinfo
+        )
 
         return super().de_json(data=data, bot=bot)
