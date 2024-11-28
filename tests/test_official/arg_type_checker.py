@@ -24,7 +24,7 @@ import inspect
 import logging
 import re
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timedelta
 from types import FunctionType
 from typing import Any
 
@@ -67,6 +67,7 @@ DATETIME_REGEX = re.compile(
     """,
     re.VERBOSE,
 )
+TIMEDELTA_REGEX = re.compile(r"\w+_period$")  # Parameter names ending with "_period"
 
 log = logging.debug
 
@@ -191,7 +192,18 @@ def check_param_type(
         # If it's a class, we only accept datetime as the parameter
         mapped_type = datetime if is_class else mapped_type | datetime
 
-    # 4) COMPLEX TYPES:
+    # 4) HANDLING TIMEDELTA:
+    elif re.search(TIMEDELTA_REGEX, ptb_param.name) and obj.__name__ in (
+        "TransactionPartnerUser",
+        "create_invoice_link",
+    ):
+        # Currently we only support timedelta for `subscription_period` in `TransactionPartnerUser`
+        # and `create_invoice_link`.
+        # See https://github.com/python-telegram-bot/python-telegram-bot/issues/4575
+        log("Checking that `%s` is a timedelta!\n", ptb_param.name)
+        mapped_type = timedelta if is_class else mapped_type | timedelta
+
+    # 5) COMPLEX TYPES:
     # Some types are too complicated, so we replace our annotation with a simpler type:
     elif any(ptb_param.name in key for key in PTCE.COMPLEX_TYPES):
         log("Converting `%s` to a simpler type!\n", ptb_param.name)
@@ -199,7 +211,7 @@ def check_param_type(
             if ptb_param.name == param_name and is_class is is_expected_class:
                 ptb_annotation = wrap_with_none(tg_parameter, exception_type, obj)
 
-    # 5) HANDLING DEFAULTS PARAMETERS:
+    # 6) HANDLING DEFAULTS PARAMETERS:
     # Classes whose parameters are all ODVInput should be converted and checked.
     elif obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
         log("Checking that `%s`'s param is ODVInput:\n", obj.__name__)

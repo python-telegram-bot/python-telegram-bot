@@ -3425,7 +3425,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_user_emoji_status(
         self,
         user_id: int,
-        emoji_status_custom_emoji_id: Optional[str],
+        emoji_status_custom_emoji_id: Optional[str] = None,
         emoji_status_expiration_date: Optional[Union[int, datetime]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
