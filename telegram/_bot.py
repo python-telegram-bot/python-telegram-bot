@@ -6190,7 +6190,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Args:
             user_id (:obj:`int`): Unique identifier of the target user
             emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of the
-            emoji status to set. Pass an empty string to remove the status.
+                emoji status to set. Pass an empty string to remove the status.
             emoji_status_expiration_date (Union[:obj:`int`, :obj:`datetime.datetime`], optional):
                 Expiration date of the emoji status, if any, as unix timestamp or
                 :class:`datetime.datetime` object.
