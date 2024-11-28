@@ -201,6 +201,7 @@ __all__ = (
     "PollAnswer",
     "PollOption",
     "PreCheckoutQuery",
+    "PreparedInlineMessage",
     "ProximityAlertTriggered",
     "ReactionCount",
     "ReactionType",
@@ -405,6 +406,7 @@ from ._inline.inputlocationmessagecontent import InputLocationMessageContent
 from ._inline.inputmessagecontent import InputMessageContent
 from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
+from ._inline.preparedinlinemessage import PreparedInlineMessage
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers

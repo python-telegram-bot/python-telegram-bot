@@ -392,6 +392,8 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
+    * - :meth:`~telegram.Bot.save_prepared_inline_message`
+      - Used for storing a message to be sent by a user of a Mini App
 
 .. raw:: html
 
