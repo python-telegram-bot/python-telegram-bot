@@ -8140,6 +8140,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             business_connection_id (:obj:`str`, optional): |business_id_str|
+                For payments in |tg_stars| only.
 
                 .. versionadded:: NEXT.VERSION
             title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
@@ -8172,7 +8173,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 subscription will be active for before the next payment, either as number of
                 seconds or as :class:`datetime.timedelta` object. The currency must be set to
                 ``“XTR”`` (Telegram Stars) if the parameter is used. Currently, it must always be
-                :tg-const:`telegram.constants.InvoiceLimit.SUBSCRIPTION_PERIOD` if specified.
+                :tg-const:`telegram.constants.InvoiceLimit.SUBSCRIPTION_PERIOD` if specified. Any
+                number of subscriptions can be active for a given bot at the same time, including
+                multiple concurrent subscriptions from the same user.
 
                 .. versionadded:: NEXT.VERSION
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
