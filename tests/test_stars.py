@@ -24,6 +24,7 @@ import pytest
 
 from telegram import (
     Dice,
+    Gift,
     PaidMediaPhoto,
     PhotoSize,
     RevenueWithdrawalState,
@@ -32,6 +33,7 @@ from telegram import (
     RevenueWithdrawalStateSucceeded,
     StarTransaction,
     StarTransactions,
+    Sticker,
     TransactionPartner,
     TransactionPartnerFragment,
     TransactionPartnerOther,
@@ -76,6 +78,22 @@ def transaction_partner_user():
             )
         ],
         paid_media_payload="payload",
+        subscription_period=datetime.timedelta(days=1),
+        gift=Gift(
+            id="some_id",
+            sticker=Sticker(
+                file_id="file_id",
+                file_unique_id="file_unique_id",
+                width=512,
+                height=512,
+                is_animated=False,
+                is_video=False,
+                type="regular",
+            ),
+            star_count=5,
+            total_count=10,
+            remaining_count=5,
+        ),
     )
 
 
@@ -513,6 +531,20 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
 
             assert c != f
             assert hash(c) != hash(f)
+
+
+class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
+    def test_de_json_required(self, offline_bot):
+        json_dict = {
+            "user": transaction_partner_user().user.to_dict(),
+        }
+        tp = TransactionPartnerUser.de_json(json_dict, offline_bot)
+        assert tp.api_kwargs == {}
+        assert tp.user == transaction_partner_user().user
+
+        # This test is here mainly to check that the below cases work
+        assert tp.subscription_period is None
+        assert tp.gift is None
 
 
 class RevenueWithdrawalStateTestBase:

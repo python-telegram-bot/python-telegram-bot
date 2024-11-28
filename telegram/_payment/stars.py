@@ -19,11 +19,12 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars transactions."""
 
+import datetime as dtm
 from collections.abc import Sequence
-from datetime import datetime
 from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
+from telegram._gifts import Gift
 from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -144,7 +145,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
 
     def __init__(
         self,
-        date: datetime,
+        date: dtm.datetime,
         url: str,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -152,7 +153,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
         super().__init__(type=RevenueWithdrawalState.SUCCEEDED, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.date: datetime = date
+            self.date: dtm.datetime = date
             self.url: str = url
             self._id_attrs = (
                 self.type,
@@ -328,30 +329,51 @@ class TransactionPartnerUser(TransactionPartner):
     Args:
         user (:class:`telegram.User`): Information about the user.
         invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
+        subscription_period (:class:`datetime.timedelta`, optional): The duration of the paid
+            subscription
+
+            .. versionadded:: NEXT.VERSION
         paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
             media bought by the user.
 
             .. versionadded:: 21.5
-        paid_media_payload (:obj:`str`, optional): Optional. Bot-specified paid media payload.
+        paid_media_payload (:obj:`str`, optional): Bot-specified paid media payload.
 
             .. versionadded:: 21.6
+        gift (:class:`telegram.Gift`, optional): The gift sent to the user by the bot
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
         user (:class:`telegram.User`): Information about the user.
         invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
+        subscription_period (:class:`datetime.timedelta`): Optional. The duration of the paid
+            subscription
+
+            .. versionadded:: NEXT.VERSION
         paid_media (tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
             media bought by the user.
 
             .. versionadded:: 21.5
-        paid_media_payload (:obj:`str`): Optional. Optional. Bot-specified paid media payload.
+        paid_media_payload (:obj:`str`): Optional. Bot-specified paid media payload.
 
             .. versionadded:: 21.6
+        gift (:class:`telegram.Gift`): Optional. The gift sent to the user by the bot
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("invoice_payload", "paid_media", "paid_media_payload", "user")
+    __slots__ = (
+        "gift",
+        "invoice_payload",
+        "paid_media",
+        "paid_media_payload",
+        "subscription_period",
+        "user",
+    )
 
     def __init__(
         self,
@@ -359,6 +381,8 @@ class TransactionPartnerUser(TransactionPartner):
         invoice_payload: Optional[str] = None,
         paid_media: Optional[Sequence[PaidMedia]] = None,
         paid_media_payload: Optional[str] = None,
+        subscription_period: Optional[dtm.timedelta] = None,
+        gift: Optional[Gift] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -369,6 +393,9 @@ class TransactionPartnerUser(TransactionPartner):
             self.invoice_payload: Optional[str] = invoice_payload
             self.paid_media: Optional[tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
             self.paid_media_payload: Optional[str] = paid_media_payload
+            self.subscription_period: Optional[dtm.timedelta] = subscription_period
+            self.gift: Optional[Gift] = gift
+
             self._id_attrs = (
                 self.type,
                 self.user,
@@ -386,6 +413,12 @@ class TransactionPartnerUser(TransactionPartner):
 
         data["user"] = User.de_json(data.get("user"), bot)
         data["paid_media"] = PaidMedia.de_list(data.get("paid_media"), bot=bot)
+        data["subscription_period"] = (
+            dtm.timedelta(seconds=sp)
+            if (sp := data.get("subscription_period")) is not None
+            else None
+        )
+        data["gift"] = Gift.de_json(data.get("gift"), bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
@@ -496,7 +529,7 @@ class StarTransaction(TelegramObject):
         self,
         id: str,
         amount: int,
-        date: datetime,
+        date: dtm.datetime,
         source: Optional[TransactionPartner] = None,
         receiver: Optional[TransactionPartner] = None,
         *,
@@ -505,7 +538,7 @@ class StarTransaction(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
         self.amount: int = amount
-        self.date: datetime = date
+        self.date: dtm.datetime = date
         self.source: Optional[TransactionPartner] = source
         self.receiver: Optional[TransactionPartner] = receiver
 

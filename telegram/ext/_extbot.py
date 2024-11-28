@@ -57,6 +57,8 @@ from telegram import (
     File,
     ForumTopic,
     GameHighScore,
+    Gift,
+    Gifts,
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
@@ -4414,6 +4416,52 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_available_gifts(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Gifts:
+        return await super().get_available_gifts(
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def send_gift(
+        self,
+        user_id: int,
+        gift_id: Union[str, Gift],
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().send_gift(
+            user_id=user_id,
+            gift_id=gift_id,
+            text=text,
+            text_parse_mode=text_parse_mode,
+            text_entities=text_entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -4542,3 +4590,5 @@ class ExtBot(Bot, Generic[RLARGS]):
     createChatSubscriptionInviteLink = create_chat_subscription_invite_link
     editChatSubscriptionInviteLink = edit_chat_subscription_invite_link
     sendPaidMedia = send_paid_media
+    getAvailableGifts = get_available_gifts
+    sendGift = send_gift

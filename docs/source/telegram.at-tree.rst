@@ -93,7 +93,6 @@ Available Types
     telegram.inputpaidmediaphoto
     telegram.inputpaidmediavideo
     telegram.inputpolloption
-    telegram.inputsticker
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
