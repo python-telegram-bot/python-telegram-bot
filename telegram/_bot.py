@@ -9272,6 +9272,53 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def edit_user_star_subscription(
+        self,
+        user_id: int,
+        telegram_payment_charge_id: str,
+        is_canceled: bool,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Allows the bot to cancel or re-enable extension of a subscription paid in Telegram
+        Stars.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Identifier of the user whose subscription will be edited.
+            telegram_payment_charge_id (:obj:`str`): Telegram payment identifier for the
+                subscription.
+            is_canceled (:obj:`bool`): Pass :obj:`True` to cancel extension of the user
+                subscription; the subscription must be active up to the end of the current
+                subscription period. Pass :obj:`False` to allow the user to re-enable a
+                subscription that was previously canceled by the bot.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "telegram_payment_charge_id": telegram_payment_charge_id,
+            "is_canceled": is_canceled,
+        }
+        return await self._post(
+            "editUserStartSubscription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_paid_media(
         self,
         chat_id: Union[str, int],
@@ -9747,6 +9794,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`refund_star_payment`"""
     getStarTransactions = get_star_transactions
     """Alias for :meth:`get_star_transactions`"""
+    editUserStarSubscription = edit_user_star_subscription
+    """Alias for :meth:`edit_user_star_subscription`"""
     sendPaidMedia = send_paid_media
     """Alias for :meth:`send_paid_media`"""
     createChatSubscriptionInviteLink = create_chat_subscription_invite_link

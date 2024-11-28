@@ -355,7 +355,7 @@
 .. raw:: html
 
    <details>
-   <summary>Miscellaneous</summary>
+   <summary>Payments and Stars</summary>
 
 .. list-table::
     :align: left
@@ -363,6 +363,27 @@
 
     * - :meth:`~telegram.Bot.create_invoice_link`
       - Used to generate an HTTP link for an invoice
+    * - :meth:`~telegram.Bot.edit_user_star_subscription`
+      - Used for editing a user's star subscription
+    * - :meth:`~telegram.Bot.get_star_transactions`
+      - Used for obtaining the bot's Telegram Stars transactions
+    * - :meth:`~telegram.Bot.refund_star_payment`
+      - Used for refunding a payment in Telegram Stars
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
+   <summary>Miscellaneous</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
     * - :meth:`~telegram.Bot.close`
       - Used for closing server instance when switching to another local server
     * - :meth:`~telegram.Bot.log_out`
@@ -371,10 +392,6 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
-    * - :meth:`~telegram.Bot.get_star_transactions`
-      - Used for obtaining the bot's Telegram Stars transactions
-    * - :meth:`~telegram.Bot.refund_star_payment`
-      - Used for refunding a payment in Telegram Stars
 
 .. raw:: html
 
