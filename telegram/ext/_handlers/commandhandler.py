@@ -36,10 +36,11 @@ RT = TypeVar("RT")
 class CommandHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram commands.
 
-    Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
-    bot's name and/or some additional text. The handler will add a :obj:`list` to the
-    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
-    which is the text following the command split on single or consecutive whitespace characters.
+    Commands are Telegram messages that start with a :attr:`telegram.MessageEntity.BOT_COMMAND`
+    (so with ``/``, optionally followed by an ``@`` and the bot's name and/or some additional
+    text). The handler will add a :obj:`list` to the :class:`CallbackContext` named
+    :attr:`CallbackContext.args`. It will contain a list of strings, which is the text following
+    the command split on single or consecutive whitespace characters.
 
     By default, the handler listens to messages as well as edited messages. To change this behavior
     use :attr:`~filters.UpdateType.EDITED_MESSAGE <telegram.ext.filters.UpdateType.EDITED_MESSAGE>`
@@ -52,6 +53,11 @@ class CommandHandler(BaseHandler[Update, CCT, RT]):
         :attr:`telegram.ext.filters.UpdateType.CHANNEL_POSTS`,
         :attr:`telegram.ext.filters.CAPTION` and :class:`telegram.ext.filters.Regex`) to handle
         those messages.
+
+    Note:
+        If you want to support a different entity in the beginning, e.g. if a command message is
+        wrapped in a :attr:`telegram.MessageEntity.CODE`, use the
+        :class:`telegram.ext.PrefixHandler`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
