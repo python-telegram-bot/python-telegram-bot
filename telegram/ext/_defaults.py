@@ -188,6 +188,7 @@ class Defaults:
             "explanation_parse_mode",
             "link_preview_options",
             "parse_mode",
+            "text_parse_mode",
             "protect_content",
             "question_parse_mode",
         ):
@@ -271,7 +272,8 @@ class Defaults:
     @property
     def text_parse_mode(self) -> Optional[str]:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
-        the corresponding parameter of :class:`telegram.InputPollOption`.
+        the corresponding parameter of :class:`telegram.InputPollOption` and
+        :meth:`telegram.Bot.send_gift`.
 
         .. versionadded:: 21.2
         """

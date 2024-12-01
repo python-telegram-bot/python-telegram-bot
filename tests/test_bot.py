@@ -67,6 +67,7 @@ from telegram import (
     MessageEntity,
     Poll,
     PollOption,
+    PreparedInlineMessage,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     ReplyParameters,
@@ -2321,6 +2322,22 @@ class TestBotWithoutRequest:
         obj = await offline_bot.get_star_transactions(offset=3)
         assert isinstance(obj, StarTransactions)
 
+    async def test_edit_user_star_subscription(self, offline_bot, monkeypatch):
+        """Can't properly test, so we only check that the correct values are passed"""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return (
+                request_data.parameters.get("user_id") == 42
+                and request_data.parameters.get("telegram_payment_charge_id")
+                == "telegram_payment_charge_id"
+                and request_data.parameters.get("is_canceled") is False
+            )
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.edit_user_star_subscription(
+            42, "telegram_payment_charge_id", False
+        )
+
     async def test_create_chat_subscription_invite_link(
         self,
         monkeypatch,
@@ -2336,6 +2353,39 @@ class TestBotWithoutRequest:
 
         await offline_bot.create_chat_subscription_invite_link(1234, 2592000, 6)
 
+    @pytest.mark.parametrize(
+        "expiration_date", [dtm.datetime(2024, 1, 1), 1704067200], ids=["datetime", "timestamp"]
+    )
+    async def test_set_user_emoji_status_basic(self, offline_bot, monkeypatch, expiration_date):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 4242
+            assert (
+                request_data.parameters.get("emoji_status_custom_emoji_id")
+                == "emoji_status_custom_emoji_id"
+            )
+            assert request_data.parameters.get("emoji_status_expiration_date") == 1704067200
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.set_user_emoji_status(
+            4242, "emoji_status_custom_emoji_id", expiration_date
+        )
+
+    async def test_set_user_emoji_status_default_timezone(self, tz_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 4242
+            assert (
+                request_data.parameters.get("emoji_status_custom_emoji_id")
+                == "emoji_status_custom_emoji_id"
+            )
+            assert request_data.parameters.get("emoji_status_expiration_date") == to_timestamp(
+                dtm.datetime(2024, 1, 1), tzinfo=tz_bot.defaults.tzinfo
+            )
+
+        monkeypatch.setattr(tz_bot.request, "post", make_assertion)
+        await tz_bot.set_user_emoji_status(
+            4242, "emoji_status_custom_emoji_id", dtm.datetime(2024, 1, 1)
+        )
+
 
 class TestBotWithRequest:
     """
@@ -2344,6 +2394,9 @@ class TestBotWithRequest:
     Behavior for init of ExtBot with missing optional dependency cachetools (for CallbackDataCache)
     is tested in `test_callbackdatacache`
     """
+
+    # get_available_gifts, send_gift are tested in `test_gift`.
+    # No need to duplicate here.
 
     async def test_invalid_token_server_response(self):
         with pytest.raises(InvalidToken, match="The token `12` was rejected by the server."):
@@ -2840,6 +2893,15 @@ class TestBotWithRequest:
             await bot.answer_inline_query(
                 1234, results=inline_results, next_offset=42, current_offset=51
             )
+
+    async def test_save_prepared_inline_message(self, bot, chat_id):
+        # We can't really check that the result is stored correctly, we just ensur ethat we get
+        # a proper return value
+        result = InlineQueryResultArticle(
+            id="some_id", title="title", input_message_content=InputTextMessageContent("text")
+        )
+        out = await bot.save_prepared_inline_message(chat_id, result, True, False, True, False)
+        assert isinstance(out, PreparedInlineMessage)
 
     async def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = await bot.get_user_profile_photos(chat_id)

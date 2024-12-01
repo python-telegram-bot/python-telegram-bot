@@ -24,7 +24,7 @@ import contextlib
 import copy
 import pickle
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timedelta
 from types import TracebackType
 from typing import (
     TYPE_CHECKING,
@@ -75,7 +75,9 @@ from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
+from telegram._gifts import Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
+from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -3641,6 +3643,65 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
+    async def save_prepared_inline_message(
+        self,
+        user_id: int,
+        result: "InlineQueryResult",
+        allow_user_chats: Optional[bool] = None,
+        allow_bot_chats: Optional[bool] = None,
+        allow_group_chats: Optional[bool] = None,
+        allow_channel_chats: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> PreparedInlineMessage:
+        """Stores a message that can be sent by a user of a Mini App.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user that can use the prepared
+                message.
+            result (:class:`telegram.InlineQueryResult`): The result to store.
+            allow_user_chats (:obj:`bool`, optional): Pass :obj:`True` if the message can be sent
+                to private chats with users
+            allow_bot_chats (:obj:`bool`, optional): Pass :obj:`True` if the message can be sent
+                to private chats with bots
+            allow_group_chats (:obj:`bool`, optional): Pass :obj:`True` if the message can be sent
+                to group and supergroup chats
+            allow_channel_chats (:obj:`bool`, optional): Pass :obj:`True` if the message can be
+                sent to channels
+
+        Returns:
+            :class:`telegram.PreparedInlineMessage`: On success, the prepared message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "result": result,
+            "allow_user_chats": allow_user_chats,
+            "allow_bot_chats": allow_bot_chats,
+            "allow_group_chats": allow_group_chats,
+            "allow_channel_chats": allow_channel_chats,
+        }
+        return PreparedInlineMessage.de_json(  # type: ignore[return-value]
+            await self._post(
+                "savePreparedInlineMessage",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
+        )
+
     async def get_user_profile_photos(
         self,
         user_id: int,
@@ -3779,9 +3840,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 be unbanned, unix time. If user is banned for more than 366 days or less than 30
                 seconds from the current time they are considered to be banned forever. Applied
                 for supergroups and channels only.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             revoke_messages (:obj:`bool`, optional): Pass :obj:`True` to delete all messages from
                 the chat for the user that is being removed. If :obj:`False`, the user will be able
                 to see messages in the group that were sent before the user was removed.
@@ -5415,9 +5474,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 will be lifted for the user, unix time. If user is restricted for more than 366
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             permissions (:class:`telegram.ChatPermissions`): An object for new user
                 permissions.
             use_independent_chat_permissions (:obj:`bool`, optional): Pass :obj:`True` if chat
@@ -5761,9 +5818,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire. Integer input will be interpreted as Unix timestamp.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
@@ -5840,9 +5895,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                     Now also accepts :class:`telegram.ChatInviteLink` instances.
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
@@ -6168,6 +6221,56 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         return await self._post(
             "setChatDescription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_user_emoji_status(
+        self,
+        user_id: int,
+        emoji_status_custom_emoji_id: Optional[str] = None,
+        emoji_status_expiration_date: Optional[Union[int, datetime]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Changes the emoji status for a given user that previously allowed the bot to manage
+        their emoji status via the Mini App method
+        `requestEmojiStatusAccess <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_
+        .
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user
+            emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of the
+                emoji status to set. Pass an empty string to remove the status.
+            emoji_status_expiration_date (Union[:obj:`int`, :obj:`datetime.datetime`], optional):
+                Expiration date of the emoji status, if any, as unix timestamp or
+                :class:`datetime.datetime` object.
+                |tz-naive-dtms|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "emoji_status_custom_emoji_id": emoji_status_custom_emoji_id,
+            "emoji_status_expiration_date": emoji_status_expiration_date,
+        }
+        return await self._post(
+            "setUserEmojiStatus",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -7127,9 +7230,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.MIN_OPEN_PERIOD` and no more than
                 :tg-const:`telegram.Poll.MAX_OPEN_PERIOD` seconds in the future.
                 Can't be used together with :paramref:`open_period`.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-                used.
+                |tz-naive-dtms|
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be
                 immediately closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -8024,6 +8125,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
         is_flexible: Optional[bool] = None,
+        subscription_period: Optional[Union[int, timedelta]] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -8036,6 +8139,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
+            business_connection_id (:obj:`str`, optional): |business_id_str|
+                For payments in |tg_stars| only.
+
+                .. versionadded:: NEXT.VERSION
             title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
             description (:obj:`str`): Product description.
@@ -8062,6 +8169,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
+            subscription_period (:obj:`int` | :class:`datetime.timedelta`, optional): The time the
+                subscription will be active for before the next payment, either as number of
+                seconds or as :class:`datetime.timedelta` object. The currency must be set to
+                ``“XTR”`` (Telegram Stars) if the parameter is used. Currently, it must always be
+                :tg-const:`telegram.constants.InvoiceLimit.SUBSCRIPTION_PERIOD` if specified. Any
+                number of subscriptions can be active for a given bot at the same time, including
+                multiple concurrent subscriptions from the same user.
+
+                .. versionadded:: NEXT.VERSION
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
                 *smallest units* of the currency (integer, **not** float/double). For example, for
                 a maximum tip of ``US$ 1.45`` pass ``max_tip_amount = 145``. See the ``exp``
@@ -8127,6 +8243,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_flexible": is_flexible,
             "send_phone_number_to_provider": send_phone_number_to_provider,
             "send_email_to_provider": send_email_to_provider,
+            "subscription_period": (
+                subscription_period.total_seconds()
+                if isinstance(subscription_period, timedelta)
+                else subscription_period
+            ),
+            "business_connection_id": business_connection_id,
         }
 
         return await self._post(
@@ -9254,6 +9376,53 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def edit_user_star_subscription(
+        self,
+        user_id: int,
+        telegram_payment_charge_id: str,
+        is_canceled: bool,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Allows the bot to cancel or re-enable extension of a subscription paid in Telegram
+        Stars.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Identifier of the user whose subscription will be edited.
+            telegram_payment_charge_id (:obj:`str`): Telegram payment identifier for the
+                subscription.
+            is_canceled (:obj:`bool`): Pass :obj:`True` to cancel extension of the user
+                subscription; the subscription must be active up to the end of the current
+                subscription period. Pass :obj:`False` to allow the user to re-enable a
+                subscription that was previously canceled by the bot.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "telegram_payment_charge_id": telegram_payment_charge_id,
+            "is_canceled": is_canceled,
+        }
+        return await self._post(
+            "editUserStartSubscription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_paid_media(
         self,
         chat_id: Union[str, int],
@@ -9475,6 +9644,99 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
 
+    async def get_available_gifts(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Gifts:
+        """Returns the list of gifts that can be sent by the bot to users.
+        Requires no parameters.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.Gifts`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        return Gifts.de_json(  # type: ignore[return-value]
+            await self._post(
+                "getAvailableGifts",
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
+    async def send_gift(
+        self,
+        user_id: int,
+        gift_id: Union[str, Gift],
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Sends a gift to the given user.
+        The gift can't be converted to Telegram Stars by the user
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user that will receive the gift
+            gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
+                :class:`~telegram.Gift` object
+            text (:obj:`str`, optional): Text that will be shown along with the gift;
+                0- :tg-const:`telegram.constants.GiftLimit.MAX_TEXT_LENGTH` characters
+            text_parse_mode (:obj:`str`, optional): Mode for parsing entities.
+                See :class:`telegram.constants.ParseMode` and
+                `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
+                more details. Entities other than :attr:`~MessageEntity.BOLD`,
+                :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
+                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+            text_entities (Sequence[:class:`telegram.MessageEntity`], optional): A list of special
+                entities that appear in the gift text. It can be specified instead of
+                :paramref:`text_parse_mode`. Entities other than :attr:`~MessageEntity.BOLD`,
+                :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
+                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "gift_id": gift_id.id if isinstance(gift_id, Gift) else gift_id,
+            "text": text,
+            "text_parse_mode": text_parse_mode,
+            "text_entities": text_entities,
+        }
+        return await self._post(
+            "sendGift",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -9531,6 +9793,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`send_chat_action`"""
     answerInlineQuery = answer_inline_query
     """Alias for :meth:`answer_inline_query`"""
+    savePreparedInlineMessage = save_prepared_inline_message
+    """Alias for :meth:`save_prepared_inline_message`"""
     getUserProfilePhotos = get_user_profile_photos
     """Alias for :meth:`get_user_profile_photos`"""
     getFile = get_file
@@ -9615,6 +9879,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_chat_title`"""
     setChatDescription = set_chat_description
     """Alias for :meth:`set_chat_description`"""
+    setUserEmojiStatus = set_user_emoji_status
+    """Alias for :meth:`set_user_emoji_status`"""
     pinChatMessage = pin_chat_message
     """Alias for :meth:`pin_chat_message`"""
     unpinChatMessage = unpin_chat_message
@@ -9729,9 +9995,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`refund_star_payment`"""
     getStarTransactions = get_star_transactions
     """Alias for :meth:`get_star_transactions`"""
+    editUserStarSubscription = edit_user_star_subscription
+    """Alias for :meth:`edit_user_star_subscription`"""
     sendPaidMedia = send_paid_media
     """Alias for :meth:`send_paid_media`"""
     createChatSubscriptionInviteLink = create_chat_subscription_invite_link
     """Alias for :meth:`create_chat_subscription_invite_link`"""
     editChatSubscriptionInviteLink = edit_chat_subscription_invite_link
     """Alias for :meth:`edit_chat_subscription_invite_link`"""
+    getAvailableGifts = get_available_gifts
+    """Alias for :meth:`get_available_gifts`"""
+    sendGift = send_gift
+    """Alias for :meth:`send_gift`"""
