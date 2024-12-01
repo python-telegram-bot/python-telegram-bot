@@ -4,6 +4,22 @@
 Changelog
 =========
 
+Version 21.8
+============
+*Released 2024-12-01*
+
+This is the technical changelog for version 21.8. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for Bot API 8.0 (:pr:`4568`, :pr:`4566` closes :issue:`4567`, :pr:`4572`, :pr:`4571`, :pr:`4570`, :pr:`4576`, :pr:`4574`)
+
+Documentation Improvements
+--------------------------
+
+- Documentation Improvements (:pr:`4565` by `Snehashish06 <https://github.com/Snehashish06>`_, :pr:`4573`)
+
 Version 21.7
 ============
 *Released 2024-11-04*

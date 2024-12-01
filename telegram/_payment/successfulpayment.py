@@ -50,14 +50,14 @@ class SuccessfulPayment(TelegramObject):
         subscription_expiration_date (:class:`datetime.datetime`, optional): Expiration date of the
             subscription; for recurring payments only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
         is_recurring (:obj:`bool`, optional): True, if the payment is for a subscription.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
         is_first_recurring (:obj:`bool`, optional): True, if the payment is the first payment of a
             subscription.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
@@ -77,14 +77,14 @@ class SuccessfulPayment(TelegramObject):
         subscription_expiration_date (:class:`datetime.datetime`): Optional. Expiration
             date of the subscription; for recurring payments only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
         is_recurring (:obj:`bool`): Optional. True, if the payment is for a subscription.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
         is_first_recurring (:obj:`bool`): Optional. True, if the payment is the first payment of a
             subscription.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
         shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.

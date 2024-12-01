@@ -1229,7 +1229,7 @@ class GiftLimit(IntEnum):
     """This enum contains limitations for :meth:`~telegram.Bot.send_gift`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.8
     """
 
     __slots__ = ()
@@ -2923,7 +2923,7 @@ class InvoiceLimit(IntEnum):
     the next payment, passed as :paramref:`~telegram.Bot.create_invoice_link.subscription_period`
     parameter of :meth:`telegram.Bot.create_invoice_link`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.8
     """
 
 

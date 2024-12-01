@@ -3660,7 +3660,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     ) -> PreparedInlineMessage:
         """Stores a message that can be sent by a user of a Mini App.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.8
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user that can use the prepared
@@ -6246,7 +6246,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         `requestEmojiStatusAccess <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_
         .
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.8
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user
@@ -8142,7 +8142,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             business_connection_id (:obj:`str`, optional): |business_id_str|
                 For payments in |tg_stars| only.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.8
             title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
             description (:obj:`str`): Product description.
@@ -8177,7 +8177,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 number of subscriptions can be active for a given bot at the same time, including
                 multiple concurrent subscriptions from the same user.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.8
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
                 *smallest units* of the currency (integer, **not** float/double). For example, for
                 a maximum tip of ``US$ 1.45`` pass ``max_tip_amount = 145``. See the ``exp``
@@ -9391,7 +9391,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Allows the bot to cancel or re-enable extension of a subscription paid in Telegram
         Stars.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.8
 
         Args:
             user_id (:obj:`int`): Identifier of the user whose subscription will be edited.
@@ -9656,7 +9656,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Returns the list of gifts that can be sent by the bot to users.
         Requires no parameters.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.8
 
         Returns:
             :class:`telegram.Gifts`
@@ -9692,7 +9692,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Sends a gift to the given user.
         The gift can't be converted to Telegram Stars by the user
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.8
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user that will receive the gift
