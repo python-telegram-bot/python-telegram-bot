@@ -64,6 +64,7 @@ __all__ = [
     "FloodLimit",
     "ForumIconColor",
     "ForumTopicLimit",
+    "GiftLimit",
     "GiveawayLimit",
     "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
@@ -152,7 +153,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=11)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=0)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1221,6 +1222,21 @@ class ForumIconColor(IntEnum):
 
         <div style="height:15px; width:15px; background-color:#FB6F5F;"></div>
 
+    """
+
+
+class GiftLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.send_gift`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_TEXT_LENGTH = 255
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.send_gift.text` parameter of :meth:`~telegram.Bot.send_gift`.
     """
 
 
@@ -2901,6 +2917,13 @@ class InvoiceLimit(IntEnum):
     :meth:`telegram.Bot.send_paid_media`.
 
     .. versionadded:: 21.6
+    """
+    SUBSCRIPTION_PERIOD = datetime.timedelta(days=30).total_seconds()
+    """:obj:`int`: The period of time for which the subscription is active before
+    the next payment, passed as :paramref:`~telegram.Bot.create_invoice_link.subscription_period`
+    parameter of :meth:`telegram.Bot.create_invoice_link`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
 

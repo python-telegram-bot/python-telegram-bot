@@ -101,6 +101,8 @@ __all__ = (
     "GameHighScore",
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
+    "Gift",
+    "Gifts",
     "Giveaway",
     "GiveawayCompleted",
     "GiveawayCreated",
@@ -201,6 +203,7 @@ __all__ = (
     "PollAnswer",
     "PollOption",
     "PreCheckoutQuery",
+    "PreparedInlineMessage",
     "ProximityAlertTriggered",
     "ReactionCount",
     "ReactionType",
@@ -373,6 +376,7 @@ from ._forumtopic import (
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
+from ._gifts import Gift, Gifts
 from ._giveaway import Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -405,6 +409,7 @@ from ._inline.inputlocationmessagecontent import InputLocationMessageContent
 from ._inline.inputmessagecontent import InputMessageContent
 from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
+from ._inline.preparedinlinemessage import PreparedInlineMessage
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers

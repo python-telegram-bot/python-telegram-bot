@@ -44,6 +44,7 @@ if TYPE_CHECKING:
         ChatMember,
         Contact,
         Document,
+        Gift,
         InlineKeyboardMarkup,
         InputMediaAudio,
         InputMediaDocument,
@@ -3434,6 +3435,46 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             payload=payload,
             allow_paid_broadcast=allow_paid_broadcast,
+        )
+
+    async def send_gift(
+        self,
+        gift_id: Union[str, "Gift"],
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.send_gift(user_id=update.effective_chat.id, *args, **kwargs )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_gift`.
+
+        Caution:
+            Can only work, if the chat is a private chat, see :attr:`type`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().send_gift(
+            user_id=self.id,
+            gift_id=gift_id,
+            text=text,
+            text_parse_mode=text_parse_mode,
+            text_entities=text_entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
 

@@ -16,9 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import OrderInfo, SuccessfulPayment
+from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
 
 
@@ -32,6 +35,9 @@ def successful_payment():
         SuccessfulPaymentTestBase.provider_payment_charge_id,
         shipping_option_id=SuccessfulPaymentTestBase.shipping_option_id,
         order_info=SuccessfulPaymentTestBase.order_info,
+        subscription_expiration_date=SuccessfulPaymentTestBase.subscription_expiration_date,
+        is_recurring=SuccessfulPaymentTestBase.is_recurring,
+        is_first_recurring=SuccessfulPaymentTestBase.is_first_recurring,
     )
 
 
@@ -43,6 +49,9 @@ class SuccessfulPaymentTestBase:
     order_info = OrderInfo()
     telegram_payment_charge_id = "telegram_payment_charge_id"
     provider_payment_charge_id = "provider_payment_charge_id"
+    subscription_expiration_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
+    is_recurring = True
+    is_first_recurring = True
 
 
 class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
@@ -61,6 +70,9 @@ class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
             "order_info": self.order_info.to_dict(),
             "telegram_payment_charge_id": self.telegram_payment_charge_id,
             "provider_payment_charge_id": self.provider_payment_charge_id,
+            "subscription_expiration_date": to_timestamp(self.subscription_expiration_date),
+            "is_recurring": self.is_recurring,
+            "is_first_recurring": self.is_first_recurring,
         }
         successful_payment = SuccessfulPayment.de_json(json_dict, offline_bot)
         assert successful_payment.api_kwargs == {}
@@ -72,6 +84,32 @@ class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
         assert successful_payment.order_info == self.order_info
         assert successful_payment.telegram_payment_charge_id == self.telegram_payment_charge_id
         assert successful_payment.provider_payment_charge_id == self.provider_payment_charge_id
+        assert successful_payment.subscription_expiration_date == self.subscription_expiration_date
+        assert successful_payment.is_recurring == self.is_recurring
+        assert successful_payment.is_first_recurring == self.is_first_recurring
+
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
+        json_dict = {
+            "invoice_payload": self.invoice_payload,
+            "currency": self.currency,
+            "total_amount": self.total_amount,
+            "telegram_payment_charge_id": self.telegram_payment_charge_id,
+            "provider_payment_charge_id": self.provider_payment_charge_id,
+            "subscription_expiration_date": to_timestamp(self.subscription_expiration_date),
+        }
+        successful_payment = SuccessfulPayment.de_json(json_dict, offline_bot)
+        successful_payment_raw = SuccessfulPayment.de_json(json_dict, raw_bot)
+        successful_payment_tz = SuccessfulPayment.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        date_offset = successful_payment_tz.subscription_expiration_date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            successful_payment_tz.subscription_expiration_date.replace(tzinfo=None)
+        )
+
+        assert successful_payment_raw.subscription_expiration_date.tzinfo == UTC
+        assert successful_payment.subscription_expiration_date.tzinfo == UTC
+        assert date_offset == tz_bot_offset
 
     def test_to_dict(self, successful_payment):
         successful_payment_dict = successful_payment.to_dict()
@@ -91,6 +129,13 @@ class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
         assert (
             successful_payment_dict["provider_payment_charge_id"]
             == successful_payment.provider_payment_charge_id
+        )
+        assert successful_payment_dict["subscription_expiration_date"] == to_timestamp(
+            successful_payment.subscription_expiration_date
+        )
+        assert successful_payment_dict["is_recurring"] == successful_payment.is_recurring
+        assert (
+            successful_payment_dict["is_first_recurring"] == successful_payment.is_first_recurring
         )
 
     def test_equality(self):

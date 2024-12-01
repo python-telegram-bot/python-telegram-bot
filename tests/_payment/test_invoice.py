@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 
 import pytest
 
@@ -122,10 +123,14 @@ class TestInvoiceWithoutRequest(InvoiceTestBase):
             protect_content=True,
         )
 
-    async def test_send_all_args_create_invoice_link(self, offline_bot, monkeypatch):
+    @pytest.mark.parametrize("subscription_period", [42, dtm.timedelta(seconds=42)])
+    async def test_send_all_args_create_invoice_link(
+        self, offline_bot, monkeypatch, subscription_period
+    ):
         async def make_assertion(*args, **_):
             kwargs = args[1]
-            return all(kwargs[i] == i for i in kwargs)
+            sp = kwargs.pop("subscription_period") == 42
+            return all(kwargs[i] == i for i in kwargs) and sp
 
         monkeypatch.setattr(offline_bot, "_post", make_assertion)
         assert await offline_bot.create_invoice_link(
@@ -149,6 +154,8 @@ class TestInvoiceWithoutRequest(InvoiceTestBase):
             send_phone_number_to_provider="send_phone_number_to_provider",
             send_email_to_provider="send_email_to_provider",
             is_flexible="is_flexible",
+            business_connection_id="business_connection_id",
+            subscription_period=subscription_period,
         )
 
     async def test_send_object_as_provider_data(

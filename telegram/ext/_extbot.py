@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
 from collections.abc import Sequence
 from copy import copy
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -57,6 +57,8 @@ from telegram import (
     File,
     ForumTopic,
     GameHighScore,
+    Gift,
+    Gifts,
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
@@ -69,6 +71,7 @@ from telegram import (
     MessageId,
     PhotoSize,
     Poll,
+    PreparedInlineMessage,
     ReactionType,
     ReplyParameters,
     SentWebAppMessage,
@@ -979,6 +982,36 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def save_prepared_inline_message(
+        self,
+        user_id: int,
+        result: "InlineQueryResult",
+        allow_user_chats: Optional[bool] = None,
+        allow_bot_chats: Optional[bool] = None,
+        allow_group_chats: Optional[bool] = None,
+        allow_channel_chats: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> PreparedInlineMessage:
+        return await super().save_prepared_inline_message(
+            user_id=user_id,
+            result=result,
+            allow_user_chats=allow_user_chats,
+            allow_bot_chats=allow_bot_chats,
+            allow_group_chats=allow_group_chats,
+            allow_channel_chats=allow_channel_chats,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def answer_pre_checkout_query(
         self,
         pre_checkout_query_id: str,
@@ -1171,6 +1204,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
         is_flexible: Optional[bool] = None,
+        subscription_period: Optional[Union[int, timedelta]] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1204,6 +1239,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            subscription_period=subscription_period,
+            business_connection_id=business_connection_id,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
@@ -3385,6 +3422,30 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_user_emoji_status(
+        self,
+        user_id: int,
+        emoji_status_custom_emoji_id: Optional[str] = None,
+        emoji_status_expiration_date: Optional[Union[int, datetime]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_user_emoji_status(
+            user_id=user_id,
+            emoji_status_custom_emoji_id=emoji_status_custom_emoji_id,
+            emoji_status_expiration_date=emoji_status_expiration_date,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def set_chat_menu_button(
         self,
         chat_id: Optional[int] = None,
@@ -4255,6 +4316,30 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def edit_user_star_subscription(
+        self,
+        user_id: int,
+        telegram_payment_charge_id: str,
+        is_canceled: bool,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().edit_user_star_subscription(
+            user_id=user_id,
+            telegram_payment_charge_id=telegram_payment_charge_id,
+            is_canceled=is_canceled,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def send_paid_media(
         self,
         chat_id: Union[str, int],
@@ -4355,6 +4440,52 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_available_gifts(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Gifts:
+        return await super().get_available_gifts(
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def send_gift(
+        self,
+        user_id: int,
+        gift_id: Union[str, Gift],
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().send_gift(
+            user_id=user_id,
+            gift_id=gift_id,
+            text=text,
+            text_parse_mode=text_parse_mode,
+            text_entities=text_entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -4379,6 +4510,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     sendGame = send_game
     sendChatAction = send_chat_action
     answerInlineQuery = answer_inline_query
+    savePreparedInlineMessage = save_prepared_inline_message
     getUserProfilePhotos = get_user_profile_photos
     getFile = get_file
     banChatMember = ban_chat_member
@@ -4421,6 +4553,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     deleteChatPhoto = delete_chat_photo
     setChatTitle = set_chat_title
     setChatDescription = set_chat_description
+    setUserEmojiStatus = set_user_emoji_status
     pinChatMessage = pin_chat_message
     unpinChatMessage = unpin_chat_message
     unpinAllChatMessages = unpin_all_chat_messages
@@ -4478,6 +4611,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     replaceStickerInSet = replace_sticker_in_set
     refundStarPayment = refund_star_payment
     getStarTransactions = get_star_transactions
+    editUserStarSubscription = edit_user_star_subscription
     createChatSubscriptionInviteLink = create_chat_subscription_invite_link
     editChatSubscriptionInviteLink = edit_chat_subscription_invite_link
     sendPaidMedia = send_paid_media
+    getAvailableGifts = get_available_gifts
+    sendGift = send_gift

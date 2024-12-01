@@ -18,8 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
 
-
-from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
+from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -45,6 +44,7 @@ class ParamTypeCheckingExceptions:
         "animation": Animation,
         "voice": Voice,
         "sticker": Sticker,
+        "gift_id": Gift,
     }
 
     # TODO: Look into merging this with COMPLEX_TYPES
