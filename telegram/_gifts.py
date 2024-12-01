@@ -36,7 +36,7 @@ class Gift(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.8
 
     Args:
         id (:obj:`str`): Unique identifier of the gift
@@ -99,7 +99,7 @@ class Gifts(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`gifts` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.8
 
     Args:
         gifts (Sequence[:class:`Gift`]): The sequence of gifts

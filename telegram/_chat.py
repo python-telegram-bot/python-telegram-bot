@@ -3459,7 +3459,7 @@ class _ChatBase(TelegramObject):
         Caution:
             Can only work, if the chat is a private chat, see :attr:`type`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

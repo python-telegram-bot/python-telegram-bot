@@ -332,7 +332,7 @@ class TransactionPartnerUser(TransactionPartner):
         subscription_period (:class:`datetime.timedelta`, optional): The duration of the paid
             subscription
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
         paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
             media bought by the user.
 
@@ -342,7 +342,7 @@ class TransactionPartnerUser(TransactionPartner):
             .. versionadded:: 21.6
         gift (:class:`telegram.Gift`, optional): The gift sent to the user by the bot
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
@@ -352,7 +352,7 @@ class TransactionPartnerUser(TransactionPartner):
         subscription_period (:class:`datetime.timedelta`): Optional. The duration of the paid
             subscription
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
         paid_media (tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
             media bought by the user.
 
@@ -362,7 +362,7 @@ class TransactionPartnerUser(TransactionPartner):
             .. versionadded:: 21.6
         gift (:class:`telegram.Gift`): Optional. The gift sent to the user by the bot
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.8
 
     """
 

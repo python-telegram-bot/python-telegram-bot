@@ -1666,7 +1666,7 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_gift`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
