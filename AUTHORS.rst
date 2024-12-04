@@ -81,6 +81,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `LRezende <https://github.com/lrezende>`_
 - `Luca Bellanti <https://github.com/Trifase>`_
 - `Lucas Molinari <https://github.com/lucasmolinari>`_
+- `Luis Pérez <https://github.com/nemacysts>`_
 - `macrojames <https://github.com/macrojames>`_
 - `Matheus Lemos <https://github.com/mlemosf>`_
 - `Michael Dix <https://github.com/Eisberge>`_

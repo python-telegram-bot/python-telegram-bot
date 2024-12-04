@@ -29,7 +29,7 @@ repos:
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.2.4
+    rev: v3.3.2
     hooks:
     -   id: pylint
         files: ^(?!(tests|docs)).*\.py$
