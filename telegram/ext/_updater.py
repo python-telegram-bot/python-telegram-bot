@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Updater, which tries to make creating Telegram bots intuitive."""
+
 import asyncio
 import contextlib
 import ssl
-from collections.abc import Coroutine
+from collections.abc import Coroutine, Sequence
 from pathlib import Path
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union
@@ -210,7 +211,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        allowed_updates: Optional[list[str]] = None,
+        allowed_updates: Optional[Sequence[str]] = None,
         drop_pending_updates: Optional[bool] = None,
         error_callback: Optional[Callable[[TelegramError], None]] = None,
     ) -> "asyncio.Queue[object]":
@@ -265,8 +266,11 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                     Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
-            allowed_updates (list[:obj:`str`], optional): Passed to
+            allowed_updates (Sequence[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
+
+                .. versionchanged:: NEXT.VERSION
+                    Accepts any :class:`collections.abc.Sequence` as input instead of just a list
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
 
@@ -344,7 +348,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         pool_timeout: ODVInput[float],
         bootstrap_retries: int,
         drop_pending_updates: Optional[bool],
-        allowed_updates: Optional[list[str]],
+        allowed_updates: Optional[Sequence[str]],
         ready: asyncio.Event,
         error_callback: Optional[Callable[[TelegramError], None]],
     ) -> None:
@@ -457,7 +461,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         key: Optional[Union[str, Path]] = None,
         bootstrap_retries: int = 0,
         webhook_url: Optional[str] = None,
-        allowed_updates: Optional[list[str]] = None,
+        allowed_updates: Optional[Sequence[str]] = None,
         drop_pending_updates: Optional[bool] = None,
         ip_address: Optional[str] = None,
         max_connections: int = 40,
@@ -516,8 +520,11 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 Defaults to :obj:`None`.
 
                 .. versionadded :: 13.4
-            allowed_updates (list[:obj:`str`], optional): Passed to
+            allowed_updates (Sequence[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`. Defaults to :obj:`None`.
+
+                .. versionchanged:: NEXT.VERSION
+                    Accepts any :class:`collections.abc.Sequence` as input instead of just a list
             max_connections (:obj:`int`, optional): Passed to
                 :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
 
@@ -624,7 +631,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         port: int,
         url_path: str,
         bootstrap_retries: int,
-        allowed_updates: Optional[list[str]],
+        allowed_updates: Optional[Sequence[str]],
         cert: Optional[Union[str, Path]] = None,
         key: Optional[Union[str, Path]] = None,
         drop_pending_updates: Optional[bool] = None,
@@ -767,7 +774,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         self,
         max_retries: int,
         webhook_url: Optional[str],
-        allowed_updates: Optional[list[str]],
+        allowed_updates: Optional[Sequence[str]],
         drop_pending_updates: Optional[bool] = None,
         cert: Optional[bytes] = None,
         bootstrap_interval: float = 1,
