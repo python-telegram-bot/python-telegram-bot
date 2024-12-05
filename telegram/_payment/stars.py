@@ -487,6 +487,10 @@ class TransactionPartnerUser(TransactionPartner):
 
     Args:
         user (:class:`telegram.User`): Information about the user.
+        affiliate (:class:`telegram.AffiliateInfo`, optional): Information about the affiliate that
+            received a commission via this transaction
+
+            .. versionadded:: NEXT.VERSION
         invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
         subscription_period (:class:`datetime.timedelta`, optional): The duration of the paid
             subscription
@@ -507,6 +511,10 @@ class TransactionPartnerUser(TransactionPartner):
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
         user (:class:`telegram.User`): Information about the user.
+        affiliate (:class:`telegram.AffiliateInfo`): Optional. Information about the affiliate that
+            received a commission via this transaction
+
+            .. versionadded:: NEXT.VERSION
         invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
         subscription_period (:class:`datetime.timedelta`): Optional. The duration of the paid
             subscription
@@ -526,6 +534,7 @@ class TransactionPartnerUser(TransactionPartner):
     """
 
     __slots__ = (
+        "affiliate",
         "gift",
         "invoice_payload",
         "paid_media",
@@ -542,6 +551,7 @@ class TransactionPartnerUser(TransactionPartner):
         paid_media_payload: Optional[str] = None,
         subscription_period: Optional[dtm.timedelta] = None,
         gift: Optional[Gift] = None,
+        affiliate: Optional[AffiliateInfo] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -549,6 +559,7 @@ class TransactionPartnerUser(TransactionPartner):
 
         with self._unfrozen():
             self.user: User = user
+            self.affiliate: Optional[AffiliateInfo] = affiliate
             self.invoice_payload: Optional[str] = invoice_payload
             self.paid_media: Optional[tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
             self.paid_media_payload: Optional[str] = paid_media_payload
@@ -571,6 +582,7 @@ class TransactionPartnerUser(TransactionPartner):
             return None
 
         data["user"] = User.de_json(data.get("user"), bot)
+        data["affiliate"] = AffiliateInfo.de_json(data.get("affiliate"), bot)
         data["paid_media"] = PaidMedia.de_list(data.get("paid_media"), bot=bot)
         data["subscription_period"] = (
             dtm.timedelta(seconds=sp)
