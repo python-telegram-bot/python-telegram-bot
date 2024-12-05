@@ -2470,6 +2470,8 @@ class StarTransactions(FloatEnum):
     .. versionadded:: NEXT.VERSION
     """
 
+    __slots__ = ()
+
     NANOSTAR_VALUE = 1 / 1000000000
     """:obj:`float`: The value of one nanostar as used in
     :attr:`telegram.StarTransaction.nanostar_amount`.
