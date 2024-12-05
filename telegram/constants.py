@@ -95,6 +95,7 @@ __all__ = [
     "ReactionType",
     "ReplyLimit",
     "RevenueWithdrawalStateType",
+    "StarTransactions",
     "StarTransactionsLimit",
     "StickerFormat",
     "StickerLimit",
@@ -112,7 +113,7 @@ from enum import Enum
 from typing import Final, NamedTuple, Optional
 
 from telegram._utils.datetime import UTC
-from telegram._utils.enum import IntEnum, StringEnum
+from telegram._utils.enum import FloatEnum, IntEnum, StringEnum
 
 
 class _BotAPIVersion(NamedTuple):
@@ -2461,8 +2462,23 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
 
 
+class StarTransactions(FloatEnum):
+    """This enum contains constants for :class:`telegram.StarTransaction`.
+    The enum members of this enumeration are instances of :class:`float` and can be treated as
+    such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    NANOSTAR_VALUE = 1 / 1000000000
+    """:obj:`float`: The value of one nanostar as used in
+    :attr:`telegram.StarTransaction.nanostar_amount`.
+    """
+
+
 class StarTransactionsLimit(IntEnum):
-    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions`.
+    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions` and
+    :class:`telegram.StarTransaction`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 21.4
@@ -2478,6 +2494,12 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
+    NANOSTAR_MAX_AMOUNT = 999999999
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
+    parameter of :class:`telegram.StarTransaction`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class StickerFormat(StringEnum):
@@ -2924,6 +2946,12 @@ class InvoiceLimit(IntEnum):
     parameter of :meth:`telegram.Bot.create_invoice_link`.
 
     .. versionadded:: 21.8
+    """
+    SUBSCRIPTION_MAX_PRICE = 2500
+    """:obj:`int`: The maximum price of a subscription created wtih
+    :meth:`telegram.Bot.create_invoice_link`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
 

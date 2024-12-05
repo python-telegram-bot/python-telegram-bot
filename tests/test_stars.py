@@ -107,6 +107,7 @@ def star_transaction():
     return StarTransaction(
         id="1",
         amount=1,
+        nanostar_amount=365,
         date=to_timestamp(datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)),
         source=transaction_partner_user(),
         receiver=transaction_partner_fragment(),
@@ -256,6 +257,7 @@ def revenue_withdrawal_state(rws_scope_class_and_type):
 class StarTransactionTestBase:
     id = "2"
     amount = 2
+    nanostar_amount = 365
     date = to_timestamp(datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC))
     source = TransactionPartnerUser(
         user=User(
@@ -278,6 +280,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         json_dict = {
             "id": self.id,
             "amount": self.amount,
+            "nanostar_amount": self.nanostar_amount,
             "date": self.date,
             "source": self.source.to_dict(),
             "receiver": self.receiver.to_dict(),
@@ -287,6 +290,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         assert st.api_kwargs == {}
         assert st.id == self.id
         assert st.amount == self.amount
+        assert st.nanostar_amount == self.nanostar_amount
         assert st.date == from_timestamp(self.date)
         assert st.source == self.source
         assert st.receiver == self.receiver
@@ -311,6 +315,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         expected_dict = {
             "id": "1",
             "amount": 1,
+            "nanostar_amount": 365,
             "date": st.date,
             "source": st.source.to_dict(),
             "receiver": st.receiver.to_dict(),

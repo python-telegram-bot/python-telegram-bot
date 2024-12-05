@@ -499,7 +499,13 @@ class StarTransaction(TelegramObject):
             of the original transaction for refund transactions.
             Coincides with :attr:`SuccessfulPayment.telegram_payment_charge_id` for
             successful incoming payments from users.
-        amount (:obj:`int`): Number of Telegram Stars transferred by the transaction.
+        amount (:obj:`int`): Integer amount of Telegram Stars transferred by the transaction.
+        nanostar_amount (:obj:`int`, optional): The number of
+            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            Stars transferred by the transaction; from 0 to
+            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`
+
+            .. versionadded:: NEXT.VERSION
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
         source (:class:`telegram.TransactionPartner`, optional): Source of an incoming transaction
             (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
@@ -513,7 +519,13 @@ class StarTransaction(TelegramObject):
             of the original transaction for refund transactions.
             Coincides with :attr:`SuccessfulPayment.telegram_payment_charge_id` for
             successful incoming payments from users.
-        amount (:obj:`int`): Number of Telegram Stars transferred by the transaction.
+        amount (:obj:`int`): Integer amount of Telegram Stars transferred by the transaction.
+        nanostar_amount (:obj:`int`, optional): The number of
+            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            Stars transferred by the transaction; from 0 to
+            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`
+
+            .. versionadded:: NEXT.VERSION
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
         source (:class:`telegram.TransactionPartner`): Optional. Source of an incoming transaction
             (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
@@ -523,7 +535,7 @@ class StarTransaction(TelegramObject):
             outgoing transactions.
     """
 
-    __slots__ = ("amount", "date", "id", "receiver", "source")
+    __slots__ = ("amount", "date", "id", "nanostar_amount", "receiver", "source")
 
     def __init__(
         self,
@@ -532,6 +544,7 @@ class StarTransaction(TelegramObject):
         date: dtm.datetime,
         source: Optional[TransactionPartner] = None,
         receiver: Optional[TransactionPartner] = None,
+        nanostar_amount: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -541,6 +554,7 @@ class StarTransaction(TelegramObject):
         self.date: dtm.datetime = date
         self.source: Optional[TransactionPartner] = source
         self.receiver: Optional[TransactionPartner] = receiver
+        self.nanostar_amount: Optional[int] = nanostar_amount
 
         self._id_attrs = (
             self.id,
