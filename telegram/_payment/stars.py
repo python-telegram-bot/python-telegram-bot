@@ -401,8 +401,8 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
 
     def __init__(
         self,
-        sponsor_user: Optional["User"],
         commission_per_mille: int,
+        sponsor_user: Optional["User"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
