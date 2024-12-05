@@ -87,4 +87,4 @@ class FloatEnum(float, _enum.Enum):
         return f"<{self.__class__.__name__}.{self.name}>"
 
     def __str__(self) -> str:
-        return str.__str__(self)
+        return str(self.value)

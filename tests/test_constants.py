@@ -24,7 +24,7 @@ import re
 import pytest
 
 from telegram import Message, constants
-from telegram._utils.enum import IntEnum, StringEnum
+from telegram._utils.enum import FloatEnum, IntEnum, StringEnum
 from telegram.error import BadRequest
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
@@ -39,6 +39,11 @@ class StrEnumTest(StringEnum):
 class IntEnumTest(IntEnum):
     FOO = 1
     BAR = 2
+
+
+class FloatEnumTest(FloatEnum):
+    FOO = 1.1
+    BAR = 2.1
 
 
 class TestConstantsWithoutRequest:
@@ -69,6 +74,7 @@ class TestConstantsWithoutRequest:
     def test_to_json(self):
         assert json.dumps(StrEnumTest.FOO) == json.dumps("foo")
         assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
+        assert json.dumps(FloatEnumTest.FOO) == json.dumps(1.1)
 
     def test_string_representation(self):
         # test __repr__
@@ -89,6 +95,15 @@ class TestConstantsWithoutRequest:
         assert f"{IntEnumTest.FOO:*^10}" == "****1*****"
         # test __str__
         assert str(IntEnumTest.FOO) == "1"
+
+    def test_float_representation(self):
+        # test __repr__
+        assert repr(FloatEnumTest.FOO) == "<FloatEnumTest.FOO>"
+        # test __format__
+        assert f"{FloatEnumTest.FOO}/0 is undefined!" == "1.1/0 is undefined!"
+        assert f"{FloatEnumTest.FOO:*^10}" == "***1.1****"
+        # test __str__
+        assert str(FloatEnumTest.FOO) == "1.1"
 
     def test_string_inheritance(self):
         assert isinstance(StrEnumTest.FOO, str)
@@ -114,6 +129,18 @@ class TestConstantsWithoutRequest:
         assert object() != IntEnumTest.FOO
 
         assert hash(IntEnumTest.FOO) == hash(1)
+
+    def test_float_inheritance(self):
+        assert isinstance(FloatEnumTest.FOO, float)
+        assert FloatEnumTest.FOO + FloatEnumTest.BAR == 3.2
+
+        assert FloatEnumTest.FOO == FloatEnumTest.FOO
+        assert FloatEnumTest.FOO == 1.1
+        assert FloatEnumTest.FOO != FloatEnumTest.BAR
+        assert FloatEnumTest.FOO != 2.1
+        assert object() != FloatEnumTest.FOO
+
+        assert hash(FloatEnumTest.FOO) == hash(1.1)
 
     def test_bot_api_version_and_info(self):
         assert str(constants.BOT_API_VERSION_INFO) == constants.BOT_API_VERSION
