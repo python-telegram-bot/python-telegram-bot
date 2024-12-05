@@ -2494,9 +2494,17 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
+    NANOSTAR_MIN_AMOUNT = -999999999
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
+    parameter of :class:`telegram.AffiliateInfo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     NANOSTAR_MAX_AMOUNT = 999999999
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
-    parameter of :class:`telegram.StarTransaction`.
+    parameter of :class:`telegram.StarTransaction` and
+    :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
+    :class:`telegram.AffiliateInfo`.
 
     .. versionadded:: NEXT.VERSION
     """
