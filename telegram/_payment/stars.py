@@ -199,8 +199,10 @@ class TransactionPartner(TelegramObject):
     transactions. Currently, it can be one of:
 
     * :class:`TransactionPartnerUser`
+    * :class:`TransactionPartnerAffiliateProgram`
     * :class:`TransactionPartnerFragment`
     * :class:`TransactionPartnerTelegramAds`
+    * :class:`TransactionPartnerTelegramApi`
     * :class:`TransactionPartnerOther`
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -217,6 +219,11 @@ class TransactionPartner(TelegramObject):
 
     __slots__ = ("type",)
 
+    AFFILIATE_PROGRAM: Final[str] = constants.TransactionPartnerType.AFFILIATE_PROGRAM
+    """:const:`telegram.constants.TransactionPartnerType.AFFILIATE_PROGRAM`
+
+    .. versionadded:: NEXT.VERSION
+    """
     FRAGMENT: Final[str] = constants.TransactionPartnerType.FRAGMENT
     """:const:`telegram.constants.TransactionPartnerType.FRAGMENT`"""
     OTHER: Final[str] = constants.TransactionPartnerType.OTHER
@@ -259,6 +266,7 @@ class TransactionPartner(TelegramObject):
             return None
 
         _class_mapping: dict[str, type[TransactionPartner]] = {
+            cls.AFFILIATE_PROGRAM: TransactionPartnerAffiliateProgram,
             cls.FRAGMENT: TransactionPartnerFragment,
             cls.USER: TransactionPartnerUser,
             cls.TELEGRAM_ADS: TransactionPartnerTelegramAds,
@@ -270,6 +278,64 @@ class TransactionPartner(TelegramObject):
             return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
         return super().de_json(data=data, bot=bot)
+
+
+class TransactionPartnerAffiliateProgram(TransactionPartner):
+    """Describes the affiliate program that issued the affiliate commission received via this
+    transaction.
+
+    This object is comparable in terms of equality. Two objects of this class are considered equal,
+    if their :attr:`commission_per_mille` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        sponsor_user (:class:`telegram.User`, optional): Information about the bot that sponsored
+            the affiliate program
+        commission_per_mille (:obj:`int`): The number of Telegram Stars received by the bot for
+            each 1000 Telegram Stars received by the affiliate program sponsor from referred users.
+
+    Attributes:
+        type (:obj:`str`): The type of the transaction partner,
+            always :tg-const:`telegram.TransactionPartner.AFFILIATE_PROGRAM`.
+        sponsor_user (:class:`telegram.User`): Optional. Information about the bot that sponsored
+            the affiliate program
+        commission_per_mille (:obj:`int`): The number of Telegram Stars received by the bot for
+            each 1000 Telegram Stars received by the affiliate program sponsor from referred users.
+    """
+
+    __slots__ = ("commission_per_mille", "sponsor_user")
+
+    def __init__(
+        self,
+        sponsor_user: Optional["User"],
+        commission_per_mille: int,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
+        super().__init__(type=TransactionPartner.AFFILIATE_PROGRAM, api_kwargs=api_kwargs)
+
+        with self._unfrozen():
+            self.sponsor_user: Optional[User] = sponsor_user
+            self.commission_per_mille: int = commission_per_mille
+            self._id_attrs = (
+                self.type,
+                self.commission_per_mille,
+            )
+
+    @classmethod
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["TransactionPartnerAffiliateProgram"]:
+        """See :meth:`telegram.TransactionPartner.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["sponsor_user"] = User.de_json(data.get("sponsor_user"), bot)
+
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class TransactionPartnerFragment(TransactionPartner):

@@ -42,6 +42,7 @@ from telegram import (
     TransactionPartnerUser,
     User,
 )
+from telegram._payment.stars import TransactionPartnerAffiliateProgram
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
 from telegram.constants import RevenueWithdrawalStateType, TransactionPartnerType
 from tests.auxil.slots import mro_slots
@@ -97,6 +98,13 @@ def transaction_partner_user():
     )
 
 
+def transaction_partner_affiliate_program():
+    return TransactionPartnerAffiliateProgram(
+        sponsor_user=User(id=1, is_bot=True, first_name="first_name", username="username"),
+        commission_per_mille=42,
+    )
+
+
 def transaction_partner_fragment():
     return TransactionPartnerFragment(
         withdrawal_state=withdrawal_state_succeeded(),
@@ -127,6 +135,7 @@ def star_transactions():
 @pytest.fixture(
     scope="module",
     params=[
+        TransactionPartner.AFFILIATE_PROGRAM,
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.TELEGRAM_ADS,
@@ -141,6 +150,7 @@ def tp_scope_type(request):
 @pytest.fixture(
     scope="module",
     params=[
+        TransactionPartnerAffiliateProgram,
         TransactionPartnerFragment,
         TransactionPartnerOther,
         TransactionPartnerTelegramAds,
@@ -148,6 +158,7 @@ def tp_scope_type(request):
         TransactionPartnerUser,
     ],
     ids=[
+        TransactionPartner.AFFILIATE_PROGRAM,
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.TELEGRAM_ADS,
@@ -162,6 +173,7 @@ def tp_scope_class(request):
 @pytest.fixture(
     scope="module",
     params=[
+        (TransactionPartnerAffiliateProgram, TransactionPartner.AFFILIATE_PROGRAM),
         (TransactionPartnerFragment, TransactionPartner.FRAGMENT),
         (TransactionPartnerOther, TransactionPartner.OTHER),
         (TransactionPartnerTelegramAds, TransactionPartner.TELEGRAM_ADS),
@@ -169,6 +181,7 @@ def tp_scope_class(request):
         (TransactionPartnerUser, TransactionPartner.USER),
     ],
     ids=[
+        TransactionPartner.AFFILIATE_PROGRAM,
         TransactionPartner.FRAGMENT,
         TransactionPartner.OTHER,
         TransactionPartner.TELEGRAM_ADS,
@@ -190,6 +203,8 @@ def transaction_partner(tp_scope_class_and_type):
             "withdrawal_state": TransactionPartnerTestBase.withdrawal_state.to_dict(),
             "user": TransactionPartnerTestBase.user.to_dict(),
             "request_count": TransactionPartnerTestBase.request_count,
+            "sponsor_user": TransactionPartnerTestBase.sponsor_user.to_dict(),
+            "commission_per_mille": TransactionPartnerTestBase.commission_per_mille,
         },
         bot=None,
     )
@@ -408,6 +423,8 @@ class TransactionPartnerTestBase:
     user = transaction_partner_user().user
     invoice_payload = "payload"
     request_count = 42
+    sponsor_user = transaction_partner_affiliate_program().sponsor_user
+    commission_per_mille = transaction_partner_affiliate_program().commission_per_mille
 
 
 class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
@@ -427,6 +444,8 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
             "request_count": self.request_count,
+            "sponsor_user": self.sponsor_user.to_dict(),
+            "commission_per_mille": self.commission_per_mille,
         }
         tp = TransactionPartner.de_json(json_dict, offline_bot)
         assert set(tp.api_kwargs.keys()) == {
@@ -434,6 +453,8 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "withdrawal_state",
             "invoice_payload",
             "request_count",
+            "sponsor_user",
+            "commission_per_mille",
         } - set(cls.__slots__)
 
         assert isinstance(tp, TransactionPartner)
@@ -478,6 +499,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "withdrawal_state": self.withdrawal_state.to_dict(),
             "user": self.user.to_dict(),
             "request_count": self.request_count,
+            "commission_per_mille": self.commission_per_mille,
         }
         assert type(tp_scope_class.de_json(json_dict, offline_bot)) is tp_scope_class
 

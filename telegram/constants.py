@@ -2644,6 +2644,11 @@ class TransactionPartnerType(StringEnum):
 
     __slots__ = ()
 
+    AFFILIATE_PROGRAM = "affiliate_program"
+    """:obj:`str`: Transaction with Affiliate Program.
+
+    .. versionadded:: NEXT.VERSION
+    """
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""
     OTHER = "other"
