@@ -2497,7 +2497,7 @@ class StarTransactionsLimit(IntEnum):
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
     NANOSTAR_MIN_AMOUNT = -999999999
-    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
     parameter of :class:`telegram.AffiliateInfo`.
 
     .. versionadded:: NEXT.VERSION
