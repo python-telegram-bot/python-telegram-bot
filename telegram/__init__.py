@@ -20,6 +20,7 @@
 
 __author__ = "devs@python-telegram-bot.org"
 __all__ = (
+    "AffiliateInfo",
     "Animation",
     "Audio",
     "BackgroundFill",
@@ -236,6 +237,7 @@ __all__ = (
     "TelegramObject",
     "TextQuote",
     "TransactionPartner",
+    "TransactionPartnerAffiliateProgram",
     "TransactionPartnerFragment",
     "TransactionPartnerOther",
     "TransactionPartnerTelegramAds",
@@ -469,6 +471,7 @@ from ._payment.shippingaddress import ShippingAddress
 from ._payment.shippingoption import ShippingOption
 from ._payment.shippingquery import ShippingQuery
 from ._payment.stars import (
+    AffiliateInfo,
     RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
@@ -476,6 +479,7 @@ from ._payment.stars import (
     StarTransaction,
     StarTransactions,
     TransactionPartner,
+    TransactionPartnerAffiliateProgram,
     TransactionPartnerFragment,
     TransactionPartnerOther,
     TransactionPartnerTelegramAds,

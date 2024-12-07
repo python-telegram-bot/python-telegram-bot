@@ -95,6 +95,7 @@ __all__ = [
     "ReactionType",
     "ReplyLimit",
     "RevenueWithdrawalStateType",
+    "StarTransactions",
     "StarTransactionsLimit",
     "StickerFormat",
     "StickerLimit",
@@ -112,7 +113,7 @@ from enum import Enum
 from typing import Final, NamedTuple, Optional
 
 from telegram._utils.datetime import UTC
-from telegram._utils.enum import IntEnum, StringEnum
+from telegram._utils.enum import FloatEnum, IntEnum, StringEnum
 
 
 class _BotAPIVersion(NamedTuple):
@@ -153,7 +154,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=0)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=1)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1835,7 +1836,6 @@ class MessageLimit(IntEnum):
     :paramref:`~telegram.Bot.edit_message_text.text` parameter of
     :meth:`telegram.Bot.edit_message_text`.
     """
-    # TODO this constant is not used. helpers.py contains 64 as a number
     DEEP_LINK_LENGTH = 64
     """:obj:`int`: Maximum number of characters for a deep link."""
     # TODO this constant is not used anywhere
@@ -2461,8 +2461,25 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
 
 
+class StarTransactions(FloatEnum):
+    """This enum contains constants for :class:`telegram.StarTransaction`.
+    The enum members of this enumeration are instances of :class:`float` and can be treated as
+    such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    NANOSTAR_VALUE = 1 / 1000000000
+    """:obj:`float`: The value of one nanostar as used in
+    :attr:`telegram.StarTransaction.nanostar_amount`.
+    """
+
+
 class StarTransactionsLimit(IntEnum):
-    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions`.
+    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions` and
+    :class:`telegram.StarTransaction`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 21.4
@@ -2478,6 +2495,20 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
+    NANOSTAR_MIN_AMOUNT = -999999999
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
+    parameter of :class:`telegram.AffiliateInfo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    NANOSTAR_MAX_AMOUNT = 999999999
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
+    parameter of :class:`telegram.StarTransaction` and
+    :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
+    :class:`telegram.AffiliateInfo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class StickerFormat(StringEnum):
@@ -2622,6 +2653,11 @@ class TransactionPartnerType(StringEnum):
 
     __slots__ = ()
 
+    AFFILIATE_PROGRAM = "affiliate_program"
+    """:obj:`str`: Transaction with Affiliate Program.
+
+    .. versionadded:: NEXT.VERSION
+    """
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""
     OTHER = "other"
@@ -2924,6 +2960,12 @@ class InvoiceLimit(IntEnum):
     parameter of :meth:`telegram.Bot.create_invoice_link`.
 
     .. versionadded:: 21.8
+    """
+    SUBSCRIPTION_MAX_PRICE = 2500
+    """:obj:`int`: The maximum price of a subscription created wtih
+    :meth:`telegram.Bot.create_invoice_link`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
 
