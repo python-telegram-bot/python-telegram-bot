@@ -202,7 +202,7 @@ class AffiliateInfo(TelegramObject):
     considered equal, if their :attr:`affiliate_user`, :attr:`affiliate_chat`,
     :attr:`commission_per_mille`, :attr:`amount`, and :attr:`nanostar_amount` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.9
 
     Args:
         affiliate_user (:class:`telegram.User`, optional): The bot or the user that received an
@@ -315,7 +315,7 @@ class TransactionPartner(TelegramObject):
     AFFILIATE_PROGRAM: Final[str] = constants.TransactionPartnerType.AFFILIATE_PROGRAM
     """:const:`telegram.constants.TransactionPartnerType.AFFILIATE_PROGRAM`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.9
     """
     FRAGMENT: Final[str] = constants.TransactionPartnerType.FRAGMENT
     """:const:`telegram.constants.TransactionPartnerType.FRAGMENT`"""
@@ -380,7 +380,7 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
     This object is comparable in terms of equality. Two objects of this class are considered equal,
     if their :attr:`commission_per_mille` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.9
 
     Args:
         sponsor_user (:class:`telegram.User`, optional): Information about the bot that sponsored
@@ -490,7 +490,7 @@ class TransactionPartnerUser(TransactionPartner):
         affiliate (:class:`telegram.AffiliateInfo`, optional): Information about the affiliate that
             received a commission via this transaction
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.9
         invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
         subscription_period (:class:`datetime.timedelta`, optional): The duration of the paid
             subscription
@@ -514,7 +514,7 @@ class TransactionPartnerUser(TransactionPartner):
         affiliate (:class:`telegram.AffiliateInfo`): Optional. Information about the affiliate that
             received a commission via this transaction
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.9
         invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
         subscription_period (:class:`datetime.timedelta`): Optional. The duration of the paid
             subscription
@@ -676,7 +676,7 @@ class StarTransaction(TelegramObject):
             Stars transferred by the transaction; from 0 to
             :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.9
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
         source (:class:`telegram.TransactionPartner`, optional): Source of an incoming transaction
             (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
@@ -696,7 +696,7 @@ class StarTransaction(TelegramObject):
             Stars transferred by the transaction; from 0 to
             :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.9
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
         source (:class:`telegram.TransactionPartner`): Optional. Source of an incoming transaction
             (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
