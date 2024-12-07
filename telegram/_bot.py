@@ -8175,7 +8175,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 ``“XTR”`` (Telegram Stars) if the parameter is used. Currently, it must always be
                 :tg-const:`telegram.constants.InvoiceLimit.SUBSCRIPTION_PERIOD` if specified. Any
                 number of subscriptions can be active for a given bot at the same time, including
-                multiple concurrent subscriptions from the same user.
+                multiple concurrent subscriptions from the same user. Subscription price must
+                not exceed
+                :tg-const:`telegram.constants.InvoiceLimit.SUBSCRIPTION_MAX_PRICE`
+                Telegram Stars.
 
                 .. versionadded:: 21.8
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the

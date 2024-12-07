@@ -24,6 +24,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
+from telegram._chat import Chat
 from telegram._gifts import Gift
 from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
@@ -194,13 +195,107 @@ class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
         self._freeze()
 
 
+class AffiliateInfo(TelegramObject):
+    """Contains information about the affiliate that received a commission via this transaction.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`affiliate_user`, :attr:`affiliate_chat`,
+    :attr:`commission_per_mille`, :attr:`amount`, and :attr:`nanostar_amount` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        affiliate_user (:class:`telegram.User`, optional): The bot or the user that received an
+            affiliate commission if it was received by a bot or a user
+        affiliate_chat (:class:`telegram.Chat`, optional): The chat that received an affiliate
+            commission if it was received by a chat
+        commission_per_mille (:obj:`int`): The number of Telegram Stars received by the affiliate
+            for each 1000 Telegram Stars received by the bot from referred users
+        amount (:obj:`int`): Integer amount of Telegram Stars received by the affiliate from the
+            transaction, rounded to 0; can be negative for refunds
+        nanostar_amount (:obj:`int`, optional): The number of
+            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            Stars received by the affiliate; from
+            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MIN_AMOUNT` to
+            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`;
+            can be negative for refunds
+
+    Attributes:
+        affiliate_user (:class:`telegram.User`): Optional. The bot or the user that received an
+            affiliate commission if it was received by a bot or a user
+        affiliate_chat (:class:`telegram.Chat`): Optional. The chat that received an affiliate
+            commission if it was received by a chat
+        commission_per_mille (:obj:`int`): The number of Telegram Stars received by the affiliate
+            for each 1000 Telegram Stars received by the bot from referred users
+        amount (:obj:`int`): Integer amount of Telegram Stars received by the affiliate from the
+            transaction, rounded to 0; can be negative for refunds
+        nanostar_amount (:obj:`int`): Optional. The number of
+            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            Stars received by the affiliate; from
+            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MIN_AMOUNT` to
+            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`;
+            can be negative for refunds
+    """
+
+    __slots__ = (
+        "affiliate_chat",
+        "affiliate_user",
+        "amount",
+        "commission_per_mille",
+        "nanostar_amount",
+    )
+
+    def __init__(
+        self,
+        commission_per_mille: int,
+        amount: int,
+        affiliate_user: Optional["User"] = None,
+        affiliate_chat: Optional["Chat"] = None,
+        nanostar_amount: Optional[int] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
+        self.affiliate_user: Optional[User] = affiliate_user
+        self.affiliate_chat: Optional[Chat] = affiliate_chat
+        self.commission_per_mille: int = commission_per_mille
+        self.amount: int = amount
+        self.nanostar_amount: Optional[int] = nanostar_amount
+
+        self._id_attrs = (
+            self.affiliate_user,
+            self.affiliate_chat,
+            self.commission_per_mille,
+            self.amount,
+            self.nanostar_amount,
+        )
+        self._freeze()
+
+    @classmethod
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["AffiliateInfo"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["affiliate_user"] = User.de_json(data.get("affiliate_user"), bot)
+        data["affiliate_chat"] = Chat.de_json(data.get("affiliate_chat"), bot)
+
+        return super().de_json(data=data, bot=bot)
+
+
 class TransactionPartner(TelegramObject):
     """This object describes the source of a transaction, or its recipient for outgoing
     transactions. Currently, it can be one of:
 
     * :class:`TransactionPartnerUser`
+    * :class:`TransactionPartnerAffiliateProgram`
     * :class:`TransactionPartnerFragment`
     * :class:`TransactionPartnerTelegramAds`
+    * :class:`TransactionPartnerTelegramApi`
     * :class:`TransactionPartnerOther`
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -217,6 +312,11 @@ class TransactionPartner(TelegramObject):
 
     __slots__ = ("type",)
 
+    AFFILIATE_PROGRAM: Final[str] = constants.TransactionPartnerType.AFFILIATE_PROGRAM
+    """:const:`telegram.constants.TransactionPartnerType.AFFILIATE_PROGRAM`
+
+    .. versionadded:: NEXT.VERSION
+    """
     FRAGMENT: Final[str] = constants.TransactionPartnerType.FRAGMENT
     """:const:`telegram.constants.TransactionPartnerType.FRAGMENT`"""
     OTHER: Final[str] = constants.TransactionPartnerType.OTHER
@@ -259,6 +359,7 @@ class TransactionPartner(TelegramObject):
             return None
 
         _class_mapping: dict[str, type[TransactionPartner]] = {
+            cls.AFFILIATE_PROGRAM: TransactionPartnerAffiliateProgram,
             cls.FRAGMENT: TransactionPartnerFragment,
             cls.USER: TransactionPartnerUser,
             cls.TELEGRAM_ADS: TransactionPartnerTelegramAds,
@@ -270,6 +371,64 @@ class TransactionPartner(TelegramObject):
             return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
         return super().de_json(data=data, bot=bot)
+
+
+class TransactionPartnerAffiliateProgram(TransactionPartner):
+    """Describes the affiliate program that issued the affiliate commission received via this
+    transaction.
+
+    This object is comparable in terms of equality. Two objects of this class are considered equal,
+    if their :attr:`commission_per_mille` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        sponsor_user (:class:`telegram.User`, optional): Information about the bot that sponsored
+            the affiliate program
+        commission_per_mille (:obj:`int`): The number of Telegram Stars received by the bot for
+            each 1000 Telegram Stars received by the affiliate program sponsor from referred users.
+
+    Attributes:
+        type (:obj:`str`): The type of the transaction partner,
+            always :tg-const:`telegram.TransactionPartner.AFFILIATE_PROGRAM`.
+        sponsor_user (:class:`telegram.User`): Optional. Information about the bot that sponsored
+            the affiliate program
+        commission_per_mille (:obj:`int`): The number of Telegram Stars received by the bot for
+            each 1000 Telegram Stars received by the affiliate program sponsor from referred users.
+    """
+
+    __slots__ = ("commission_per_mille", "sponsor_user")
+
+    def __init__(
+        self,
+        commission_per_mille: int,
+        sponsor_user: Optional["User"] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
+        super().__init__(type=TransactionPartner.AFFILIATE_PROGRAM, api_kwargs=api_kwargs)
+
+        with self._unfrozen():
+            self.sponsor_user: Optional[User] = sponsor_user
+            self.commission_per_mille: int = commission_per_mille
+            self._id_attrs = (
+                self.type,
+                self.commission_per_mille,
+            )
+
+    @classmethod
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["TransactionPartnerAffiliateProgram"]:
+        """See :meth:`telegram.TransactionPartner.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["sponsor_user"] = User.de_json(data.get("sponsor_user"), bot)
+
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class TransactionPartnerFragment(TransactionPartner):
@@ -328,6 +487,10 @@ class TransactionPartnerUser(TransactionPartner):
 
     Args:
         user (:class:`telegram.User`): Information about the user.
+        affiliate (:class:`telegram.AffiliateInfo`, optional): Information about the affiliate that
+            received a commission via this transaction
+
+            .. versionadded:: NEXT.VERSION
         invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
         subscription_period (:class:`datetime.timedelta`, optional): The duration of the paid
             subscription
@@ -348,6 +511,10 @@ class TransactionPartnerUser(TransactionPartner):
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
         user (:class:`telegram.User`): Information about the user.
+        affiliate (:class:`telegram.AffiliateInfo`): Optional. Information about the affiliate that
+            received a commission via this transaction
+
+            .. versionadded:: NEXT.VERSION
         invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
         subscription_period (:class:`datetime.timedelta`): Optional. The duration of the paid
             subscription
@@ -367,6 +534,7 @@ class TransactionPartnerUser(TransactionPartner):
     """
 
     __slots__ = (
+        "affiliate",
         "gift",
         "invoice_payload",
         "paid_media",
@@ -383,6 +551,7 @@ class TransactionPartnerUser(TransactionPartner):
         paid_media_payload: Optional[str] = None,
         subscription_period: Optional[dtm.timedelta] = None,
         gift: Optional[Gift] = None,
+        affiliate: Optional[AffiliateInfo] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -390,6 +559,7 @@ class TransactionPartnerUser(TransactionPartner):
 
         with self._unfrozen():
             self.user: User = user
+            self.affiliate: Optional[AffiliateInfo] = affiliate
             self.invoice_payload: Optional[str] = invoice_payload
             self.paid_media: Optional[tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
             self.paid_media_payload: Optional[str] = paid_media_payload
@@ -412,6 +582,7 @@ class TransactionPartnerUser(TransactionPartner):
             return None
 
         data["user"] = User.de_json(data.get("user"), bot)
+        data["affiliate"] = AffiliateInfo.de_json(data.get("affiliate"), bot)
         data["paid_media"] = PaidMedia.de_list(data.get("paid_media"), bot=bot)
         data["subscription_period"] = (
             dtm.timedelta(seconds=sp)
@@ -499,7 +670,13 @@ class StarTransaction(TelegramObject):
             of the original transaction for refund transactions.
             Coincides with :attr:`SuccessfulPayment.telegram_payment_charge_id` for
             successful incoming payments from users.
-        amount (:obj:`int`): Number of Telegram Stars transferred by the transaction.
+        amount (:obj:`int`): Integer amount of Telegram Stars transferred by the transaction.
+        nanostar_amount (:obj:`int`, optional): The number of
+            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            Stars transferred by the transaction; from 0 to
+            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`
+
+            .. versionadded:: NEXT.VERSION
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
         source (:class:`telegram.TransactionPartner`, optional): Source of an incoming transaction
             (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
@@ -513,7 +690,13 @@ class StarTransaction(TelegramObject):
             of the original transaction for refund transactions.
             Coincides with :attr:`SuccessfulPayment.telegram_payment_charge_id` for
             successful incoming payments from users.
-        amount (:obj:`int`): Number of Telegram Stars transferred by the transaction.
+        amount (:obj:`int`): Integer amount of Telegram Stars transferred by the transaction.
+        nanostar_amount (:obj:`int`): Optional. The number of
+            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            Stars transferred by the transaction; from 0 to
+            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`
+
+            .. versionadded:: NEXT.VERSION
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
         source (:class:`telegram.TransactionPartner`): Optional. Source of an incoming transaction
             (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
@@ -523,7 +706,7 @@ class StarTransaction(TelegramObject):
             outgoing transactions.
     """
 
-    __slots__ = ("amount", "date", "id", "receiver", "source")
+    __slots__ = ("amount", "date", "id", "nanostar_amount", "receiver", "source")
 
     def __init__(
         self,
@@ -532,6 +715,7 @@ class StarTransaction(TelegramObject):
         date: dtm.datetime,
         source: Optional[TransactionPartner] = None,
         receiver: Optional[TransactionPartner] = None,
+        nanostar_amount: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -541,6 +725,7 @@ class StarTransaction(TelegramObject):
         self.date: dtm.datetime = date
         self.source: Optional[TransactionPartner] = source
         self.receiver: Optional[TransactionPartner] = receiver
+        self.nanostar_amount: Optional[int] = nanostar_amount
 
         self._id_attrs = (
             self.id,
