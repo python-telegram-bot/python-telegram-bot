@@ -86,7 +86,7 @@ passport = [
     "cffi >= 1.17.0rc1; python_version > '3.12'"
 ]
 rate-limiter = [
-    "aiolimiter~=1.1.0",
+    "aiolimiter>=1.1,<1.3",
 ]
 socks = [
     "httpx[socks]",
