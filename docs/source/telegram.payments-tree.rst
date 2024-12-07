@@ -9,6 +9,7 @@ Your bot can accept payments from Telegram users. Please see the `introduction t
 .. toctree::
     :titlesonly:
 
+    telegram.affiliateinfo
     telegram.invoice
     telegram.labeledprice
     telegram.orderinfo
@@ -25,6 +26,7 @@ Your bot can accept payments from Telegram users. Please see the `introduction t
     telegram.startransactions
     telegram.successfulpayment
     telegram.transactionpartner
+    telegram.transactionpartneraffiliateprogram
     telegram.transactionpartnerfragment
     telegram.transactionpartnerother
     telegram.transactionpartnertelegramads

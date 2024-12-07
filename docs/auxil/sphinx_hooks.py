@@ -187,6 +187,11 @@ def autodoc_process_bases(app, name, obj, option, bases: list) -> None:
             bases[idx] = ":class:`enum.IntEnum`"
             continue
 
+        if "FloatEnum" in base:
+            bases[idx] = ":class:`enum.Enum`"
+            bases.insert(0, ":class:`float`")
+            continue
+
         # Drop generics (at least for now)
         if base.endswith("]"):
             base = base.split("[", maxsplit=1)[0]

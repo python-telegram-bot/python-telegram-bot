@@ -74,3 +74,17 @@ class IntEnum(_enum.IntEnum):  # pylint: disable=invalid-slots
 
         def __str__(self) -> str:
             return str(self.value)
+
+
+class FloatEnum(float, _enum.Enum):
+    """Helper class for float enums where ``str(member)`` prints the value, but ``repr(member)``
+    gives ``EnumName.MEMBER_NAME``.
+    """
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}.{self.name}>"
+
+    def __str__(self) -> str:
+        return str(self.value)
