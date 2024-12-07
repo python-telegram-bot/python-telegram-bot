@@ -1836,7 +1836,6 @@ class MessageLimit(IntEnum):
     :paramref:`~telegram.Bot.edit_message_text.text` parameter of
     :meth:`telegram.Bot.edit_message_text`.
     """
-    # TODO this constant is not used. helpers.py contains 64 as a number
     DEEP_LINK_LENGTH = 64
     """:obj:`int`: Maximum number of characters for a deep link."""
     # TODO this constant is not used anywhere
