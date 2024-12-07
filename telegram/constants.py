@@ -2466,7 +2466,7 @@ class StarTransactions(FloatEnum):
     The enum members of this enumeration are instances of :class:`float` and can be treated as
     such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.9
     """
 
     __slots__ = ()
@@ -2499,7 +2499,7 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
     parameter of :class:`telegram.AffiliateInfo`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.9
     """
     NANOSTAR_MAX_AMOUNT = 999999999
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
@@ -2507,7 +2507,7 @@ class StarTransactionsLimit(IntEnum):
     :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
     :class:`telegram.AffiliateInfo`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.9
     """
 
 
@@ -2656,7 +2656,7 @@ class TransactionPartnerType(StringEnum):
     AFFILIATE_PROGRAM = "affiliate_program"
     """:obj:`str`: Transaction with Affiliate Program.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.9
     """
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""
@@ -2965,7 +2965,7 @@ class InvoiceLimit(IntEnum):
     """:obj:`int`: The maximum price of a subscription created wtih
     :meth:`telegram.Bot.create_invoice_link`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.9
     """
 
 
