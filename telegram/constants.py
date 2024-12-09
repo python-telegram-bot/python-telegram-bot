@@ -107,7 +107,7 @@ __all__ = [
     "WebhookLimit",
 ]
 
-import datetime
+import datetime as dtm
 import sys
 from enum import Enum
 from typing import Final, NamedTuple, Optional
@@ -172,7 +172,7 @@ SUPPORTED_WEBHOOK_PORTS: Final[list[int]] = [443, 80, 88, 8443]
 #: This date literal is used in :class:`telegram.InaccessibleMessage`
 #:
 #: .. versionadded:: 20.8
-ZERO_DATE: Final[datetime.datetime] = datetime.datetime(1970, 1, 1, tzinfo=UTC)
+ZERO_DATE: Final[dtm.datetime] = dtm.datetime(1970, 1, 1, tzinfo=UTC)
 
 
 class AccentColor(Enum):
@@ -2954,7 +2954,7 @@ class InvoiceLimit(IntEnum):
 
     .. versionadded:: 21.6
     """
-    SUBSCRIPTION_PERIOD = datetime.timedelta(days=30).total_seconds()
+    SUBSCRIPTION_PERIOD = dtm.timedelta(days=30).total_seconds()
     """:obj:`int`: The period of time for which the subscription is active before
     the next payment, passed as :paramref:`~telegram.Bot.create_invoice_link.subscription_period`
     parameter of :meth:`telegram.Bot.create_invoice_link`.

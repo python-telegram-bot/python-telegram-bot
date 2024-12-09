@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes JobQueue and Job."""
 import asyncio
-import datetime
+import datetime as dtm
 import weakref
 from typing import TYPE_CHECKING, Any, Generic, Optional, Union, cast, overload
 
@@ -168,8 +168,8 @@ class JobQueue(Generic[CCT]):
             "executors": {"default": self._executor},
         }
 
-    def _tz_now(self) -> datetime.datetime:
-        return datetime.datetime.now(self.scheduler.timezone)
+    def _tz_now(self) -> dtm.datetime:
+        return dtm.datetime.now(self.scheduler.timezone)
 
     @overload
     def _parse_time_input(self, time: None, shift_day: bool = False) -> None: ...
@@ -177,29 +177,29 @@ class JobQueue(Generic[CCT]):
     @overload
     def _parse_time_input(
         self,
-        time: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
+        time: Union[float, dtm.timedelta, dtm.datetime, dtm.time],
         shift_day: bool = False,
-    ) -> datetime.datetime: ...
+    ) -> dtm.datetime: ...
 
     def _parse_time_input(
         self,
-        time: Union[float, datetime.timedelta, datetime.datetime, datetime.time, None],
+        time: Union[float, dtm.timedelta, dtm.datetime, dtm.time, None],
         shift_day: bool = False,
-    ) -> Optional[datetime.datetime]:
+    ) -> Optional[dtm.datetime]:
         if time is None:
             return None
         if isinstance(time, (int, float)):
-            return self._tz_now() + datetime.timedelta(seconds=time)
-        if isinstance(time, datetime.timedelta):
+            return self._tz_now() + dtm.timedelta(seconds=time)
+        if isinstance(time, dtm.timedelta):
             return self._tz_now() + time
-        if isinstance(time, datetime.time):
-            date_time = datetime.datetime.combine(
-                datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time
+        if isinstance(time, dtm.time):
+            date_time = dtm.datetime.combine(
+                dtm.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time
             )
             if date_time.tzinfo is None:
                 date_time = self.scheduler.timezone.localize(date_time)
-            if shift_day and date_time <= datetime.datetime.now(pytz.utc):
-                date_time += datetime.timedelta(days=1)
+            if shift_day and date_time <= dtm.datetime.now(pytz.utc):
+                date_time += dtm.timedelta(days=1)
             return date_time
         return time
 
@@ -242,7 +242,7 @@ class JobQueue(Generic[CCT]):
     def run_once(
         self,
         callback: JobCallback[CCT],
-        when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
+        when: Union[float, dtm.timedelta, dtm.datetime, dtm.time],
         data: Optional[object] = None,
         name: Optional[str] = None,
         chat_id: Optional[int] = None,
@@ -326,9 +326,9 @@ class JobQueue(Generic[CCT]):
     def run_repeating(
         self,
         callback: JobCallback[CCT],
-        interval: Union[float, datetime.timedelta],
-        first: Optional[Union[float, datetime.timedelta, datetime.datetime, datetime.time]] = None,
-        last: Optional[Union[float, datetime.timedelta, datetime.datetime, datetime.time]] = None,
+        interval: Union[float, dtm.timedelta],
+        first: Optional[Union[float, dtm.timedelta, dtm.datetime, dtm.time]] = None,
+        last: Optional[Union[float, dtm.timedelta, dtm.datetime, dtm.time]] = None,
         data: Optional[object] = None,
         name: Optional[str] = None,
         chat_id: Optional[int] = None,
@@ -433,7 +433,7 @@ class JobQueue(Generic[CCT]):
         if dt_last and dt_first and dt_last < dt_first:
             raise ValueError("'last' must not be before 'first'!")
 
-        if isinstance(interval, datetime.timedelta):
+        if isinstance(interval, dtm.timedelta):
             interval = interval.total_seconds()
 
         j = self.scheduler.add_job(
@@ -453,7 +453,7 @@ class JobQueue(Generic[CCT]):
     def run_monthly(
         self,
         callback: JobCallback[CCT],
-        when: datetime.time,
+        when: dtm.time,
         day: int,
         data: Optional[object] = None,
         name: Optional[str] = None,
@@ -531,7 +531,7 @@ class JobQueue(Generic[CCT]):
     def run_daily(
         self,
         callback: JobCallback[CCT],
-        time: datetime.time,
+        time: dtm.time,
         days: tuple[int, ...] = _ALL_DAYS,
         data: Optional[object] = None,
         name: Optional[str] = None,
@@ -904,7 +904,7 @@ class Job(Generic[CCT]):
         self._enabled = status
 
     @property
-    def next_t(self) -> Optional[datetime.datetime]:
+    def next_t(self) -> Optional[dtm.datetime]:
         """
         :class:`datetime.datetime`: Datetime for the next job execution.
         Datetime is localized according to :attr:`datetime.datetime.tzinfo`.
