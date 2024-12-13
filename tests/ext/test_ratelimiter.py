@@ -22,10 +22,10 @@ We mostly test on directly on AIORateLimiter here, b/c BaseRateLimiter doesn't c
 notable
 """
 import asyncio
+import datetime as dtm
 import json
 import platform
 import time
-from datetime import datetime
 from http import HTTPStatus
 
 import pytest
@@ -181,7 +181,7 @@ class TestAIORateLimiter:
                         {
                             "ok": True,
                             "result": Message(
-                                message_id=1, date=datetime.now(), chat=Chat(1, "chat")
+                                message_id=1, date=dtm.datetime.now(), chat=Chat(1, "chat")
                             ).to_dict(),
                         }
                     ).encode(),
