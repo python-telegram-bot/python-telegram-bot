@@ -57,7 +57,7 @@ from tests.auxil.slots import mro_slots
 
 message = Message(
     1,
-    dtm.utcnow(),
+    dtm.datetime.utcnow(),
     Chat(1, ""),
     from_user=User(1, "", False),
     text="Text",
@@ -65,7 +65,7 @@ message = Message(
 )
 channel_post = Message(
     1,
-    dtm.utcnow(),
+    dtm.datetime.utcnow(),
     Chat(1, ""),
     text="Text",
     sender_chat=Chat(1, ""),
@@ -139,7 +139,7 @@ deleted_business_messages = BusinessMessagesDeleted(
 
 business_message = Message(
     1,
-    dtm.utcnow(),
+    dtm.datetime.utcnow(),
     Chat(1, ""),
     User(1, "", False),
 )
