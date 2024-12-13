@@ -117,7 +117,7 @@ jobs:
         # we don't define it through this workflow.
         run: >-
           gh release create
-          '${{ env.TAG }}'
+          '${TAG}'
           --repo '${{ github.repository }}'
           --generate-notes
           --draft
@@ -130,5 +130,5 @@ jobs:
         # sigstore-produced signatures and certificates.
         run: >-
           gh release upload
-          '${{ env.TAG }}' dist/**
+          '${TAG}' dist/**
           --repo '${{ github.repository }}'
