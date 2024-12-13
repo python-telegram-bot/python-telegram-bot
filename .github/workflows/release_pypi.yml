@@ -115,7 +115,7 @@ jobs:
         # we don't define it through this workflow.
         run: >-
           gh release create
-          '${TAG}'
+          "$TAG"
           --repo '${{ github.repository }}'
           --generate-notes
       - name: Upload artifact signatures to GitHub Release
@@ -127,5 +127,5 @@ jobs:
         # sigstore-produced signatures and certificates.
         run: >-
           gh release upload
-          '${TAG}' dist/**
+          "$TAG" dist/**
           --repo '${{ github.repository }}'
