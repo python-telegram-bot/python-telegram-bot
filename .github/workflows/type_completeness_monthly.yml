@@ -9,14 +9,14 @@ jobs:
     name:   test-type-completeness
     runs-on: ubuntu-latest
     steps:
-      - uses: Bibo-Joshi/pyright-type-completeness@1.0.1
+      - uses: Bibo-Joshi/pyright-type-completeness@c85a67ff3c66f51dcbb2d06bfcf4fe83a57d69cc # v1.0.1
         id: pyright-type-completeness
         with:
           package-name: telegram
           python-version: 3.12
           pyright-version: ~=1.1.367
       - name: Check Output
-        uses: jannekem/run-python-script-action@v1
+        uses: jannekem/run-python-script-action@bbfca66c612a28f3eeca0ae40e1f810265e2ea68 # v1.7
         env:
           TYPE_COMPLETENESS: ${{ steps.pyright-type-completeness.outputs.base-completeness-score }}
         with:
