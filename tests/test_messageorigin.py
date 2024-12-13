@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import inspect
 from copy import deepcopy
 
@@ -39,7 +39,7 @@ ignored = ["self", "api_kwargs"]
 
 
 class MODefaults:
-    date: datetime.datetime = to_timestamp(datetime.datetime.utcnow())
+    date: dtm.datetime = to_timestamp(dtm.datetime.utcnow())
     chat = Chat(1, Chat.CHANNEL)
     message_id = 123
     author_signautre = "PTB"
@@ -106,7 +106,7 @@ def iter_args(
         if param.name in ignored:
             continue
         inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
-        if isinstance(json_at, datetime.datetime):  # Convert datetime to int
+        if isinstance(json_at, dtm.datetime):  # Convert datetime to int
             json_at = to_timestamp(json_at)
         if (
             param.default is not inspect.Parameter.empty and include_optional

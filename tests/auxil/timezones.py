@@ -16,10 +16,10 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 
 
-class BasicTimezone(datetime.tzinfo):
+class BasicTimezone(dtm.tzinfo):
     def __init__(self, offset, name):
         self.offset = offset
         self.name = name
@@ -28,4 +28,4 @@ class BasicTimezone(datetime.tzinfo):
         return self.offset
 
     def dst(self, dt):
-        return datetime.timedelta(0)
+        return dtm.timedelta(0)
