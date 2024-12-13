@@ -89,12 +89,12 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
         assert webhook_info.url == self.url
         assert webhook_info.has_custom_certificate == self.has_custom_certificate
         assert webhook_info.pending_update_count == self.pending_update_count
-        assert isinstance(webhook_info.last_error_date, dtm)
+        assert isinstance(webhook_info.last_error_date, dtm.datetime)
         assert webhook_info.last_error_date == from_timestamp(self.last_error_date)
         assert webhook_info.max_connections == self.max_connections
         assert webhook_info.allowed_updates == tuple(self.allowed_updates)
         assert webhook_info.ip_address == self.ip_address
-        assert isinstance(webhook_info.last_synchronization_error_date, dtm)
+        assert isinstance(webhook_info.last_synchronization_error_date, dtm.datetime)
         assert webhook_info.last_synchronization_error_date == from_timestamp(
             self.last_synchronization_error_date
         )
