@@ -153,7 +153,7 @@ class TestFilters:
                 not key.startswith("_")
                 # exclude imported stuff
                 and getattr(member, "__module__", "unknown module") == "telegram.ext.filters"
-                and key != "sys"
+                and key not in ("sys", "dtm")
             )
         }
         actual = set(filters.__all__)
