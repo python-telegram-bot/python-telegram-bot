@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-import datetime
+import datetime as dtm
 import inspect
 from copy import deepcopy
 
@@ -48,7 +48,7 @@ class ChatBoostDefaults:
     is_unclaimed = False
     chat = Chat(1, "group")
     user = User(1, "user", False)
-    date = to_timestamp(datetime.datetime.utcnow())
+    date = to_timestamp(dtm.datetime.utcnow())
     default_source = ChatBoostSourcePremium(user)
     prize_star_count = 99
 
@@ -148,7 +148,7 @@ def iter_args(
         if param.name in ignored:
             continue
         inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
-        if isinstance(json_at, datetime.datetime):  # Convert datetime to int
+        if isinstance(json_at, dtm.datetime):  # Convert dtm to int
             json_at = to_timestamp(json_at)
         if (
             param.default is not inspect.Parameter.empty and include_optional
@@ -275,8 +275,8 @@ class TestChatBoostWithoutRequest(ChatBoostDefaults):
         cb = ChatBoost.de_json(json_dict, offline_bot)
 
         assert isinstance(cb, ChatBoost)
-        assert isinstance(cb.add_date, datetime.datetime)
-        assert isinstance(cb.expiration_date, datetime.datetime)
+        assert isinstance(cb.add_date, dtm.datetime)
+        assert isinstance(cb.expiration_date, dtm.datetime)
         assert isinstance(cb.source, ChatBoostSource)
         with cb._unfrozen():
             cb.add_date = to_timestamp(cb.add_date)

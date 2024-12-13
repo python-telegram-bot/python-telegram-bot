@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 
 import pytest
 
@@ -116,7 +116,7 @@ class ChatFullInfoTestBase:
     is_forum = True
     active_usernames = ["These", "Are", "Usernames!"]
     emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
-    emoji_status_expiration_date = datetime.datetime.now(tz=UTC).replace(microsecond=0)
+    emoji_status_expiration_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
     has_aggressive_anti_spam_enabled = True
     has_hidden_members = True
     available_reactions = [

@@ -16,9 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 import contextlib
+import datetime as dtm
 from copy import copy
-from datetime import datetime
 
 import pytest
 
@@ -112,10 +113,10 @@ def message(bot):
     params=[
         {
             "reply_to_message": Message(
-                50, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                50, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
             )
         },
-        {"edit_date": datetime.utcnow()},
+        {"edit_date": dtm.datetime.utcnow()},
         {
             "text": "a text message",
             "entities": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
@@ -161,7 +162,7 @@ def message(bot):
         {"migrate_from_chat_id": -54321},
         {
             "pinned_message": Message(
-                7, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
             )
         },
         {"invoice": Invoice("my invoice", "invoice", "start", "EUR", 243)},
@@ -210,7 +211,7 @@ def message(bot):
                 User(1, "John", False), User(2, "Doe", False), 42
             )
         },
-        {"video_chat_scheduled": VideoChatScheduled(datetime.utcnow())},
+        {"video_chat_scheduled": VideoChatScheduled(dtm.datetime.utcnow())},
         {"video_chat_started": VideoChatStarted()},
         {"video_chat_ended": VideoChatEnded(100)},
         {
@@ -234,7 +235,7 @@ def message(bot):
         {
             "giveaway": Giveaway(
                 chats=[Chat(1, Chat.SUPERGROUP)],
-                winners_selection_date=datetime.utcnow().replace(microsecond=0),
+                winners_selection_date=dtm.datetime.utcnow().replace(microsecond=0),
                 winner_count=5,
             )
         },
@@ -243,7 +244,7 @@ def message(bot):
             "giveaway_winners": GiveawayWinners(
                 chat=Chat(1, Chat.CHANNEL),
                 giveaway_message_id=123456789,
-                winners_selection_date=datetime.utcnow().replace(microsecond=0),
+                winners_selection_date=dtm.datetime.utcnow().replace(microsecond=0),
                 winner_count=42,
                 winners=[User(1, "user1", False), User(2, "user2", False)],
             )
@@ -266,11 +267,11 @@ def message(bot):
         },
         {
             "external_reply": ExternalReplyInfo(
-                MessageOriginChat(datetime.utcnow(), Chat(1, Chat.PRIVATE))
+                MessageOriginChat(dtm.datetime.utcnow(), Chat(1, Chat.PRIVATE))
             )
         },
         {"quote": TextQuote("a text quote", 1)},
-        {"forward_origin": MessageOriginChat(datetime.utcnow(), Chat(1, Chat.PRIVATE))},
+        {"forward_origin": MessageOriginChat(dtm.datetime.utcnow(), Chat(1, Chat.PRIVATE))},
         {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
         {"boost_added": ChatBoostAdded(100)},
         {"sender_boost_count": 1},
@@ -372,7 +373,7 @@ def message_params(bot, request):
 class MessageTestBase:
     id_ = 1
     from_user = User(2, "testuser", False)
-    date = datetime.utcnow()
+    date = dtm.datetime.utcnow()
     chat = Chat(3, "private")
     test_entities = [
         {"length": 4, "offset": 10, "type": "bold"},
@@ -591,9 +592,9 @@ class TestMessageWithoutRequest(MessageTestBase):
         json_dict = {
             "message_id": 12,
             "from_user": None,
-            "date": int(datetime.now().timestamp()),
+            "date": int(dtm.datetime.now().timestamp()),
             "chat": None,
-            "edit_date": int(datetime.now().timestamp()),
+            "edit_date": int(dtm.datetime.now().timestamp()),
         }
 
         message_raw = Message.de_json(json_dict, raw_bot)

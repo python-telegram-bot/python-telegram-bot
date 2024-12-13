@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 
 import pytest
 
@@ -32,7 +32,7 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def time():
-    return datetime.datetime.now(tz=UTC)
+    return dtm.datetime.now(tz=UTC)
 
 
 @pytest.fixture(scope="module")
@@ -82,7 +82,7 @@ class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
-        assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
+        assert abs(chat_join_request.date - time) < dtm.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
         assert chat_join_request.user_chat_id == self.from_user.id
 
@@ -92,7 +92,7 @@ class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
-        assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
+        assert abs(chat_join_request.date - time) < dtm.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
         assert chat_join_request.user_chat_id == self.from_user.id
         assert chat_join_request.bio == self.bio
@@ -133,9 +133,7 @@ class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
         a = chat_join_request
         b = ChatJoinRequest(self.chat, self.from_user, time, self.from_user.id)
         c = ChatJoinRequest(self.chat, self.from_user, time, self.from_user.id, bio="bio")
-        d = ChatJoinRequest(
-            self.chat, self.from_user, time + datetime.timedelta(1), self.from_user.id
-        )
+        d = ChatJoinRequest(self.chat, self.from_user, time + dtm.timedelta(1), self.from_user.id)
         e = ChatJoinRequest(self.chat, User(-1, "last_name", True), time, -1)
         f = User(456, "", False)
 
