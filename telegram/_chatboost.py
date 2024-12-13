@@ -17,9 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram ChatBoosts."""
-
+import datetime as dtm
 from collections.abc import Sequence
-from datetime import datetime
 from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
@@ -274,8 +273,8 @@ class ChatBoost(TelegramObject):
     def __init__(
         self,
         boost_id: str,
-        add_date: datetime,
-        expiration_date: datetime,
+        add_date: dtm.datetime,
+        expiration_date: dtm.datetime,
         source: ChatBoostSource,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -283,8 +282,8 @@ class ChatBoost(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         self.boost_id: str = boost_id
-        self.add_date: datetime = add_date
-        self.expiration_date: datetime = expiration_date
+        self.add_date: dtm.datetime = add_date
+        self.expiration_date: dtm.datetime = expiration_date
         self.source: ChatBoostSource = source
 
         self._id_attrs = (self.boost_id, self.add_date, self.expiration_date, self.source)
@@ -386,7 +385,7 @@ class ChatBoostRemoved(TelegramObject):
         self,
         chat: Chat,
         boost_id: str,
-        remove_date: datetime,
+        remove_date: dtm.datetime,
         source: ChatBoostSource,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -395,7 +394,7 @@ class ChatBoostRemoved(TelegramObject):
 
         self.chat: Chat = chat
         self.boost_id: str = boost_id
-        self.remove_date: datetime = remove_date
+        self.remove_date: dtm.datetime = remove_date
         self.source: ChatBoostSource = source
 
         self._id_attrs = (self.chat, self.boost_id, self.remove_date, self.source)

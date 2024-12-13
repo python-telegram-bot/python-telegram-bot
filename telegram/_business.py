@@ -18,9 +18,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains the Telegram Business related classes."""
-
+import datetime as dtm
 from collections.abc import Sequence
-from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
@@ -81,7 +80,7 @@ class BusinessConnection(TelegramObject):
         id: str,
         user: "User",
         user_chat_id: int,
-        date: datetime,
+        date: dtm.datetime,
         can_reply: bool,
         is_enabled: bool,
         *,
@@ -91,7 +90,7 @@ class BusinessConnection(TelegramObject):
         self.id: str = id
         self.user: User = user
         self.user_chat_id: int = user_chat_id
-        self.date: datetime = date
+        self.date: dtm.datetime = date
         self.can_reply: bool = can_reply
         self.is_enabled: bool = is_enabled
 
