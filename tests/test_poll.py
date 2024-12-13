@@ -297,7 +297,7 @@ class PollTestBase:
     ).decode("unicode-escape")
     explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     open_period = 42
-    close_date = dtm.now(dtm.timezone.utc)
+    close_date = dtm.datetime.now(dtm.timezone.utc)
     question_entities = [
         MessageEntity(MessageEntity.BOLD, 0, 4),
         MessageEntity(MessageEntity.ITALIC, 5, 8),

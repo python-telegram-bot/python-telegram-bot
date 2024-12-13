@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import datetime
+import datetime as dtm
 
 import pytest
 
@@ -72,7 +72,7 @@ def false_update(request):
 
 @pytest.fixture(scope="class")
 def time():
-    return datetime.datetime.now(tz=UTC)
+    return dtm.datetime.now(tz=UTC)
 
 
 @pytest.fixture(scope="class")

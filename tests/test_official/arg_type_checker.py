@@ -20,11 +20,11 @@
 match the official API. It also checks if the type annotations are correct and if the parameters
 are required or not."""
 
+import datetime as dtm
 import inspect
 import logging
 import re
 from collections.abc import Sequence
-from datetime import datetime, timedelta
 from types import FunctionType
 from typing import Any
 
@@ -190,7 +190,7 @@ def check_param_type(
         if ptb_param.name in PTCE.DATETIME_EXCEPTIONS:
             return True, mapped_type
         # If it's a class, we only accept datetime as the parameter
-        mapped_type = datetime if is_class else mapped_type | datetime
+        mapped_type = dtm.datetime if is_class else mapped_type | dtm.datetime
 
     # 4) HANDLING TIMEDELTA:
     elif re.search(TIMEDELTA_REGEX, ptb_param.name) and obj.__name__ in (
@@ -201,7 +201,7 @@ def check_param_type(
         # and `create_invoice_link`.
         # See https://github.com/python-telegram-bot/python-telegram-bot/issues/4575
         log("Checking that `%s` is a timedelta!\n", ptb_param.name)
-        mapped_type = timedelta if is_class else mapped_type | timedelta
+        mapped_type = dtm.timedelta if is_class else mapped_type | dtm.timedelta
 
     # 5) COMPLEX TYPES:
     # Some types are too complicated, so we replace our annotation with a simpler type:
