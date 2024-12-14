@@ -24,6 +24,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
+from pytest_asyncio import is_async_test
 
 from telegram import (
     CallbackQuery,
@@ -77,7 +78,12 @@ def no_rerun_after_xfail_or_flood(error, name, test: pytest.Function, plugin):
 
 def pytest_collection_modifyitems(items: list[pytest.Item]):
     """Here we add a flaky marker to all request making tests and a (no_)req marker to the rest."""
+    pytest_asyncio_session_scope_marker = pytest.mark.asyncio(loop_scope="session")
+
     for item in items:  # items are the test methods
+        if is_async_test(item):
+            item.add_marker(pytest_asyncio_session_scope_marker)
+
         parent = item.parent  # Get the parent of the item (class, or module if defined outside)
         if parent is None:  # should never happen, but just in case
             return
@@ -137,9 +143,10 @@ def event_loop(request):
     # ever since ProactorEventLoop became the default in Win 3.8+, the app crashes after the loop
     # is closed. Hence, we use SelectorEventLoop on Windows to avoid this. See
     # https://github.com/python/cpython/issues/83413, https://github.com/encode/httpx/issues/914
-    if sys.platform.startswith("win"):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    return asyncio.get_event_loop_policy().new_event_loop()
+    # if sys.platform.startswith("win"):
+    #     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # return asyncio.get_event_loop_policy().new_event_loop()
+    return asyncio.get_event_loop()
     # loop.close() # instead of closing here, do that at the every end of the test session
 
 
