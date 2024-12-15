@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 
-import datetime
+import datetime as dtm
 from collections.abc import Sequence
 from copy import deepcopy
 
@@ -53,7 +53,7 @@ from tests.auxil.slots import mro_slots
 
 def withdrawal_state_succeeded():
     return RevenueWithdrawalStateSucceeded(
-        date=datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC),
+        date=dtm.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC),
         url="url",
     )
 
@@ -89,7 +89,7 @@ def transaction_partner_user():
             )
         ],
         paid_media_payload="payload",
-        subscription_period=datetime.timedelta(days=1),
+        subscription_period=dtm.timedelta(days=1),
         gift=Gift(
             id="some_id",
             sticker=Sticker(
@@ -126,7 +126,7 @@ def star_transaction():
         id="1",
         amount=1,
         nanostar_amount=365,
-        date=to_timestamp(datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)),
+        date=to_timestamp(dtm.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)),
         source=transaction_partner_user(),
         receiver=transaction_partner_fragment(),
     )
@@ -288,7 +288,7 @@ class StarTransactionTestBase:
     id = "2"
     amount = 2
     nanostar_amount = 365
-    date = to_timestamp(datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC))
+    date = to_timestamp(dtm.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC))
     source = TransactionPartnerUser(
         user=User(
             id=2,
@@ -370,7 +370,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         c = StarTransaction(
             id="3",
             amount=3,
-            date=to_timestamp(datetime.datetime.utcnow()),
+            date=to_timestamp(dtm.datetime.utcnow()),
             source=TransactionPartnerUser(
                 user=User(
                     id=3,
@@ -539,7 +539,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
                 assert tp_dict[attr] == attribute.to_dict()
             elif not isinstance(attribute, str) and isinstance(attribute, Sequence):
                 assert tp_dict[attr] == [a.to_dict() for a in attribute]
-            elif isinstance(attribute, datetime.timedelta):
+            elif isinstance(attribute, dtm.timedelta):
                 assert tp_dict[attr] == attribute.total_seconds()
             else:
                 assert tp_dict[attr] == attribute
@@ -605,7 +605,7 @@ class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
 
 
 class RevenueWithdrawalStateTestBase:
-    date = datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)
+    date = dtm.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)
     url = "url"
 
 
@@ -713,7 +713,7 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
 
         if hasattr(c, "date"):
             json_dict = c.to_dict()
-            json_dict["date"] = to_timestamp(datetime.datetime.utcnow())
+            json_dict["date"] = to_timestamp(dtm.datetime.utcnow())
             f = c.__class__.de_json(json_dict, offline_bot)
 
             assert c != f

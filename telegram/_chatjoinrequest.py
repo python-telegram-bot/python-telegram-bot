@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatJoinRequest."""
-import datetime
+import datetime as dtm
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
@@ -106,7 +106,7 @@ class ChatJoinRequest(TelegramObject):
         self,
         chat: Chat,
         from_user: User,
-        date: datetime.datetime,
+        date: dtm.datetime,
         user_chat_id: int,
         bio: Optional[str] = None,
         invite_link: Optional[ChatInviteLink] = None,
@@ -117,7 +117,7 @@ class ChatJoinRequest(TelegramObject):
         # Required
         self.chat: Chat = chat
         self.from_user: User = from_user
-        self.date: datetime.datetime = date
+        self.date: dtm.datetime = date
         self.user_chat_id: int = user_chat_id
 
         # Optionals

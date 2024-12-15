@@ -16,7 +16,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import re
 
 from telegram import Chat, Message, MessageEntity, Update, User
@@ -24,7 +24,7 @@ from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.pytest_classes import make_bot
 
 CMD_PATTERN = re.compile(r"/[\da-z_]{1,32}(?:@\w{1,32})?")
-DATE = datetime.datetime.now()
+DATE = dtm.datetime.now()
 
 
 def make_message(text: str, offline: bool = True, **kwargs):

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import inspect
 import re
 
@@ -49,14 +49,12 @@ def update():
         0,
         Message(
             0,
-            datetime.datetime.utcnow(),
+            dtm.datetime.utcnow(),
             Chat(0, "private"),
             from_user=User(0, "Testuser", False),
             via_bot=User(0, "Testbot", True),
             sender_chat=Chat(0, "Channel"),
-            forward_origin=MessageOriginUser(
-                datetime.datetime.utcnow(), User(0, "Testuser", False)
-            ),
+            forward_origin=MessageOriginUser(dtm.datetime.utcnow(), User(0, "Testuser", False)),
         ),
     )
     update._unfreeze()
@@ -86,7 +84,7 @@ def base_class(request):
 
 @pytest.fixture(scope="class")
 def message_origin_user():
-    return MessageOriginUser(datetime.datetime.utcnow(), User(1, "TestOther", False))
+    return MessageOriginUser(dtm.datetime.utcnow(), User(1, "TestOther", False))
 
 
 class TestFilters:
@@ -155,7 +153,7 @@ class TestFilters:
                 not key.startswith("_")
                 # exclude imported stuff
                 and getattr(member, "__module__", "unknown module") == "telegram.ext.filters"
-                and key != "sys"
+                and key not in ("sys", "dtm")
             )
         }
         actual = set(filters.__all__)
@@ -616,7 +614,7 @@ class TestFilters:
     def test_filters_reply(self, update):
         another_message = Message(
             1,
-            datetime.datetime.utcnow(),
+            dtm.datetime.utcnow(),
             Chat(0, "private"),
             from_user=User(1, "TestOther", False),
         )
@@ -1107,7 +1105,7 @@ class TestFilters:
 
     def test_filters_forwarded(self, update, message_origin_user):
         assert filters.FORWARDED.check_update(update)
-        update.message.forward_origin = MessageOriginHiddenUser(datetime.datetime.utcnow(), 1)
+        update.message.forward_origin = MessageOriginHiddenUser(dtm.datetime.utcnow(), 1)
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = None
         assert not filters.FORWARDED.check_update(update)
@@ -2681,7 +2679,7 @@ class TestFilters:
             0,
             Message(
                 0,
-                datetime.datetime.utcnow(),
+                dtm.datetime.utcnow(),
                 Chat(0, "private"),
                 document=Document("str", "other_str"),
             ),

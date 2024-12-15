@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import inspect
 from copy import deepcopy
 
@@ -43,7 +43,7 @@ class CMDefaults:
     user = User(1, "First name", False)
     custom_title: str = "PTB"
     is_anonymous: bool = True
-    until_date: datetime.datetime = to_timestamp(datetime.datetime.utcnow())
+    until_date: dtm.datetime = to_timestamp(dtm.datetime.utcnow())
     can_be_edited: bool = False
     can_change_info: bool = True
     can_post_messages: bool = True
@@ -173,7 +173,7 @@ def iter_args(instance: ChatMember, de_json_inst: ChatMember, include_optional: 
         if param.name in ignored:
             continue
         inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
-        if isinstance(json_at, datetime.datetime):  # Convert datetime to int
+        if isinstance(json_at, dtm.datetime):  # Convert dtm to int
             json_at = to_timestamp(json_at)
         if (
             param.default is not inspect.Parameter.empty and include_optional

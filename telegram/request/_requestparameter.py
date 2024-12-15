@@ -17,10 +17,10 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that describes a single parameter of a request to the Bot API."""
+import datetime as dtm
 import json
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Optional, final
 
 from telegram._files.inputfile import InputFile
@@ -113,7 +113,7 @@ class RequestParameter:
         * if a user passes a custom enum, it's unlikely that we can actually properly handle it
           even with some special casing.
         """
-        if isinstance(value, datetime):
+        if isinstance(value, dtm.datetime):
             return to_timestamp(value), []
         if isinstance(value, StringEnum):
             return value.value, []

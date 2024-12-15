@@ -31,6 +31,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Ambro17 <https://github.com/Ambro17>`_
 - `Andrej Zhilenkov <https://github.com/Andrej730>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
+- `Anya Marcano <https://github.com/AnyaMarcanito>`
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Balduro <https://github.com/Balduro>`_
 - `Bibo-Joshi <https://github.com/Bibo-Joshi>`_
@@ -58,12 +59,14 @@ The following wonderful people contributed directly or indirectly to this projec
 - `gamgi <https://github.com/gamgi>`_
 - `Gauthamram Ravichandran <https://github.com/GauthamramRavichandran>`_
 - `Harshil <https://github.com/harshil21>`_
+- `Henry Galue <https://github.com/henryg311>`
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
 - `Iulian Onofrei <https://github.com/revolter>`_
 - `Jainam Oswal <https://github.com/jainamoswal>`_
 - `Jasmin Bom <https://github.com/jsmnbom>`_
 - `JASON0916 <https://github.com/JASON0916>`_
+- `Jeamhowards Montiel <https://github.com/Jeam-zx>`
 - `jeffffc <https://github.com/jeffffc>`_
 - `Jelle Besseling <https://github.com/pingiun>`_
 - `jh0ker <https://github.com/jh0ker>`_
@@ -72,6 +75,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Joscha Götzer <https://github.com/Rostgnom>`_
 - `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
+- `Juan Cuevas <https://github.com/cuevasrja>`
 - `kenjitagawa <https://github.com/kenjitagawa>`_
 - `kennethcheo <https://github.com/kennethcheo>`_
 - `Kirill Vasin <https://github.com/vasinkd>`_
@@ -87,6 +91,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Michael Dix <https://github.com/Eisberge>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
 - `Miguel C. R. <https://github.com/MiguelX413>`_
+- `Miguel Salomon <https://github.com/Migueldsc12>`
 - `miles <https://github.com/miles170>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `Mohd Yusuf <https://github.com/mohdyusuf2312>`_

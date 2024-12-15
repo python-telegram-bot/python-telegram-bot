@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from datetime import date
+import datetime as dtm
 
 import pytest
 
@@ -72,10 +72,10 @@ class TestBirthdateWithoutRequest(BirthdateTestBase):
         assert hash(bd1) != hash(bd4)
 
     def test_to_date(self, birthdate):
-        assert isinstance(birthdate.to_date(), date)
-        assert birthdate.to_date() == date(self.year, self.month, self.day)
+        assert isinstance(birthdate.to_date(), dtm.date)
+        assert birthdate.to_date() == dtm.date(self.year, self.month, self.day)
         new_bd = birthdate.to_date(2023)
-        assert new_bd == date(2023, self.month, self.day)
+        assert new_bd == dtm.date(2023, self.month, self.day)
 
     def test_to_date_no_year(self):
         bd = Birthdate(1, 1)

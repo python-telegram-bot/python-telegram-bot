@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import datetime
+import datetime as dtm
 import logging
 import sys
 from pathlib import Path
@@ -313,7 +313,7 @@ def tzinfo(request):
     if TEST_WITH_OPT_DEPS:
         return pytz.timezone(request.param)
     hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
-    return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
+    return BasicTimezone(offset=dtm.timedelta(hours=hours_offset), name=request.param)
 
 
 @pytest.fixture(scope="session")

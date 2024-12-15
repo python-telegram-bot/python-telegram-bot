@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Provides functions to test both methods."""
-import datetime
+import datetime as dtm
 import functools
 import inspect
 import re
@@ -336,12 +336,10 @@ def build_kwargs(
         elif name == "until_date":
             if manually_passed_value not in [None, DEFAULT_NONE]:
                 # Europe/Berlin
-                kws[name] = pytz.timezone("Europe/Berlin").localize(
-                    datetime.datetime(2000, 1, 1, 0)
-                )
+                kws[name] = pytz.timezone("Europe/Berlin").localize(dtm.datetime(2000, 1, 1, 0))
             else:
                 # naive UTC
-                kws[name] = datetime.datetime(2000, 1, 1, 0)
+                kws[name] = dtm.datetime(2000, 1, 1, 0)
         elif name == "reply_parameters":
             kws[name] = telegram.ReplyParameters(
                 message_id=1,

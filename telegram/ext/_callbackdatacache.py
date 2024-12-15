@@ -17,9 +17,9 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackDataCache class."""
+import datetime as dtm
 import time
 from collections.abc import MutableMapping
-from datetime import datetime
 from typing import TYPE_CHECKING, Any, Optional, Union, cast
 from uuid import uuid4
 
@@ -431,7 +431,9 @@ class CallbackDataCache:
         with contextlib.suppress(KeyError):
             self._keyboard_data.pop(keyboard_uuid)
 
-    def clear_callback_data(self, time_cutoff: Optional[Union[float, datetime]] = None) -> None:
+    def clear_callback_data(
+        self, time_cutoff: Optional[Union[float, dtm.datetime]] = None
+    ) -> None:
         """Clears the stored callback data.
 
         Args:
@@ -447,13 +449,13 @@ class CallbackDataCache:
         self.__clear(self._callback_queries)
 
     def __clear(
-        self, mapping: MutableMapping, time_cutoff: Optional[Union[float, datetime]] = None
+        self, mapping: MutableMapping, time_cutoff: Optional[Union[float, dtm.datetime]] = None
     ) -> None:
         if not time_cutoff:
             mapping.clear()
             return
 
-        if isinstance(time_cutoff, datetime):
+        if isinstance(time_cutoff, dtm.datetime):
             effective_cutoff = to_float_timestamp(
                 time_cutoff, tzinfo=self.bot.defaults.tzinfo if self.bot.defaults else None
             )
