@@ -28,27 +28,31 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
-from tests._payment.stars.test_stars import transaction_partner_fragment, transaction_partner_user
 from tests.auxil.slots import mro_slots
 
 
-def star_transaction():
+def star_transaction_factory():
     return StarTransaction(
-        id="1",
-        amount=1,
-        nanostar_amount=365,
-        date=to_timestamp(dtm.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)),
-        source=transaction_partner_user(),
-        receiver=transaction_partner_fragment(),
+        id=StarTransactionTestBase.id,
+        amount=StarTransactionTestBase.amount,
+        nanostar_amount=StarTransactionTestBase.nanostar_amount,
+        date=from_timestamp(StarTransactionTestBase.date),
+        source=StarTransactionTestBase.source,
+        receiver=StarTransactionTestBase.receiver,
     )
+
+
+@pytest.fixture
+def star_transaction():
+    return star_transaction_factory()
 
 
 @pytest.fixture
 def star_transactions():
     return StarTransactions(
         transactions=[
-            star_transaction(),
-            star_transaction(),
+            star_transaction_factory(),
+            star_transaction_factory(),
         ]
     )
 
@@ -69,8 +73,8 @@ class StarTransactionTestBase:
 
 
 class TestStarTransactionWithoutRequest(StarTransactionTestBase):
-    def test_slot_behaviour(self):
-        inst = star_transaction()
+    def test_slot_behaviour(self, star_transaction):
+        inst = star_transaction
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -95,8 +99,10 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         assert st.receiver == self.receiver
         assert st_none is None
 
-    def test_de_json_star_transaction_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = star_transaction().to_dict()
+    def test_de_json_star_transaction_localization(
+        self, tz_bot, offline_bot, raw_bot, star_transaction
+    ):
+        json_dict = star_transaction.to_dict()
         st_raw = StarTransaction.de_json(json_dict, raw_bot)
         st_bot = StarTransaction.de_json(json_dict, offline_bot)
         st_tz = StarTransaction.de_json(json_dict, tz_bot)
@@ -109,17 +115,16 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         assert st_bot.date.tzinfo == UTC
         assert st_offset == tz_bot_offset
 
-    def test_to_dict(self):
-        st = star_transaction()
+    def test_to_dict(self, star_transaction):
         expected_dict = {
-            "id": "1",
-            "amount": 1,
-            "nanostar_amount": 365,
-            "date": st.date,
-            "source": st.source.to_dict(),
-            "receiver": st.receiver.to_dict(),
+            "id": self.id,
+            "amount": self.amount,
+            "nanostar_amount": self.nanostar_amount,
+            "date": self.date,
+            "source": self.source.to_dict(),
+            "receiver": self.receiver.to_dict(),
         }
-        assert st.to_dict() == expected_dict
+        assert star_transaction.to_dict() == expected_dict
 
     def test_equality(self):
         a = StarTransaction(
@@ -158,7 +163,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
 
 
 class StarTransactionsTestBase:
-    transactions = [star_transaction(), star_transaction()]
+    transactions = [star_transaction_factory(), star_transaction_factory()]
 
 
 class TestStarTransactionsWithoutRequest(StarTransactionsTestBase):
@@ -184,7 +189,7 @@ class TestStarTransactionsWithoutRequest(StarTransactionsTestBase):
         }
         assert star_transactions.to_dict() == expected_dict
 
-    def test_equality(self):
+    def test_equality(self, star_transaction):
         a = StarTransactions(
             transactions=self.transactions,
         )
@@ -192,7 +197,7 @@ class TestStarTransactionsWithoutRequest(StarTransactionsTestBase):
             transactions=self.transactions,
         )
         c = StarTransactions(
-            transactions=[star_transaction()],
+            transactions=[star_transaction],
         )
 
         assert a == b
