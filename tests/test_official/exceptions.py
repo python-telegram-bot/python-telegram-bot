@@ -37,7 +37,7 @@ class ParamTypeCheckingExceptions:
     # Types for certain parameters accepted by PTB but not in the official API
     # structure: method/class_name/regex: {param_name/regex: type}
     ADDITIONAL_TYPES = {
-        "send_*": {
+        r"send_\w*": {
             "photo$": PhotoSize,
             "video$": Video,
             "video_note": VideoNote,
@@ -70,19 +70,29 @@ class ParamTypeCheckingExceptions:
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
-    # too complex to compare/predict with official API:
+    # too complex to compare/predict with official API
+    # structure: class/method_name: {param_name: reduced form of annotation}
     COMPLEX_TYPES = (
         {  # (param_name, is_class (i.e appears in a class?)): reduced form of annotation
-            ("correct_option_id", False): int,  # actual: Literal
-            ("file_id", False): str,  # actual: Union[str, objs_with_file_id_attr]
-            ("invite_link", False): str,  # actual: Union[str, ChatInviteLink]
-            ("provider_data", False): str,  # actual: Union[str, obj]
-            ("callback_data", True): str,  # actual: Union[str, obj]
-            ("media", True): str,  # actual: Union[str, InputMedia*, FileInput]
-            (
-                "data",
-                True,
-            ): str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
+            "send_poll": {"correct_option_id": int},  # actual: Literal
+            "get_file": {
+                "file_id": str,  # actual: Union[str, objs_with_file_id_attr]
+            },
+            r"\w+invite_link": {
+                "invite_link": str,  # actual: Union[str, ChatInviteLink]
+            },
+            "send_invoice|create_invoice_link": {
+                "provider_data": str,  # actual: Union[str, obj]
+            },
+            "InlineKeyboardButton": {
+                "callback_data": str,  # actual: Union[str, obj]
+            },
+            "Input(Paid)?Media.*": {
+                "media": str,  # actual: Union[str, InputMedia*, FileInput]
+            },
+            "EncryptedPassportElement": {
+                "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
+            },
         }
     )
 

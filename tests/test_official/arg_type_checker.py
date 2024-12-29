@@ -215,15 +215,21 @@ def check_param_type(
 
     # 5) COMPLEX TYPES:
     # Some types are too complicated, so we replace our annotation with a simpler type:
-    elif any(ptb_param.name in key for key in PTCE.COMPLEX_TYPES):
-        log("Converting `%s` to a simpler type!\n", ptb_param.name)
-        for (param_name, is_expected_class), exception_type in PTCE.COMPLEX_TYPES.items():
-            if ptb_param.name == param_name and is_class is is_expected_class:
+    elif mappings := [
+        mapping
+        for pattern, mapping in PTCE.COMPLEX_TYPES.items()
+        if (re.match(pattern, obj.__name__))
+    ]:
+        for mapping in mappings:
+            for key, exception_type in mapping.items():
+                if not re.match(key, ptb_param.name):
+                    continue
+                log("Converting `%s` to a simpler type!\n", ptb_param.name)
                 ptb_annotation = wrap_with_none(tg_parameter, exception_type, obj)
 
     # 6) HANDLING DEFAULTS PARAMETERS:
     # Classes whose parameters are all ODVInput should be converted and checked.
-    elif obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
+    if obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
         log("Checking that `%s`'s param is ODVInput:\n", obj.__name__)
         mapped_type = ODVInput[mapped_type]
     elif not (
