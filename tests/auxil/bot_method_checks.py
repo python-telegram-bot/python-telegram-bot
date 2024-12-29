@@ -37,6 +37,7 @@ from telegram import (
     InputTextMessageContent,
     LinkPreviewOptions,
     ReplyParameters,
+    Sticker,
     TelegramObject,
 )
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
@@ -317,6 +318,16 @@ def build_kwargs(
                 kws["error_message"] = "error"
             elif name == "options":
                 kws[name] = ["option1", "option2"]
+            elif name in ("sticker", "old_sticker"):
+                kws[name] = Sticker(
+                    file_id="file_id",
+                    file_unique_id="file_unique_id",
+                    width=1,
+                    height=1,
+                    is_animated=False,
+                    is_video=False,
+                    type="regular",
+                )
             else:
                 kws[name] = True
 
