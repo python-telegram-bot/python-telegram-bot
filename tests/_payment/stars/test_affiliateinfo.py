@@ -64,9 +64,6 @@ class TestAffiliateInfoWithoutRequest(AffiliateInfoTestBase):
         assert ai.amount == self.amount
         assert ai.nanostar_amount == self.nanostar_amount
 
-        assert AffiliateInfo.de_json(None, offline_bot) is None
-        assert AffiliateInfo.de_json({}, offline_bot) is None
-
     def test_to_dict(self, affiliate_info):
         ai_dict = affiliate_info.to_dict()
 

@@ -59,8 +59,6 @@ class TestUsersSharedWithoutRequest(UsersSharedTestBase):
         assert users_shared.request_id == self.request_id
         assert users_shared.users == self.users
 
-        assert UsersShared.de_json({}, offline_bot) is None
-
     def test_equality(self):
         a = UsersShared(self.request_id, users=self.users)
         b = UsersShared(self.request_id, users=self.users)
@@ -208,8 +206,6 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
         assert shared_user.last_name == self.last_name
         assert shared_user.username == self.username
         assert shared_user.photo == self.photo
-
-        assert SharedUser.de_json({}, offline_bot) is None
 
     def test_equality(self, chat_shared):
         a = SharedUser(

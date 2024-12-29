@@ -77,9 +77,6 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
         assert rws.api_kwargs == {}
         assert rws.type == "unknown"
 
-        assert RevenueWithdrawalState.de_json(None, offline_bot) is None
-        assert RevenueWithdrawalState.de_json({}, offline_bot) is None
-
     @pytest.mark.parametrize(
         ("state", "subclass"),
         [
@@ -129,8 +126,6 @@ class TestRevenueWithdrawalStatePendingWithoutRequest(RevenueWithdrawalStateTest
         assert rws.api_kwargs == {}
         assert rws.type == "pending"
 
-        assert RevenueWithdrawalStatePending.de_json(None, offline_bot) is None
-
     def test_to_dict(self, revenue_withdrawal_state_pending):
         json_dict = revenue_withdrawal_state_pending.to_dict()
         assert json_dict == {"type": "pending"}
@@ -167,8 +162,6 @@ class TestRevenueWithdrawalStateSucceededWithoutRequest(RevenueWithdrawalStateTe
         assert rws.type == "succeeded"
         assert rws.date == self.date
         assert rws.url == self.url
-
-        assert RevenueWithdrawalStateSucceeded.de_json(None, offline_bot) is None
 
     def test_to_dict(self, revenue_withdrawal_state_succeeded):
         json_dict = revenue_withdrawal_state_succeeded.to_dict()
@@ -212,8 +205,6 @@ class TestRevenueWithdrawalStateFailedWithoutRequest(RevenueWithdrawalStateTestB
         rws = RevenueWithdrawalStateFailed.de_json(json_dict, offline_bot)
         assert rws.api_kwargs == {}
         assert rws.type == "failed"
-
-        assert RevenueWithdrawalStateFailed.de_json(None, offline_bot) is None
 
     def test_to_dict(self, revenue_withdrawal_state_failed):
         json_dict = revenue_withdrawal_state_failed.to_dict()

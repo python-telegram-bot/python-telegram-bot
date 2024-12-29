@@ -94,8 +94,6 @@ class TestGiveawayWithoutRequest:
         assert giveaway.premium_subscription_month_count == self.premium_subscription_month_count
         assert giveaway.prize_star_count == self.prize_star_count
 
-        assert Giveaway.de_json(None, offline_bot) is None
-
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
             "chats": [chat.to_dict() for chat in self.chats],
@@ -196,8 +194,6 @@ class TestGiveawayCreatedWithoutRequest:
         assert gac.api_kwargs == {}
         assert gac.prize_star_count == self.prize_star_count
 
-        assert Giveaway.de_json(None, bot) is None
-
     def test_to_dict(self, giveaway_created):
         gac_dict = giveaway_created.to_dict()
 
@@ -280,8 +276,6 @@ class TestGiveawayWinnersWithoutRequest:
         assert giveaway_winners.was_refunded == self.was_refunded
         assert giveaway_winners.prize_description == self.prize_description
         assert giveaway_winners.prize_star_count == self.prize_star_count
-
-        assert GiveawayWinners.de_json(None, offline_bot) is None
 
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
@@ -410,8 +404,6 @@ class TestGiveawayCompletedWithoutRequest:
         assert giveaway_completed.unclaimed_prize_count == self.unclaimed_prize_count
         assert giveaway_completed.giveaway_message == self.giveaway_message
         assert giveaway_completed.is_star_giveaway == self.is_star_giveaway
-
-        assert GiveawayCompleted.de_json(None, offline_bot) is None
 
     def test_to_dict(self, giveaway_completed):
         giveaway_completed_dict = giveaway_completed.to_dict()

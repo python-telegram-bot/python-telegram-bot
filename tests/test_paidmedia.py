@@ -193,9 +193,6 @@ class TestPaidMediaWithoutRequest(PaidMediaTestBase):
         if "photo" in cls.__slots__:
             assert pm.photo == self.photo
 
-        assert cls.de_json(None, offline_bot) is None
-        assert PaidMedia.de_json({}, offline_bot) is None
-
     def test_de_json_invalid_type(self, offline_bot):
         json_dict = {
             "type": "invalid",
@@ -308,10 +305,8 @@ class TestPaidMediaInfoWithoutRequest(PaidMediaInfoTestBase):
             "paid_media": [t.to_dict() for t in self.paid_media],
         }
         pmi = PaidMediaInfo.de_json(json_dict, offline_bot)
-        pmi_none = PaidMediaInfo.de_json(None, offline_bot)
         assert pmi.paid_media == tuple(self.paid_media)
         assert pmi.star_count == self.star_count
-        assert pmi_none is None
 
     def test_to_dict(self, paid_media_info):
         assert paid_media_info.to_dict() == {
@@ -353,11 +348,9 @@ class TestPaidMediaPurchasedWithoutRequest(PaidMediaPurchasedTestBase):
             "paid_media_payload": self.paid_media_payload,
         }
         pmp = PaidMediaPurchased.de_json(json_dict, bot)
-        pmp_none = PaidMediaPurchased.de_json(None, bot)
         assert pmp.from_user == self.from_user
         assert pmp.paid_media_payload == self.paid_media_payload
         assert pmp.api_kwargs == {}
-        assert pmp_none is None
 
     def test_to_dict(self, paid_media_purchased):
         assert paid_media_purchased.to_dict() == {

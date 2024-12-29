@@ -179,9 +179,6 @@ class TestKeyboardButtonRequestChatWithoutRequest(KeyboardButtonRequestChatTestB
         assert request_chat.bot_administrator_rights == self.bot_administrator_rights
         assert request_chat.bot_is_member == self.bot_is_member
 
-        empty_chat = KeyboardButtonRequestChat.de_json({}, offline_bot)
-        assert empty_chat is None
-
     def test_equality(self):
         a = KeyboardButtonRequestChat(self.request_id, True)
         b = KeyboardButtonRequestChat(self.request_id, True)

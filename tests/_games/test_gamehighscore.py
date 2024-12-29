@@ -55,8 +55,6 @@ class TestGameHighScoreWithoutRequest(GameHighScoreTestBase):
         assert highscore.user == self.user
         assert highscore.score == self.score
 
-        assert GameHighScore.de_json(None, offline_bot) is None
-
     def test_to_dict(self, game_highscore):
         game_highscore_dict = game_highscore.to_dict()
 

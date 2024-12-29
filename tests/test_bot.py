@@ -43,6 +43,7 @@ from telegram import (
     Chat,
     ChatAdministratorRights,
     ChatFullInfo,
+    ChatInviteLink,
     ChatPermissions,
     Dice,
     InlineKeyboardButton,
@@ -1432,7 +1433,9 @@ class TestBotWithoutRequest:
         )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_set_chat_photo_local_files(self, monkeypatch, offline_bot, chat_id, local_mode):
+    async def test_set_chat_photo_local_files(
+        self, dummy_message_dict, monkeypatch, offline_bot, chat_id, local_mode
+    ):
         try:
             offline_bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local Bot API set up
@@ -2228,14 +2231,31 @@ class TestBotWithoutRequest:
             api_kwargs={"chat_id": 2, "user_id": 32, "until_date": until_timestamp},
         )
 
-    async def test_business_connection_id_argument(self, offline_bot, monkeypatch):
+    async def test_business_connection_id_argument(
+        self, offline_bot, monkeypatch, dummy_message_dict
+    ):
         """We can't connect to a business acc, so we just test that the correct data is passed.
         We also can't test every single method easily, so we just test a few. Our linting will
         catch any unused args with the others."""
+        return_values = asyncio.Queue()
+        await return_values.put(dummy_message_dict)
+        await return_values.put(
+            Poll(
+                id="42",
+                question="question",
+                options=[PollOption("option", 0)],
+                total_voter_count=5,
+                is_closed=True,
+                is_anonymous=True,
+                type="regular",
+            ).to_dict()
+        )
+        await return_values.put(True)
+        await return_values.put(True)
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters.get("business_connection_id") == 42
-            return {}
+            return await return_values.get()
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
@@ -2348,6 +2368,9 @@ class TestBotWithoutRequest:
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters.get("subscription_period") == 2592000
             assert request_data.parameters.get("subscription_price") == 6
+            return ChatInviteLink(
+                "https://t.me/joinchat/invite_link", User(1, "first", False), False, False, False
+            ).to_dict()
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 

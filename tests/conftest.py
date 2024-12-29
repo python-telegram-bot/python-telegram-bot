@@ -37,7 +37,7 @@ from telegram import (
     User,
 )
 from telegram.ext import Defaults
-from tests.auxil.build_messages import DATE
+from tests.auxil.build_messages import DATE, make_message
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.envvars import GITHUB_ACTION, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
@@ -324,3 +324,13 @@ def timezone(tzinfo):
 @pytest.fixture
 def tmp_file(tmp_path) -> Path:
     return tmp_path / uuid4().hex
+
+
+@pytest.fixture(scope="session")
+def dummy_message():
+    return make_message("dummy_message")
+
+
+@pytest.fixture(scope="session")
+def dummy_message_dict(dummy_message):
+    return dummy_message.to_dict()

@@ -71,6 +71,8 @@ TeleCrypto_co = TypeVar("TeleCrypto_co", bound="HasDecryptMethod", covariant=Tru
 
 
 class HasDecryptMethod(Protocol):
+    __slots__ = ()
+
     @classmethod
     def de_json_decrypted(
         cls: type[TeleCrypto_co],

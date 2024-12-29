@@ -252,11 +252,6 @@ class TestUpdateWithoutRequest(UpdateTestBase):
                 assert getattr(update, _type) == paramdict[_type]
         assert i == 1
 
-    def test_update_de_json_empty(self, offline_bot):
-        update = Update.de_json(None, offline_bot)
-
-        assert update is None
-
     def test_to_dict(self, update):
         update_dict = update.to_dict()
 

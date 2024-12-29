@@ -46,7 +46,6 @@ class TestDiceWithoutRequest(DiceTestBase):
 
         assert dice.value == self.value
         assert dice.emoji == emoji
-        assert Dice.de_json(None, offline_bot) is None
 
     def test_to_dict(self, dice):
         dice_dict = dice.to_dict()

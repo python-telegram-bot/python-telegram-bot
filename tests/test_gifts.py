@@ -76,8 +76,6 @@ class TestGiftWithoutRequest(GiftTestBase):
         assert gift.total_count == self.total_count
         assert gift.remaining_count == self.remaining_count
 
-        assert Gift.de_json(None, offline_bot) is None
-
     def test_to_dict(self, gift):
         gift_dict = gift.to_dict()
 
@@ -236,8 +234,6 @@ class TestGiftsWithoutRequest(GiftsTestBase):
             assert de_json_gift.star_count == original_gift.star_count
             assert de_json_gift.total_count == original_gift.total_count
             assert de_json_gift.remaining_count == original_gift.remaining_count
-
-        assert Gifts.de_json(None, offline_bot) is None
 
     def test_to_dict(self, gifts):
         gifts_dict = gifts.to_dict()

@@ -162,7 +162,6 @@ class TestVideoChatScheduledWithoutRequest:
         assert VideoChatScheduled(self.start_date).start_date == self.start_date
 
     def test_de_json(self, offline_bot):
-        assert VideoChatScheduled.de_json({}, bot=offline_bot) is None
 
         json_dict = {"start_date": to_timestamp(self.start_date)}
         video_chat_scheduled = VideoChatScheduled.de_json(json_dict, offline_bot)
