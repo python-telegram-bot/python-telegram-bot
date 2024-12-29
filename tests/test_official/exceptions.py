@@ -35,16 +35,19 @@ GLOBALLY_IGNORED_PARAMETERS = {
 
 class ParamTypeCheckingExceptions:
     # Types for certain parameters accepted by PTB but not in the official API
+    # structure: method/class_name/regex: {param_name/regex: type}
     ADDITIONAL_TYPES = {
-        "photo": PhotoSize,
-        "video": Video,
-        "video_note": VideoNote,
-        "audio": Audio,
-        "document": Document,
-        "animation": Animation,
-        "voice": Voice,
-        "sticker": Sticker,
-        "gift_id": Gift,
+        "send_*": {
+            "photo$": PhotoSize,
+            "video$": Video,
+            "video_note": VideoNote,
+            "audio": Audio,
+            "document": Document,
+            "animation": Animation,
+            "voice": Voice,
+            "sticker": Sticker,
+            "gift_id": Gift,
+        }
     }
 
     # TODO: Look into merging this with COMPLEX_TYPES

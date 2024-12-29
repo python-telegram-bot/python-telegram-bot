@@ -144,7 +144,7 @@ def check_param_type(
     )
 
     # CHECKING:
-    # Each branch manipulates the `mapped_type` (except for 4) ) to match the `ptb_annotation`.
+    # Each branch manipulates the `mapped_type` (except for 5) ) to match the `ptb_annotation`.
 
     # 1) HANDLING ARRAY TYPES:
     # Now let's do the checking, starting with "Array of ..." types.
@@ -174,12 +174,22 @@ def check_param_type(
 
     # 2) HANDLING OTHER TYPES:
     # Special case for send_* methods where we accept more types than the official API:
-    elif ptb_param.name in PTCE.ADDITIONAL_TYPES and obj.__name__.startswith("send"):
-        log("Checking that `%s` has an additional argument!\n", ptb_param.name)
-        mapped_type = mapped_type | PTCE.ADDITIONAL_TYPES[ptb_param.name]
+    elif mappings := [
+        mapping
+        for pattern, mapping in PTCE.ADDITIONAL_TYPES.items()
+        if (re.match(pattern, obj.__name__))
+    ]:
+        log("Checking that `%s` accepts additional types for some parameters!\n", obj.__name__)
+        for mapping in mappings:
+            for key, value in mapping.items():
+                if not re.match(key, ptb_param.name):
+                    continue
+
+                log("Checking that `%s` is an additional type for `%s`!\n", value, ptb_param.name)
+                mapped_type = mapped_type | value
 
     # 3) HANDLING DATETIMES:
-    elif (
+    if (
         re.search(
             DATETIME_REGEX,
             ptb_param.name,
