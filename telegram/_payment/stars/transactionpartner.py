@@ -106,9 +106,6 @@ class TransactionPartner(TelegramObject):
         if (cls is TransactionPartner and not data) or data is None:
             return None
 
-        if not data and cls is TransactionPartner:
-            return None
-
         _class_mapping: dict[str, type[TransactionPartner]] = {
             cls.AFFILIATE_PROGRAM: TransactionPartnerAffiliateProgram,
             cls.FRAGMENT: TransactionPartnerFragment,
