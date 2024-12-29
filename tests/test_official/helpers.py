@@ -21,7 +21,7 @@
 import functools
 import re
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, _eval_type, get_type_hints
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, _eval_type, get_type_hints
 
 from bs4 import PageElement, Tag
 
@@ -110,3 +110,22 @@ def cached_type_hints(obj: Any, is_class: bool) -> dict[str, Any]:
 def resolve_forward_refs_in_type(obj: type) -> type:
     """Resolves forward references in a type hint."""
     return _eval_type(obj, localns=tg_objects, globalns=None)
+
+
+T = TypeVar("T")
+
+
+def extract_mappings(
+    exceptions: dict[str, dict[str, T]], obj: object, param_name: str
+) -> Optional[list[T]]:
+    mappings = (
+        mapping for pattern, mapping in exceptions.items() if (re.match(pattern, obj.__name__))
+    )
+    out = [
+        value
+        for mapping in mappings
+        for key, value in mapping.items()
+        if re.match(key, param_name)
+    ]
+
+    return None or out
