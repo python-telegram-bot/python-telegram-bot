@@ -181,8 +181,8 @@ markers = [
     "req",
 ]
 asyncio_mode = "auto"
-log_format = "%(funcName)s - Line %(lineno)d - %(message)s"
-# log_level = "DEBUG"  # uncomment to see DEBUG logs
+log_cli_format = "%(funcName)s - Line %(lineno)d - %(message)s"
+# log_cli_level = "DEBUG"  # uncomment to see DEBUG logs
 
 # MYPY:
 [tool.mypy]

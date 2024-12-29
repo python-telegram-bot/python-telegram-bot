@@ -699,6 +699,54 @@ class TestStickerSetWithoutRequest(StickerSetTestBase):
         monkeypatch.setattr(sticker.get_bot(), "get_file", make_assertion)
         assert await sticker.get_file()
 
+    async def test_delete_sticker_from_set_sticker_input(self, offline_bot, sticker, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["sticker"] == sticker.file_id
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.delete_sticker_from_set(sticker)
+
+    async def test_replace_sticker_in_set_sticker_input(self, offline_bot, sticker, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["old_sticker"] == sticker.file_id
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.replace_sticker_in_set(
+            user_id=1, name="name", sticker="sticker", old_sticker=sticker
+        )
+
+    async def test_set_sticker_emoji_list_sticker_input(self, offline_bot, sticker, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["sticker"] == sticker.file_id
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.set_sticker_emoji_list(sticker, ["emoji"])
+
+    async def test_set_sticker_mask_position_sticker_input(
+        self, offline_bot, sticker, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["sticker"] == sticker.file_id
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.set_sticker_mask_position(sticker, MaskPosition("eyes", 1, 2, 3))
+
+    async def test_set_sticker_position_in_set_sticker_input(
+        self, offline_bot, sticker, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["sticker"] == sticker.file_id
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.set_sticker_position_in_set(sticker, 1)
+
+    async def test_set_sticker_keywords_sticker_input(self, offline_bot, sticker, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["sticker"] == sticker.file_id
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.set_sticker_keywords(sticker, ["keyword"])
+
 
 @pytest.mark.xdist_group("stickerset")
 class TestStickerSetWithRequest:
