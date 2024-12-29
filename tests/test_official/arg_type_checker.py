@@ -38,6 +38,7 @@ from tests.test_official.helpers import (
     _get_params_base,
     _unionizer,
     cached_type_hints,
+    extract_mappings,
     resolve_forward_refs_in_type,
     wrap_with_none,
 )
@@ -174,22 +175,14 @@ def check_param_type(
 
     # 2) HANDLING OTHER TYPES:
     # Special case for send_* methods where we accept more types than the official API:
-    elif mappings := [
-        mapping
-        for pattern, mapping in PTCE.ADDITIONAL_TYPES.items()
-        if (re.match(pattern, obj.__name__))
-    ]:
+    elif additional_types := extract_mappings(PTCE.ADDITIONAL_TYPES, obj, ptb_param.name):
         log("Checking that `%s` accepts additional types for some parameters!\n", obj.__name__)
-        for mapping in mappings:
-            for key, value in mapping.items():
-                if not re.match(key, ptb_param.name):
-                    continue
-
-                log("Checking that `%s` is an additional type for `%s`!\n", value, ptb_param.name)
-                mapped_type = mapped_type | value
+        for at in additional_types:
+            log("Checking that `%s` is an additional type for `%s`!\n", at, ptb_param.name)
+            mapped_type = mapped_type | at
 
     # 3) HANDLING DATETIMES:
-    if (
+    elif (
         re.search(
             DATETIME_REGEX,
             ptb_param.name,
@@ -215,21 +208,14 @@ def check_param_type(
 
     # 5) COMPLEX TYPES:
     # Some types are too complicated, so we replace our annotation with a simpler type:
-    elif mappings := [
-        mapping
-        for pattern, mapping in PTCE.COMPLEX_TYPES.items()
-        if (re.match(pattern, obj.__name__))
-    ]:
-        for mapping in mappings:
-            for key, exception_type in mapping.items():
-                if not re.match(key, ptb_param.name):
-                    continue
-                log("Converting `%s` to a simpler type!\n", ptb_param.name)
-                ptb_annotation = wrap_with_none(tg_parameter, exception_type, obj)
+    elif overrides := extract_mappings(PTCE.COMPLEX_TYPES, obj, ptb_param.name):
+        exception_type = overrides[0]
+        log("Converting `%s` to a simpler type!\n", ptb_param.name)
+        ptb_annotation = wrap_with_none(tg_parameter, exception_type, obj)
 
     # 6) HANDLING DEFAULTS PARAMETERS:
     # Classes whose parameters are all ODVInput should be converted and checked.
-    if obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
+    elif obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
         log("Checking that `%s`'s param is ODVInput:\n", obj.__name__)
         mapped_type = ODVInput[mapped_type]
     elif not (
