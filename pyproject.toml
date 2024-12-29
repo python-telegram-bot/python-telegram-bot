@@ -76,7 +76,7 @@ http2 = [
 ]
 job-queue = [
     # APS doesn't have a strict stability policy. Let's be cautious for now.
-    "APScheduler~=3.10.4",
+    "APScheduler>=3.10.4,<3.12.0",
     # pytz is required by APS and just needs the lower bound due to #2120
     "pytz>=2018.6",
 ]
