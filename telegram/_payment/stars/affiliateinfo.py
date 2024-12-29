@@ -18,10 +18,15 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars affiliates."""
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from telegram import Bot, Chat, TelegramObject, User
+from telegram._chat import Chat
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class AffiliateInfo(TelegramObject):

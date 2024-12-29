@@ -19,12 +19,16 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars Revenue Withdrawals."""
 import datetime as dtm
-from typing import Final, Optional
+from typing import TYPE_CHECKING, Final, Optional
 
-from telegram import Bot, TelegramObject, constants
+from telegram import constants
+from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class RevenueWithdrawalState(TelegramObject):
@@ -80,7 +84,7 @@ class RevenueWithdrawalState(TelegramObject):
         """
         data = cls._parse_data(data)
 
-        if not data:
+        if (cls is RevenueWithdrawalState and not data) or data is None:
             return None
 
         _class_mapping: dict[str, type[RevenueWithdrawalState]] = {

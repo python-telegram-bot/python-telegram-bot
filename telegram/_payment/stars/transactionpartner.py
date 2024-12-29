@@ -20,15 +20,22 @@
 """This module contains the classes for Telegram Stars transaction partners."""
 import datetime as dtm
 from collections.abc import Sequence
-from typing import Final, Optional
+from typing import TYPE_CHECKING, Final, Optional
 
-from telegram import Bot, Gift, PaidMedia, TelegramObject, User, constants
+from telegram import constants
+from telegram._gifts import Gift
+from telegram._paidmedia import PaidMedia
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 from .affiliateinfo import AffiliateInfo
 from .revenuewithdrawelstate import RevenueWithdrawalState
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class TransactionPartner(TelegramObject):
