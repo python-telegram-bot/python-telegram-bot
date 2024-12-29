@@ -24,6 +24,7 @@ from copy import deepcopy
 import pytest
 
 from telegram import (
+    AffiliateInfo,
     Chat,
     Dice,
     Gift,
@@ -38,6 +39,7 @@ from telegram import (
     Sticker,
     TelegramObject,
     TransactionPartner,
+    TransactionPartnerAffiliateProgram,
     TransactionPartnerFragment,
     TransactionPartnerOther,
     TransactionPartnerTelegramAds,
@@ -45,7 +47,6 @@ from telegram import (
     TransactionPartnerUser,
     User,
 )
-from telegram._payment.stars import AffiliateInfo, TransactionPartnerAffiliateProgram
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
 from telegram.constants import RevenueWithdrawalStateType, TransactionPartnerType
 from tests.auxil.slots import mro_slots

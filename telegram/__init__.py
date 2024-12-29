@@ -271,6 +271,17 @@ __all__ = (
     "warnings",
 )
 
+from telegram._payment.stars.startransactions import StarTransaction, StarTransactions
+from telegram._payment.stars.transactionpartner import (
+    TransactionPartner,
+    TransactionPartnerAffiliateProgram,
+    TransactionPartnerFragment,
+    TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
+    TransactionPartnerTelegramApi,
+    TransactionPartnerUser,
+)
+
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
 from ._bot import Bot
@@ -470,21 +481,12 @@ from ._payment.refundedpayment import RefundedPayment
 from ._payment.shippingaddress import ShippingAddress
 from ._payment.shippingoption import ShippingOption
 from ._payment.shippingquery import ShippingQuery
-from ._payment.stars import (
-    AffiliateInfo,
+from ._payment.stars.affiliateinfo import AffiliateInfo
+from ._payment.stars.revenuewithdrawelstate import (
     RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
     RevenueWithdrawalStateSucceeded,
-    StarTransaction,
-    StarTransactions,
-    TransactionPartner,
-    TransactionPartnerAffiliateProgram,
-    TransactionPartnerFragment,
-    TransactionPartnerOther,
-    TransactionPartnerTelegramAds,
-    TransactionPartnerTelegramApi,
-    TransactionPartnerUser,
 )
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import InputPollOption, Poll, PollAnswer, PollOption
