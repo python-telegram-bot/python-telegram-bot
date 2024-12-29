@@ -103,7 +103,7 @@ class TransactionPartner(TelegramObject):
         """
         data = cls._parse_data(data)
 
-        if data is None:
+        if (cls is TransactionPartner and not data) or data is None:
             return None
 
         if not data and cls is TransactionPartner:
@@ -218,7 +218,7 @@ class TransactionPartnerFragment(TransactionPartner):
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
+        if data is None:
             return None
 
         data["withdrawal_state"] = RevenueWithdrawalState.de_json(
