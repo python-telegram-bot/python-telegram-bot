@@ -1426,7 +1426,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def delete_sticker_from_set(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3660,7 +3660,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_sticker_position_in_set(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         position: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4114,7 +4114,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_sticker_emoji_list(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         emoji_list: Sequence[str],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4136,7 +4136,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_sticker_keywords(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         keywords: Optional[Sequence[str]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4158,7 +4158,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_sticker_mask_position(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         mask_position: Optional[MaskPosition] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4250,7 +4250,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         user_id: int,
         name: str,
-        old_sticker: str,
+        old_sticker: Union[str, "Sticker"],
         sticker: "InputSticker",
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

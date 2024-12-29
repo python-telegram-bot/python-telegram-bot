@@ -47,7 +47,13 @@ class ParamTypeCheckingExceptions:
             "voice": Voice,
             "sticker": Sticker,
             "gift_id": Gift,
-        }
+        },
+        "(delete|set)_sticker.*": {
+            "sticker$": Sticker,
+        },
+        "replace_sticker_in_set": {
+            "old_sticker$": Sticker,
+        },
     }
 
     # TODO: Look into merging this with COMPLEX_TYPES
