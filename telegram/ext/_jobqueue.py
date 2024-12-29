@@ -696,7 +696,7 @@ class JobQueue(Generic[CCT]):
             # so give it a tiny bit of time to actually shut down.
             await asyncio.sleep(0.01)
 
-    def jobs(self, pattern: Union[str, re.Pattern, None] = None) -> tuple["Job[CCT]", ...]:
+    def jobs(self, pattern: Union[str, re.Pattern[str], None] = None) -> tuple["Job[CCT]", ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`.
 
         Args:
