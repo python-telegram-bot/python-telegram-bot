@@ -482,7 +482,7 @@ from ._payment.shippingaddress import ShippingAddress
 from ._payment.shippingoption import ShippingOption
 from ._payment.shippingquery import ShippingQuery
 from ._payment.stars.affiliateinfo import AffiliateInfo
-from ._payment.stars.revenuewithdrawelstate import (
+from ._payment.stars.revenuewithdrawalstate import (
     RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,

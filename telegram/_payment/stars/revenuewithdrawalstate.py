@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 
 class RevenueWithdrawalState(TelegramObject):
-    """This object escribes the state of a revenue withdrawal operation. Currently, it can be one
+    """This object describes the state of a revenue withdrawal operation. Currently, it can be one
     of:
 
     * :class:`telegram.RevenueWithdrawalStatePending`

@@ -32,7 +32,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 from .affiliateinfo import AffiliateInfo
-from .revenuewithdrawelstate import RevenueWithdrawalState
+from .revenuewithdrawalstate import RevenueWithdrawalState
 
 if TYPE_CHECKING:
     from telegram import Bot
