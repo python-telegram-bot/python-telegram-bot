@@ -81,7 +81,7 @@ from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
-from telegram._payment.stars import StarTransactions
+from telegram._payment.stars.startransactions import StarTransactions
 from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
