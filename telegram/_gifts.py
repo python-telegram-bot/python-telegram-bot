@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -82,14 +82,11 @@ class Gift(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Gift"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Gift":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
+        data["sticker"] = de_json_wo(data.get("sticker"), Sticker, bot)
         return cls(**data)
 
 
@@ -125,12 +122,9 @@ class Gifts(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Gifts"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Gifts":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["gifts"] = Gift.de_list(data.get("gifts"), bot)
+        data["gifts"] = de_list_wo(data.get("gifts"), Gift, bot)
         return cls(**data)

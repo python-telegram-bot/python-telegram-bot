@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars affiliates."""
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_wo
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -106,16 +106,11 @@ class AffiliateInfo(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["AffiliateInfo"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "AffiliateInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["affiliate_user"] = User.de_json(data.get("affiliate_user"), bot)
-        data["affiliate_chat"] = Chat.de_json(data.get("affiliate_chat"), bot)
+        data["affiliate_user"] = de_json_wo(data.get("affiliate_user"), User, bot)
+        data["affiliate_chat"] = de_json_wo(data.get("affiliate_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)

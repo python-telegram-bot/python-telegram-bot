@@ -901,7 +901,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
         self._bot_user = User.de_json(result, self)
-        return self._bot_user  # type: ignore[return-value]
+        return self._bot_user
 
     async def send_message(
         self,
@@ -3689,7 +3689,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "allow_group_chats": allow_group_chats,
             "allow_channel_chats": allow_channel_chats,
         }
-        return PreparedInlineMessage.de_json(  # type: ignore[return-value]
+        return PreparedInlineMessage.de_json(
             await self._post(
                 "savePreparedInlineMessage",
                 data,
@@ -3744,7 +3744,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value]
+        return UserProfilePhotos.de_json(result, self)
 
     async def get_file(
         self,
@@ -3809,7 +3809,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         if file_path and not is_local_file(file_path):
             result["file_path"] = f"{self._base_file_url}/{file_path}"
 
-        return File.de_json(result, self)  # type: ignore[return-value]
+        return File.de_json(result, self)
 
     async def ban_chat_member(
         self,
@@ -4729,7 +4729,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        return ChatFullInfo.de_json(result, self)  # type: ignore[return-value]
+        return ChatFullInfo.de_json(result, self)
 
     async def get_chat_administrators(
         self,
@@ -4842,7 +4842,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return ChatMember.de_json(result, self)  # type: ignore[return-value]
+        return ChatMember.de_json(result, self)
 
     async def set_chat_sticker_set(
         self,
@@ -4937,7 +4937,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return WebhookInfo.de_json(result, self)  # type: ignore[return-value]
+        return WebhookInfo.de_json(result, self)
 
     async def set_game_score(
         self,
@@ -5444,7 +5444,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        return SentWebAppMessage.de_json(api_result, self)  # type: ignore[return-value]
+        return SentWebAppMessage.de_json(api_result, self)
 
     async def restrict_chat_member(
         self,
@@ -5858,7 +5858,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
+        return ChatInviteLink.de_json(result, self)
 
     async def edit_chat_invite_link(
         self,
@@ -5937,7 +5937,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
+        return ChatInviteLink.de_json(result, self)
 
     async def revoke_chat_invite_link(
         self,
@@ -5984,7 +5984,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
+        return ChatInviteLink.de_json(result, self)
 
     async def approve_chat_join_request(
         self,
@@ -6456,7 +6456,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return StickerSet.de_json(result, self)  # type: ignore[return-value]
+        return StickerSet.de_json(result, self)
 
     async def get_custom_emoji_stickers(
         self,
@@ -6559,7 +6559,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return File.de_json(result, self)  # type: ignore[return-value]
+        return File.de_json(result, self)
 
     async def add_sticker_to_set(
         self,
@@ -7384,7 +7384,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return Poll.de_json(result, self)  # type: ignore[return-value]
+        return Poll.de_json(result, self)
 
     async def send_dice(
         self,
@@ -7540,7 +7540,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-        return ChatAdministratorRights.de_json(result, self)  # type: ignore[return-value]
+        return ChatAdministratorRights.de_json(result, self)
 
     async def set_my_default_administrator_rights(
         self,
@@ -7950,7 +7950,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return MessageId.de_json(result, self)  # type: ignore[return-value]
+        return MessageId.de_json(result, self)
 
     async def copy_messages(
         self,
@@ -8101,7 +8101,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return MenuButton.de_json(result, bot=self)  # type: ignore[return-value]
+        return MenuButton.de_json(result, bot=self)
 
     async def create_invoice_link(
         self,
@@ -8352,7 +8352,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return ForumTopic.de_json(result, self)  # type: ignore[return-value]
+        return ForumTopic.de_json(result, self)
 
     async def edit_forum_topic(
         self,
@@ -8940,7 +8940,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         data = {"language_code": language_code}
-        return BotDescription.de_json(  # type: ignore[return-value]
+        return BotDescription.de_json(
             await self._post(
                 "getMyDescription",
                 data,
@@ -8979,7 +8979,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         data = {"language_code": language_code}
-        return BotShortDescription.de_json(  # type: ignore[return-value]
+        return BotShortDescription.de_json(
             await self._post(
                 "getMyShortDescription",
                 data,
@@ -9065,7 +9065,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         data = {"language_code": language_code}
-        return BotName.de_json(  # type: ignore[return-value]
+        return BotName.de_json(
             await self._post(
                 "getMyName",
                 data,
@@ -9107,7 +9107,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
-        return UserChatBoosts.de_json(  # type: ignore[return-value]
+        return UserChatBoosts.de_json(
             await self._post(
                 "getUserChatBoosts",
                 data,
@@ -9231,7 +9231,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"business_connection_id": business_connection_id}
-        return BusinessConnection.de_json(  # type: ignore[return-value]
+        return BusinessConnection.de_json(
             await self._post(
                 "getBusinessConnection",
                 data,
@@ -9366,7 +9366,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         data: JSONDict = {"offset": offset, "limit": limit}
 
-        return StarTransactions.de_json(  # type: ignore[return-value]
+        return StarTransactions.de_json(
             await self._post(
                 "getStarTransactions",
                 data,
@@ -9592,7 +9592,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
+        return ChatInviteLink.de_json(result, self)
 
     async def edit_chat_subscription_invite_link(
         self,
@@ -9645,7 +9645,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
+        return ChatInviteLink.de_json(result, self)
 
     async def get_available_gifts(
         self,
@@ -9667,7 +9667,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        return Gifts.de_json(  # type: ignore[return-value]
+        return Gifts.de_json(
             await self._post(
                 "getAvailableGifts",
                 read_timeout=read_timeout,

@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Final, Optional
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_wo
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -105,14 +106,9 @@ class ChatMember(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatMember"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatMember":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         _class_mapping: dict[str, type[ChatMember]] = {
             cls.OWNER: ChatMemberOwner,
@@ -126,7 +122,7 @@ class ChatMember(TelegramObject):
         if cls is ChatMember and data.get("status") in _class_mapping:
             return _class_mapping[data.pop("status")].de_json(data=data, bot=bot)
 
-        data["user"] = User.de_json(data.get("user"), bot)
+        data["user"] = de_json_wo(data.get("user"), User, bot)
         if "until_date" in data:
             # Get the local timezone from the bot if it has defaults
             loc_tzinfo = extract_tzinfo_from_defaults(bot)

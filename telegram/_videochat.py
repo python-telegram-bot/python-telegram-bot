@@ -126,13 +126,10 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["VideoChatParticipantsInvited"]:
+        cls, data: JSONDict, bot: Optional["Bot"] = None
+    ) -> "VideoChatParticipantsInvited":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         data["users"] = User.de_list(data.get("users", []), bot)
         return super().de_json(data=data, bot=bot)
@@ -178,14 +175,9 @@ class VideoChatScheduled(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["VideoChatScheduled"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "VideoChatScheduled":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)

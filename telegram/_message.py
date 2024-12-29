@@ -65,7 +65,7 @@ from telegram._shared import ChatShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
@@ -191,9 +191,6 @@ class MaybeInaccessibleMessage(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
         if cls is MaybeInaccessibleMessage:
             if data["date"] == 0:
                 return InaccessibleMessage.de_json(data=data, bot=bot)
@@ -208,7 +205,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         else:
             data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
 
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
 
@@ -1251,83 +1248,92 @@ class Message(MaybeInaccessibleMessage):
         return None
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Message"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Message":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["from_user"] = User.de_json(data.pop("from", None), bot)
-        data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
-        data["entities"] = MessageEntity.de_list(data.get("entities"), bot)
-        data["caption_entities"] = MessageEntity.de_list(data.get("caption_entities"), bot)
-        data["reply_to_message"] = Message.de_json(data.get("reply_to_message"), bot)
+        data["from_user"] = de_json_wo(data.pop("from", None), User, bot)
+        data["sender_chat"] = de_json_wo(data.get("sender_chat"), Chat, bot)
+        data["entities"] = de_list_wo(data.get("entities"), MessageEntity, bot)
+        data["caption_entities"] = de_list_wo(data.get("caption_entities"), MessageEntity, bot)
+        data["reply_to_message"] = de_json_wo(data.get("reply_to_message"), Message, bot)
         data["edit_date"] = from_timestamp(data.get("edit_date"), tzinfo=loc_tzinfo)
-        data["audio"] = Audio.de_json(data.get("audio"), bot)
-        data["document"] = Document.de_json(data.get("document"), bot)
-        data["animation"] = Animation.de_json(data.get("animation"), bot)
-        data["game"] = Game.de_json(data.get("game"), bot)
-        data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
-        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
-        data["story"] = Story.de_json(data.get("story"), bot)
-        data["video"] = Video.de_json(data.get("video"), bot)
-        data["voice"] = Voice.de_json(data.get("voice"), bot)
-        data["video_note"] = VideoNote.de_json(data.get("video_note"), bot)
-        data["contact"] = Contact.de_json(data.get("contact"), bot)
-        data["location"] = Location.de_json(data.get("location"), bot)
-        data["venue"] = Venue.de_json(data.get("venue"), bot)
-        data["new_chat_members"] = User.de_list(data.get("new_chat_members"), bot)
-        data["left_chat_member"] = User.de_json(data.get("left_chat_member"), bot)
-        data["new_chat_photo"] = PhotoSize.de_list(data.get("new_chat_photo"), bot)
-        data["message_auto_delete_timer_changed"] = MessageAutoDeleteTimerChanged.de_json(
-            data.get("message_auto_delete_timer_changed"), bot
+        data["audio"] = de_json_wo(data.get("audio"), Audio, bot)
+        data["document"] = de_json_wo(data.get("document"), Document, bot)
+        data["animation"] = de_json_wo(data.get("animation"), Animation, bot)
+        data["game"] = de_json_wo(data.get("game"), Game, bot)
+        data["photo"] = de_list_wo(data.get("photo"), PhotoSize, bot)
+        data["sticker"] = de_json_wo(data.get("sticker"), Sticker, bot)
+        data["story"] = de_json_wo(data.get("story"), Story, bot)
+        data["video"] = de_json_wo(data.get("video"), Video, bot)
+        data["voice"] = de_json_wo(data.get("voice"), Voice, bot)
+        data["video_note"] = de_json_wo(data.get("video_note"), VideoNote, bot)
+        data["contact"] = de_json_wo(data.get("contact"), Contact, bot)
+        data["location"] = de_json_wo(data.get("location"), Location, bot)
+        data["venue"] = de_json_wo(data.get("venue"), Venue, bot)
+        data["new_chat_members"] = de_list_wo(data.get("new_chat_members"), User, bot)
+        data["left_chat_member"] = de_json_wo(data.get("left_chat_member"), User, bot)
+        data["new_chat_photo"] = de_list_wo(data.get("new_chat_photo"), PhotoSize, bot)
+        data["message_auto_delete_timer_changed"] = de_json_wo(
+            data.get("message_auto_delete_timer_changed"), MessageAutoDeleteTimerChanged, bot
         )
-        data["pinned_message"] = MaybeInaccessibleMessage.de_json(data.get("pinned_message"), bot)
-        data["invoice"] = Invoice.de_json(data.get("invoice"), bot)
-        data["successful_payment"] = SuccessfulPayment.de_json(data.get("successful_payment"), bot)
-        data["passport_data"] = PassportData.de_json(data.get("passport_data"), bot)
-        data["poll"] = Poll.de_json(data.get("poll"), bot)
-        data["dice"] = Dice.de_json(data.get("dice"), bot)
-        data["via_bot"] = User.de_json(data.get("via_bot"), bot)
-        data["proximity_alert_triggered"] = ProximityAlertTriggered.de_json(
-            data.get("proximity_alert_triggered"), bot
+        data["pinned_message"] = de_json_wo(
+            data.get("pinned_message"), MaybeInaccessibleMessage, bot
         )
-        data["reply_markup"] = InlineKeyboardMarkup.de_json(data.get("reply_markup"), bot)
-        data["video_chat_scheduled"] = VideoChatScheduled.de_json(
-            data.get("video_chat_scheduled"), bot
+        data["invoice"] = de_json_wo(data.get("invoice"), Invoice, bot)
+        data["successful_payment"] = de_json_wo(
+            data.get("successful_payment"), SuccessfulPayment, bot
         )
-        data["video_chat_started"] = VideoChatStarted.de_json(data.get("video_chat_started"), bot)
-        data["video_chat_ended"] = VideoChatEnded.de_json(data.get("video_chat_ended"), bot)
-        data["video_chat_participants_invited"] = VideoChatParticipantsInvited.de_json(
-            data.get("video_chat_participants_invited"), bot
+        data["passport_data"] = de_json_wo(data.get("passport_data"), PassportData, bot)
+        data["poll"] = de_json_wo(data.get("poll"), Poll, bot)
+        data["dice"] = de_json_wo(data.get("dice"), Dice, bot)
+        data["via_bot"] = de_json_wo(data.get("via_bot"), User, bot)
+        data["proximity_alert_triggered"] = de_json_wo(
+            data.get("proximity_alert_triggered"), ProximityAlertTriggered, bot
         )
-        data["web_app_data"] = WebAppData.de_json(data.get("web_app_data"), bot)
-        data["forum_topic_closed"] = ForumTopicClosed.de_json(data.get("forum_topic_closed"), bot)
-        data["forum_topic_created"] = ForumTopicCreated.de_json(
-            data.get("forum_topic_created"), bot
+        data["reply_markup"] = de_json_wo(data.get("reply_markup"), InlineKeyboardMarkup, bot)
+        data["video_chat_scheduled"] = de_json_wo(
+            data.get("video_chat_scheduled"), VideoChatScheduled, bot
         )
-        data["forum_topic_reopened"] = ForumTopicReopened.de_json(
-            data.get("forum_topic_reopened"), bot
+        data["video_chat_started"] = de_json_wo(
+            data.get("video_chat_started"), VideoChatStarted, bot
         )
-        data["forum_topic_edited"] = ForumTopicEdited.de_json(data.get("forum_topic_edited"), bot)
-        data["general_forum_topic_hidden"] = GeneralForumTopicHidden.de_json(
-            data.get("general_forum_topic_hidden"), bot
+        data["video_chat_ended"] = de_json_wo(data.get("video_chat_ended"), VideoChatEnded, bot)
+        data["video_chat_participants_invited"] = de_json_wo(
+            data.get("video_chat_participants_invited"), VideoChatParticipantsInvited, bot
         )
-        data["general_forum_topic_unhidden"] = GeneralForumTopicUnhidden.de_json(
-            data.get("general_forum_topic_unhidden"), bot
+        data["web_app_data"] = de_json_wo(data.get("web_app_data"), WebAppData, bot)
+        data["forum_topic_closed"] = de_json_wo(
+            data.get("forum_topic_closed"), ForumTopicClosed, bot
         )
-        data["write_access_allowed"] = WriteAccessAllowed.de_json(
-            data.get("write_access_allowed"), bot
+        data["forum_topic_created"] = de_json_wo(
+            data.get("forum_topic_created"), ForumTopicCreated, bot
         )
-        data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
-        data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
-        data["chat_background_set"] = ChatBackground.de_json(data.get("chat_background_set"), bot)
-        data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
-        data["refunded_payment"] = RefundedPayment.de_json(data.get("refunded_payment"), bot)
+        data["forum_topic_reopened"] = de_json_wo(
+            data.get("forum_topic_reopened"), ForumTopicReopened, bot
+        )
+        data["forum_topic_edited"] = de_json_wo(
+            data.get("forum_topic_edited"), ForumTopicEdited, bot
+        )
+        data["general_forum_topic_hidden"] = de_json_wo(
+            data.get("general_forum_topic_hidden"), GeneralForumTopicHidden, bot
+        )
+        data["general_forum_topic_unhidden"] = de_json_wo(
+            data.get("general_forum_topic_unhidden"), GeneralForumTopicUnhidden, bot
+        )
+        data["write_access_allowed"] = de_json_wo(
+            data.get("write_access_allowed"), WriteAccessAllowed, bot
+        )
+        data["users_shared"] = de_json_wo(data.get("users_shared"), UsersShared, bot)
+        data["chat_shared"] = de_json_wo(data.get("chat_shared"), ChatShared, bot)
+        data["chat_background_set"] = de_json_wo(
+            data.get("chat_background_set"), ChatBackground, bot
+        )
+        data["paid_media"] = de_json_wo(data.get("paid_media"), PaidMediaInfo, bot)
+        data["refunded_payment"] = de_json_wo(data.get("refunded_payment"), RefundedPayment, bot)
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
@@ -1344,19 +1350,21 @@ class Message(MaybeInaccessibleMessage):
             TextQuote,
         )
 
-        data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
-        data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
-        data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)
-        data["giveaway_winners"] = GiveawayWinners.de_json(data.get("giveaway_winners"), bot)
-        data["link_preview_options"] = LinkPreviewOptions.de_json(
-            data.get("link_preview_options"), bot
+        data["giveaway"] = de_json_wo(data.get("giveaway"), Giveaway, bot)
+        data["giveaway_completed"] = de_json_wo(
+            data.get("giveaway_completed"), GiveawayCompleted, bot
         )
-        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
-        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
-        data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
-        data["reply_to_story"] = Story.de_json(data.get("reply_to_story"), bot)
-        data["boost_added"] = ChatBoostAdded.de_json(data.get("boost_added"), bot)
-        data["sender_business_bot"] = User.de_json(data.get("sender_business_bot"), bot)
+        data["giveaway_created"] = de_json_wo(data.get("giveaway_created"), GiveawayCreated, bot)
+        data["giveaway_winners"] = de_json_wo(data.get("giveaway_winners"), GiveawayWinners, bot)
+        data["link_preview_options"] = de_json_wo(
+            data.get("link_preview_options"), LinkPreviewOptions, bot
+        )
+        data["external_reply"] = de_json_wo(data.get("external_reply"), ExternalReplyInfo, bot)
+        data["quote"] = de_json_wo(data.get("quote"), TextQuote, bot)
+        data["forward_origin"] = de_json_wo(data.get("forward_origin"), MessageOrigin, bot)
+        data["reply_to_story"] = de_json_wo(data.get("reply_to_story"), Story, bot)
+        data["boost_added"] = de_json_wo(data.get("boost_added"), ChatBoostAdded, bot)
+        data["sender_business_bot"] = de_json_wo(data.get("sender_business_bot"), User, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

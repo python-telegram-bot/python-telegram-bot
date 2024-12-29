@@ -71,14 +71,9 @@ class UserProfilePhotos(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["UserProfilePhotos"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UserProfilePhotos":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         data["photos"] = [PhotoSize.de_list(photo, bot) for photo in data["photos"]]
 
