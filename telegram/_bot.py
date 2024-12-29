@@ -9280,7 +9280,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         user_id: int,
         name: str,
-        old_sticker: Union[str, Sticker],
+        old_sticker: Union[str, "Sticker"],
         sticker: "InputSticker",
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
