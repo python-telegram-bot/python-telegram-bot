@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
 import contextlib
-import datetime
+import datetime as dtm
 import inspect
 import json
 from collections.abc import Iterator, Mapping, Sized
@@ -634,9 +634,9 @@ class TelegramObject:
                         val.append(item)
                 out[key] = val
 
-            elif isinstance(value, datetime.datetime):
+            elif isinstance(value, dtm.datetime):
                 out[key] = to_timestamp(value)
-            elif isinstance(value, datetime.timedelta):
+            elif isinstance(value, dtm.timedelta):
                 out[key] = value.total_seconds()
 
         for key in pop_keys:

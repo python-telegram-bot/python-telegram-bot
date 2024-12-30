@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import gzip
 import os
 import pickle
@@ -229,7 +229,7 @@ def pickle_files_wo_callback_data(user_data, chat_data, bot_data, conversations)
 def update(bot):
     user = User(id=321, first_name="test_user", is_bot=False)
     chat = Chat(id=123, type="group")
-    message = Message(1, datetime.datetime.now(), chat, from_user=user, text="Hi there")
+    message = Message(1, dtm.datetime.now(), chat, from_user=user, text="Hi there")
     message.set_bot(bot)
     return Update(0, message=message)
 
@@ -289,7 +289,7 @@ class TestPicklePersistence:
 
     async def test_pickle_behaviour_with_slots(self, pickle_persistence):
         bot_data = await pickle_persistence.get_bot_data()
-        bot_data["message"] = Message(3, datetime.datetime.now(), Chat(2, type="supergroup"))
+        bot_data["message"] = Message(3, dtm.datetime.now(), Chat(2, type="supergroup"))
         await pickle_persistence.update_bot_data(bot_data)
         retrieved = await pickle_persistence.get_bot_data()
         assert retrieved == bot_data

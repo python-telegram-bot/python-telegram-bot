@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 
-import datetime
+import datetime as dtm
 import re
 from collections.abc import Sequence
 from html import escape
@@ -158,14 +158,14 @@ class MaybeInaccessibleMessage(TelegramObject):
         self,
         chat: Chat,
         message_id: int,
-        date: datetime.datetime,
+        date: dtm.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.chat: Chat = chat
         self.message_id: int = message_id
-        self.date: datetime.datetime = date
+        self.date: dtm.datetime = date
 
         self._id_attrs = (self.message_id, self.chat)
 
@@ -1024,11 +1024,11 @@ class Message(MaybeInaccessibleMessage):
     def __init__(
         self,
         message_id: int,
-        date: datetime.datetime,
+        date: dtm.datetime,
         chat: Chat,
         from_user: Optional[User] = None,
         reply_to_message: Optional["Message"] = None,
-        edit_date: Optional[datetime.datetime] = None,
+        edit_date: Optional[dtm.datetime] = None,
         text: Optional[str] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
@@ -1119,11 +1119,11 @@ class Message(MaybeInaccessibleMessage):
             # Optionals
             self.from_user: Optional[User] = from_user
             self.sender_chat: Optional[Chat] = sender_chat
-            self.date: datetime.datetime = date
+            self.date: dtm.datetime = date
             self.chat: Chat = chat
             self.is_automatic_forward: Optional[bool] = is_automatic_forward
             self.reply_to_message: Optional[Message] = reply_to_message
-            self.edit_date: Optional[datetime.datetime] = edit_date
+            self.edit_date: Optional[dtm.datetime] = edit_date
             self.has_protected_content: Optional[bool] = has_protected_content
             self.text: Optional[str] = text
             self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
@@ -3077,7 +3077,7 @@ class Message(MaybeInaccessibleMessage):
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: Optional[int] = None,
-        close_date: Optional[Union[int, datetime.datetime]] = None,
+        close_date: Optional[Union[int, dtm.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,

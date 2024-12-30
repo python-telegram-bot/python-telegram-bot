@@ -16,14 +16,15 @@ jobs:
 
     - name: Fetch Dependabot metadata
       id: dependabot-metadata
-      uses: dependabot/fetch-metadata@v2.2.0
+      uses: dependabot/fetch-metadata@dbb049abf0d677abbd7f7eee0375145b417fdd34 # v2.2.0
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         ref: ${{ github.event.pull_request.head.ref }}
+        persist-credentials: false
 
     - name: Update Version Number in Other Files
-      uses: jacobtomlinson/gha-find-replace@v3
+      uses: jacobtomlinson/gha-find-replace@f1069b438f125e5395d84d1c6fd3b559a7880cb5 # v3
       with:
         find: ${{ steps.dependabot-metadata.outputs.previous-version }}
         replace: ${{ steps.dependabot-metadata.outputs.new-version }}
@@ -31,7 +32,7 @@ jobs:
         exclude: CHANGES.rst
 
     - name: Commit & Push Changes to PR
-      uses: EndBug/add-and-commit@v9.1.4
+      uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9.1.4
       with:
         message: 'Update version number in other files'
         committer_name: GitHub Actions

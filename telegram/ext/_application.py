@@ -826,7 +826,7 @@ class Application(
             allowed_updates (Sequence[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.9
                     Accepts any :class:`collections.abc.Sequence` as input instead of just a list
             close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
                 closed upon shutdown. Defaults to :obj:`True`.
@@ -960,7 +960,7 @@ class Application(
             allowed_updates (Sequence[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.9
                     Accepts any :class:`collections.abc.Sequence` as input instead of just a list
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.

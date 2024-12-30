@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMemberUpdated."""
-import datetime
+import datetime as dtm
 from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._chat import Chat
@@ -108,7 +108,7 @@ class ChatMemberUpdated(TelegramObject):
         self,
         chat: Chat,
         from_user: User,
-        date: datetime.datetime,
+        date: dtm.datetime,
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
         invite_link: Optional[ChatInviteLink] = None,
@@ -121,7 +121,7 @@ class ChatMemberUpdated(TelegramObject):
         # Required
         self.chat: Chat = chat
         self.from_user: User = from_user
-        self.date: datetime.datetime = date
+        self.date: dtm.datetime = date
         self.old_chat_member: ChatMember = old_chat_member
         self.new_chat_member: ChatMember = new_chat_member
         self.via_chat_folder_invite_link: Optional[bool] = via_chat_folder_invite_link
@@ -179,9 +179,7 @@ class ChatMemberUpdated(TelegramObject):
         self,
     ) -> dict[
         str,
-        tuple[
-            Union[str, bool, datetime.datetime, User], Union[str, bool, datetime.datetime, User]
-        ],
+        tuple[Union[str, bool, dtm.datetime, User], Union[str, bool, dtm.datetime, User]],
     ]:
         """Computes the difference between :attr:`old_chat_member` and :attr:`new_chat_member`.
 

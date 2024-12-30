@@ -35,9 +35,7 @@ if TEST_WITH_OPT_DEPS:
 
     UTC = pytz.utc
 else:
-    import datetime
-
-    UTC = datetime.timezone.utc
+    UTC = dtm.timezone.utc
 
 
 class CustomContext(CallbackContext):

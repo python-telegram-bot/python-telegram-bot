@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from datetime import datetime, timedelta, timezone
+import datetime as dtm
 
 import pytest
 
@@ -297,7 +297,7 @@ class PollTestBase:
     ).decode("unicode-escape")
     explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     open_period = 42
-    close_date = datetime.now(timezone.utc)
+    close_date = dtm.datetime.now(dtm.timezone.utc)
     question_entities = [
         MessageEntity(MessageEntity.BOLD, 0, 4),
         MessageEntity(MessageEntity.ITALIC, 5, 8),
@@ -339,7 +339,7 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll.explanation == self.explanation
         assert poll.explanation_entities == tuple(self.explanation_entities)
         assert poll.open_period == self.open_period
-        assert abs(poll.close_date - self.close_date) < timedelta(seconds=1)
+        assert abs(poll.close_date - self.close_date) < dtm.timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
         assert poll.question_entities == tuple(self.question_entities)
 

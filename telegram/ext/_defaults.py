@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
-import datetime
+import datetime as dtm
 from typing import Any, NoReturn, Optional, final
 
 from telegram import LinkPreviewOptions
@@ -132,7 +132,7 @@ class Defaults:
         disable_notification: Optional[bool] = None,
         disable_web_page_preview: Optional[bool] = None,
         quote: Optional[bool] = None,
-        tzinfo: datetime.tzinfo = UTC,
+        tzinfo: dtm.tzinfo = UTC,
         block: bool = True,
         allow_sending_without_reply: Optional[bool] = None,
         protect_content: Optional[bool] = None,
@@ -142,7 +142,7 @@ class Defaults:
         self._parse_mode: Optional[str] = parse_mode
         self._disable_notification: Optional[bool] = disable_notification
         self._allow_sending_without_reply: Optional[bool] = allow_sending_without_reply
-        self._tzinfo: datetime.tzinfo = tzinfo
+        self._tzinfo: dtm.tzinfo = tzinfo
         self._block: bool = block
         self._protect_content: Optional[bool] = protect_content
 
@@ -356,7 +356,7 @@ class Defaults:
         raise AttributeError("You can not assign a new value to quote after initialization.")
 
     @property
-    def tzinfo(self) -> datetime.tzinfo:
+    def tzinfo(self) -> dtm.tzinfo:
         """:obj:`tzinfo`: A timezone to be used for all date(time) objects appearing
         throughout PTB.
         """

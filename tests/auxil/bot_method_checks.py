@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Provides functions to test both methods."""
-import datetime
+import datetime as dtm
 import functools
 import inspect
 import re
@@ -38,6 +38,7 @@ from telegram import (
     InputTextMessageContent,
     LinkPreviewOptions,
     ReplyParameters,
+    Sticker,
     TelegramObject,
 )
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
@@ -318,6 +319,16 @@ def build_kwargs(
                 kws["error_message"] = "error"
             elif name == "options":
                 kws[name] = ["option1", "option2"]
+            elif name in ("sticker", "old_sticker"):
+                kws[name] = Sticker(
+                    file_id="file_id",
+                    file_unique_id="file_unique_id",
+                    width=1,
+                    height=1,
+                    is_animated=False,
+                    is_video=False,
+                    type="regular",
+                )
             else:
                 kws[name] = True
 
@@ -337,12 +348,10 @@ def build_kwargs(
         elif name == "until_date":
             if manually_passed_value not in [None, DEFAULT_NONE]:
                 # Europe/Berlin
-                kws[name] = datetime.datetime(
-                    2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin")
-                )
+                kws[name] = dtm.datetime(2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"))
             else:
                 # naive UTC
-                kws[name] = datetime.datetime(2000, 1, 1, 0)
+                kws[name] = dtm.datetime(2000, 1, 1, 0)
         elif name == "reply_parameters":
             kws[name] = telegram.ReplyParameters(
                 message_id=1,

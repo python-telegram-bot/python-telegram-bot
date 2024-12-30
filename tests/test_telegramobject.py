@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import inspect
 import pickle
 import re
@@ -176,9 +176,7 @@ class TestTelegramObject:
         assert to.to_dict() == {"foo": "bar"}
 
     def test_to_dict_missing_attribute(self):
-        message = Message(
-            1, datetime.datetime.now(), Chat(1, "private"), from_user=User(1, "", False)
-        )
+        message = Message(1, dtm.datetime.now(), Chat(1, "private"), from_user=User(1, "", False))
         message._unfreeze()
         del message.chat
 
@@ -288,7 +286,7 @@ class TestTelegramObject:
     def test_pickle(self, bot):
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
-        date = datetime.datetime.now()
+        date = dtm.datetime.now()
         photo = PhotoSize("file_id", "unique", 21, 21)
         photo.set_bot(bot)
         msg = Message(
@@ -432,7 +430,7 @@ class PicklePropertyTest(TelegramObject):
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
-        date = datetime.datetime.now()
+        date = dtm.datetime.now()
         photo = PhotoSize("file_id", "unique", 21, 21)
         photo.set_bot(bot)
         msg = Message(

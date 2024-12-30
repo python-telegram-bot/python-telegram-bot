@@ -22,9 +22,9 @@
 import asyncio
 import contextlib
 import copy
+import datetime as dtm
 import pickle
 from collections.abc import Sequence
-from datetime import datetime, timedelta
 from types import TracebackType
 from typing import (
     TYPE_CHECKING,
@@ -81,7 +81,7 @@ from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
-from telegram._payment.stars import StarTransactions
+from telegram._payment.stars.startransactions import StarTransactions
 from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
@@ -3815,7 +3815,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: Union[str, int],
         user_id: int,
-        until_date: Optional[Union[int, datetime]] = None,
+        until_date: Optional[Union[int, dtm.datetime]] = None,
         revoke_messages: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5451,7 +5451,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         chat_id: Union[str, int],
         user_id: int,
         permissions: ChatPermissions,
-        until_date: Optional[Union[int, datetime]] = None,
+        until_date: Optional[Union[int, dtm.datetime]] = None,
         use_independent_chat_permissions: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5788,7 +5788,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     async def create_chat_invite_link(
         self,
         chat_id: Union[str, int],
-        expire_date: Optional[Union[int, datetime]] = None,
+        expire_date: Optional[Union[int, dtm.datetime]] = None,
         member_limit: Optional[int] = None,
         name: Optional[str] = None,
         creates_join_request: Optional[bool] = None,
@@ -5864,7 +5864,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: Union[str, int],
         invite_link: Union[str, "ChatInviteLink"],
-        expire_date: Optional[Union[int, datetime]] = None,
+        expire_date: Optional[Union[int, dtm.datetime]] = None,
         member_limit: Optional[int] = None,
         name: Optional[str] = None,
         creates_join_request: Optional[bool] = None,
@@ -6233,7 +6233,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         user_id: int,
         emoji_status_custom_emoji_id: Optional[str] = None,
-        emoji_status_expiration_date: Optional[Union[int, datetime]] = None,
+        emoji_status_expiration_date: Optional[Union[int, dtm.datetime]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6622,7 +6622,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
     async def set_sticker_position_in_set(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         position: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6634,7 +6634,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Use this method to move a sticker in a set created by the bot to a specific position.
 
         Args:
-            sticker (:obj:`str`): File identifier of the sticker.
+            sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
+                the sticker object.
+
+                .. versionchanged:: NEXT.VERSION
+                   Accepts also :class:`telegram.Sticker` instances.
             position (:obj:`int`): New sticker position in the set, zero-based.
 
         Returns:
@@ -6644,7 +6648,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"sticker": sticker, "position": position}
+        data: JSONDict = {
+            "sticker": sticker if isinstance(sticker, str) else sticker.file_id,
+            "position": position,
+        }
         return await self._post(
             "setStickerPositionInSet",
             data,
@@ -6749,7 +6756,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
     async def delete_sticker_from_set(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6760,7 +6767,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Use this method to delete a sticker from a set created by the bot.
 
         Args:
-            sticker (:obj:`str`): File identifier of the sticker.
+            sticker (:obj:`str` | :class:`telegram.Sticker`): File identifier of the sticker or
+                the sticker object.
+
+                .. versionchanged:: NEXT.VERSION
+                   Accepts also :class:`telegram.Sticker` instances.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6769,7 +6780,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"sticker": sticker}
+        data: JSONDict = {"sticker": sticker if isinstance(sticker, str) else sticker.file_id}
         return await self._post(
             "deleteStickerFromSet",
             data,
@@ -6937,7 +6948,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
     async def set_sticker_emoji_list(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         emoji_list: Sequence[str],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6953,7 +6964,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.2
 
         Args:
-            sticker (:obj:`str`): File identifier of the sticker.
+            sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
+                the sticker object.
+
+                .. versionchanged:: NEXT.VERSION
+                   Accepts also :class:`telegram.Sticker` instances.
             emoji_list (Sequence[:obj:`str`]): A sequence of
                 :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI`-
                 :tg-const:`telegram.constants.StickerLimit.MAX_STICKER_EMOJI` emoji associated with
@@ -6965,7 +6980,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        data: JSONDict = {"sticker": sticker, "emoji_list": emoji_list}
+        data: JSONDict = {
+            "sticker": sticker if isinstance(sticker, str) else sticker.file_id,
+            "emoji_list": emoji_list,
+        }
         return await self._post(
             "setStickerEmojiList",
             data,
@@ -6978,7 +6996,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
     async def set_sticker_keywords(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         keywords: Optional[Sequence[str]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6994,7 +7012,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.2
 
         Args:
-            sticker (:obj:`str`): File identifier of the sticker.
+            sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
+                the sticker object.
+
+                .. versionchanged:: NEXT.VERSION
+                   Accepts also :class:`telegram.Sticker` instances.
             keywords (Sequence[:obj:`str`]): A sequence of
                 0-:tg-const:`telegram.constants.StickerLimit.MAX_SEARCH_KEYWORDS` search keywords
                 for the sticker with total length up to
@@ -7006,7 +7028,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        data: JSONDict = {"sticker": sticker, "keywords": keywords}
+        data: JSONDict = {
+            "sticker": sticker if isinstance(sticker, str) else sticker.file_id,
+            "keywords": keywords,
+        }
         return await self._post(
             "setStickerKeywords",
             data,
@@ -7019,7 +7044,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
     async def set_sticker_mask_position(
         self,
-        sticker: str,
+        sticker: Union[str, "Sticker"],
         mask_position: Optional[MaskPosition] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7035,7 +7060,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.2
 
         Args:
-            sticker (:obj:`str`): File identifier of the sticker.
+            sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
+                the sticker object.
+
+                .. versionchanged:: NEXT.VERSION
+                   Accepts also :class:`telegram.Sticker` instances.
             mask_position (:class:`telegram.MaskPosition`, optional): A object with the position
                 where the mask should be placed on faces. Omit the parameter to remove the mask
                 position.
@@ -7046,7 +7075,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        data: JSONDict = {"sticker": sticker, "mask_position": mask_position}
+        data: JSONDict = {
+            "sticker": sticker if isinstance(sticker, str) else sticker.file_id,
+            "mask_position": mask_position,
+        }
         return await self._post(
             "setStickerMaskPosition",
             data,
@@ -7159,7 +7191,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: Optional[int] = None,
-        close_date: Optional[Union[int, datetime]] = None,
+        close_date: Optional[Union[int, dtm.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -8125,7 +8157,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
         is_flexible: Optional[bool] = None,
-        subscription_period: Optional[Union[int, timedelta]] = None,
+        subscription_period: Optional[Union[int, dtm.timedelta]] = None,
         business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -8248,7 +8280,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "send_email_to_provider": send_email_to_provider,
             "subscription_period": (
                 subscription_period.total_seconds()
-                if isinstance(subscription_period, timedelta)
+                if isinstance(subscription_period, dtm.timedelta)
                 else subscription_period
             ),
             "business_connection_id": business_connection_id,
@@ -9248,7 +9280,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         user_id: int,
         name: str,
-        old_sticker: str,
+        old_sticker: Union[str, "Sticker"],
         sticker: "InputSticker",
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -9266,7 +9298,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             user_id (:obj:`int`): User identifier of the sticker set owner.
             name (:obj:`str`): Sticker set name.
-            old_sticker (:obj:`str`): File identifier of the replaced sticker.
+            old_sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the replaced
+                sticker or the sticker object itself.
+
+                .. versionchanged:: NEXT.VERSION
+                   Accepts also :class:`telegram.Sticker` instances.
             sticker (:class:`telegram.InputSticker`): An object with information about the added
                 sticker. If exactly the same sticker had already been added to the set, then the
                 set remains unchanged.
@@ -9280,7 +9316,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         data: JSONDict = {
             "user_id": user_id,
             "name": name,
-            "old_sticker": old_sticker,
+            "old_sticker": old_sticker if isinstance(old_sticker, str) else old_sticker.file_id,
             "sticker": sticker,
         }
 

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ConversationHandler."""
 import asyncio
-import datetime
+import datetime as dtm
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Final, Generic, NoReturn, Optional, Union, cast
 
@@ -291,7 +291,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         per_chat: bool = True,
         per_user: bool = True,
         per_message: bool = False,
-        conversation_timeout: Optional[Union[float, datetime.timedelta]] = None,
+        conversation_timeout: Optional[Union[float, dtm.timedelta]] = None,
         name: Optional[str] = None,
         persistent: bool = False,
         map_to_parent: Optional[dict[object, object]] = None,
@@ -319,9 +319,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         self._per_user: bool = per_user
         self._per_chat: bool = per_chat
         self._per_message: bool = per_message
-        self._conversation_timeout: Optional[Union[float, datetime.timedelta]] = (
-            conversation_timeout
-        )
+        self._conversation_timeout: Optional[Union[float, dtm.timedelta]] = conversation_timeout
         self._name: Optional[str] = name
         self._map_to_parent: Optional[dict[object, object]] = map_to_parent
 
@@ -530,7 +528,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
     @property
     def conversation_timeout(
         self,
-    ) -> Optional[Union[float, datetime.timedelta]]:
+    ) -> Optional[Union[float, dtm.timedelta]]:
         """:obj:`float` | :obj:`datetime.timedelta`: Optional. When this
         handler is inactive more than this timeout (in seconds), it will be automatically
         ended.

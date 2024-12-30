@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 
-import datetime
+import datetime as dtm
 from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
@@ -413,13 +413,13 @@ class ChatMemberMember(ChatMember):
     def __init__(
         self,
         user: User,
-        until_date: Optional[datetime.datetime] = None,
+        until_date: Optional[dtm.datetime] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.until_date: Optional[datetime.datetime] = until_date
+            self.until_date: Optional[dtm.datetime] = until_date
 
 
 class ChatMemberRestricted(ChatMember):
@@ -566,7 +566,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
         can_manage_topics: bool,
-        until_date: datetime.datetime,
+        until_date: dtm.datetime,
         can_send_audios: bool,
         can_send_documents: bool,
         can_send_photos: bool,
@@ -587,7 +587,7 @@ class ChatMemberRestricted(ChatMember):
             self.can_send_other_messages: bool = can_send_other_messages
             self.can_add_web_page_previews: bool = can_add_web_page_previews
             self.can_manage_topics: bool = can_manage_topics
-            self.until_date: datetime.datetime = until_date
+            self.until_date: dtm.datetime = until_date
             self.can_send_audios: bool = can_send_audios
             self.can_send_documents: bool = can_send_documents
             self.can_send_photos: bool = can_send_photos
@@ -656,10 +656,10 @@ class ChatMemberBanned(ChatMember):
     def __init__(
         self,
         user: User,
-        until_date: datetime.datetime,
+        until_date: dtm.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.until_date: datetime.datetime = until_date
+            self.until_date: dtm.datetime = until_date

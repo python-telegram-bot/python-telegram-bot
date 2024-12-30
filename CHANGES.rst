@@ -4,6 +4,33 @@
 Changelog
 =========
 
+Version 21.9
+============
+
+*Released 2024-12-07*
+
+This is the technical changelog for version 21.9. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for Bot API 8.1 (:pr:`4594` closes :issue:`4592`)
+
+Minor Changes
+-------------
+
+- Use ``MessageLimit.DEEP_LINK_LENGTH`` in ``helpers.create_deep_linked_url`` (:pr:`4597` by `nemacysts <https://github.com/nemacysts>`_)
+- Allow ``Sequence`` Input for ``allowed_updates`` in ``Application`` and ``Updater`` Methods (:pr:`4589` by `nemacysts <https://github.com/nemacysts>`_)
+
+Dependency Updates
+------------------
+
+- Update ``aiolimiter`` requirement from ~=1.1.0 to >=1.1,<1.3 (:pr:`4595`)
+- Bump ``pytest`` from 8.3.3 to 8.3.4 (:pr:`4596`)
+- Bump ``codecov/codecov-action`` from 4 to 5 (:pr:`4585`)
+- Bump ``pylint`` to v3.3.2 to Improve Python 3.13 Support (:pr:`4590` by `nemacysts <https://github.com/nemacysts>`_)
+- Bump ``srvaroa/labeler`` from 1.11.1 to 1.12.0 (:pr:`4586`)
+
 Version 21.8
 ============
 *Released 2024-12-01*

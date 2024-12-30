@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an objects that are related to Telegram giveaways."""
-import datetime
+import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
@@ -105,7 +105,7 @@ class Giveaway(TelegramObject):
     def __init__(
         self,
         chats: Sequence[Chat],
-        winners_selection_date: datetime.datetime,
+        winners_selection_date: dtm.datetime,
         winner_count: int,
         only_new_members: Optional[bool] = None,
         has_public_winners: Optional[bool] = None,
@@ -119,7 +119,7 @@ class Giveaway(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         self.chats: tuple[Chat, ...] = tuple(chats)
-        self.winners_selection_date: datetime.datetime = winners_selection_date
+        self.winners_selection_date: dtm.datetime = winners_selection_date
         self.winner_count: int = winner_count
         self.only_new_members: Optional[bool] = only_new_members
         self.has_public_winners: Optional[bool] = has_public_winners
@@ -260,7 +260,7 @@ class GiveawayWinners(TelegramObject):
         self,
         chat: Chat,
         giveaway_message_id: int,
-        winners_selection_date: datetime.datetime,
+        winners_selection_date: dtm.datetime,
         winner_count: int,
         winners: Sequence[User],
         additional_chat_count: Optional[int] = None,
@@ -277,7 +277,7 @@ class GiveawayWinners(TelegramObject):
 
         self.chat: Chat = chat
         self.giveaway_message_id: int = giveaway_message_id
-        self.winners_selection_date: datetime.datetime = winners_selection_date
+        self.winners_selection_date: dtm.datetime = winners_selection_date
         self.winner_count: int = winner_count
         self.winners: tuple[User, ...] = tuple(winners)
         self.additional_chat_count: Optional[int] = additional_chat_count

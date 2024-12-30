@@ -18,8 +18,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
+import datetime as dtm
 from collections.abc import Sequence
-from datetime import datetime
 from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
@@ -1582,7 +1582,7 @@ class User(TelegramObject):
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: Optional[int] = None,
-        close_date: Optional[Union[int, datetime]] = None,
+        close_date: Optional[Union[int, dtm.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,

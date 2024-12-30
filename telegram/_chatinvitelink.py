@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents an invite link for a chat."""
-import datetime
+import datetime as dtm
 from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
@@ -139,7 +139,7 @@ class ChatInviteLink(TelegramObject):
         creates_join_request: bool,
         is_primary: bool,
         is_revoked: bool,
-        expire_date: Optional[datetime.datetime] = None,
+        expire_date: Optional[dtm.datetime] = None,
         member_limit: Optional[int] = None,
         name: Optional[str] = None,
         pending_join_request_count: Optional[int] = None,
@@ -157,7 +157,7 @@ class ChatInviteLink(TelegramObject):
         self.is_revoked: bool = is_revoked
 
         # Optionals
-        self.expire_date: Optional[datetime.datetime] = expire_date
+        self.expire_date: Optional[dtm.datetime] = expire_date
         self.member_limit: Optional[int] = member_limit
         self.name: Optional[str] = name
         self.pending_join_request_count: Optional[int] = (

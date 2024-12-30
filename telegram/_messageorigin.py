@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram MessageOigin."""
-import datetime
+import datetime as dtm
 from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
@@ -78,14 +78,14 @@ class MessageOrigin(TelegramObject):
     def __init__(
         self,
         type: str,  # pylint: disable=W0622
-        date: datetime.datetime,
+        date: dtm.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
         self.type: str = enum.get_member(constants.MessageOriginType, type, type)
-        self.date: datetime.datetime = date
+        self.date: dtm.datetime = date
 
         self._id_attrs = (
             self.type,
@@ -152,7 +152,7 @@ class MessageOriginUser(MessageOrigin):
 
     def __init__(
         self,
-        date: datetime.datetime,
+        date: dtm.datetime,
         sender_user: User,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -186,7 +186,7 @@ class MessageOriginHiddenUser(MessageOrigin):
 
     def __init__(
         self,
-        date: datetime.datetime,
+        date: dtm.datetime,
         sender_user_name: str,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -227,7 +227,7 @@ class MessageOriginChat(MessageOrigin):
 
     def __init__(
         self,
-        date: datetime.datetime,
+        date: dtm.datetime,
         sender_chat: Chat,
         author_signature: Optional[str] = None,
         *,
@@ -271,7 +271,7 @@ class MessageOriginChannel(MessageOrigin):
 
     def __init__(
         self,
-        date: datetime.datetime,
+        date: dtm.datetime,
         chat: Chat,
         message_id: int,
         author_signature: Optional[str] = None,

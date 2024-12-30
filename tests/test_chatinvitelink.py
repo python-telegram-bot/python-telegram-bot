@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 
 import pytest
 
@@ -52,7 +52,7 @@ class ChatInviteLinkTestBase:
     creates_join_request = False
     primary = True
     revoked = False
-    expire_date = datetime.datetime.now(datetime.timezone.utc)
+    expire_date = dtm.datetime.now(dtm.timezone.utc)
     member_limit = 42
     name = "LinkName"
     pending_join_request_count = 42
@@ -107,7 +107,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
         assert invite_link.creates_join_request == self.creates_join_request
         assert invite_link.is_primary == self.primary
         assert invite_link.is_revoked == self.revoked
-        assert abs(invite_link.expire_date - self.expire_date) < datetime.timedelta(seconds=1)
+        assert abs(invite_link.expire_date - self.expire_date) < dtm.timedelta(seconds=1)
         assert to_timestamp(invite_link.expire_date) == to_timestamp(self.expire_date)
         assert invite_link.member_limit == self.member_limit
         assert invite_link.name == self.name

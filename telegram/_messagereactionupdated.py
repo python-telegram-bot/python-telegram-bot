@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageReaction Update."""
+import datetime as dtm
 from collections.abc import Sequence
-from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
@@ -70,7 +70,7 @@ class MessageReactionCountUpdated(TelegramObject):
         self,
         chat: Chat,
         message_id: int,
-        date: datetime,
+        date: dtm.datetime,
         reactions: Sequence[ReactionCount],
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -79,7 +79,7 @@ class MessageReactionCountUpdated(TelegramObject):
         # Required
         self.chat: Chat = chat
         self.message_id: int = message_id
-        self.date: datetime = date
+        self.date: dtm.datetime = date
         self.reactions: tuple[ReactionCount, ...] = parse_sequence_arg(reactions)
 
         self._id_attrs = (self.chat, self.message_id, self.date, self.reactions)
@@ -157,7 +157,7 @@ class MessageReactionUpdated(TelegramObject):
         self,
         chat: Chat,
         message_id: int,
-        date: datetime,
+        date: dtm.datetime,
         old_reaction: Sequence[ReactionType],
         new_reaction: Sequence[ReactionType],
         user: Optional[User] = None,
@@ -169,7 +169,7 @@ class MessageReactionUpdated(TelegramObject):
         # Required
         self.chat: Chat = chat
         self.message_id: int = message_id
-        self.date: datetime = date
+        self.date: dtm.datetime = date
         self.old_reaction: tuple[ReactionType, ...] = parse_sequence_arg(old_reaction)
         self.new_reaction: tuple[ReactionType, ...] = parse_sequence_arg(new_reaction)
 
