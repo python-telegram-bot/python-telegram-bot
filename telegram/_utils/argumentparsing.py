@@ -31,6 +31,8 @@ from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
+    from typing import type_check_only
+
     from telegram import Bot, FileCredentials
 
 T = TypeVar("T")
@@ -69,25 +71,27 @@ def parse_lpo_and_dwpp(
 Tele_co = TypeVar("Tele_co", bound=TelegramObject, covariant=True)
 TeleCrypto_co = TypeVar("TeleCrypto_co", bound="HasDecryptMethod", covariant=True)
 
+if TYPE_CHECKING:
 
-class HasDecryptMethod(Protocol):
-    __slots__ = ()
+    @type_check_only
+    class HasDecryptMethod(Protocol):
+        __slots__ = ()
 
-    @classmethod
-    def de_json_decrypted(
-        cls: type[TeleCrypto_co],
-        data: JSONDict,
-        bot: Optional["Bot"],
-        credentials: list["FileCredentials"],
-    ) -> TeleCrypto_co: ...
+        @classmethod
+        def de_json_decrypted(
+            cls: type[TeleCrypto_co],
+            data: JSONDict,
+            bot: Optional["Bot"],
+            credentials: list["FileCredentials"],
+        ) -> TeleCrypto_co: ...
 
-    @classmethod
-    def de_list_decrypted(
-        cls: type[TeleCrypto_co],
-        data: list[JSONDict],
-        bot: Optional["Bot"],
-        credentials: list["FileCredentials"],
-    ) -> tuple[TeleCrypto_co, ...]: ...
+        @classmethod
+        def de_list_decrypted(
+            cls: type[TeleCrypto_co],
+            data: list[JSONDict],
+            bot: Optional["Bot"],
+            credentials: list["FileCredentials"],
+        ) -> tuple[TeleCrypto_co, ...]: ...
 
 
 def de_json_wo(
