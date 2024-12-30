@@ -23,7 +23,6 @@ import weakref
 from typing import TYPE_CHECKING, Any, Generic, Optional, Union, cast, overload
 
 try:
-    import pytz
     from apscheduler.executors.asyncio import AsyncIOExecutor
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -31,6 +30,7 @@ try:
 except ImportError:
     APS_AVAILABLE = False
 
+from telegram._utils.datetime import UTC, localize
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import JSONDict
@@ -155,13 +155,13 @@ class JobQueue(Generic[CCT]):
             dict[:obj:`str`, :obj:`object`]: The configuration values as dictionary.
 
         """
-        timezone: object = pytz.utc
+        timezone: datetime.tzinfo = UTC
         if (
             self._application
             and isinstance(self.application.bot, ExtBot)
             and self.application.bot.defaults
         ):
-            timezone = self.application.bot.defaults.tzinfo or pytz.utc
+            timezone = self.application.bot.defaults.tzinfo or UTC
 
         return {
             "timezone": timezone,
@@ -197,8 +197,8 @@ class JobQueue(Generic[CCT]):
                 datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time
             )
             if date_time.tzinfo is None:
-                date_time = self.scheduler.timezone.localize(date_time)
-            if shift_day and date_time <= datetime.datetime.now(pytz.utc):
+                date_time = localize(date_time, self.scheduler.timezone)
+            if shift_day and date_time <= datetime.datetime.now(UTC):
                 date_time += datetime.timedelta(days=1)
             return date_time
         return time

@@ -57,9 +57,7 @@ class Defaults:
                 versions.
         tzinfo (:class:`datetime.tzinfo`, optional): A timezone to be used for all date(time)
             inputs appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
-            somewhere, it will be assumed to be in :paramref:`tzinfo`. If the
-            :class:`telegram.ext.JobQueue` is used, this must be a timezone provided
-            by the ``pytz`` module. Defaults to ``pytz.utc``, if available, and
+            somewhere, it will be assumed to be in :paramref:`tzinfo`. Defaults to
             :attr:`datetime.timezone.utc` otherwise.
         block (:obj:`bool`, optional): Default setting for the :paramref:`BaseHandler.block`
             parameter

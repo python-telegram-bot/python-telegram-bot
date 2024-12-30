@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import datetime
 import logging
 import sys
+import zoneinfo
 from pathlib import Path
 from uuid import uuid4
 
@@ -44,7 +44,6 @@ from tests.auxil.envvars import GITHUB_ACTION, RUN_TEST_OFFICIAL, TEST_WITH_OPT_
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestBot, make_bot
-from tests.auxil.timezones import BasicTimezone
 
 if TEST_WITH_OPT_DEPS:
     import pytz
@@ -311,9 +310,8 @@ def false_update(request):
 @pytest.fixture(scope="session", params=["Europe/Berlin", "Asia/Singapore", "UTC"])
 def tzinfo(request):
     if TEST_WITH_OPT_DEPS:
-        return pytz.timezone(request.param)
-    hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
-    return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
+        yield pytz.timezone(request.param)
+    yield zoneinfo.ZoneInfo(request.param)
 
 
 @pytest.fixture(scope="session")

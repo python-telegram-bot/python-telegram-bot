@@ -21,6 +21,7 @@ import datetime
 import functools
 import inspect
 import re
+import zoneinfo
 from collections.abc import Collection, Iterable
 from typing import Any, Callable, Optional
 
@@ -46,7 +47,7 @@ from telegram.request import RequestData
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
 if TEST_WITH_OPT_DEPS:
-    import pytz
+    pass
 
 
 FORWARD_REF_PATTERN = re.compile(r"ForwardRef\('(?P<class_name>\w+)'\)")
@@ -336,8 +337,8 @@ def build_kwargs(
         elif name == "until_date":
             if manually_passed_value not in [None, DEFAULT_NONE]:
                 # Europe/Berlin
-                kws[name] = pytz.timezone("Europe/Berlin").localize(
-                    datetime.datetime(2000, 1, 1, 0)
+                kws[name] = datetime.datetime(
+                    2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin")
                 )
             else:
                 # naive UTC
@@ -587,7 +588,7 @@ async def check_defaults_handling(
 
     defaults_no_custom_defaults = Defaults()
     kwargs = {kwarg: "custom_default" for kwarg in inspect.signature(Defaults).parameters}
-    kwargs["tzinfo"] = pytz.timezone("America/New_York")
+    kwargs["tzinfo"] = zoneinfo.ZoneInfo("America/New_York")
     kwargs.pop("disable_web_page_preview")  # mutually exclusive with link_preview_options
     kwargs.pop("quote")  # mutually exclusive with do_quote
     kwargs["link_preview_options"] = LinkPreviewOptions(

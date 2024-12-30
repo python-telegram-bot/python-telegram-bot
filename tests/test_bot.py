@@ -79,7 +79,7 @@ from telegram import (
     User,
     WebAppInfo,
 )
-from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
+from telegram._utils.datetime import UTC, from_timestamp, localize, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import to_camel_case
 from telegram.constants import (
@@ -97,7 +97,7 @@ from telegram.request import BaseRequest, HTTPXRequest, RequestData
 from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
-from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTION
 from tests.auxil.files import data_file
 from tests.auxil.networking import OfflineRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
@@ -3467,7 +3467,6 @@ class TestBotWithRequest:
         )
         assert revoked_link.is_revoked
 
-    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="This test's implementation requires pytz")
     @pytest.mark.parametrize("datetime", argvalues=[True, False], ids=["datetime", "integer"])
     async def test_advanced_chat_invite_links(self, bot, channel_id, datetime):
         # we are testing this all in one function in order to save api calls
@@ -3475,7 +3474,7 @@ class TestBotWithRequest:
         add_seconds = dtm.timedelta(0, 70)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = UTC.localize(time_in_future)
+        aware_time_in_future = localize(time_in_future, UTC)
 
         invite_link = await bot.create_chat_invite_link(
             channel_id, expire_date=expire_time, member_limit=10
@@ -3488,7 +3487,7 @@ class TestBotWithRequest:
         add_seconds = dtm.timedelta(0, 80)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = UTC.localize(time_in_future)
+        aware_time_in_future = localize(time_in_future, UTC)
 
         edited_invite_link = await bot.edit_chat_invite_link(
             channel_id,
