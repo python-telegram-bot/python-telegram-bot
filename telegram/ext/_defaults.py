@@ -59,6 +59,11 @@ class Defaults:
             inputs appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
             somewhere, it will be assumed to be in :paramref:`tzinfo`. Defaults to
             :attr:`datetime.timezone.utc` otherwise.
+
+            .. deprecated:: NEXT.VERSION
+                Support for ``pytz`` timezones is deprecated and will be removed in future
+                versions.
+
         block (:obj:`bool`, optional): Default setting for the :paramref:`BaseHandler.block`
             parameter
             of handlers and error handlers registered through :meth:`Application.add_handler` and
@@ -145,6 +150,19 @@ class Defaults:
         self._tzinfo: dtm.tzinfo = tzinfo
         self._block: bool = block
         self._protect_content: Optional[bool] = protect_content
+
+        if "pytz" in str(self._tzinfo.__class__):
+            # TODO: When dropping support, make sure to update _utils.datetime accordingly
+            warn(
+                message=PTBDeprecationWarning(
+                    version="NEXT.VERSION",
+                    message=(
+                        "Support for pytz timezones is deprecated and will be removed in "
+                        "future versions."
+                    ),
+                ),
+                stacklevel=2,
+            )
 
         if disable_web_page_preview is not None and link_preview_options is not None:
             raise ValueError(

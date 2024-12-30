@@ -25,6 +25,7 @@ import pytest
 from telegram import LinkPreviewOptions, User
 from telegram.ext import Defaults
 from telegram.warnings import PTBDeprecationWarning
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
 
@@ -38,6 +39,16 @@ class TestDefaults:
     def test_utc(self):
         defaults = Defaults()
         assert defaults.tzinfo is dtm.timezone.utc
+
+    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
+    def test_pytz_deprecation(self, recwarn):
+        import pytz
+
+        with pytest.warns(PTBDeprecationWarning, match="pytz") as record:
+            Defaults(tzinfo=pytz.timezone("Europe/Berlin"))
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
     def test_data_assignment(self):
         defaults = Defaults()
