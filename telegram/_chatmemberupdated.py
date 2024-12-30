@@ -149,11 +149,11 @@ class ChatMemberUpdated(TelegramObject):
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
+        data["chat"] = Chat.de_json(data["chat"], bot)
         data["from_user"] = de_json_wo(data.pop("from", None), User, bot)
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["old_chat_member"] = de_json_wo(data.get("old_chat_member"), ChatMember, bot)
-        data["new_chat_member"] = de_json_wo(data.get("new_chat_member"), ChatMember, bot)
+        data["old_chat_member"] = ChatMember.de_json(data["old_chat_member"], bot)
+        data["new_chat_member"] = ChatMember.de_json(data["new_chat_member"], bot)
         data["invite_link"] = de_json_wo(data.get("invite_link"), ChatInviteLink, bot)
 
         return super().de_json(data=data, bot=bot)

@@ -114,7 +114,7 @@ class BusinessConnection(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["user"] = de_json_wo(data.get("user"), User, bot)
+        data["user"] = User.de_json(data["user"], bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -176,7 +176,7 @@ class BusinessMessagesDeleted(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
+        data["chat"] = Chat.de_json(data["chat"], bot)
 
         return super().de_json(data=data, bot=bot)
 

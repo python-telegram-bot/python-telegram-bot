@@ -25,7 +25,6 @@ from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -114,13 +113,13 @@ class MessageOrigin(TelegramObject):
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
 
         if "sender_user" in data:
-            data["sender_user"] = de_json_wo(data.get("sender_user"), User, bot)
+            data["sender_user"] = User.de_json(data["sender_user"], bot)
 
         if "sender_chat" in data:
-            data["sender_chat"] = de_json_wo(data.get("sender_chat"), Chat, bot)
+            data["sender_chat"] = Chat.de_json(data["sender_chat"], bot)
 
         if "chat" in data:
-            data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
+            data["chat"] = Chat.de_json(data["chat"], bot)
 
         return super().de_json(data=data, bot=bot)
 

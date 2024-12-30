@@ -137,7 +137,7 @@ class ChatJoinRequest(TelegramObject):
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
+        data["chat"] = Chat.de_json(data["chat"], bot)
         data["from_user"] = de_json_wo(data.pop("from", None), User, bot)
         data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
         data["invite_link"] = de_json_wo(data.get("invite_link"), ChatInviteLink, bot)

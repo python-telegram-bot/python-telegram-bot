@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Optional
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -87,7 +87,7 @@ class PassportData(TelegramObject):
         data = cls._parse_data(data)
 
         data["data"] = EncryptedPassportElement.de_list(data["data"], bot)
-        data["credentials"] = de_json_wo(data.get("credentials"), EncryptedCredentials, bot)
+        data["credentials"] = EncryptedCredentials.de_json(data["credentials"], bot)
 
         return super().de_json(data=data, bot=bot)
 

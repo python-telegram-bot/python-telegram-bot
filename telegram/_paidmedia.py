@@ -27,7 +27,7 @@ from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -221,7 +221,7 @@ class PaidMediaVideo(PaidMedia):
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaVideo":
         data = cls._parse_data(data)
 
-        data["video"] = de_json_wo(data.get("video"), Video, bot)
+        data["video"] = Video.de_json(data["video"], bot)
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 

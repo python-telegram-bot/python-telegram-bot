@@ -84,7 +84,7 @@ class ShippingQuery(TelegramObject):
         data = cls._parse_data(data)
 
         data["from_user"] = de_json_wo(data.pop("from", None), User, bot)
-        data["shipping_address"] = de_json_wo(data.get("shipping_address"), ShippingAddress, bot)
+        data["shipping_address"] = ShippingAddress.de_json(data["shipping_address"], bot)
 
         return super().de_json(data=data, bot=bot)
 
