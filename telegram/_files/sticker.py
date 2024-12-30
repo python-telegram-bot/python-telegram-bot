@@ -26,7 +26,7 @@ from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -307,7 +307,7 @@ class StickerSet(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
 
         data["thumbnail"] = de_json_wo(data.get("thumbnail"), PhotoSize, bot)
-        data["stickers"] = de_list_wo(data.get("stickers"), Sticker, bot)
+        data["stickers"] = Sticker.de_list(data["stickers"], bot)
 
         api_kwargs = {}
         # These are deprecated fields that TG still returns for backwards compatibility

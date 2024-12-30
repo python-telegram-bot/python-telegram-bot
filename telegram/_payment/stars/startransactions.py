@@ -24,7 +24,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -158,5 +158,5 @@ class StarTransactions(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["transactions"] = de_list_wo(data.get("transactions"), StarTransaction, bot)
+        data["transactions"] = StarTransaction.de_list(data["transactions"], bot)
         return super().de_json(data=data, bot=bot)

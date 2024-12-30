@@ -26,7 +26,7 @@ from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -434,6 +434,6 @@ class UserChatBoosts(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["boosts"] = de_list_wo(data.get("boosts"), ChatBoost, bot)
+        data["boosts"] = ChatBoost.de_list(data["boosts"], bot)
 
         return super().de_json(data=data, bot=bot)

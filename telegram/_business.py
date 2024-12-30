@@ -27,7 +27,7 @@ from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -423,8 +423,6 @@ class BusinessOpeningHours(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["opening_hours"] = de_list_wo(
-            data.get("opening_hours"), BusinessOpeningHoursInterval, bot
-        )
+        data["opening_hours"] = BusinessOpeningHoursInterval.de_list(data["opening_hours"], bot)
 
         return super().de_json(data=data, bot=bot)

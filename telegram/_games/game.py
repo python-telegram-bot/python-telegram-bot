@@ -128,7 +128,7 @@ class Game(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["photo"] = de_list_wo(data.get("photo"), PhotoSize, bot)
+        data["photo"] = PhotoSize.de_list(data["photo"], bot)
         data["text_entities"] = de_list_wo(data.get("text_entities"), MessageEntity, bot)
         data["animation"] = de_json_wo(data.get("animation"), Animation, bot)
 

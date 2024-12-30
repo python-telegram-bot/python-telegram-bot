@@ -88,7 +88,7 @@ class UsersShared(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["users"] = de_list_wo(data.get("users"), SharedUser, bot)
+        data["users"] = SharedUser.de_list(data["users"], bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
