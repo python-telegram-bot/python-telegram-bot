@@ -345,7 +345,7 @@ def build_kwargs(
         # Some special casing for methods that have "exactly one of the optionals" type args
         elif name in ["location", "contact", "venue", "inline_message_id"]:
             kws[name] = True
-        elif name == "until_date":
+        elif name.endswith("_date"):
             if manually_passed_value not in [None, DEFAULT_NONE]:
                 # Europe/Berlin
                 kws[name] = dtm.datetime(2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"))
@@ -531,14 +531,19 @@ async def make_assertion(
         )
 
     # Check datetime conversion
-    until_date = data.pop("until_date", None)
-    if until_date:
-        if manual_value_expected and until_date != 946681200:
-            pytest.fail("Non-naive until_date should have been interpreted as Europe/Berlin.")
-        if not any((manually_passed_value, expected_defaults_value)) and until_date != 946684800:
-            pytest.fail("Naive until_date should have been interpreted as UTC")
-        if default_value_expected and until_date != 946702800:
-            pytest.fail("Naive until_date should have been interpreted as America/New_York")
+    date_keys = [key for key in data if key.endswith("_date")]
+    for key in date_keys:
+        date_param = data.pop(key)
+        if date_param:
+            if manual_value_expected and date_param != 946681200:
+                pytest.fail(f"Non-naive `{key}` should have been interpreted as Europe/Berlin.")
+            if (
+                not any((manually_passed_value, expected_defaults_value))
+                and date_param != 946684800
+            ):
+                pytest.fail(f"Naive `{key}` should have been interpreted as UTC")
+            if default_value_expected and date_param != 946702800:
+                pytest.fail(f"Naive `{key}` should have been interpreted as America/New_York")
 
     if method_name in ["get_file", "get_small_file", "get_big_file"]:
         # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
