@@ -5,6 +5,9 @@ updates:
     schedule:
       interval: "weekly"
       day: "friday"
+    labels:
+      - "⚙️ dependencies"
+      - "🔗 python"
 
   # Updates the dependencies of the GitHub Actions workflows
   - package-ecosystem: "github-actions"
@@ -12,3 +15,6 @@ updates:
     schedule:
       interval: "monthly"
       day: "friday"
+    labels:
+      - "⚙️ dependencies"
+      - "🔗 github-actions"
