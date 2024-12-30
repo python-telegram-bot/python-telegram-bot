@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import calendar
+import contextlib
 import datetime as dtm
 import logging
 import platform
@@ -76,6 +77,13 @@ class TestJobQueue:
     result = 0
     job_time = 0
     received_error = None
+
+    @staticmethod
+    def normalize(datetime: dtm.datetime, timezone: dtm.tzinfo) -> dtm.datetime:
+        with contextlib.suppress(AttributeError):
+            return timezone.normalize(datetime)
+
+        return datetime
 
     async def test_repr(self, app):
         jq = JobQueue()
@@ -400,7 +408,7 @@ class TestJobQueue:
         if day > next_months_days:
             expected_reschedule_time += dtm.timedelta(next_months_days)
 
-        expected_reschedule_time = timezone.normalize(expected_reschedule_time)
+        expected_reschedule_time = self.normalize(expected_reschedule_time, timezone)
         # Adjust the hour for the special case that between now and next month a DST switch happens
         expected_reschedule_time += dtm.timedelta(
             hours=time_of_day.hour - expected_reschedule_time.hour
@@ -422,7 +430,7 @@ class TestJobQueue:
             calendar.monthrange(now.year, now.month)[1]
         ) - dtm.timedelta(days=now.day)
         # Adjust the hour for the special case that between now & end of month a DST switch happens
-        expected_reschedule_time = timezone.normalize(expected_reschedule_time)
+        expected_reschedule_time = self.normalize(expected_reschedule_time, timezone)
         expected_reschedule_time += dtm.timedelta(
             hours=time_of_day.hour - expected_reschedule_time.hour
         )
