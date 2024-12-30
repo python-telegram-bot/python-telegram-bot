@@ -1,0 +1,19 @@
+import logging
+from telegram.ext import Updater, CommandHandler, MessageHandler
+
+TOKEN = '7874406154:AAHJauA_ZZyh540l7zUpod55Mz8PgI34-Dg'
+
+logging.basicConfig(level=logging.INFO)
+
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text='مرحباً! يمكنك تقديم بلاغك.')
+
+def report(update, context):
+    # أرسل البلاغ إلى الإيميل
+    pass
+
+def main():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+
+    dp
