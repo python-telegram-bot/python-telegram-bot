@@ -25,7 +25,6 @@ import pytest
 from telegram import LinkPreviewOptions, User
 from telegram.ext import Defaults
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
 
@@ -38,10 +37,7 @@ class TestDefaults:
 
     def test_utc(self):
         defaults = Defaults()
-        if not TEST_WITH_OPT_DEPS:
-            assert defaults.tzinfo is dtm.timezone.utc
-        else:
-            assert defaults.tzinfo is not dtm.timezone.utc
+        assert defaults.tzinfo is dtm.timezone.utc
 
     def test_data_assignment(self):
         defaults = Defaults()

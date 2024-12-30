@@ -52,6 +52,8 @@ def localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
         if isinstance(tzinfo, pytz.BaseTzInfo):
             return tzinfo.localize(datetime)
 
+    if datetime.tzinfo is None:
+        return datetime.replace(tzinfo=tzinfo)
     return datetime.astimezone(tzinfo)
 
 

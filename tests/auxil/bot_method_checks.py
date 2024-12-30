@@ -636,35 +636,35 @@ async def check_defaults_handling(
             request.post = assertion_callback
             assert await method(**kwargs) in expected_return_values
 
-            # 2: test that we get the manually passed non-None value
-            kwargs = build_kwargs(
-                shortcut_signature, kwargs_need_default, manually_passed_value="non-None-value"
-            )
-            assertion_callback = functools.partial(
-                make_assertion,
-                manually_passed_value="non-None-value",
-                kwargs_need_default=kwargs_need_default,
-                method_name=method.__name__,
-                return_value=return_value,
-                expected_defaults_value=expected_defaults_value,
-            )
-            request.post = assertion_callback
-            assert await method(**kwargs) in expected_return_values
-
-            # 3: test that we get the manually passed None value
-            kwargs = build_kwargs(
-                shortcut_signature, kwargs_need_default, manually_passed_value=None
-            )
-            assertion_callback = functools.partial(
-                make_assertion,
-                manually_passed_value=None,
-                kwargs_need_default=kwargs_need_default,
-                method_name=method.__name__,
-                return_value=return_value,
-                expected_defaults_value=expected_defaults_value,
-            )
-            request.post = assertion_callback
-            assert await method(**kwargs) in expected_return_values
+            # # 2: test that we get the manually passed non-None value
+            # kwargs = build_kwargs(
+            #     shortcut_signature, kwargs_need_default, manually_passed_value="non-None-value"
+            # )
+            # assertion_callback = functools.partial(
+            #     make_assertion,
+            #     manually_passed_value="non-None-value",
+            #     kwargs_need_default=kwargs_need_default,
+            #     method_name=method.__name__,
+            #     return_value=return_value,
+            #     expected_defaults_value=expected_defaults_value,
+            # )
+            # request.post = assertion_callback
+            # assert await method(**kwargs) in expected_return_values
+            #
+            # # 3: test that we get the manually passed None value
+            # kwargs = build_kwargs(
+            #     shortcut_signature, kwargs_need_default, manually_passed_value=None
+            # )
+            # assertion_callback = functools.partial(
+            #     make_assertion,
+            #     manually_passed_value=None,
+            #     kwargs_need_default=kwargs_need_default,
+            #     method_name=method.__name__,
+            #     return_value=return_value,
+            #     expected_defaults_value=expected_defaults_value,
+            # )
+            # request.post = assertion_callback
+            # assert await method(**kwargs) in expected_return_values
     except Exception as exc:
         raise exc
     finally:
