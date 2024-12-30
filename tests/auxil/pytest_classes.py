@@ -66,7 +66,7 @@ class PytestExtBot(ExtBot):
         self._unfreeze()
 
     # Here we override get_me for caching because we don't want to call the API repeatedly in tests
-    async def get_me(self, *args, **kwargs):
+    async def get_me(self, *args, **kwargs) -> User:
         return await _mocked_get_me(self)
 
 
@@ -77,7 +77,7 @@ class PytestBot(Bot):
         self._unfreeze()
 
     # Here we override get_me for caching because we don't want to call the API repeatedly in tests
-    async def get_me(self, *args, **kwargs):
+    async def get_me(self, *args, **kwargs) -> User:
         return await _mocked_get_me(self)
 
 

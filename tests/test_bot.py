@@ -488,17 +488,11 @@ class TestBotWithoutRequest:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
-        # Mocking get_me within check_defaults_handling messes with the cached values like
-        # Bot.{bot, username, id, …}` unless we return the expected User object.
-        return_value = (
-            offline_bot.bot if bot_method_name.lower().replace("_", "") == "getme" else None
-        )
-
         # Check that ExtBot does the right thing
         bot_method = getattr(offline_bot, bot_method_name)
         raw_bot_method = getattr(raw_bot, bot_method_name)
-        assert await check_defaults_handling(bot_method, offline_bot, return_value=return_value)
-        assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
+        assert await check_defaults_handling(bot_method, offline_bot)
+        assert await check_defaults_handling(raw_bot_method, raw_bot)
 
     @pytest.mark.parametrize(
         ("name", "method"), inspect.getmembers(Bot, predicate=inspect.isfunction)
@@ -2248,6 +2242,7 @@ class TestBotWithoutRequest:
                 is_closed=True,
                 is_anonymous=True,
                 type="regular",
+                allows_multiple_answers=False,
             ).to_dict()
         )
         await return_values.put(True)
