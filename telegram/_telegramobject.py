@@ -454,7 +454,7 @@ class TelegramObject:
             A tuple of Telegram objects.
 
         """
-        return tuple(obj for obj in (cls.de_json(d, bot) for d in data))
+        return tuple(cls.de_json(d, bot) for d in data)
 
     @contextmanager
     def _unfrozen(self: Tele_co) -> Iterator[Tele_co]:

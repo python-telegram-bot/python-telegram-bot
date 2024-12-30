@@ -305,6 +305,7 @@ class StickerSet(TelegramObject):
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "StickerSet":
         """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         data["thumbnail"] = de_json_wo(data.get("thumbnail"), PhotoSize, bot)
         data["stickers"] = Sticker.de_list(data["stickers"], bot)

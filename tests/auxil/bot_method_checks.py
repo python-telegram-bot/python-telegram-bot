@@ -403,7 +403,6 @@ def guess_return_type_name(method: Callable[[...], Any]) -> tuple[Union[str, obj
     # and string annotations. But it also wants to resolve the parameter annotations, which
     # need additional namespaces and that's not worth the struggle for now …
     return_annotation = _check_forward_ref(inspect.signature(method).return_annotation)
-    print(return_annotation, type(return_annotation))
     as_tuple = False
 
     if isinstance(return_annotation, GenericAlias):
