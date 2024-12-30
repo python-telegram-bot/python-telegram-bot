@@ -8,13 +8,17 @@ from telegram import (
     BotName,
     BotShortDescription,
     BusinessConnection,
+    Chat,
     ChatAdministratorRights,
+    ChatBoost,
+    ChatBoostSource,
     ChatFullInfo,
     ChatInviteLink,
     ChatMember,
     File,
     ForumTopic,
     GameHighScore,
+    Gift,
     Gifts,
     MenuButton,
     MessageId,
@@ -22,6 +26,7 @@ from telegram import (
     PollOption,
     PreparedInlineMessage,
     SentWebAppMessage,
+    StarTransaction,
     StarTransactions,
     Sticker,
     StickerSet,
@@ -38,6 +43,15 @@ _DUMMY_USER = User(
     id=123456, is_bot=False, first_name="Dummy", last_name="User", username="dummy_user"
 )
 _DUMMY_DATE = dtm.datetime(1970, 1, 1, 0, 0, 0, 0, tzinfo=dtm.timezone.utc)
+_DUMMY_STICKER = Sticker(
+    file_id="dummy_file_id",
+    file_unique_id="dummy_file_unique_id",
+    width=1,
+    height=1,
+    is_animated=False,
+    is_video=False,
+    type="dummy_type",
+)
 
 _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     "bool": True,
@@ -53,6 +67,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
         can_reply=True,
         is_enabled=True,
     ),
+    "Chat": Chat(id=123456, type="dummy_type"),
     "ChatAdministratorRights": ChatAdministratorRights.all_rights(),
     "ChatFullInfo": ChatFullInfo(
         id=123456,
@@ -70,7 +85,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     "ChatMember": ChatMember(user=_DUMMY_USER, status="dummy_status"),
     "File": File(file_id="dummy_file_id", file_unique_id="dummy_file_unique_id"),
     "ForumTopic": ForumTopic(message_thread_id=2, name="dummy_name", icon_color=1),
-    "Gifts": Gifts(gifts=[]),
+    "Gifts": Gifts(gifts=[Gift(id="dummy_id", sticker=_DUMMY_STICKER, star_count=1)]),
     "GameHighScore": GameHighScore(position=1, user=_DUMMY_USER, score=1),
     "int": 123456,
     "MenuButton": MenuButton(type="dummy_type"),
@@ -88,23 +103,29 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     ),
     "PreparedInlineMessage": PreparedInlineMessage(id="dummy_id", expiration_date=_DUMMY_DATE),
     "SentWebAppMessage": SentWebAppMessage(inline_message_id="dummy_inline_message_id"),
-    "StarTransactions": StarTransactions(transactions=[]),
-    "Sticker": Sticker(
-        file_id="dummy_file_id",
-        file_unique_id="dummy_file_unique_id",
-        width=1,
-        height=1,
-        is_animated=False,
-        is_video=False,
-        type="dummy_type",
+    "StarTransactions": StarTransactions(
+        transactions=[StarTransaction(id="dummy_id", amount=1, date=_DUMMY_DATE)]
     ),
+    "Sticker": _DUMMY_STICKER,
     "StickerSet": StickerSet(
-        name="dummy_name", title="dummy_title", stickers=[], sticker_type="dummy_type"
+        name="dummy_name",
+        title="dummy_title",
+        stickers=[_DUMMY_STICKER],
+        sticker_type="dummy_type",
     ),
     "str": "dummy_string",
     "Update": Update(update_id=123456),
     "User": _DUMMY_USER,
-    "UserChatBoosts": UserChatBoosts(boosts=[]),
+    "UserChatBoosts": UserChatBoosts(
+        boosts=[
+            ChatBoost(
+                boost_id="dummy_id",
+                add_date=_DUMMY_DATE,
+                expiration_date=_DUMMY_DATE,
+                source=ChatBoostSource(source="dummy_source"),
+            )
+        ]
+    ),
     "UserProfilePhotos": UserProfilePhotos(total_count=1, photos=[[]]),
     "WebhookInfo": WebhookInfo(
         url="dummy_url",

@@ -126,5 +126,5 @@ class Gifts(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["gifts"] = Gifts.de_list(data["gifts"], bot)
+        data["gifts"] = Gift.de_list(data["gifts"], bot)
         return cls(**data)

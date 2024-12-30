@@ -105,6 +105,7 @@ from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
 
 from .auxil.build_messages import make_message
+from .auxil.dummy_objects import get_dummy_object
 
 
 @pytest.fixture
@@ -1625,7 +1626,7 @@ class TestBotWithoutRequest:
         message = Message(
             1,
             dtm.datetime.utcnow(),
-            None,
+            get_dummy_object(Chat),
             reply_markup=offline_bot.callback_data_cache.process_keyboard(reply_markup),
         )
         message._unfreeze()
@@ -1639,7 +1640,7 @@ class TestBotWithoutRequest:
                     message_type: Message(
                         1,
                         dtm.datetime.utcnow(),
-                        None,
+                        get_dummy_object(Chat),
                         pinned_message=message,
                         reply_to_message=Message.de_json(message.to_dict(), offline_bot),
                     )
@@ -1782,7 +1783,7 @@ class TestBotWithoutRequest:
         message = Message(
             1,
             dtm.datetime.utcnow(),
-            None,
+            get_dummy_object(Chat),
             reply_markup=reply_markup,
             via_bot=bot.bot if self_sender else User(1, "first", False),
         )

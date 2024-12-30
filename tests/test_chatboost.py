@@ -38,6 +38,7 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatBoostSources
 from telegram.request import RequestData
+from tests.auxil.dummy_objects import get_dummy_object_json_dict
 from tests.auxil.slots import mro_slots
 
 
@@ -532,7 +533,7 @@ class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
             user_id = data["user_id"] == "2"
             if not all((chat_id, user_id)):
                 pytest.fail("I got wrong parameters in post")
-            return data
+            return get_dummy_object_json_dict(UserChatBoosts)
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
