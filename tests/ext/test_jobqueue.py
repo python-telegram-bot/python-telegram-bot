@@ -110,10 +110,7 @@ class TestJobQueue:
         # Unfortunately, we can't really test the executor setting explicitly without relying
         # on protected attributes. However, this should be tested enough implicitly via all the
         # other tests in here
-        tz = job_queue.scheduler_configuration["timezone"]
-        print(tz, repr(tz), type(tz))
-        print(UTC, repr(UTC), type(UTC))
-        assert job_queue.scheduler_configuration["timezone"] is UTC
+        assert job_queue.scheduler_configuration["timezone"] is dtm.timezone.utc
 
         tz_app = ApplicationBuilder().defaults(Defaults(tzinfo=timezone)).token(bot.token).build()
         assert tz_app.job_queue.scheduler_configuration["timezone"] is timezone
