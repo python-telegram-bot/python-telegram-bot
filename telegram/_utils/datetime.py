@@ -126,6 +126,12 @@ def to_float_timestamp(
         return reference_timestamp + time_object
 
     if tzinfo is None:
+        # We do this here rather than in the signature to ensure that we can make calls like
+        # to_float_timestamp(
+        #     time, tzinfo=bot.defaults.tzinfo if bot.defaults else None
+        # )
+        # This ensures clean separation of concerns, i.e. the default timezone should not be
+        # the responsibility of the caller
         tzinfo = UTC
 
     if isinstance(time_object, dtm.time):
@@ -137,6 +143,8 @@ def to_float_timestamp(
 
         aware_datetime = dtm.datetime.combine(reference_date, time_object)
         if aware_datetime.tzinfo is None:
+            # datetime.combine uses the tzinfo of `time_object`, which might be None
+            # so we still need to localize
             aware_datetime = localize(aware_datetime, tzinfo)
 
         # if the time of day has passed today, use tomorrow

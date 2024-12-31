@@ -41,15 +41,11 @@ from telegram import (
     Sticker,
     TelegramObject,
 )
+from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram.constants import InputMediaType
 from telegram.ext import Defaults, ExtBot
 from telegram.request import RequestData
-from tests.auxil.envvars import TEST_WITH_OPT_DEPS
-
-if TEST_WITH_OPT_DEPS:
-    pass
-
 
 FORWARD_REF_PATTERN = re.compile(r"ForwardRef\('(?P<class_name>\w+)'\)")
 """ A pattern to find a class name in a ForwardRef typing annotation.
@@ -396,6 +392,15 @@ def make_assertion_for_link_preview_options(
             )
 
 
+_EUROPE_BERLIN_TS = to_timestamp(
+    dtm.datetime(2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"))
+)
+_UTC_TS = to_timestamp(dtm.datetime(2000, 1, 1, 0), tzinfo=zoneinfo.ZoneInfo("UTC"))
+_AMERICA_NEW_YORK_TS = to_timestamp(
+    dtm.datetime(2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))
+)
+
+
 async def make_assertion(
     url,
     request_data: RequestData,
@@ -535,14 +540,11 @@ async def make_assertion(
     for key in date_keys:
         date_param = data.pop(key)
         if date_param:
-            if manual_value_expected and date_param != 946681200:
+            if manual_value_expected and date_param != _EUROPE_BERLIN_TS:
                 pytest.fail(f"Non-naive `{key}` should have been interpreted as Europe/Berlin.")
-            if (
-                not any((manually_passed_value, expected_defaults_value))
-                and date_param != 946684800
-            ):
+            if not any((manually_passed_value, expected_defaults_value)) and date_param != _UTC_TS:
                 pytest.fail(f"Naive `{key}` should have been interpreted as UTC")
-            if default_value_expected and date_param != 946702800:
+            if default_value_expected and date_param != _AMERICA_NEW_YORK_TS:
                 pytest.fail(f"Naive `{key}` should have been interpreted as America/New_York")
 
     if method_name in ["get_file", "get_small_file", "get_big_file"]:
@@ -641,35 +643,35 @@ async def check_defaults_handling(
             request.post = assertion_callback
             assert await method(**kwargs) in expected_return_values
 
-            # # 2: test that we get the manually passed non-None value
-            # kwargs = build_kwargs(
-            #     shortcut_signature, kwargs_need_default, manually_passed_value="non-None-value"
-            # )
-            # assertion_callback = functools.partial(
-            #     make_assertion,
-            #     manually_passed_value="non-None-value",
-            #     kwargs_need_default=kwargs_need_default,
-            #     method_name=method.__name__,
-            #     return_value=return_value,
-            #     expected_defaults_value=expected_defaults_value,
-            # )
-            # request.post = assertion_callback
-            # assert await method(**kwargs) in expected_return_values
-            #
-            # # 3: test that we get the manually passed None value
-            # kwargs = build_kwargs(
-            #     shortcut_signature, kwargs_need_default, manually_passed_value=None
-            # )
-            # assertion_callback = functools.partial(
-            #     make_assertion,
-            #     manually_passed_value=None,
-            #     kwargs_need_default=kwargs_need_default,
-            #     method_name=method.__name__,
-            #     return_value=return_value,
-            #     expected_defaults_value=expected_defaults_value,
-            # )
-            # request.post = assertion_callback
-            # assert await method(**kwargs) in expected_return_values
+            # 2: test that we get the manually passed non-None value
+            kwargs = build_kwargs(
+                shortcut_signature, kwargs_need_default, manually_passed_value="non-None-value"
+            )
+            assertion_callback = functools.partial(
+                make_assertion,
+                manually_passed_value="non-None-value",
+                kwargs_need_default=kwargs_need_default,
+                method_name=method.__name__,
+                return_value=return_value,
+                expected_defaults_value=expected_defaults_value,
+            )
+            request.post = assertion_callback
+            assert await method(**kwargs) in expected_return_values
+
+            # 3: test that we get the manually passed None value
+            kwargs = build_kwargs(
+                shortcut_signature, kwargs_need_default, manually_passed_value=None
+            )
+            assertion_callback = functools.partial(
+                make_assertion,
+                manually_passed_value=None,
+                kwargs_need_default=kwargs_need_default,
+                method_name=method.__name__,
+                return_value=return_value,
+                expected_defaults_value=expected_defaults_value,
+            )
+            request.post = assertion_callback
+            assert await method(**kwargs) in expected_return_values
     except Exception as exc:
         raise exc
     finally:

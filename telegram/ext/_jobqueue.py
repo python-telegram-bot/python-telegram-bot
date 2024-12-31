@@ -197,6 +197,8 @@ class JobQueue(Generic[CCT]):
                 dtm.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time
             )
             if date_time.tzinfo is None:
+                # dtm.combine uses the tzinfo of `time`, which might be None, so we still have
+                # to localize it
                 date_time = localize(date_time, self.scheduler.timezone)
             if shift_day and date_time <= dtm.datetime.now(UTC):
                 date_time += dtm.timedelta(days=1)
