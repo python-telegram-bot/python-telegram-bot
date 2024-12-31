@@ -42,7 +42,7 @@ from tests.auxil.build_messages import DATE
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.envvars import (
-    GITHUB_ACTION,
+    GITHUB_ACTIONS,
     RUN_TEST_OFFICIAL,
     TEST_WITH_OPT_DEPS,
     env_var_2_bool,
@@ -52,8 +52,8 @@ from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestBot, make_bot
 
 if TEST_WITH_OPT_DEPS:
-    assert GITHUB_ACTION is True
-    assert (env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", "false")) or not GITHUB_ACTION) is True
+    assert GITHUB_ACTIONS is True
+    assert (env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", "false")) or not GITHUB_ACTIONS) is True
     assert os.getenv("TEST_WITH_OPT_DEPS", "false") == "true"
     assert env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", "false")) is True
     import pytz
@@ -106,7 +106,7 @@ def pytest_collection_modifyitems(items: list[pytest.Item]):
             parent.add_marker(pytest.mark.no_req)
 
 
-if GITHUB_ACTION and JOB_INDEX == 0:
+if GITHUB_ACTIONS and JOB_INDEX == 0:
     # let's not slow down the tests too much with these additional checks
     # that's why we run them only in GitHub actions and only on *one* of the several test
     # matrix entries

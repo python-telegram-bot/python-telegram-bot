@@ -97,7 +97,7 @@ from telegram.request import BaseRequest, HTTPXRequest, RequestData
 from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
-from tests.auxil.envvars import GITHUB_ACTION
+from tests.auxil.envvars import GITHUB_ACTIONS
 from tests.auxil.files import data_file
 from tests.auxil.networking import OfflineRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
@@ -154,7 +154,7 @@ def inline_results():
 BASE_GAME_SCORE = 60  # Base game score for game tests
 
 xfail = pytest.mark.xfail(
-    GITHUB_ACTION,  # This condition is only relevant for github actions game tests.
+    GITHUB_ACTIONS,  # This condition is only relevant for github actions game tests.
     reason=(
         "Can fail due to race conditions when multiple test suites "
         "with the same bot token are run at the same time"
