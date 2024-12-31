@@ -27,7 +27,7 @@ Warning:
 from telegram._utils.enum import StringEnum
 
 # TODO: Remove this when https://github.com/PyCQA/pylint/issues/6887 is resolved.
-# pylint: disable=invalid-enum-extension,invalid-slots
+# pylint: disable=invalid-enum-extension
 
 
 class TextEncoding(StringEnum):
