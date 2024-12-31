@@ -200,13 +200,9 @@ class TestAIORateLimiter:
 
     @pytest.fixture(autouse=True)
     def _reset(self):
-        # self.count = 0
-        # self.apb_count = 0
         TestAIORateLimiter.count = 0
         TestAIORateLimiter.call_times = []
-        # self.call_times = []
-        # self.apb_call_times = []
-        TestAIORateLimiter.call_times = []
+        TestAIORateLimiter.apb_count = 0
         TestAIORateLimiter.apb_call_times = []
 
     @pytest.mark.parametrize("max_retries", [0, 1, 4])
