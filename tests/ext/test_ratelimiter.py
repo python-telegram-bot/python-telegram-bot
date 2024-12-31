@@ -148,7 +148,9 @@ class TestBaseRateLimiter:
 @pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
 class TestAIORateLimiter:
     count = 0
+    apb_count = 0
     call_times = []
+    apb_call_times = []
 
     class CountRequest(BaseRequest):
         def __init__(self, retry_after=None):
@@ -161,8 +163,16 @@ class TestAIORateLimiter:
             pass
 
         async def do_request(self, *args, **kwargs):
-            TestAIORateLimiter.count += 1
-            TestAIORateLimiter.call_times.append(time.time())
+            request_data = kwargs.get("request_data")
+            allow_paid_broadcast = request_data.parameters.get("allow_paid_broadcast", False)
+
+            if allow_paid_broadcast:
+                TestAIORateLimiter.apb_count += 1
+                TestAIORateLimiter.apb_call_times.append(time.time())
+            else:
+                TestAIORateLimiter.count += 1
+                TestAIORateLimiter.call_times.append(time.time())
+
             if self.retry_after:
                 raise RetryAfter(retry_after=1)
 
@@ -190,10 +200,14 @@ class TestAIORateLimiter:
 
     @pytest.fixture(autouse=True)
     def _reset(self):
-        self.count = 0
+        # self.count = 0
+        # self.apb_count = 0
         TestAIORateLimiter.count = 0
-        self.call_times = []
         TestAIORateLimiter.call_times = []
+        # self.call_times = []
+        # self.apb_call_times = []
+        TestAIORateLimiter.call_times = []
+        TestAIORateLimiter.apb_call_times = []
 
     @pytest.mark.parametrize("max_retries", [0, 1, 4])
     async def test_max_retries(self, bot, max_retries):
@@ -358,3 +372,56 @@ class TestAIORateLimiter:
         finally:
             TestAIORateLimiter.count = 0
             TestAIORateLimiter.call_times = []
+
+    async def test_allow_paid_broadcast(self, bot):
+        try:
+            rl_bot = ExtBot(
+                token=bot.token,
+                request=self.CountRequest(retry_after=None),
+                rate_limiter=AIORateLimiter(),
+            )
+
+            async with rl_bot:
+                apb_tasks = {}
+                non_apb_tasks = {}
+                for i in range(3000):
+                    apb_tasks[i] = asyncio.create_task(
+                        rl_bot.send_message(chat_id=-1, text="test", allow_paid_broadcast=True)
+                    )
+
+                number = 2
+                for i in range(number):
+                    non_apb_tasks[i] = asyncio.create_task(
+                        rl_bot.send_message(chat_id=-1, text="test")
+                    )
+                    non_apb_tasks[i + number] = asyncio.create_task(
+                        rl_bot.send_message(chat_id=-1, text="test", allow_paid_broadcast=False)
+                    )
+
+                await asyncio.sleep(0.85)
+                # We expect 5 non-apb requests:
+                # 1: `get_me` from `async with rl_bot`
+                # 2: `send_message` at time 0.00
+                # 3: `send_message` at time 0.25
+                # 4: `send_message` at time 0.50
+                # 5: `send_message` at time 0.75
+                # We expect
+                assert TestAIORateLimiter.count == 5
+                assert sum(1 for task in non_apb_tasks.values() if task.done()) == 4
+
+                # 1 second after start
+                await asyncio.sleep(1 - 0.85)
+                # We expect ~2000 apb requests after the first second
+                # 2000 (>>1000), since we have a floating window logic such that an initial
+                # burst is allowed that is hard to measure in the tests
+                assert TestAIORateLimiter.apb_count < 3000
+                assert sum(1 for task in apb_tasks.values() if task.done()) < 3000
+
+                # 2 seconds after start
+                await asyncio.sleep(2.1 - 1)
+                assert TestAIORateLimiter.apb_count == 3000
+                assert all(task.done() for task in apb_tasks.values())
+
+        finally:
+            # cleanup
+            await asyncio.gather(*apb_tasks.values(), *non_apb_tasks.values())
