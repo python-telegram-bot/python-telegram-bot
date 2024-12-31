@@ -26,6 +26,7 @@ import datetime as dtm
 import json
 import platform
 import time
+from collections import defaultdict
 from http import HTTPStatus
 
 import pytest
@@ -405,18 +406,26 @@ class TestAIORateLimiter:
                 assert TestAIORateLimiter.count == 5
                 assert sum(1 for task in non_apb_tasks.values() if task.done()) == 4
 
-                # 1 second after start
-                await asyncio.sleep(1 - 0.85)
+                # ~2 second after start
+                # We do the checks once all apb_tasks are done as apparently getting the timings
+                # right to check after 1 second is hard
+                await asyncio.sleep(2.1 - 0.85)
+                assert all(task.done() for task in apb_tasks.values())
+
+                apb_call_times = [
+                    ct - TestAIORateLimiter.apb_call_times[0]
+                    for ct in TestAIORateLimiter.apb_call_times
+                ]
+                apb_call_times_dict = defaultdict(int)
+                for ct in apb_call_times:
+                    apb_call_times_dict[int(ct)] += 1
+
                 # We expect ~2000 apb requests after the first second
                 # 2000 (>>1000), since we have a floating window logic such that an initial
                 # burst is allowed that is hard to measure in the tests
-                assert TestAIORateLimiter.apb_count < 3000
-                assert sum(1 for task in apb_tasks.values() if task.done()) < 3000
-
-                # 2 seconds after start
-                await asyncio.sleep(2.1 - 1)
-                assert TestAIORateLimiter.apb_count == 3000
-                assert all(task.done() for task in apb_tasks.values())
+                assert apb_call_times_dict[0] <= 2000
+                assert apb_call_times_dict[0] + apb_call_times_dict[1] < 3000
+                assert sum(apb_call_times_dict.values()) == 3000
 
         finally:
             # cleanup
