@@ -104,6 +104,7 @@ __all__ = [
     "TransactionPartnerType",
     "UpdateType",
     "UserProfilePhotosLimit",
+    "VerifyLimit",
     "WebhookLimit",
 ]
 

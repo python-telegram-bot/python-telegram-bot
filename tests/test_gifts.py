@@ -34,6 +34,7 @@ def gift(request):
         star_count=GiftTestBase.star_count,
         total_count=GiftTestBase.total_count,
         remaining_count=GiftTestBase.remaining_count,
+        upgrade_star_count=GiftTestBase.upgrade_star_count,
     )
 
 
@@ -51,6 +52,7 @@ class GiftTestBase:
     star_count = 5
     total_count = 10
     remaining_count = 5
+    upgrade_star_count = 10
 
 
 class TestGiftWithoutRequest(GiftTestBase):
@@ -66,6 +68,7 @@ class TestGiftWithoutRequest(GiftTestBase):
             "star_count": self.star_count,
             "total_count": self.total_count,
             "remaining_count": self.remaining_count,
+            "upgrade_star_count": self.upgrade_star_count,
         }
         gift = Gift.de_json(json_dict, offline_bot)
         assert gift.api_kwargs == {}
@@ -75,6 +78,7 @@ class TestGiftWithoutRequest(GiftTestBase):
         assert gift.star_count == self.star_count
         assert gift.total_count == self.total_count
         assert gift.remaining_count == self.remaining_count
+        assert gift.upgrade_star_count == self.upgrade_star_count
 
         assert Gift.de_json(None, offline_bot) is None
 
@@ -87,12 +91,25 @@ class TestGiftWithoutRequest(GiftTestBase):
         assert gift_dict["star_count"] == self.star_count
         assert gift_dict["total_count"] == self.total_count
         assert gift_dict["remaining_count"] == self.remaining_count
+        assert gift_dict["upgrade_star_count"] == self.upgrade_star_count
 
     def test_equality(self, gift):
         a = gift
-        b = Gift(self.id, self.sticker, self.star_count, self.total_count, self.remaining_count)
+        b = Gift(
+            self.id,
+            self.sticker,
+            self.star_count,
+            self.total_count,
+            self.remaining_count,
+            self.upgrade_star_count,
+        )
         c = Gift(
-            "other_uid", self.sticker, self.star_count, self.total_count, self.remaining_count
+            "other_uid",
+            self.sticker,
+            self.star_count,
+            self.total_count,
+            self.remaining_count,
+            self.upgrade_star_count,
         )
         d = BotCommand("start", "description")
 
@@ -115,6 +132,7 @@ class TestGiftWithoutRequest(GiftTestBase):
                 5,
                 10,
                 5,
+                10,
             ),
         ],
         ids=["string", "Gift"],
@@ -134,11 +152,18 @@ class TestGiftWithoutRequest(GiftTestBase):
             tes = request_data.parameters["text_entities"] == [
                 me.to_dict() for me in text_entities
             ]
-            return user_id and gift_id and text and text_parse_mode and tes
+            pay_for_upgrade = request_data.parameters["pay_for_upgrade"] is True
+
+            return user_id and gift_id and text and text_parse_mode and tes and pay_for_upgrade
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_gift(
-            "user_id", gift, "text", text_parse_mode="text_parse_mode", text_entities=text_entities
+            "user_id",
+            gift,
+            "text",
+            text_parse_mode="text_parse_mode",
+            text_entities=text_entities,
+            pay_for_upgrade=True,
         )
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -184,6 +209,7 @@ class GiftsTestBase:
             star_count=5,
             total_count=5,
             remaining_count=5,
+            upgrade_star_count=5,
         ),
         Gift(
             id="id2",
@@ -199,6 +225,7 @@ class GiftsTestBase:
             star_count=6,
             total_count=6,
             remaining_count=6,
+            upgrade_star_count=6,
         ),
         Gift(
             id="id3",
@@ -214,6 +241,7 @@ class GiftsTestBase:
             star_count=7,
             total_count=7,
             remaining_count=7,
+            upgrade_star_count=7,
         ),
     ]
 
@@ -236,6 +264,7 @@ class TestGiftsWithoutRequest(GiftsTestBase):
             assert de_json_gift.star_count == original_gift.star_count
             assert de_json_gift.total_count == original_gift.total_count
             assert de_json_gift.remaining_count == original_gift.remaining_count
+            assert de_json_gift.upgrade_star_count == original_gift.upgrade_star_count
 
         assert Gifts.de_json(None, offline_bot) is None
 

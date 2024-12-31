@@ -742,3 +742,34 @@ class TestUserWithoutRequest(UserTestBase):
             text_parse_mode="text_parse_mode",
             text_entities="text_entities",
         )
+
+    async def test_instance_method_verify_user(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["custom_description"] == "This is a custom description"
+            )
+
+        assert check_shortcut_signature(user.verify_user, Bot.verify_user, ["user_id"], [])
+        assert await check_shortcut_call(user.verify_user, user.get_bot(), "verify_user")
+        assert await check_defaults_handling(user.verify_user, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "verify_user", make_assertion)
+        assert await user.verify_user(
+            custom_description="This is a custom description",
+        )
+
+    async def test_instance_method_remove_user_verification(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id
+
+        assert check_shortcut_signature(
+            user.remove_user_verification, Bot.remove_user_verification, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.remove_user_verification, user.get_bot(), "remove_user_verification"
+        )
+        assert await check_defaults_handling(user.remove_user_verification, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "remove_user_verification", make_assertion)
+        assert await user.remove_user_verification()

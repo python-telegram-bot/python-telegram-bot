@@ -28,6 +28,7 @@ from telegram import (
     InputTextMessageContent,
 )
 from telegram.constants import InlineQueryResultType
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -157,3 +158,31 @@ class TestInlineQueryResultArticleWithoutRequest(InlineQueryResultArticleTestBas
 
         assert a != e
         assert hash(a) != hash(e)
+
+    def test_deprecation_warning_for_hide_url(self):
+        with pytest.warns(PTBDeprecationWarning, match="The argument `hide_url`") as record:
+            InlineQueryResultArticle(
+                self.id_, self.title, self.input_message_content, hide_url=True
+            )
+
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+        with pytest.warns(PTBDeprecationWarning, match="The argument `hide_url`") as record:
+            InlineQueryResultArticle(
+                self.id_, self.title, self.input_message_content, hide_url=False
+            )
+
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+        assert (
+            InlineQueryResultArticle(
+                self.id_, self.title, self.input_message_content, hide_url=True
+            ).hide_url
+            is True
+        )
+        assert (
+            InlineQueryResultArticle(
+                self.id_, self.title, self.input_message_content, hide_url=False
+            ).hide_url
+            is False
+        )
