@@ -142,7 +142,7 @@ class TestBaseRateLimiter:
     not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
 @pytest.mark.skipif(
-    bool(GITHUB_ACTION and platform.system() == "Darwin"),
+    GITHUB_ACTION and platform.system() == "Darwin",
     reason="The timings are apparently rather inaccurate on MacOS.",
 )
 @pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
