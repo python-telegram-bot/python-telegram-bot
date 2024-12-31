@@ -35,6 +35,8 @@ class TrackedBoundedSemaphore(asyncio.BoundedSemaphore):
     don't want to rely on it.
     """
 
+    __slots__ = ("_current_value",)
+
     def __init__(self, value: int = 1) -> None:
         super().__init__(value)
         self._current_value = value
