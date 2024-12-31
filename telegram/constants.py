@@ -3229,3 +3229,20 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Woman Shrugging"""
     POUTING_FACE = "😡"
     """:obj:`str`: Pouting face"""
+
+
+class VerifyLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.verify_chat` and
+    :meth:`~telegram.Bot.verify_user`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_TEXT_LENGTH = 70
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.verify_chat.custom_description` or
+    :paramref:`~telegram.Bot.verify_user.custom_description` parameter.
+    """
