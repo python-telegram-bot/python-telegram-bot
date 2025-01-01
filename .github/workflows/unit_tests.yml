@@ -64,7 +64,8 @@ jobs:
 
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
-          pip install .[all]
+          # need to manually install pytz here, because it's no longer in the optional reqs
+          pip install .[all] pytz
           # `-n auto --dist worksteal` uses pytest-xdist to run tests on multiple CPU
           # workers. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness.

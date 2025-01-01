@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
 import time
+import zoneinfo
 
 import pytest
 
@@ -55,18 +56,38 @@ with the TEST_WITH_OPT_DEPS=False environment variable in addition to the regula
 
 
 class TestDatetime:
-    @staticmethod
-    def localize(dt, tzinfo):
-        if TEST_WITH_OPT_DEPS:
-            return tzinfo.localize(dt)
-        return dt.replace(tzinfo=tzinfo)
+    def test_localize_utc(self):
+        dt = dtm.datetime(2023, 1, 1, 12, 0, 0)
+        localized_dt = tg_dtm.localize(dt, tg_dtm.UTC)
+        assert localized_dt.tzinfo == tg_dtm.UTC
+        assert localized_dt == dt.replace(tzinfo=tg_dtm.UTC)
 
-    def test_helpers_utc(self):
-        # Here we just test, that we got the correct UTC variant
-        if not TEST_WITH_OPT_DEPS:
-            assert tg_dtm.UTC is tg_dtm.DTM_UTC
-        else:
-            assert tg_dtm.UTC is not tg_dtm.DTM_UTC
+    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
+    def test_localize_pytz(self):
+        dt = dtm.datetime(2023, 1, 1, 12, 0, 0)
+        import pytz
+
+        tzinfo = pytz.timezone("Europe/Berlin")
+        localized_dt = tg_dtm.localize(dt, tzinfo)
+        assert localized_dt.hour == dt.hour
+        assert localized_dt.tzinfo is not None
+        assert tzinfo.utcoffset(dt) is not None
+
+    def test_localize_zoneinfo_naive(self):
+        dt = dtm.datetime(2023, 1, 1, 12, 0, 0)
+        tzinfo = zoneinfo.ZoneInfo("Europe/Berlin")
+        localized_dt = tg_dtm.localize(dt, tzinfo)
+        assert localized_dt.hour == dt.hour
+        assert localized_dt.tzinfo is not None
+        assert tzinfo.utcoffset(dt) is not None
+
+    def test_localize_zoneinfo_aware(self):
+        dt = dtm.datetime(2023, 1, 1, 12, 0, 0, tzinfo=dtm.timezone.utc)
+        tzinfo = zoneinfo.ZoneInfo("Europe/Berlin")
+        localized_dt = tg_dtm.localize(dt, tzinfo)
+        assert localized_dt.hour == dt.hour + 1
+        assert localized_dt.tzinfo is not None
+        assert tzinfo.utcoffset(dt) is not None
 
     def test_to_float_timestamp_absolute_naive(self):
         """Conversion from timezone-naive datetime to timestamp.
@@ -75,20 +96,12 @@ class TestDatetime:
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         assert tg_dtm.to_float_timestamp(datetime) == 1573431976.1
 
-    def test_to_float_timestamp_absolute_naive_no_pytz(self, monkeypatch):
-        """Conversion from timezone-naive datetime to timestamp.
-        Naive datetimes should be assumed to be in UTC.
-        """
-        monkeypatch.setattr(tg_dtm, "UTC", tg_dtm.DTM_UTC)
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        assert tg_dtm.to_float_timestamp(datetime) == 1573431976.1
-
     def test_to_float_timestamp_absolute_aware(self, timezone):
         """Conversion from timezone-aware datetime to timestamp"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        datetime = self.localize(test_datetime, timezone)
+        datetime = tg_dtm.localize(test_datetime, timezone)
         assert (
             tg_dtm.to_float_timestamp(datetime)
             == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()
@@ -126,7 +139,7 @@ class TestDatetime:
         ref_datetime = dtm.datetime(1970, 1, 1, 12)
         utc_offset = timezone.utcoffset(ref_datetime)
         ref_t, time_of_day = tg_dtm._datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
-        aware_time_of_day = self.localize(ref_datetime, timezone).timetz()
+        aware_time_of_day = tg_dtm.localize(ref_datetime, timezone).timetz()
 
         # first test that naive time is assumed to be utc:
         assert tg_dtm.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
@@ -169,7 +182,7 @@ class TestDatetime:
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        datetime = self.localize(test_datetime, timezone)
+        datetime = tg_dtm.localize(test_datetime, timezone)
         assert (
             tg_dtm.from_timestamp(1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
             == datetime

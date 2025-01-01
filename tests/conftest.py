@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import datetime as dtm
 import logging
 import sys
+import zoneinfo
 from pathlib import Path
 from uuid import uuid4
 
@@ -40,11 +40,10 @@ from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
-from tests.auxil.envvars import GITHUB_ACTION, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTIONS, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestBot, make_bot
-from tests.auxil.timezones import BasicTimezone
 
 if TEST_WITH_OPT_DEPS:
     import pytz
@@ -97,7 +96,7 @@ def pytest_collection_modifyitems(items: list[pytest.Item]):
             parent.add_marker(pytest.mark.no_req)
 
 
-if GITHUB_ACTION and JOB_INDEX == 0:
+if GITHUB_ACTIONS and JOB_INDEX == 0:
     # let's not slow down the tests too much with these additional checks
     # that's why we run them only in GitHub actions and only on *one* of the several test
     # matrix entries
@@ -308,12 +307,20 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
+@pytest.fixture(
+    scope="session",
+    params=[pytz.timezone, zoneinfo.ZoneInfo] if TEST_WITH_OPT_DEPS else [zoneinfo.ZoneInfo],
+)
+def _tz_implementation(request):  # noqa: PT005
+    # This fixture is used to parametrize the timezone fixture
+    # This is similar to what @pyttest.mark.parametrize does but for fixtures
+    # However, this is needed only internally for the `tzinfo` fixture, so we keep it private
+    return request.param
+
+
 @pytest.fixture(scope="session", params=["Europe/Berlin", "Asia/Singapore", "UTC"])
-def tzinfo(request):
-    if TEST_WITH_OPT_DEPS:
-        return pytz.timezone(request.param)
-    hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
-    return BasicTimezone(offset=dtm.timedelta(hours=hours_offset), name=request.param)
+def tzinfo(request, _tz_implementation):
+    return _tz_implementation(request.param)
 
 
 @pytest.fixture(scope="session")

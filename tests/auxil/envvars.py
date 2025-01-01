@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,9 @@ def env_var_2_bool(env_var: object) -> bool:
     return env_var.lower().strip() == "true"
 
 
-GITHUB_ACTION = os.getenv("GITHUB_ACTION", "")
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", "true"))
-RUN_TEST_OFFICIAL = env_var_2_bool(os.getenv("TEST_OFFICIAL"))
+GITHUB_ACTIONS: bool = env_var_2_bool(os.getenv("GITHUB_ACTIONS", "false"))
+TEST_WITH_OPT_DEPS: bool = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", "false")) or (
+    # on local setups, we usually want to test with optional dependencies
+    not GITHUB_ACTIONS
+)
+RUN_TEST_OFFICIAL: bool = env_var_2_bool(os.getenv("TEST_OFFICIAL"))

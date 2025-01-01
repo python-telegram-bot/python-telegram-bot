@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ import datetime as dtm
 import functools
 import inspect
 import re
+import zoneinfo
 from collections.abc import Collection, Iterable
 from typing import Any, Callable, Optional
 
@@ -40,15 +41,11 @@ from telegram import (
     Sticker,
     TelegramObject,
 )
+from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram.constants import InputMediaType
 from telegram.ext import Defaults, ExtBot
 from telegram.request import RequestData
-from tests.auxil.envvars import TEST_WITH_OPT_DEPS
-
-if TEST_WITH_OPT_DEPS:
-    import pytz
-
 
 FORWARD_REF_PATTERN = re.compile(r"ForwardRef\('(?P<class_name>\w+)'\)")
 """ A pattern to find a class name in a ForwardRef typing annotation.
@@ -344,10 +341,10 @@ def build_kwargs(
         # Some special casing for methods that have "exactly one of the optionals" type args
         elif name in ["location", "contact", "venue", "inline_message_id"]:
             kws[name] = True
-        elif name == "until_date":
+        elif name.endswith("_date"):
             if manually_passed_value not in [None, DEFAULT_NONE]:
                 # Europe/Berlin
-                kws[name] = pytz.timezone("Europe/Berlin").localize(dtm.datetime(2000, 1, 1, 0))
+                kws[name] = dtm.datetime(2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"))
             else:
                 # naive UTC
                 kws[name] = dtm.datetime(2000, 1, 1, 0)
@@ -393,6 +390,15 @@ def make_assertion_for_link_preview_options(
                 f"Got value {lpo.get('url')} for link_preview_options.url, "
                 f"expected it to be {expected_defaults_value}"
             )
+
+
+_EUROPE_BERLIN_TS = to_timestamp(
+    dtm.datetime(2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"))
+)
+_UTC_TS = to_timestamp(dtm.datetime(2000, 1, 1, 0), tzinfo=zoneinfo.ZoneInfo("UTC"))
+_AMERICA_NEW_YORK_TS = to_timestamp(
+    dtm.datetime(2000, 1, 1, 0, tzinfo=zoneinfo.ZoneInfo("America/New_York"))
+)
 
 
 async def make_assertion(
@@ -530,14 +536,16 @@ async def make_assertion(
         )
 
     # Check datetime conversion
-    until_date = data.pop("until_date", None)
-    if until_date:
-        if manual_value_expected and until_date != 946681200:
-            pytest.fail("Non-naive until_date should have been interpreted as Europe/Berlin.")
-        if not any((manually_passed_value, expected_defaults_value)) and until_date != 946684800:
-            pytest.fail("Naive until_date should have been interpreted as UTC")
-        if default_value_expected and until_date != 946702800:
-            pytest.fail("Naive until_date should have been interpreted as America/New_York")
+    date_keys = [key for key in data if key.endswith("_date")]
+    for key in date_keys:
+        date_param = data.pop(key)
+        if date_param:
+            if manual_value_expected and date_param != _EUROPE_BERLIN_TS:
+                pytest.fail(f"Non-naive `{key}` should have been interpreted as Europe/Berlin.")
+            if not any((manually_passed_value, expected_defaults_value)) and date_param != _UTC_TS:
+                pytest.fail(f"Naive `{key}` should have been interpreted as UTC")
+            if default_value_expected and date_param != _AMERICA_NEW_YORK_TS:
+                pytest.fail(f"Naive `{key}` should have been interpreted as America/New_York")
 
     if method_name in ["get_file", "get_small_file", "get_big_file"]:
         # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
@@ -596,7 +604,7 @@ async def check_defaults_handling(
 
     defaults_no_custom_defaults = Defaults()
     kwargs = {kwarg: "custom_default" for kwarg in inspect.signature(Defaults).parameters}
-    kwargs["tzinfo"] = pytz.timezone("America/New_York")
+    kwargs["tzinfo"] = zoneinfo.ZoneInfo("America/New_York")
     kwargs.pop("disable_web_page_preview")  # mutually exclusive with link_preview_options
     kwargs.pop("quote")  # mutually exclusive with do_quote
     kwargs["link_preview_options"] = LinkPreviewOptions(
