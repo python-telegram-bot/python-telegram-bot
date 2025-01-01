@@ -474,9 +474,10 @@ class TestBotWithoutRequest:
         ("cls", "logger_name"), [(Bot, "telegram.Bot"), (ExtBot, "telegram.ext.ExtBot")]
     )
     async def test_bot_method_logging(self, offline_bot: PytestExtBot, cls, logger_name, caplog):
+        instance = cls(offline_bot.token)
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
-            await cls(offline_bot.token).get_me()
+            await instance.get_me()
             # Only for stabilizing this test-
             if len(caplog.records) == 4:
                 for idx, record in enumerate(caplog.records):
