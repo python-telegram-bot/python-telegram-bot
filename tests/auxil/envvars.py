@@ -27,6 +27,9 @@ def env_var_2_bool(env_var: object) -> bool:
     return env_var.lower().strip() == "true"
 
 
-GITHUB_ACTION = os.getenv("GITHUB_ACTION", "")
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", "true"))
-RUN_TEST_OFFICIAL = env_var_2_bool(os.getenv("TEST_OFFICIAL"))
+GITHUB_ACTIONS: bool = env_var_2_bool(os.getenv("GITHUB_ACTIONS", "false"))
+TEST_WITH_OPT_DEPS: bool = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", "false")) or (
+    # on local setups, we usually want to test with optional dependencies
+    not GITHUB_ACTIONS
+)
+RUN_TEST_OFFICIAL: bool = env_var_2_bool(os.getenv("TEST_OFFICIAL"))
