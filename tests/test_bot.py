@@ -262,7 +262,7 @@ class TestBotWithoutRequest:
         assert caplog.records[1].getMessage() == "Set Bot API File URL: base/!!Test String!!"
 
     @pytest.mark.parametrize(
-        "insert_key", {"token", "TOKEN", "bot_token", "BOT_TOKEN", "bot-token", "BOT-TOKEN"}
+        "insert_key", ["token", "TOKEN", "bot_token", "BOT_TOKEN", "bot-token", "BOT-TOKEN"]
     )
     def test_base_url_parsing_string_format(self, offline_bot, insert_key, caplog):
         string = f"{{{insert_key}}}"
