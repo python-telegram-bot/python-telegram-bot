@@ -233,7 +233,9 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     def test_slot_behaviour(self, bot_class, offline_bot):
-        inst = bot_class(offline_bot.token)
+        inst = bot_class(
+            offline_bot.token, request=OfflineRequest(1), get_updates_request=OfflineRequest(1)
+        )
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -241,6 +243,68 @@ class TestBotWithoutRequest:
     async def test_no_token_passed(self):
         with pytest.raises(InvalidToken, match="You must pass the token"):
             Bot("")
+
+    def test_base_url_parsing_basic(self, offline_bot, caplog):
+        with caplog.at_level(logging.DEBUG):
+            bot = Bot(
+                token="!!Test String!!",
+                base_url="base/",
+                base_file_url="base/",
+                request=OfflineRequest(1),
+                get_updates_request=OfflineRequest(1),
+            )
+
+        assert bot.base_url == "base/!!Test String!!"
+        assert bot.base_file_url == "base/!!Test String!!"
+
+        assert len(caplog.records) == 2
+        assert caplog.records[0].getMessage() == "Set Bot API URL: base/!!Test String!!"
+        assert caplog.records[1].getMessage() == "Set Bot API File URL: base/!!Test String!!"
+
+    @pytest.mark.parametrize(
+        "insert_key", {"token", "TOKEN", "bot_token", "BOT_TOKEN", "bot-token", "BOT-TOKEN"}
+    )
+    def test_base_url_parsing_string_format(self, offline_bot, insert_key, caplog):
+        string = f"{{{insert_key}}}"
+
+        with caplog.at_level(logging.DEBUG):
+            bot = Bot(
+                token="!!Test String!!",
+                base_url=string,
+                base_file_url=string,
+                request=OfflineRequest(1),
+                get_updates_request=OfflineRequest(1),
+            )
+
+        assert bot.base_url == "!!Test String!!"
+        assert bot.base_file_url == "!!Test String!!"
+
+        assert len(caplog.records) == 2
+        assert caplog.records[0].getMessage() == "Set Bot API URL: !!Test String!!"
+        assert caplog.records[1].getMessage() == "Set Bot API File URL: !!Test String!!"
+
+        with pytest.raises(KeyError, match="unsupported insertion: unknown"):
+            Bot("token", base_url="{unknown}{token}")
+
+    def test_base_url_parsing_callable(self, offline_bot, caplog):
+        def build_url(_: str) -> str:
+            return "!!Test String!!"
+
+        with caplog.at_level(logging.DEBUG):
+            bot = Bot(
+                token="some-token",
+                base_url=build_url,
+                base_file_url=build_url,
+                request=OfflineRequest(1),
+                get_updates_request=OfflineRequest(1),
+            )
+
+        assert bot.base_url == "!!Test String!!"
+        assert bot.base_file_url == "!!Test String!!"
+
+        assert len(caplog.records) == 2
+        assert caplog.records[0].getMessage() == "Set Bot API URL: !!Test String!!"
+        assert caplog.records[1].getMessage() == "Set Bot API File URL: !!Test String!!"
 
     async def test_repr(self):
         offline_bot = Bot(token="some_token", base_file_url="")
