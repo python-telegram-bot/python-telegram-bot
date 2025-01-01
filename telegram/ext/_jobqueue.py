@@ -701,7 +701,7 @@ class JobQueue(Generic[CCT]):
 
         Args:
             pattern (:obj:`str` | :obj:`re.Pattern`, optional): A regular expression pattern. If
-                passend, only jobs whose name matches the pattern will be returned.
+                passed, only jobs whose name matches the pattern will be returned.
                 Defaults to :obj:`None`.
 
                 Hint:
