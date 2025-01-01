@@ -58,7 +58,7 @@ class TestConstantsWithoutRequest:
                 not key.startswith("_")
                 # exclude imported stuff
                 and getattr(member, "__module__", "telegram.constants") == "telegram.constants"
-                and key not in ("sys", "dtm")
+                and key not in ("sys", "dtm", "UTC")
             )
         }
         actual = set(constants.__all__)
