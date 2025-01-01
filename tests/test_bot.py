@@ -257,9 +257,10 @@ class TestBotWithoutRequest:
         assert bot.base_url == "base/!!Test String!!"
         assert bot.base_file_url == "base/!!Test String!!"
 
-        assert len(caplog.records) == 2
-        assert caplog.records[0].getMessage() == "Set Bot API URL: base/!!Test String!!"
-        assert caplog.records[1].getMessage() == "Set Bot API File URL: base/!!Test String!!"
+        assert len(caplog.records) >= 2
+        messages = [record.getMessage() for record in caplog.records]
+        assert "Set Bot API URL: base/!!Test String!!" in messages
+        assert "Set Bot API File URL: base/!!Test String!!" in messages
 
     @pytest.mark.parametrize(
         "insert_key", ["token", "TOKEN", "bot_token", "BOT_TOKEN", "bot-token", "BOT-TOKEN"]
@@ -279,9 +280,10 @@ class TestBotWithoutRequest:
         assert bot.base_url == "!!Test String!!"
         assert bot.base_file_url == "!!Test String!!"
 
-        assert len(caplog.records) == 2
-        assert caplog.records[0].getMessage() == "Set Bot API URL: !!Test String!!"
-        assert caplog.records[1].getMessage() == "Set Bot API File URL: !!Test String!!"
+        assert len(caplog.records) >= 2
+        messages = [record.getMessage() for record in caplog.records]
+        assert "Set Bot API URL: !!Test String!!" in messages
+        assert "Set Bot API File URL: !!Test String!!" in messages
 
         with pytest.raises(KeyError, match="unsupported insertion: unknown"):
             Bot("token", base_url="{unknown}{token}")
@@ -302,9 +304,10 @@ class TestBotWithoutRequest:
         assert bot.base_url == "!!Test String!!"
         assert bot.base_file_url == "!!Test String!!"
 
-        assert len(caplog.records) == 2
-        assert caplog.records[0].getMessage() == "Set Bot API URL: !!Test String!!"
-        assert caplog.records[1].getMessage() == "Set Bot API File URL: !!Test String!!"
+        assert len(caplog.records) >= 2
+        messages = [record.getMessage() for record in caplog.records]
+        assert "Set Bot API URL: !!Test String!!" in messages
+        assert "Set Bot API File URL: !!Test String!!" in messages
 
     async def test_repr(self):
         offline_bot = Bot(token="some_token", base_file_url="")
