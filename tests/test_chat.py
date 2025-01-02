@@ -1340,12 +1340,12 @@ class TestChatWithoutRequest(ChatTestBase):
                 and kwargs["custom_description"] == "This is a custom description"
             )
 
-        assert check_shortcut_signature(Chat.verify_chat, Bot.verify_chat, ["chat_id"], [])
-        assert await check_shortcut_call(chat.verify_chat, chat.get_bot(), "verify_chat")
-        assert await check_defaults_handling(chat.verify_chat, chat.get_bot())
+        assert check_shortcut_signature(Chat.verify, Bot.verify_chat, ["chat_id"], [])
+        assert await check_shortcut_call(chat.verify, chat.get_bot(), "verify_chat")
+        assert await check_defaults_handling(chat.verify, chat.get_bot())
 
         monkeypatch.setattr(chat.get_bot(), "verify_chat", make_assertion)
-        assert await chat.verify_chat(
+        assert await chat.verify(
             custom_description="This is a custom description",
         )
 
@@ -1354,15 +1354,15 @@ class TestChatWithoutRequest(ChatTestBase):
             return kwargs["chat_id"] == chat.id
 
         assert check_shortcut_signature(
-            Chat.remove_chat_verification, Bot.remove_chat_verification, ["chat_id"], []
+            Chat.remove_verification, Bot.remove_chat_verification, ["chat_id"], []
         )
         assert await check_shortcut_call(
-            chat.remove_chat_verification, chat.get_bot(), "remove_chat_verification"
+            chat.remove_verification, chat.get_bot(), "remove_chat_verification"
         )
-        assert await check_defaults_handling(chat.remove_chat_verification, chat.get_bot())
+        assert await check_defaults_handling(chat.remove_verification, chat.get_bot())
 
         monkeypatch.setattr(chat.get_bot(), "remove_chat_verification", make_assertion)
-        assert await chat.remove_chat_verification()
+        assert await chat.remove_verification()
 
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
