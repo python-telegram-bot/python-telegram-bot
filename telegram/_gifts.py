@@ -107,7 +107,7 @@ class Gift(TelegramObject):
             return None
 
         data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
 
 class Gifts(TelegramObject):
@@ -150,4 +150,4 @@ class Gifts(TelegramObject):
             return None
 
         data["gifts"] = Gift.de_list(data.get("gifts"), bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

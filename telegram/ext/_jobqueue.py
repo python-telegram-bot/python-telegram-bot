@@ -19,6 +19,7 @@
 """This module contains the classes JobQueue and Job."""
 import asyncio
 import datetime as dtm
+import re
 import weakref
 from typing import TYPE_CHECKING, Any, Generic, Optional, Union, cast, overload
 
@@ -38,6 +39,8 @@ from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import CCT, JobCallback
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     if APS_AVAILABLE:
         from apscheduler.job import Job as APSJob
 
@@ -695,22 +698,43 @@ class JobQueue(Generic[CCT]):
             # so give it a tiny bit of time to actually shut down.
             await asyncio.sleep(0.01)
 
-    def jobs(self) -> tuple["Job[CCT]", ...]:
+    def jobs(self, pattern: Union[str, re.Pattern[str], None] = None) -> tuple["Job[CCT]", ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`.
+
+        Args:
+            pattern (:obj:`str` | :obj:`re.Pattern`, optional): A regular expression pattern. If
+                passed, only jobs whose name matches the pattern will be returned.
+                Defaults to :obj:`None`.
+
+                Hint:
+                    This uses :func:`re.search` and not :func:`re.match`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             tuple[:class:`Job`]: Tuple of all *scheduled* jobs.
         """
-        return tuple(Job.from_aps_job(job) for job in self.scheduler.get_jobs())
+        jobs_generator: Iterable[Job] = (
+            Job.from_aps_job(job) for job in self.scheduler.get_jobs()
+        )
+        if pattern is None:
+            return tuple(jobs_generator)
+        return tuple(
+            job for job in jobs_generator if (job.name and re.compile(pattern).search(job.name))
+        )
 
     def get_jobs_by_name(self, name: str) -> tuple["Job[CCT]", ...]:
-        """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
+        """Returns a tuple of all *scheduled* jobs with the given name that are currently
         in the :class:`JobQueue`.
 
+        Hint:
+            This method is a convenience wrapper for :meth:`jobs` with a pattern that matches the
+            given name.
+
         Returns:
-            tuple[:class:`Job`]: Tuple of all *pending* or *scheduled* jobs matching the name.
+            tuple[:class:`Job`]: Tuple of all *scheduled* jobs matching the name.
         """
-        return tuple(job for job in self.jobs() if job.name == name)
+        return self.jobs(f"^{re.escape(name)}$")
 
 
 class Job(Generic[CCT]):

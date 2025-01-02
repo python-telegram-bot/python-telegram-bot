@@ -22,6 +22,7 @@ import contextlib
 import datetime as dtm
 import logging
 import platform
+import re
 import time
 
 import pytest
@@ -462,19 +463,34 @@ class TestJobQueue:
 
         await jq.stop()
 
-    async def test_get_jobs(self, job_queue):
+    @pytest.mark.parametrize(
+        "pattern", [None, "not", re.compile("not")], ids=["None", "str", "re.Pattern"]
+    )
+    async def test_get_jobs(self, job_queue, pattern):
         callback = self.job_run_once
 
-        job1 = job_queue.run_once(callback, 10, name="name1")
+        job1 = job_queue.run_once(callback, 10, name="is|a|match")
         await asyncio.sleep(0.03)  # To stablize tests on windows
-        job2 = job_queue.run_once(callback, 10, name="name1")
+        job2 = job_queue.run_once(callback, 10, name="is|a|match")
         await asyncio.sleep(0.03)
-        job3 = job_queue.run_once(callback, 10, name="name2")
+        job3 = job_queue.run_once(callback, 10, name="not|is|a|match")
+        await asyncio.sleep(0.03)
+        job4 = job_queue.run_once(callback, 10, name="is|a|match|not")
+        await asyncio.sleep(0.03)
+        job5 = job_queue.run_once(callback, 10, name="something_else")
+        await asyncio.sleep(0.03)
+        # name-less job
+        job6 = job_queue.run_once(callback, 10)
         await asyncio.sleep(0.03)
 
-        assert job_queue.jobs() == (job1, job2, job3)
-        assert job_queue.get_jobs_by_name("name1") == (job1, job2)
-        assert job_queue.get_jobs_by_name("name2") == (job3,)
+        if pattern is None:
+            assert job_queue.jobs(pattern) == (job1, job2, job3, job4, job5, job6)
+        else:
+            assert job_queue.jobs(pattern) == (job3, job4)
+
+        assert job_queue.jobs() == (job1, job2, job3, job4, job5, job6)
+        assert job_queue.get_jobs_by_name("is|a|match") == (job1, job2)
+        assert job_queue.get_jobs_by_name("something_else") == (job5,)
 
     async def test_job_run(self, app):
         job = app.job_queue.run_repeating(self.job_run_once, 0.02)
