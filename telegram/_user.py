@@ -2273,7 +2273,7 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def verify_user(
+    async def verify(
         self,
         custom_description: Optional[str] = None,
         *,
@@ -2305,7 +2305,7 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def remove_user_verification(
+    async def remove_verification(
         self,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

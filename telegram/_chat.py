@@ -3479,7 +3479,7 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def verify_chat(
+    async def verify(
         self,
         custom_description: Optional[str] = None,
         *,
@@ -3511,7 +3511,7 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def remove_chat_verification(
+    async def remove_verification(
         self,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

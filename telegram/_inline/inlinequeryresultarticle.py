@@ -137,7 +137,7 @@ class InlineQueryResultArticle(InlineQueryResult):
                 warn(
                     PTBDeprecationWarning(
                         "NEXT.VERSION",
-                        "The argument `hide_url` will be removed in future major PTB/Bot API"
+                        "The argument `hide_url` will be removed in future PTB"
                         "versions. Pass an empty string as URL instead.",
                     ),
                     stacklevel=2,
