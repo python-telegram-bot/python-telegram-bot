@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -1332,6 +1332,37 @@ class TestChatWithoutRequest(ChatTestBase):
             text_parse_mode="text_parse_mode",
             text_entities="text_entities",
         )
+
+    async def test_instance_method_verify_chat(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["custom_description"] == "This is a custom description"
+            )
+
+        assert check_shortcut_signature(Chat.verify, Bot.verify_chat, ["chat_id"], [])
+        assert await check_shortcut_call(chat.verify, chat.get_bot(), "verify_chat")
+        assert await check_defaults_handling(chat.verify, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "verify_chat", make_assertion)
+        assert await chat.verify(
+            custom_description="This is a custom description",
+        )
+
+    async def test_instance_method_remove_chat_verification(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.remove_verification, Bot.remove_chat_verification, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.remove_verification, chat.get_bot(), "remove_chat_verification"
+        )
+        assert await check_defaults_handling(chat.remove_verification, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "remove_chat_verification", make_assertion)
+        assert await chat.remove_verification()
 
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")

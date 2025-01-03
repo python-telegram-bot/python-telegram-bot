@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -38,10 +38,17 @@ class TestDefaults:
 
     def test_utc(self):
         defaults = Defaults()
-        if not TEST_WITH_OPT_DEPS:
-            assert defaults.tzinfo is dtm.timezone.utc
-        else:
-            assert defaults.tzinfo is not dtm.timezone.utc
+        assert defaults.tzinfo is dtm.timezone.utc
+
+    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
+    def test_pytz_deprecation(self, recwarn):
+        import pytz
+
+        with pytest.warns(PTBDeprecationWarning, match="pytz") as record:
+            Defaults(tzinfo=pytz.timezone("Europe/Berlin"))
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
     def test_data_assignment(self):
         defaults = Defaults()

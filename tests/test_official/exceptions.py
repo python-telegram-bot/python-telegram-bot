@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -200,7 +200,8 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 # Arguments that are optional arguments for now for backwards compatibility
 BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
-    "send_invoice|create_invoice_link|InputInvoiceMessageContent": {"provider_token"}
+    "send_invoice|create_invoice_link|InputInvoiceMessageContent": {"provider_token"},
+    "InlineQueryResultArticle": {"hide_url"},
 }
 
 

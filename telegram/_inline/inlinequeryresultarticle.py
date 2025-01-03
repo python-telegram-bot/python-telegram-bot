@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,9 @@ from typing import TYPE_CHECKING, Optional
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
 from telegram.constants import InlineQueryResultType
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
@@ -50,6 +52,10 @@ class InlineQueryResultArticle(InlineQueryResult):
         url (:obj:`str`, optional): URL of the result.
         hide_url (:obj:`bool`, optional): Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
+
+            .. deprecated:: 21.10
+                This attribute will be removed in future PTB versions. Pass an empty string as URL
+                instead.
         description (:obj:`str`, optional): Short description of the result.
         thumbnail_url (:obj:`str`, optional): Url of the thumbnail for the result.
 
@@ -74,6 +80,10 @@ class InlineQueryResultArticle(InlineQueryResult):
         url (:obj:`str`): Optional. URL of the result.
         hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
+
+            .. deprecated:: 21.10
+                This attribute will be removed in future PTB versions. Pass an empty string as URL
+                instead.
         description (:obj:`str`): Optional. Short description of the result.
         thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
 
@@ -123,6 +133,15 @@ class InlineQueryResultArticle(InlineQueryResult):
             # Optional
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.url: Optional[str] = url
+            if hide_url is not None:
+                warn(
+                    PTBDeprecationWarning(
+                        "21.10",
+                        "The argument `hide_url` will be removed in future PTB"
+                        "versions. Pass an empty string as URL instead.",
+                    ),
+                    stacklevel=2,
+                )
             self.hide_url: Optional[bool] = hide_url
             self.description: Optional[str] = description
             self.thumbnail_url: Optional[str] = thumbnail_url

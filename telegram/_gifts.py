@@ -2,7 +2,7 @@
 # pylint: disable=redefined-builtin
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -46,6 +46,10 @@ class Gift(TelegramObject):
             sent; for limited gifts only
         remaining_count (:obj:`int`, optional): The number of remaining gifts of this type that can
             be sent; for limited gifts only
+        upgrade_star_count (:obj:`int`, optional): The number of Telegram Stars that must be paid
+            to upgrade the gift to a unique one
+
+            .. versionadded:: 21.10
 
     Attributes:
         id (:obj:`str`): Unique identifier of the gift
@@ -55,10 +59,21 @@ class Gift(TelegramObject):
             sent; for limited gifts only
         remaining_count (:obj:`int`): Optional. The number of remaining gifts of this type that can
             be sent; for limited gifts only
+        upgrade_star_count (:obj:`int`): Optional. The number of Telegram Stars that must be paid
+            to upgrade the gift to a unique one
+
+            .. versionadded:: 21.10
 
     """
 
-    __slots__ = ("id", "remaining_count", "star_count", "sticker", "total_count")
+    __slots__ = (
+        "id",
+        "remaining_count",
+        "star_count",
+        "sticker",
+        "total_count",
+        "upgrade_star_count",
+    )
 
     def __init__(
         self,
@@ -67,6 +82,7 @@ class Gift(TelegramObject):
         star_count: int,
         total_count: Optional[int] = None,
         remaining_count: Optional[int] = None,
+        upgrade_star_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -76,6 +92,7 @@ class Gift(TelegramObject):
         self.star_count: int = star_count
         self.total_count: Optional[int] = total_count
         self.remaining_count: Optional[int] = remaining_count
+        self.upgrade_star_count: Optional[int] = upgrade_star_count
 
         self._id_attrs = (self.id,)
 
@@ -87,7 +104,7 @@ class Gift(TelegramObject):
         data = cls._parse_data(data)
 
         data["sticker"] = Sticker.de_json(data["sticker"], bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
 
 class Gifts(TelegramObject):
@@ -127,4 +144,4 @@ class Gifts(TelegramObject):
         data = cls._parse_data(data)
 
         data["gifts"] = Gift.de_list(data["gifts"], bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

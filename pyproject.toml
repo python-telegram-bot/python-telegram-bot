@@ -76,9 +76,7 @@ http2 = [
 ]
 job-queue = [
     # APS doesn't have a strict stability policy. Let's be cautious for now.
-    "APScheduler~=3.10.4",
-    # pytz is required by APS and just needs the lower bound due to #2120
-    "pytz>=2018.6",
+    "APScheduler>=3.10.4,<3.12.0",
 ]
 passport = [
     "cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1",
