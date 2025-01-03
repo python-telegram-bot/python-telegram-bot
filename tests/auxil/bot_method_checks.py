@@ -592,8 +592,6 @@ async def check_defaults_handling(
             values. Defaults to an empty frozenset.
 
     """
-    guess_return_type_name(method)
-
     raw_bot = not isinstance(bot, ExtBot)
     get_updates = method.__name__.lower().replace("_", "") == "getupdates"
 
