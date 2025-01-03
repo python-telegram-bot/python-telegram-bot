@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -143,5 +143,5 @@ class Gifts(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["gifts"] = Gifts.de_list(data["gifts"], bot)
+        data["gifts"] = de_list_wo(data.get("gifts"), Gift, bot)
         return super().de_json(data=data, bot=bot)

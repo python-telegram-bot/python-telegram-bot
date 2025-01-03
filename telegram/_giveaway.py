@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Optional
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -144,7 +144,7 @@ class Giveaway(TelegramObject):
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["chats"] = Chat.de_list(data["chats"], bot)
+        data["chats"] = tuple(de_list_wo(data.get("chats"), Chat, bot))
         data["winners_selection_date"] = from_timestamp(
             data.get("winners_selection_date"), tzinfo=loc_tzinfo
         )
@@ -302,7 +302,7 @@ class GiveawayWinners(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
-        data["winners"] = User.de_list(data["winners"], bot)
+        data["winners"] = tuple(de_list_wo(data.get("winners"), User, bot))
         data["winners_selection_date"] = from_timestamp(
             data.get("winners_selection_date"), tzinfo=loc_tzinfo
         )

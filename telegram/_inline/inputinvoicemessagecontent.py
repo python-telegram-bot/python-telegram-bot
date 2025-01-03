@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._payment.labeledprice import LabeledPrice
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_list_wo, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -258,6 +258,6 @@ class InputInvoiceMessageContent(InputMessageContent):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["prices"] = LabeledPrice.de_list(data["prices"], bot)
+        data["prices"] = de_list_wo(data.get("prices"), LabeledPrice, bot)
 
         return super().de_json(data=data, bot=bot)

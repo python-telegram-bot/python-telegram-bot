@@ -260,7 +260,7 @@ class ExternalReplyInfo(TelegramObject):
         data["animation"] = de_json_wo(data.get("animation"), Animation, bot)
         data["audio"] = de_json_wo(data.get("audio"), Audio, bot)
         data["document"] = de_json_wo(data.get("document"), Document, bot)
-        data["photo"] = de_list_wo(data.get("photo"), PhotoSize, bot)
+        data["photo"] = tuple(de_list_wo(data.get("photo"), PhotoSize, bot))
         data["sticker"] = de_json_wo(data.get("sticker"), Sticker, bot)
         data["story"] = de_json_wo(data.get("story"), Story, bot)
         data["video"] = de_json_wo(data.get("video"), Video, bot)
@@ -349,7 +349,7 @@ class TextQuote(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["entities"] = de_list_wo(data.get("entities"), MessageEntity, bot)
+        data["entities"] = tuple(de_list_wo(data.get("entities"), MessageEntity, bot))
 
         return super().de_json(data=data, bot=bot)
 
@@ -452,6 +452,6 @@ class ReplyParameters(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["quote_entities"] = de_list_wo(data.get("quote_entities"), MessageEntity, bot)
+        data["quote_entities"] = tuple(de_list_wo(data.get("quote_entities"), MessageEntity, bot))
 
         return super().de_json(data=data, bot=bot)

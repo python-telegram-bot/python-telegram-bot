@@ -27,7 +27,7 @@ from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -180,7 +180,7 @@ class PaidMediaPhoto(PaidMedia):
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaPhoto":
         data = cls._parse_data(data)
 
-        data["photo"] = PhotoSize.de_list(data["photo"], bot)
+        data["photo"] = de_list_wo(data.get("photo"), PhotoSize, bot)
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
@@ -265,7 +265,7 @@ class PaidMediaInfo(TelegramObject):
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaInfo":
         data = cls._parse_data(data)
 
-        data["paid_media"] = PaidMedia.de_list(data["paid_media"], bot)
+        data["paid_media"] = de_list_wo(data.get("paid_media"), PaidMedia, bot)
         return super().de_json(data=data, bot=bot)
 
 
