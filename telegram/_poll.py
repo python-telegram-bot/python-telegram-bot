@@ -466,7 +466,7 @@ class Poll(TelegramObject):
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["options"] = PollOption.de_list(data["options"], bot)
+        data["options"] = de_list_wo(data.get("options"), PollOption, bot)
         data["explanation_entities"] = de_list_wo(
             data.get("explanation_entities"), MessageEntity, bot
         )

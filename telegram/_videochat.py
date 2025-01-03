@@ -182,6 +182,6 @@ class VideoChatScheduled(TelegramObject):
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["start_date"] = from_timestamp(data["start_date"], tzinfo=loc_tzinfo)
+        data["start_date"] = from_timestamp(data.get("start_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)

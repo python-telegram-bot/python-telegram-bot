@@ -127,7 +127,7 @@ class ChatMember(TelegramObject):
             # Get the local timezone from the bot if it has defaults
             loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-            data["until_date"] = from_timestamp(data["until_date"], tzinfo=loc_tzinfo)
+            data["until_date"] = from_timestamp(data.get("until_date"), tzinfo=loc_tzinfo)
 
         # This is a deprecated field that TG still returns for backwards compatibility
         # Let's filter it out to speed up the de-json process

@@ -291,8 +291,8 @@ class ChatBoost(TelegramObject):
 
         data["source"] = de_json_wo(data.get("source"), ChatBoostSource, bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["add_date"] = from_timestamp(data["add_date"], tzinfo=loc_tzinfo)
-        data["expiration_date"] = from_timestamp(data["expiration_date"], tzinfo=loc_tzinfo)
+        data["add_date"] = from_timestamp(data.get("add_date"), tzinfo=loc_tzinfo)
+        data["expiration_date"] = from_timestamp(data.get("expiration_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 
@@ -393,7 +393,7 @@ class ChatBoostRemoved(TelegramObject):
         data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
         data["source"] = de_json_wo(data.get("source"), ChatBoostSource, bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["remove_date"] = from_timestamp(data["remove_date"], tzinfo=loc_tzinfo)
+        data["remove_date"] = from_timestamp(data.get("remove_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 

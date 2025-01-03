@@ -203,7 +203,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         if data["date"] == 0:
             data["date"] = ZERO_DATE
         else:
-            data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
+            data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
 
         data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
