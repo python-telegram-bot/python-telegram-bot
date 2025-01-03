@@ -104,6 +104,7 @@ __all__ = [
     "TransactionPartnerType",
     "UpdateType",
     "UserProfilePhotosLimit",
+    "VerifyLimit",
     "WebhookLimit",
 ]
 
@@ -154,7 +155,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=1)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=2)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -3229,3 +3230,20 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Woman Shrugging"""
     POUTING_FACE = "😡"
     """:obj:`str`: Pouting face"""
+
+
+class VerifyLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.verify_chat` and
+    :meth:`~telegram.Bot.verify_user`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 21.10
+    """
+
+    __slots__ = ()
+
+    MAX_TEXT_LENGTH = 70
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.verify_chat.custom_description` or
+    :paramref:`~telegram.Bot.verify_user.custom_description` parameter.
+    """

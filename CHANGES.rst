@@ -4,6 +4,47 @@
 Changelog
 =========
 
+Version 21.10
+=============
+
+*Released 2025-01-03*
+
+This is the technical changelog for version 21.10. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for Bot API 8.2 (:pr:`4633`)
+- Bump ``apscheduler`` & Deprecate ``pytz`` Support (:pr:`4582`)
+
+New Features
+------------
+- Add Parameter ``pattern`` to ``JobQueue.jobs()`` (:pr:`4613` closes :issue:`4544`)
+- Allow Input of Type ``Sticker`` for Several Methods (:pr:`4616` closes :issue:`4580`)
+
+Bug Fixes
+---------
+- Ensure Forward Compatibility of ``Gift`` and ``Gifts`` (:pr:`4634` closes :issue:`4637`)
+
+
+Documentation Improvements & Internal Changes
+---------------------------------------------
+
+- Use Custom Labels for ``dependabot`` PRs (:pr:`4621`)
+- Remove Redundant ``pylint`` Suppressions (:pr:`4628`)
+- Update Copyright to 2025 (:pr:`4631`)
+- Refactor Module Structure and Tests for Star Payments Classes (:pr:`4615` closes :issue:`4593`)
+- Unify ``datetime`` Imports (:pr:`4605` by `cuevasrja <https://github.com/cuevasrja>`_ closes :issue:`4577`)
+- Add Static Security Analysis of GitHub Actions Workflows (:pr:`4606`)
+
+Dependency Updates
+------------------
+
+- Bump ``astral-sh/setup-uv`` from 4.2.0 to 5.1.0 (:pr:`4625`)
+- Bump ``codecov/codecov-action`` from 5.1.1 to 5.1.2 (:pr:`4622`)
+- Bump ``actions/upload-artifact`` from 4.4.3 to 4.5.0 (:pr:`4623`)
+- Bump ``github/codeql-action`` from 3.27.9 to 3.28.0 (:pr:`4624`)
+
 Version 21.9
 ============
 
