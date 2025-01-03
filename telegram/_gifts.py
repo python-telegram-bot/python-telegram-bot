@@ -49,7 +49,7 @@ class Gift(TelegramObject):
         upgrade_star_count (:obj:`int`, optional): The number of Telegram Stars that must be paid
             to upgrade the gift to a unique one
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.10
 
     Attributes:
         id (:obj:`str`): Unique identifier of the gift
@@ -62,7 +62,7 @@ class Gift(TelegramObject):
         upgrade_star_count (:obj:`int`): Optional. The number of Telegram Stars that must be paid
             to upgrade the gift to a unique one
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.10
 
     """
 

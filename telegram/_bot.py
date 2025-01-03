@@ -6637,7 +6637,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             position (:obj:`int`): New sticker position in the set, zero-based.
 
@@ -6770,7 +6770,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
 
         Returns:
@@ -6967,7 +6967,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             emoji_list (Sequence[:obj:`str`]): A sequence of
                 :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI`-
@@ -7015,7 +7015,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             keywords (Sequence[:obj:`str`]): A sequence of
                 0-:tg-const:`telegram.constants.StickerLimit.MAX_SEARCH_KEYWORDS` search keywords
@@ -7063,7 +7063,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             mask_position (:class:`telegram.MaskPosition`, optional): A object with the position
                 where the mask should be placed on faces. Omit the parameter to remove the mask
@@ -9301,7 +9301,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             old_sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the replaced
                 sticker or the sticker object itself.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             sticker (:class:`telegram.InputSticker`): An object with information about the added
                 sticker. If exactly the same sticker had already been added to the set, then the
@@ -9756,7 +9756,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pay_for_upgrade (:obj:`bool`, optional): Pass :obj:`True` to pay for the gift upgrade
                 from the bot's balance, thereby making the upgrade free for the receiver.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.10
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -9795,7 +9795,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """Verifies a chat on behalf of the organization which is represented by the bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.10
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -9837,7 +9837,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """Verifies a user on behalf of the organization which is represented by the bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.10
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.
@@ -9881,7 +9881,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
 
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.10
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -9920,7 +9920,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
 
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.10
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.

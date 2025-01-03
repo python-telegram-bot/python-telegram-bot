@@ -709,7 +709,7 @@ class JobQueue(Generic[CCT]):
                 Hint:
                     This uses :func:`re.search` and not :func:`re.match`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.10
 
         Returns:
             tuple[:class:`Job`]: Tuple of all *scheduled* jobs.

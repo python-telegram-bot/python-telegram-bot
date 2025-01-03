@@ -53,7 +53,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         hide_url (:obj:`bool`, optional): Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.10
                 This attribute will be removed in future PTB versions. Pass an empty string as URL
                 instead.
         description (:obj:`str`, optional): Short description of the result.
@@ -81,7 +81,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.10
                 This attribute will be removed in future PTB versions. Pass an empty string as URL
                 instead.
         description (:obj:`str`): Optional. Short description of the result.
@@ -136,7 +136,7 @@ class InlineQueryResultArticle(InlineQueryResult):
             if hide_url is not None:
                 warn(
                     PTBDeprecationWarning(
-                        "NEXT.VERSION",
+                        "21.10",
                         "The argument `hide_url` will be removed in future PTB"
                         "versions. Pass an empty string as URL instead.",
                     ),

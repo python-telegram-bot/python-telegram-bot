@@ -60,7 +60,7 @@ class Defaults:
             somewhere, it will be assumed to be in :paramref:`tzinfo`. Defaults to
             :attr:`datetime.timezone.utc` otherwise.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.10
                 Support for ``pytz`` timezones is deprecated and will be removed in future
                 versions.
 
@@ -155,7 +155,7 @@ class Defaults:
             # TODO: When dropping support, make sure to update _utils.datetime accordingly
             warn(
                 message=PTBDeprecationWarning(
-                    version="NEXT.VERSION",
+                    version="21.10",
                     message=(
                         "Support for pytz timezones is deprecated and will be removed in "
                         "future versions."

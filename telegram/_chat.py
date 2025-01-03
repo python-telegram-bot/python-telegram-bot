@@ -3496,7 +3496,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.verify_chat`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.10
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3527,7 +3527,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.remove_chat_verification`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.10
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
