@@ -6702,7 +6702,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             position (:obj:`int`): New sticker position in the set, zero-based.
 
@@ -6835,7 +6835,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
 
         Returns:
@@ -7032,7 +7032,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             emoji_list (Sequence[:obj:`str`]): A sequence of
                 :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI`-
@@ -7080,7 +7080,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             keywords (Sequence[:obj:`str`]): A sequence of
                 0-:tg-const:`telegram.constants.StickerLimit.MAX_SEARCH_KEYWORDS` search keywords
@@ -7128,7 +7128,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the sticker or
                 the sticker object.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             mask_position (:class:`telegram.MaskPosition`, optional): A object with the position
                 where the mask should be placed on faces. Omit the parameter to remove the mask
@@ -9366,7 +9366,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             old_sticker (:obj:`str` | :class:`~telegram.Sticker`): File identifier of the replaced
                 sticker or the sticker object itself.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.10
                    Accepts also :class:`telegram.Sticker` instances.
             sticker (:class:`telegram.InputSticker`): An object with information about the added
                 sticker. If exactly the same sticker had already been added to the set, then the
@@ -9786,6 +9786,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         text: Optional[str] = None,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Optional[Sequence["MessageEntity"]] = None,
+        pay_for_upgrade: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -9817,6 +9818,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
                 :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
                 :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+            pay_for_upgrade (:obj:`bool`, optional): Pass :obj:`True` to pay for the gift upgrade
+                from the bot's balance, thereby making the upgrade free for the receiver.
+
+                .. versionadded:: 21.10
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -9830,9 +9835,172 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "text": text,
             "text_parse_mode": text_parse_mode,
             "text_entities": text_entities,
+            "pay_for_upgrade": pay_for_upgrade,
         }
         return await self._post(
             "sendGift",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def verify_chat(
+        self,
+        chat_id: Union[int, str],
+        custom_description: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Verifies a chat on behalf of the organization which is represented by the bot.
+
+        .. versionadded:: 21.10
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            custom_description (:obj:`str`, optional): Custom description for the verification;
+                0- :tg-const:`telegram.constants.VerifyLimit.MAX_TEXT_LENGTH` characters. Must be
+                empty if the organization isn't allowed to provide a custom verification
+                description.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "custom_description": custom_description,
+        }
+        return await self._post(
+            "verifyChat",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def verify_user(
+        self,
+        user_id: int,
+        custom_description: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Verifies a user on behalf of the organization which is represented by the bot.
+
+        .. versionadded:: 21.10
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user.
+            custom_description (:obj:`str`, optional): Custom description for the verification;
+                0- :tg-const:`telegram.constants.VerifyLimit.MAX_TEXT_LENGTH` characters. Must be
+                empty if the organization isn't allowed to provide a custom verification
+                description.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "custom_description": custom_description,
+        }
+        return await self._post(
+            "verifyUser",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def remove_chat_verification(
+        self,
+        chat_id: Union[int, str],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Removes verification from a chat that is currently verified on behalf of the
+        organization represented by the bot.
+
+
+
+        .. versionadded:: 21.10
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+        }
+        return await self._post(
+            "removeChatVerification",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def remove_user_verification(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Removes verification from a user who is currently verified on behalf of the
+        organization represented by the bot.
+
+
+
+        .. versionadded:: 21.10
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+        }
+        return await self._post(
+            "removeUserVerification",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -10111,3 +10279,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`get_available_gifts`"""
     sendGift = send_gift
     """Alias for :meth:`send_gift`"""
+    verifyChat = verify_chat
+    """Alias for :meth:`verify_chat`"""
+    verifyUser = verify_user
+    """Alias for :meth:`verify_user`"""
+    removeChatVerification = remove_chat_verification
+    """Alias for :meth:`remove_chat_verification`"""
+    removeUserVerification = remove_user_verification
+    """Alias for :meth:`remove_user_verification`"""

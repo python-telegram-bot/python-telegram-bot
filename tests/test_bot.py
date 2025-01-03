@@ -2454,6 +2454,48 @@ class TestBotWithoutRequest:
             4242, "emoji_status_custom_emoji_id", dtm.datetime(2024, 1, 1)
         )
 
+    async def test_verify_user(self, offline_bot, monkeypatch):
+        "No way to test this without getting verified"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            assert request_data.parameters.get("custom_description") == "this is so custom"
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.verify_user(1234, "this is so custom")
+
+    async def test_verify_chat(self, offline_bot, monkeypatch):
+        "No way to test this without getting verified"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("custom_description") == "this is so custom"
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.verify_chat(1234, "this is so custom")
+
+    async def test_unverify_user(self, offline_bot, monkeypatch):
+        "No way to test this without getting verified"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.remove_user_verification(1234)
+
+    async def test_unverify_chat(self, offline_bot, monkeypatch):
+        "No way to test this without getting verified"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.remove_chat_verification(1234)
+
 
 class TestBotWithRequest:
     """
