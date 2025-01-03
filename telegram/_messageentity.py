@@ -27,7 +27,7 @@ from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
 
@@ -142,7 +142,7 @@ class MessageEntity(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["user"] = de_json_wo(data.get("user"), User, bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
 
         return super().de_json(data=data, bot=bot)
 

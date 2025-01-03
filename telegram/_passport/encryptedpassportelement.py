@@ -26,10 +26,10 @@ from telegram._passport.data import IdDocumentData, PersonalDetails, Residential
 from telegram._passport.passportfile import PassportFile
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import (
-    de_json_decrypted_wo,
-    de_json_wo,
-    de_list_decrypted_wo,
-    de_list_wo,
+    de_json_decrypted_optional,
+    de_json_optional,
+    de_list_decrypted_optional,
+    de_list_optional,
     parse_sequence_arg,
 )
 from telegram._utils.types import JSONDict
@@ -204,11 +204,11 @@ class EncryptedPassportElement(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["files"] = de_list_wo(data.get("files"), PassportFile, bot) or None
-        data["front_side"] = de_json_wo(data.get("front_side"), PassportFile, bot)
-        data["reverse_side"] = de_json_wo(data.get("reverse_side"), PassportFile, bot)
-        data["selfie"] = de_json_wo(data.get("selfie"), PassportFile, bot)
-        data["translation"] = de_list_wo(data.get("translation"), PassportFile, bot) or None
+        data["files"] = de_list_optional(data.get("files"), PassportFile, bot) or None
+        data["front_side"] = de_json_optional(data.get("front_side"), PassportFile, bot)
+        data["reverse_side"] = de_json_optional(data.get("reverse_side"), PassportFile, bot)
+        data["selfie"] = de_json_optional(data.get("selfie"), PassportFile, bot)
+        data["translation"] = de_list_optional(data.get("translation"), PassportFile, bot) or None
 
         return super().de_json(data=data, bot=bot)
 
@@ -260,20 +260,20 @@ class EncryptedPassportElement(TelegramObject):
                     data["data"] = ResidentialAddress.de_json(data["data"], bot=bot)
 
             data["files"] = (
-                de_list_decrypted_wo(data.get("files"), PassportFile, bot, secure_data.files)
+                de_list_decrypted_optional(data.get("files"), PassportFile, bot, secure_data.files)
                 or None
             )
-            data["front_side"] = de_json_decrypted_wo(
+            data["front_side"] = de_json_decrypted_optional(
                 data.get("front_side"), PassportFile, bot, secure_data.front_side
             )
-            data["reverse_side"] = de_json_decrypted_wo(
+            data["reverse_side"] = de_json_decrypted_optional(
                 data.get("reverse_side"), PassportFile, bot, secure_data.reverse_side
             )
-            data["selfie"] = de_json_decrypted_wo(
+            data["selfie"] = de_json_decrypted_optional(
                 data.get("selfie"), PassportFile, bot, secure_data.selfie
             )
             data["translation"] = (
-                de_list_decrypted_wo(
+                de_list_decrypted_optional(
                     data.get("translation"), PassportFile, bot, secure_data.translation
                 )
                 or None

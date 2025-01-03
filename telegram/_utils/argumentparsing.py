@@ -94,7 +94,7 @@ if TYPE_CHECKING:
         ) -> tuple[TeleCrypto_co, ...]: ...
 
 
-def de_json_wo(
+def de_json_optional(
     data: Optional[JSONDict], cls: type[Tele_co], bot: Optional["Bot"]
 ) -> Optional[Tele_co]:
     """Wrapper around TO.de_json that returns None if data is None."""
@@ -104,7 +104,7 @@ def de_json_wo(
     return cls.de_json(data, bot)
 
 
-def de_json_decrypted_wo(
+def de_json_decrypted_optional(
     data: Optional[JSONDict],
     cls: type[TeleCrypto_co],
     bot: Optional["Bot"],
@@ -117,7 +117,7 @@ def de_json_decrypted_wo(
     return cls.de_json_decrypted(data, bot, credentials)
 
 
-def de_list_wo(
+def de_list_optional(
     data: Optional[list[JSONDict]], cls: type[Tele_co], bot: Optional["Bot"]
 ) -> tuple[Tele_co, ...]:
     """Wrapper around TO.de_list that returns an empty list if data is None."""
@@ -127,7 +127,7 @@ def de_list_wo(
     return cls.de_list(data, bot)
 
 
-def de_list_decrypted_wo(
+def de_list_decrypted_optional(
     data: Optional[list[JSONDict]],
     cls: type[TeleCrypto_co],
     bot: Optional["Bot"],

@@ -26,7 +26,7 @@ from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -124,7 +124,7 @@ class ChatBoostSource(TelegramObject):
             return _class_mapping[data.pop("source")].de_json(data=data, bot=bot)
 
         if "user" in data:
-            data["user"] = de_json_wo(data.get("user"), User, bot)
+            data["user"] = de_json_optional(data.get("user"), User, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -289,7 +289,7 @@ class ChatBoost(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["source"] = de_json_wo(data.get("source"), ChatBoostSource, bot)
+        data["source"] = de_json_optional(data.get("source"), ChatBoostSource, bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["add_date"] = from_timestamp(data.get("add_date"), tzinfo=loc_tzinfo)
         data["expiration_date"] = from_timestamp(data.get("expiration_date"), tzinfo=loc_tzinfo)
@@ -336,8 +336,8 @@ class ChatBoostUpdated(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
-        data["boost"] = de_json_wo(data.get("boost"), ChatBoost, bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["boost"] = de_json_optional(data.get("boost"), ChatBoost, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -390,8 +390,8 @@ class ChatBoostRemoved(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
-        data["source"] = de_json_wo(data.get("source"), ChatBoostSource, bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["source"] = de_json_optional(data.get("source"), ChatBoostSource, bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["remove_date"] = from_timestamp(data.get("remove_date"), tzinfo=loc_tzinfo)
 
@@ -434,6 +434,6 @@ class UserChatBoosts(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["boosts"] = de_list_wo(data.get("boosts"), ChatBoost, bot)
+        data["boosts"] = de_list_optional(data.get("boosts"), ChatBoost, bot)
 
         return super().de_json(data=data, bot=bot)

@@ -26,7 +26,7 @@ from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
 from telegram._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_wo
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
 
@@ -301,13 +301,13 @@ class InlineKeyboardButton(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["login_url"] = de_json_wo(data.get("login_url"), LoginUrl, bot)
-        data["web_app"] = de_json_wo(data.get("web_app"), WebAppInfo, bot)
-        data["callback_game"] = de_json_wo(data.get("callback_game"), CallbackGame, bot)
-        data["switch_inline_query_chosen_chat"] = de_json_wo(
+        data["login_url"] = de_json_optional(data.get("login_url"), LoginUrl, bot)
+        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
+        data["callback_game"] = de_json_optional(data.get("callback_game"), CallbackGame, bot)
+        data["switch_inline_query_chosen_chat"] = de_json_optional(
             data.get("switch_inline_query_chosen_chat"), SwitchInlineQueryChosenChat, bot
         )
-        data["copy_text"] = de_json_wo(data.get("copy_text"), CopyTextButton, bot)
+        data["copy_text"] = de_json_optional(data.get("copy_text"), CopyTextButton, bot)
 
         return super().de_json(data=data, bot=bot)
 

@@ -27,7 +27,7 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.entities import parse_message_entities, parse_message_entity
@@ -95,7 +95,7 @@ class InputPollOption(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["text_entities"] = de_list_wo(data.get("text_entities"), MessageEntity, bot)
+        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -156,7 +156,7 @@ class PollOption(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["text_entities"] = de_list_wo(data.get("text_entities"), MessageEntity, bot)
+        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -300,8 +300,8 @@ class PollAnswer(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["user"] = de_json_wo(data.get("user"), User, bot)
-        data["voter_chat"] = de_json_wo(data.get("voter_chat"), Chat, bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
+        data["voter_chat"] = de_json_optional(data.get("voter_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -466,12 +466,14 @@ class Poll(TelegramObject):
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["options"] = de_list_wo(data.get("options"), PollOption, bot)
-        data["explanation_entities"] = de_list_wo(
+        data["options"] = de_list_optional(data.get("options"), PollOption, bot)
+        data["explanation_entities"] = de_list_optional(
             data.get("explanation_entities"), MessageEntity, bot
         )
         data["close_date"] = from_timestamp(data.get("close_date"), tzinfo=loc_tzinfo)
-        data["question_entities"] = de_list_wo(data.get("question_entities"), MessageEntity, bot)
+        data["question_entities"] = de_list_optional(
+            data.get("question_entities"), MessageEntity, bot
+        )
 
         return super().de_json(data=data, bot=bot)
 

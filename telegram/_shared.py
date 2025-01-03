@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -88,7 +88,7 @@ class UsersShared(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["users"] = de_list_wo(data.get("users"), SharedUser, bot)
+        data["users"] = de_list_optional(data.get("users"), SharedUser, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -174,7 +174,7 @@ class ChatShared(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["photo"] = de_list_wo(data.get("photo"), PhotoSize, bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
         return super().de_json(data=data, bot=bot)
 
 
@@ -249,5 +249,5 @@ class SharedUser(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["photo"] = de_list_wo(data.get("photo"), PhotoSize, bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
         return super().de_json(data=data, bot=bot)

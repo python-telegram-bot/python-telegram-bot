@@ -28,7 +28,7 @@ from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 from .affiliateinfo import AffiliateInfo
@@ -166,7 +166,7 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
-        data["sponsor_user"] = de_json_wo(data.get("sponsor_user"), User, bot)
+        data["sponsor_user"] = de_json_optional(data.get("sponsor_user"), User, bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
@@ -205,7 +205,7 @@ class TransactionPartnerFragment(TransactionPartner):
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
-        data["withdrawal_state"] = de_json_wo(
+        data["withdrawal_state"] = de_json_optional(
             data.get("withdrawal_state"), RevenueWithdrawalState, bot
         )
 
@@ -311,15 +311,15 @@ class TransactionPartnerUser(TransactionPartner):
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
-        data["user"] = de_json_wo(data.get("user"), User, bot)
-        data["affiliate"] = de_json_wo(data.get("affiliate"), AffiliateInfo, bot)
-        data["paid_media"] = de_list_wo(data.get("paid_media"), PaidMedia, bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
+        data["affiliate"] = de_json_optional(data.get("affiliate"), AffiliateInfo, bot)
+        data["paid_media"] = de_list_optional(data.get("paid_media"), PaidMedia, bot)
         data["subscription_period"] = (
             dtm.timedelta(seconds=sp)
             if (sp := data.get("subscription_period")) is not None
             else None
         )
-        data["gift"] = de_json_wo(data.get("gift"), Gift, bot)
+        data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 

@@ -24,7 +24,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -120,8 +120,8 @@ class StarTransaction(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
 
-        data["source"] = de_json_wo(data.get("source"), TransactionPartner, bot)
-        data["receiver"] = de_json_wo(data.get("receiver"), TransactionPartner, bot)
+        data["source"] = de_json_optional(data.get("source"), TransactionPartner, bot)
+        data["receiver"] = de_json_optional(data.get("receiver"), TransactionPartner, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -158,5 +158,5 @@ class StarTransactions(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["transactions"] = de_list_wo(data.get("transactions"), StarTransaction, bot)
+        data["transactions"] = de_list_optional(data.get("transactions"), StarTransaction, bot)
         return super().de_json(data=data, bot=bot)

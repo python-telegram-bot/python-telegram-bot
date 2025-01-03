@@ -26,7 +26,7 @@ from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -198,9 +198,9 @@ class Sticker(_BaseThumbedMedium):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["thumbnail"] = de_json_wo(data.get("thumbnail"), PhotoSize, bot)
-        data["mask_position"] = de_json_wo(data.get("mask_position"), MaskPosition, bot)
-        data["premium_animation"] = de_json_wo(data.get("premium_animation"), File, bot)
+        data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
+        data["mask_position"] = de_json_optional(data.get("mask_position"), MaskPosition, bot)
+        data["premium_animation"] = de_json_optional(data.get("premium_animation"), File, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -307,8 +307,8 @@ class StickerSet(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["thumbnail"] = de_json_wo(data.get("thumbnail"), PhotoSize, bot)
-        data["stickers"] = de_list_wo(data.get("stickers"), Sticker, bot)
+        data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
+        data["stickers"] = de_list_optional(data.get("stickers"), Sticker, bot)
 
         api_kwargs = {}
         # These are deprecated fields that TG still returns for backwards compatibility

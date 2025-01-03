@@ -27,7 +27,7 @@ from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -114,7 +114,7 @@ class BusinessConnection(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["user"] = de_json_wo(data.get("user"), User, bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -176,7 +176,7 @@ class BusinessMessagesDeleted(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -230,7 +230,7 @@ class BusinessIntro(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["sticker"] = de_json_wo(data.get("sticker"), Sticker, bot)
+        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -279,7 +279,7 @@ class BusinessLocation(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["location"] = de_json_wo(data.get("location"), Location, bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -423,7 +423,7 @@ class BusinessOpeningHours(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["opening_hours"] = de_list_wo(
+        data["opening_hours"] = de_list_optional(
             data.get("opening_hours"), BusinessOpeningHoursInterval, bot
         )
 

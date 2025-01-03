@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Optional, TypeVar
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import de_json_wo
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -90,7 +90,7 @@ class _BaseThumbedMedium(_BaseMedium):
 
         # In case this wasn't already done by the subclass
         if not isinstance(data.get("thumbnail"), PhotoSize):
-            data["thumbnail"] = de_json_wo(data.get("thumbnail"), PhotoSize, bot)
+            data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Optional
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_wo
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
 
@@ -173,12 +173,16 @@ class KeyboardButton(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["request_poll"] = de_json_wo(data.get("request_poll"), KeyboardButtonPollType, bot)
-        data["request_users"] = de_json_wo(
+        data["request_poll"] = de_json_optional(
+            data.get("request_poll"), KeyboardButtonPollType, bot
+        )
+        data["request_users"] = de_json_optional(
             data.get("request_users"), KeyboardButtonRequestUsers, bot
         )
-        data["request_chat"] = de_json_wo(data.get("request_chat"), KeyboardButtonRequestChat, bot)
-        data["web_app"] = de_json_wo(data.get("web_app"), WebAppInfo, bot)
+        data["request_chat"] = de_json_optional(
+            data.get("request_chat"), KeyboardButtonRequestChat, bot
+        )
+        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

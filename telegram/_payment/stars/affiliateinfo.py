@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_wo
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -110,7 +110,7 @@ class AffiliateInfo(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["affiliate_user"] = de_json_wo(data.get("affiliate_user"), User, bot)
-        data["affiliate_chat"] = de_json_wo(data.get("affiliate_chat"), Chat, bot)
+        data["affiliate_user"] = de_json_optional(data.get("affiliate_user"), User, bot)
+        data["affiliate_chat"] = de_json_optional(data.get("affiliate_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)

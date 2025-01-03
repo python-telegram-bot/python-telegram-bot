@@ -25,7 +25,7 @@ from telegram._chat import Chat
 from telegram._reaction import ReactionCount, ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -94,8 +94,8 @@ class MessageReactionCountUpdated(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
-        data["reactions"] = de_list_wo(data.get("reactions"), ReactionCount, bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["reactions"] = de_list_optional(data.get("reactions"), ReactionCount, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -190,10 +190,10 @@ class MessageReactionUpdated(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
-        data["old_reaction"] = de_list_wo(data.get("old_reaction"), ReactionType, bot)
-        data["new_reaction"] = de_list_wo(data.get("new_reaction"), ReactionType, bot)
-        data["user"] = de_json_wo(data.get("user"), User, bot)
-        data["actor_chat"] = de_json_wo(data.get("actor_chat"), Chat, bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["old_reaction"] = de_list_optional(data.get("old_reaction"), ReactionType, bot)
+        data["new_reaction"] = de_list_optional(data.get("new_reaction"), ReactionType, bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
+        data["actor_chat"] = de_json_optional(data.get("actor_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)

@@ -43,7 +43,7 @@ from telegram._payment.invoice import Invoice
 from telegram._poll import Poll
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -252,30 +252,32 @@ class ExternalReplyInfo(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["origin"] = de_json_wo(data.get("origin"), MessageOrigin, bot)
-        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
-        data["link_preview_options"] = de_json_wo(
+        data["origin"] = de_json_optional(data.get("origin"), MessageOrigin, bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["link_preview_options"] = de_json_optional(
             data.get("link_preview_options"), LinkPreviewOptions, bot
         )
-        data["animation"] = de_json_wo(data.get("animation"), Animation, bot)
-        data["audio"] = de_json_wo(data.get("audio"), Audio, bot)
-        data["document"] = de_json_wo(data.get("document"), Document, bot)
-        data["photo"] = tuple(de_list_wo(data.get("photo"), PhotoSize, bot))
-        data["sticker"] = de_json_wo(data.get("sticker"), Sticker, bot)
-        data["story"] = de_json_wo(data.get("story"), Story, bot)
-        data["video"] = de_json_wo(data.get("video"), Video, bot)
-        data["video_note"] = de_json_wo(data.get("video_note"), VideoNote, bot)
-        data["voice"] = de_json_wo(data.get("voice"), Voice, bot)
-        data["contact"] = de_json_wo(data.get("contact"), Contact, bot)
-        data["dice"] = de_json_wo(data.get("dice"), Dice, bot)
-        data["game"] = de_json_wo(data.get("game"), Game, bot)
-        data["giveaway"] = de_json_wo(data.get("giveaway"), Giveaway, bot)
-        data["giveaway_winners"] = de_json_wo(data.get("giveaway_winners"), GiveawayWinners, bot)
-        data["invoice"] = de_json_wo(data.get("invoice"), Invoice, bot)
-        data["location"] = de_json_wo(data.get("location"), Location, bot)
-        data["poll"] = de_json_wo(data.get("poll"), Poll, bot)
-        data["venue"] = de_json_wo(data.get("venue"), Venue, bot)
-        data["paid_media"] = de_json_wo(data.get("paid_media"), PaidMediaInfo, bot)
+        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
+        data["audio"] = de_json_optional(data.get("audio"), Audio, bot)
+        data["document"] = de_json_optional(data.get("document"), Document, bot)
+        data["photo"] = tuple(de_list_optional(data.get("photo"), PhotoSize, bot))
+        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
+        data["story"] = de_json_optional(data.get("story"), Story, bot)
+        data["video"] = de_json_optional(data.get("video"), Video, bot)
+        data["video_note"] = de_json_optional(data.get("video_note"), VideoNote, bot)
+        data["voice"] = de_json_optional(data.get("voice"), Voice, bot)
+        data["contact"] = de_json_optional(data.get("contact"), Contact, bot)
+        data["dice"] = de_json_optional(data.get("dice"), Dice, bot)
+        data["game"] = de_json_optional(data.get("game"), Game, bot)
+        data["giveaway"] = de_json_optional(data.get("giveaway"), Giveaway, bot)
+        data["giveaway_winners"] = de_json_optional(
+            data.get("giveaway_winners"), GiveawayWinners, bot
+        )
+        data["invoice"] = de_json_optional(data.get("invoice"), Invoice, bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
+        data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
+        data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
+        data["paid_media"] = de_json_optional(data.get("paid_media"), PaidMediaInfo, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -349,7 +351,7 @@ class TextQuote(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["entities"] = tuple(de_list_wo(data.get("entities"), MessageEntity, bot))
+        data["entities"] = tuple(de_list_optional(data.get("entities"), MessageEntity, bot))
 
         return super().de_json(data=data, bot=bot)
 
@@ -452,6 +454,8 @@ class ReplyParameters(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["quote_entities"] = tuple(de_list_wo(data.get("quote_entities"), MessageEntity, bot))
+        data["quote_entities"] = tuple(
+            de_list_optional(data.get("quote_entities"), MessageEntity, bot)
+        )
 
         return super().de_json(data=data, bot=bot)

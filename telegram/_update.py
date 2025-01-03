@@ -35,7 +35,7 @@ from telegram._payment.precheckoutquery import PreCheckoutQuery
 from telegram._payment.shippingquery import ShippingQuery
 from telegram._poll import Poll, PollAnswer
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_wo
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
@@ -762,45 +762,51 @@ class Update(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["message"] = de_json_wo(data.get("message"), Message, bot)
-        data["edited_message"] = de_json_wo(data.get("edited_message"), Message, bot)
-        data["inline_query"] = de_json_wo(data.get("inline_query"), InlineQuery, bot)
-        data["chosen_inline_result"] = de_json_wo(
+        data["message"] = de_json_optional(data.get("message"), Message, bot)
+        data["edited_message"] = de_json_optional(data.get("edited_message"), Message, bot)
+        data["inline_query"] = de_json_optional(data.get("inline_query"), InlineQuery, bot)
+        data["chosen_inline_result"] = de_json_optional(
             data.get("chosen_inline_result"), ChosenInlineResult, bot
         )
-        data["callback_query"] = de_json_wo(data.get("callback_query"), CallbackQuery, bot)
-        data["shipping_query"] = de_json_wo(data.get("shipping_query"), ShippingQuery, bot)
-        data["pre_checkout_query"] = de_json_wo(
+        data["callback_query"] = de_json_optional(data.get("callback_query"), CallbackQuery, bot)
+        data["shipping_query"] = de_json_optional(data.get("shipping_query"), ShippingQuery, bot)
+        data["pre_checkout_query"] = de_json_optional(
             data.get("pre_checkout_query"), PreCheckoutQuery, bot
         )
-        data["channel_post"] = de_json_wo(data.get("channel_post"), Message, bot)
-        data["edited_channel_post"] = de_json_wo(data.get("edited_channel_post"), Message, bot)
-        data["poll"] = de_json_wo(data.get("poll"), Poll, bot)
-        data["poll_answer"] = de_json_wo(data.get("poll_answer"), PollAnswer, bot)
-        data["my_chat_member"] = de_json_wo(data.get("my_chat_member"), ChatMemberUpdated, bot)
-        data["chat_member"] = de_json_wo(data.get("chat_member"), ChatMemberUpdated, bot)
-        data["chat_join_request"] = de_json_wo(data.get("chat_join_request"), ChatJoinRequest, bot)
-        data["chat_boost"] = de_json_wo(data.get("chat_boost"), ChatBoostUpdated, bot)
-        data["removed_chat_boost"] = de_json_wo(
+        data["channel_post"] = de_json_optional(data.get("channel_post"), Message, bot)
+        data["edited_channel_post"] = de_json_optional(
+            data.get("edited_channel_post"), Message, bot
+        )
+        data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
+        data["poll_answer"] = de_json_optional(data.get("poll_answer"), PollAnswer, bot)
+        data["my_chat_member"] = de_json_optional(
+            data.get("my_chat_member"), ChatMemberUpdated, bot
+        )
+        data["chat_member"] = de_json_optional(data.get("chat_member"), ChatMemberUpdated, bot)
+        data["chat_join_request"] = de_json_optional(
+            data.get("chat_join_request"), ChatJoinRequest, bot
+        )
+        data["chat_boost"] = de_json_optional(data.get("chat_boost"), ChatBoostUpdated, bot)
+        data["removed_chat_boost"] = de_json_optional(
             data.get("removed_chat_boost"), ChatBoostRemoved, bot
         )
-        data["message_reaction"] = de_json_wo(
+        data["message_reaction"] = de_json_optional(
             data.get("message_reaction"), MessageReactionUpdated, bot
         )
-        data["message_reaction_count"] = de_json_wo(
+        data["message_reaction_count"] = de_json_optional(
             data.get("message_reaction_count"), MessageReactionCountUpdated, bot
         )
-        data["business_connection"] = de_json_wo(
+        data["business_connection"] = de_json_optional(
             data.get("business_connection"), BusinessConnection, bot
         )
-        data["business_message"] = de_json_wo(data.get("business_message"), Message, bot)
-        data["edited_business_message"] = de_json_wo(
+        data["business_message"] = de_json_optional(data.get("business_message"), Message, bot)
+        data["edited_business_message"] = de_json_optional(
             data.get("edited_business_message"), Message, bot
         )
-        data["deleted_business_messages"] = de_json_wo(
+        data["deleted_business_messages"] = de_json_optional(
             data.get("deleted_business_messages"), BusinessMessagesDeleted, bot
         )
-        data["purchased_paid_media"] = de_json_wo(
+        data["purchased_paid_media"] = de_json_optional(
             data.get("purchased_paid_media"), PaidMediaPurchased, bot
         )
 

@@ -27,7 +27,7 @@ from telegram._files.location import Location
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_wo
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -131,8 +131,8 @@ class InlineQuery(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["from_user"] = de_json_wo(data.pop("from", None), User, bot)
-        data["location"] = de_json_wo(data.get("location"), Location, bot)
+        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
 
         return super().de_json(data=data, bot=bot)
 

@@ -28,7 +28,7 @@ from telegram._chatlocation import ChatLocation
 from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._reaction import ReactionType
-from telegram._utils.argumentparsing import de_json_wo, de_list_wo, parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -523,7 +523,7 @@ class ChatFullInfo(_ChatBase):
             data.get("emoji_status_expiration_date"), tzinfo=loc_tzinfo
         )
 
-        data["photo"] = de_json_wo(data.get("photo"), ChatPhoto, bot)
+        data["photo"] = de_json_optional(data.get("photo"), ChatPhoto, bot)
 
         from telegram import (  # pylint: disable=import-outside-toplevel
             BusinessIntro,
@@ -532,19 +532,19 @@ class ChatFullInfo(_ChatBase):
             Message,
         )
 
-        data["pinned_message"] = de_json_wo(data.get("pinned_message"), Message, bot)
-        data["permissions"] = de_json_wo(data.get("permissions"), ChatPermissions, bot)
-        data["location"] = de_json_wo(data.get("location"), ChatLocation, bot)
-        data["available_reactions"] = de_list_wo(
+        data["pinned_message"] = de_json_optional(data.get("pinned_message"), Message, bot)
+        data["permissions"] = de_json_optional(data.get("permissions"), ChatPermissions, bot)
+        data["location"] = de_json_optional(data.get("location"), ChatLocation, bot)
+        data["available_reactions"] = de_list_optional(
             data.get("available_reactions"), ReactionType, bot
         )
-        data["birthdate"] = de_json_wo(data.get("birthdate"), Birthdate, bot)
-        data["personal_chat"] = de_json_wo(data.get("personal_chat"), Chat, bot)
-        data["business_intro"] = de_json_wo(data.get("business_intro"), BusinessIntro, bot)
-        data["business_location"] = de_json_wo(
+        data["birthdate"] = de_json_optional(data.get("birthdate"), Birthdate, bot)
+        data["personal_chat"] = de_json_optional(data.get("personal_chat"), Chat, bot)
+        data["business_intro"] = de_json_optional(data.get("business_intro"), BusinessIntro, bot)
+        data["business_location"] = de_json_optional(
             data.get("business_location"), BusinessLocation, bot
         )
-        data["business_opening_hours"] = de_json_wo(
+        data["business_opening_hours"] = de_json_optional(
             data.get("business_opening_hours"), BusinessOpeningHours, bot
         )
 
