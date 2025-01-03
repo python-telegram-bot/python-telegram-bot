@@ -54,7 +54,7 @@ class InlineQueryResultArticle(InlineQueryResult):
             in the message.
 
             .. deprecated:: NEXT.VERSION
-                This attribute will be removed in future PTP versions. Pass an empty string as URL
+                This attribute will be removed in future PTB versions. Pass an empty string as URL
                 instead.
         description (:obj:`str`, optional): Short description of the result.
         thumbnail_url (:obj:`str`, optional): Url of the thumbnail for the result.
@@ -82,7 +82,7 @@ class InlineQueryResultArticle(InlineQueryResult):
             in the message.
 
             .. deprecated:: NEXT.VERSION
-                This attribute will be removed in future PTP versions. Pass an empty string as URL
+                This attribute will be removed in future PTB versions. Pass an empty string as URL
                 instead.
         description (:obj:`str`): Optional. Short description of the result.
         thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
