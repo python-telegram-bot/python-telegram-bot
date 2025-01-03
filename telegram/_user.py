@@ -2290,7 +2290,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.verify_user`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.10
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -2321,7 +2321,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.remove_user_verification`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.10
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

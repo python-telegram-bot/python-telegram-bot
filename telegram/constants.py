@@ -3237,7 +3237,7 @@ class VerifyLimit(IntEnum):
     :meth:`~telegram.Bot.verify_user`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.10
     """
 
     __slots__ = ()
