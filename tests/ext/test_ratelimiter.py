@@ -36,7 +36,7 @@ from telegram.constants import ParseMode
 from telegram.error import RetryAfter
 from telegram.ext import AIORateLimiter, BaseRateLimiter, Defaults, ExtBot
 from telegram.request import BaseRequest, RequestData
-from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTIONS, TEST_WITH_OPT_DEPS
 
 
 @pytest.mark.skipif(
@@ -143,7 +143,7 @@ class TestBaseRateLimiter:
     not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
 @pytest.mark.skipif(
-    bool(GITHUB_ACTION and platform.system() == "Darwin"),
+    GITHUB_ACTIONS and platform.system() == "Darwin",
     reason="The timings are apparently rather inaccurate on MacOS.",
 )
 @pytest.mark.flaky(10, 1)  # Timings aren't quite perfect

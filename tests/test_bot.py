@@ -79,7 +79,7 @@ from telegram import (
     User,
     WebAppInfo,
 )
-from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
+from telegram._utils.datetime import UTC, from_timestamp, localize, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import to_camel_case
 from telegram.constants import (
@@ -97,7 +97,7 @@ from telegram.request import BaseRequest, HTTPXRequest, RequestData
 from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
-from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTIONS
 from tests.auxil.files import data_file
 from tests.auxil.networking import OfflineRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
@@ -154,7 +154,7 @@ def inline_results():
 BASE_GAME_SCORE = 60  # Base game score for game tests
 
 xfail = pytest.mark.xfail(
-    bool(GITHUB_ACTION),  # This condition is only relevant for github actions game tests.
+    GITHUB_ACTIONS,  # This condition is only relevant for github actions game tests.
     reason=(
         "Can fail due to race conditions when multiple test suites "
         "with the same bot token are run at the same time"
@@ -2386,6 +2386,48 @@ class TestBotWithoutRequest:
             4242, "emoji_status_custom_emoji_id", dtm.datetime(2024, 1, 1)
         )
 
+    async def test_verify_user(self, offline_bot, monkeypatch):
+        "No way to test this without getting verified"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            assert request_data.parameters.get("custom_description") == "this is so custom"
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.verify_user(1234, "this is so custom")
+
+    async def test_verify_chat(self, offline_bot, monkeypatch):
+        "No way to test this without getting verified"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("custom_description") == "this is so custom"
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.verify_chat(1234, "this is so custom")
+
+    async def test_unverify_user(self, offline_bot, monkeypatch):
+        "No way to test this without getting verified"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.remove_user_verification(1234)
+
+    async def test_unverify_chat(self, offline_bot, monkeypatch):
+        "No way to test this without getting verified"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.remove_chat_verification(1234)
+
 
 class TestBotWithRequest:
     """
@@ -3467,7 +3509,6 @@ class TestBotWithRequest:
         )
         assert revoked_link.is_revoked
 
-    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="This test's implementation requires pytz")
     @pytest.mark.parametrize("datetime", argvalues=[True, False], ids=["datetime", "integer"])
     async def test_advanced_chat_invite_links(self, bot, channel_id, datetime):
         # we are testing this all in one function in order to save api calls
@@ -3475,7 +3516,7 @@ class TestBotWithRequest:
         add_seconds = dtm.timedelta(0, 70)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = UTC.localize(time_in_future)
+        aware_time_in_future = localize(time_in_future, UTC)
 
         invite_link = await bot.create_chat_invite_link(
             channel_id, expire_date=expire_time, member_limit=10
@@ -3488,7 +3529,7 @@ class TestBotWithRequest:
         add_seconds = dtm.timedelta(0, 80)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = UTC.localize(time_in_future)
+        aware_time_in_future = localize(time_in_future, UTC)
 
         edited_invite_link = await bot.edit_chat_invite_link(
             channel_id,

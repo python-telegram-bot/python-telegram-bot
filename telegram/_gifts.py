@@ -46,6 +46,10 @@ class Gift(TelegramObject):
             sent; for limited gifts only
         remaining_count (:obj:`int`, optional): The number of remaining gifts of this type that can
             be sent; for limited gifts only
+        upgrade_star_count (:obj:`int`, optional): The number of Telegram Stars that must be paid
+            to upgrade the gift to a unique one
+
+            .. versionadded:: 21.10
 
     Attributes:
         id (:obj:`str`): Unique identifier of the gift
@@ -55,10 +59,21 @@ class Gift(TelegramObject):
             sent; for limited gifts only
         remaining_count (:obj:`int`): Optional. The number of remaining gifts of this type that can
             be sent; for limited gifts only
+        upgrade_star_count (:obj:`int`): Optional. The number of Telegram Stars that must be paid
+            to upgrade the gift to a unique one
+
+            .. versionadded:: 21.10
 
     """
 
-    __slots__ = ("id", "remaining_count", "star_count", "sticker", "total_count")
+    __slots__ = (
+        "id",
+        "remaining_count",
+        "star_count",
+        "sticker",
+        "total_count",
+        "upgrade_star_count",
+    )
 
     def __init__(
         self,
@@ -67,6 +82,7 @@ class Gift(TelegramObject):
         star_count: int,
         total_count: Optional[int] = None,
         remaining_count: Optional[int] = None,
+        upgrade_star_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -76,6 +92,7 @@ class Gift(TelegramObject):
         self.star_count: int = star_count
         self.total_count: Optional[int] = total_count
         self.remaining_count: Optional[int] = remaining_count
+        self.upgrade_star_count: Optional[int] = upgrade_star_count
 
         self._id_attrs = (self.id,)
 
@@ -90,7 +107,7 @@ class Gift(TelegramObject):
             return None
 
         data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
 
 class Gifts(TelegramObject):
@@ -133,4 +150,4 @@ class Gifts(TelegramObject):
             return None
 
         data["gifts"] = Gift.de_list(data.get("gifts"), bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

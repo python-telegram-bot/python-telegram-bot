@@ -186,6 +186,29 @@
 .. raw:: html
 
    <details>
+   <summary>Verification on behalf of an organization</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
+    * - :meth:`~telegram.Bot.verify_chat`
+      - Used for verifying a chat
+    * - :meth:`~telegram.Bot.verify_user`
+      - Used for verifying a user
+    * - :meth:`~telegram.Bot.remove_chat_verification`
+      - Used for removing the verification from a chat
+    * - :meth:`~telegram.Bot.remove_user_verification`
+      - Used for removing the verification from a user
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
    <summary>Bot settings</summary>
 
 .. list-table::
