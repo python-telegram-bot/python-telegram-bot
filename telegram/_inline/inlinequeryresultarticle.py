@@ -23,7 +23,9 @@ from typing import TYPE_CHECKING, Optional
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
 from telegram.constants import InlineQueryResultType
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
@@ -50,6 +52,10 @@ class InlineQueryResultArticle(InlineQueryResult):
         url (:obj:`str`, optional): URL of the result.
         hide_url (:obj:`bool`, optional): Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
+
+            .. deprecated:: NEXT.VERSION
+                This attribute will be removed in future PTB versions. Pass an empty string as URL
+                instead.
         description (:obj:`str`, optional): Short description of the result.
         thumbnail_url (:obj:`str`, optional): Url of the thumbnail for the result.
 
@@ -74,6 +80,10 @@ class InlineQueryResultArticle(InlineQueryResult):
         url (:obj:`str`): Optional. URL of the result.
         hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
+
+            .. deprecated:: NEXT.VERSION
+                This attribute will be removed in future PTB versions. Pass an empty string as URL
+                instead.
         description (:obj:`str`): Optional. Short description of the result.
         thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
 
@@ -123,6 +133,15 @@ class InlineQueryResultArticle(InlineQueryResult):
             # Optional
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.url: Optional[str] = url
+            if hide_url is not None:
+                warn(
+                    PTBDeprecationWarning(
+                        "NEXT.VERSION",
+                        "The argument `hide_url` will be removed in future PTB"
+                        "versions. Pass an empty string as URL instead.",
+                    ),
+                    stacklevel=2,
+                )
             self.hide_url: Optional[bool] = hide_url
             self.description: Optional[str] = description
             self.thumbnail_url: Optional[str] = thumbnail_url
