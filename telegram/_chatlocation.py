@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Final, Optional
 from telegram import constants
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import de_json_wo
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -72,7 +73,7 @@ class ChatLocation(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["location"] = Location.de_json(data["location"], bot)
+        data["location"] = de_json_wo(data.get("location"), Location, bot)
 
         return super().de_json(data=data, bot=bot)
 

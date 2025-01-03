@@ -311,7 +311,7 @@ class TransactionPartnerUser(TransactionPartner):
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
-        data["user"] = User.de_json(data["user"], bot)
+        data["user"] = de_json_wo(data.get("user"), User, bot)
         data["affiliate"] = de_json_wo(data.get("affiliate"), AffiliateInfo, bot)
         data["paid_media"] = de_list_wo(data.get("paid_media"), PaidMedia, bot)
         data["subscription_period"] = (

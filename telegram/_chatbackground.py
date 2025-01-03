@@ -24,7 +24,7 @@ from telegram import constants
 from telegram._files.document import Document
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -280,10 +280,10 @@ class BackgroundType(TelegramObject):
             return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
         if "fill" in data:
-            data["fill"] = BackgroundFill.de_json(data["fill"], bot)
+            data["fill"] = de_json_wo(data.get("fill"), BackgroundFill, bot)
 
         if "document" in data:
-            data["document"] = Document.de_json(data["document"], bot)
+            data["document"] = de_json_wo(data.get("document"), Document, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -527,6 +527,6 @@ class ChatBackground(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["type"] = BackgroundType.de_json(data["type"], bot)
+        data["type"] = de_json_wo(data.get("type"), BackgroundType, bot)
 
         return super().de_json(data=data, bot=bot)

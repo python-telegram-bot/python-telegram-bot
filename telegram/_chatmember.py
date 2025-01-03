@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Final, Optional
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_wo
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -121,7 +122,7 @@ class ChatMember(TelegramObject):
         if cls is ChatMember and data.get("status") in _class_mapping:
             return _class_mapping[data.pop("status")].de_json(data=data, bot=bot)
 
-        data["user"] = User.de_json(data["user"], bot)
+        data["user"] = de_json_wo(data.get("user"), User, bot)
         if "until_date" in data:
             # Get the local timezone from the bot if it has defaults
             loc_tzinfo = extract_tzinfo_from_defaults(bot)

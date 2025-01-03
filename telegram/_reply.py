@@ -252,7 +252,7 @@ class ExternalReplyInfo(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["origin"] = MessageOrigin.de_json(data["origin"], bot)
+        data["origin"] = de_json_wo(data.get("origin"), MessageOrigin, bot)
         data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
         data["link_preview_options"] = de_json_wo(
             data.get("link_preview_options"), LinkPreviewOptions, bot

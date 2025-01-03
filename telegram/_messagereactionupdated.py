@@ -94,7 +94,7 @@ class MessageReactionCountUpdated(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = Chat.de_json(data["chat"], bot)
+        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
         data["reactions"] = ReactionCount.de_list(data["reactions"], bot)
 
         return super().de_json(data=data, bot=bot)
@@ -190,7 +190,7 @@ class MessageReactionUpdated(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = Chat.de_json(data["chat"], bot)
+        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
         data["old_reaction"] = ReactionType.de_list(data["old_reaction"], bot)
         data["new_reaction"] = ReactionType.de_list(data["new_reaction"], bot)
         data["user"] = de_json_wo(data.get("user"), User, bot)

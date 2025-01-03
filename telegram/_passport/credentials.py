@@ -238,7 +238,7 @@ class Credentials(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["secure_data"] = SecureData.de_json(data["secure_data"], bot)
+        data["secure_data"] = de_json_wo(data.get("secure_data"), SecureData, bot)
 
         return super().de_json(data=data, bot=bot)
 

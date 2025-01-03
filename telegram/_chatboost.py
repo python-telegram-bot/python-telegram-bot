@@ -26,7 +26,7 @@ from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_wo, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -124,7 +124,7 @@ class ChatBoostSource(TelegramObject):
             return _class_mapping[data.pop("source")].de_json(data=data, bot=bot)
 
         if "user" in data:
-            data["user"] = User.de_json(data["user"], bot)
+            data["user"] = de_json_wo(data.get("user"), User, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -289,7 +289,7 @@ class ChatBoost(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["source"] = ChatBoostSource.de_json(data["source"], bot)
+        data["source"] = de_json_wo(data.get("source"), ChatBoostSource, bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["add_date"] = from_timestamp(data["add_date"], tzinfo=loc_tzinfo)
         data["expiration_date"] = from_timestamp(data["expiration_date"], tzinfo=loc_tzinfo)
@@ -336,8 +336,8 @@ class ChatBoostUpdated(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["chat"] = Chat.de_json(data["chat"], bot)
-        data["boost"] = ChatBoost.de_json(data["boost"], bot)
+        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
+        data["boost"] = de_json_wo(data.get("boost"), ChatBoost, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -390,8 +390,8 @@ class ChatBoostRemoved(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["chat"] = Chat.de_json(data["chat"], bot)
-        data["source"] = ChatBoostSource.de_json(data["source"], bot)
+        data["chat"] = de_json_wo(data.get("chat"), Chat, bot)
+        data["source"] = de_json_wo(data.get("source"), ChatBoostSource, bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["remove_date"] = from_timestamp(data["remove_date"], tzinfo=loc_tzinfo)
 
