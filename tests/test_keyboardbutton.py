@@ -108,9 +108,6 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button.request_chat == self.request_chat
         assert keyboard_button.request_users == self.request_users
 
-        none = KeyboardButton.de_json({}, None)
-        assert none is None
-
     def test_equality(self):
         a = KeyboardButton("test", request_contact=True)
         b = KeyboardButton("test", request_contact=True)

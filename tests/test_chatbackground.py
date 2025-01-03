@@ -170,7 +170,6 @@ class TestBackgroundTypeWithoutRequest:
 
     def test_de_json_required_args(self, offline_bot, background_type):
         cls = background_type.__class__
-        assert cls.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(background_type)
         const_background_type = BackgroundType.de_json(json_dict, offline_bot)
@@ -277,7 +276,6 @@ class TestBackgroundFillWithoutRequest:
 
     def test_de_json_required_args(self, offline_bot, background_fill):
         cls = background_fill.__class__
-        assert cls.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(background_fill)
         const_background_fill = BackgroundFill.de_json(json_dict, offline_bot)

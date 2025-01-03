@@ -207,7 +207,6 @@ class TestChatMemberTypesWithoutRequest:
 
     def test_de_json_required_args(self, offline_bot, chat_member_type):
         cls = chat_member_type.__class__
-        assert cls.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(chat_member_type)
         const_chat_member = ChatMember.de_json(json_dict, offline_bot)

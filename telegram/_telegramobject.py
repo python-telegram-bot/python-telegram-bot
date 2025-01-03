@@ -377,23 +377,20 @@ class TelegramObject:
         return result
 
     @staticmethod
-    def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
+    def _parse_data(data: JSONDict) -> JSONDict:
         """Should be called by subclasses that override de_json to ensure that the input
         is not altered. Whoever calls de_json might still want to use the original input
         for something else.
         """
-        return None if data is None else data.copy()
+        return data.copy()
 
     @classmethod
     def _de_json(
         cls: type[Tele_co],
-        data: Optional[JSONDict],
+        data: JSONDict,
         bot: Optional["Bot"],
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Optional[Tele_co]:
-        if data is None:
-            return None
-
+    ) -> Tele_co:
         # try-except is significantly faster in case we already have a correct argument set
         try:
             obj = cls(**data, api_kwargs=api_kwargs)
@@ -417,9 +414,7 @@ class TelegramObject:
         return obj
 
     @classmethod
-    def de_json(
-        cls: type[Tele_co], data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional[Tele_co]:
+    def de_json(cls: type[Tele_co], data: JSONDict, bot: Optional["Bot"] = None) -> Tele_co:
         """Converts JSON data to a Telegram object.
 
         Args:
@@ -438,7 +433,7 @@ class TelegramObject:
 
     @classmethod
     def de_list(
-        cls: type[Tele_co], data: Optional[list[JSONDict]], bot: Optional["Bot"] = None
+        cls: type[Tele_co], data: list[JSONDict], bot: Optional["Bot"] = None
     ) -> tuple[Tele_co, ...]:
         """Converts a list of JSON objects to a tuple of Telegram objects.
 
@@ -459,10 +454,7 @@ class TelegramObject:
             A tuple of Telegram objects.
 
         """
-        if not data:
-            return ()
-
-        return tuple(obj for obj in (cls.de_json(d, bot) for d in data) if obj is not None)
+        return tuple(cls.de_json(d, bot) for d in data)
 
     @contextmanager
     def _unfrozen(self: Tele_co) -> Iterator[Tele_co]:

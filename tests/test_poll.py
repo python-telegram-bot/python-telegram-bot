@@ -54,7 +54,6 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
         ), "duplicate slot"
 
     def test_de_json(self):
-        assert InputPollOption.de_json({}, None) is None
 
         json_dict = {
             "text": self.text,
@@ -144,7 +143,7 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
             "text_entities": [e.to_dict() for e in self.text_entities],
         }
         poll_option = PollOption.de_json(json_dict, None)
-        assert PollOption.de_json(None, None) is None
+
         assert poll_option.api_kwargs == {}
 
         assert poll_option.text == self.text

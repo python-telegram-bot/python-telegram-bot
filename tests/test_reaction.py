@@ -117,8 +117,6 @@ class TestReactionTypesWithoutRequest:
 
     def test_de_json_required_args(self, offline_bot, reaction_type):
         cls = reaction_type.__class__
-        assert cls.de_json(None, offline_bot) is None
-        assert ReactionType.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(reaction_type)
         const_reaction_type = ReactionType.de_json(json_dict, offline_bot)
@@ -251,8 +249,6 @@ class TestReactionCountWithoutRequest:
         assert reaction_count.type.type == self.type.type
         assert reaction_count.type.emoji == self.type.emoji
         assert reaction_count.total_count == self.total_count
-
-        assert ReactionCount.de_json(None, offline_bot) is None
 
     def test_to_dict(self, reaction_count):
         reaction_count_dict = reaction_count.to_dict()

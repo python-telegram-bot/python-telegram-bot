@@ -103,7 +103,7 @@ class TestTelegramObject:
 
                 self._id_attrs = (self.arg,)
 
-        assert SubClass.de_list([{"arg": 1}, None, {"arg": 2}, None], bot) == (
+        assert SubClass.de_list([{"arg": 1}, {"arg": 2}], bot) == (
             SubClass(1),
             SubClass(2),
         )

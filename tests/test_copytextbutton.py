@@ -46,7 +46,6 @@ class TestCopyTextButtonWithoutRequest(CopyTextButtonTestBase):
         assert copy_text_button.api_kwargs == {}
 
         assert copy_text_button.text == self.text
-        assert CopyTextButton.de_json(None, offline_bot) is None
 
     def test_to_dict(self, copy_text_button):
         copy_text_button_dict = copy_text_button.to_dict()

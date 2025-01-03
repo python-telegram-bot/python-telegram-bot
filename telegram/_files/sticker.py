@@ -26,7 +26,7 @@ from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -194,16 +194,13 @@ class Sticker(_BaseThumbedMedium):
     """:const:`telegram.constants.StickerType.CUSTOM_EMOJI`"""
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Sticker"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Sticker":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
-        data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
-        data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
+        data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
+        data["mask_position"] = de_json_optional(data.get("mask_position"), MaskPosition, bot)
+        data["premium_animation"] = de_json_optional(data.get("premium_animation"), File, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -306,15 +303,12 @@ class StickerSet(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["StickerSet"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "StickerSet":
         """See :meth:`telegram.TelegramObject.de_json`."""
-        if not data:
-            return None
+        data = cls._parse_data(data)
 
-        data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
-        data["stickers"] = Sticker.de_list(data.get("stickers"), bot)
+        data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
+        data["stickers"] = de_list_optional(data.get("stickers"), Sticker, bot)
 
         api_kwargs = {}
         # These are deprecated fields that TG still returns for backwards compatibility

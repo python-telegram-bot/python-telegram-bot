@@ -129,8 +129,6 @@ class TestBotCommandScopeWithoutRequest:
         cls = scope_class_and_type[0]
         type_ = scope_class_and_type[1]
 
-        assert cls.de_json({}, offline_bot) is None
-
         json_dict = {"type": type_, "chat_id": chat_id, "user_id": 42}
         bot_command_scope = BotCommandScope.de_json(json_dict, offline_bot)
         assert set(bot_command_scope.api_kwargs.keys()) == {"chat_id", "user_id"} - set(
