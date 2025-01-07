@@ -9796,7 +9796,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Verifies a chat on behalf of the organization which is represented by the bot.
+        """Verifies a chat |org-verify| which is represented by the bot.
 
         .. versionadded:: 21.10
 
@@ -9838,7 +9838,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Verifies a user on behalf of the organization which is represented by the bot.
+        """Verifies a user |org-verify| which is represented by the bot.
 
         .. versionadded:: 21.10
 
@@ -9879,8 +9879,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Removes verification from a chat that is currently verified on behalf of the
-        organization represented by the bot.
+        """Removes verification from a chat that is currently verified |org-verify|
+        represented by the bot.
 
 
 
@@ -9918,8 +9918,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Removes verification from a user who is currently verified on behalf of the
-        organization represented by the bot.
+        """Removes verification from a user who is currently verified |org-verify|
+        represented by the bot.
 
 
 
