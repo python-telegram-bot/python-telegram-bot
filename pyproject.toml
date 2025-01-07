@@ -10,7 +10,7 @@ description = "We have made you a wrapper you can't refuse"
 readme = "README.rst"
 requires-python = ">=3.9"
 license = "LGPL-3.0-only"
-license-files = { paths = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"] }
+license-files = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"]
 authors = [
     { name = "Leandro Toledo", email = "devs@python-telegram-bot.org" }
 ]

@@ -132,7 +132,7 @@ class TestChatBoostHandler:
         )
 
     @pytest.mark.parametrize(
-        argnames=["allowed_types", "cb", "expected"],
+        argnames=("allowed_types", "cb", "expected"),
         argvalues=[
             (ChatBoostHandler.CHAT_BOOST, "cb_chat_boost_updated", (True, False)),
             (ChatBoostHandler.REMOVED_CHAT_BOOST, "cb_chat_boost_removed", (False, True)),

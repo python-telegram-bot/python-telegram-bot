@@ -205,7 +205,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
     async def start_polling(
         self,
         poll_interval: float = 0.0,
-        timeout: int = 10,  # noqa: ASYNC109
+        timeout: int = 10,
         bootstrap_retries: int = -1,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -341,7 +341,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
     async def _start_polling(
         self,
         poll_interval: float,
-        timeout: int,  # noqa: ASYNC109
+        timeout: int,
         read_timeout: ODVInput[float],
         write_timeout: ODVInput[float],
         connect_timeout: ODVInput[float],
