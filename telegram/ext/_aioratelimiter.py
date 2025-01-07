@@ -247,7 +247,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
         # In case user passes integer chat id as string
         with contextlib.suppress(ValueError, TypeError):
-            chat_id = int(chat_id)
+            chat_id = int(chat_id)  # type: ignore[arg-type]
 
         if (isinstance(chat_id, int) and chat_id < 0) or isinstance(chat_id, str):
             # string chat_id only works for channels and supergroups
