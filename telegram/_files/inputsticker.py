@@ -61,8 +61,8 @@ class InputSticker(TelegramObject):
         format (:obj:`str`): Format of the added sticker, must be one of
             :tg-const:`telegram.constants.StickerFormat.STATIC` for a
             ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
-            for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a WEBM
-            video.
+            for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a
+            ``.WEBM`` video.
 
             .. versionadded:: 21.1
 
@@ -84,8 +84,8 @@ class InputSticker(TelegramObject):
         format (:obj:`str`): Format of the added sticker, must be one of
             :tg-const:`telegram.constants.StickerFormat.STATIC` for a
             ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
-            for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a WEBM
-            video.
+            for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a
+            ``.WEBM`` video.
 
             .. versionadded:: 21.1
     """
