@@ -96,7 +96,14 @@ from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.strings import to_camel_case
-from telegram._utils.types import CorrectOptionID, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import (
+    BaseUrl,
+    CorrectOptionID,
+    FileInput,
+    JSONDict,
+    ODVInput,
+    ReplyMarkup,
+)
 from telegram._utils.warnings import warn
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit, ReactionEmoji
@@ -124,6 +131,35 @@ if TYPE_CHECKING:
     )
 
 BT = TypeVar("BT", bound="Bot")
+
+
+# Even though we document only {token} as supported insertion, we are a bit more flexible
+# internally and support additional variants. At the very least, we don't want the insertion
+# to be case sensitive.
+_SUPPORTED_INSERTIONS = {"token", "TOKEN", "bot_token", "BOT_TOKEN", "bot-token", "BOT-TOKEN"}
+_INSERTION_STRINGS = {f"{{{insertion}}}" for insertion in _SUPPORTED_INSERTIONS}
+
+
+class _TokenDict(dict):
+    __slots__ = ("token",)
+
+    # small helper to make .format_map work without knowing which exact insertion name is used
+    def __init__(self, token: str):
+        self.token = token
+        super().__init__()
+
+    def __missing__(self, key: str) -> str:
+        if key in _SUPPORTED_INSERTIONS:
+            return self.token
+        raise KeyError(f"Base URL string contains unsupported insertion: {key}")
+
+
+def _parse_base_url(value: BaseUrl, token: str) -> str:
+    if callable(value):
+        return value(token)
+    if any(insertion in value for insertion in _INSERTION_STRINGS):
+        return value.format_map(_TokenDict(token))
+    return value + token
 
 
 class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
@@ -193,8 +229,34 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
     Args:
         token (:obj:`str`): Bot's unique authentication token.
-        base_url (:obj:`str`, optional): Telegram Bot API service URL.
+        base_url (:obj:`str` | Callable[[:obj:`str`], :obj:`str`], optional): Telegram Bot API
+            service URL. If the string contains ``{token}``, it will be replaced with the bot's
+            token. If a callable is passed, it will be called with the bot's token as the only
+            argument and must return the base URL. Otherwise, the token will be appended to the
+            string. Defaults to ``"https://api.telegram.org/bot"``.
+
+            Tip:
+                Customizing the base URL can be used to run a bot against
+                :wiki:`Local Bot API Server <Local-Bot-API-Server>` or using Telegrams
+                `test environment \
+                <https://core.telegram.org/bots/features#dedicated-test-environment>`_.
+
+            .. versionchanged:: NEXT.VERSION
+               Supports callable input and string formatting.
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
+            If the string contains ``{token}``, it will be replaced with the bot's
+            token. If a callable is passed, it will be called with the bot's token as the only
+            argument and must return the base URL. Otherwise, the token will be appended to the
+            string. Defaults to ``"https://api.telegram.org/bot"``.
+
+            Tip:
+                Customizing the base URL can be used to run a bot against
+                :wiki:`Local Bot API Server <Local-Bot-API-Server>` or using Telegrams
+                `test environment \
+                <https://core.telegram.org/bots/features#dedicated-test-environment>`_.
+
+            .. versionchanged:: NEXT.VERSION
+               Supports callable input and string formatting.
         request (:class:`telegram.request.BaseRequest`, optional): Pre initialized
             :class:`telegram.request.BaseRequest` instances. Will be used for all bot methods
             *except* for :meth:`get_updates`. If not passed, an instance of
@@ -239,8 +301,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     def __init__(
         self,
         token: str,
-        base_url: str = "https://api.telegram.org/bot",
-        base_file_url: str = "https://api.telegram.org/file/bot",
+        base_url: BaseUrl = "https://api.telegram.org/bot",
+        base_file_url: BaseUrl = "https://api.telegram.org/file/bot",
         request: Optional[BaseRequest] = None,
         get_updates_request: Optional[BaseRequest] = None,
         private_key: Optional[bytes] = None,
@@ -252,8 +314,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
         self._token: str = token
 
-        self._base_url: str = base_url + self._token
-        self._base_file_url: str = base_file_url + self._token
+        self._base_url: str = _parse_base_url(base_url, self._token)
+        self._base_file_url: str = _parse_base_url(base_file_url, self._token)
+        self._LOGGER.debug("Set Bot API URL: %s", self._base_url)
+        self._LOGGER.debug("Set Bot API File URL: %s", self._base_file_url)
+
         self._local_mode: bool = local_mode
         self._bot_user: Optional[User] = None
         self._private_key: Optional[bytes] = None
@@ -264,7 +329,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             HTTPXRequest() if request is None else request,
         )
 
-        # this section is about issuing a warning when using HTTP/2 and connect to a self hosted
+        # this section is about issuing a warning when using HTTP/2 and connect to a self-hosted
         # bot api instance, which currently only supports HTTP/1.1. Checking if a custom base url
         # is set is the best way to do that.
 
@@ -273,14 +338,14 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         if (
             isinstance(self._request[0], HTTPXRequest)
             and self._request[0].http_version == "2"
-            and not base_url.startswith("https://api.telegram.org/bot")
+            and not self.base_url.startswith("https://api.telegram.org/bot")
         ):
             warning_string = "get_updates_request"
 
         if (
             isinstance(self._request[1], HTTPXRequest)
             and self._request[1].http_version == "2"
-            and not base_url.startswith("https://api.telegram.org/bot")
+            and not self.base_url.startswith("https://api.telegram.org/bot")
         ):
             if warning_string:
                 warning_string += " and request"
