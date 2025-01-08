@@ -25,7 +25,13 @@ from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
 from telegram._passport.passportfile import PassportFile
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import (
+    de_json_decrypted_optional,
+    de_json_optional,
+    de_list_decrypted_optional,
+    de_list_optional,
+    parse_sequence_arg,
+)
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -194,27 +200,22 @@ class EncryptedPassportElement(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["EncryptedPassportElement"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "EncryptedPassportElement":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["files"] = PassportFile.de_list(data.get("files"), bot) or None
-        data["front_side"] = PassportFile.de_json(data.get("front_side"), bot)
-        data["reverse_side"] = PassportFile.de_json(data.get("reverse_side"), bot)
-        data["selfie"] = PassportFile.de_json(data.get("selfie"), bot)
-        data["translation"] = PassportFile.de_list(data.get("translation"), bot) or None
+        data["files"] = de_list_optional(data.get("files"), PassportFile, bot) or None
+        data["front_side"] = de_json_optional(data.get("front_side"), PassportFile, bot)
+        data["reverse_side"] = de_json_optional(data.get("reverse_side"), PassportFile, bot)
+        data["selfie"] = de_json_optional(data.get("selfie"), PassportFile, bot)
+        data["translation"] = de_list_optional(data.get("translation"), PassportFile, bot) or None
 
         return super().de_json(data=data, bot=bot)
 
     @classmethod
     def de_json_decrypted(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"], credentials: "Credentials"
-    ) -> Optional["EncryptedPassportElement"]:
+        cls, data: JSONDict, bot: Optional["Bot"], credentials: "Credentials"
+    ) -> "EncryptedPassportElement":
         """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
         passport credentials.
 
@@ -234,8 +235,6 @@ class EncryptedPassportElement(TelegramObject):
             :class:`telegram.EncryptedPassportElement`:
 
         """
-        if not data:
-            return None
 
         if data["type"] not in ("phone_number", "email"):
             secure_data = getattr(credentials.secure_data, data["type"])
@@ -261,20 +260,21 @@ class EncryptedPassportElement(TelegramObject):
                     data["data"] = ResidentialAddress.de_json(data["data"], bot=bot)
 
             data["files"] = (
-                PassportFile.de_list_decrypted(data.get("files"), bot, secure_data.files) or None
+                de_list_decrypted_optional(data.get("files"), PassportFile, bot, secure_data.files)
+                or None
             )
-            data["front_side"] = PassportFile.de_json_decrypted(
-                data.get("front_side"), bot, secure_data.front_side
+            data["front_side"] = de_json_decrypted_optional(
+                data.get("front_side"), PassportFile, bot, secure_data.front_side
             )
-            data["reverse_side"] = PassportFile.de_json_decrypted(
-                data.get("reverse_side"), bot, secure_data.reverse_side
+            data["reverse_side"] = de_json_decrypted_optional(
+                data.get("reverse_side"), PassportFile, bot, secure_data.reverse_side
             )
-            data["selfie"] = PassportFile.de_json_decrypted(
-                data.get("selfie"), bot, secure_data.selfie
+            data["selfie"] = de_json_decrypted_optional(
+                data.get("selfie"), PassportFile, bot, secure_data.selfie
             )
             data["translation"] = (
-                PassportFile.de_list_decrypted(
-                    data.get("translation"), bot, secure_data.translation
+                de_list_decrypted_optional(
+                    data.get("translation"), PassportFile, bot, secure_data.translation
                 )
                 or None
             )

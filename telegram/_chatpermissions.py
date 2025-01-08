@@ -231,14 +231,9 @@ class ChatPermissions(TelegramObject):
         return cls(*(14 * (False,)))
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatPermissions"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatPermissions":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

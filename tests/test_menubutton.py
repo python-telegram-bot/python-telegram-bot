@@ -119,9 +119,6 @@ class TestMenuButtonWithoutRequest(MenuButtonTestBase):
         if "text" in cls.__slots__:
             assert menu_button.text == self.text
 
-        assert cls.de_json(None, offline_bot) is None
-        assert MenuButton.de_json({}, offline_bot) is None
-
     def test_de_json_invalid_type(self, offline_bot):
         json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
         menu_button = MenuButton.de_json(json_dict, offline_bot)

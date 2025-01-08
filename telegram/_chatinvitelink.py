@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -177,19 +178,14 @@ class ChatInviteLink(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatInviteLink"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatInviteLink":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["creator"] = User.de_json(data.get("creator"), bot)
+        data["creator"] = de_json_optional(data.get("creator"), User, bot)
         data["expire_date"] = from_timestamp(data.get("expire_date", None), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)

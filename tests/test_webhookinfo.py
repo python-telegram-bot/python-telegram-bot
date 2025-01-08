@@ -99,9 +99,6 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
             self.last_synchronization_error_date
         )
 
-        none = WebhookInfo.de_json(None, offline_bot)
-        assert none is None
-
     def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "url": self.url,

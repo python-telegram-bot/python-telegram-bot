@@ -89,6 +89,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.dummy_objects import get_dummy_object_json_dict
 from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
 from tests.auxil.slots import mro_slots
 
@@ -591,9 +592,9 @@ class TestMessageWithoutRequest(MessageTestBase):
     def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "message_id": 12,
-            "from_user": None,
+            "from_user": get_dummy_object_json_dict("User"),
             "date": int(dtm.datetime.now().timestamp()),
-            "chat": None,
+            "chat": get_dummy_object_json_dict("Chat"),
             "edit_date": int(dtm.datetime.now().timestamp()),
         }
 

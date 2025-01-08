@@ -38,6 +38,7 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatBoostSources
 from telegram.request import RequestData
+from tests.auxil.dummy_objects import get_dummy_object_json_dict
 from tests.auxil.slots import mro_slots
 
 
@@ -174,8 +175,6 @@ class TestChatBoostSourceTypesWithoutRequest:
 
     def test_de_json_required_args(self, offline_bot, chat_boost_source):
         cls = chat_boost_source.__class__
-        assert cls.de_json({}, offline_bot) is None
-        assert ChatBoost.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(chat_boost_source)
         const_boost_source = ChatBoostSource.de_json(json_dict, offline_bot)
@@ -534,7 +533,7 @@ class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
             user_id = data["user_id"] == "2"
             if not all((chat_id, user_id)):
                 pytest.fail("I got wrong parameters in post")
-            return data
+            return get_dummy_object_json_dict(UserChatBoosts)
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 

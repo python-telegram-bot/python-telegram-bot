@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -138,16 +139,11 @@ class SuccessfulPayment(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["SuccessfulPayment"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuccessfulPayment":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
+        data["order_info"] = de_json_optional(data.get("order_info"), OrderInfo, bot)
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)

@@ -89,7 +89,6 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
             "receiver": self.receiver.to_dict(),
         }
         st = StarTransaction.de_json(json_dict, offline_bot)
-        st_none = StarTransaction.de_json(None, offline_bot)
         assert st.api_kwargs == {}
         assert st.id == self.id
         assert st.amount == self.amount
@@ -97,7 +96,6 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         assert st.date == from_timestamp(self.date)
         assert st.source == self.source
         assert st.receiver == self.receiver
-        assert st_none is None
 
     def test_de_json_star_transaction_localization(
         self, tz_bot, offline_bot, raw_bot, star_transaction
@@ -178,10 +176,8 @@ class TestStarTransactionsWithoutRequest(StarTransactionsTestBase):
             "transactions": [t.to_dict() for t in self.transactions],
         }
         st = StarTransactions.de_json(json_dict, offline_bot)
-        st_none = StarTransactions.de_json(None, offline_bot)
         assert st.api_kwargs == {}
         assert st.transactions == tuple(self.transactions)
-        assert st_none is None
 
     def test_to_dict(self, star_transactions):
         expected_dict = {

@@ -138,7 +138,6 @@ class TestMessageOriginTypesWithoutRequest:
 
     def test_de_json_required_args(self, offline_bot, message_origin_type):
         cls = message_origin_type.__class__
-        assert cls.de_json({}, offline_bot) is None
 
         json_dict = make_json_dict(message_origin_type)
         const_message_origin = MessageOrigin.de_json(json_dict, offline_bot)

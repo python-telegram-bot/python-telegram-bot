@@ -24,7 +24,7 @@ from telegram import constants
 from telegram._files.document import Document
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -79,14 +79,9 @@ class BackgroundFill(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BackgroundFill"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BackgroundFill":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         _class_mapping: dict[str, type[BackgroundFill]] = {
             cls.SOLID: BackgroundFillSolid,
@@ -270,14 +265,9 @@ class BackgroundType(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BackgroundType"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BackgroundType":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         _class_mapping: dict[str, type[BackgroundType]] = {
             cls.FILL: BackgroundTypeFill,
@@ -290,10 +280,10 @@ class BackgroundType(TelegramObject):
             return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
         if "fill" in data:
-            data["fill"] = BackgroundFill.de_json(data.get("fill"), bot)
+            data["fill"] = de_json_optional(data.get("fill"), BackgroundFill, bot)
 
         if "document" in data:
-            data["document"] = Document.de_json(data.get("document"), bot)
+            data["document"] = de_json_optional(data.get("document"), Document, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -533,15 +523,10 @@ class ChatBackground(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatBackground"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBackground":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["type"] = BackgroundType.de_json(data.get("type"), bot)
+        data["type"] = de_json_optional(data.get("type"), BackgroundType, bot)
 
         return super().de_json(data=data, bot=bot)

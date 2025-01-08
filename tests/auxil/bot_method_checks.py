@@ -23,7 +23,8 @@ import inspect
 import re
 import zoneinfo
 from collections.abc import Collection, Iterable
-from typing import Any, Callable, Optional
+from types import GenericAlias
+from typing import Any, Callable, ForwardRef, Optional, Union
 
 import pytest
 
@@ -31,7 +32,6 @@ import telegram  # for ForwardRef resolution
 from telegram import (
     Bot,
     ChatPermissions,
-    File,
     InlineQueryResultArticle,
     InlineQueryResultCachedPhoto,
     InputMediaPhoto,
@@ -46,6 +46,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram.constants import InputMediaType
 from telegram.ext import Defaults, ExtBot
 from telegram.request import RequestData
+from tests.auxil.dummy_objects import get_dummy_object_json_dict
 
 FORWARD_REF_PATTERN = re.compile(r"ForwardRef\('(?P<class_name>\w+)'\)")
 """ A pattern to find a class name in a ForwardRef typing annotation.
@@ -258,10 +259,6 @@ async def check_shortcut_call(
                 f"{expected_args - received_kwargs}"
             )
 
-        if bot_method_name == "get_file":
-            # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
-            # return value
-            return File(file_id="result", file_unique_id="result")
         return True
 
     setattr(bot, bot_method_name, make_assertion)
@@ -390,6 +387,33 @@ def make_assertion_for_link_preview_options(
                 f"Got value {lpo.get('url')} for link_preview_options.url, "
                 f"expected it to be {expected_defaults_value}"
             )
+
+
+def _check_forward_ref(obj: object) -> Union[str, object]:
+    if isinstance(obj, ForwardRef):
+        return obj.__forward_arg__
+    return obj
+
+
+def guess_return_type_name(method: Callable[[...], Any]) -> tuple[Union[str, object], bool]:
+    # Using typing.get_type_hints(method) would be the nicer as it also resolves ForwardRefs
+    # and string annotations. But it also wants to resolve the parameter annotations, which
+    # need additional namespaces and that's not worth the struggle for now …
+    return_annotation = _check_forward_ref(inspect.signature(method).return_annotation)
+    as_tuple = False
+
+    if isinstance(return_annotation, GenericAlias):
+        if return_annotation.__origin__ is tuple:
+            as_tuple = True
+        else:
+            raise ValueError(
+                f"Return type of {method.__name__} is a GenericAlias. This can not be handled yet."
+            )
+
+    # For tuples and Unions, we simply take the first element
+    if hasattr(return_annotation, "__args__"):
+        return _check_forward_ref(return_annotation.__args__[0]), as_tuple
+    return return_annotation, as_tuple
 
 
 _EUROPE_BERLIN_TS = to_timestamp(
@@ -547,15 +571,6 @@ async def make_assertion(
             if default_value_expected and date_param != _AMERICA_NEW_YORK_TS:
                 pytest.fail(f"Naive `{key}` should have been interpreted as America/New_York")
 
-    if method_name in ["get_file", "get_small_file", "get_big_file"]:
-        # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
-        # return value
-        out = File(file_id="result", file_unique_id="result")
-        return out.to_dict()
-    # Otherwise return None by default, as TGObject.de_json/list(None) in [None, []]
-    # That way we can check what gets passed to Request.post without having to actually
-    # make a request
-    # Some methods expect specific output, so we allow to customize that
     if isinstance(return_value, TelegramObject):
         return return_value.to_dict()
     return return_value
@@ -564,7 +579,6 @@ async def make_assertion(
 async def check_defaults_handling(
     method: Callable,
     bot: Bot,
-    return_value=None,
     no_default_kwargs: Collection[str] = frozenset(),
 ) -> bool:
     """
@@ -574,9 +588,6 @@ async def check_defaults_handling(
         method: The shortcut/bot_method
         bot: The bot. May be a telegram.Bot or a telegram.ext.ExtBot. In the former case, all
             default values will be converted to None.
-        return_value: Optional. The return value of Bot._post that the method expects. Defaults to
-            None. get_file is automatically handled. If this is a `TelegramObject`, Bot._post will
-            return the `to_dict` representation of it.
         no_default_kwargs: Optional. A collection of keyword arguments that should not have default
             values. Defaults to an empty frozenset.
 
@@ -612,12 +623,10 @@ async def check_defaults_handling(
     )
     defaults_custom_defaults = Defaults(**kwargs)
 
-    expected_return_values = [None, ()] if return_value is None else [return_value]
-    if method.__name__ in ["get_file", "get_small_file", "get_big_file"]:
-        expected_return_values = [File(file_id="result", file_unique_id="result")]
-
     request = bot._request[0] if get_updates else bot.request
     orig_post = request.post
+    return_value = get_dummy_object_json_dict(*guess_return_type_name(method))
+
     try:
         if raw_bot:
             combinations = [(None, None)]
@@ -641,7 +650,7 @@ async def check_defaults_handling(
                 expected_defaults_value=expected_defaults_value,
             )
             request.post = assertion_callback
-            assert await method(**kwargs) in expected_return_values
+            await method(**kwargs)
 
             # 2: test that we get the manually passed non-None value
             kwargs = build_kwargs(
@@ -656,7 +665,7 @@ async def check_defaults_handling(
                 expected_defaults_value=expected_defaults_value,
             )
             request.post = assertion_callback
-            assert await method(**kwargs) in expected_return_values
+            await method(**kwargs)
 
             # 3: test that we get the manually passed None value
             kwargs = build_kwargs(
@@ -671,7 +680,7 @@ async def check_defaults_handling(
                 expected_defaults_value=expected_defaults_value,
             )
             request.post = assertion_callback
-            assert await method(**kwargs) in expected_return_values
+            await method(**kwargs)
     except Exception as exc:
         raise exc
     finally:

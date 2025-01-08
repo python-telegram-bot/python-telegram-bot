@@ -28,7 +28,7 @@ from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 from .affiliateinfo import AffiliateInfo
@@ -87,9 +87,7 @@ class TransactionPartner(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["TransactionPartner"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TransactionPartner":
         """Converts JSON data to the appropriate :class:`TransactionPartner` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -102,9 +100,6 @@ class TransactionPartner(TelegramObject):
 
         """
         data = cls._parse_data(data)
-
-        if (cls is TransactionPartner and not data) or data is None:
-            return None
 
         _class_mapping: dict[str, type[TransactionPartner]] = {
             cls.AFFILIATE_PROGRAM: TransactionPartnerAffiliateProgram,
@@ -166,15 +161,12 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["TransactionPartnerAffiliateProgram"]:
+        cls, data: JSONDict, bot: Optional["Bot"] = None
+    ) -> "TransactionPartnerAffiliateProgram":
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["sponsor_user"] = User.de_json(data.get("sponsor_user"), bot)
+        data["sponsor_user"] = de_json_optional(data.get("sponsor_user"), User, bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
@@ -209,17 +201,12 @@ class TransactionPartnerFragment(TransactionPartner):
             self.withdrawal_state: Optional[RevenueWithdrawalState] = withdrawal_state
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["TransactionPartnerFragment"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TransactionPartnerFragment":
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        data["withdrawal_state"] = RevenueWithdrawalState.de_json(
-            data.get("withdrawal_state"), bot
+        data["withdrawal_state"] = de_json_optional(
+            data.get("withdrawal_state"), RevenueWithdrawalState, bot
         )
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
@@ -320,24 +307,19 @@ class TransactionPartnerUser(TransactionPartner):
             )
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["TransactionPartnerUser"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TransactionPartnerUser":
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["user"] = User.de_json(data.get("user"), bot)
-        data["affiliate"] = AffiliateInfo.de_json(data.get("affiliate"), bot)
-        data["paid_media"] = PaidMedia.de_list(data.get("paid_media"), bot=bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
+        data["affiliate"] = de_json_optional(data.get("affiliate"), AffiliateInfo, bot)
+        data["paid_media"] = de_list_optional(data.get("paid_media"), PaidMedia, bot)
         data["subscription_period"] = (
             dtm.timedelta(seconds=sp)
             if (sp := data.get("subscription_period")) is not None
             else None
         )
-        data["gift"] = Gift.de_json(data.get("gift"), bot)
+        data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 

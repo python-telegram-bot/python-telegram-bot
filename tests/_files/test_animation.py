@@ -138,7 +138,9 @@ class TestAnimationWithoutRequest(AnimationTestBase):
         )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_animation_local_files(self, monkeypatch, offline_bot, chat_id, local_mode):
+    async def test_send_animation_local_files(
+        self, monkeypatch, offline_bot, chat_id, local_mode, dummy_message_dict
+    ):
         try:
             offline_bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local Bot API set up
@@ -156,6 +158,7 @@ class TestAnimationWithoutRequest(AnimationTestBase):
                     test_flag = isinstance(data.get("animation"), InputFile) and isinstance(
                         data.get("thumbnail"), InputFile
                     )
+                return dummy_message_dict
 
             monkeypatch.setattr(offline_bot, "_post", make_assertion)
             await offline_bot.send_animation(chat_id, file, thumbnail=file)
