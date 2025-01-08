@@ -28,7 +28,6 @@ from telegram import (
     InputTextMessageContent,
 )
 from telegram.constants import InlineQueryResultType
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -40,7 +39,6 @@ def inline_query_result_article():
         input_message_content=InlineQueryResultArticleTestBase.input_message_content,
         reply_markup=InlineQueryResultArticleTestBase.reply_markup,
         url=InlineQueryResultArticleTestBase.url,
-        hide_url=InlineQueryResultArticleTestBase.hide_url,
         description=InlineQueryResultArticleTestBase.description,
         thumbnail_url=InlineQueryResultArticleTestBase.thumbnail_url,
         thumbnail_height=InlineQueryResultArticleTestBase.thumbnail_height,
@@ -55,7 +53,6 @@ class InlineQueryResultArticleTestBase:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
     url = "url"
-    hide_url = True
     description = "description"
     thumbnail_url = "thumb url"
     thumbnail_height = 10
@@ -79,7 +76,6 @@ class TestInlineQueryResultArticleWithoutRequest(InlineQueryResultArticleTestBas
         )
         assert inline_query_result_article.reply_markup.to_dict() == self.reply_markup.to_dict()
         assert inline_query_result_article.url == self.url
-        assert inline_query_result_article.hide_url == self.hide_url
         assert inline_query_result_article.description == self.description
         assert inline_query_result_article.thumbnail_url == self.thumbnail_url
         assert inline_query_result_article.thumbnail_height == self.thumbnail_height
@@ -101,7 +97,6 @@ class TestInlineQueryResultArticleWithoutRequest(InlineQueryResultArticleTestBas
             == inline_query_result_article.reply_markup.to_dict()
         )
         assert inline_query_result_article_dict["url"] == inline_query_result_article.url
-        assert inline_query_result_article_dict["hide_url"] == inline_query_result_article.hide_url
         assert (
             inline_query_result_article_dict["description"]
             == inline_query_result_article.description
@@ -158,31 +153,3 @@ class TestInlineQueryResultArticleWithoutRequest(InlineQueryResultArticleTestBas
 
         assert a != e
         assert hash(a) != hash(e)
-
-    def test_deprecation_warning_for_hide_url(self):
-        with pytest.warns(PTBDeprecationWarning, match="The argument `hide_url`") as record:
-            InlineQueryResultArticle(
-                self.id_, self.title, self.input_message_content, hide_url=True
-            )
-
-        assert record[0].filename == __file__, "wrong stacklevel!"
-
-        with pytest.warns(PTBDeprecationWarning, match="The argument `hide_url`") as record:
-            InlineQueryResultArticle(
-                self.id_, self.title, self.input_message_content, hide_url=False
-            )
-
-        assert record[0].filename == __file__, "wrong stacklevel!"
-
-        assert (
-            InlineQueryResultArticle(
-                self.id_, self.title, self.input_message_content, hide_url=True
-            ).hide_url
-            is True
-        )
-        assert (
-            InlineQueryResultArticle(
-                self.id_, self.title, self.input_message_content, hide_url=False
-            ).hide_url
-            is False
-        )
