@@ -27,7 +27,7 @@ from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -106,20 +106,15 @@ class BusinessConnection(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessConnection"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessConnection":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["user"] = User.de_json(data.get("user"), bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -177,16 +172,11 @@ class BusinessMessagesDeleted(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessMessagesDeleted"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessMessagesDeleted":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -236,16 +226,11 @@ class BusinessIntro(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessIntro"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessIntro":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
+        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -290,16 +275,11 @@ class BusinessLocation(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessLocation"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessLocation":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["location"] = Location.de_json(data.get("location"), bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -439,17 +419,12 @@ class BusinessOpeningHours(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessOpeningHours"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessOpeningHours":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["opening_hours"] = BusinessOpeningHoursInterval.de_list(
-            data.get("opening_hours"), bot
+        data["opening_hours"] = de_list_optional(
+            data.get("opening_hours"), BusinessOpeningHoursInterval, bot
         )
 
         return super().de_json(data=data, bot=bot)

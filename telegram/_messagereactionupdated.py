@@ -25,7 +25,7 @@ from telegram._chat import Chat
 from telegram._reaction import ReactionCount, ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -86,21 +86,16 @@ class MessageReactionCountUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["MessageReactionCountUpdated"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageReactionCountUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["reactions"] = ReactionCount.de_list(data.get("reactions"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["reactions"] = de_list_optional(data.get("reactions"), ReactionCount, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -187,23 +182,18 @@ class MessageReactionUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["MessageReactionUpdated"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageReactionUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["old_reaction"] = ReactionType.de_list(data.get("old_reaction"), bot)
-        data["new_reaction"] = ReactionType.de_list(data.get("new_reaction"), bot)
-        data["user"] = User.de_json(data.get("user"), bot)
-        data["actor_chat"] = Chat.de_json(data.get("actor_chat"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["old_reaction"] = de_list_optional(data.get("old_reaction"), ReactionType, bot)
+        data["new_reaction"] = de_list_optional(data.get("new_reaction"), ReactionType, bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
+        data["actor_chat"] = de_json_optional(data.get("actor_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)

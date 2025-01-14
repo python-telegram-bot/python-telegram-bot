@@ -27,7 +27,7 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.entities import parse_message_entities, parse_message_entity
@@ -91,16 +91,11 @@ class InputPollOption(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["InputPollOption"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InputPollOption":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
+        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -157,16 +152,11 @@ class PollOption(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["PollOption"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PollOption":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
+        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -306,17 +296,12 @@ class PollAnswer(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["PollAnswer"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PollAnswer":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["user"] = User.de_json(data.get("user"), bot)
-        data["voter_chat"] = Chat.de_json(data.get("voter_chat"), bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
+        data["voter_chat"] = de_json_optional(data.get("voter_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -474,20 +459,21 @@ class Poll(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Poll"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Poll":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["options"] = [PollOption.de_json(option, bot) for option in data["options"]]
-        data["explanation_entities"] = MessageEntity.de_list(data.get("explanation_entities"), bot)
+        data["options"] = de_list_optional(data.get("options"), PollOption, bot)
+        data["explanation_entities"] = de_list_optional(
+            data.get("explanation_entities"), MessageEntity, bot
+        )
         data["close_date"] = from_timestamp(data.get("close_date"), tzinfo=loc_tzinfo)
-        data["question_entities"] = MessageEntity.de_list(data.get("question_entities"), bot)
+        data["question_entities"] = de_list_optional(
+            data.get("question_entities"), MessageEntity, bot
+        )
 
         return super().de_json(data=data, bot=bot)
 

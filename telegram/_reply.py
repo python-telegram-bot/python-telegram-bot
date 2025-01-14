@@ -43,7 +43,7 @@ from telegram._payment.invoice import Invoice
 from telegram._poll import Poll
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -248,39 +248,36 @@ class ExternalReplyInfo(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ExternalReplyInfo"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ExternalReplyInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        data["origin"] = MessageOrigin.de_json(data.get("origin"), bot)
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["link_preview_options"] = LinkPreviewOptions.de_json(
-            data.get("link_preview_options"), bot
+        data["origin"] = de_json_optional(data.get("origin"), MessageOrigin, bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["link_preview_options"] = de_json_optional(
+            data.get("link_preview_options"), LinkPreviewOptions, bot
         )
-        data["animation"] = Animation.de_json(data.get("animation"), bot)
-        data["audio"] = Audio.de_json(data.get("audio"), bot)
-        data["document"] = Document.de_json(data.get("document"), bot)
-        data["photo"] = tuple(PhotoSize.de_list(data.get("photo"), bot))
-        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
-        data["story"] = Story.de_json(data.get("story"), bot)
-        data["video"] = Video.de_json(data.get("video"), bot)
-        data["video_note"] = VideoNote.de_json(data.get("video_note"), bot)
-        data["voice"] = Voice.de_json(data.get("voice"), bot)
-        data["contact"] = Contact.de_json(data.get("contact"), bot)
-        data["dice"] = Dice.de_json(data.get("dice"), bot)
-        data["game"] = Game.de_json(data.get("game"), bot)
-        data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
-        data["giveaway_winners"] = GiveawayWinners.de_json(data.get("giveaway_winners"), bot)
-        data["invoice"] = Invoice.de_json(data.get("invoice"), bot)
-        data["location"] = Location.de_json(data.get("location"), bot)
-        data["poll"] = Poll.de_json(data.get("poll"), bot)
-        data["venue"] = Venue.de_json(data.get("venue"), bot)
-        data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
+        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
+        data["audio"] = de_json_optional(data.get("audio"), Audio, bot)
+        data["document"] = de_json_optional(data.get("document"), Document, bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
+        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
+        data["story"] = de_json_optional(data.get("story"), Story, bot)
+        data["video"] = de_json_optional(data.get("video"), Video, bot)
+        data["video_note"] = de_json_optional(data.get("video_note"), VideoNote, bot)
+        data["voice"] = de_json_optional(data.get("voice"), Voice, bot)
+        data["contact"] = de_json_optional(data.get("contact"), Contact, bot)
+        data["dice"] = de_json_optional(data.get("dice"), Dice, bot)
+        data["game"] = de_json_optional(data.get("game"), Game, bot)
+        data["giveaway"] = de_json_optional(data.get("giveaway"), Giveaway, bot)
+        data["giveaway_winners"] = de_json_optional(
+            data.get("giveaway_winners"), GiveawayWinners, bot
+        )
+        data["invoice"] = de_json_optional(data.get("invoice"), Invoice, bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
+        data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
+        data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
+        data["paid_media"] = de_json_optional(data.get("paid_media"), PaidMediaInfo, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -350,16 +347,11 @@ class TextQuote(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["TextQuote"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TextQuote":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        data["entities"] = tuple(MessageEntity.de_list(data.get("entities"), bot))
+        data["entities"] = de_list_optional(data.get("entities"), MessageEntity, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -458,15 +450,12 @@ class ReplyParameters(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ReplyParameters"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReplyParameters":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        data["quote_entities"] = tuple(MessageEntity.de_list(data.get("quote_entities"), bot))
+        data["quote_entities"] = tuple(
+            de_list_optional(data.get("quote_entities"), MessageEntity, bot)
+        )
 
         return super().de_json(data=data, bot=bot)

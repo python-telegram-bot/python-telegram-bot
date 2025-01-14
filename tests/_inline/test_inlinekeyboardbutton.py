@@ -159,9 +159,6 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
         )
         assert inline_keyboard_button.copy_text == self.copy_text
 
-        none = InlineKeyboardButton.de_json({}, offline_bot)
-        assert none is None
-
     def test_equality(self):
         a = InlineKeyboardButton("text", callback_data="data")
         b = InlineKeyboardButton("text", callback_data="data")

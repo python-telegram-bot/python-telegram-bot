@@ -93,8 +93,6 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert external_reply_info.giveaway == self.giveaway
         assert external_reply_info.paid_media == self.paid_media
 
-        assert ExternalReplyInfo.de_json(None, offline_bot) is None
-
     def test_to_dict(self, external_reply_info):
         ext_reply_info_dict = external_reply_info.to_dict()
 
@@ -166,8 +164,6 @@ class TestTextQuoteWithoutRequest(TextQuoteTestBase):
         assert text_quote.position == self.position
         assert text_quote.entities == tuple(self.entities)
         assert text_quote.is_manual == self.is_manual
-
-        assert TextQuote.de_json(None, offline_bot) is None
 
     def test_to_dict(self, text_quote):
         text_quote_dict = text_quote.to_dict()
@@ -254,8 +250,6 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
         assert reply_parameters.quote_parse_mode == self.quote_parse_mode
         assert reply_parameters.quote_entities == tuple(self.quote_entities)
         assert reply_parameters.quote_position == self.quote_position
-
-        assert ReplyParameters.de_json(None, offline_bot) is None
 
     def test_to_dict(self, reply_parameters):
         reply_parameters_dict = reply_parameters.to_dict()

@@ -435,12 +435,12 @@ class AdmonitionInserter:
         return admonition_for_class
 
     @staticmethod
-    def _generate_class_name_for_link(cls: type) -> str:
+    def _generate_class_name_for_link(cls_: type) -> str:
         """Generates class name that can be used in a ReST link."""
 
         # Check for potential presence of ".ext.", we will need to keep it.
-        ext = ".ext" if ".ext." in str(cls) else ""
-        return f"telegram{ext}.{cls.__name__}"
+        ext = ".ext" if ".ext." in str(cls_) else ""
+        return f"telegram{ext}.{cls_.__name__}"
 
     def _generate_link_to_method(self, method_name: str, cls: type) -> str:
         """Generates a ReST link to a method of a telegram class."""
@@ -448,11 +448,11 @@ class AdmonitionInserter:
         return f":meth:`{self._generate_class_name_for_link(cls)}.{method_name}`"
 
     @staticmethod
-    def _iter_subclasses(cls: type) -> Iterator:
+    def _iter_subclasses(cls_: type) -> Iterator:
         return (
             # exclude private classes
             c
-            for c in cls.__subclasses__()
+            for c in cls_.__subclasses__()
             if not str(c).split(".")[-1].startswith("_")
         )
 

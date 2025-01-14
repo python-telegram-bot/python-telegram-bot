@@ -145,7 +145,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @property
     def application(self) -> "Application[BT, ST, UD, CD, BD, Any]":
         """:class:`telegram.ext.Application`: The application associated with this context."""
-        return self._application
+        return self._application  # type: ignore[return-value]
 
     @property
     def bot_data(self) -> BD:
