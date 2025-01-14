@@ -193,7 +193,7 @@ def bot_methods(ext_bot=True, include_camel_case=False, include_do_api_request=F
             ids.append(f"{cls.__name__}.{name}")
 
     return pytest.mark.parametrize(
-        argnames="bot_class, bot_method_name,bot_method", argvalues=arg_values, ids=ids
+        argnames=("bot_class", "bot_method_name", "bot_method"), argvalues=arg_values, ids=ids
     )
 
 

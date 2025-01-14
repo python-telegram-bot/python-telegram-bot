@@ -153,10 +153,8 @@ def make_json_dict(instance: ChatMember, include_optional_args: bool = False) ->
         # If we want to test all args (for de_json)
         # or if the param is optional but for backwards compatability
         elif (
-            param.default is not inspect.Parameter.empty
-            and include_optional_args
-            or param.name in ["can_delete_stories", "can_post_stories", "can_edit_stories"]
-        ):
+            param.default is not inspect.Parameter.empty and include_optional_args
+        ) or param.name in ["can_delete_stories", "can_post_stories", "can_edit_stories"]:
             json_dict[param.name] = val
     return json_dict
 

@@ -115,7 +115,7 @@ class TestChatMemberHandler:
         )
 
     @pytest.mark.parametrize(
-        argnames=["allowed_types", "expected"],
+        argnames=("allowed_types", "expected"),
         argvalues=[
             (ChatMemberHandler.MY_CHAT_MEMBER, (True, False)),
             (ChatMemberHandler.CHAT_MEMBER, (False, True)),
@@ -145,7 +145,7 @@ class TestChatMemberHandler:
             assert self.test_flag == result_2
 
     @pytest.mark.parametrize(
-        argnames=["allowed_types", "chat_id", "expected"],
+        argnames=("allowed_types", "chat_id", "expected"),
         argvalues=[
             (ChatMemberHandler.MY_CHAT_MEMBER, None, (True, False)),
             (ChatMemberHandler.CHAT_MEMBER, None, (False, True)),

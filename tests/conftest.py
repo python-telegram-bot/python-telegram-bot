@@ -311,7 +311,7 @@ def false_update(request):
     scope="session",
     params=[pytz.timezone, zoneinfo.ZoneInfo] if TEST_WITH_OPT_DEPS else [zoneinfo.ZoneInfo],
 )
-def _tz_implementation(request):  # noqa: PT005
+def _tz_implementation(request):
     # This fixture is used to parametrize the timezone fixture
     # This is similar to what @pyttest.mark.parametrize does but for fixtures
     # However, this is needed only internally for the `tzinfo` fixture, so we keep it private
