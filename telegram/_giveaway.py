@@ -144,7 +144,7 @@ class Giveaway(TelegramObject):
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["chats"] = tuple(de_list_optional(data.get("chats"), Chat, bot))
+        data["chats"] = de_list_optional(data.get("chats"), Chat, bot)
         data["winners_selection_date"] = from_timestamp(
             data.get("winners_selection_date"), tzinfo=loc_tzinfo
         )
@@ -302,7 +302,7 @@ class GiveawayWinners(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-        data["winners"] = tuple(de_list_optional(data.get("winners"), User, bot))
+        data["winners"] = de_list_optional(data.get("winners"), User, bot)
         data["winners_selection_date"] = from_timestamp(
             data.get("winners_selection_date"), tzinfo=loc_tzinfo
         )
