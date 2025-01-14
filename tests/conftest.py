@@ -37,7 +37,7 @@ from telegram import (
     User,
 )
 from telegram.ext import Defaults
-from tests.auxil.build_messages import DATE
+from tests.auxil.build_messages import DATE, make_message
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.envvars import GITHUB_ACTIONS, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
@@ -311,7 +311,7 @@ def false_update(request):
     scope="session",
     params=[pytz.timezone, zoneinfo.ZoneInfo] if TEST_WITH_OPT_DEPS else [zoneinfo.ZoneInfo],
 )
-def _tz_implementation(request):  # noqa: PT005
+def _tz_implementation(request):
     # This fixture is used to parametrize the timezone fixture
     # This is similar to what @pyttest.mark.parametrize does but for fixtures
     # However, this is needed only internally for the `tzinfo` fixture, so we keep it private
@@ -331,3 +331,13 @@ def timezone(tzinfo):
 @pytest.fixture
 def tmp_file(tmp_path) -> Path:
     return tmp_path / uuid4().hex
+
+
+@pytest.fixture(scope="session")
+def dummy_message():
+    return make_message("dummy_message")
+
+
+@pytest.fixture(scope="session")
+def dummy_message_dict(dummy_message):
+    return dummy_message.to_dict()
