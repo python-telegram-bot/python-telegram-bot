@@ -45,7 +45,6 @@ class TestStoryWithoutRequest(StoryTestBase):
         assert story.chat == self.chat
         assert story.id == self.id
         assert isinstance(story, Story)
-        assert Story.de_json(None, offline_bot) is None
 
     def test_to_dict(self, story):
         story_dict = story.to_dict()

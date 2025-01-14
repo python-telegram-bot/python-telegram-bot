@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Final, Optional
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
 
@@ -69,9 +70,7 @@ class MenuButton(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["MenuButton"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MenuButton":
         """Converts JSON data to the appropriate :class:`MenuButton` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -88,12 +87,6 @@ class MenuButton(TelegramObject):
 
         """
         data = cls._parse_data(data)
-
-        if data is None:
-            return None
-
-        if not data and cls is MenuButton:
-            return None
 
         _class_mapping: dict[str, type[MenuButton]] = {
             cls.COMMANDS: MenuButtonCommands,
@@ -172,16 +165,11 @@ class MenuButtonWebApp(MenuButton):
             self._id_attrs = (self.type, self.text, self.web_app)
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["MenuButtonWebApp"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MenuButtonWebApp":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
+        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 

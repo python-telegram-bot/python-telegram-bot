@@ -43,6 +43,7 @@ from telegram import (
     Chat,
     ChatAdministratorRights,
     ChatFullInfo,
+    ChatInviteLink,
     ChatPermissions,
     Dice,
     InlineKeyboardButton,
@@ -104,6 +105,7 @@ from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
 
 from .auxil.build_messages import make_message
+from .auxil.dummy_objects import get_dummy_object
 
 
 @pytest.fixture
@@ -487,17 +489,11 @@ class TestBotWithoutRequest:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
-        # Mocking get_me within check_defaults_handling messes with the cached values like
-        # Bot.{bot, username, id, …}` unless we return the expected User object.
-        return_value = (
-            offline_bot.bot if bot_method_name.lower().replace("_", "") == "getme" else None
-        )
-
         # Check that ExtBot does the right thing
         bot_method = getattr(offline_bot, bot_method_name)
         raw_bot_method = getattr(raw_bot, bot_method_name)
-        assert await check_defaults_handling(bot_method, offline_bot, return_value=return_value)
-        assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
+        assert await check_defaults_handling(bot_method, offline_bot)
+        assert await check_defaults_handling(raw_bot_method, raw_bot)
 
     @pytest.mark.parametrize(
         ("name", "method"), inspect.getmembers(Bot, predicate=inspect.isfunction)
@@ -1432,7 +1428,9 @@ class TestBotWithoutRequest:
         )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_set_chat_photo_local_files(self, monkeypatch, offline_bot, chat_id, local_mode):
+    async def test_set_chat_photo_local_files(
+        self, dummy_message_dict, monkeypatch, offline_bot, chat_id, local_mode
+    ):
         try:
             offline_bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local Bot API set up
@@ -1628,7 +1626,7 @@ class TestBotWithoutRequest:
         message = Message(
             1,
             dtm.datetime.utcnow(),
-            None,
+            get_dummy_object(Chat),
             reply_markup=offline_bot.callback_data_cache.process_keyboard(reply_markup),
         )
         message._unfreeze()
@@ -1642,7 +1640,7 @@ class TestBotWithoutRequest:
                     message_type: Message(
                         1,
                         dtm.datetime.utcnow(),
-                        None,
+                        get_dummy_object(Chat),
                         pinned_message=message,
                         reply_to_message=Message.de_json(message.to_dict(), offline_bot),
                     )
@@ -1785,7 +1783,7 @@ class TestBotWithoutRequest:
         message = Message(
             1,
             dtm.datetime.utcnow(),
-            None,
+            get_dummy_object(Chat),
             reply_markup=reply_markup,
             via_bot=bot.bot if self_sender else User(1, "first", False),
         )
@@ -2228,14 +2226,32 @@ class TestBotWithoutRequest:
             api_kwargs={"chat_id": 2, "user_id": 32, "until_date": until_timestamp},
         )
 
-    async def test_business_connection_id_argument(self, offline_bot, monkeypatch):
+    async def test_business_connection_id_argument(
+        self, offline_bot, monkeypatch, dummy_message_dict
+    ):
         """We can't connect to a business acc, so we just test that the correct data is passed.
         We also can't test every single method easily, so we just test a few. Our linting will
         catch any unused args with the others."""
+        return_values = asyncio.Queue()
+        await return_values.put(dummy_message_dict)
+        await return_values.put(
+            Poll(
+                id="42",
+                question="question",
+                options=[PollOption("option", 0)],
+                total_voter_count=5,
+                is_closed=True,
+                is_anonymous=True,
+                type="regular",
+                allows_multiple_answers=False,
+            ).to_dict()
+        )
+        await return_values.put(True)
+        await return_values.put(True)
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters.get("business_connection_id") == 42
-            return {}
+            return await return_values.get()
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
@@ -2348,6 +2364,9 @@ class TestBotWithoutRequest:
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters.get("subscription_period") == 2592000
             assert request_data.parameters.get("subscription_price") == 6
+            return ChatInviteLink(
+                "https://t.me/joinchat/invite_link", User(1, "first", False), False, False, False
+            ).to_dict()
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 

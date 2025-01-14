@@ -24,7 +24,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -112,21 +112,16 @@ class StarTransaction(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["StarTransaction"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "StarTransaction":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
 
-        data["source"] = TransactionPartner.de_json(data.get("source"), bot)
-        data["receiver"] = TransactionPartner.de_json(data.get("receiver"), bot)
+        data["source"] = de_json_optional(data.get("source"), TransactionPartner, bot)
+        data["receiver"] = de_json_optional(data.get("receiver"), TransactionPartner, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -159,14 +154,9 @@ class StarTransactions(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["StarTransactions"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "StarTransactions":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        data["transactions"] = StarTransaction.de_list(data.get("transactions"), bot)
+        data["transactions"] = de_list_optional(data.get("transactions"), StarTransaction, bot)
         return super().de_json(data=data, bot=bot)
