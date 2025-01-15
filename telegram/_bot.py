@@ -96,7 +96,14 @@ from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.strings import to_camel_case
-from telegram._utils.types import CorrectOptionID, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import (
+    CorrectOptionID,
+    FileInput,
+    JSONDict,
+    ODVInput,
+    ReplyMarkup,
+    TimePeriod,
+)
 from telegram._utils.warnings import warn
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit, ReactionEmoji
@@ -1421,7 +1428,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: Union[int, str],
         audio: Union[FileInput, "Audio"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         performer: Optional[str] = None,
         title: Optional[str] = None,
         caption: Optional[str] = None,
@@ -1483,7 +1490,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
-            duration (:obj:`int`, optional): Duration of sent audio in seconds.
+            duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent audio
+                in seconds.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -1861,7 +1872,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: Union[int, str],
         video: Union[FileInput, "Video"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -1919,7 +1930,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
-            duration (:obj:`int`, optional): Duration of sent video in seconds.
+            duration (:obj:`int` | class:`datetime.timedelate`, optional): Duration of sent video
+                in seconds.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
             caption (:obj:`str`, optional): Video caption (may also be used when resending videos
@@ -2040,7 +2055,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: Union[int, str],
         video_note: Union[FileInput, "VideoNote"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         length: Optional[int] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -2092,7 +2107,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
-            duration (:obj:`int`, optional): Duration of sent video in seconds.
+            duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent video
+                in seconds.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             length (:obj:`int`, optional): Video width and height, i.e. diameter of the video
                 message.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -2188,7 +2207,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: Union[int, str],
         animation: Union[FileInput, "Animation"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
         caption: Optional[str] = None,
@@ -2240,7 +2259,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            duration (:obj:`int`, optional): Duration of sent animation in seconds.
+            duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent
+                animation in seconds.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
@@ -2359,7 +2382,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: Union[int, str],
         voice: Union[FileInput, "Voice"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -2420,7 +2443,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
-            duration (:obj:`int`, optional): Duration of the voice message in seconds.
+            duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the voice
+                message in seconds.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -2692,7 +2719,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         longitude: Optional[float] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -2725,13 +2752,18 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             horizontal_accuracy (:obj:`int`, optional): The radius of uncertainty for the location,
                 measured in meters;
                 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
-            live_period (:obj:`int`, optional): Period in seconds for which the location will be
+            live_period (:obj:`int` | :class:`datetime.timedelta`, optional): Period in seconds for
+                which the location will be
                 updated, should be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD` and
                 :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`, or
                 :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
                 locations that can be edited indefinitely.
-            heading (:obj:`int`, optional): For live locations, a direction in which the user is
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
+            heading (:obj:`int` | :class:`datetime.timedelta, optional): For live locations, a
+                direction in which the user is
                 moving, in degrees. Must be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_HEADING` and
                 :tg-const:`telegram.constants.LocationLimit.MAX_HEADING` if specified.
@@ -2848,7 +2880,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         business_connection_id: Optional[str] = None,
         *,
         location: Optional[Location] = None,
@@ -2888,7 +2920,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 if specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
-            live_period (:obj:`int`, optional): New period in seconds during which the location
+            live_period (:obj:`int` | :class:`datetime.timedelta`, optional): New period in seconds
+                during which the location
                 can be updated, starting from the message send date. If
                 :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` is specified,
                 then the location can be updated forever. Otherwise, the new value must not exceed
@@ -2897,6 +2930,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 remains unchanged
 
                 .. versionadded:: 21.2.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
                 .. versionadded:: 21.4
@@ -3552,7 +3588,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        cache_time: Optional[int] = None,
+        cache_time: Optional[TimePeriod] = None,
         is_personal: Optional[bool] = None,
         next_offset: Optional[str] = None,
         button: Optional[InlineQueryResultsButton] = None,
@@ -3588,8 +3624,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 a callable that accepts the current page index starting from 0. It must return
                 either a list of :class:`telegram.InlineQueryResult` instances or :obj:`None` if
                 there are no more results.
-            cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
+            cache_time (:obj:`int` | :class:`datetime.timedelta`, optional): The maximum amount of
+                time in seconds that the
                 result of the inline query may be cached on the server. Defaults to ``300``.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on
                 the server side only for the user that sent the query. By default,
                 results may be returned to any user who sends the same query.
@@ -4005,7 +4045,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         text: Optional[str] = None,
         show_alert: Optional[bool] = None,
         url: Optional[str] = None,
-        cache_time: Optional[int] = None,
+        cache_time: Optional[TimePeriod] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4036,8 +4076,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 opens your game - note that this will only work if the query comes from a callback
                 game button. Otherwise, you may use links like t.me/your_bot?start=XXXX that open
                 your bot with a parameter.
-            cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
+            cache_time (:obj:`int` | :class:`datetime.timedelta`, optional): The maximum amount of
+                time in seconds that the
                 result of the callback query may be cached client-side. Defaults to 0.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -7190,7 +7234,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reply_markup: Optional[ReplyMarkup] = None,
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        open_period: Optional[int] = None,
+        open_period: Optional[TimePeriod] = None,
         close_date: Optional[Union[int, dtm.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -7253,10 +7297,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
-            open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
+            open_period (:obj:`int` | :class:`datetime.timedelta`, optional): Amount of time in
+                seconds the poll will be active
                 after creation, :tg-const:`telegram.Poll.MIN_OPEN_PERIOD`-
                 :tg-const:`telegram.Poll.MAX_OPEN_PERIOD`. Can't be used together with
                 :paramref:`close_date`.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
                 timestamp) when the poll will be automatically closed. Must be at least
                 :tg-const:`telegram.Poll.MIN_OPEN_PERIOD` and no more than
@@ -8157,7 +8205,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
         is_flexible: Optional[bool] = None,
-        subscription_period: Optional[Union[int, dtm.timedelta]] = None,
+        subscription_period: Optional[TimePeriod] = None,
         business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -8278,11 +8326,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_flexible": is_flexible,
             "send_phone_number_to_provider": send_phone_number_to_provider,
             "send_email_to_provider": send_email_to_provider,
-            "subscription_period": (
-                subscription_period.total_seconds()
-                if isinstance(subscription_period, dtm.timedelta)
-                else subscription_period
-            ),
+            "subscription_period": subscription_period,
             "business_connection_id": business_connection_id,
         }
 
@@ -9573,7 +9617,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def create_chat_subscription_invite_link(
         self,
         chat_id: Union[str, int],
-        subscription_period: int,
+        subscription_period: TimePeriod,
         subscription_price: int,
         name: Optional[str] = None,
         *,
@@ -9594,9 +9638,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            subscription_period (:obj:`int`): The number of seconds the subscription will be
+            subscription_period (:obj:`int` | :class:`datetime.timedelta`): The number of seconds
+                the subscription will be
                 active for before the next payment. Currently, it must always be
                 :tg-const:`telegram.constants.ChatSubscriptionLimit.SUBSCRIPTION_PERIOD` (30 days).
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             subscription_price (:obj:`int`): The number of Telegram Stars a user must pay initially
                 and after each subsequent subscription period to be a member of the chat;
                 :tg-const:`telegram.constants.ChatSubscriptionLimit.MIN_PRICE`-

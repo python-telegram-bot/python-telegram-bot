@@ -23,6 +23,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+import datetime as dtm
 from collections.abc import Collection
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Literal, Optional, TypeVar, Union
@@ -91,3 +92,5 @@ SocketOpt = Union[
     tuple[int, int, Union[bytes, bytearray]],
     tuple[int, int, None, int],
 ]
+
+TimePeriod = Union[int, dtm.timedelta]
