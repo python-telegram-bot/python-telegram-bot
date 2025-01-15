@@ -127,12 +127,12 @@ class TestInvoiceWithoutRequest(InvoiceTestBase):
     async def test_send_all_args_create_invoice_link(
         self, offline_bot, monkeypatch, subscription_period
     ):
-        async def make_assertion(*args, **_):
-            kwargs = args[1]
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            kwargs = request_data.parameters
             sp = kwargs.pop("subscription_period") == 42
             return all(kwargs[i] == i for i in kwargs) and sp
 
-        monkeypatch.setattr(offline_bot, "_post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.create_invoice_link(
             title="title",
             description="description",
