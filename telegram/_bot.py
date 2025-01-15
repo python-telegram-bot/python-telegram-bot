@@ -1930,7 +1930,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
-            duration (:obj:`int` | class:`datetime.timedelate`, optional): Duration of sent video
+            duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent video
                 in seconds.
 
                 .. versionchanged:: NEXT.VERSION
@@ -2762,8 +2762,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
                 .. versionchanged:: NEXT.VERSION
                     |time-period-input|
-            heading (:obj:`int` | :class:`datetime.timedelta, optional): For live locations, a
-                direction in which the user is
+            heading (:obj:`int`, optional): For live locations, a direction in which the user is
                 moving, in degrees. Must be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_HEADING` and
                 :tg-const:`telegram.constants.LocationLimit.MAX_HEADING` if specified.
