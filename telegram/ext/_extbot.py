@@ -93,7 +93,14 @@ from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
-from telegram._utils.types import CorrectOptionID, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import (
+    CorrectOptionID,
+    FileInput,
+    JSONDict,
+    ODVInput,
+    ReplyMarkup,
+    TimePeriod,
+)
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._utils.types import RLARGS
 from telegram.request import BaseRequest
@@ -926,7 +933,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         text: Optional[str] = None,
         show_alert: Optional[bool] = None,
         url: Optional[str] = None,
-        cache_time: Optional[int] = None,
+        cache_time: Optional[TimePeriod] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -954,7 +961,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        cache_time: Optional[int] = None,
+        cache_time: Optional[TimePeriod] = None,
         is_personal: Optional[bool] = None,
         next_offset: Optional[str] = None,
         button: Optional[InlineQueryResultsButton] = None,
@@ -1204,7 +1211,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
         is_flexible: Optional[bool] = None,
-        subscription_period: Optional[Union[int, dtm.timedelta]] = None,
+        subscription_period: Optional[TimePeriod] = None,
         business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1589,7 +1596,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         business_connection_id: Optional[str] = None,
         *,
         location: Optional[Location] = None,
@@ -2424,7 +2431,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         animation: Union[FileInput, "Animation"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
         caption: Optional[str] = None,
@@ -2486,7 +2493,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         audio: Union[FileInput, "Audio"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         performer: Optional[str] = None,
         title: Optional[str] = None,
         caption: Optional[str] = None,
@@ -2841,7 +2848,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         longitude: Optional[float] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -3054,7 +3061,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_markup: Optional[ReplyMarkup] = None,
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        open_period: Optional[int] = None,
+        open_period: Optional[TimePeriod] = None,
         close_date: Optional[Union[int, dtm.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -3214,7 +3221,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         video: Union[FileInput, "Video"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -3278,7 +3285,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         video_note: Union[FileInput, "VideoNote"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         length: Optional[int] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -3328,7 +3335,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         voice: Union[FileInput, "Voice"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -4393,7 +4400,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def create_chat_subscription_invite_link(
         self,
         chat_id: Union[str, int],
-        subscription_period: int,
+        subscription_period: TimePeriod,
         subscription_price: int,
         name: Optional[str] = None,
         *,
