@@ -719,11 +719,14 @@ class TestBotWithoutRequest:
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     @pytest.mark.parametrize("button_type", ["start", "web_app"])
-    async def test_answer_inline_query(self, monkeypatch, offline_bot, raw_bot, button_type):
+    @pytest.mark.parametrize("cache_time", [74, dtm.timedelta(seconds=74)])
+    async def test_answer_inline_query(
+        self, monkeypatch, offline_bot, raw_bot, button_type, cache_time
+    ):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             expected = {
-                "cache_time": 300,
+                "cache_time": 74,
                 "results": [
                     {
                         "title": "first",
@@ -803,7 +806,7 @@ class TestBotWithoutRequest:
             assert await bot_type.answer_inline_query(
                 1234,
                 results=results,
-                cache_time=300,
+                cache_time=cache_time,
                 is_personal=True,
                 next_offset="42",
                 button=button,
@@ -1259,21 +1262,22 @@ class TestBotWithoutRequest:
         assert await offline_bot.set_chat_administrator_custom_title(2, 32, "custom_title")
 
     # TODO: Needs improvement. Need an incoming callbackquery to test
-    async def test_answer_callback_query(self, monkeypatch, offline_bot):
+    @pytest.mark.parametrize("cache_time", [74, dtm.timedelta(seconds=74)])
+    async def test_answer_callback_query(self, monkeypatch, offline_bot, cache_time):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters == {
                 "callback_query_id": 23,
                 "show_alert": True,
                 "url": "no_url",
-                "cache_time": 1,
+                "cache_time": 74,
                 "text": "answer",
             }
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
         assert await offline_bot.answer_callback_query(
-            23, text="answer", show_alert=True, url="no_url", cache_time=1
+            23, text="answer", show_alert=True, url="no_url", cache_time=cache_time
         )
 
     @pytest.mark.parametrize("drop_pending_updates", [True, False])
@@ -2715,7 +2719,9 @@ class TestBotWithRequest:
         assert quiz_task.done()
 
     @pytest.mark.parametrize(
-        ("open_period", "close_date"), [(5, None), (None, True)], ids=["open_period", "close_date"]
+        ("open_period", "close_date"),
+        [(5, None), (dtm.timedelta(seconds=5), None), (None, True)],
+        ids=["open_period", "open_period-dtm", "close_date"],
     )
     async def test_send_open_period(self, bot, super_group_id, open_period, close_date):
         question = "Is this a test?"
@@ -4417,13 +4423,14 @@ class TestBotWithRequest:
         assert isinstance(transactions, StarTransactions)
         assert len(transactions.transactions) == 0
 
+    @pytest.mark.parametrize("subscription_period", [2592000, dtm.timedelta(days=30)])
     async def test_create_edit_chat_subscription_link(
-        self, bot, subscription_channel_id, channel_id
+        self, bot, subscription_channel_id, channel_id, subscription_period
     ):
         sub_link = await bot.create_chat_subscription_invite_link(
             subscription_channel_id,
             name="sub_name",
-            subscription_period=2592000,
+            subscription_period=subscription_period,
             subscription_price=13,
         )
         assert sub_link.name == "sub_name"

@@ -101,6 +101,19 @@ class TestRequestParameterWithoutRequest:
         assert request_parameter.value == expected_value
         assert request_parameter.input_files is None
 
+    @pytest.mark.parametrize(
+        ("value", "expected_type", "expected_value"),
+        [
+            (dtm.timedelta(seconds=1), int, 1),
+            (dtm.timedelta(milliseconds=1), float, 0.001),
+        ],
+    )
+    def test_from_input_timedelta(self, value, expected_type, expected_value):
+        request_parameter = RequestParameter.from_input("key", value)
+        assert request_parameter.value == expected_value
+        assert request_parameter.input_files is None
+        assert isinstance(request_parameter.value, expected_type)
+
     def test_from_input_inputfile(self):
         inputfile_1 = InputFile("data1", filename="inputfile_1", attach=True)
         inputfile_2 = InputFile("data2", filename="inputfile_2")
