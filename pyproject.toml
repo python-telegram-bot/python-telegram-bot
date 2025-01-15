@@ -98,7 +98,7 @@ webhooks = [
 # HATCH
 [tool.hatch.version]
 # dynamically evaluates the `__version__` variable in that file
-source = "code"
+source = "file"
 path = "telegram/_version.py"
 search-paths = ["telegram"]
 
