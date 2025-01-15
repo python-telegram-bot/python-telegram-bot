@@ -83,6 +83,7 @@ class TestRequestParameterWithoutRequest:
             (ChatType.PRIVATE, "private"),
             (MessageEntity("type", 1, 1), {"type": "type", "offset": 1, "length": 1}),
             (dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5), 1573431976),
+            (dtm.timedelta(days=42), 42 * 24 * 60 * 60),
             (
                 [
                     True,
