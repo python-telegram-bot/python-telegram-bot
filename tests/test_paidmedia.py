@@ -37,102 +37,13 @@ from telegram.constants import PaidMediaType
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(
-    scope="module",
-    params=[
-        PaidMedia.PREVIEW,
-        PaidMedia.PHOTO,
-        PaidMedia.VIDEO,
-    ],
-)
-def pm_scope_type(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=[
-        PaidMediaPreview,
-        PaidMediaPhoto,
-        PaidMediaVideo,
-    ],
-    ids=[
-        PaidMedia.PREVIEW,
-        PaidMedia.PHOTO,
-        PaidMedia.VIDEO,
-    ],
-)
-def pm_scope_class(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=[
-        (
-            PaidMediaPreview,
-            PaidMedia.PREVIEW,
-        ),
-        (
-            PaidMediaPhoto,
-            PaidMedia.PHOTO,
-        ),
-        (
-            PaidMediaVideo,
-            PaidMedia.VIDEO,
-        ),
-    ],
-    ids=[
-        PaidMedia.PREVIEW,
-        PaidMedia.PHOTO,
-        PaidMedia.VIDEO,
-    ],
-)
-def pm_scope_class_and_type(request):
-    return request.param
-
-
-@pytest.fixture(scope="module")
-def paid_media(pm_scope_class_and_type):
-    # We use de_json here so that we don't have to worry about which class gets which arguments
-    return pm_scope_class_and_type[0].de_json(
-        {
-            "type": pm_scope_class_and_type[1],
-            "width": PaidMediaTestBase.width,
-            "height": PaidMediaTestBase.height,
-            "duration": PaidMediaTestBase.duration,
-            "video": PaidMediaTestBase.video.to_dict(),
-            "photo": [p.to_dict() for p in PaidMediaTestBase.photo],
-        },
-        bot=None,
-    )
-
-
-def paid_media_video():
-    return PaidMediaVideo(video=PaidMediaTestBase.video)
-
-
-def paid_media_photo():
-    return PaidMediaPhoto(photo=PaidMediaTestBase.photo)
-
-
-@pytest.fixture(scope="module")
-def paid_media_info():
-    return PaidMediaInfo(
-        star_count=PaidMediaInfoTestBase.star_count,
-        paid_media=[paid_media_video(), paid_media_photo()],
-    )
-
-
-@pytest.fixture(scope="module")
-def paid_media_purchased():
-    return PaidMediaPurchased(
-        from_user=PaidMediaPurchasedTestBase.from_user,
-        paid_media_payload=PaidMediaPurchasedTestBase.paid_media_payload,
-    )
+@pytest.fixture
+def paid_media():
+    return PaidMedia(type=PaidMediaType.PHOTO)
 
 
 class PaidMediaTestBase:
+    type = PaidMediaType.PHOTO
     width = 640
     height = 480
     duration = 60
@@ -160,97 +71,49 @@ class TestPaidMediaWithoutRequest(PaidMediaTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, pm_scope_class_and_type):
-        cls = pm_scope_class_and_type[0]
-        type_ = pm_scope_class_and_type[1]
-
-        json_dict = {
-            "type": type_,
-            "width": self.width,
-            "height": self.height,
-            "duration": self.duration,
-            "video": self.video.to_dict(),
-            "photo": [p.to_dict() for p in self.photo],
-        }
-        pm = PaidMedia.de_json(json_dict, offline_bot)
-        assert set(pm.api_kwargs.keys()) == {
-            "width",
-            "height",
-            "duration",
-            "video",
-            "photo",
-        } - set(cls.__slots__)
-
-        assert isinstance(pm, PaidMedia)
-        assert type(pm) is cls
-        assert pm.type == type_
-        if "width" in cls.__slots__:
-            assert pm.width == self.width
-            assert pm.height == self.height
-            assert pm.duration == self.duration
-        if "video" in cls.__slots__:
-            assert pm.video == self.video
-        if "photo" in cls.__slots__:
-            assert pm.photo == self.photo
-
-    def test_de_json_invalid_type(self, offline_bot):
-        json_dict = {
-            "type": "invalid",
-            "width": self.width,
-            "height": self.height,
-            "duration": self.duration,
-            "video": self.video.to_dict(),
-            "photo": [p.to_dict() for p in self.photo],
-        }
-        pm = PaidMedia.de_json(json_dict, offline_bot)
-        assert pm.api_kwargs == {
-            "width": self.width,
-            "height": self.height,
-            "duration": self.duration,
-            "video": self.video.to_dict(),
-            "photo": [p.to_dict() for p in self.photo],
-        }
-
-        assert type(pm) is PaidMedia
-        assert pm.type == "invalid"
-
-    def test_de_json_subclass(self, pm_scope_class, offline_bot):
-        """This makes sure that e.g. PaidMediaPreivew(data) never returns a
-        TransactionPartnerPhoto instance."""
-        json_dict = {
-            "type": "invalid",
-            "width": self.width,
-            "height": self.height,
-            "duration": self.duration,
-            "video": self.video.to_dict(),
-            "photo": [p.to_dict() for p in self.photo],
-        }
-        assert type(pm_scope_class.de_json(json_dict, offline_bot)) is pm_scope_class
-
-    def test_to_dict(self, paid_media):
-        pm_dict = paid_media.to_dict()
-
-        assert isinstance(pm_dict, dict)
-        assert pm_dict["type"] == paid_media.type
-        if hasattr(paid_media_info, "width"):
-            assert pm_dict["width"] == paid_media.width
-            assert pm_dict["height"] == paid_media.height
-            assert pm_dict["duration"] == paid_media.duration
-        if hasattr(paid_media_info, "video"):
-            assert pm_dict["video"] == paid_media.video.to_dict()
-        if hasattr(paid_media_info, "photo"):
-            assert pm_dict["photo"] == [p.to_dict() for p in paid_media.photo]
-
-    def test_type_enum_conversion(self):
-        assert type(PaidMedia("video").type) is PaidMediaType
+    def test_type_enum_conversion(self, paid_media):
+        assert type(PaidMedia("photo").type) is PaidMediaType
         assert PaidMedia("unknown").type == "unknown"
 
-    def test_equality(self, paid_media, offline_bot):
-        a = PaidMedia("base_type")
-        b = PaidMedia("base_type")
-        c = paid_media
-        d = deepcopy(paid_media)
-        e = Dice(4, "emoji")
+    def test_de_json(self, offline_bot):
+        data = {"type": "unknown"}
+        paid_media = PaidMedia.de_json(data, offline_bot)
+        assert paid_media.api_kwargs == {}
+        assert paid_media.type == "unknown"
+
+    @pytest.mark.parametrize(
+        ("pm_type", "subclass"),
+        [
+            ("photo", PaidMediaPhoto),
+            ("video", PaidMediaVideo),
+            ("preview", PaidMediaPreview),
+        ],
+    )
+    def test_de_json_subclass(self, offline_bot, pm_type, subclass):
+        json_dict = {
+            "type": pm_type,
+            "video": self.video.to_dict(),
+            "photo": [p.to_dict() for p in self.photo],
+            "width": self.width,
+            "height": self.height,
+            "duration": self.duration,
+        }
+        pm = PaidMedia.de_json(json_dict, offline_bot)
+
+        assert type(pm) is subclass
+        assert set(pm.api_kwargs.keys()) == set(json_dict.keys()) - set(subclass.__slots__) - {
+            "type"
+        }
+        assert pm.type == pm_type
+
+    def test_to_dict(self, paid_media):
+        assert paid_media.to_dict() == {"type": paid_media.type}
+
+    def test_equality(self, paid_media):
+        a = paid_media
+        b = PaidMedia(self.type)
+        c = PaidMedia("unknown")
+        d = Dice(5, "test")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -261,35 +124,216 @@ class TestPaidMediaWithoutRequest(PaidMediaTestBase):
         assert a != d
         assert hash(a) != hash(d)
 
-        assert a != e
-        assert hash(a) != hash(e)
 
-        assert c == d
-        assert hash(c) == hash(d)
+@pytest.fixture
+def paid_media_photo():
+    return PaidMediaPhoto(
+        photo=TestPaidMediaPhotoWithoutRequest.photo,
+    )
 
-        assert c != e
-        assert hash(c) != hash(e)
 
-        if hasattr(c, "video"):
-            json_dict = c.to_dict()
-            json_dict["video"] = Video("different", "d2", 1, 1, 1).to_dict()
-            f = c.__class__.de_json(json_dict, offline_bot)
+class TestPaidMediaPhotoWithoutRequest(PaidMediaTestBase):
+    type = PaidMediaType.PHOTO
 
-            assert c != f
-            assert hash(c) != hash(f)
+    def test_slot_behaviour(self, paid_media_photo):
+        inst = paid_media_photo
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-        if hasattr(c, "photo"):
-            json_dict = c.to_dict()
-            json_dict["photo"] = [PhotoSize("different", "d2", 1, 1, 1).to_dict()]
-            f = c.__class__.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "photo": [p.to_dict() for p in self.photo],
+        }
+        pmp = PaidMediaPhoto.de_json(json_dict, offline_bot)
+        assert pmp.photo == tuple(self.photo)
+        assert pmp.api_kwargs == {}
 
-            assert c != f
-            assert hash(c) != hash(f)
+    def test_to_dict(self, paid_media_photo):
+        assert paid_media_photo.to_dict() == {
+            "type": paid_media_photo.type,
+            "photo": [p.to_dict() for p in self.photo],
+        }
+
+    def test_equality(self, paid_media_photo):
+        a = paid_media_photo
+        b = PaidMediaPhoto(deepcopy(self.photo))
+        c = PaidMediaPhoto([PhotoSize("file_id", 640, 480, "file_unique_id")])
+        d = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def paid_media_video():
+    return PaidMediaVideo(
+        video=TestPaidMediaVideoWithoutRequest.video,
+    )
+
+
+class TestPaidMediaVideoWithoutRequest(PaidMediaTestBase):
+    type = PaidMediaType.VIDEO
+
+    def test_slot_behaviour(self, paid_media_video):
+        inst = paid_media_video
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "video": self.video.to_dict(),
+        }
+        pmv = PaidMediaVideo.de_json(json_dict, offline_bot)
+        assert pmv.video == self.video
+        assert pmv.api_kwargs == {}
+
+    def test_to_dict(self, paid_media_video):
+        assert paid_media_video.to_dict() == {
+            "type": self.type,
+            "video": paid_media_video.video.to_dict(),
+        }
+
+    def test_equality(self, paid_media_video):
+        a = paid_media_video
+        b = PaidMediaVideo(
+            video=deepcopy(self.video),
+        )
+        c = PaidMediaVideo(
+            video=Video("test", "test_unique", 640, 480, 60),
+        )
+        d = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def paid_media_preview():
+    return PaidMediaPreview(
+        width=TestPaidMediaPreviewWithoutRequest.width,
+        height=TestPaidMediaPreviewWithoutRequest.height,
+        duration=TestPaidMediaPreviewWithoutRequest.duration,
+    )
+
+
+class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase):
+    type = PaidMediaType.PREVIEW
+
+    def test_slot_behaviour(self, paid_media_preview):
+        inst = paid_media_preview
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "width": self.width,
+            "height": self.height,
+            "duration": self.duration,
+        }
+        pmp = PaidMediaPreview.de_json(json_dict, offline_bot)
+        assert pmp.width == self.width
+        assert pmp.height == self.height
+        assert pmp.duration == self.duration
+        assert pmp.api_kwargs == {}
+
+    def test_to_dict(self, paid_media_preview):
+        assert paid_media_preview.to_dict() == {
+            "type": paid_media_preview.type,
+            "width": self.width,
+            "height": self.height,
+            "duration": self.duration,
+        }
+
+    def test_equality(self, paid_media_preview):
+        a = paid_media_preview
+        b = PaidMediaPreview(
+            width=self.width,
+            height=self.height,
+            duration=self.duration,
+        )
+        c = PaidMediaPreview(
+            width=100,
+            height=100,
+            duration=100,
+        )
+        d = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+# ===========================================================================================
+# ===========================================================================================
+# ===========================================================================================
+# ===========================================================================================
+# ===========================================================================================
+# ===========================================================================================
+# ===========================================================================================
+# ===========================================================================================
+# ===========================================================================================
+# ===========================================================================================
+
+
+@pytest.fixture(scope="module")
+def paid_media_info():
+    return PaidMediaInfo(
+        star_count=PaidMediaInfoTestBase.star_count,
+        paid_media=PaidMediaInfoTestBase.paid_media,
+    )
+
+
+@pytest.fixture(scope="module")
+def paid_media_purchased():
+    return PaidMediaPurchased(
+        from_user=PaidMediaPurchasedTestBase.from_user,
+        paid_media_payload=PaidMediaPurchasedTestBase.paid_media_payload,
+    )
 
 
 class PaidMediaInfoTestBase:
     star_count = 200
-    paid_media = [paid_media_video(), paid_media_photo()]
+    paid_media = [
+        PaidMediaVideo(
+            video=Video(
+                file_id="video_file_id",
+                width=640,
+                height=480,
+                file_unique_id="file_unique_id",
+                duration=60,
+            )
+        ),
+        PaidMediaPhoto(
+            photo=[
+                PhotoSize(
+                    file_id="photo_file_id",
+                    width=640,
+                    height=480,
+                    file_unique_id="file_unique_id",
+                )
+            ]
+        ),
+    ]
 
 
 class TestPaidMediaInfoWithoutRequest(PaidMediaInfoTestBase):
@@ -315,13 +359,9 @@ class TestPaidMediaInfoWithoutRequest(PaidMediaInfoTestBase):
         }
 
     def test_equality(self):
-        pmi1 = PaidMediaInfo(
-            star_count=self.star_count, paid_media=[paid_media_video(), paid_media_photo()]
-        )
-        pmi2 = PaidMediaInfo(
-            star_count=self.star_count, paid_media=[paid_media_video(), paid_media_photo()]
-        )
-        pmi3 = PaidMediaInfo(star_count=100, paid_media=[paid_media_photo()])
+        pmi1 = PaidMediaInfo(star_count=self.star_count, paid_media=self.paid_media)
+        pmi2 = PaidMediaInfo(star_count=self.star_count, paid_media=self.paid_media)
+        pmi3 = PaidMediaInfo(star_count=100, paid_media=[self.paid_media[0]])
 
         assert pmi1 == pmi2
         assert hash(pmi1) == hash(pmi2)
