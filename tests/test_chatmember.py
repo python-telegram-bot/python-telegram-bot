@@ -590,11 +590,13 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             "can_send_voice_notes": self.can_send_voice_notes,
             "is_member": self.is_member,
             "until_date": to_timestamp(self.until_date),
+            # legacy argument
+            "can_send_media_messages": False,
         }
         chat_member = ChatMemberRestricted.de_json(data, offline_bot)
 
         assert type(chat_member) is ChatMemberRestricted
-        assert chat_member.api_kwargs == {}
+        assert chat_member.api_kwargs == {"can_send_media_messages": False}
 
         assert chat_member.user == self.user
         assert chat_member.can_add_web_page_previews == self.can_add_web_page_previews
