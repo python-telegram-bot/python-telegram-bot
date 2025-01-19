@@ -24,18 +24,24 @@ from telegram import (
     ChatBoost,
     ChatBoostAdded,
     ChatBoostRemoved,
+    ChatBoostSource,
+    ChatBoostSourceGiftCode,
+    ChatBoostSourceGiveaway,
     ChatBoostSourcePremium,
     ChatBoostUpdated,
+    Dice,
     User,
     UserChatBoosts,
 )
 from telegram._utils.datetime import UTC, to_timestamp
+from telegram.constants import ChatBoostSources
 from telegram.request import RequestData
 from tests.auxil.dummy_objects import get_dummy_object_json_dict
 from tests.auxil.slots import mro_slots
 
 
 class ChatBoostDefaults:
+    source = ChatBoostSource.PREMIUM
     chat_id = 1
     boost_id = "2"
     giveaway_message_id = 3
@@ -51,6 +57,213 @@ class ChatBoostDefaults:
         expiration_date=date,
         source=default_source,
     )
+
+
+@pytest.fixture(scope="module")
+def chat_boost_source():
+    return ChatBoostSource(
+        source=ChatBoostDefaults.source,
+    )
+
+
+class TestChatBoostSourceWithoutRequest(ChatBoostDefaults):
+    def test_slot_behaviour(self, chat_boost_source):
+        inst = chat_boost_source
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_type_enum_conversion(self, chat_boost_source):
+        assert type(ChatBoostSource("premium").source) is ChatBoostSources
+        assert ChatBoostSource("unknown").source == "unknown"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "source": "unknown",
+        }
+        cbs = ChatBoostSource.de_json(json_dict, offline_bot)
+
+        assert cbs.api_kwargs == {}
+        assert cbs.source == "unknown"
+
+    @pytest.mark.parametrize(
+        ("cb_source", "subclass"),
+        [
+            ("premium", ChatBoostSourcePremium),
+            ("gift_code", ChatBoostSourceGiftCode),
+            ("giveaway", ChatBoostSourceGiveaway),
+        ],
+    )
+    def test_de_json_subclass(self, offline_bot, cb_source, subclass):
+        json_dict = {
+            "source": cb_source,
+            "user": ChatBoostDefaults.user.to_dict(),
+            "giveaway_message_id": ChatBoostDefaults.giveaway_message_id,
+        }
+        cbs = ChatBoostSource.de_json(json_dict, offline_bot)
+
+        assert type(cbs) is subclass
+        assert set(cbs.api_kwargs.keys()) == set(json_dict.keys()) - set(subclass.__slots__) - {
+            "source"
+        }
+        assert cbs.source == cb_source
+
+    def test_to_dict(self, chat_boost_source):
+        chat_boost_source_dict = chat_boost_source.to_dict()
+
+        assert isinstance(chat_boost_source_dict, dict)
+        assert chat_boost_source_dict["source"] == chat_boost_source.source
+
+    def test_equality(self, chat_boost_source):
+        a = chat_boost_source
+        b = ChatBoostSource(source=ChatBoostDefaults.source)
+        c = ChatBoostSource(source="unknown")
+        d = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture(scope="module")
+def chat_boost_source_premium():
+    return ChatBoostSourcePremium(
+        user=TestChatBoostSourcePremiumWithoutRequest.user,
+    )
+
+
+class TestChatBoostSourcePremiumWithoutRequest(ChatBoostDefaults):
+    source = ChatBoostSources.PREMIUM
+
+    def test_slot_behaviour(self, chat_boost_source_premium):
+        inst = chat_boost_source_premium
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "user": self.user.to_dict(),
+        }
+        cbsp = ChatBoostSourcePremium.de_json(json_dict, offline_bot)
+
+        assert cbsp.api_kwargs == {}
+        assert cbsp.user == self.user
+
+    def test_to_dict(self, chat_boost_source_premium):
+        chat_boost_source_premium_dict = chat_boost_source_premium.to_dict()
+
+        assert isinstance(chat_boost_source_premium_dict, dict)
+        assert chat_boost_source_premium_dict["source"] == self.source
+        assert chat_boost_source_premium_dict["user"] == self.user.to_dict()
+
+    def test_equality(self, chat_boost_source_premium):
+        a = chat_boost_source_premium
+        b = ChatBoostSourcePremium(user=self.user)
+        c = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+
+@pytest.fixture(scope="module")
+def chat_boost_source_gift_code():
+    return ChatBoostSourceGiftCode(
+        user=TestChatBoostSourceGiftCodeWithoutRequest.user,
+    )
+
+
+class TestChatBoostSourceGiftCodeWithoutRequest(ChatBoostDefaults):
+    source = ChatBoostSources.GIFT_CODE
+
+    def test_slot_behaviour(self, chat_boost_source_gift_code):
+        inst = chat_boost_source_gift_code
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "user": self.user.to_dict(),
+        }
+        cbsgc = ChatBoostSourceGiftCode.de_json(json_dict, offline_bot)
+
+        assert cbsgc.api_kwargs == {}
+        assert cbsgc.user == self.user
+
+    def test_to_dict(self, chat_boost_source_gift_code):
+        chat_boost_source_gift_code_dict = chat_boost_source_gift_code.to_dict()
+
+        assert isinstance(chat_boost_source_gift_code_dict, dict)
+        assert chat_boost_source_gift_code_dict["source"] == self.source
+        assert chat_boost_source_gift_code_dict["user"] == self.user.to_dict()
+
+    def test_equality(self, chat_boost_source_gift_code):
+        a = chat_boost_source_gift_code
+        b = ChatBoostSourceGiftCode(user=self.user)
+        c = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+
+@pytest.fixture(scope="module")
+def chat_boost_source_giveaway():
+    return ChatBoostSourceGiveaway(
+        user=TestChatBoostSourceGiveawayWithoutRequest.user,
+        giveaway_message_id=TestChatBoostSourceGiveawayWithoutRequest.giveaway_message_id,
+    )
+
+
+class TestChatBoostSourceGiveawayWithoutRequest(ChatBoostDefaults):
+    source = ChatBoostSources.GIVEAWAY
+
+    def test_slot_behaviour(self, chat_boost_source_giveaway):
+        inst = chat_boost_source_giveaway
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "user": self.user.to_dict(),
+            "giveaway_message_id": self.giveaway_message_id,
+        }
+        cbsg = ChatBoostSourceGiveaway.de_json(json_dict, offline_bot)
+
+        assert cbsg.api_kwargs == {}
+        assert cbsg.user == self.user
+        assert cbsg.giveaway_message_id == self.giveaway_message_id
+
+    def test_to_dict(self, chat_boost_source_giveaway):
+        chat_boost_source_giveaway_dict = chat_boost_source_giveaway.to_dict()
+
+        assert isinstance(chat_boost_source_giveaway_dict, dict)
+        assert chat_boost_source_giveaway_dict["source"] == self.source
+        assert chat_boost_source_giveaway_dict["user"] == self.user.to_dict()
+        assert chat_boost_source_giveaway_dict["giveaway_message_id"] == self.giveaway_message_id
+
+    def test_equality(self, chat_boost_source_giveaway):
+        a = chat_boost_source_giveaway
+        b = ChatBoostSourceGiveaway(user=self.user, giveaway_message_id=self.giveaway_message_id)
+        c = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
 
 
 @pytest.fixture(scope="module")
