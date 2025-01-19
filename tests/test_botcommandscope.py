@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from copy import deepcopy
 
 import pytest
 
@@ -35,147 +34,232 @@ from telegram.constants import BotCommandScopeType
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="module", params=["str", "int"])
-def chat_id(request):
-    if request.param == "str":
-        return "@supergroupusername"
-    return 43
+@pytest.fixture
+def bot_command_scope():
+    return BotCommandScope(BotCommandScopeTestBase.type)
 
 
-@pytest.fixture(
-    scope="class",
-    params=[
-        BotCommandScope.DEFAULT,
-        BotCommandScope.ALL_PRIVATE_CHATS,
-        BotCommandScope.ALL_GROUP_CHATS,
-        BotCommandScope.ALL_CHAT_ADMINISTRATORS,
-        BotCommandScope.CHAT,
-        BotCommandScope.CHAT_ADMINISTRATORS,
-        BotCommandScope.CHAT_MEMBER,
-    ],
-)
-def scope_type(request):
-    return request.param
+class BotCommandScopeTestBase:
+    type = BotCommandScopeType.DEFAULT
+    chat_id = 123456789
+    user_id = 987654321
 
 
-@pytest.fixture(
-    scope="module",
-    params=[
-        BotCommandScopeDefault,
-        BotCommandScopeAllPrivateChats,
-        BotCommandScopeAllGroupChats,
-        BotCommandScopeAllChatAdministrators,
-        BotCommandScopeChat,
-        BotCommandScopeChatAdministrators,
-        BotCommandScopeChatMember,
-    ],
-    ids=[
-        BotCommandScope.DEFAULT,
-        BotCommandScope.ALL_PRIVATE_CHATS,
-        BotCommandScope.ALL_GROUP_CHATS,
-        BotCommandScope.ALL_CHAT_ADMINISTRATORS,
-        BotCommandScope.CHAT,
-        BotCommandScope.CHAT_ADMINISTRATORS,
-        BotCommandScope.CHAT_MEMBER,
-    ],
-)
-def scope_class(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=[
-        (BotCommandScopeDefault, BotCommandScope.DEFAULT),
-        (BotCommandScopeAllPrivateChats, BotCommandScope.ALL_PRIVATE_CHATS),
-        (BotCommandScopeAllGroupChats, BotCommandScope.ALL_GROUP_CHATS),
-        (BotCommandScopeAllChatAdministrators, BotCommandScope.ALL_CHAT_ADMINISTRATORS),
-        (BotCommandScopeChat, BotCommandScope.CHAT),
-        (BotCommandScopeChatAdministrators, BotCommandScope.CHAT_ADMINISTRATORS),
-        (BotCommandScopeChatMember, BotCommandScope.CHAT_MEMBER),
-    ],
-    ids=[
-        BotCommandScope.DEFAULT,
-        BotCommandScope.ALL_PRIVATE_CHATS,
-        BotCommandScope.ALL_GROUP_CHATS,
-        BotCommandScope.ALL_CHAT_ADMINISTRATORS,
-        BotCommandScope.CHAT,
-        BotCommandScope.CHAT_ADMINISTRATORS,
-        BotCommandScope.CHAT_MEMBER,
-    ],
-)
-def scope_class_and_type(request):
-    return request.param
-
-
-@pytest.fixture(scope="module")
-def bot_command_scope(scope_class_and_type, chat_id):
-    # we use de_json here so that we don't have to worry about which class needs which arguments
-    return scope_class_and_type[0].de_json(
-        {"type": scope_class_and_type[1], "chat_id": chat_id, "user_id": 42}, bot=None
-    )
-
-
-# All the scope types are very similar, so we test everything via parametrization
-class TestBotCommandScopeWithoutRequest:
+class TestBotCommandScopeWithoutRequest(BotCommandScopeTestBase):
     def test_slot_behaviour(self, bot_command_scope):
-        for attr in bot_command_scope.__slots__:
-            assert getattr(bot_command_scope, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(bot_command_scope)) == len(
-            set(mro_slots(bot_command_scope))
-        ), "duplicate slot"
+        inst = bot_command_scope
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, scope_class_and_type, chat_id):
-        cls = scope_class_and_type[0]
-        type_ = scope_class_and_type[1]
-
-        json_dict = {"type": type_, "chat_id": chat_id, "user_id": 42}
-        bot_command_scope = BotCommandScope.de_json(json_dict, offline_bot)
-        assert set(bot_command_scope.api_kwargs.keys()) == {"chat_id", "user_id"} - set(
-            cls.__slots__
-        )
-
-        assert isinstance(bot_command_scope, BotCommandScope)
-        assert isinstance(bot_command_scope, cls)
-        assert bot_command_scope.type == type_
-        if "chat_id" in cls.__slots__:
-            assert bot_command_scope.chat_id == chat_id
-        if "user_id" in cls.__slots__:
-            assert bot_command_scope.user_id == 42
-
-    def test_de_json_invalid_type(self, offline_bot):
-        json_dict = {"type": "invalid", "chat_id": chat_id, "user_id": 42}
-        bot_command_scope = BotCommandScope.de_json(json_dict, offline_bot)
-
-        assert type(bot_command_scope) is BotCommandScope
-        assert bot_command_scope.type == "invalid"
-
-    def test_de_json_subclass(self, scope_class, offline_bot, chat_id):
-        """This makes sure that e.g. BotCommandScopeDefault(data) never returns a
-        BotCommandScopeChat instance."""
-        json_dict = {"type": "invalid", "chat_id": chat_id, "user_id": 42}
-        assert type(scope_class.de_json(json_dict, offline_bot)) is scope_class
-
-    def test_to_dict(self, bot_command_scope):
-        bot_command_scope_dict = bot_command_scope.to_dict()
-
-        assert isinstance(bot_command_scope_dict, dict)
-        assert bot_command_scope["type"] == bot_command_scope.type
-        if hasattr(bot_command_scope, "chat_id"):
-            assert bot_command_scope["chat_id"] == bot_command_scope.chat_id
-        if hasattr(bot_command_scope, "user_id"):
-            assert bot_command_scope["user_id"] == bot_command_scope.user_id
-
-    def test_type_enum_conversion(self):
+    def test_type_enum_conversion(self, bot_command_scope):
         assert type(BotCommandScope("default").type) is BotCommandScopeType
         assert BotCommandScope("unknown").type == "unknown"
 
-    def test_equality(self, bot_command_scope, offline_bot):
-        a = BotCommandScope("base_type")
-        b = BotCommandScope("base_type")
-        c = bot_command_scope
-        d = deepcopy(bot_command_scope)
-        e = Dice(4, "emoji")
+    def test_de_json(self, offline_bot):
+        data = {"type": "unknown"}
+        transaction_partner = BotCommandScope.de_json(data, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "unknown"
+
+    @pytest.mark.parametrize(
+        ("bcs_type", "subclass"),
+        [
+            ("all_private_chats", BotCommandScopeAllPrivateChats),
+            ("all_chat_administrators", BotCommandScopeAllChatAdministrators),
+            ("all_group_chats", BotCommandScopeAllGroupChats),
+            ("chat", BotCommandScopeChat),
+            ("chat_administrators", BotCommandScopeChatAdministrators),
+            ("chat_member", BotCommandScopeChatMember),
+            ("default", BotCommandScopeDefault),
+        ],
+    )
+    def test_de_json_subclass(self, offline_bot, bcs_type, subclass):
+        json_dict = {
+            "type": bcs_type,
+            "chat_id": self.chat_id,
+            "user_id": self.user_id,
+        }
+        bcs = BotCommandScope.de_json(json_dict, offline_bot)
+
+        assert type(bcs) is subclass
+        assert set(bcs.api_kwargs.keys()) == set(json_dict.keys()) - set(subclass.__slots__) - {
+            "type"
+        }
+        assert bcs.type == bcs_type
+
+    def test_to_dict(self, bot_command_scope):
+        data = bot_command_scope.to_dict()
+        assert data == {"type": "default"}
+
+    def test_equality(self, bot_command_scope):
+        a = bot_command_scope
+        b = BotCommandScope(self.type)
+        c = BotCommandScope("unknown")
+        d = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def bot_command_scope_all_private_chats():
+    return BotCommandScopeAllPrivateChats()
+
+
+class TestBotCommandScopeAllPrivateChatsWithoutRequest(BotCommandScopeTestBase):
+    type = BotCommandScopeType.ALL_PRIVATE_CHATS
+
+    def test_slot_behaviour(self, bot_command_scope_all_private_chats):
+        inst = bot_command_scope_all_private_chats
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        transaction_partner = BotCommandScopeAllPrivateChats.de_json({}, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "all_private_chats"
+
+    def test_to_dict(self, bot_command_scope_all_private_chats):
+        assert bot_command_scope_all_private_chats.to_dict() == {
+            "type": bot_command_scope_all_private_chats.type
+        }
+
+    def test_equality(self, bot_command_scope_all_private_chats):
+        a = bot_command_scope_all_private_chats
+        b = BotCommandScopeAllPrivateChats()
+        c = Dice(5, "test")
+        d = BotCommandScopeDefault()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def bot_command_scope_all_chat_administrators():
+    return BotCommandScopeAllChatAdministrators()
+
+
+class TestBotCommandScopeAllChatAdministratorsWithoutRequest(BotCommandScopeTestBase):
+    type = BotCommandScopeType.ALL_CHAT_ADMINISTRATORS
+
+    def test_slot_behaviour(self, bot_command_scope_all_chat_administrators):
+        inst = bot_command_scope_all_chat_administrators
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        transaction_partner = BotCommandScopeAllChatAdministrators.de_json({}, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "all_chat_administrators"
+
+    def test_to_dict(self, bot_command_scope_all_chat_administrators):
+        assert bot_command_scope_all_chat_administrators.to_dict() == {
+            "type": bot_command_scope_all_chat_administrators.type
+        }
+
+    def test_equality(self, bot_command_scope_all_chat_administrators):
+        a = bot_command_scope_all_chat_administrators
+        b = BotCommandScopeAllChatAdministrators()
+        c = Dice(5, "test")
+        d = BotCommandScopeDefault()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def bot_command_scope_all_group_chats():
+    return BotCommandScopeAllGroupChats()
+
+
+class TestBotCommandScopeAllGroupChatsWithoutRequest(BotCommandScopeTestBase):
+    type = BotCommandScopeType.ALL_GROUP_CHATS
+
+    def test_slot_behaviour(self, bot_command_scope_all_group_chats):
+        inst = bot_command_scope_all_group_chats
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        transaction_partner = BotCommandScopeAllGroupChats.de_json({}, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "all_group_chats"
+
+    def test_to_dict(self, bot_command_scope_all_group_chats):
+        assert bot_command_scope_all_group_chats.to_dict() == {
+            "type": bot_command_scope_all_group_chats.type
+        }
+
+    def test_equality(self, bot_command_scope_all_group_chats):
+        a = bot_command_scope_all_group_chats
+        b = BotCommandScopeAllGroupChats()
+        c = Dice(5, "test")
+        d = BotCommandScopeDefault()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def bot_command_scope_chat():
+    return BotCommandScopeChat(TestBotCommandScopeChatWithoutRequest.chat_id)
+
+
+class TestBotCommandScopeChatWithoutRequest(BotCommandScopeTestBase):
+    type = BotCommandScopeType.CHAT
+
+    def test_slot_behaviour(self, bot_command_scope_chat):
+        inst = bot_command_scope_chat
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        transaction_partner = BotCommandScopeChat.de_json({"chat_id": self.chat_id}, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "chat"
+        assert transaction_partner.chat_id == self.chat_id
+
+    def test_to_dict(self, bot_command_scope_chat):
+        assert bot_command_scope_chat.to_dict() == {
+            "type": bot_command_scope_chat.type,
+            "chat_id": self.chat_id,
+        }
+
+    def test_equality(self, bot_command_scope_chat):
+        a = bot_command_scope_chat
+        b = BotCommandScopeChat(self.chat_id)
+        c = BotCommandScopeChat(self.chat_id + 1)
+        d = Dice(5, "test")
+        e = BotCommandScopeDefault()
 
         assert a == b
         assert hash(a) == hash(b)
@@ -189,24 +273,147 @@ class TestBotCommandScopeWithoutRequest:
         assert a != e
         assert hash(a) != hash(e)
 
-        assert c == d
-        assert hash(c) == hash(d)
 
-        assert c != e
-        assert hash(c) != hash(e)
+@pytest.fixture
+def bot_command_scope_chat_administrators():
+    return BotCommandScopeChatAdministrators(
+        TestBotCommandScopeChatAdministratorsWithoutRequest.chat_id
+    )
 
-        if hasattr(c, "chat_id"):
-            json_dict = c.to_dict()
-            json_dict["chat_id"] = 0
-            f = c.__class__.de_json(json_dict, offline_bot)
 
-            assert c != f
-            assert hash(c) != hash(f)
+class TestBotCommandScopeChatAdministratorsWithoutRequest(BotCommandScopeTestBase):
+    type = BotCommandScopeType.CHAT_ADMINISTRATORS
 
-        if hasattr(c, "user_id"):
-            json_dict = c.to_dict()
-            json_dict["user_id"] = 0
-            g = c.__class__.de_json(json_dict, offline_bot)
+    def test_slot_behaviour(self, bot_command_scope_chat_administrators):
+        inst = bot_command_scope_chat_administrators
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-            assert c != g
-            assert hash(c) != hash(g)
+    def test_de_json(self, offline_bot):
+        transaction_partner = BotCommandScopeChatAdministrators.de_json(
+            {"chat_id": self.chat_id}, offline_bot
+        )
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "chat_administrators"
+        assert transaction_partner.chat_id == self.chat_id
+
+    def test_to_dict(self, bot_command_scope_chat_administrators):
+        assert bot_command_scope_chat_administrators.to_dict() == {
+            "type": bot_command_scope_chat_administrators.type,
+            "chat_id": self.chat_id,
+        }
+
+    def test_equality(self, bot_command_scope_chat_administrators):
+        a = bot_command_scope_chat_administrators
+        b = BotCommandScopeChatAdministrators(self.chat_id)
+        c = BotCommandScopeChatAdministrators(self.chat_id + 1)
+        d = Dice(5, "test")
+        e = BotCommandScopeDefault()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+@pytest.fixture
+def bot_command_scope_chat_member():
+    return BotCommandScopeChatMember(
+        TestBotCommandScopeChatMemberWithoutRequest.chat_id,
+        TestBotCommandScopeChatMemberWithoutRequest.user_id,
+    )
+
+
+class TestBotCommandScopeChatMemberWithoutRequest(BotCommandScopeTestBase):
+    type = BotCommandScopeType.CHAT_MEMBER
+
+    def test_slot_behaviour(self, bot_command_scope_chat_member):
+        inst = bot_command_scope_chat_member
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        transaction_partner = BotCommandScopeChatMember.de_json(
+            {"chat_id": self.chat_id, "user_id": self.user_id}, offline_bot
+        )
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "chat_member"
+        assert transaction_partner.chat_id == self.chat_id
+        assert transaction_partner.user_id == self.user_id
+
+    def test_to_dict(self, bot_command_scope_chat_member):
+        assert bot_command_scope_chat_member.to_dict() == {
+            "type": bot_command_scope_chat_member.type,
+            "chat_id": self.chat_id,
+            "user_id": self.user_id,
+        }
+
+    def test_equality(self, bot_command_scope_chat_member):
+        a = bot_command_scope_chat_member
+        b = BotCommandScopeChatMember(self.chat_id, self.user_id)
+        c = BotCommandScopeChatMember(self.chat_id + 1, self.user_id)
+        d = BotCommandScopeChatMember(self.chat_id, self.user_id + 1)
+        e = Dice(5, "test")
+        f = BotCommandScopeDefault()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)
+
+
+@pytest.fixture
+def bot_command_scope_default():
+    return BotCommandScopeDefault()
+
+
+class TestBotCommandScopeDefaultWithoutRequest(BotCommandScopeTestBase):
+    type = BotCommandScopeType.DEFAULT
+
+    def test_slot_behaviour(self, bot_command_scope_default):
+        inst = bot_command_scope_default
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        transaction_partner = BotCommandScopeDefault.de_json({}, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "default"
+
+    def test_to_dict(self, bot_command_scope_default):
+        assert bot_command_scope_default.to_dict() == {"type": bot_command_scope_default.type}
+
+    def test_equality(self, bot_command_scope_default):
+        a = bot_command_scope_default
+        b = BotCommandScopeDefault()
+        c = Dice(5, "test")
+        d = BotCommandScopeChatMember(123, 456)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
