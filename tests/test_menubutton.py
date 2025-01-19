@@ -66,7 +66,7 @@ class TestMenuButtonWithoutRequest(MenuButtonTestBase):
             ("default", MenuButtonDefault),
         ],
     )
-    def test_subclass(self, offline_bot, mb_type, subclass):
+    def test_de_json_subclass(self, offline_bot, mb_type, subclass):
         json_dict = {
             "type": mb_type,
             "web_app": self.web_app.to_dict(),
