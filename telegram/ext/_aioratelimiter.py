@@ -88,7 +88,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
           :attr:`~telegram.error.RetryAfter.retry_after` + 0.1 seconds. This may be stricter than
           necessary in some cases, e.g. the bot may hit a rate limit in one group but might still
           be allowed to send messages in another group or with
-          :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` set to ``True``.
+          :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` set to :obj:`True`.
 
     Tip:
         With `Bot API 7.1 <https://core.telegram.org/bots/api-changelog#october-31-2024>`_

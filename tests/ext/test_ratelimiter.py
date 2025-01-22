@@ -26,7 +26,7 @@ import datetime as dtm
 import json
 import platform
 import time
-from collections import defaultdict
+from collections import Counter
 from http import HTTPStatus
 
 import pytest
@@ -395,30 +395,24 @@ class TestAIORateLimiter:
                         rl_bot.send_message(chat_id=-1, text="test", allow_paid_broadcast=False)
                     )
 
-                await asyncio.sleep(0.85)
+                await asyncio.sleep(0.1)
                 # We expect 5 non-apb requests:
                 # 1: `get_me` from `async with rl_bot`
-                # 2: `send_message` at time 0.00
-                # 3: `send_message` at time 0.25
-                # 4: `send_message` at time 0.50
-                # 5: `send_message` at time 0.75
-                # We expect
+                # 2-5: `send_message`
                 assert TestAIORateLimiter.count == 5
                 assert sum(1 for task in non_apb_tasks.values() if task.done()) == 4
 
                 # ~2 second after start
                 # We do the checks once all apb_tasks are done as apparently getting the timings
                 # right to check after 1 second is hard
-                await asyncio.sleep(2.1 - 0.85)
+                await asyncio.sleep(2.1 - 0.1)
                 assert all(task.done() for task in apb_tasks.values())
 
                 apb_call_times = [
                     ct - TestAIORateLimiter.apb_call_times[0]
                     for ct in TestAIORateLimiter.apb_call_times
                 ]
-                apb_call_times_dict = defaultdict(int)
-                for ct in apb_call_times:
-                    apb_call_times_dict[int(ct)] += 1
+                apb_call_times_dict = Counter(map(int, apb_call_times))
 
                 # We expect ~2000 apb requests after the first second
                 # 2000 (>>1000), since we have a floating window logic such that an initial
