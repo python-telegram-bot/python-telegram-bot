@@ -241,6 +241,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 `test environment \
                 <https://core.telegram.org/bots/features#dedicated-test-environment>`_.
 
+                Example:
+                    ``"https://api.telegram.org/bot{token}/test"``
+
             .. versionchanged:: NEXT.VERSION
                Supports callable input and string formatting.
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
@@ -254,6 +257,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 :wiki:`Local Bot API Server <Local-Bot-API-Server>` or using Telegrams
                 `test environment \
                 <https://core.telegram.org/bots/features#dedicated-test-environment>`_.
+
+                Example:
+                    ``"https://api.telegram.org/file/bot{token}/test"``
 
             .. versionchanged:: NEXT.VERSION
                Supports callable input and string formatting.

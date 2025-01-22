@@ -246,7 +246,7 @@ class TestBotWithoutRequest:
         with pytest.raises(InvalidToken, match="You must pass the token"):
             Bot("")
 
-    def test_base_url_parsing_basic(self, offline_bot, caplog):
+    def test_base_url_parsing_basic(self, caplog):
         with caplog.at_level(logging.DEBUG):
             bot = Bot(
                 token="!!Test String!!",
@@ -267,7 +267,7 @@ class TestBotWithoutRequest:
     @pytest.mark.parametrize(
         "insert_key", ["token", "TOKEN", "bot_token", "BOT_TOKEN", "bot-token", "BOT-TOKEN"]
     )
-    def test_base_url_parsing_string_format(self, offline_bot, insert_key, caplog):
+    def test_base_url_parsing_string_format(self, insert_key, caplog):
         string = f"{{{insert_key}}}"
 
         with caplog.at_level(logging.DEBUG):
@@ -290,7 +290,7 @@ class TestBotWithoutRequest:
         with pytest.raises(KeyError, match="unsupported insertion: unknown"):
             Bot("token", base_url="{unknown}{token}")
 
-    def test_base_url_parsing_callable(self, offline_bot, caplog):
+    def test_base_url_parsing_callable(self, caplog):
         def build_url(_: str) -> str:
             return "!!Test String!!"
 
