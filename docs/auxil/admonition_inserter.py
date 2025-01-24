@@ -21,23 +21,24 @@ import inspect
 import re
 import typing
 from collections import defaultdict
+from collections.abc import Iterator
+from socket import socket
 from types import FunctionType
-from typing import Any, Iterator, Literal, Union, Generator
-from tests.auxil.slots import mro_slots
+from typing import Union
+
+from apscheduler.job import Job as APSJob
 
 import telegram
-import telegram.ext
-
-# Some external & internal imports are necessary to make the symbols available during type resolution.
-import telegram.ext._utils.types
-import telegram._utils.types
 import telegram._utils.defaultvalue
-from socket import socket
-from apscheduler.job import Job as APSJob
+import telegram._utils.types
+import telegram.ext
+import telegram.ext._utils.types
+from tests.auxil.slots import mro_slots
 
 # Define the namespace for type resolution. This helps dealing with the internal imports that
 # we do in many places
-TG_NAMESPACE = vars(telegram)
+# The .copy() is important to avoid modifying the original namespace
+TG_NAMESPACE = vars(telegram).copy()
 TG_NAMESPACE.update(vars(telegram._utils.types))
 TG_NAMESPACE.update(vars(telegram._utils.defaultvalue))
 TG_NAMESPACE.update(vars(telegram.ext))
@@ -51,6 +52,17 @@ class PublicMethod(typing.NamedTuple):
     method: FunctionType
 
 
+def _is_inherited_method(cls: type, method_name: str) -> bool:
+    """Checks if a method is inherited from a parent class.
+    Inheritance is not considered if the parent class is private.
+    Recurses through all direcot or indirect parent classes.
+    """
+    # The [1:] slice is used to exclude the class itself from the MRO.
+    for base in cls.__mro__[1:]:
+        if method_name in base.__dict__ and not base.__name__.startswith("_"):
+            return True
+    return False
+
 
 def _iter_own_public_methods(cls: type) -> Iterator[PublicMethod]:
     """Iterates over methods of a class that are not protected/private,
@@ -60,12 +72,13 @@ def _iter_own_public_methods(cls: type) -> Iterator[PublicMethod]:
 
     This function is defined outside the class because it is used to create class constants.
     """
+
     # Use .isfunction() instead of .ismethod() because we want to include static methods.
     for m in inspect.getmembers(cls, predicate=inspect.isfunction):
         if (
             not m[0].startswith("_")
             and m[0].islower()  # to avoid camelCase methods
-            and m[0] in cls.__dict__  # method is not inherited from parent class
+            and not _is_inherited_method(cls, m[0])
         ):
             yield PublicMethod(m[0], m[1])
 
@@ -76,7 +89,6 @@ class AdmonitionInserter:
     CLASS_ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
     METHOD_ADMONITION_TYPES = ("shortcuts",)
     ALL_ADMONITION_TYPES = CLASS_ADMONITION_TYPES + METHOD_ADMONITION_TYPES
-    # ALL_ADMONITION_TYPES = ("use_in",)
 
     FORWARD_REF_PATTERN = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
     """ A pattern to find a class name in a ForwardRef typing annotation.
@@ -107,15 +119,11 @@ class AdmonitionInserter:
             # dynamically determine which method to use to create a sub-dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
             for admonition_type in self.ALL_ADMONITION_TYPES
-            # "use_in": self._create_use_in(),
-            # "shortcuts": self._create_shortcuts(),
-            # "available_in": self._create_available_in(),
         }
-        # print(self.admonitions["use_in"])
         """Dictionary with admonitions. Contains sub-dictionaries, one per admonition type.
         Each sub-dictionary matches bot methods (for "Shortcuts") or telegram classes (for other
         admonition types) to texts of admonitions, e.g.:
-        
+
         ```
         {
             "use_in": {
@@ -189,7 +197,6 @@ class AdmonitionInserter:
             class_attrs = [slot for slot in mro_slots(inspected_class) if not slot.startswith("_")]
             for target_attr in class_attrs:
                 try:
-                    print(f"{inspected_class=},")
                     self._resolve_arg_and_add_link(
                         dict_of_methods_for_class=attrs_for_class,
                         link=f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`",
@@ -213,7 +220,9 @@ class AdmonitionInserter:
                     continue
 
                 # fget is used to access the actual function under the property wrapper
-                type_hints = typing.get_type_hints(getattr(inspected_class, prop_name).fget, localns=TG_NAMESPACE)
+                type_hints = typing.get_type_hints(
+                    getattr(inspected_class, prop_name).fget, localns=TG_NAMESPACE
+                )
 
                 # Writing to dictionary: matching the class found in the docstring and its
                 # subclasses to the property of the class being inspected.
@@ -239,7 +248,6 @@ class AdmonitionInserter:
         """Creates a dictionary with 'Returned in' admonitions for classes that are returned
         in Bot's and ApplicationBuilder's methods.
         """
-
         # Generate a mapping of classes to ReST links to Bot methods which return it,
         # i.e. {<class 'telegram._message.Message'>: {:meth:`telegram.Bot.send_message`, ...}}
         methods_for_class = defaultdict(set)
@@ -248,7 +256,6 @@ class AdmonitionInserter:
             for method_name in method_names:
                 method_link = self._generate_link_to_method(method_name, cls)
                 arg = getattr(cls, method_name)
-                print(arg, method_name)
                 ret_type_hint = typing.get_type_hints(arg, localns=TG_NAMESPACE)
 
                 try:
@@ -256,6 +263,7 @@ class AdmonitionInserter:
                         dict_of_methods_for_class=methods_for_class,
                         link=method_link,
                         type_hints={"return": ret_type_hint.get("return")},
+                        resolve_nested_type_vars=False,
                     )
                 except NotImplementedError as e:
                     raise NotImplementedError(
@@ -288,21 +296,23 @@ class AdmonitionInserter:
         # inspect methods of all telegram classes for return statements that indicate
         # that this given method is a shortcut for a Bot method
         for _class_name, cls in inspect.getmembers(telegram, predicate=inspect.isclass):
-            # no need to inspect Bot's own methods, as Bot can't have shortcuts in Bot
+            if not cls.__module__.startswith("telegram"):
+                # For some reason inspect.getmembers() also yields some classes that are
+                # imported in the namespace but not part of the telegram module.
+                continue
+
             if cls is telegram.Bot:
+                # no need to inspect Bot's own methods, as Bot can't have shortcuts in Bot
                 continue
 
             for method_name, method in _iter_own_public_methods(cls):
-                print(f"{cls=}, {cls.__module__=}")
                 # .getsourcelines() returns a tuple. Item [1] is an int
                 for line in inspect.getsourcelines(method)[0]:
                     if not (bot_method_match := bot_method_pattern.search(line)):
                         continue
 
                     bot_method = getattr(telegram.Bot, bot_method_match.group())
-
                     link_to_shortcut_method = self._generate_link_to_method(method_name, cls)
-
                     shortcuts_for_bot_method[bot_method].add(link_to_shortcut_method)
 
         return self._generate_admonitions(shortcuts_for_bot_method, admonition_type="shortcuts")
@@ -451,6 +461,7 @@ class AdmonitionInserter:
         dict_of_methods_for_class: defaultdict,
         link: str,
         type_hints: dict[str, type],
+        resolve_nested_type_vars: bool = True,
     ) -> None:
         """A helper method. Tries to resolve the arg into a valid class. In case of success,
         adds the link (to a method, attribute, or property) for that class' and its subclasses'
@@ -460,7 +471,7 @@ class AdmonitionInserter:
         """
         type_hints.pop("self", None)
 
-        for cls in self._resolve_arg(type_hints):
+        for cls in self._resolve_arg(type_hints, resolve_nested_type_vars):
             # When trying to resolve an argument from args or return annotation,
             # the method _resolve_arg returns None if nothing could be resolved.
             # Also, if class was resolved correctly, "telegram" will definitely be in its str().
@@ -472,48 +483,56 @@ class AdmonitionInserter:
             for subclass in self._iter_subclasses(cls):
                 dict_of_methods_for_class[subclass].add(link)
 
-    def _resolve_arg(self, type_hints: dict[str, type]) -> list[type]:
+    def _resolve_arg(
+        self, type_hints: dict[str, type], resolve_nested_type_vars: bool
+    ) -> list[type]:
         """Analyzes an argument of a method and recursively yields classes that the argument
         or its sub-arguments (in cases like Union[...]) belong to, if they can be resolved to
         telegram or telegram.ext classes.
 
+        Args:
+            type_hints: A dictionary of argument names and their types.
+            resolve_nested_type_vars: If True, nested type variables (like Application[BT, …])
+                will be resolved to their actual classes. If False, only the outermost type
+                variable will be resolved. *Only* affects ptb classes, not built-in types.
+                Useful for checking the return type of methods, where nested type variables
+                are not really useful.
+
         Raises `NotImplementedError`.
         """
+
+        def _is_ptb_class(cls: type) -> bool:
+            if not hasattr(cls, "__module__"):
+                return False
+            return cls.__module__.startswith("telegram")
+
+        # will be edited in place
         telegram_classes = set()
 
-        def recurse_type(typ):
-            if hasattr(typ, '__origin__'):  # For generic types like Union, List, etc.
+        def recurse_type(type_, is_recursed_from_ptb_class: bool):
+            next_is_recursed_from_ptb_class = is_recursed_from_ptb_class or _is_ptb_class(type_)
+
+            if hasattr(type_, "__origin__"):  # For generic types like Union, List, etc.
                 # Make sure it's not a telegram.ext generic type (e.g. ContextTypes[...])
-                org = typing.get_origin(typ)
+                org = typing.get_origin(type_)
                 if "telegram.ext" in str(org):
                     telegram_classes.add(org)
 
-                args = typing.get_args(typ)
-                # print(f"In recurse_type, found __origin__ {typ=}, {args=}")
-                for ar in args:
-                    recurse_type(ar)
-            elif isinstance(typ, typing.TypeVar):
+                args = typing.get_args(type_)
+                for arg in args:
+                    recurse_type(arg, next_is_recursed_from_ptb_class)
+            elif isinstance(type_, typing.TypeVar) and (
+                resolve_nested_type_vars or not is_recursed_from_ptb_class
+            ):
                 # gets access to the "bound=..." parameter
-                recurse_type(typ.__bound__)
-            elif inspect.isclass(typ) and "telegram" in inspect.getmodule(typ).__name__:
-                # print(f"typ is a class and inherits from TelegramObject: {typ=}")
-                telegram_classes.add(typ)
-            else:
-                pass
-                # print(f"typ is not a class or doesn't inherit from TelegramObject: {typ=}. The "
-                #       f"type is: {type(typ)=}")
-                # print(f"{inspect.isclass(typ)=}")
-                # if inspect.isclass(typ):
-                #     print(f"{inspect.getmodule(typ).__name__=}")
+                recurse_type(type_.__bound__, next_is_recursed_from_ptb_class)
+            elif inspect.isclass(type_) and "telegram" in inspect.getmodule(type_).__name__:
+                telegram_classes.add(type_)
 
-        print()
-        print(f"in _resolve_arg {type_hints=}")
-        for param_name, type_hint in type_hints.items():
-            print(f"{param_name=}", f"{type_hint=}")
-            if type_hint is None:
-                continue
-            recurse_type(type_hint)
-        print(f"{telegram_classes=}")
+        for type_hint in type_hints.values():
+            if type_hint is not None:
+                recurse_type(type_hint, False)
+
         return list(telegram_classes)
 
     @staticmethod

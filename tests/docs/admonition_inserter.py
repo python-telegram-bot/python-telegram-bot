@@ -143,6 +143,18 @@ class TestAdmonitionInserter:
                 ":meth:`telegram.CallbackQuery.edit_message_caption`",
             ),
             (
+                "shortcuts",
+                telegram.Bot.ban_chat_member,
+                # ban_member is defined on the private parent class _ChatBase
+                ":meth:`telegram.Chat.ban_member`",
+            ),
+            (
+                "shortcuts",
+                telegram.Bot.ban_chat_member,
+                # ban_member is defined on the private parent class _ChatBase
+                ":meth:`telegram.ChatFullInfo.ban_member`",
+            ),
+            (
                 "use_in",
                 telegram.InlineQueryResult,
                 ":meth:`telegram.Bot.answer_web_app_query`",  # ForwardRef
@@ -212,8 +224,15 @@ class TestAdmonitionInserter:
                 "returned_in",
                 telegram.ext.CallbackContext,
                 # -> Application[BT, CCT, UD, CD, BD, JQ].
-                # In this case classes inside square brackets must not be parsed
+                # The type vars are not really part of the return value, so we don't expect them
                 ":meth:`telegram.ext.ApplicationBuilder.build`",
+            ),
+            (
+                "returned_in",
+                telegram.Bot,
+                # -> Application[BT, CCT, UD, CD, BD, JQ].
+                # The type vars are not really part of the return value, so we don't expect them
+                ":meth:`telegram.ext.ApplicationBuilder.bot`",
             ),
         ],
     )
