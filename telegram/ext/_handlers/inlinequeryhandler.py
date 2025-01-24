@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the InlineQueryHandler class."""
 import re
-from typing import TYPE_CHECKING, Any, List, Match, Optional, Pattern, TypeVar, Union, cast
+from re import Match, Pattern
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class InlineQueryHandler(BaseHandler[Update, CCT]):
+class InlineQueryHandler(BaseHandler[Update, CCT, RT]):
     """
     BaseHandler class to handle Telegram updates that contain a
     :attr:`telegram.Update.inline_query`.
@@ -67,7 +68,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
-        chat_types (List[:obj:`str`], optional): List of allowed chat types. If passed, will only
+        chat_types (list[:obj:`str`], optional): List of allowed chat types. If passed, will only
             handle inline queries with the appropriate :attr:`telegram.InlineQuery.chat_type`.
 
             .. versionadded:: 13.5
@@ -75,7 +76,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
         callback (:term:`coroutine function`): The callback function for this handler.
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): Optional. Regex pattern to test
             :attr:`telegram.InlineQuery.query` against.
-        chat_types (List[:obj:`str`]): Optional. List of allowed chat types.
+        chat_types (list[:obj:`str`]): Optional. List of allowed chat types.
 
             .. versionadded:: 13.5
         block (:obj:`bool`): Determines whether the return value of the callback should be
@@ -87,11 +88,11 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
     __slots__ = ("chat_types", "pattern")
 
     def __init__(
-        self,
+        self: "InlineQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         pattern: Optional[Union[str, Pattern[str]]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
-        chat_types: Optional[List[str]] = None,
+        chat_types: Optional[list[str]] = None,
     ):
         super().__init__(callback, block=block)
 
@@ -99,7 +100,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
             pattern = re.compile(pattern)
 
         self.pattern: Optional[Union[str, Pattern[str]]] = pattern
-        self.chat_types: Optional[List[str]] = chat_types
+        self.chat_types: Optional[list[str]] = chat_types
 
     def check_update(self, update: object) -> Optional[Union[bool, Match[str]]]:
         """

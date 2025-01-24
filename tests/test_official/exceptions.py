@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
 
-
-from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
+from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -36,15 +35,25 @@ GLOBALLY_IGNORED_PARAMETERS = {
 
 class ParamTypeCheckingExceptions:
     # Types for certain parameters accepted by PTB but not in the official API
+    # structure: method/class_name/regex: {param_name/regex: type}
     ADDITIONAL_TYPES = {
-        "photo": PhotoSize,
-        "video": Video,
-        "video_note": VideoNote,
-        "audio": Audio,
-        "document": Document,
-        "animation": Animation,
-        "voice": Voice,
-        "sticker": Sticker,
+        r"send_\w*": {
+            "photo$": PhotoSize,
+            "video$": Video,
+            "video_note": VideoNote,
+            "audio": Audio,
+            "document": Document,
+            "animation": Animation,
+            "voice": Voice,
+            "sticker": Sticker,
+            "gift_id": Gift,
+        },
+        "(delete|set)_sticker.*": {
+            "sticker$": Sticker,
+        },
+        "replace_sticker_in_set": {
+            "old_sticker$": Sticker,
+        },
     }
 
     # TODO: Look into merging this with COMPLEX_TYPES
@@ -57,23 +66,33 @@ class ParamTypeCheckingExceptions:
         ("reaction", False): "ReactionType",  # + str
         ("options", False): "InputPollOption",  # + str
         # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
-        ("file_hashes", True): "List[str]",
+        ("file_hashes", True): "list[str]",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
-    # too complex to compare/predict with official API:
+    # too complex to compare/predict with official API
+    # structure: class/method_name: {param_name: reduced form of annotation}
     COMPLEX_TYPES = (
         {  # (param_name, is_class (i.e appears in a class?)): reduced form of annotation
-            ("correct_option_id", False): int,  # actual: Literal
-            ("file_id", False): str,  # actual: Union[str, objs_with_file_id_attr]
-            ("invite_link", False): str,  # actual: Union[str, ChatInviteLink]
-            ("provider_data", False): str,  # actual: Union[str, obj]
-            ("callback_data", True): str,  # actual: Union[str, obj]
-            ("media", True): str,  # actual: Union[str, InputMedia*, FileInput]
-            (
-                "data",
-                True,
-            ): str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
+            "send_poll": {"correct_option_id": int},  # actual: Literal
+            "get_file": {
+                "file_id": str,  # actual: Union[str, objs_with_file_id_attr]
+            },
+            r"\w+invite_link": {
+                "invite_link": str,  # actual: Union[str, ChatInviteLink]
+            },
+            "send_invoice|create_invoice_link": {
+                "provider_data": str,  # actual: Union[str, obj]
+            },
+            "InlineKeyboardButton": {
+                "callback_data": str,  # actual: Union[str, obj]
+            },
+            "Input(Paid)?Media.*": {
+                "media": str,  # actual: Union[str, InputMedia*, FileInput]
+            },
+            "EncryptedPassportElement": {
+                "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
+            },
         }
     )
 
@@ -181,7 +200,8 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 # Arguments that are optional arguments for now for backwards compatibility
 BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
-    "send_invoice|create_invoice_link|InputInvoiceMessageContent": {"provider_token"}
+    "send_invoice|create_invoice_link|InputInvoiceMessageContent": {"provider_token"},
+    "InlineQueryResultArticle": {"hide_url"},
 }
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,8 @@
 """This module contains the StringRegexHandler class."""
 
 import re
-from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union
+from re import Match, Pattern
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class StringRegexHandler(BaseHandler[str, CCT]):
+class StringRegexHandler(BaseHandler[str, CCT, RT]):
     """Handler class to handle string updates based on a regex which checks the update content.
 
     Read the documentation of the :mod:`re` module for more information. The :func:`re.match`
@@ -74,7 +75,7 @@ class StringRegexHandler(BaseHandler[str, CCT]):
     __slots__ = ("pattern",)
 
     def __init__(
-        self,
+        self: "StringRegexHandler[CCT, RT]",
         pattern: Union[str, Pattern[str]],
         callback: HandlerCallback[str, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
-from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+
+import datetime as dtm
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -59,7 +61,7 @@ class WebhookInfo(TelegramObject):
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
             connections to the webhook for update delivery.
-        allowed_updates (Sequence[:obj:`str`], optional): A list of update types the bot is
+        allowed_updates (Sequence[:obj:`str`], optional): A sequence of update types the bot is
             subscribed to. Defaults to all update types, except
             :attr:`telegram.Update.chat_member`.
 
@@ -89,7 +91,7 @@ class WebhookInfo(TelegramObject):
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
             connections to the webhook for update delivery.
-        allowed_updates (Tuple[:obj:`str`]): Optional. A list of update types the bot is
+        allowed_updates (tuple[:obj:`str`]): Optional. A tuple of update types the bot is
             subscribed to. Defaults to all update types, except
             :attr:`telegram.Update.chat_member`.
 
@@ -124,12 +126,12 @@ class WebhookInfo(TelegramObject):
         url: str,
         has_custom_certificate: bool,
         pending_update_count: int,
-        last_error_date: Optional[datetime] = None,
+        last_error_date: Optional[dtm.datetime] = None,
         last_error_message: Optional[str] = None,
         max_connections: Optional[int] = None,
         allowed_updates: Optional[Sequence[str]] = None,
         ip_address: Optional[str] = None,
-        last_synchronization_error_date: Optional[datetime] = None,
+        last_synchronization_error_date: Optional[dtm.datetime] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -141,11 +143,13 @@ class WebhookInfo(TelegramObject):
 
         # Optional
         self.ip_address: Optional[str] = ip_address
-        self.last_error_date: Optional[datetime] = last_error_date
+        self.last_error_date: Optional[dtm.datetime] = last_error_date
         self.last_error_message: Optional[str] = last_error_message
         self.max_connections: Optional[int] = max_connections
-        self.allowed_updates: Tuple[str, ...] = parse_sequence_arg(allowed_updates)
-        self.last_synchronization_error_date: Optional[datetime] = last_synchronization_error_date
+        self.allowed_updates: tuple[str, ...] = parse_sequence_arg(allowed_updates)
+        self.last_synchronization_error_date: Optional[dtm.datetime] = (
+            last_synchronization_error_date
+        )
 
         self._id_attrs = (
             self.url,
@@ -162,14 +166,9 @@ class WebhookInfo(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["WebhookInfo"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "WebhookInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)

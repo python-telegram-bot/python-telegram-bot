@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This modules contains objects that represents Telegram Replies"""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -42,7 +43,7 @@ from telegram._payment.invoice import Invoice
 from telegram._poll import Poll
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -124,7 +125,7 @@ class ExternalReplyInfo(TelegramObject):
             file.
         document (:class:`telegram.Document`): Optional. Message is a general file, information
             about the file.
-        photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available sizes
+        photo (tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available sizes
             of the photo.
         sticker (:class:`telegram.Sticker`): Optional. Message is a sticker, information about the
             sticker.
@@ -224,7 +225,7 @@ class ExternalReplyInfo(TelegramObject):
         self.animation: Optional[Animation] = animation
         self.audio: Optional[Audio] = audio
         self.document: Optional[Document] = document
-        self.photo: Optional[Tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
+        self.photo: Optional[tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
         self.sticker: Optional[Sticker] = sticker
         self.story: Optional[Story] = story
         self.video: Optional[Video] = video
@@ -247,39 +248,36 @@ class ExternalReplyInfo(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ExternalReplyInfo"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ExternalReplyInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        data["origin"] = MessageOrigin.de_json(data.get("origin"), bot)
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["link_preview_options"] = LinkPreviewOptions.de_json(
-            data.get("link_preview_options"), bot
+        data["origin"] = de_json_optional(data.get("origin"), MessageOrigin, bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["link_preview_options"] = de_json_optional(
+            data.get("link_preview_options"), LinkPreviewOptions, bot
         )
-        data["animation"] = Animation.de_json(data.get("animation"), bot)
-        data["audio"] = Audio.de_json(data.get("audio"), bot)
-        data["document"] = Document.de_json(data.get("document"), bot)
-        data["photo"] = tuple(PhotoSize.de_list(data.get("photo"), bot))
-        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
-        data["story"] = Story.de_json(data.get("story"), bot)
-        data["video"] = Video.de_json(data.get("video"), bot)
-        data["video_note"] = VideoNote.de_json(data.get("video_note"), bot)
-        data["voice"] = Voice.de_json(data.get("voice"), bot)
-        data["contact"] = Contact.de_json(data.get("contact"), bot)
-        data["dice"] = Dice.de_json(data.get("dice"), bot)
-        data["game"] = Game.de_json(data.get("game"), bot)
-        data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
-        data["giveaway_winners"] = GiveawayWinners.de_json(data.get("giveaway_winners"), bot)
-        data["invoice"] = Invoice.de_json(data.get("invoice"), bot)
-        data["location"] = Location.de_json(data.get("location"), bot)
-        data["poll"] = Poll.de_json(data.get("poll"), bot)
-        data["venue"] = Venue.de_json(data.get("venue"), bot)
-        data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
+        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
+        data["audio"] = de_json_optional(data.get("audio"), Audio, bot)
+        data["document"] = de_json_optional(data.get("document"), Document, bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
+        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
+        data["story"] = de_json_optional(data.get("story"), Story, bot)
+        data["video"] = de_json_optional(data.get("video"), Video, bot)
+        data["video_note"] = de_json_optional(data.get("video_note"), VideoNote, bot)
+        data["voice"] = de_json_optional(data.get("voice"), Voice, bot)
+        data["contact"] = de_json_optional(data.get("contact"), Contact, bot)
+        data["dice"] = de_json_optional(data.get("dice"), Dice, bot)
+        data["game"] = de_json_optional(data.get("game"), Game, bot)
+        data["giveaway"] = de_json_optional(data.get("giveaway"), Giveaway, bot)
+        data["giveaway_winners"] = de_json_optional(
+            data.get("giveaway_winners"), GiveawayWinners, bot
+        )
+        data["invoice"] = de_json_optional(data.get("invoice"), Invoice, bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
+        data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
+        data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
+        data["paid_media"] = de_json_optional(data.get("paid_media"), PaidMediaInfo, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -311,7 +309,7 @@ class TextQuote(TelegramObject):
             message.
         position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
             units as specified by the sender.
-        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that appear
+        entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that appear
             in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
             custom_emoji entities are kept in quotes.
         is_manual (:obj:`bool`): Optional. :obj:`True`, if the quote was chosen manually by the
@@ -338,7 +336,7 @@ class TextQuote(TelegramObject):
 
         self.text: str = text
         self.position: int = position
-        self.entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(entities)
+        self.entities: Optional[tuple[MessageEntity, ...]] = parse_sequence_arg(entities)
         self.is_manual: Optional[bool] = is_manual
 
         self._id_attrs = (
@@ -349,16 +347,11 @@ class TextQuote(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["TextQuote"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TextQuote":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        data["entities"] = tuple(MessageEntity.de_list(data.get("entities"), bot))
+        data["entities"] = de_list_optional(data.get("entities"), MessageEntity, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -411,7 +404,7 @@ class ReplyParameters(TelegramObject):
         quote_parse_mode (:obj:`str`): Optional. Mode for parsing entities in the quote. See
             :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
             more details.
-        quote_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. A JSON-serialized list
+        quote_entities (tuple[:class:`telegram.MessageEntity`]): Optional. A JSON-serialized list
             of special entities that appear in the quote. It can be specified instead of
             :paramref:`quote_parse_mode`.
         quote_position (:obj:`int`): Optional. Position of the quote in the original message in
@@ -447,7 +440,7 @@ class ReplyParameters(TelegramObject):
         self.allow_sending_without_reply: ODVInput[bool] = allow_sending_without_reply
         self.quote: Optional[str] = quote
         self.quote_parse_mode: ODVInput[str] = quote_parse_mode
-        self.quote_entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(
+        self.quote_entities: Optional[tuple[MessageEntity, ...]] = parse_sequence_arg(
             quote_entities
         )
         self.quote_position: Optional[int] = quote_position
@@ -457,15 +450,12 @@ class ReplyParameters(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ReplyParameters"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReplyParameters":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        data["quote_entities"] = tuple(MessageEntity.de_list(data.get("quote_entities"), bot))
+        data["quote_entities"] = tuple(
+            de_list_optional(data.get("quote_entities"), MessageEntity, bot)
+        )
 
         return super().de_json(data=data, bot=bot)

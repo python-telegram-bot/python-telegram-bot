@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import (
-    Bot,
     CallbackQuery,
     Chat,
     InlineKeyboardButton,
@@ -194,8 +193,7 @@ class TestCallbackContext:
         callback_context = CallbackContext(app)
         assert callback_context.application is app
 
-    def test_drop_callback_data_exception(self, bot, app):
-        non_ext_bot = Bot(bot.token)
+    def test_drop_callback_data_exception(self, bot, app, raw_bot):
         update = Update(
             0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
         )
@@ -206,14 +204,14 @@ class TestCallbackContext:
             callback_context.drop_callback_data(None)
 
         try:
-            app.bot = non_ext_bot
+            app.bot = raw_bot
             with pytest.raises(RuntimeError, match="telegram.Bot does not allow for"):
                 callback_context.drop_callback_data(None)
         finally:
             app.bot = bot
 
     async def test_drop_callback_data(self, bot, chat_id):
-        new_bot = make_bot(token=bot.token, arbitrary_callback_data=True)
+        new_bot = make_bot(token=bot.token, arbitrary_callback_data=True, offline=False)
         app = ApplicationBuilder().bot(new_bot).build()
 
         update = Update(

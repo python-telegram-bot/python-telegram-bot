@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ https://github.com/sphinx-doc/sphinx/issues/1556 is closed
 """
 import subprocess
 from pathlib import Path
-from typing import Dict, Tuple
 
 from sphinx.util import logging
 
@@ -32,7 +31,7 @@ sphinx_logger = logging.getLogger(__name__)
 
 # must be a module-level variable so that it can be written to by the `autodoc-process-docstring`
 # event handler in `sphinx_hooks.py`
-LINE_NUMBERS: Dict[str, Tuple[Path, int, int]] = {}
+LINE_NUMBERS: dict[str, tuple[Path, int, int]] = {}
 
 
 def _git_branch() -> str:

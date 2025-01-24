@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,12 +20,13 @@
 match the official API. It also checks if the type annotations are correct and if the parameters
 are required or not."""
 
+import datetime as dtm
 import inspect
 import logging
 import re
-from datetime import datetime
+from collections.abc import Sequence
 from types import FunctionType
-from typing import Any, Sequence
+from typing import Any
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import FileInput, ODVInput
@@ -37,6 +38,7 @@ from tests.test_official.helpers import (
     _get_params_base,
     _unionizer,
     cached_type_hints,
+    extract_mappings,
     resolve_forward_refs_in_type,
     wrap_with_none,
 )
@@ -66,6 +68,7 @@ DATETIME_REGEX = re.compile(
     """,
     re.VERBOSE,
 )
+TIMEDELTA_REGEX = re.compile(r"\w+_period$")  # Parameter names ending with "_period"
 
 log = logging.debug
 
@@ -142,7 +145,7 @@ def check_param_type(
     )
 
     # CHECKING:
-    # Each branch manipulates the `mapped_type` (except for 4) ) to match the `ptb_annotation`.
+    # Each branch manipulates the `mapped_type` (except for 5) ) to match the `ptb_annotation`.
 
     # 1) HANDLING ARRAY TYPES:
     # Now let's do the checking, starting with "Array of ..." types.
@@ -172,9 +175,11 @@ def check_param_type(
 
     # 2) HANDLING OTHER TYPES:
     # Special case for send_* methods where we accept more types than the official API:
-    elif ptb_param.name in PTCE.ADDITIONAL_TYPES and obj.__name__.startswith("send"):
-        log("Checking that `%s` has an additional argument!\n", ptb_param.name)
-        mapped_type = mapped_type | PTCE.ADDITIONAL_TYPES[ptb_param.name]
+    elif additional_types := extract_mappings(PTCE.ADDITIONAL_TYPES, obj, ptb_param.name):
+        log("Checking that `%s` accepts additional types for some parameters!\n", obj.__name__)
+        for at in additional_types:
+            log("Checking that `%s` is an additional type for `%s`!\n", at, ptb_param.name)
+            mapped_type = mapped_type | at
 
     # 3) HANDLING DATETIMES:
     elif (
@@ -188,17 +193,27 @@ def check_param_type(
         if ptb_param.name in PTCE.DATETIME_EXCEPTIONS:
             return True, mapped_type
         # If it's a class, we only accept datetime as the parameter
-        mapped_type = datetime if is_class else mapped_type | datetime
+        mapped_type = dtm.datetime if is_class else mapped_type | dtm.datetime
 
-    # 4) COMPLEX TYPES:
+    # 4) HANDLING TIMEDELTA:
+    elif re.search(TIMEDELTA_REGEX, ptb_param.name) and obj.__name__ in (
+        "TransactionPartnerUser",
+        "create_invoice_link",
+    ):
+        # Currently we only support timedelta for `subscription_period` in `TransactionPartnerUser`
+        # and `create_invoice_link`.
+        # See https://github.com/python-telegram-bot/python-telegram-bot/issues/4575
+        log("Checking that `%s` is a timedelta!\n", ptb_param.name)
+        mapped_type = dtm.timedelta if is_class else mapped_type | dtm.timedelta
+
+    # 5) COMPLEX TYPES:
     # Some types are too complicated, so we replace our annotation with a simpler type:
-    elif any(ptb_param.name in key for key in PTCE.COMPLEX_TYPES):
+    elif overrides := extract_mappings(PTCE.COMPLEX_TYPES, obj, ptb_param.name):
+        exception_type = overrides[0]
         log("Converting `%s` to a simpler type!\n", ptb_param.name)
-        for (param_name, is_expected_class), exception_type in PTCE.COMPLEX_TYPES.items():
-            if ptb_param.name == param_name and is_class is is_expected_class:
-                ptb_annotation = wrap_with_none(tg_parameter, exception_type, obj)
+        ptb_annotation = wrap_with_none(tg_parameter, exception_type, obj)
 
-    # 5) HANDLING DEFAULTS PARAMETERS:
+    # 6) HANDLING DEFAULTS PARAMETERS:
     # Classes whose parameters are all ODVInput should be converted and checked.
     elif obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
         log("Checking that `%s`'s param is ODVInput:\n", obj.__name__)

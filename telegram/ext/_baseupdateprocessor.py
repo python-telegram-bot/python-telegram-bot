@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,19 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BaseProcessor class."""
 from abc import ABC, abstractmethod
-from asyncio import BoundedSemaphore
+from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Any, AsyncContextManager, Awaitable, Optional, Type, TypeVar, final
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, final
+
+from telegram.ext._utils.asyncio import TrackedBoundedSemaphore
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable
 
 _BUPT = TypeVar("_BUPT", bound="BaseUpdateProcessor")
 
 
-class BaseUpdateProcessor(AsyncContextManager["BaseUpdateProcessor"], ABC):
+class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], ABC):
     """An abstract base class for update processors. You can use this class to implement
     your own update processor.
 
@@ -67,7 +72,7 @@ class BaseUpdateProcessor(AsyncContextManager["BaseUpdateProcessor"], ABC):
         self._max_concurrent_updates = max_concurrent_updates
         if self.max_concurrent_updates < 1:
             raise ValueError("`max_concurrent_updates` must be a positive integer!")
-        self._semaphore = BoundedSemaphore(self.max_concurrent_updates)
+        self._semaphore = TrackedBoundedSemaphore(self.max_concurrent_updates)
 
     async def __aenter__(self: _BUPT) -> _BUPT:  # noqa: PYI019
         """|async_context_manager| :meth:`initializes <initialize>` the Processor.
@@ -88,7 +93,7 @@ class BaseUpdateProcessor(AsyncContextManager["BaseUpdateProcessor"], ABC):
 
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]],
+        exc_type: Optional[type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
@@ -99,6 +104,18 @@ class BaseUpdateProcessor(AsyncContextManager["BaseUpdateProcessor"], ABC):
     def max_concurrent_updates(self) -> int:
         """:obj:`int`: The maximum number of updates that can be processed concurrently."""
         return self._max_concurrent_updates
+
+    @property
+    def current_concurrent_updates(self) -> int:
+        """:obj:`int`: The number of updates currently being processed.
+
+        Caution:
+            This value is a snapshot of the current number of updates being processed. It may
+            change immediately after being read.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self.max_concurrent_updates - self._semaphore.current_value
 
     @abstractmethod
     async def do_process_update(

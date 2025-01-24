@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -164,3 +164,33 @@ class TestSimpleUpdateProcessor:
                 pass
 
         assert self.test_flag == "shutdown"
+
+    async def test_current_concurrent_updates(self, mock_processor):
+        async def callback(event: asyncio.Event):
+            await event.wait()
+
+        events = {i: asyncio.Event() for i in range(10)}
+        coroutines = {i: callback(event) for i, event in events.items()}
+
+        process_tasks = [
+            asyncio.create_task(mock_processor.process_update(Update(i), coroutines[i]))
+            for i in range(10)
+        ]
+        await asyncio.sleep(0.01)
+
+        assert mock_processor.current_concurrent_updates == mock_processor.max_concurrent_updates
+        for i in range(5):
+            events[i].set()
+
+        await asyncio.sleep(0.01)
+        assert mock_processor.current_concurrent_updates == mock_processor.max_concurrent_updates
+
+        for i in range(5, 10):
+            events[i].set()
+            await asyncio.sleep(0.01)
+            assert (
+                mock_processor.current_concurrent_updates
+                == mock_processor.max_concurrent_updates - (i - 4)
+            )
+
+        await asyncio.gather(*process_tasks)

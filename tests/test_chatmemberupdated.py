@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import inspect
 
 import pytest
@@ -72,7 +72,7 @@ def new_chat_member(user):
 
 @pytest.fixture(scope="module")
 def time():
-    return datetime.datetime.now(tz=UTC)
+    return dtm.datetime.now(tz=UTC)
 
 
 @pytest.fixture(scope="module")
@@ -99,7 +99,9 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json_required_args(self, bot, user, chat, old_chat_member, new_chat_member, time):
+    def test_de_json_required_args(
+        self, offline_bot, user, chat, old_chat_member, new_chat_member, time
+    ):
         json_dict = {
             "chat": chat.to_dict(),
             "from": user.to_dict(),
@@ -108,12 +110,12 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
             "new_chat_member": new_chat_member.to_dict(),
         }
 
-        chat_member_updated = ChatMemberUpdated.de_json(json_dict, bot)
+        chat_member_updated = ChatMemberUpdated.de_json(json_dict, offline_bot)
         assert chat_member_updated.api_kwargs == {}
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
-        assert abs(chat_member_updated.date - time) < datetime.timedelta(seconds=1)
+        assert abs(chat_member_updated.date - time) < dtm.timedelta(seconds=1)
         assert to_timestamp(chat_member_updated.date) == to_timestamp(time)
         assert chat_member_updated.old_chat_member == old_chat_member
         assert chat_member_updated.new_chat_member == new_chat_member
@@ -121,7 +123,7 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         assert chat_member_updated.via_chat_folder_invite_link is None
 
     def test_de_json_all_args(
-        self, bot, user, time, invite_link, chat, old_chat_member, new_chat_member
+        self, offline_bot, user, time, invite_link, chat, old_chat_member, new_chat_member
     ):
         json_dict = {
             "chat": chat.to_dict(),
@@ -134,12 +136,12 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
             "via_join_request": True,
         }
 
-        chat_member_updated = ChatMemberUpdated.de_json(json_dict, bot)
+        chat_member_updated = ChatMemberUpdated.de_json(json_dict, offline_bot)
         assert chat_member_updated.api_kwargs == {}
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
-        assert abs(chat_member_updated.date - time) < datetime.timedelta(seconds=1)
+        assert abs(chat_member_updated.date - time) < dtm.timedelta(seconds=1)
         assert to_timestamp(chat_member_updated.date) == to_timestamp(time)
         assert chat_member_updated.old_chat_member == old_chat_member
         assert chat_member_updated.new_chat_member == new_chat_member
@@ -148,7 +150,16 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         assert chat_member_updated.via_join_request is True
 
     def test_de_json_localization(
-        self, bot, raw_bot, tz_bot, user, chat, old_chat_member, new_chat_member, time, invite_link
+        self,
+        offline_bot,
+        raw_bot,
+        tz_bot,
+        user,
+        chat,
+        old_chat_member,
+        new_chat_member,
+        time,
+        invite_link,
     ):
         json_dict = {
             "chat": chat.to_dict(),
@@ -159,7 +170,7 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
             "invite_link": invite_link.to_dict(),
         }
 
-        chat_member_updated_bot = ChatMemberUpdated.de_json(json_dict, bot)
+        chat_member_updated_bot = ChatMemberUpdated.de_json(json_dict, offline_bot)
         chat_member_updated_raw = ChatMemberUpdated.de_json(json_dict, raw_bot)
         chat_member_updated_tz = ChatMemberUpdated.de_json(json_dict, tz_bot)
 
@@ -210,7 +221,7 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         c = ChatMemberUpdated(
             Chat(1, "chat"),
             User(1, "", False),
-            time + datetime.timedelta(hours=1),
+            time + dtm.timedelta(hours=1),
             old_chat_member,
             new_chat_member,
         )
@@ -253,7 +264,7 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         old_chat_member = ChatMember(user, "old_status")
         new_chat_member = ChatMember(user, "new_status")
         chat_member_updated = ChatMemberUpdated(
-            chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
+            chat, user, dtm.datetime.utcnow(), old_chat_member, new_chat_member
         )
         assert chat_member_updated.difference() == {"status": ("old_status", "new_status")}
 
@@ -262,7 +273,7 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         new_user = User(1, "First name", False, last_name="last name")
         new_chat_member = ChatMember(new_user, "new_status")
         chat_member_updated = ChatMemberUpdated(
-            chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
+            chat, user, dtm.datetime.utcnow(), old_chat_member, new_chat_member
         )
         assert chat_member_updated.difference() == {
             "status": ("old_status", "new_status"),
@@ -310,22 +321,22 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
             can_post_stories=True,
         )
         chat_member_updated = ChatMemberUpdated(
-            chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
+            chat, user, dtm.datetime.utcnow(), old_chat_member, new_chat_member
         )
         assert chat_member_updated.difference() == {optional_attribute: (old_value, new_value)}
 
     def test_difference_different_classes(self, user, chat):
         old_chat_member = ChatMemberOwner(user=user, is_anonymous=False)
-        new_chat_member = ChatMemberBanned(user=user, until_date=datetime.datetime(2021, 1, 1))
+        new_chat_member = ChatMemberBanned(user=user, until_date=dtm.datetime(2021, 1, 1))
         chat_member_updated = ChatMemberUpdated(
             chat=chat,
             from_user=user,
-            date=datetime.datetime.utcnow(),
+            date=dtm.datetime.utcnow(),
             old_chat_member=old_chat_member,
             new_chat_member=new_chat_member,
         )
         diff = chat_member_updated.difference()
         assert diff.pop("is_anonymous") == (False, None)
-        assert diff.pop("until_date") == (None, datetime.datetime(2021, 1, 1))
+        assert diff.pop("until_date") == (None, dtm.datetime(2021, 1, 1))
         assert diff.pop("status") == (ChatMember.OWNER, ChatMember.BANNED)
         assert diff == {}

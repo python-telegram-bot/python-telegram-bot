@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,12 +25,12 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from typing import FrozenSet, Optional
+from typing import Optional
 
 from telegram._utils.types import SCT
 
 
-def parse_chat_id(chat_id: Optional[SCT[int]]) -> FrozenSet[int]:
+def parse_chat_id(chat_id: Optional[SCT[int]]) -> frozenset[int]:
     """Accepts a chat id or collection of chat ids and returns a frozenset of chat ids."""
     if chat_id is None:
         return frozenset()
@@ -39,12 +39,12 @@ def parse_chat_id(chat_id: Optional[SCT[int]]) -> FrozenSet[int]:
     return frozenset(chat_id)
 
 
-def parse_username(username: Optional[SCT[str]]) -> FrozenSet[str]:
+def parse_username(username: Optional[SCT[str]]) -> frozenset[str]:
     """Accepts a username or collection of usernames and returns a frozenset of usernames.
     Strips the leading ``@`` if present.
     """
     if username is None:
         return frozenset()
     if isinstance(username, str):
-        return frozenset({username[1:] if username.startswith("@") else username})
-    return frozenset({usr[1:] if usr.startswith("@") else usr for usr in username})
+        return frozenset({username.removeprefix("@")})
+    return frozenset(usr.removeprefix("@") for usr in username)

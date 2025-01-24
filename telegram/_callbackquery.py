@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._files.location import Location
 from telegram._message import MaybeInaccessibleMessage, Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput, ReplyMarkup
 
@@ -148,17 +150,12 @@ class CallbackQuery(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["CallbackQuery"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "CallbackQuery":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["from_user"] = User.de_json(data.pop("from", None), bot)
-        data["message"] = Message.de_json(data.get("message"), bot)
+        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
+        data["message"] = de_json_optional(data.get("message"), Message, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -676,7 +673,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["GameHighScore", ...]:
+    ) -> tuple["GameHighScore", ...]:
         """Shortcut for either::
 
             await update.callback_query.message.get_game_high_score(*args, **kwargs)
@@ -695,7 +692,7 @@ class CallbackQuery(TelegramObject):
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
-            Tuple[:class:`telegram.GameHighScore`]
+            tuple[:class:`telegram.GameHighScore`]
 
         Raises:
             :exc:`TypeError` if :attr:`message` is not accessible.
@@ -833,6 +830,7 @@ class CallbackQuery(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -880,6 +878,7 @@ class CallbackQuery(TelegramObject):
             message_thread_id=message_thread_id,
             reply_parameters=reply_parameters,
             show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     MAX_ANSWER_TEXT_LENGTH: Final[int] = (

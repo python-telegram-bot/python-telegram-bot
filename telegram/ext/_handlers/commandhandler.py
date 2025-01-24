@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler class."""
 import re
-from typing import TYPE_CHECKING, Any, FrozenSet, List, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
 
 from telegram import MessageEntity, Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -33,13 +33,14 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class CommandHandler(BaseHandler[Update, CCT]):
+class CommandHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram commands.
 
-    Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
-    bot's name and/or some additional text. The handler will add a :obj:`list` to the
-    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
-    which is the text following the command split on single or consecutive whitespace characters.
+    Commands are Telegram messages that start with a :attr:`telegram.MessageEntity.BOT_COMMAND`
+    (so with ``/``, optionally followed by an ``@`` and the bot's name and/or some additional
+    text). The handler will add a :obj:`list` to the :class:`CallbackContext` named
+    :attr:`CallbackContext.args`. It will contain a list of strings, which is the text following
+    the command split on single or consecutive whitespace characters.
 
     By default, the handler listens to messages as well as edited messages. To change this behavior
     use :attr:`~filters.UpdateType.EDITED_MESSAGE <telegram.ext.filters.UpdateType.EDITED_MESSAGE>`
@@ -52,6 +53,11 @@ class CommandHandler(BaseHandler[Update, CCT]):
         :attr:`telegram.ext.filters.UpdateType.CHANNEL_POSTS`,
         :attr:`telegram.ext.filters.CAPTION` and :class:`telegram.ext.filters.Regex`) to handle
         those messages.
+
+    Note:
+        If you want to support a different entity in the beginning, e.g. if a command message is
+        wrapped in a :attr:`telegram.MessageEntity.CODE`, use the
+        :class:`telegram.ext.PrefixHandler`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
@@ -101,7 +107,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         :exc:`ValueError`: When the command is too long or has illegal chars.
 
     Attributes:
-        commands (FrozenSet[:obj:`str`]): The set of commands this handler should listen for.
+        commands (frozenset[:obj:`str`]): The set of commands this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             filters.
@@ -118,7 +124,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
     __slots__ = ("commands", "filters", "has_args")
 
     def __init__(
-        self,
+        self: "CommandHandler[CCT, RT]",
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
         filters: Optional[filters_module.BaseFilter] = None,
@@ -134,7 +140,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         for comm in commands:
             if not re.match(r"^[\da-z_]{1,32}$", comm):
                 raise ValueError(f"Command `{comm}` is not a valid bot command")
-        self.commands: FrozenSet[str] = commands
+        self.commands: frozenset[str] = commands
 
         self.filters: filters_module.BaseFilter = (
             filters if filters is not None else filters_module.UpdateType.MESSAGES
@@ -145,7 +151,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         if (isinstance(self.has_args, int)) and (self.has_args < 0):
             raise ValueError("CommandHandler argument has_args cannot be a negative integer")
 
-    def _check_correct_args(self, args: List[str]) -> Optional[bool]:
+    def _check_correct_args(self, args: list[str]) -> Optional[bool]:
         """Determines whether the args are correct for this handler. Implemented in check_update().
         Args:
             args (:obj:`list`): The args for the handler.
@@ -161,7 +167,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
 
     def check_update(
         self, update: object
-    ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, FilterDataDict]]]]]:
+    ) -> Optional[Union[bool, tuple[list[str], Optional[Union[bool, FilterDataDict]]]]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -206,7 +212,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         context: CCT,
         update: Update,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
+        check_result: Optional[Union[bool, tuple[list[str], Optional[bool]]]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single
         whitespaces and add output of data filters to :attr:`CallbackContext` as well.

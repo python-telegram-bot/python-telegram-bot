@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,14 +32,14 @@ RT = TypeVar("RT")
 UT = TypeVar("UT")
 
 
-class BaseHandler(Generic[UT, CCT], ABC):
+class BaseHandler(Generic[UT, CCT, RT], ABC):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    This class is a :class:`~typing.Generic` class and accepts two type variables:
+    This class is a :class:`~typing.Generic` class and accepts three type variables:
 
     1. The type of the updates that this handler will handle. Must coincide with the type of the
        first argument of :paramref:`callback`. :meth:`check_update` must only accept
@@ -54,6 +54,7 @@ class BaseHandler(Generic[UT, CCT], ABC):
            For this type variable, one should usually provide a :class:`~typing.TypeVar` that is
            also used for the mentioned method arguments. That way, a type checker can check whether
            this handler fits the definition of the :class:`~Application`.
+    3. The return type of the :paramref:`callback` function accepted by this handler.
 
     .. seealso:: :wiki:`Types of Handlers <Types-of-Handlers>`
 
@@ -89,7 +90,7 @@ class BaseHandler(Generic[UT, CCT], ABC):
     )
 
     def __init__(
-        self,
+        self: "BaseHandler[UT, CCT, RT]",
         callback: HandlerCallback[UT, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
     ):

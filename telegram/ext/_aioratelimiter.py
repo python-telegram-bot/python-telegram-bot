@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,8 @@ library.
 import asyncio
 import contextlib
 import sys
-from typing import Any, AsyncIterator, Callable, Coroutine, Dict, List, Optional, Union
+from collections.abc import AsyncIterator, Coroutine
+from typing import Any, Callable, Optional, Union
 
 try:
     from aiolimiter import AsyncLimiter
@@ -86,6 +87,19 @@ class AIORateLimiter(BaseRateLimiter[int]):
           :attr:`~telegram.error.RetryAfter.retry_after` + 0.1 seconds. This may be stricter than
           necessary in some cases, e.g. the bot may hit a rate limit in one group but might still
           be allowed to send messages in another group.
+
+    Tip:
+        With `Bot API 7.1 <https://core.telegram.org/bots/api-changelog#october-31-2024>`_
+        (PTB v27.1), Telegram introduced the parameter
+        :paramref:`~telegram.Bot.send_message.allow_paid_broadcast`.
+        This allows bots to send up to
+        :tg-const:`telegram.constants.FloodLimit.PAID_MESSAGES_PER_SECOND` messages per second by
+        paying a fee in Telegram Stars.
+
+        .. caution::
+            This class currently doesn't take the
+            :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` parameter into account.
+            This means that the rate limiting is applied just like for any other message.
 
     Note:
         This class is to be understood as minimal effort reference implementation.
@@ -152,7 +166,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
             self._group_max_rate = 0
             self._group_time_period = 0
 
-        self._group_limiters: Dict[Union[str, int], AsyncLimiter] = {}
+        self._group_limiters: dict[Union[str, int], AsyncLimiter] = {}
         self._max_retries: int = max_retries
         self._retry_after_event = asyncio.Event()
         self._retry_after_event.set()
@@ -187,10 +201,10 @@ class AIORateLimiter(BaseRateLimiter[int]):
         self,
         chat: bool,
         group: Union[str, int, bool],
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, list[JSONDict]]]],
         args: Any,
-        kwargs: Dict[str, Any],
-    ) -> Union[bool, JSONDict, List[JSONDict]]:
+        kwargs: dict[str, Any],
+    ) -> Union[bool, JSONDict, list[JSONDict]]:
         base_context = self._base_limiter if (chat and self._base_limiter) else null_context()
         group_context = (
             self._get_group_limiter(group) if group and self._group_max_rate else null_context()
@@ -205,13 +219,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
     # mypy doesn't understand that the last run of the for loop raises an exception
     async def process_request(
         self,
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, list[JSONDict]]]],
         args: Any,
-        kwargs: Dict[str, Any],
+        kwargs: dict[str, Any],
         endpoint: str,  # noqa: ARG002
-        data: Dict[str, Any],
+        data: dict[str, Any],
         rate_limit_args: Optional[int],
-    ) -> Union[bool, JSONDict, List[JSONDict]]:
+    ) -> Union[bool, JSONDict, list[JSONDict]]:
         """
         Processes a request by applying rate limiting.
 
@@ -233,7 +247,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
         # In case user passes integer chat id as string
         with contextlib.suppress(ValueError, TypeError):
-            chat_id = int(chat_id)
+            chat_id = int(chat_id)  # type: ignore[arg-type]
 
         if (isinstance(chat_id, int) and chat_id < 0) or isinstance(chat_id, str):
             # string chat_id only works for channels and supergroups

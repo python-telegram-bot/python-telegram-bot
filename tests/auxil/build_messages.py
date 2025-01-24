@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import re
 
 from telegram import Chat, Message, MessageEntity, Update, User
@@ -24,19 +24,20 @@ from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.pytest_classes import make_bot
 
 CMD_PATTERN = re.compile(r"/[\da-z_]{1,32}(?:@\w{1,32})?")
-DATE = datetime.datetime.now()
+DATE = dtm.datetime.now()
 
 
-def make_message(text, **kwargs):
+def make_message(text: str, offline: bool = True, **kwargs):
     """
     Testing utility factory to create a fake ``telegram.Message`` with
     reasonable defaults for mimicking a real message.
     :param text: (str) message text
+    :param offline: (bool) whether the bot should be offline
     :return: a (fake) ``telegram.Message``
     """
     bot = kwargs.pop("bot", None)
     if bot is None:
-        bot = make_bot(BOT_INFO_PROVIDER.get_info())
+        bot = make_bot(BOT_INFO_PROVIDER.get_info(), offline=offline)
     message = Message(
         message_id=1,
         from_user=kwargs.pop("user", User(id=1, first_name="", is_bot=False)),

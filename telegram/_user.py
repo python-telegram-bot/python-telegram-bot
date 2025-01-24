@@ -2,7 +2,7 @@
 # pylint: disable=redefined-builtin
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
-from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
+import datetime as dtm
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
@@ -35,6 +36,7 @@ if TYPE_CHECKING:
         Audio,
         Contact,
         Document,
+        Gift,
         InlineKeyboardMarkup,
         InputMediaAudio,
         InputMediaDocument,
@@ -426,6 +428,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         disable_web_page_preview: Optional[bool] = None,
@@ -470,6 +473,7 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def delete_message(
@@ -550,6 +554,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -596,6 +601,7 @@ class User(TelegramObject):
             has_spoiler=has_spoiler,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -610,6 +616,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -621,7 +628,7 @@ class User(TelegramObject):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-    ) -> Tuple["Message", ...]:
+    ) -> tuple["Message", ...]:
         """Shortcut for::
 
              await bot.send_media_group(update.effective_user.id, *args, **kwargs)
@@ -632,7 +639,7 @@ class User(TelegramObject):
             |user_chat_id_note|
 
         Returns:
-            Tuple[:class:`telegram.Message`:] On success, a tuple of :class:`~telegram.Message`
+            tuple[:class:`telegram.Message`:] On success, a tuple of :class:`~telegram.Message`
             instances that were sent is returned.
 
         """
@@ -655,6 +662,7 @@ class User(TelegramObject):
             caption_entities=caption_entities,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_audio(
@@ -674,6 +682,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -722,6 +731,7 @@ class User(TelegramObject):
             thumbnail=thumbnail,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_chat_action(
@@ -777,6 +787,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -821,6 +832,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_dice(
@@ -833,6 +845,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -872,6 +885,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_document(
@@ -889,6 +903,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -935,6 +950,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_game(
@@ -947,6 +963,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -986,6 +1003,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_invoice(
@@ -1017,6 +1035,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1085,6 +1104,7 @@ class User(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_location(
@@ -1102,6 +1122,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1148,6 +1169,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_animation(
@@ -1168,6 +1190,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1218,6 +1241,7 @@ class User(TelegramObject):
             thumbnail=thumbnail,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -1232,6 +1256,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1272,6 +1297,7 @@ class User(TelegramObject):
             emoji=emoji,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_video(
@@ -1293,6 +1319,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1344,6 +1371,7 @@ class User(TelegramObject):
             has_spoiler=has_spoiler,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -1364,6 +1392,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1412,6 +1441,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_video_note(
@@ -1427,6 +1457,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1471,6 +1502,7 @@ class User(TelegramObject):
             thumbnail=thumbnail,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_voice(
@@ -1487,6 +1519,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1532,6 +1565,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_poll(
@@ -1548,7 +1582,7 @@ class User(TelegramObject):
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: Optional[int] = None,
-        close_date: Optional[Union[int, datetime]] = None,
+        close_date: Optional[Union[int, dtm.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -1557,6 +1591,7 @@ class User(TelegramObject):
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Optional[Sequence["MessageEntity"]] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1609,6 +1644,46 @@ class User(TelegramObject):
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+        )
+
+    async def send_gift(
+        self,
+        gift_id: Union[str, "Gift"],
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        pay_for_upgrade: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.send_gift( user_id=update.effective_user.id, *args, **kwargs )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_gift`.
+
+        .. versionadded:: 21.8
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().send_gift(
+            user_id=self.id,
+            gift_id=gift_id,
+            text=text,
+            text_parse_mode=text_parse_mode,
+            text_entities=text_entities,
+            pay_for_upgrade=pay_for_upgrade,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def send_copy(
@@ -1624,6 +1699,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1666,6 +1742,7 @@ class User(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def copy_message(
@@ -1681,6 +1758,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1723,6 +1801,7 @@ class User(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_copies(
@@ -1739,7 +1818,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.copy_messages(chat_id=update.effective_user.id, *argss, **kwargs)
@@ -1751,7 +1830,7 @@ class User(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
 
         """
@@ -1784,7 +1863,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.copy_messages(from_chat_id=update.effective_user.id, *argss, **kwargs)
@@ -1796,7 +1875,7 @@ class User(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
 
         """
@@ -1913,7 +1992,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.forward_messages(chat_id=update.effective_user.id, *argss, **kwargs)
@@ -1925,7 +2004,7 @@ class User(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of sent messages is returned.
 
         """
@@ -1956,7 +2035,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["MessageId", ...]:
+    ) -> tuple["MessageId", ...]:
         """Shortcut for::
 
              await bot.forward_messages(from_chat_id=update.effective_user.id, *argss, **kwargs)
@@ -1968,7 +2047,7 @@ class User(TelegramObject):
         .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of sent messages is returned.
 
         """
@@ -2187,6 +2266,68 @@ class User(TelegramObject):
         return await self.get_bot().refund_star_payment(
             user_id=self.id,
             telegram_payment_charge_id=telegram_payment_charge_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def verify(
+        self,
+        custom_description: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.verify_user(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.verify_user`.
+
+        .. versionadded:: 21.10
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().verify_user(
+            user_id=self.id,
+            custom_description=custom_description,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def remove_verification(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.remove_user_verification(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.remove_user_verification`.
+
+        .. versionadded:: 21.10
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().remove_user_verification(
+            user_id=self.id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

@@ -4,7 +4,7 @@
 build
 
 # For the test suite
-pytest==8.3.2
+pytest==8.3.4
 
 # needed because pytest doesn't come with native support for coroutines as tests
 pytest-asyncio==0.21.2
@@ -17,3 +17,7 @@ flaky>=3.8.1
 
 # used in test_official for parsing tg docs
 beautifulsoup4
+
+# For testing with timezones. Might not be needed on all systems, but to ensure that unit tests
+# run correctly on all systems, we include it here.
+tzdata

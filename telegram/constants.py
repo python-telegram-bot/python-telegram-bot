@@ -1,5 +1,5 @@
 # python-telegram-bot - a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # by the python-telegram-bot contributors <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -64,6 +64,7 @@ __all__ = [
     "FloodLimit",
     "ForumIconColor",
     "ForumTopicLimit",
+    "GiftLimit",
     "GiveawayLimit",
     "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
@@ -94,6 +95,7 @@ __all__ = [
     "ReactionType",
     "ReplyLimit",
     "RevenueWithdrawalStateType",
+    "StarTransactions",
     "StarTransactionsLimit",
     "StickerFormat",
     "StickerLimit",
@@ -102,16 +104,17 @@ __all__ = [
     "TransactionPartnerType",
     "UpdateType",
     "UserProfilePhotosLimit",
+    "VerifyLimit",
     "WebhookLimit",
 ]
 
-import datetime
+import datetime as dtm
 import sys
 from enum import Enum
-from typing import Final, List, NamedTuple, Optional, Tuple
+from typing import Final, NamedTuple, Optional
 
 from telegram._utils.datetime import UTC
-from telegram._utils.enum import IntEnum, StringEnum
+from telegram._utils.enum import FloatEnum, IntEnum, StringEnum
 
 
 class _BotAPIVersion(NamedTuple):
@@ -141,8 +144,8 @@ class _AccentColor(NamedTuple):
 
     identifier: int
     name: Optional[str] = None
-    light_colors: Tuple[int, ...] = ()
-    dark_colors: Tuple[int, ...] = ()
+    light_colors: tuple[int, ...] = ()
+    dark_colors: tuple[int, ...] = ()
 
 
 #: :class:`typing.NamedTuple`: A tuple containing the two components of the version number:
@@ -152,7 +155,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=9)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=2)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -162,15 +165,15 @@ BOT_API_VERSION: Final[str] = str(BOT_API_VERSION_INFO)
 
 # constants above this line are tested
 
-#: List[:obj:`int`]: Ports supported by
+#: list[:obj:`int`]: Ports supported by
 #:  :paramref:`telegram.Bot.set_webhook.url`.
-SUPPORTED_WEBHOOK_PORTS: Final[List[int]] = [443, 80, 88, 8443]
+SUPPORTED_WEBHOOK_PORTS: Final[list[int]] = [443, 80, 88, 8443]
 
 #: :obj:`datetime.datetime`, value of unix 0.
 #: This date literal is used in :class:`telegram.InaccessibleMessage`
 #:
 #: .. versionadded:: 20.8
-ZERO_DATE: Final[datetime.datetime] = datetime.datetime(1970, 1, 1, tzinfo=UTC)
+ZERO_DATE: Final[dtm.datetime] = dtm.datetime(1970, 1, 1, tzinfo=UTC)
 
 
 class AccentColor(Enum):
@@ -180,9 +183,9 @@ class AccentColor(Enum):
 
     - ``identifier`` (:obj:`int`): The identifier of the accent color.
     - ``name`` (:obj:`str`): Optional. The name of the accent color.
-    - ``light_colors`` (Tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
+    - ``light_colors`` (tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
       value.
-    - ``dark_colors`` (Tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
+    - ``dark_colors`` (tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
       value.
 
     Since Telegram gives no exact specification for the accent colors, future accent colors might
@@ -552,6 +555,42 @@ class AccentColor(Enum):
     """
 
 
+class BackgroundTypeType(StringEnum):
+    """This enum contains the available types of :class:`telegram.BackgroundType`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 21.2
+    """
+
+    __slots__ = ()
+
+    FILL = "fill"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with fill background."""
+    WALLPAPER = "wallpaper"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with wallpaper background."""
+    PATTERN = "pattern"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with pattern background."""
+    CHAT_THEME = "chat_theme"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with chat_theme background."""
+
+
+class BackgroundFillType(StringEnum):
+    """This enum contains the available types of :class:`telegram.BackgroundFill`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 21.2
+    """
+
+    __slots__ = ()
+
+    SOLID = "solid"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with solid fill."""
+    GRADIENT = "gradient"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with gradient fill."""
+    FREEFORM_GRADIENT = "freeform_gradient"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with freeform_gradient fill."""
+
+
 class BotCommandLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.BotCommand` and
     :meth:`telegram.Bot.set_my_commands`.
@@ -833,6 +872,25 @@ class ChatLimit(IntEnum):
     """
 
 
+class ChatSubscriptionLimit(IntEnum):
+    """This enum contains limitations for
+    :paramref:`telegram.Bot.create_chat_subscription_invite_link.subscription_period` and
+    :paramref:`telegram.Bot.create_chat_subscription_invite_link.subscription_price`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 21.5
+    """
+
+    __slots__ = ()
+
+    SUBSCRIPTION_PERIOD = 2592000
+    """:obj:`int`: The number of seconds the subscription will be active."""
+    MIN_PRICE = 1
+    """:obj:`int`: Amount of stars a user pays, minimum amount the subscription can be set to."""
+    MAX_PRICE = 2500
+    """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to."""
+
+
 class BackgroundTypeLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.BackgroundTypeFill`,
     :class:`telegram.BackgroundTypeWallpaper` and :class:`telegram.BackgroundTypePattern`.
@@ -1099,6 +1157,14 @@ class FloodLimit(IntEnum):
     """:obj:`int`: The number of messages that can roughly be sent to a particular group within one
     minute.
     """
+    PAID_MESSAGES_PER_SECOND = 1000
+    """:obj:`int`: The number of messages that can be sent per second when paying with the bot's
+    Telegram Star balance. See e.g. parameter
+    :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` of
+    :meth:`~telegram.Bot.send_message`.
+
+    .. versionadded:: 21.7
+    """
 
 
 class ForumIconColor(IntEnum):
@@ -1161,6 +1227,21 @@ class ForumIconColor(IntEnum):
     """
 
 
+class GiftLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.send_gift`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 21.8
+    """
+
+    __slots__ = ()
+
+    MAX_TEXT_LENGTH = 255
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.send_gift.text` parameter of :meth:`~telegram.Bot.send_gift`.
+    """
+
+
 class GiveawayLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.Giveaway` and related classes.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -1206,14 +1287,22 @@ class InlineKeyboardButtonLimit(IntEnum):
     __slots__ = ()
 
     MIN_CALLBACK_DATA = 1
-    """:obj:`int`: Minimum value allowed for
+    """:obj:`int`: Minimum length allowed for
     :paramref:`~telegram.InlineKeyboardButton.callback_data` parameter of
     :class:`telegram.InlineKeyboardButton`
     """
     MAX_CALLBACK_DATA = 64
-    """:obj:`int`: Maximum value allowed for
+    """:obj:`int`: Maximum length allowed for
     :paramref:`~telegram.InlineKeyboardButton.callback_data` parameter of
     :class:`telegram.InlineKeyboardButton`
+    """
+    MIN_COPY_TEXT = 1
+    """:obj:`int`: Minimum length allowed for
+    :paramref:`~telegram.CopyTextButton.text` parameter of :class:`telegram.CopyTextButton`
+    """
+    MAX_COPY_TEXT = 256
+    """:obj:`int`: Maximum length allowed for
+    :paramref:`~telegram.CopyTextButton.text` parameter of :class:`telegram.CopyTextButton`
     """
 
 
@@ -1748,7 +1837,6 @@ class MessageLimit(IntEnum):
     :paramref:`~telegram.Bot.edit_message_text.text` parameter of
     :meth:`telegram.Bot.edit_message_text`.
     """
-    # TODO this constant is not used. helpers.py contains 64 as a number
     DEEP_LINK_LENGTH = 64
     """:obj:`int`: Maximum number of characters for a deep link."""
     # TODO this constant is not used anywhere
@@ -2028,9 +2116,9 @@ class ProfileAccentColor(Enum):
 
     - ``identifier`` (:obj:`int`): The identifier of the accent color.
     - ``name`` (:obj:`str`): Optional. The name of the accent color.
-    - ``light_colors`` (Tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
+    - ``light_colors`` (tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
       value.
-    - ``dark_colors`` (Tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
+    - ``dark_colors`` (tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
       value.
 
     Since Telegram gives no exact specification for the accent colors, future accent colors might
@@ -2374,8 +2462,25 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
 
 
+class StarTransactions(FloatEnum):
+    """This enum contains constants for :class:`telegram.StarTransaction`.
+    The enum members of this enumeration are instances of :class:`float` and can be treated as
+    such.
+
+    .. versionadded:: 21.9
+    """
+
+    __slots__ = ()
+
+    NANOSTAR_VALUE = 1 / 1000000000
+    """:obj:`float`: The value of one nanostar as used in
+    :attr:`telegram.StarTransaction.nanostar_amount`.
+    """
+
+
 class StarTransactionsLimit(IntEnum):
-    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions`.
+    """This enum contains limitations for :class:`telegram.Bot.get_star_transactions` and
+    :class:`telegram.StarTransaction`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 21.4
@@ -2391,6 +2496,20 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
+    NANOSTAR_MIN_AMOUNT = -999999999
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
+    parameter of :class:`telegram.AffiliateInfo`.
+
+    .. versionadded:: 21.9
+    """
+    NANOSTAR_MAX_AMOUNT = 999999999
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
+    parameter of :class:`telegram.StarTransaction` and
+    :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
+    :class:`telegram.AffiliateInfo`.
+
+    .. versionadded:: 21.9
+    """
 
 
 class StickerFormat(StringEnum):
@@ -2535,14 +2654,25 @@ class TransactionPartnerType(StringEnum):
 
     __slots__ = ()
 
+    AFFILIATE_PROGRAM = "affiliate_program"
+    """:obj:`str`: Transaction with Affiliate Program.
+
+    .. versionadded:: 21.9
+    """
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""
-    USER = "user"
-    """:obj:`str`: Transaction with a user."""
     OTHER = "other"
     """:obj:`str`: Transaction with unknown source or recipient."""
     TELEGRAM_ADS = "telegram_ads"
     """:obj:`str`: Transaction with Telegram Ads."""
+    TELEGRAM_API = "telegram_api"
+    """:obj:`str`: Transaction with with payment for
+    `paid broadcasting <https://core.telegram.org/bots/api#paid-broadcasts>`_.
+
+    ..versionadded:: 21.7
+    """
+    USER = "user"
+    """:obj:`str`: Transaction with a user."""
 
 
 class ParseMode(StringEnum):
@@ -2724,6 +2854,11 @@ class UpdateType(StringEnum):
 
     .. versionadded:: 21.1
     """
+    PURCHASED_PAID_MEDIA = "purchased_paid_media"
+    """:obj:`str`: Updates with :attr:`telegram.Update.purchased_paid_media`.
+
+    .. versionadded:: 21.6
+    """
 
 
 class InvoiceLimit(IntEnum):
@@ -2795,6 +2930,8 @@ class InvoiceLimit(IntEnum):
       :meth:`telegram.Bot.send_invoice`.
     * :paramref:`~telegram.Bot.create_invoice_link.payload` parameter of
       :meth:`telegram.Bot.create_invoice_link`.
+    * :paramref:`~telegram.Bot.send_paid_media.payload` parameter of
+      :meth:`telegram.Bot.send_paid_media`.
     """
     MAX_TIP_AMOUNTS = 4
     """:obj:`int`: Maximum length of a :obj:`Sequence` passed as:
@@ -2803,6 +2940,33 @@ class InvoiceLimit(IntEnum):
       :meth:`telegram.Bot.send_invoice`.
     * :paramref:`~telegram.Bot.create_invoice_link.suggested_tip_amounts` parameter of
       :meth:`telegram.Bot.create_invoice_link`.
+    """
+    MIN_STAR_COUNT = 1
+    """:obj:`int`: Minimum amount of starts that must be paid to buy access to a paid media
+    passed as :paramref:`~telegram.Bot.send_paid_media.star_count` parameter of
+    :meth:`telegram.Bot.send_paid_media`.
+
+    .. versionadded:: 21.6
+    """
+    MAX_STAR_COUNT = 2500
+    """:obj:`int`: Maximum amount of starts that must be paid to buy access to a paid media
+    passed as :paramref:`~telegram.Bot.send_paid_media.star_count` parameter of
+    :meth:`telegram.Bot.send_paid_media`.
+
+    .. versionadded:: 21.6
+    """
+    SUBSCRIPTION_PERIOD = dtm.timedelta(days=30).total_seconds()
+    """:obj:`int`: The period of time for which the subscription is active before
+    the next payment, passed as :paramref:`~telegram.Bot.create_invoice_link.subscription_period`
+    parameter of :meth:`telegram.Bot.create_invoice_link`.
+
+    .. versionadded:: 21.8
+    """
+    SUBSCRIPTION_MAX_PRICE = 2500
+    """:obj:`int`: The maximum price of a subscription created wtih
+    :meth:`telegram.Bot.create_invoice_link`.
+
+    .. versionadded:: 21.9
     """
 
 
@@ -3068,56 +3232,18 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Pouting face"""
 
 
-class BackgroundTypeType(StringEnum):
-    """This enum contains the available types of :class:`telegram.BackgroundType`. The enum
-    members of this enumeration are instances of :class:`str` and can be treated as such.
-
-    .. versionadded:: 21.2
-    """
-
-    __slots__ = ()
-
-    FILL = "fill"
-    """:obj:`str`: A :class:`telegram.BackgroundType` with fill background."""
-    WALLPAPER = "wallpaper"
-    """:obj:`str`: A :class:`telegram.BackgroundType` with wallpaper background."""
-    PATTERN = "pattern"
-    """:obj:`str`: A :class:`telegram.BackgroundType` with pattern background."""
-    CHAT_THEME = "chat_theme"
-    """:obj:`str`: A :class:`telegram.BackgroundType` with chat_theme background."""
-
-
-class BackgroundFillType(StringEnum):
-    """This enum contains the available types of :class:`telegram.BackgroundFill`. The enum
-    members of this enumeration are instances of :class:`str` and can be treated as such.
-
-    .. versionadded:: 21.2
-    """
-
-    __slots__ = ()
-
-    SOLID = "solid"
-    """:obj:`str`: A :class:`telegram.BackgroundFill` with solid fill."""
-    GRADIENT = "gradient"
-    """:obj:`str`: A :class:`telegram.BackgroundFill` with gradient fill."""
-    FREEFORM_GRADIENT = "freeform_gradient"
-    """:obj:`str`: A :class:`telegram.BackgroundFill` with freeform_gradient fill."""
-
-
-class ChatSubscriptionLimit(IntEnum):
-    """This enum contains limitations for
-    :paramref:`telegram.Bot.create_chat_subscription_invite_link.subscription_period` and
-    :paramref:`telegram.Bot.create_chat_subscription_invite_link.subscription_price`.
+class VerifyLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.verify_chat` and
+    :meth:`~telegram.Bot.verify_user`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: 21.5
+    .. versionadded:: 21.10
     """
 
     __slots__ = ()
 
-    SUBSCRIPTION_PERIOD = 2592000
-    """:obj:`int`: The number of seconds the subscription will be active."""
-    MIN_PRICE = 1
-    """:obj:`int`: Amount of stars a user pays, minimum amount the subscription can be set to."""
-    MAX_PRICE = 2500
-    """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to."""
+    MAX_TEXT_LENGTH = 70
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.verify_chat.custom_description` or
+    :paramref:`~telegram.Bot.verify_user.custom_description` parameter.
+    """

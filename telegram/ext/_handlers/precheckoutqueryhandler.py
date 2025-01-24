@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,8 @@
 
 
 import re
-from typing import Optional, Pattern, TypeVar, Union
+from re import Pattern
+from typing import Optional, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -31,7 +32,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 RT = TypeVar("RT")
 
 
-class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
+class PreCheckoutQueryHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram :attr:`telegram.Update.pre_checkout_query`.
 
     Warning:
@@ -73,7 +74,7 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
     __slots__ = ("pattern",)
 
     def __init__(
-        self,
+        self: "PreCheckoutQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
         pattern: Optional[Union[str, Pattern[str]]] = None,

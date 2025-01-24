@@ -2,7 +2,7 @@
 # pylint: disable=too-many-instance-attributes, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,10 +19,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 
-import datetime
+import datetime as dtm
 import re
+from collections.abc import Sequence
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, TypedDict, Union
+from typing import TYPE_CHECKING, Optional, TypedDict, Union
 
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
@@ -64,7 +65,7 @@ from telegram._shared import ChatShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
@@ -104,6 +105,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPaidMedia,
         InputPollOption,
         LabeledPrice,
         MessageId,
@@ -156,14 +158,14 @@ class MaybeInaccessibleMessage(TelegramObject):
         self,
         chat: Chat,
         message_id: int,
-        date: datetime.datetime,
+        date: dtm.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.chat: Chat = chat
         self.message_id: int = message_id
-        self.date: datetime.datetime = date
+        self.date: dtm.datetime = date
 
         self._id_attrs = (self.message_id, self.chat)
 
@@ -189,9 +191,6 @@ class MaybeInaccessibleMessage(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
         if cls is MaybeInaccessibleMessage:
             if data["date"] == 0:
                 return InaccessibleMessage.de_json(data=data, bot=bot)
@@ -204,9 +203,9 @@ class MaybeInaccessibleMessage(TelegramObject):
         if data["date"] == 0:
             data["date"] = ZERO_DATE
         else:
-            data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
+            data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
 
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
 
@@ -279,7 +278,10 @@ class Message(MaybeInaccessibleMessage):
           and notice that some positional arguments changed position as a result.
 
     Args:
-        message_id (:obj:`int`): Unique message identifier inside this chat.
+        message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
+            (e.g., message containing a video sent to a big chat), the server might automatically
+            schedule a message instead of sending it immediately. In such cases, this field will be
+            ``0`` and the relevant message will be unusable until it is actually sent.
         from_user (:class:`telegram.User`, optional): Sender of the message; may be empty for
             messages sent to channels. For backward compatibility, if the message was sent on
             behalf of a chat, the field contains a fake sender user in non-channel chats.
@@ -589,7 +591,10 @@ class Message(MaybeInaccessibleMessage):
             .. versionadded:: 21.4
 
     Attributes:
-        message_id (:obj:`int`): Unique message identifier inside this chat.
+        message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
+            (e.g., message containing a video sent to a big chat), the server might automatically
+            schedule a message instead of sending it immediately. In such cases, this field will be
+            ``0`` and the relevant message will be unusable until it is actually sent.
         from_user (:class:`telegram.User`): Optional. Sender of the message; may be empty for
             messages sent to channels. For backward compatibility, if the message was sent on
             behalf of a chat, the field contains a fake sender user in non-channel chats.
@@ -629,7 +634,7 @@ class Message(MaybeInaccessibleMessage):
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
-        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
+        entities (tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
             This list is empty if the message does not contain entities.
@@ -648,7 +653,7 @@ class Message(MaybeInaccessibleMessage):
 
             ..versionadded:: 21.3
 
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
+        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
             methods for how to use properly. This list is empty if the message does not contain
@@ -675,7 +680,7 @@ class Message(MaybeInaccessibleMessage):
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
             :ref:`More about games >> <games-tree>`.
-        photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
+        photo (tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -703,7 +708,7 @@ class Message(MaybeInaccessibleMessage):
             about the video message.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        new_chat_members (Tuple[:class:`telegram.User`]): Optional. New members that were added
+        new_chat_members (tuple[:class:`telegram.User`]): Optional. New members that were added
             to the group or supergroup and information about them (the bot itself may be one of
             these members). This list is empty if the message does not contain new chat members.
 
@@ -722,7 +727,7 @@ class Message(MaybeInaccessibleMessage):
         left_chat_member (:class:`telegram.User`): Optional. A member was removed from the group,
             information about them (this member may be the bot itself).
         new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
-        new_chat_photo (Tuple[:class:`telegram.PhotoSize`]): A chat photo was changed to
+        new_chat_photo (tuple[:class:`telegram.PhotoSize`]): A chat photo was changed to
             this value. This list is empty if the message does not contain a new chat photo.
 
             .. versionchanged:: 20.0
@@ -1016,11 +1021,11 @@ class Message(MaybeInaccessibleMessage):
     def __init__(
         self,
         message_id: int,
-        date: datetime.datetime,
+        date: dtm.datetime,
         chat: Chat,
         from_user: Optional[User] = None,
         reply_to_message: Optional["Message"] = None,
-        edit_date: Optional[datetime.datetime] = None,
+        edit_date: Optional[dtm.datetime] = None,
         text: Optional[str] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
@@ -1111,19 +1116,19 @@ class Message(MaybeInaccessibleMessage):
             # Optionals
             self.from_user: Optional[User] = from_user
             self.sender_chat: Optional[Chat] = sender_chat
-            self.date: datetime.datetime = date
+            self.date: dtm.datetime = date
             self.chat: Chat = chat
             self.is_automatic_forward: Optional[bool] = is_automatic_forward
             self.reply_to_message: Optional[Message] = reply_to_message
-            self.edit_date: Optional[datetime.datetime] = edit_date
+            self.edit_date: Optional[dtm.datetime] = edit_date
             self.has_protected_content: Optional[bool] = has_protected_content
             self.text: Optional[str] = text
-            self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.audio: Optional[Audio] = audio
             self.game: Optional[Game] = game
             self.document: Optional[Document] = document
-            self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+            self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
             self.sticker: Optional[Sticker] = sticker
             self.video: Optional[Video] = video
             self.voice: Optional[Voice] = voice
@@ -1132,10 +1137,10 @@ class Message(MaybeInaccessibleMessage):
             self.contact: Optional[Contact] = contact
             self.location: Optional[Location] = location
             self.venue: Optional[Venue] = venue
-            self.new_chat_members: Tuple[User, ...] = parse_sequence_arg(new_chat_members)
+            self.new_chat_members: tuple[User, ...] = parse_sequence_arg(new_chat_members)
             self.left_chat_member: Optional[User] = left_chat_member
             self.new_chat_title: Optional[str] = new_chat_title
-            self.new_chat_photo: Tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
+            self.new_chat_photo: tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
             self.delete_chat_photo: Optional[bool] = bool(delete_chat_photo)
             self.group_chat_created: Optional[bool] = bool(group_chat_created)
             self.supergroup_chat_created: Optional[bool] = bool(supergroup_chat_created)
@@ -1243,83 +1248,100 @@ class Message(MaybeInaccessibleMessage):
         return None
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Message"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Message":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["from_user"] = User.de_json(data.pop("from", None), bot)
-        data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
-        data["entities"] = MessageEntity.de_list(data.get("entities"), bot)
-        data["caption_entities"] = MessageEntity.de_list(data.get("caption_entities"), bot)
-        data["reply_to_message"] = Message.de_json(data.get("reply_to_message"), bot)
+        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
+        data["sender_chat"] = de_json_optional(data.get("sender_chat"), Chat, bot)
+        data["entities"] = de_list_optional(data.get("entities"), MessageEntity, bot)
+        data["caption_entities"] = de_list_optional(
+            data.get("caption_entities"), MessageEntity, bot
+        )
+        data["reply_to_message"] = de_json_optional(data.get("reply_to_message"), Message, bot)
         data["edit_date"] = from_timestamp(data.get("edit_date"), tzinfo=loc_tzinfo)
-        data["audio"] = Audio.de_json(data.get("audio"), bot)
-        data["document"] = Document.de_json(data.get("document"), bot)
-        data["animation"] = Animation.de_json(data.get("animation"), bot)
-        data["game"] = Game.de_json(data.get("game"), bot)
-        data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
-        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
-        data["story"] = Story.de_json(data.get("story"), bot)
-        data["video"] = Video.de_json(data.get("video"), bot)
-        data["voice"] = Voice.de_json(data.get("voice"), bot)
-        data["video_note"] = VideoNote.de_json(data.get("video_note"), bot)
-        data["contact"] = Contact.de_json(data.get("contact"), bot)
-        data["location"] = Location.de_json(data.get("location"), bot)
-        data["venue"] = Venue.de_json(data.get("venue"), bot)
-        data["new_chat_members"] = User.de_list(data.get("new_chat_members"), bot)
-        data["left_chat_member"] = User.de_json(data.get("left_chat_member"), bot)
-        data["new_chat_photo"] = PhotoSize.de_list(data.get("new_chat_photo"), bot)
-        data["message_auto_delete_timer_changed"] = MessageAutoDeleteTimerChanged.de_json(
-            data.get("message_auto_delete_timer_changed"), bot
+        data["audio"] = de_json_optional(data.get("audio"), Audio, bot)
+        data["document"] = de_json_optional(data.get("document"), Document, bot)
+        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
+        data["game"] = de_json_optional(data.get("game"), Game, bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
+        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
+        data["story"] = de_json_optional(data.get("story"), Story, bot)
+        data["video"] = de_json_optional(data.get("video"), Video, bot)
+        data["voice"] = de_json_optional(data.get("voice"), Voice, bot)
+        data["video_note"] = de_json_optional(data.get("video_note"), VideoNote, bot)
+        data["contact"] = de_json_optional(data.get("contact"), Contact, bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
+        data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
+        data["new_chat_members"] = de_list_optional(data.get("new_chat_members"), User, bot)
+        data["left_chat_member"] = de_json_optional(data.get("left_chat_member"), User, bot)
+        data["new_chat_photo"] = de_list_optional(data.get("new_chat_photo"), PhotoSize, bot)
+        data["message_auto_delete_timer_changed"] = de_json_optional(
+            data.get("message_auto_delete_timer_changed"), MessageAutoDeleteTimerChanged, bot
         )
-        data["pinned_message"] = MaybeInaccessibleMessage.de_json(data.get("pinned_message"), bot)
-        data["invoice"] = Invoice.de_json(data.get("invoice"), bot)
-        data["successful_payment"] = SuccessfulPayment.de_json(data.get("successful_payment"), bot)
-        data["passport_data"] = PassportData.de_json(data.get("passport_data"), bot)
-        data["poll"] = Poll.de_json(data.get("poll"), bot)
-        data["dice"] = Dice.de_json(data.get("dice"), bot)
-        data["via_bot"] = User.de_json(data.get("via_bot"), bot)
-        data["proximity_alert_triggered"] = ProximityAlertTriggered.de_json(
-            data.get("proximity_alert_triggered"), bot
+        data["pinned_message"] = de_json_optional(
+            data.get("pinned_message"), MaybeInaccessibleMessage, bot
         )
-        data["reply_markup"] = InlineKeyboardMarkup.de_json(data.get("reply_markup"), bot)
-        data["video_chat_scheduled"] = VideoChatScheduled.de_json(
-            data.get("video_chat_scheduled"), bot
+        data["invoice"] = de_json_optional(data.get("invoice"), Invoice, bot)
+        data["successful_payment"] = de_json_optional(
+            data.get("successful_payment"), SuccessfulPayment, bot
         )
-        data["video_chat_started"] = VideoChatStarted.de_json(data.get("video_chat_started"), bot)
-        data["video_chat_ended"] = VideoChatEnded.de_json(data.get("video_chat_ended"), bot)
-        data["video_chat_participants_invited"] = VideoChatParticipantsInvited.de_json(
-            data.get("video_chat_participants_invited"), bot
+        data["passport_data"] = de_json_optional(data.get("passport_data"), PassportData, bot)
+        data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
+        data["dice"] = de_json_optional(data.get("dice"), Dice, bot)
+        data["via_bot"] = de_json_optional(data.get("via_bot"), User, bot)
+        data["proximity_alert_triggered"] = de_json_optional(
+            data.get("proximity_alert_triggered"), ProximityAlertTriggered, bot
         )
-        data["web_app_data"] = WebAppData.de_json(data.get("web_app_data"), bot)
-        data["forum_topic_closed"] = ForumTopicClosed.de_json(data.get("forum_topic_closed"), bot)
-        data["forum_topic_created"] = ForumTopicCreated.de_json(
-            data.get("forum_topic_created"), bot
+        data["reply_markup"] = de_json_optional(
+            data.get("reply_markup"), InlineKeyboardMarkup, bot
         )
-        data["forum_topic_reopened"] = ForumTopicReopened.de_json(
-            data.get("forum_topic_reopened"), bot
+        data["video_chat_scheduled"] = de_json_optional(
+            data.get("video_chat_scheduled"), VideoChatScheduled, bot
         )
-        data["forum_topic_edited"] = ForumTopicEdited.de_json(data.get("forum_topic_edited"), bot)
-        data["general_forum_topic_hidden"] = GeneralForumTopicHidden.de_json(
-            data.get("general_forum_topic_hidden"), bot
+        data["video_chat_started"] = de_json_optional(
+            data.get("video_chat_started"), VideoChatStarted, bot
         )
-        data["general_forum_topic_unhidden"] = GeneralForumTopicUnhidden.de_json(
-            data.get("general_forum_topic_unhidden"), bot
+        data["video_chat_ended"] = de_json_optional(
+            data.get("video_chat_ended"), VideoChatEnded, bot
         )
-        data["write_access_allowed"] = WriteAccessAllowed.de_json(
-            data.get("write_access_allowed"), bot
+        data["video_chat_participants_invited"] = de_json_optional(
+            data.get("video_chat_participants_invited"), VideoChatParticipantsInvited, bot
         )
-        data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
-        data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
-        data["chat_background_set"] = ChatBackground.de_json(data.get("chat_background_set"), bot)
-        data["paid_media"] = PaidMediaInfo.de_json(data.get("paid_media"), bot)
-        data["refunded_payment"] = RefundedPayment.de_json(data.get("refunded_payment"), bot)
+        data["web_app_data"] = de_json_optional(data.get("web_app_data"), WebAppData, bot)
+        data["forum_topic_closed"] = de_json_optional(
+            data.get("forum_topic_closed"), ForumTopicClosed, bot
+        )
+        data["forum_topic_created"] = de_json_optional(
+            data.get("forum_topic_created"), ForumTopicCreated, bot
+        )
+        data["forum_topic_reopened"] = de_json_optional(
+            data.get("forum_topic_reopened"), ForumTopicReopened, bot
+        )
+        data["forum_topic_edited"] = de_json_optional(
+            data.get("forum_topic_edited"), ForumTopicEdited, bot
+        )
+        data["general_forum_topic_hidden"] = de_json_optional(
+            data.get("general_forum_topic_hidden"), GeneralForumTopicHidden, bot
+        )
+        data["general_forum_topic_unhidden"] = de_json_optional(
+            data.get("general_forum_topic_unhidden"), GeneralForumTopicUnhidden, bot
+        )
+        data["write_access_allowed"] = de_json_optional(
+            data.get("write_access_allowed"), WriteAccessAllowed, bot
+        )
+        data["users_shared"] = de_json_optional(data.get("users_shared"), UsersShared, bot)
+        data["chat_shared"] = de_json_optional(data.get("chat_shared"), ChatShared, bot)
+        data["chat_background_set"] = de_json_optional(
+            data.get("chat_background_set"), ChatBackground, bot
+        )
+        data["paid_media"] = de_json_optional(data.get("paid_media"), PaidMediaInfo, bot)
+        data["refunded_payment"] = de_json_optional(
+            data.get("refunded_payment"), RefundedPayment, bot
+        )
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
@@ -1336,19 +1358,27 @@ class Message(MaybeInaccessibleMessage):
             TextQuote,
         )
 
-        data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
-        data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
-        data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)
-        data["giveaway_winners"] = GiveawayWinners.de_json(data.get("giveaway_winners"), bot)
-        data["link_preview_options"] = LinkPreviewOptions.de_json(
-            data.get("link_preview_options"), bot
+        data["giveaway"] = de_json_optional(data.get("giveaway"), Giveaway, bot)
+        data["giveaway_completed"] = de_json_optional(
+            data.get("giveaway_completed"), GiveawayCompleted, bot
         )
-        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
-        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
-        data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
-        data["reply_to_story"] = Story.de_json(data.get("reply_to_story"), bot)
-        data["boost_added"] = ChatBoostAdded.de_json(data.get("boost_added"), bot)
-        data["sender_business_bot"] = User.de_json(data.get("sender_business_bot"), bot)
+        data["giveaway_created"] = de_json_optional(
+            data.get("giveaway_created"), GiveawayCreated, bot
+        )
+        data["giveaway_winners"] = de_json_optional(
+            data.get("giveaway_winners"), GiveawayWinners, bot
+        )
+        data["link_preview_options"] = de_json_optional(
+            data.get("link_preview_options"), LinkPreviewOptions, bot
+        )
+        data["external_reply"] = de_json_optional(
+            data.get("external_reply"), ExternalReplyInfo, bot
+        )
+        data["quote"] = de_json_optional(data.get("quote"), TextQuote, bot)
+        data["forward_origin"] = de_json_optional(data.get("forward_origin"), MessageOrigin, bot)
+        data["reply_to_story"] = de_json_optional(data.get("reply_to_story"), Story, bot)
+        data["boost_added"] = de_json_optional(data.get("boost_added"), ChatBoostAdded, bot)
+        data["sender_business_bot"] = de_json_optional(data.get("sender_business_bot"), User, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -1406,7 +1436,7 @@ class Message(MaybeInaccessibleMessage):
         * :class:`telegram.Invoice`
         * :class:`telegram.Location`
         * :class:`telegram.PassportData`
-        * List[:class:`telegram.PhotoSize`]
+        * list[:class:`telegram.PhotoSize`]
         * :class:`telegram.PaidMediaInfo`
         * :class:`telegram.Poll`
         * :class:`telegram.Sticker`
@@ -1478,7 +1508,7 @@ class Message(MaybeInaccessibleMessage):
 
     def compute_quote_position_and_entities(
         self, quote: str, index: Optional[int] = None
-    ) -> Tuple[int, Optional[Tuple[MessageEntity, ...]]]:
+    ) -> tuple[int, Optional[tuple[MessageEntity, ...]]]:
         """
         Use this function to compute position and entities of a quote in the message text or
         caption. Useful for filling the parameters
@@ -1504,7 +1534,7 @@ class Message(MaybeInaccessibleMessage):
                 message. If not specified, the first occurrence is used.
 
         Returns:
-            Tuple[:obj:`int`, :obj:`None` | Tuple[:class:`~telegram.MessageEntity`, ...]]: On
+            tuple[:obj:`int`, :obj:`None` | tuple[:class:`~telegram.MessageEntity`, ...]]: On
             success, a tuple containing information about quote position and entities is returned.
 
         Raises:
@@ -1647,7 +1677,7 @@ class Message(MaybeInaccessibleMessage):
         quote: Optional[bool],
         reply_to_message_id: Optional[int],
         reply_parameters: Optional["ReplyParameters"],
-    ) -> Tuple[Union[str, int], ReplyParameters]:
+    ) -> tuple[Union[str, int], ReplyParameters]:
         if quote and do_quote:
             raise ValueError("The arguments `quote` and `do_quote` are mutually exclusive")
 
@@ -1714,6 +1744,7 @@ class Message(MaybeInaccessibleMessage):
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1779,6 +1810,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_markdown(
@@ -1792,6 +1824,7 @@ class Message(MaybeInaccessibleMessage):
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1863,6 +1896,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_markdown_v2(
@@ -1876,6 +1910,7 @@ class Message(MaybeInaccessibleMessage):
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1943,6 +1978,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_html(
@@ -1956,6 +1992,7 @@ class Message(MaybeInaccessibleMessage):
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2023,6 +2060,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_media_group(
@@ -2035,6 +2073,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2048,7 +2087,7 @@ class Message(MaybeInaccessibleMessage):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-    ) -> Tuple["Message", ...]:
+    ) -> tuple["Message", ...]:
         """Shortcut for::
 
              await bot.send_media_group(
@@ -2075,7 +2114,7 @@ class Message(MaybeInaccessibleMessage):
                 .. versionadded:: 20.8
 
         Returns:
-            Tuple[:class:`telegram.Message`]: An array of the sent Messages.
+            tuple[:class:`telegram.Message`]: An array of the sent Messages.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -2102,6 +2141,7 @@ class Message(MaybeInaccessibleMessage):
             caption_entities=caption_entities,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_photo(
@@ -2117,6 +2157,7 @@ class Message(MaybeInaccessibleMessage):
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2184,6 +2225,7 @@ class Message(MaybeInaccessibleMessage):
             has_spoiler=has_spoiler,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -2203,6 +2245,7 @@ class Message(MaybeInaccessibleMessage):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2272,6 +2315,7 @@ class Message(MaybeInaccessibleMessage):
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_document(
@@ -2288,6 +2332,7 @@ class Message(MaybeInaccessibleMessage):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2355,6 +2400,7 @@ class Message(MaybeInaccessibleMessage):
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_animation(
@@ -2374,6 +2420,7 @@ class Message(MaybeInaccessibleMessage):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2445,6 +2492,7 @@ class Message(MaybeInaccessibleMessage):
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -2458,6 +2506,7 @@ class Message(MaybeInaccessibleMessage):
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2519,6 +2568,7 @@ class Message(MaybeInaccessibleMessage):
             emoji=emoji,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_video(
@@ -2539,6 +2589,7 @@ class Message(MaybeInaccessibleMessage):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2611,6 +2662,7 @@ class Message(MaybeInaccessibleMessage):
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
         )
 
@@ -2626,6 +2678,7 @@ class Message(MaybeInaccessibleMessage):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2691,6 +2744,7 @@ class Message(MaybeInaccessibleMessage):
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_voice(
@@ -2706,6 +2760,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2772,6 +2827,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_location(
@@ -2788,6 +2844,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2855,6 +2912,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_venue(
@@ -2873,6 +2931,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2942,6 +3001,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_contact(
@@ -2956,6 +3016,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3021,6 +3082,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_poll(
@@ -3037,7 +3099,7 @@ class Message(MaybeInaccessibleMessage):
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: Optional[int] = None,
-        close_date: Optional[Union[int, datetime.datetime]] = None,
+        close_date: Optional[Union[int, dtm.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
@@ -3045,6 +3107,7 @@ class Message(MaybeInaccessibleMessage):
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Optional[Sequence["MessageEntity"]] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3118,6 +3181,7 @@ class Message(MaybeInaccessibleMessage):
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_dice(
@@ -3129,6 +3193,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3189,6 +3254,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_chat_action(
@@ -3244,6 +3310,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3306,6 +3373,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_invoice(
@@ -3337,6 +3405,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3427,6 +3496,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def forward(
@@ -3491,6 +3561,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3536,6 +3607,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def reply_copy(
@@ -3551,6 +3623,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
+        allow_paid_broadcast: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3615,6 +3688,78 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
+        )
+
+    async def reply_paid_media(
+        self,
+        star_count: int,
+        media: Sequence["InputPaidMedia"],
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        show_caption_above_media: Optional[bool] = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        payload: Optional[str] = None,
+        allow_paid_broadcast: Optional[bool] = None,
+        *,
+        reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_paid_media(
+                 chat_id=message.chat.id,
+                 business_connection_id=message.business_connection_id,
+                 *args,
+                 **kwargs
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_paid_media`.
+
+        .. versionadded:: 21.7
+
+        Keyword Args:
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent message is returned.
+
+        """
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, None, reply_to_message_id, reply_parameters
+        )
+        return await self.get_bot().send_paid_media(
+            chat_id=chat_id,
+            caption=caption,
+            star_count=star_count,
+            media=media,
+            payload=payload,
+            business_connection_id=self.business_connection_id,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            disable_notification=disable_notification,
+            reply_parameters=effective_reply_parameters,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            protect_content=protect_content,
+            show_caption_above_media=show_caption_above_media,
+            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def edit_text(
@@ -3989,7 +4134,7 @@ class Message(MaybeInaccessibleMessage):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple["GameHighScore", ...]:
+    ) -> tuple["GameHighScore", ...]:
         """Shortcut for::
 
              await bot.get_game_high_scores(
@@ -4005,7 +4150,7 @@ class Message(MaybeInaccessibleMessage):
             behaviour is undocumented and might be changed by Telegram.
 
         Returns:
-            Tuple[:class:`telegram.GameHighScore`]
+            tuple[:class:`telegram.GameHighScore`]
         """
         return await self.get_bot().get_game_high_scores(
             chat_id=self.chat_id,
@@ -4431,7 +4576,7 @@ class Message(MaybeInaccessibleMessage):
 
         return parse_message_entity(self.caption, entity)
 
-    def parse_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
+    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their
@@ -4444,21 +4589,21 @@ class Message(MaybeInaccessibleMessage):
             See :attr:`parse_entity` for more info.
 
         Args:
-            types (List[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
+            types (list[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
                 strings. If the ``type`` attribute of an entity is contained in this list, it will
                 be returned. Defaults to a list of all types. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
 
         Returns:
-            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """
         return parse_message_entities(self.text, self.entities, types=types)
 
     def parse_caption_entities(
-        self, types: Optional[List[str]] = None
-    ) -> Dict[MessageEntity, str]:
+        self, types: Optional[list[str]] = None
+    ) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message's caption filtered by their
@@ -4471,13 +4616,13 @@ class Message(MaybeInaccessibleMessage):
             codepoints. See :attr:`parse_entity` for more info.
 
         Args:
-            types (List[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
+            types (list[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
                 strings. If the ``type`` attribute of an entity is contained in this list, it will
                 be returned. Defaults to a list of all types. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
 
         Returns:
-            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """
@@ -4487,7 +4632,7 @@ class Message(MaybeInaccessibleMessage):
     def _parse_html(
         cls,
         message_text: Optional[str],
-        entities: Dict[MessageEntity, str],
+        entities: dict[MessageEntity, str],
         urled: bool = False,
         offset: int = 0,
     ) -> Optional[str]:
@@ -4676,7 +4821,7 @@ class Message(MaybeInaccessibleMessage):
     def _parse_markdown(
         cls,
         message_text: Optional[str],
-        entities: Dict[MessageEntity, str],
+        entities: dict[MessageEntity, str],
         urled: bool = False,
         version: MarkdownVersion = 1,
         offset: int = 0,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ class TestSentWebAppMessageWithoutRequest(SentWebAppMessageTestBase):
         assert isinstance(sent_web_app_message_dict, dict)
         assert sent_web_app_message_dict["inline_message_id"] == self.inline_message_id
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         data = {"inline_message_id": self.inline_message_id}
         m = SentWebAppMessage.de_json(data, None)
         assert m.api_kwargs == {}

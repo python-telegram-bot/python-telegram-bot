@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,14 +25,14 @@ Warning:
 """
 import enum as _enum
 import sys
-from typing import Type, TypeVar, Union
+from typing import TypeVar, Union
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
 _Enum = TypeVar("_Enum", bound=_enum.Enum)
 
 
-def get_member(enum_cls: Type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _B]:
+def get_member(enum_cls: type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _B]:
     """Tries to call ``enum_cls(value)`` to convert the value into an enumeration member.
     If that fails, the ``default`` is returned.
     """
@@ -74,3 +74,17 @@ class IntEnum(_enum.IntEnum):  # pylint: disable=invalid-slots
 
         def __str__(self) -> str:
             return str(self.value)
+
+
+class FloatEnum(float, _enum.Enum):
+    """Helper class for float enums where ``str(member)`` prints the value, but ``repr(member)``
+    gives ``EnumName.MEMBER_NAME``.
+    """
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}.{self.name}>"
+
+    def __str__(self) -> str:
+        return str(self.value)

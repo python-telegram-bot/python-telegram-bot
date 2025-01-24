@@ -25,6 +25,8 @@
           - Used for sending documents
         * - :meth:`~telegram.Bot.send_game`
           - Used for sending a game
+        * - :meth:`~telegram.Bot.send_gift`
+          - Used for sending a gift
         * - :meth:`~telegram.Bot.send_invoice`
           - Used for sending an invoice
         * - :meth:`~telegram.Bot.send_location`
@@ -151,6 +153,8 @@
       - Used for setting a chat title
     * - :meth:`~telegram.Bot.set_chat_description`
       - Used for setting the description of a chat
+    * - :meth:`~telegram.Bot.set_user_emoji_status`
+      - Used for setting the users status emoji
     * - :meth:`~telegram.Bot.pin_chat_message`
       - Used for pinning a message
     * - :meth:`~telegram.Bot.unpin_chat_message`
@@ -173,6 +177,29 @@
       - Used for getting the list of boosts added to a chat
     * - :meth:`~telegram.Bot.leave_chat`
       - Used for leaving a chat
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
+   <summary>Verification on behalf of an organization</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
+    * - :meth:`~telegram.Bot.verify_chat`
+      - Used for verifying a chat
+    * - :meth:`~telegram.Bot.verify_user`
+      - Used for verifying a user
+    * - :meth:`~telegram.Bot.remove_chat_verification`
+      - Used for removing the verification from a chat
+    * - :meth:`~telegram.Bot.remove_user_verification`
+      - Used for removing the verification from a user
 
 .. raw:: html
 
@@ -355,7 +382,7 @@
 .. raw:: html
 
    <details>
-   <summary>Miscellaneous</summary>
+   <summary>Payments and Stars</summary>
 
 .. list-table::
     :align: left
@@ -363,18 +390,39 @@
 
     * - :meth:`~telegram.Bot.create_invoice_link`
       - Used to generate an HTTP link for an invoice
+    * - :meth:`~telegram.Bot.edit_user_star_subscription`
+      - Used for editing a user's star subscription
+    * - :meth:`~telegram.Bot.get_star_transactions`
+      - Used for obtaining the bot's Telegram Stars transactions
+    * - :meth:`~telegram.Bot.refund_star_payment`
+      - Used for refunding a payment in Telegram Stars
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
+   <summary>Miscellaneous</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
     * - :meth:`~telegram.Bot.close`
       - Used for closing server instance when switching to another local server
     * - :meth:`~telegram.Bot.log_out`
       - Used for logging out from cloud Bot API server
     * - :meth:`~telegram.Bot.get_file`
       - Used for getting basic info about a file
+    * - :meth:`~telegram.Bot.get_available_gifts`
+      - Used for getting information about gifts available for sending
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
-    * - :meth:`~telegram.Bot.get_star_transactions`
-      - Used for obtaining the bot's Telegram Stars transactions
-    * - :meth:`~telegram.Bot.refund_star_payment`
-      - Used for refunding a payment in Telegram Stars
+    * - :meth:`~telegram.Bot.save_prepared_inline_message`
+      - Used for storing a message to be sent by a user of a Mini App
 
 .. raw:: html
 

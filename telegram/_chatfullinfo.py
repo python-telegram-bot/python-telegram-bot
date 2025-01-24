@@ -2,7 +2,7 @@
 # pylint: disable=redefined-builtin
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatFullInfo."""
-from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+import datetime as dtm
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._birthdate import Birthdate
 from telegram._chat import Chat, _ChatBase
@@ -27,7 +28,7 @@ from telegram._chatlocation import ChatLocation
 from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._reaction import ReactionType
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -224,7 +225,7 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 20.0
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
-        active_usernames (Tuple[:obj:`str`]): Optional. If set, the list of all `active chat
+        active_usernames (tuple[:obj:`str`]): Optional. If set, the list of all `active chat
             usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
             #collectible-usernames>`_; for private chats, supergroups and channels.
 
@@ -252,7 +253,7 @@ class ChatFullInfo(_ChatBase):
             of the user.
 
             .. versionadded:: 21.1
-        available_reactions (Tuple[:class:`telegram.ReactionType`]): Optional. List of available
+        available_reactions (tuple[:class:`telegram.ReactionType`]): Optional. List of available
             reactions allowed in the chat. If omitted, then all of
             :const:`telegram.constants.ReactionEmoji` are allowed.
 
@@ -421,7 +422,7 @@ class ChatFullInfo(_ChatBase):
         profile_accent_color_id: Optional[int] = None,
         profile_background_custom_emoji_id: Optional[str] = None,
         emoji_status_custom_emoji_id: Optional[str] = None,
-        emoji_status_expiration_date: Optional[datetime] = None,
+        emoji_status_expiration_date: Optional[dtm.datetime] = None,
         bio: Optional[str] = None,
         has_private_forwards: Optional[bool] = None,
         has_restricted_voice_and_video_messages: Optional[bool] = None,
@@ -483,14 +484,16 @@ class ChatFullInfo(_ChatBase):
             self.has_restricted_voice_and_video_messages: Optional[bool] = (
                 has_restricted_voice_and_video_messages
             )
-            self.active_usernames: Tuple[str, ...] = parse_sequence_arg(active_usernames)
+            self.active_usernames: tuple[str, ...] = parse_sequence_arg(active_usernames)
             self.emoji_status_custom_emoji_id: Optional[str] = emoji_status_custom_emoji_id
-            self.emoji_status_expiration_date: Optional[datetime] = emoji_status_expiration_date
+            self.emoji_status_expiration_date: Optional[dtm.datetime] = (
+                emoji_status_expiration_date
+            )
             self.has_aggressive_anti_spam_enabled: Optional[bool] = (
                 has_aggressive_anti_spam_enabled
             )
             self.has_hidden_members: Optional[bool] = has_hidden_members
-            self.available_reactions: Optional[Tuple[ReactionType, ...]] = parse_sequence_arg(
+            self.available_reactions: Optional[tuple[ReactionType, ...]] = parse_sequence_arg(
                 available_reactions
             )
             self.accent_color_id: Optional[int] = accent_color_id
@@ -509,14 +512,9 @@ class ChatFullInfo(_ChatBase):
             self.can_send_paid_media: Optional[bool] = can_send_paid_media
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatFullInfo"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatFullInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
@@ -525,7 +523,7 @@ class ChatFullInfo(_ChatBase):
             data.get("emoji_status_expiration_date"), tzinfo=loc_tzinfo
         )
 
-        data["photo"] = ChatPhoto.de_json(data.get("photo"), bot)
+        data["photo"] = de_json_optional(data.get("photo"), ChatPhoto, bot)
 
         from telegram import (  # pylint: disable=import-outside-toplevel
             BusinessIntro,
@@ -534,16 +532,20 @@ class ChatFullInfo(_ChatBase):
             Message,
         )
 
-        data["pinned_message"] = Message.de_json(data.get("pinned_message"), bot)
-        data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
-        data["location"] = ChatLocation.de_json(data.get("location"), bot)
-        data["available_reactions"] = ReactionType.de_list(data.get("available_reactions"), bot)
-        data["birthdate"] = Birthdate.de_json(data.get("birthdate"), bot)
-        data["personal_chat"] = Chat.de_json(data.get("personal_chat"), bot)
-        data["business_intro"] = BusinessIntro.de_json(data.get("business_intro"), bot)
-        data["business_location"] = BusinessLocation.de_json(data.get("business_location"), bot)
-        data["business_opening_hours"] = BusinessOpeningHours.de_json(
-            data.get("business_opening_hours"), bot
+        data["pinned_message"] = de_json_optional(data.get("pinned_message"), Message, bot)
+        data["permissions"] = de_json_optional(data.get("permissions"), ChatPermissions, bot)
+        data["location"] = de_json_optional(data.get("location"), ChatLocation, bot)
+        data["available_reactions"] = de_list_optional(
+            data.get("available_reactions"), ReactionType, bot
+        )
+        data["birthdate"] = de_json_optional(data.get("birthdate"), Birthdate, bot)
+        data["personal_chat"] = de_json_optional(data.get("personal_chat"), Chat, bot)
+        data["business_intro"] = de_json_optional(data.get("business_intro"), BusinessIntro, bot)
+        data["business_location"] = de_json_optional(
+            data.get("business_location"), BusinessLocation, bot
+        )
+        data["business_opening_hours"] = de_json_optional(
+            data.get("business_opening_hours"), BusinessOpeningHours, bot
         )
 
         return super().de_json(data=data, bot=bot)

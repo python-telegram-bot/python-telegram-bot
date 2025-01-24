@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -44,13 +44,13 @@ class TestProximityAlertTriggeredWithoutRequest(ProximityAlertTriggeredTestBase)
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "traveler": self.traveler.to_dict(),
             "watcher": self.watcher.to_dict(),
             "distance": self.distance,
         }
-        proximity_alert_triggered = ProximityAlertTriggered.de_json(json_dict, bot)
+        proximity_alert_triggered = ProximityAlertTriggered.de_json(json_dict, offline_bot)
         assert proximity_alert_triggered.api_kwargs == {}
 
         assert proximity_alert_triggered.traveler == self.traveler

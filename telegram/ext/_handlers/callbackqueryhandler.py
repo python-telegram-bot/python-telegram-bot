@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,8 @@
 """This module contains the CallbackQueryHandler class."""
 import asyncio
 import re
-from typing import TYPE_CHECKING, Any, Callable, Match, Optional, Pattern, TypeVar, Union, cast
+from re import Match, Pattern
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class CallbackQueryHandler(BaseHandler[Update, CCT]):
+class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram
     :attr:`callback queries <telegram.Update.callback_query>`. Optionally based on a regex.
 
@@ -125,7 +126,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
     __slots__ = ("game_pattern", "pattern")
 
     def __init__(
-        self,
+        self: "CallbackQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         pattern: Optional[
             Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]

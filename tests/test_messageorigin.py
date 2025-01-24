@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import inspect
 from copy import deepcopy
 
@@ -39,7 +39,7 @@ ignored = ["self", "api_kwargs"]
 
 
 class MODefaults:
-    date: datetime.datetime = to_timestamp(datetime.datetime.utcnow())
+    date: dtm.datetime = to_timestamp(dtm.datetime.utcnow())
     chat = Chat(1, Chat.CHANNEL)
     message_id = 123
     author_signautre = "PTB"
@@ -106,7 +106,7 @@ def iter_args(
         if param.name in ignored:
             continue
         inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
-        if isinstance(json_at, datetime.datetime):  # Convert datetime to int
+        if isinstance(json_at, dtm.datetime):  # Convert datetime to int
             json_at = to_timestamp(json_at)
         if (
             param.default is not inspect.Parameter.empty and include_optional
@@ -136,12 +136,11 @@ class TestMessageOriginTypesWithoutRequest:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json_required_args(self, bot, message_origin_type):
+    def test_de_json_required_args(self, offline_bot, message_origin_type):
         cls = message_origin_type.__class__
-        assert cls.de_json({}, bot) is None
 
         json_dict = make_json_dict(message_origin_type)
-        const_message_origin = MessageOrigin.de_json(json_dict, bot)
+        const_message_origin = MessageOrigin.de_json(json_dict, offline_bot)
         assert const_message_origin.api_kwargs == {}
 
         assert isinstance(const_message_origin, MessageOrigin)
@@ -151,9 +150,9 @@ class TestMessageOriginTypesWithoutRequest:
         ):
             assert msg_origin_type_at == const_msg_origin_at
 
-    def test_de_json_all_args(self, bot, message_origin_type):
+    def test_de_json_all_args(self, offline_bot, message_origin_type):
         json_dict = make_json_dict(message_origin_type, include_optional_args=True)
-        const_message_origin = MessageOrigin.de_json(json_dict, bot)
+        const_message_origin = MessageOrigin.de_json(json_dict, offline_bot)
 
         assert const_message_origin.api_kwargs == {}
 
@@ -164,10 +163,12 @@ class TestMessageOriginTypesWithoutRequest:
         ):
             assert msg_origin_type_at == const_msg_origin_at
 
-    def test_de_json_messageorigin_localization(self, message_origin_type, tz_bot, bot, raw_bot):
+    def test_de_json_messageorigin_localization(
+        self, message_origin_type, tz_bot, offline_bot, raw_bot
+    ):
         json_dict = make_json_dict(message_origin_type, include_optional_args=True)
         msgorigin_raw = MessageOrigin.de_json(json_dict, raw_bot)
-        msgorigin_bot = MessageOrigin.de_json(json_dict, bot)
+        msgorigin_bot = MessageOrigin.de_json(json_dict, offline_bot)
         msgorigin_tz = MessageOrigin.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -178,19 +179,19 @@ class TestMessageOriginTypesWithoutRequest:
         assert msgorigin_bot.date.tzinfo == UTC
         assert msgorigin_offset == tz_bot_offset
 
-    def test_de_json_invalid_type(self, message_origin_type, bot):
+    def test_de_json_invalid_type(self, message_origin_type, offline_bot):
         json_dict = {"type": "invalid", "date": MODefaults.date}
-        message_origin_type = MessageOrigin.de_json(json_dict, bot)
+        message_origin_type = MessageOrigin.de_json(json_dict, offline_bot)
 
         assert type(message_origin_type) is MessageOrigin
         assert message_origin_type.type == "invalid"
 
-    def test_de_json_subclass(self, message_origin_type, bot, chat_id):
-        """This makes sure that e.g. MessageOriginChat(data, bot) never returns a
+    def test_de_json_subclass(self, message_origin_type, offline_bot, chat_id):
+        """This makes sure that e.g. MessageOriginChat(data, offline_bot) never returns a
         MessageOriginUser instance."""
         cls = message_origin_type.__class__
         json_dict = make_json_dict(message_origin_type, True)
-        assert type(cls.de_json(json_dict, bot)) is cls
+        assert type(cls.de_json(json_dict, offline_bot)) is cls
 
     def test_to_dict(self, message_origin_type):
         message_origin_dict = message_origin_type.to_dict()

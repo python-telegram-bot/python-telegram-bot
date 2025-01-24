@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ with the TEST_WITH_OPT_DEPS environment variable set to False in addition to the
 """
 import pytest
 
-from telegram import _bot as bot
+import telegram
 from telegram._passport import credentials
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
@@ -39,7 +39,7 @@ from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 class TestNoPassportWithoutRequest:
     def test_bot_init(self, bot_info):
         with pytest.raises(RuntimeError, match="passport"):
-            bot.Bot(bot_info["token"], private_key=1, private_key_password=2)
+            telegram.Bot(bot_info["token"], private_key=1, private_key_password=2)
 
     def test_credentials_decrypt(self):
         with pytest.raises(RuntimeError, match="passport"):

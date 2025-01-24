@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 
 import pytest
 
@@ -58,7 +59,7 @@ class TestInvoiceWithoutRequest(InvoiceTestBase):
             assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invoice)) == len(set(mro_slots(invoice))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         invoice_json = Invoice.de_json(
             {
                 "title": self.title,
@@ -67,7 +68,7 @@ class TestInvoiceWithoutRequest(InvoiceTestBase):
                 "currency": self.currency,
                 "total_amount": self.total_amount,
             },
-            bot,
+            offline_bot,
         )
         assert invoice_json.api_kwargs == {}
 
@@ -87,15 +88,15 @@ class TestInvoiceWithoutRequest(InvoiceTestBase):
         assert invoice_dict["currency"] == invoice.currency
         assert invoice_dict["total_amount"] == invoice.total_amount
 
-    async def test_send_invoice_all_args_mock(self, bot, monkeypatch):
+    async def test_send_invoice_all_args_mock(self, offline_bot, monkeypatch):
         # We do this one as safety guard to make sure that we pass all of the optional
         # parameters correctly because #2526 went unnoticed for 3 years …
         async def make_assertion(*args, **_):
             kwargs = args[1]
             return all(kwargs[key] == key for key in kwargs)
 
-        monkeypatch.setattr(bot, "_send_message", make_assertion)
-        assert await bot.send_invoice(
+        monkeypatch.setattr(offline_bot, "_send_message", make_assertion)
+        assert await offline_bot.send_invoice(
             chat_id="chat_id",
             title="title",
             description="description",
@@ -122,13 +123,17 @@ class TestInvoiceWithoutRequest(InvoiceTestBase):
             protect_content=True,
         )
 
-    async def test_send_all_args_create_invoice_link(self, bot, monkeypatch):
+    @pytest.mark.parametrize("subscription_period", [42, dtm.timedelta(seconds=42)])
+    async def test_send_all_args_create_invoice_link(
+        self, offline_bot, monkeypatch, subscription_period
+    ):
         async def make_assertion(*args, **_):
             kwargs = args[1]
-            return all(kwargs[i] == i for i in kwargs)
+            sp = kwargs.pop("subscription_period") == 42
+            return all(kwargs[i] == i for i in kwargs) and sp
 
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        assert await bot.create_invoice_link(
+        monkeypatch.setattr(offline_bot, "_post", make_assertion)
+        assert await offline_bot.create_invoice_link(
             title="title",
             description="description",
             payload="payload",
@@ -149,15 +154,19 @@ class TestInvoiceWithoutRequest(InvoiceTestBase):
             send_phone_number_to_provider="send_phone_number_to_provider",
             send_email_to_provider="send_email_to_provider",
             is_flexible="is_flexible",
+            business_connection_id="business_connection_id",
+            subscription_period=subscription_period,
         )
 
-    async def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
+    async def test_send_object_as_provider_data(
+        self, monkeypatch, offline_bot, chat_id, provider_token
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["provider_data"] == '{"test_data": 123456789}'
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        assert await bot.send_invoice(
+        assert await offline_bot.send_invoice(
             chat_id,
             self.title,
             self.description,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 
 import pytest
 
@@ -32,7 +32,7 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def time():
-    return datetime.datetime.now(tz=UTC)
+    return dtm.datetime.now(tz=UTC)
 
 
 @pytest.fixture(scope="module")
@@ -70,35 +70,35 @@ class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot, time):
+    def test_de_json(self, offline_bot, time):
         json_dict = {
             "chat": self.chat.to_dict(),
             "from": self.from_user.to_dict(),
             "date": to_timestamp(time),
             "user_chat_id": self.from_user.id,
         }
-        chat_join_request = ChatJoinRequest.de_json(json_dict, bot)
+        chat_join_request = ChatJoinRequest.de_json(json_dict, offline_bot)
         assert chat_join_request.api_kwargs == {}
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
-        assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
+        assert abs(chat_join_request.date - time) < dtm.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
         assert chat_join_request.user_chat_id == self.from_user.id
 
         json_dict.update({"bio": self.bio, "invite_link": self.invite_link.to_dict()})
-        chat_join_request = ChatJoinRequest.de_json(json_dict, bot)
+        chat_join_request = ChatJoinRequest.de_json(json_dict, offline_bot)
         assert chat_join_request.api_kwargs == {}
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
-        assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
+        assert abs(chat_join_request.date - time) < dtm.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
         assert chat_join_request.user_chat_id == self.from_user.id
         assert chat_join_request.bio == self.bio
         assert chat_join_request.invite_link == self.invite_link
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot, time):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, time):
         json_dict = {
             "chat": self.chat.to_dict(),
             "from": self.from_user.to_dict(),
@@ -107,7 +107,7 @@ class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
         }
 
         chatjoin_req_raw = ChatJoinRequest.de_json(json_dict, raw_bot)
-        chatjoin_req_bot = ChatJoinRequest.de_json(json_dict, bot)
+        chatjoin_req_bot = ChatJoinRequest.de_json(json_dict, offline_bot)
         chatjoin_req_tz = ChatJoinRequest.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -133,9 +133,7 @@ class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
         a = chat_join_request
         b = ChatJoinRequest(self.chat, self.from_user, time, self.from_user.id)
         c = ChatJoinRequest(self.chat, self.from_user, time, self.from_user.id, bio="bio")
-        d = ChatJoinRequest(
-            self.chat, self.from_user, time + datetime.timedelta(1), self.from_user.id
-        )
+        d = ChatJoinRequest(self.chat, self.from_user, time + dtm.timedelta(1), self.from_user.id)
         e = ChatJoinRequest(self.chat, User(-1, "last_name", True), time, -1)
         f = User(456, "", False)
 

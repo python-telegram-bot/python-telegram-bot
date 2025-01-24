@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import Final, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import Final, Optional, Union
 
 from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
@@ -85,7 +86,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             .. versionadded:: 20.0
 
     Attributes:
-        keyboard (Tuple[Tuple[:class:`telegram.KeyboardButton`]]): Array of button rows,
+        keyboard (tuple[tuple[:class:`telegram.KeyboardButton`]]): Array of button rows,
             each represented by an Array of :class:`telegram.KeyboardButton` objects.
         resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard vertically
             for optimal fit (e.g., make the keyboard smaller if there are just two rows of
@@ -148,7 +149,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             )
 
         # Required
-        self.keyboard: Tuple[Tuple[KeyboardButton, ...], ...] = tuple(
+        self.keyboard: tuple[tuple[KeyboardButton, ...], ...] = tuple(
             tuple(KeyboardButton(button) if isinstance(button, str) else button for button in row)
             for row in keyboard
         )

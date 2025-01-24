@@ -1,7 +1,7 @@
 name: Question
 description: Get help with errors or general questions
-title: "[QUESTION]"
 labels: ["question"]
+type: '❔ question'
 
 body:
   - type: markdown

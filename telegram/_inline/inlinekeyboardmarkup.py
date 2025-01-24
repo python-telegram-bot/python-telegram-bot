@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -57,7 +58,7 @@ class InlineKeyboardMarkup(TelegramObject):
                 |sequenceclassargs|
 
     Attributes:
-        inline_keyboard (Tuple[Tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of
+        inline_keyboard (tuple[tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of
             button rows, each represented by a tuple of :class:`~telegram.InlineKeyboardButton`
             objects.
 
@@ -81,7 +82,7 @@ class InlineKeyboardMarkup(TelegramObject):
                 "InlineKeyboardButtons"
             )
         # Required
-        self.inline_keyboard: Tuple[Tuple[InlineKeyboardButton, ...], ...] = tuple(
+        self.inline_keyboard: tuple[tuple[InlineKeyboardButton, ...], ...] = tuple(
             tuple(row) for row in inline_keyboard
         )
 
@@ -90,12 +91,8 @@ class InlineKeyboardMarkup(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["InlineKeyboardMarkup"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InlineKeyboardMarkup":
         """See :meth:`telegram.TelegramObject.de_json`."""
-        if not data:
-            return None
 
         keyboard = []
         for row in data["inline_keyboard"]:

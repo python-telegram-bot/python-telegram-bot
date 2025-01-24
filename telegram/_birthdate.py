@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Birthday."""
-from datetime import date
+import datetime as dtm
 from typing import Optional
 
 from telegram._telegramobject import TelegramObject
@@ -70,7 +70,7 @@ class Birthdate(TelegramObject):
 
         self._freeze()
 
-    def to_date(self, year: Optional[int] = None) -> date:
+    def to_date(self, year: Optional[int] = None) -> dtm.date:
         """Return the birthdate as a date object.
 
         .. versionchanged:: 21.2
@@ -89,4 +89,4 @@ class Birthdate(TelegramObject):
                 "The `year` argument is required if the `year` attribute was not present."
             )
 
-        return date(year or self.year, self.month, self.day)  # type: ignore[arg-type]
+        return dtm.date(year or self.year, self.month, self.day)  # type: ignore[arg-type]

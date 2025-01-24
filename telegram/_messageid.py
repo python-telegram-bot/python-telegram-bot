@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -31,10 +31,16 @@ class MessageId(TelegramObject):
     considered equal, if their :attr:`message_id` is equal.
 
     Args:
-        message_id (:obj:`int`): Unique message identifier.
+        message_id (:obj:`int`): Unique message identifier. In specific instances
+            (e.g., message containing a video sent to a big chat), the server might automatically
+            schedule a message instead of sending it immediately. In such cases, this field will be
+            ``0`` and the relevant message will be unusable until it is actually sent.
 
     Attributes:
-        message_id (:obj:`int`): Unique message identifier.
+        message_id (:obj:`int`): Unique message identifier. In specific instances
+            (e.g., message containing a video sent to a big chat), the server might automatically
+            schedule a message instead of sending it immediately. In such cases, this field will be
+            ``0`` and the relevant message will be unusable until it is actually sent.
     """
 
     __slots__ = ("message_id",)

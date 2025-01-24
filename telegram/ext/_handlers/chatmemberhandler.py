@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 RT = TypeVar("RT")
 
 
-class ChatMemberHandler(BaseHandler[Update, CCT]):
+class ChatMemberHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram updates that contain a chat member update.
 
     Warning:
@@ -87,7 +87,7 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
     and :attr:`telegram.Update.chat_member`."""
 
     def __init__(
-        self,
+        self: "ChatMemberHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         chat_member_types: int = MY_CHAT_MEMBER,
         block: DVType[bool] = DEFAULT_TRUE,

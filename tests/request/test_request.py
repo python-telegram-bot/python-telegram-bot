@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,10 @@ import asyncio
 import json
 import logging
 from collections import defaultdict
+from collections.abc import Coroutine
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Callable, Coroutine, Tuple
+from typing import Any, Callable
 
 import httpx
 import pytest
@@ -67,7 +68,7 @@ from .test_requestdata import (  # noqa: F401
 
 def mocker_factory(
     response: bytes, return_code: int = HTTPStatus.OK
-) -> Callable[[Tuple[Any]], Coroutine[Any, Any, Tuple[int, bytes]]]:
+) -> Callable[[tuple[Any]], Coroutine[Any, Any, tuple[int, bytes]]]:
     async def make_assertion(*args, **kwargs):
         return return_code, response
 
@@ -84,7 +85,7 @@ async def httpx_request():
     TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
 class TestNoSocksHTTP2WithoutRequest:
-    async def test_init(self, bot):
+    async def test_init(self, offline_bot):
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[socks\]"):
             HTTPXRequest(proxy="socks5://foo")
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[http2\]"):
@@ -133,6 +134,37 @@ class TestRequestWithoutRequest:
             at = f"_{inst.__class__.__name__}{attr}" if attr.startswith("__") else attr
             assert getattr(inst, at, "err") != "err", f"got extra slot '{at}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_httpx_kwargs(self, monkeypatch):
+        self.test_flag = {}
+
+        orig_init = httpx.AsyncClient.__init__
+
+        class Client(httpx.AsyncClient):
+            def __init__(*args, **kwargs):
+                orig_init(*args, **kwargs)
+                self.test_flag["args"] = args
+                self.test_flag["kwargs"] = kwargs
+
+        monkeypatch.setattr(httpx, "AsyncClient", Client)
+
+        HTTPXRequest(
+            connect_timeout=1,
+            connection_pool_size=42,
+            http_version="2",
+            httpx_kwargs={
+                "timeout": httpx.Timeout(7),
+                "limits": httpx.Limits(max_connections=7),
+                "http1": True,
+                "verify": False,
+            },
+        )
+        kwargs = self.test_flag["kwargs"]
+
+        assert kwargs["timeout"].connect == 7
+        assert kwargs["limits"].max_connections == 7
+        assert kwargs["http1"] is True
+        assert kwargs["verify"] is False
 
     async def test_context_manager(self, monkeypatch):
         async def initialize():
@@ -188,8 +220,9 @@ class TestRequestWithoutRequest:
 
         monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
-        with pytest.raises(TelegramError, match="Invalid server response"), caplog.at_level(
-            logging.ERROR
+        with (
+            pytest.raises(TelegramError, match="Invalid server response"),
+            caplog.at_level(logging.ERROR),
         ):
             await httpx_request.post(None, None, None)
 
@@ -382,7 +415,7 @@ class TestRequestWithoutRequest:
             async def shutdown(self_) -> None:
                 pass
 
-            async def do_request(self_, *args, **kwargs) -> Tuple[int, bytes]:
+            async def do_request(self_, *args, **kwargs) -> tuple[int, bytes]:
                 self.test_flag = (
                     kwargs.get("read_timeout"),
                     kwargs.get("connect_timeout"),
@@ -515,27 +548,9 @@ class TestHTTPXRequestWithoutRequest:
         assert self.test_flag["init"] == 1
         assert self.test_flag["shutdown"] == 1
 
-    async def test_multiple_init_cycles(self):
-        # nothing really to assert - this should just not fail
-        httpx_request = HTTPXRequest()
-        async with httpx_request:
-            await httpx_request.do_request(url="https://python-telegram-bot.org", method="GET")
-        async with httpx_request:
-            await httpx_request.do_request(url="https://python-telegram-bot.org", method="GET")
-
     async def test_http_version_error(self):
         with pytest.raises(ValueError, match="`http_version` must be either"):
             HTTPXRequest(http_version="1.0")
-
-    async def test_http_1_response(self):
-        httpx_request = HTTPXRequest(http_version="1.1")
-        async with httpx_request:
-            resp = await httpx_request._client.request(
-                url="https://python-telegram-bot.org",
-                method="GET",
-                headers={"User-Agent": httpx_request.USER_AGENT},
-            )
-            assert resp.http_version == "HTTP/1.1"
 
     async def test_do_request_after_shutdown(self, httpx_request):
         await httpx_request.shutdown()
@@ -800,6 +815,24 @@ class TestHTTPXRequestWithoutRequest:
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestHTTPXRequestWithRequest:
+    async def test_multiple_init_cycles(self):
+        # nothing really to assert - this should just not fail
+        httpx_request = HTTPXRequest()
+        async with httpx_request:
+            await httpx_request.do_request(url="https://python-telegram-bot.org", method="GET")
+        async with httpx_request:
+            await httpx_request.do_request(url="https://python-telegram-bot.org", method="GET")
+
+    async def test_http_1_response(self):
+        httpx_request = HTTPXRequest(http_version="1.1")
+        async with httpx_request:
+            resp = await httpx_request._client.request(
+                url="https://python-telegram-bot.org",
+                method="GET",
+                headers={"User-Agent": httpx_request.USER_AGENT},
+            )
+            assert resp.http_version == "HTTP/1.1"
+
     async def test_do_request_wait_for_pool(self, httpx_request):
         """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
         instead of mocking"""

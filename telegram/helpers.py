@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ from html import escape
 from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._utils.types import MarkdownVersion
-from telegram.constants import MessageType
+from telegram.constants import MessageLimit, MessageType
 
 if TYPE_CHECKING:
     from telegram import Message, Update
@@ -173,7 +173,8 @@ def create_deep_linked_url(
         :obj:`str`: An URL to start the bot with specific parameters.
 
     Raises:
-        :exc:`ValueError`: If the length of the :paramref:`payload` exceeds 64 characters,
+        :exc:`ValueError`: If the length of the :paramref:`payload` exceeds \
+        :tg-const:`telegram.constants.MessageLimit.DEEP_LINK_LENGTH` characters,
             contains invalid characters, or if the :paramref:`bot_username` is less than 4
             characters.
     """
@@ -184,8 +185,10 @@ def create_deep_linked_url(
     if not payload:
         return base_url
 
-    if len(payload) > 64:
-        raise ValueError("The deep-linking payload must not exceed 64 characters.")
+    if len(payload) > MessageLimit.DEEP_LINK_LENGTH:
+        raise ValueError(
+            f"The deep-linking payload must not exceed {MessageLimit.DEEP_LINK_LENGTH} characters."
+        )
 
     if not re.match(r"^[A-Za-z0-9_-]+$", payload):
         raise ValueError(

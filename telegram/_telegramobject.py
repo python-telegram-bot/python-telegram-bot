@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,30 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
 import contextlib
-import datetime
+import datetime as dtm
 import inspect
 import json
-from collections.abc import Sized
+from collections.abc import Iterator, Mapping, Sized
 from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    ClassVar,
-    Dict,
-    Iterator,
-    List,
-    Mapping,
-    Optional,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, ClassVar, Optional, TypeVar, Union, cast
 
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
@@ -80,7 +65,7 @@ class TelegramObject:
           :obj:`list` are now of type :obj:`tuple`.
 
     Arguments:
-        api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|
+        api_kwargs (dict[:obj:`str`, any], optional): |toapikwargsarg|
 
             .. versionadded:: 20.0
 
@@ -95,11 +80,11 @@ class TelegramObject:
 
     # Used to cache the names of the parameters of the __init__ method of the class
     # Must be a private attribute to avoid name clashes between subclasses
-    __INIT_PARAMS: ClassVar[Set[str]] = set()
+    __INIT_PARAMS: ClassVar[set[str]] = set()
     # Used to check if __INIT_PARAMS has been set for the current class. Unfortunately, we can't
     # just check if `__INIT_PARAMS is None`, since subclasses use the parent class' __INIT_PARAMS
     # unless it's overridden
-    __INIT_PARAMS_CHECK: Optional[Type["TelegramObject"]] = None
+    __INIT_PARAMS_CHECK: Optional[type["TelegramObject"]] = None
 
     def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         # Setting _frozen to `False` here means that classes without arguments still need to
@@ -107,7 +92,7 @@ class TelegramObject:
         # `with self._unfrozen()` in the `__init__` of subclasses and we have fewer empty
         # classes than classes with arguments.
         self._frozen: bool = False
-        self._id_attrs: Tuple[object, ...] = ()
+        self._id_attrs: tuple[object, ...] = ()
         self._bot: Optional[Bot] = None
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
         self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
@@ -263,7 +248,7 @@ class TelegramObject:
                 f"`{item}`."
             ) from exc
 
-    def __getstate__(self) -> Dict[str, Union[str, object]]:
+    def __getstate__(self) -> dict[str, Union[str, object]]:
         """
         Overrides :meth:`object.__getstate__` to customize the pickling process of objects of this
         type.
@@ -271,7 +256,7 @@ class TelegramObject:
         :meth:`set_bot` (if any), as it can't be pickled.
 
         Returns:
-            state (Dict[:obj:`str`, :obj:`object`]): The state of the object.
+            state (dict[:obj:`str`, :obj:`object`]): The state of the object.
         """
         out = self._get_attrs(
             include_private=True, recursive=False, remove_bot=True, convert_default_vault=False
@@ -281,7 +266,7 @@ class TelegramObject:
         out["api_kwargs"] = dict(self.api_kwargs)
         return out
 
-    def __setstate__(self, state: Dict[str, object]) -> None:
+    def __setstate__(self, state: dict[str, object]) -> None:
         """
         Overrides :meth:`object.__setstate__` to customize the unpickling process of objects of
         this type. Modifies the object in-place.
@@ -305,7 +290,7 @@ class TelegramObject:
         self._bot = None
 
         # get api_kwargs first because we may need to add entries to it (see try-except below)
-        api_kwargs = cast(Dict[str, object], state.pop("api_kwargs", {}))
+        api_kwargs = cast(dict[str, object], state.pop("api_kwargs", {}))
         # get _frozen before the loop to avoid setting it to True in the loop
         frozen = state.pop("_frozen", False)
 
@@ -341,7 +326,7 @@ class TelegramObject:
         if frozen:
             self._freeze()
 
-    def __deepcopy__(self: Tele_co, memodict: Dict[int, object]) -> Tele_co:
+    def __deepcopy__(self: Tele_co, memodict: dict[int, object]) -> Tele_co:
         """
         Customizes how :func:`copy.deepcopy` processes objects of this type.
         The only difference to the default implementation is that the :class:`telegram.Bot`
@@ -392,23 +377,20 @@ class TelegramObject:
         return result
 
     @staticmethod
-    def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
+    def _parse_data(data: JSONDict) -> JSONDict:
         """Should be called by subclasses that override de_json to ensure that the input
         is not altered. Whoever calls de_json might still want to use the original input
         for something else.
         """
-        return None if data is None else data.copy()
+        return data.copy()
 
     @classmethod
     def _de_json(
-        cls: Type[Tele_co],
-        data: Optional[JSONDict],
+        cls: type[Tele_co],
+        data: JSONDict,
         bot: Optional["Bot"],
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Optional[Tele_co]:
-        if data is None:
-            return None
-
+    ) -> Tele_co:
         # try-except is significantly faster in case we already have a correct argument set
         try:
             obj = cls(**data, api_kwargs=api_kwargs)
@@ -432,13 +414,11 @@ class TelegramObject:
         return obj
 
     @classmethod
-    def de_json(
-        cls: Type[Tele_co], data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional[Tele_co]:
+    def de_json(cls: type[Tele_co], data: JSONDict, bot: Optional["Bot"] = None) -> Tele_co:
         """Converts JSON data to a Telegram object.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (dict[:obj:`str`, ...]): The JSON data.
             bot (:class:`telegram.Bot`, optional): The bot associated with this object. Defaults to
                 :obj:`None`, in which case shortcut methods will not be available.
 
@@ -453,8 +433,8 @@ class TelegramObject:
 
     @classmethod
     def de_list(
-        cls: Type[Tele_co], data: Optional[List[JSONDict]], bot: Optional["Bot"] = None
-    ) -> Tuple[Tele_co, ...]:
+        cls: type[Tele_co], data: list[JSONDict], bot: Optional["Bot"] = None
+    ) -> tuple[Tele_co, ...]:
         """Converts a list of JSON objects to a tuple of Telegram objects.
 
         .. versionchanged:: 20.0
@@ -463,7 +443,7 @@ class TelegramObject:
            * Filters out any :obj:`None` values.
 
         Args:
-            data (List[Dict[:obj:`str`, ...]]): The JSON data.
+            data (list[dict[:obj:`str`, ...]]): The JSON data.
             bot (:class:`telegram.Bot`, optional): The bot associated with these object. Defaults
                 to :obj:`None`, in which case shortcut methods will not be available.
 
@@ -474,10 +454,7 @@ class TelegramObject:
             A tuple of Telegram objects.
 
         """
-        if not data:
-            return ()
-
-        return tuple(obj for obj in (cls.de_json(d, bot) for d in data) if obj is not None)
+        return tuple(cls.de_json(d, bot) for d in data)
 
     @contextmanager
     def _unfrozen(self: Tele_co) -> Iterator[Tele_co]:
@@ -552,7 +529,7 @@ class TelegramObject:
         recursive: bool = False,
         remove_bot: bool = False,
         convert_default_vault: bool = True,
-    ) -> Dict[str, Union[str, object]]:
+    ) -> dict[str, Union[str, object]]:
         """This method is used for obtaining the attributes of the object.
 
         Args:
@@ -625,7 +602,7 @@ class TelegramObject:
         # Now we should convert TGObjects to dicts inside objects such as sequences, and convert
         # datetimes to timestamps. This mostly eliminates the need for subclasses to override
         # `to_dict`
-        pop_keys: Set[str] = set()
+        pop_keys: set[str] = set()
         for key, value in out.items():
             if isinstance(value, (tuple, list)):
                 if not value:
@@ -637,7 +614,7 @@ class TelegramObject:
                 for item in value:
                     if hasattr(item, "to_dict"):
                         val.append(item.to_dict(recursive=recursive))
-                    # This branch is useful for e.g. Tuple[Tuple[PhotoSize|KeyboardButton]]
+                    # This branch is useful for e.g. tuple[tuple[PhotoSize|KeyboardButton]]
                     elif isinstance(item, (tuple, list)):
                         val.append(
                             [
@@ -649,8 +626,10 @@ class TelegramObject:
                         val.append(item)
                 out[key] = val
 
-            elif isinstance(value, datetime.datetime):
+            elif isinstance(value, dtm.datetime):
                 out[key] = to_timestamp(value)
+            elif isinstance(value, dtm.timedelta):
+                out[key] = value.total_seconds()
 
         for key in pop_keys:
             out.pop(key)

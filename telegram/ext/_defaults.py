@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
-import datetime
-from typing import Any, Dict, NoReturn, Optional, final
+import datetime as dtm
+from typing import Any, NoReturn, Optional, final
 
 from telegram import LinkPreviewOptions
 from telegram._utils.datetime import UTC
@@ -57,10 +57,13 @@ class Defaults:
                 versions.
         tzinfo (:class:`datetime.tzinfo`, optional): A timezone to be used for all date(time)
             inputs appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
-            somewhere, it will be assumed to be in :paramref:`tzinfo`. If the
-            :class:`telegram.ext.JobQueue` is used, this must be a timezone provided
-            by the ``pytz`` module. Defaults to ``pytz.utc``, if available, and
+            somewhere, it will be assumed to be in :paramref:`tzinfo`. Defaults to
             :attr:`datetime.timezone.utc` otherwise.
+
+            .. deprecated:: 21.10
+                Support for ``pytz`` timezones is deprecated and will be removed in future
+                versions.
+
         block (:obj:`bool`, optional): Default setting for the :paramref:`BaseHandler.block`
             parameter
             of handlers and error handlers registered through :meth:`Application.add_handler` and
@@ -134,7 +137,7 @@ class Defaults:
         disable_notification: Optional[bool] = None,
         disable_web_page_preview: Optional[bool] = None,
         quote: Optional[bool] = None,
-        tzinfo: datetime.tzinfo = UTC,
+        tzinfo: dtm.tzinfo = UTC,
         block: bool = True,
         allow_sending_without_reply: Optional[bool] = None,
         protect_content: Optional[bool] = None,
@@ -144,9 +147,22 @@ class Defaults:
         self._parse_mode: Optional[str] = parse_mode
         self._disable_notification: Optional[bool] = disable_notification
         self._allow_sending_without_reply: Optional[bool] = allow_sending_without_reply
-        self._tzinfo: datetime.tzinfo = tzinfo
+        self._tzinfo: dtm.tzinfo = tzinfo
         self._block: bool = block
         self._protect_content: Optional[bool] = protect_content
+
+        if "pytz" in str(self._tzinfo.__class__):
+            # TODO: When dropping support, make sure to update _utils.datetime accordingly
+            warn(
+                message=PTBDeprecationWarning(
+                    version="21.10",
+                    message=(
+                        "Support for pytz timezones is deprecated and will be removed in "
+                        "future versions."
+                    ),
+                ),
+                stacklevel=2,
+            )
 
         if disable_web_page_preview is not None and link_preview_options is not None:
             raise ValueError(
@@ -188,6 +204,7 @@ class Defaults:
             "explanation_parse_mode",
             "link_preview_options",
             "parse_mode",
+            "text_parse_mode",
             "protect_content",
             "question_parse_mode",
         ):
@@ -228,7 +245,7 @@ class Defaults:
         return False
 
     @property
-    def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003
+    def api_defaults(self) -> dict[str, Any]:  # skip-cq: PY-D0003
         return self._api_defaults
 
     @property
@@ -271,7 +288,8 @@ class Defaults:
     @property
     def text_parse_mode(self) -> Optional[str]:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
-        the corresponding parameter of :class:`telegram.InputPollOption`.
+        the corresponding parameter of :class:`telegram.InputPollOption` and
+        :meth:`telegram.Bot.send_gift`.
 
         .. versionadded:: 21.2
         """
@@ -356,7 +374,7 @@ class Defaults:
         raise AttributeError("You can not assign a new value to quote after initialization.")
 
     @property
-    def tzinfo(self) -> datetime.tzinfo:
+    def tzinfo(self) -> dtm.tzinfo:
         """:obj:`tzinfo`: A timezone to be used for all date(time) objects appearing
         throughout PTB.
         """

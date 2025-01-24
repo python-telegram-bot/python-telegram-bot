@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -91,8 +91,8 @@ class TestUserWithoutRequest(UserTestBase):
             assert getattr(user, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(user)) == len(set(mro_slots(user))), "duplicate slot"
 
-    def test_de_json(self, json_dict, bot):
-        user = User.de_json(json_dict, bot)
+    def test_de_json(self, json_dict, offline_bot):
+        user = User.de_json(json_dict, offline_bot)
         assert user.api_kwargs == {}
 
         assert user.id == self.id_
@@ -720,3 +720,56 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "refund_star_payment", make_assertion)
         assert await user.refund_star_payment(telegram_payment_charge_id=42)
+
+    async def test_instance_method_send_gift(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["gift_id"] == "gift_id"
+                and kwargs["text"] == "text"
+                and kwargs["text_parse_mode"] == "text_parse_mode"
+                and kwargs["text_entities"] == "text_entities"
+            )
+
+        assert check_shortcut_signature(user.send_gift, Bot.send_gift, ["user_id"], [])
+        assert await check_shortcut_call(user.send_gift, user.get_bot(), "send_gift")
+        assert await check_defaults_handling(user.send_gift, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "send_gift", make_assertion)
+        assert await user.send_gift(
+            gift_id="gift_id",
+            text="text",
+            text_parse_mode="text_parse_mode",
+            text_entities="text_entities",
+        )
+
+    async def test_instance_method_verify_user(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["custom_description"] == "This is a custom description"
+            )
+
+        assert check_shortcut_signature(user.verify, Bot.verify_user, ["user_id"], [])
+        assert await check_shortcut_call(user.verify, user.get_bot(), "verify_user")
+        assert await check_defaults_handling(user.verify, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "verify_user", make_assertion)
+        assert await user.verify(
+            custom_description="This is a custom description",
+        )
+
+    async def test_instance_method_remove_user_verification(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id
+
+        assert check_shortcut_signature(
+            user.remove_verification, Bot.remove_user_verification, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.remove_verification, user.get_bot(), "remove_user_verification"
+        )
+        assert await check_defaults_handling(user.remove_verification, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "remove_user_verification", make_assertion)
+        assert await user.remove_verification()

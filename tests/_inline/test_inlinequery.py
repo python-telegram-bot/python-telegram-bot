@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ class TestInlineQueryWithoutRequest(InlineQueryTestBase):
             assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inline_query)) == len(set(mro_slots(inline_query))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "from": self.from_user.to_dict(),
@@ -63,7 +63,7 @@ class TestInlineQueryWithoutRequest(InlineQueryTestBase):
             "offset": self.offset,
             "location": self.location.to_dict(),
         }
-        inline_query_json = InlineQuery.de_json(json_dict, bot)
+        inline_query_json = InlineQuery.de_json(json_dict, offline_bot)
         assert inline_query_json.api_kwargs == {}
 
         assert inline_query_json.id == self.id_

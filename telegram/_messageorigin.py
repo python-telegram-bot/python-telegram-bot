@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram MessageOigin."""
-import datetime
-from typing import TYPE_CHECKING, Dict, Final, Optional, Type
+import datetime as dtm
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -78,14 +79,14 @@ class MessageOrigin(TelegramObject):
     def __init__(
         self,
         type: str,  # pylint: disable=W0622
-        date: datetime.datetime,
+        date: dtm.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
         self.type: str = enum.get_member(constants.MessageOriginType, type, type)
-        self.date: datetime.datetime = date
+        self.date: dtm.datetime = date
 
         self._id_attrs = (
             self.type,
@@ -94,18 +95,13 @@ class MessageOrigin(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["MessageOrigin"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageOrigin":
         """Converts JSON data to the appropriate :class:`MessageOrigin` object, i.e. takes
         care of selecting the correct subclass.
         """
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[MessageOrigin]] = {
+        _class_mapping: dict[str, type[MessageOrigin]] = {
             cls.USER: MessageOriginUser,
             cls.HIDDEN_USER: MessageOriginHiddenUser,
             cls.CHAT: MessageOriginChat,
@@ -118,13 +114,13 @@ class MessageOrigin(TelegramObject):
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
 
         if "sender_user" in data:
-            data["sender_user"] = User.de_json(data.get("sender_user"), bot)
+            data["sender_user"] = de_json_optional(data.get("sender_user"), User, bot)
 
         if "sender_chat" in data:
-            data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
+            data["sender_chat"] = de_json_optional(data.get("sender_chat"), Chat, bot)
 
         if "chat" in data:
-            data["chat"] = Chat.de_json(data.get("chat"), bot)
+            data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -152,7 +148,7 @@ class MessageOriginUser(MessageOrigin):
 
     def __init__(
         self,
-        date: datetime.datetime,
+        date: dtm.datetime,
         sender_user: User,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -186,7 +182,7 @@ class MessageOriginHiddenUser(MessageOrigin):
 
     def __init__(
         self,
-        date: datetime.datetime,
+        date: dtm.datetime,
         sender_user_name: str,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -227,7 +223,7 @@ class MessageOriginChat(MessageOrigin):
 
     def __init__(
         self,
-        date: datetime.datetime,
+        date: dtm.datetime,
         sender_chat: Chat,
         author_signature: Optional[str] = None,
         *,
@@ -271,7 +267,7 @@ class MessageOriginChannel(MessageOrigin):
 
     def __init__(
         self,
-        date: datetime.datetime,
+        date: dtm.datetime,
         chat: Chat,
         message_id: int,
         author_signature: Optional[str] = None,

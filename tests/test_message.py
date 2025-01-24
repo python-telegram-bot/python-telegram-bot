@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
+import contextlib
+import datetime as dtm
 from copy import copy
-from datetime import datetime
 
 import pytest
 
@@ -39,6 +41,7 @@ from telegram import (
     GiveawayCompleted,
     GiveawayCreated,
     GiveawayWinners,
+    InputPaidMediaPhoto,
     Invoice,
     LinkPreviewOptions,
     Location,
@@ -86,6 +89,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.dummy_objects import get_dummy_object_json_dict
 from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
 from tests.auxil.slots import mro_slots
 
@@ -110,10 +114,10 @@ def message(bot):
     params=[
         {
             "reply_to_message": Message(
-                50, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                50, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
             )
         },
-        {"edit_date": datetime.utcnow()},
+        {"edit_date": dtm.datetime.utcnow()},
         {
             "text": "a text message",
             "entities": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
@@ -159,7 +163,7 @@ def message(bot):
         {"migrate_from_chat_id": -54321},
         {
             "pinned_message": Message(
-                7, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
             )
         },
         {"invoice": Invoice("my invoice", "invoice", "start", "EUR", 243)},
@@ -208,7 +212,7 @@ def message(bot):
                 User(1, "John", False), User(2, "Doe", False), 42
             )
         },
-        {"video_chat_scheduled": VideoChatScheduled(datetime.utcnow())},
+        {"video_chat_scheduled": VideoChatScheduled(dtm.datetime.utcnow())},
         {"video_chat_started": VideoChatStarted()},
         {"video_chat_ended": VideoChatEnded(100)},
         {
@@ -232,16 +236,16 @@ def message(bot):
         {
             "giveaway": Giveaway(
                 chats=[Chat(1, Chat.SUPERGROUP)],
-                winners_selection_date=datetime.utcnow().replace(microsecond=0),
+                winners_selection_date=dtm.datetime.utcnow().replace(microsecond=0),
                 winner_count=5,
             )
         },
-        {"giveaway_created": GiveawayCreated()},
+        {"giveaway_created": GiveawayCreated(prize_star_count=99)},
         {
             "giveaway_winners": GiveawayWinners(
                 chat=Chat(1, Chat.CHANNEL),
                 giveaway_message_id=123456789,
-                winners_selection_date=datetime.utcnow().replace(microsecond=0),
+                winners_selection_date=dtm.datetime.utcnow().replace(microsecond=0),
                 winner_count=42,
                 winners=[User(1, "user1", False), User(2, "user2", False)],
             )
@@ -264,11 +268,11 @@ def message(bot):
         },
         {
             "external_reply": ExternalReplyInfo(
-                MessageOriginChat(datetime.utcnow(), Chat(1, Chat.PRIVATE))
+                MessageOriginChat(dtm.datetime.utcnow(), Chat(1, Chat.PRIVATE))
             )
         },
         {"quote": TextQuote("a text quote", 1)},
-        {"forward_origin": MessageOriginChat(datetime.utcnow(), Chat(1, Chat.PRIVATE))},
+        {"forward_origin": MessageOriginChat(dtm.datetime.utcnow(), Chat(1, Chat.PRIVATE))},
         {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
         {"boost_added": ChatBoostAdded(100)},
         {"sender_boost_count": 1},
@@ -370,7 +374,7 @@ def message_params(bot, request):
 class MessageTestBase:
     id_ = 1
     from_user = User(2, "testuser", False)
-    date = datetime.utcnow()
+    date = dtm.datetime.utcnow()
     chat = Chat(3, "private")
     test_entities = [
         {"length": 4, "offset": 10, "type": "bold"},
@@ -447,11 +451,14 @@ class TestMessageWithoutRequest(MessageTestBase):
         """Used in testing reply_* below. Makes sure that quote and do_quote are handled
         correctly
         """
-        with pytest.raises(ValueError, match="`quote` and `do_quote` are mutually exclusive"):
-            await method(*args, quote=True, do_quote=True)
+        with contextlib.suppress(TypeError):
+            # for newer methods that don't have the deprecated argument
+            with pytest.raises(ValueError, match="`quote` and `do_quote` are mutually exclusive"):
+                await method(*args, quote=True, do_quote=True)
 
-        with pytest.warns(PTBDeprecationWarning, match="`quote` parameter is deprecated"):
-            await method(*args, quote=True)
+            # for newer methods that don't have the deprecated argument
+            with pytest.warns(PTBDeprecationWarning, match="`quote` parameter is deprecated"):
+                await method(*args, quote=True)
 
         with pytest.raises(
             ValueError,
@@ -465,13 +472,16 @@ class TestMessageWithoutRequest(MessageTestBase):
         monkeypatch.setattr(message.get_bot(), bot_method_name, make_assertion)
 
         for param in ("quote", "do_quote"):
-            chat_id, reply_parameters = await method(*args, **{param: True})
-            if chat_id != message.chat.id:
-                pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
-            if reply_parameters is None or reply_parameters.message_id != message.message_id:
-                pytest.fail(
-                    f"reply_parameters is {reply_parameters} but should be {message.message_id}"
-                )
+            with contextlib.suppress(TypeError):
+                # for newer methods that don't have the deprecated argument
+                chat_id, reply_parameters = await method(*args, **{param: True})
+                if chat_id != message.chat.id:
+                    pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
+                if reply_parameters is None or reply_parameters.message_id != message.message_id:
+                    pytest.fail(
+                        f"reply_parameters is {reply_parameters} "
+                        "but should be {message.message_id}"
+                    )
 
         input_chat_id = object()
         input_reply_parameters = ReplyParameters(message_id=1, chat_id=42)
@@ -568,8 +578,8 @@ class TestMessageWithoutRequest(MessageTestBase):
             assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
 
-    def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
-        new = Message.de_json(message_params.to_dict(), bot)
+    def test_all_possibilities_de_json_and_to_dict(self, offline_bot, message_params):
+        new = Message.de_json(message_params.to_dict(), offline_bot)
         assert new.api_kwargs == {}
         assert new.to_dict() == message_params.to_dict()
 
@@ -579,17 +589,17 @@ class TestMessageWithoutRequest(MessageTestBase):
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "message_id": 12,
-            "from_user": None,
-            "date": int(datetime.now().timestamp()),
-            "chat": None,
-            "edit_date": int(datetime.now().timestamp()),
+            "from_user": get_dummy_object_json_dict("User"),
+            "date": int(dtm.datetime.now().timestamp()),
+            "chat": get_dummy_object_json_dict("Chat"),
+            "edit_date": int(dtm.datetime.now().timestamp()),
         }
 
         message_raw = Message.de_json(json_dict, raw_bot)
-        message_bot = Message.de_json(json_dict, bot)
+        message_bot = Message.de_json(json_dict, offline_bot)
         message_tz = Message.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
@@ -609,7 +619,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert message_bot.edit_date.tzinfo == UTC
         assert edit_date_offset == edit_date_tz_bot_offset
 
-    def test_de_json_api_kwargs_backward_compatibility(self, bot, message_params):
+    def test_de_json_api_kwargs_backward_compatibility(self, offline_bot, message_params):
         message_dict = message_params.to_dict()
         keys = (
             "user_shared",
@@ -622,7 +632,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         )
         for key in keys:
             message_dict[key] = key
-        message = Message.de_json(message_dict, bot)
+        message = Message.de_json(message_dict, offline_bot)
         assert message.api_kwargs == {key: key for key in keys}
 
     def test_equality(self):
@@ -2349,6 +2359,42 @@ class TestMessageWithoutRequest(MessageTestBase):
             monkeypatch,
         )
 
+    async def test_reply_paid_media(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            id_ = kwargs["chat_id"] == message.chat_id
+            media = kwargs["media"][0].media == "media"
+            star_count = kwargs["star_count"] == 5
+            return id_ and media and star_count
+
+        assert check_shortcut_signature(
+            Message.reply_paid_media,
+            Bot.send_paid_media,
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            ["do_quote", "reply_to_message_id"],
+        )
+        assert await check_shortcut_call(
+            message.reply_paid_media,
+            message.get_bot(),
+            "send_paid_media",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
+        )
+        assert await check_defaults_handling(
+            message.reply_paid_media, message.get_bot(), no_default_kwargs={"message_thread_id"}
+        )
+
+        monkeypatch.setattr(message.get_bot(), "send_paid_media", make_assertion)
+        assert await message.reply_paid_media(
+            star_count=5, media=[InputPaidMediaPhoto(media="media")]
+        )
+        await self.check_quote_parsing(
+            message,
+            message.reply_paid_media,
+            "send_paid_media",
+            ["test", [InputPaidMediaPhoto(media="media")]],
+            monkeypatch,
+        )
+
     async def test_edit_text(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == message.chat_id
@@ -2653,10 +2699,10 @@ class TestMessageWithoutRequest(MessageTestBase):
         ],
     )
     async def test_default_do_quote(
-        self, bot, message, default_quote, chat_type, expected, monkeypatch
+        self, offline_bot, message, default_quote, chat_type, expected, monkeypatch
     ):
         original_bot = message.get_bot()
-        temp_bot = PytestExtBot(token=bot.token, defaults=Defaults(do_quote=default_quote))
+        temp_bot = PytestExtBot(token=offline_bot.token, defaults=Defaults(do_quote=default_quote))
         message.set_bot(temp_bot)
 
         async def make_assertion(*_, **kwargs):

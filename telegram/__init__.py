@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 __author__ = "devs@python-telegram-bot.org"
 __all__ = (
+    "AffiliateInfo",
     "Animation",
     "Audio",
     "BackgroundFill",
@@ -81,6 +82,7 @@ __all__ = (
     "ChatShared",
     "ChosenInlineResult",
     "Contact",
+    "CopyTextButton",
     "Credentials",
     "DataCredentials",
     "Dice",
@@ -100,6 +102,8 @@ __all__ = (
     "GameHighScore",
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
+    "Gift",
+    "Gifts",
     "Giveaway",
     "GiveawayCompleted",
     "GiveawayCreated",
@@ -180,6 +184,7 @@ __all__ = (
     "PaidMediaInfo",
     "PaidMediaPhoto",
     "PaidMediaPreview",
+    "PaidMediaPurchased",
     "PaidMediaVideo",
     "PassportData",
     "PassportElementError",
@@ -199,6 +204,7 @@ __all__ = (
     "PollAnswer",
     "PollOption",
     "PreCheckoutQuery",
+    "PreparedInlineMessage",
     "ProximityAlertTriggered",
     "ReactionCount",
     "ReactionType",
@@ -231,9 +237,11 @@ __all__ = (
     "TelegramObject",
     "TextQuote",
     "TransactionPartner",
+    "TransactionPartnerAffiliateProgram",
     "TransactionPartnerFragment",
     "TransactionPartnerOther",
     "TransactionPartnerTelegramAds",
+    "TransactionPartnerTelegramApi",
     "TransactionPartnerUser",
     "Update",
     "User",
@@ -261,6 +269,17 @@ __all__ = (
     "helpers",
     "request",
     "warnings",
+)
+
+from telegram._payment.stars.startransactions import StarTransaction, StarTransactions
+from telegram._payment.stars.transactionpartner import (
+    TransactionPartner,
+    TransactionPartnerAffiliateProgram,
+    TransactionPartnerFragment,
+    TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
+    TransactionPartnerTelegramApi,
+    TransactionPartnerUser,
 )
 
 from . import _version, constants, error, helpers, request, warnings
@@ -329,6 +348,7 @@ from ._chatmember import (
 from ._chatmemberupdated import ChatMemberUpdated
 from ._chatpermissions import ChatPermissions
 from ._choseninlineresult import ChosenInlineResult
+from ._copytextbutton import CopyTextButton
 from ._dice import Dice
 from ._files.animation import Animation
 from ._files.audio import Audio
@@ -369,6 +389,7 @@ from ._forumtopic import (
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
+from ._gifts import Gift, Gifts
 from ._giveaway import Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -401,6 +422,7 @@ from ._inline.inputlocationmessagecontent import InputLocationMessageContent
 from ._inline.inputmessagecontent import InputMessageContent
 from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
+from ._inline.preparedinlinemessage import PreparedInlineMessage
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
@@ -419,7 +441,14 @@ from ._messageorigin import (
     MessageOriginUser,
 )
 from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
-from ._paidmedia import PaidMedia, PaidMediaInfo, PaidMediaPhoto, PaidMediaPreview, PaidMediaVideo
+from ._paidmedia import (
+    PaidMedia,
+    PaidMediaInfo,
+    PaidMediaPhoto,
+    PaidMediaPreview,
+    PaidMediaPurchased,
+    PaidMediaVideo,
+)
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -452,18 +481,12 @@ from ._payment.refundedpayment import RefundedPayment
 from ._payment.shippingaddress import ShippingAddress
 from ._payment.shippingoption import ShippingOption
 from ._payment.shippingquery import ShippingQuery
-from ._payment.stars import (
+from ._payment.stars.affiliateinfo import AffiliateInfo
+from ._payment.stars.revenuewithdrawalstate import (
     RevenueWithdrawalState,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
     RevenueWithdrawalStateSucceeded,
-    StarTransaction,
-    StarTransactions,
-    TransactionPartner,
-    TransactionPartnerFragment,
-    TransactionPartnerOther,
-    TransactionPartnerTelegramAds,
-    TransactionPartnerUser,
 )
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import InputPollOption, Poll, PollAnswer, PollOption

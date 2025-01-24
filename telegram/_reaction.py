@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents a Telegram ReactionType."""
 
-from typing import TYPE_CHECKING, Dict, Final, Literal, Optional, Type, Union
+from typing import TYPE_CHECKING, Final, Literal, Optional, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -77,19 +78,11 @@ class ReactionType(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ReactionType"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReactionType":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        if not data and cls is ReactionType:
-            return None
-
-        _class_mapping: Dict[str, Type[ReactionType]] = {
+        _class_mapping: dict[str, type[ReactionType]] = {
             cls.EMOJI: ReactionTypeEmoji,
             cls.CUSTOM_EMOJI: ReactionTypeCustomEmoji,
             cls.PAID: ReactionTypePaid,
@@ -230,15 +223,10 @@ class ReactionCount(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ReactionCount"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReactionCount":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["type"] = ReactionType.de_json(data.get("type"), bot)
+        data["type"] = de_json_optional(data.get("type"), ReactionType, bot)
 
         return super().de_json(data=data, bot=bot)

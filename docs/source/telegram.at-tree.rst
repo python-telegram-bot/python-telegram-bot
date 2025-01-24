@@ -29,6 +29,7 @@ Available Types
     telegram.chat
     telegram.chatadministratorrights
     telegram.chatbackground
+    telegram.copytextbutton
     telegram.backgroundtype
     telegram.backgroundtypefill
     telegram.backgroundtypewallpaper
@@ -92,7 +93,6 @@ Available Types
     telegram.inputpaidmediaphoto
     telegram.inputpaidmediavideo
     telegram.inputpolloption
-    telegram.inputsticker
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
@@ -120,6 +120,7 @@ Available Types
     telegram.paidmediainfo
     telegram.paidmediaphoto
     telegram.paidmediapreview
+    telegram.paidmediapurchased
     telegram.paidmediavideo
     telegram.photosize
     telegram.poll

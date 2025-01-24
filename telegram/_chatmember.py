@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 
-import datetime
-from typing import TYPE_CHECKING, Dict, Final, Optional, Type
+import datetime as dtm
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -105,16 +106,11 @@ class ChatMember(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatMember"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatMember":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[ChatMember]] = {
+        _class_mapping: dict[str, type[ChatMember]] = {
             cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
             cls.MEMBER: ChatMemberMember,
@@ -126,12 +122,12 @@ class ChatMember(TelegramObject):
         if cls is ChatMember and data.get("status") in _class_mapping:
             return _class_mapping[data.pop("status")].de_json(data=data, bot=bot)
 
-        data["user"] = User.de_json(data.get("user"), bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
         if "until_date" in data:
             # Get the local timezone from the bot if it has defaults
             loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-            data["until_date"] = from_timestamp(data["until_date"], tzinfo=loc_tzinfo)
+            data["until_date"] = from_timestamp(data.get("until_date"), tzinfo=loc_tzinfo)
 
         # This is a deprecated field that TG still returns for backwards compatibility
         # Let's filter it out to speed up the de-json process
@@ -413,13 +409,13 @@ class ChatMemberMember(ChatMember):
     def __init__(
         self,
         user: User,
-        until_date: Optional[datetime.datetime] = None,
+        until_date: Optional[dtm.datetime] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.until_date: Optional[datetime.datetime] = until_date
+            self.until_date: Optional[dtm.datetime] = until_date
 
 
 class ChatMemberRestricted(ChatMember):
@@ -566,7 +562,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
         can_manage_topics: bool,
-        until_date: datetime.datetime,
+        until_date: dtm.datetime,
         can_send_audios: bool,
         can_send_documents: bool,
         can_send_photos: bool,
@@ -587,7 +583,7 @@ class ChatMemberRestricted(ChatMember):
             self.can_send_other_messages: bool = can_send_other_messages
             self.can_add_web_page_previews: bool = can_add_web_page_previews
             self.can_manage_topics: bool = can_manage_topics
-            self.until_date: datetime.datetime = until_date
+            self.until_date: dtm.datetime = until_date
             self.can_send_audios: bool = can_send_audios
             self.can_send_documents: bool = can_send_documents
             self.can_send_photos: bool = can_send_photos
@@ -656,10 +652,10 @@ class ChatMemberBanned(ChatMember):
     def __init__(
         self,
         user: User,
-        until_date: datetime.datetime,
+        until_date: dtm.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.until_date: datetime.datetime = until_date
+            self.until_date: dtm.datetime = until_date

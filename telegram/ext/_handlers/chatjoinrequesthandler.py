@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 
-class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
+class ChatJoinRequestHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram updates that contain
     :attr:`telegram.Update.chat_join_request`.
 
@@ -81,7 +81,7 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
     )
 
     def __init__(
-        self,
+        self: "ChatJoinRequestHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         chat_id: Optional[SCT[int]] = None,
         username: Optional[SCT[str]] = None,

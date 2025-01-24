@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
 import re
-from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union, cast
+from re import Match, Pattern
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
     from telegram.ext import Application
 
 
-class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
+class ChosenInlineResultHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram updates that contain
     :attr:`telegram.Update.chosen_inline_result`.
 
@@ -76,7 +77,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
     __slots__ = ("pattern",)
 
     def __init__(
-        self,
+        self: "ChosenInlineResultHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
         pattern: Optional[Union[str, Pattern[str]]] = None,

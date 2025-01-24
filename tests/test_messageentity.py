@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import random
-from typing import List, Tuple
 
 import pytest
 
@@ -55,9 +54,9 @@ class TestMessageEntityWithoutRequest(MessageEntityTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"type": self.type_, "offset": self.offset, "length": self.length}
-        entity = MessageEntity.de_json(json_dict, bot)
+        entity = MessageEntity.de_json(json_dict, offline_bot)
         assert entity.api_kwargs == {}
 
         assert entity.type == self.type_
@@ -86,7 +85,7 @@ class TestMessageEntityWithoutRequest(MessageEntityTestBase):
 
     def test_fix_utf16(self):
         text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
-        inputs_outputs: List[Tuple[Tuple[int, int, str], Tuple[int, int]]] = [
+        inputs_outputs: list[tuple[tuple[int, int, str], tuple[int, int]]] = [
             ((2, 4, MessageEntity.BOLD), (3, 4)),
             ((9, 6, MessageEntity.ITALIC), (11, 6)),
             ((28, 3, MessageEntity.UNDERLINE), (30, 6)),

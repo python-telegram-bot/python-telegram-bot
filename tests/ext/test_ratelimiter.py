@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,10 @@ We mostly test on directly on AIORateLimiter here, b/c BaseRateLimiter doesn't c
 notable
 """
 import asyncio
+import datetime as dtm
 import json
 import platform
 import time
-from datetime import datetime
 from http import HTTPStatus
 
 import pytest
@@ -35,7 +35,7 @@ from telegram.constants import ParseMode
 from telegram.error import RetryAfter
 from telegram.ext import AIORateLimiter, BaseRateLimiter, Defaults, ExtBot
 from telegram.request import BaseRequest, RequestData
-from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTIONS, TEST_WITH_OPT_DEPS
 
 
 @pytest.mark.skipif(
@@ -142,7 +142,7 @@ class TestBaseRateLimiter:
     not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
 @pytest.mark.skipif(
-    bool(GITHUB_ACTION and platform.system() == "Darwin"),
+    GITHUB_ACTIONS and platform.system() == "Darwin",
     reason="The timings are apparently rather inaccurate on MacOS.",
 )
 @pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
@@ -181,7 +181,7 @@ class TestAIORateLimiter:
                         {
                             "ok": True,
                             "result": Message(
-                                message_id=1, date=datetime.now(), chat=Chat(1, "chat")
+                                message_id=1, date=dtm.datetime.now(), chat=Chat(1, "chat")
                             ).to_dict(),
                         }
                     ).encode(),

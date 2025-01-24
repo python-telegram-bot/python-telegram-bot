@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -56,8 +56,8 @@ class InputFile:
         read_file_handle (:obj:`bool`, optional): If :obj:`True` and :paramref:`obj` is a file
             handle, the data will be read from the file handle on initialization of this object.
             If :obj:`False`, the file handle will be passed on to the
-            `networking backend <telegram.request.BaseRequest.do_request>`_ which will have to
-            handle the reading. Defaults to :obj:`True`.
+            :attr:`networking backend <telegram.request.BaseRequest.do_request>` which will have
+            to handle the reading. Defaults to :obj:`True`.
 
             Tip:
                 If you upload extremely large files, you may want to set this to :obj:`False` to
@@ -130,7 +130,7 @@ class InputFile:
             Content may now be a file handle.
 
         Returns:
-            Tuple[:obj:`str`, :obj:`bytes` | :class:`IO`, :obj:`str`]:
+            tuple[:obj:`str`, :obj:`bytes` | :class:`IO`, :obj:`str`]:
         """
         return self.filename, self.input_file_content, self.mimetype
 

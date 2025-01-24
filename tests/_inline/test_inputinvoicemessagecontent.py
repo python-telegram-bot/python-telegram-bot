@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -203,8 +203,7 @@ class TestInputInvoiceMessageContentWithoutRequest(InputInvoiceMessageContentTes
             == input_invoice_message_content.is_flexible
         )
 
-    def test_de_json(self, bot):
-        assert InputInvoiceMessageContent.de_json({}, bot=bot) is None
+    def test_de_json(self, offline_bot):
 
         json_dict = {
             "title": self.title,
@@ -229,7 +228,9 @@ class TestInputInvoiceMessageContentWithoutRequest(InputInvoiceMessageContentTes
             "is_flexible": self.is_flexible,
         }
 
-        input_invoice_message_content = InputInvoiceMessageContent.de_json(json_dict, bot=bot)
+        input_invoice_message_content = InputInvoiceMessageContent.de_json(
+            json_dict, bot=offline_bot
+        )
         assert input_invoice_message_content.api_kwargs == {}
 
         assert input_invoice_message_content.title == self.title

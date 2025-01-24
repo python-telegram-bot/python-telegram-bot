@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -48,6 +48,7 @@ __all__ = (
     "JobQueue",
     "MessageHandler",
     "MessageReactionHandler",
+    "PaidMediaPurchasedHandler",
     "PersistenceInput",
     "PicklePersistence",
     "PollAnswerHandler",
@@ -89,6 +90,7 @@ from ._handlers.conversationhandler import ConversationHandler
 from ._handlers.inlinequeryhandler import InlineQueryHandler
 from ._handlers.messagehandler import MessageHandler
 from ._handlers.messagereactionhandler import MessageReactionHandler
+from ._handlers.paidmediapurchasedhandler import PaidMediaPurchasedHandler
 from ._handlers.pollanswerhandler import PollAnswerHandler
 from ._handlers.pollhandler import PollHandler
 from ._handlers.precheckoutqueryhandler import PreCheckoutQueryHandler

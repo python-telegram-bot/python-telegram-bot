@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,11 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that describes a single parameter of a request to the Bot API."""
+import datetime as dtm
 import json
+from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime
-from typing import List, Optional, Sequence, Tuple, final
+from typing import Optional, final
 
 from telegram._files.inputfile import InputFile
 from telegram._files.inputmedia import InputMedia, InputPaidMedia
@@ -47,13 +48,13 @@ class RequestParameter:
     Args:
         name (:obj:`str`): The name of the parameter.
         value (:obj:`object` | :obj:`None`): The value of the parameter. Must be JSON-dumpable.
-        input_files (List[:class:`telegram.InputFile`], optional): A list of files that should be
+        input_files (list[:class:`telegram.InputFile`], optional): A list of files that should be
             uploaded along with this parameter.
 
     Attributes:
         name (:obj:`str`): The name of the parameter.
         value (:obj:`object` | :obj:`None`): The value of the parameter.
-        input_files (List[:class:`telegram.InputFile` | :obj:`None`): A list of files that should
+        input_files (list[:class:`telegram.InputFile` | :obj:`None`): A list of files that should
             be uploaded along with this parameter.
     """
 
@@ -61,7 +62,7 @@ class RequestParameter:
 
     name: str
     value: object
-    input_files: Optional[List[InputFile]]
+    input_files: Optional[list[InputFile]]
 
     @property
     def json_value(self) -> Optional[str]:
@@ -92,7 +93,7 @@ class RequestParameter:
     @staticmethod
     def _value_and_input_files_from_input(  # pylint: disable=too-many-return-statements
         value: object,
-    ) -> Tuple[object, List[InputFile]]:
+    ) -> tuple[object, list[InputFile]]:
         """Converts `value` into something that we can json-dump. Returns two values:
         1. the JSON-dumpable value. May be `None` in case the value is an InputFile which must
            not be uploaded via an attach:// URI
@@ -112,7 +113,7 @@ class RequestParameter:
         * if a user passes a custom enum, it's unlikely that we can actually properly handle it
           even with some special casing.
         """
-        if isinstance(value, datetime):
+        if isinstance(value, dtm.datetime):
             return to_timestamp(value), []
         if isinstance(value, StringEnum):
             return value.value, []

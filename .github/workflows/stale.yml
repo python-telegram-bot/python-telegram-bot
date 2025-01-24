@@ -7,13 +7,13 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e # v9.0.0
         with:
           # PRs never get stale
           days-before-stale: 3
           days-before-close: 2
           days-before-pr-stale: -1
-          stale-issue-label: 'stale'
+          stale-issue-label: '📋 stale'
           only-labels: 'question'
           stale-issue-message: ''
           close-issue-message: 'This issue has been automatically closed due to inactivity. Feel free to comment in order to reopen or ask again in our Telegram support group at https://t.me/pythontelegrambotgroup.'

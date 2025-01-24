@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram video chats."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -102,7 +103,7 @@ class VideoChatParticipantsInvited(TelegramObject):
                 |sequenceclassargs|
 
     Attributes:
-        users (Tuple[:class:`telegram.User`]): New members that were invited to the video chat.
+        users (tuple[:class:`telegram.User`]): New members that were invited to the video chat.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -118,20 +119,17 @@ class VideoChatParticipantsInvited(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.users: Tuple[User, ...] = parse_sequence_arg(users)
+        self.users: tuple[User, ...] = parse_sequence_arg(users)
         self._id_attrs = (self.users,)
 
         self._freeze()
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["VideoChatParticipantsInvited"]:
+        cls, data: JSONDict, bot: Optional["Bot"] = None
+    ) -> "VideoChatParticipantsInvited":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         data["users"] = User.de_list(data.get("users", []), bot)
         return super().de_json(data=data, bot=bot)
@@ -177,18 +175,13 @@ class VideoChatScheduled(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["VideoChatScheduled"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "VideoChatScheduled":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["start_date"] = from_timestamp(data["start_date"], tzinfo=loc_tzinfo)
+        data["start_date"] = from_timestamp(data.get("start_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)

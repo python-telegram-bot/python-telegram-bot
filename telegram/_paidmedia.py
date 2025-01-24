@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,16 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent paid media in Telegram."""
 
-from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._files.photosize import PhotoSize
 from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -73,14 +75,12 @@ class PaidMedia(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["PaidMedia"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMedia":
         """Converts JSON data to the appropriate :class:`PaidMedia` object, i.e. takes
         care of selecting the correct subclass.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (dict[:obj:`str`, ...]): The JSON data.
             bot (:class:`telegram.Bot`, optional): The bot associated with this object.
 
         Returns:
@@ -89,13 +89,7 @@ class PaidMedia(TelegramObject):
         """
         data = cls._parse_data(data)
 
-        if data is None:
-            return None
-
-        if not data and cls is PaidMedia:
-            return None
-
-        _class_mapping: Dict[str, Type[PaidMedia]] = {
+        _class_mapping: dict[str, type[PaidMedia]] = {
             cls.PREVIEW: PaidMediaPreview,
             cls.PHOTO: PaidMediaPhoto,
             cls.VIDEO: PaidMediaVideo,
@@ -164,7 +158,7 @@ class PaidMediaPhoto(PaidMedia):
 
     Attributes:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PHOTO`.
-        photo (Tuple[:class:`telegram.PhotoSize`]): The photo.
+        photo (tuple[:class:`telegram.PhotoSize`]): The photo.
     """
 
     __slots__ = ("photo",)
@@ -178,20 +172,15 @@ class PaidMediaPhoto(PaidMedia):
         super().__init__(type=PaidMedia.PHOTO, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+            self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
 
             self._id_attrs = (self.type, self.photo)
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["PaidMediaPhoto"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaPhoto":
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["photo"] = PhotoSize.de_list(data.get("photo"), bot=bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
@@ -229,15 +218,10 @@ class PaidMediaVideo(PaidMedia):
             self._id_attrs = (self.type, self.video)
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["PaidMediaVideo"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaVideo":
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["video"] = Video.de_json(data.get("video"), bot=bot)
+        data["video"] = de_json_optional(data.get("video"), Video, bot)
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
@@ -258,7 +242,7 @@ class PaidMediaInfo(TelegramObject):
     Attributes:
         star_count (:obj:`int`): The number of Telegram Stars that must be paid to buy access to
             the media.
-        paid_media (Tuple[:class:`telegram.PaidMedia`]): Information about the paid media.
+        paid_media (tuple[:class:`telegram.PaidMedia`]): Information about the paid media.
     """
 
     __slots__ = ("paid_media", "star_count")
@@ -272,19 +256,58 @@ class PaidMediaInfo(TelegramObject):
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.star_count: int = star_count
-        self.paid_media: Tuple[PaidMedia, ...] = parse_sequence_arg(paid_media)
+        self.paid_media: tuple[PaidMedia, ...] = parse_sequence_arg(paid_media)
 
         self._id_attrs = (self.star_count, self.paid_media)
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["PaidMediaInfo"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaInfo":
         data = cls._parse_data(data)
 
-        if not data:
-            return None
+        data["paid_media"] = de_list_optional(data.get("paid_media"), PaidMedia, bot)
+        return super().de_json(data=data, bot=bot)
 
-        data["paid_media"] = PaidMedia.de_list(data.get("paid_media"), bot=bot)
+
+class PaidMediaPurchased(TelegramObject):
+    """This object contains information about a paid media purchase.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`from_user` and :attr:`paid_media_payload` are equal.
+
+    Note:
+        In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
+
+    .. versionadded:: 21.6
+
+    Args:
+        from_user (:class:`telegram.User`): User who purchased the media.
+        paid_media_payload (:obj:`str`): Bot-specified paid media payload.
+
+    Attributes:
+        from_user (:class:`telegram.User`): User who purchased the media.
+        paid_media_payload (:obj:`str`): Bot-specified paid media payload.
+    """
+
+    __slots__ = ("from_user", "paid_media_payload")
+
+    def __init__(
+        self,
+        from_user: "User",
+        paid_media_payload: str,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
+        self.from_user: User = from_user
+        self.paid_media_payload: str = paid_media_payload
+
+        self._id_attrs = (self.from_user, self.paid_media_payload)
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaPurchased":
+        data = cls._parse_data(data)
+
+        data["from_user"] = User.de_json(data=data.pop("from"), bot=bot)
         return super().de_json(data=data, bot=bot)

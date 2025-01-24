@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -63,7 +63,7 @@ class TestChatWithoutRequest(ChatTestBase):
             assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "title": self.title,
@@ -73,7 +73,7 @@ class TestChatWithoutRequest(ChatTestBase):
             "first_name": self.first_name,
             "last_name": self.last_name,
         }
-        chat = Chat.de_json(json_dict, bot)
+        chat = Chat.de_json(json_dict, offline_bot)
 
         assert chat.id == self.id_
         assert chat.title == self.title
@@ -286,7 +286,7 @@ class TestChatWithoutRequest(ChatTestBase):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == chat.id
             user_id = kwargs["user_id"] == 42
-            o_i_b = kwargs.get("only_if_banned", None) == only_if_banned
+            o_i_b = kwargs.get("only_if_banned") == only_if_banned
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(Chat.unban_member, Bot.unban_chat_member, ["chat_id"], [])
@@ -333,7 +333,7 @@ class TestChatWithoutRequest(ChatTestBase):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == chat.id
             user_id = kwargs["user_id"] == 42
-            o_i_b = kwargs.get("is_anonymous", None) == is_anonymous
+            o_i_b = kwargs.get("is_anonymous") == is_anonymous
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(
@@ -353,7 +353,7 @@ class TestChatWithoutRequest(ChatTestBase):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == chat.id
             user_id = kwargs["user_id"] == 42
-            o_i_b = kwargs.get("permissions", None) == permissions
+            o_i_b = kwargs.get("permissions") == permissions
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(
@@ -1299,6 +1299,7 @@ class TestChatWithoutRequest(ChatTestBase):
                 and kwargs["media"] == "media"
                 and kwargs["star_count"] == 42
                 and kwargs["caption"] == "stars"
+                and kwargs["payload"] == "payload"
             )
 
         assert check_shortcut_signature(Chat.send_paid_media, Bot.send_paid_media, ["chat_id"], [])
@@ -1306,7 +1307,62 @@ class TestChatWithoutRequest(ChatTestBase):
         assert await check_defaults_handling(chat.send_paid_media, chat.get_bot())
 
         monkeypatch.setattr(chat.get_bot(), "send_paid_media", make_assertion)
-        assert await chat.send_paid_media(media="media", star_count=42, caption="stars")
+        assert await chat.send_paid_media(
+            media="media", star_count=42, caption="stars", payload="payload"
+        )
+
+    async def test_instance_method_send_gift(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == chat.id
+                and kwargs["gift_id"] == "gift_id"
+                and kwargs["text"] == "text"
+                and kwargs["text_parse_mode"] == "text_parse_mode"
+                and kwargs["text_entities"] == "text_entities"
+            )
+
+        assert check_shortcut_signature(Chat.send_gift, Bot.send_gift, ["user_id"], [])
+        assert await check_shortcut_call(chat.send_gift, chat.get_bot(), "send_gift")
+        assert await check_defaults_handling(chat.send_gift, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_gift", make_assertion)
+        assert await chat.send_gift(
+            gift_id="gift_id",
+            text="text",
+            text_parse_mode="text_parse_mode",
+            text_entities="text_entities",
+        )
+
+    async def test_instance_method_verify_chat(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["custom_description"] == "This is a custom description"
+            )
+
+        assert check_shortcut_signature(Chat.verify, Bot.verify_chat, ["chat_id"], [])
+        assert await check_shortcut_call(chat.verify, chat.get_bot(), "verify_chat")
+        assert await check_defaults_handling(chat.verify, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "verify_chat", make_assertion)
+        assert await chat.verify(
+            custom_description="This is a custom description",
+        )
+
+    async def test_instance_method_remove_chat_verification(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.remove_verification, Bot.remove_chat_verification, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.remove_verification, chat.get_bot(), "remove_chat_verification"
+        )
+        assert await check_defaults_handling(chat.remove_verification, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "remove_chat_verification", make_assertion)
+        assert await chat.remove_verification()
 
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -47,19 +47,17 @@ class TestUsersSharedWithoutRequest(UsersSharedTestBase):
         assert users_shared_dict["request_id"] == self.request_id
         assert users_shared_dict["users"] == [user.to_dict() for user in self.users]
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "request_id": self.request_id,
             "users": [user.to_dict() for user in self.users],
             "user_ids": self.user_ids,
         }
-        users_shared = UsersShared.de_json(json_dict, bot)
+        users_shared = UsersShared.de_json(json_dict, offline_bot)
         assert users_shared.api_kwargs == {"user_ids": self.user_ids}
 
         assert users_shared.request_id == self.request_id
         assert users_shared.users == self.users
-
-        assert UsersShared.de_json({}, bot) is None
 
     def test_equality(self):
         a = UsersShared(self.request_id, users=self.users)
@@ -108,12 +106,12 @@ class TestChatSharedWithoutRequest(ChatSharedTestBase):
         assert chat_shared_dict["request_id"] == self.request_id
         assert chat_shared_dict["chat_id"] == self.chat_id
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "request_id": self.request_id,
             "chat_id": self.chat_id,
         }
-        chat_shared = ChatShared.de_json(json_dict, bot)
+        chat_shared = ChatShared.de_json(json_dict, offline_bot)
         assert chat_shared.api_kwargs == {}
 
         assert chat_shared.request_id == self.request_id
@@ -178,12 +176,12 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
         assert shared_user_dict["username"] == self.username
         assert shared_user_dict["photo"] == [photo.to_dict() for photo in self.photo]
 
-    def test_de_json_required(self, bot):
+    def test_de_json_required(self, offline_bot):
         json_dict = {
             "user_id": self.user_id,
             "first_name": self.first_name,
         }
-        shared_user = SharedUser.de_json(json_dict, bot)
+        shared_user = SharedUser.de_json(json_dict, offline_bot)
         assert shared_user.api_kwargs == {}
 
         assert shared_user.user_id == self.user_id
@@ -192,7 +190,7 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
         assert shared_user.username is None
         assert shared_user.photo == ()
 
-    def test_de_json_all(self, bot):
+    def test_de_json_all(self, offline_bot):
         json_dict = {
             "user_id": self.user_id,
             "first_name": self.first_name,
@@ -200,7 +198,7 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
             "username": self.username,
             "photo": [photo.to_dict() for photo in self.photo],
         }
-        shared_user = SharedUser.de_json(json_dict, bot)
+        shared_user = SharedUser.de_json(json_dict, offline_bot)
         assert shared_user.api_kwargs == {}
 
         assert shared_user.user_id == self.user_id
@@ -208,8 +206,6 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
         assert shared_user.last_name == self.last_name
         assert shared_user.username == self.username
         assert shared_user.photo == self.photo
-
-        assert SharedUser.de_json({}, bot) is None
 
     def test_equality(self, chat_shared):
         a = SharedUser(

@@ -2,7 +2,7 @@
 # pylint: disable=redefined-builtin
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,16 +18,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains the Telegram Business related classes."""
-
-from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+import datetime as dtm
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
 from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -80,7 +80,7 @@ class BusinessConnection(TelegramObject):
         id: str,
         user: "User",
         user_chat_id: int,
-        date: datetime,
+        date: dtm.datetime,
         can_reply: bool,
         is_enabled: bool,
         *,
@@ -90,7 +90,7 @@ class BusinessConnection(TelegramObject):
         self.id: str = id
         self.user: User = user
         self.user_chat_id: int = user_chat_id
-        self.date: datetime = date
+        self.date: dtm.datetime = date
         self.can_reply: bool = can_reply
         self.is_enabled: bool = is_enabled
 
@@ -106,20 +106,15 @@ class BusinessConnection(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessConnection"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessConnection":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["user"] = User.de_json(data.get("user"), bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -145,7 +140,7 @@ class BusinessMessagesDeleted(TelegramObject):
         business_connection_id (:obj:`str`): Unique identifier of the business connection.
         chat (:class:`telegram.Chat`): Information about a chat in the business account. The bot
             may not have access to the chat or the corresponding user.
-        message_ids (Tuple[:obj:`int`]): A list of identifiers of the deleted messages in the
+        message_ids (tuple[:obj:`int`]): A list of identifiers of the deleted messages in the
             chat of the business account.
     """
 
@@ -166,7 +161,7 @@ class BusinessMessagesDeleted(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.business_connection_id: str = business_connection_id
         self.chat: Chat = chat
-        self.message_ids: Tuple[int, ...] = parse_sequence_arg(message_ids)
+        self.message_ids: tuple[int, ...] = parse_sequence_arg(message_ids)
 
         self._id_attrs = (
             self.business_connection_id,
@@ -177,16 +172,11 @@ class BusinessMessagesDeleted(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessMessagesDeleted"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessMessagesDeleted":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -236,16 +226,11 @@ class BusinessIntro(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessIntro"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessIntro":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
+        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -290,16 +275,11 @@ class BusinessLocation(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessLocation"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessLocation":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["location"] = Location.de_json(data.get("location"), bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -359,37 +339,37 @@ class BusinessOpeningHoursInterval(TelegramObject):
         self.opening_minute: int = opening_minute
         self.closing_minute: int = closing_minute
 
-        self._opening_time: Optional[Tuple[int, int, int]] = None
-        self._closing_time: Optional[Tuple[int, int, int]] = None
+        self._opening_time: Optional[tuple[int, int, int]] = None
+        self._closing_time: Optional[tuple[int, int, int]] = None
 
         self._id_attrs = (self.opening_minute, self.closing_minute)
 
         self._freeze()
 
-    def _parse_minute(self, minute: int) -> Tuple[int, int, int]:
+    def _parse_minute(self, minute: int) -> tuple[int, int, int]:
         return (minute // 1440, minute % 1440 // 60, minute % 1440 % 60)
 
     @property
-    def opening_time(self) -> Tuple[int, int, int]:
+    def opening_time(self) -> tuple[int, int, int]:
         """Convenience attribute. A :obj:`tuple` parsed from :attr:`opening_minute`. It contains
         the `weekday`, `hour` and `minute` in the same ranges as :attr:`datetime.datetime.weekday`,
         :attr:`datetime.datetime.hour` and :attr:`datetime.datetime.minute`
 
         Returns:
-            Tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
+            tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
         """
         if self._opening_time is None:
             self._opening_time = self._parse_minute(self.opening_minute)
         return self._opening_time
 
     @property
-    def closing_time(self) -> Tuple[int, int, int]:
+    def closing_time(self) -> tuple[int, int, int]:
         """Convenience attribute. A :obj:`tuple` parsed from :attr:`closing_minute`. It contains
         the `weekday`, `hour` and `minute` in the same ranges as :attr:`datetime.datetime.weekday`,
         :attr:`datetime.datetime.hour` and :attr:`datetime.datetime.minute`
 
         Returns:
-            Tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
+            tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
         """
         if self._closing_time is None:
             self._closing_time = self._parse_minute(self.closing_minute)
@@ -439,17 +419,12 @@ class BusinessOpeningHours(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BusinessOpeningHours"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessOpeningHours":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["opening_hours"] = BusinessOpeningHoursInterval.de_list(
-            data.get("opening_hours"), bot
+        data["opening_hours"] = de_list_optional(
+            data.get("opening_hours"), BusinessOpeningHoursInterval, bot
         )
 
         return super().de_json(data=data, bot=bot)

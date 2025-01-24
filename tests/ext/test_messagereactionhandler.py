@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import datetime
+import datetime as dtm
 
 import pytest
 
@@ -74,7 +74,7 @@ def false_update(request):
 
 @pytest.fixture(scope="class")
 def time():
-    return datetime.datetime.now(tz=UTC)
+    return dtm.datetime.now(tz=UTC)
 
 
 @pytest.fixture(scope="class")
@@ -173,7 +173,7 @@ class TestMessageReactionHandler:
             assert self.test_flag
 
     @pytest.mark.parametrize(
-        argnames=["allowed_types", "expected"],
+        argnames=("allowed_types", "expected"),
         argvalues=[
             (MessageReactionHandler.MESSAGE_REACTION_UPDATED, (True, False)),
             (MessageReactionHandler.MESSAGE_REACTION_COUNT_UPDATED, (False, True)),
@@ -201,7 +201,7 @@ class TestMessageReactionHandler:
             assert self.test_flag == result_2
 
     @pytest.mark.parametrize(
-        argnames=["allowed_types", "kwargs"],
+        argnames=("allowed_types", "kwargs"),
         argvalues=[
             (MessageReactionHandler.MESSAGE_REACTION_COUNT_UPDATED, {"user_username": "user"}),
             (MessageReactionHandler.MESSAGE_REACTION, {"user_id": 123}),
@@ -215,7 +215,7 @@ class TestMessageReactionHandler:
             MessageReactionHandler(self.callback, message_reaction_types=allowed_types, **kwargs)
 
     @pytest.mark.parametrize(
-        argnames=["chat_id", "expected"],
+        argnames=("chat_id", "expected"),
         argvalues=[(1, True), ([1], True), (2, False), ([2], False)],
     )
     async def test_with_chat_ids(
@@ -226,8 +226,8 @@ class TestMessageReactionHandler:
         assert handler.check_update(message_reaction_count_update) == expected
 
     @pytest.mark.parametrize(
-        argnames=["chat_username"],
-        argvalues=[("group_a",), ("@group_a",), (["group_a"],), (["@group_a"],)],
+        argnames="chat_username",
+        argvalues=["group_a", "@group_a", ["group_a"], ["@group_a"]],
         ids=["group_a", "@group_a", "['group_a']", "['@group_a']"],
     )
     async def test_with_chat_usernames(
@@ -247,7 +247,7 @@ class TestMessageReactionHandler:
         message_reaction_count_update.message_reaction_count.chat.username = None
 
     @pytest.mark.parametrize(
-        argnames=["user_id", "expected"],
+        argnames=("user_id", "expected"),
         argvalues=[(1, True), ([1], True), (2, False), ([2], False)],
     )
     async def test_with_user_ids(
@@ -262,8 +262,8 @@ class TestMessageReactionHandler:
         assert not handler.check_update(message_reaction_count_update)
 
     @pytest.mark.parametrize(
-        argnames=["user_username"],
-        argvalues=[("user_a",), ("@user_a",), (["user_a"],), (["@user_a"],)],
+        argnames="user_username",
+        argvalues=["user_a", "@user_a", ["user_a"], ["@user_a"]],
         ids=["user_a", "@user_a", "['user_a']", "['@user_a']"],
     )
     async def test_with_user_usernames(

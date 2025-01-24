@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageReaction Update."""
-from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+import datetime as dtm
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
 from telegram._reaction import ReactionCount, ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -54,7 +55,7 @@ class MessageReactionCountUpdated(TelegramObject):
         message_id (:obj:`int`): Unique message identifier inside the chat.
         date (:class:`datetime.datetime`): Date of the change in Unix time
             |datetime_localization|
-        reactions (Tuple[:class:`telegram.ReactionCount`]): List of reactions that are present on
+        reactions (tuple[:class:`telegram.ReactionCount`]): List of reactions that are present on
             the message
     """
 
@@ -69,7 +70,7 @@ class MessageReactionCountUpdated(TelegramObject):
         self,
         chat: Chat,
         message_id: int,
-        date: datetime,
+        date: dtm.datetime,
         reactions: Sequence[ReactionCount],
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -78,28 +79,23 @@ class MessageReactionCountUpdated(TelegramObject):
         # Required
         self.chat: Chat = chat
         self.message_id: int = message_id
-        self.date: datetime = date
-        self.reactions: Tuple[ReactionCount, ...] = parse_sequence_arg(reactions)
+        self.date: dtm.datetime = date
+        self.reactions: tuple[ReactionCount, ...] = parse_sequence_arg(reactions)
 
         self._id_attrs = (self.chat, self.message_id, self.date, self.reactions)
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["MessageReactionCountUpdated"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageReactionCountUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["reactions"] = ReactionCount.de_list(data.get("reactions"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["reactions"] = de_list_optional(data.get("reactions"), ReactionCount, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -132,9 +128,9 @@ class MessageReactionUpdated(TelegramObject):
         message_id (:obj:`int`): Unique message identifier inside the chat.
         date (:class:`datetime.datetime`): Date of the change in Unix time.
             |datetime_localization|
-        old_reaction (Tuple[:class:`telegram.ReactionType`]): Previous list of reaction types
+        old_reaction (tuple[:class:`telegram.ReactionType`]): Previous list of reaction types
             that were set by the user.
-        new_reaction (Tuple[:class:`telegram.ReactionType`]): New list of reaction types that
+        new_reaction (tuple[:class:`telegram.ReactionType`]): New list of reaction types that
             were set by the user.
         user (:class:`telegram.User`): Optional. The user that changed the reaction, if the user
             isn't anonymous.
@@ -156,7 +152,7 @@ class MessageReactionUpdated(TelegramObject):
         self,
         chat: Chat,
         message_id: int,
-        date: datetime,
+        date: dtm.datetime,
         old_reaction: Sequence[ReactionType],
         new_reaction: Sequence[ReactionType],
         user: Optional[User] = None,
@@ -168,9 +164,9 @@ class MessageReactionUpdated(TelegramObject):
         # Required
         self.chat: Chat = chat
         self.message_id: int = message_id
-        self.date: datetime = date
-        self.old_reaction: Tuple[ReactionType, ...] = parse_sequence_arg(old_reaction)
-        self.new_reaction: Tuple[ReactionType, ...] = parse_sequence_arg(new_reaction)
+        self.date: dtm.datetime = date
+        self.old_reaction: tuple[ReactionType, ...] = parse_sequence_arg(old_reaction)
+        self.new_reaction: tuple[ReactionType, ...] = parse_sequence_arg(new_reaction)
 
         # Optional
         self.user: Optional[User] = user
@@ -186,23 +182,18 @@ class MessageReactionUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["MessageReactionUpdated"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageReactionUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["old_reaction"] = ReactionType.de_list(data.get("old_reaction"), bot)
-        data["new_reaction"] = ReactionType.de_list(data.get("new_reaction"), bot)
-        data["user"] = User.de_json(data.get("user"), bot)
-        data["actor_chat"] = Chat.de_json(data.get("actor_chat"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["old_reaction"] = de_list_optional(data.get("old_reaction"), ReactionType, bot)
+        data["new_reaction"] = de_list_optional(data.get("new_reaction"), ReactionType, bot)
+        data["user"] = de_json_optional(data.get("user"), User, bot)
+        data["actor_chat"] = de_json_optional(data.get("actor_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)

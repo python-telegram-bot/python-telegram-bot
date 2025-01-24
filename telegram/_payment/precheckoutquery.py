@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Optional
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -110,17 +111,12 @@ class PreCheckoutQuery(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["PreCheckoutQuery"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PreCheckoutQuery":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["from_user"] = User.de_json(data.pop("from", None), bot)
-        data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
+        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
+        data["order_info"] = de_json_optional(data.get("order_info"), OrderInfo, bot)
 
         return super().de_json(data=data, bot=bot)
 

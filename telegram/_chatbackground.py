@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,13 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to chat backgrounds."""
-from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._files.document import Document
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -78,16 +79,11 @@ class BackgroundFill(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BackgroundFill"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BackgroundFill":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[BackgroundFill]] = {
+        _class_mapping: dict[str, type[BackgroundFill]] = {
             cls.SOLID: BackgroundFillSolid,
             cls.GRADIENT: BackgroundFillGradient,
             cls.FREEFORM_GRADIENT: BackgroundFillFreeformGradient,
@@ -212,7 +208,7 @@ class BackgroundFillFreeformGradient(BackgroundFill):
         super().__init__(type=self.FREEFORM_GRADIENT, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.colors: Tuple[int, ...] = parse_sequence_arg(colors)
+            self.colors: tuple[int, ...] = parse_sequence_arg(colors)
 
             self._id_attrs = (self.colors,)
 
@@ -269,16 +265,11 @@ class BackgroundType(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BackgroundType"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BackgroundType":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[BackgroundType]] = {
+        _class_mapping: dict[str, type[BackgroundType]] = {
             cls.FILL: BackgroundTypeFill,
             cls.WALLPAPER: BackgroundTypeWallpaper,
             cls.PATTERN: BackgroundTypePattern,
@@ -289,10 +280,10 @@ class BackgroundType(TelegramObject):
             return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
         if "fill" in data:
-            data["fill"] = BackgroundFill.de_json(data.get("fill"), bot)
+            data["fill"] = de_json_optional(data.get("fill"), BackgroundFill, bot)
 
         if "document" in data:
-            data["document"] = Document.de_json(data.get("document"), bot)
+            data["document"] = de_json_optional(data.get("document"), Document, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -532,15 +523,10 @@ class ChatBackground(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatBackground"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBackground":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["type"] = BackgroundType.de_json(data.get("type"), bot)
+        data["type"] = de_json_optional(data.get("type"), BackgroundType, bot)
 
         return super().de_json(data=data, bot=bot)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram ChatBoosts."""
-
-from datetime import datetime
-from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
+import datetime as dtm
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -110,16 +110,11 @@ class ChatBoostSource(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatBoostSource"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBoostSource":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        _class_mapping: Dict[str, Type[ChatBoostSource]] = {
+        _class_mapping: dict[str, type[ChatBoostSource]] = {
             cls.PREMIUM: ChatBoostSourcePremium,
             cls.GIFT_CODE: ChatBoostSourceGiftCode,
             cls.GIVEAWAY: ChatBoostSourceGiveaway,
@@ -129,7 +124,7 @@ class ChatBoostSource(TelegramObject):
             return _class_mapping[data.pop("source")].de_json(data=data, bot=bot)
 
         if "user" in data:
-            data["user"] = User.de_json(data.get("user"), bot)
+            data["user"] = de_json_optional(data.get("user"), User, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -187,15 +182,22 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
 
 class ChatBoostSourceGiveaway(ChatBoostSource):
     """
-    The boost was obtained by the creation of a Telegram Premium giveaway. This boosts the chat 4
-    times for the duration of the corresponding Telegram Premium subscription.
+    The boost was obtained by the creation of a Telegram Premium giveaway or a Telegram Star.
+    This boosts the chat 4 times for the duration of the corresponding Telegram Premium
+    subscription for Telegram Premium giveaways and :attr:`prize_star_count` / 500 times for
+    one year for Telegram Star giveaways.
 
     .. versionadded:: 20.8
 
     Args:
         giveaway_message_id (:obj:`int`): Identifier of a message in the chat with the giveaway;
             the message could have been deleted already. May be 0 if the message isn't sent yet.
-        user (:class:`telegram.User`, optional): User that won the prize in the giveaway if any.
+        user (:class:`telegram.User`, optional): User that won the prize in the giveaway if any;
+            for Telegram Premium giveaways only.
+        prize_star_count (:obj:`int`, optional): The number of Telegram Stars to be split between
+            giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
         is_unclaimed (:obj:`bool`, optional): :obj:`True`, if the giveaway was completed, but
             there was no user to win the prize.
 
@@ -205,17 +207,22 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
         giveaway_message_id (:obj:`int`): Identifier of a message in the chat with the giveaway;
             the message could have been deleted already. May be 0 if the message isn't sent yet.
         user (:class:`telegram.User`): Optional. User that won the prize in the giveaway if any.
+        prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be split between
+            giveaway winners; for Telegram Star giveaways only.
+
+            .. versionadded:: 21.6
         is_unclaimed (:obj:`bool`): Optional. :obj:`True`, if the giveaway was completed, but
             there was no user to win the prize.
     """
 
-    __slots__ = ("giveaway_message_id", "is_unclaimed", "user")
+    __slots__ = ("giveaway_message_id", "is_unclaimed", "prize_star_count", "user")
 
     def __init__(
         self,
         giveaway_message_id: int,
         user: Optional[User] = None,
         is_unclaimed: Optional[bool] = None,
+        prize_star_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -224,6 +231,7 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
         with self._unfrozen():
             self.giveaway_message_id: int = giveaway_message_id
             self.user: Optional[User] = user
+            self.prize_star_count: Optional[int] = prize_star_count
             self.is_unclaimed: Optional[bool] = is_unclaimed
 
 
@@ -260,8 +268,8 @@ class ChatBoost(TelegramObject):
     def __init__(
         self,
         boost_id: str,
-        add_date: datetime,
-        expiration_date: datetime,
+        add_date: dtm.datetime,
+        expiration_date: dtm.datetime,
         source: ChatBoostSource,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -269,27 +277,22 @@ class ChatBoost(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         self.boost_id: str = boost_id
-        self.add_date: datetime = add_date
-        self.expiration_date: datetime = expiration_date
+        self.add_date: dtm.datetime = add_date
+        self.expiration_date: dtm.datetime = expiration_date
         self.source: ChatBoostSource = source
 
         self._id_attrs = (self.boost_id, self.add_date, self.expiration_date, self.source)
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatBoost"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBoost":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["source"] = ChatBoostSource.de_json(data.get("source"), bot)
+        data["source"] = de_json_optional(data.get("source"), ChatBoostSource, bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["add_date"] = from_timestamp(data["add_date"], tzinfo=loc_tzinfo)
-        data["expiration_date"] = from_timestamp(data["expiration_date"], tzinfo=loc_tzinfo)
+        data["add_date"] = from_timestamp(data.get("add_date"), tzinfo=loc_tzinfo)
+        data["expiration_date"] = from_timestamp(data.get("expiration_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 
@@ -329,17 +332,12 @@ class ChatBoostUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatBoostUpdated"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBoostUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["boost"] = ChatBoost.de_json(data.get("boost"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["boost"] = de_json_optional(data.get("boost"), ChatBoost, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -372,7 +370,7 @@ class ChatBoostRemoved(TelegramObject):
         self,
         chat: Chat,
         boost_id: str,
-        remove_date: datetime,
+        remove_date: dtm.datetime,
         source: ChatBoostSource,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -381,26 +379,21 @@ class ChatBoostRemoved(TelegramObject):
 
         self.chat: Chat = chat
         self.boost_id: str = boost_id
-        self.remove_date: datetime = remove_date
+        self.remove_date: dtm.datetime = remove_date
         self.source: ChatBoostSource = source
 
         self._id_attrs = (self.chat, self.boost_id, self.remove_date, self.source)
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatBoostRemoved"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBoostRemoved":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["source"] = ChatBoostSource.de_json(data.get("source"), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["source"] = de_json_optional(data.get("source"), ChatBoostSource, bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["remove_date"] = from_timestamp(data["remove_date"], tzinfo=loc_tzinfo)
+        data["remove_date"] = from_timestamp(data.get("remove_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 
@@ -418,7 +411,7 @@ class UserChatBoosts(TelegramObject):
             user.
 
     Attributes:
-        boosts (Tuple[:class:`telegram.ChatBoost`]): List of boosts added to the chat by the user.
+        boosts (tuple[:class:`telegram.ChatBoost`]): List of boosts added to the chat by the user.
     """
 
     __slots__ = ("boosts",)
@@ -431,21 +424,16 @@ class UserChatBoosts(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.boosts: Tuple[ChatBoost, ...] = parse_sequence_arg(boosts)
+        self.boosts: tuple[ChatBoost, ...] = parse_sequence_arg(boosts)
 
         self._id_attrs = (self.boosts,)
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["UserChatBoosts"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UserChatBoosts":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["boosts"] = ChatBoost.de_list(data.get("boosts"), bot)
+        data["boosts"] = de_list_optional(data.get("boosts"), ChatBoost, bot)
 
         return super().de_json(data=data, bot=bot)

@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -185,6 +185,11 @@ def autodoc_process_bases(app, name, obj, option, bases: list) -> None:
 
         if "IntEnum" in base:
             bases[idx] = ":class:`enum.IntEnum`"
+            continue
+
+        if "FloatEnum" in base:
+            bases[idx] = ":class:`enum.Enum`"
+            bases.insert(0, ":class:`float`")
             continue
 
         # Drop generics (at least for now)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,13 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatJoinRequest."""
-import datetime
+import datetime as dtm
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
@@ -106,7 +107,7 @@ class ChatJoinRequest(TelegramObject):
         self,
         chat: Chat,
         from_user: User,
-        date: datetime.datetime,
+        date: dtm.datetime,
         user_chat_id: int,
         bio: Optional[str] = None,
         invite_link: Optional[ChatInviteLink] = None,
@@ -117,7 +118,7 @@ class ChatJoinRequest(TelegramObject):
         # Required
         self.chat: Chat = chat
         self.from_user: User = from_user
-        self.date: datetime.datetime = date
+        self.date: dtm.datetime = date
         self.user_chat_id: int = user_chat_id
 
         # Optionals
@@ -129,22 +130,17 @@ class ChatJoinRequest(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatJoinRequest"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatJoinRequest":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["from_user"] = User.de_json(data.pop("from", None), bot)
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
         data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
-        data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
+        data["invite_link"] = de_json_optional(data.get("invite_link"), ChatInviteLink, bot)
 
         return super().de_json(data=data, bot=bot)
 

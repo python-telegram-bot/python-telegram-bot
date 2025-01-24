@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ from pathlib import Path
 from socket import socket
 from ssl import SSLContext
 from types import TracebackType
-from typing import TYPE_CHECKING, Optional, Type, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 # Instead of checking for ImportError here, we do that in `updater.py`, where we import from
 # this module. Doing it here would be tricky, as the classes below subclass tornado classes
@@ -210,7 +210,7 @@ class TelegramHandler(tornado.web.RequestHandler):
 
     def log_exception(
         self,
-        typ: Optional[Type[BaseException]],
+        typ: Optional[type[BaseException]],
         value: Optional[BaseException],
         tb: Optional[TracebackType],
     ) -> None:

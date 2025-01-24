@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -132,7 +132,7 @@ class TestChatBoostHandler:
         )
 
     @pytest.mark.parametrize(
-        argnames=["allowed_types", "cb", "expected"],
+        argnames=("allowed_types", "cb", "expected"),
         argvalues=[
             (ChatBoostHandler.CHAT_BOOST, "cb_chat_boost_updated", (True, False)),
             (ChatBoostHandler.REMOVED_CHAT_BOOST, "cb_chat_boost_removed", (False, True)),

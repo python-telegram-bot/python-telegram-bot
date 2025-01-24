@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from datetime import date
+import datetime as dtm
 
 import pytest
 
@@ -48,9 +48,9 @@ class TestBirthdateWithoutRequest(BirthdateTestBase):
         assert bd_dict["month"] == self.month
         assert bd_dict["year"] == self.year
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"day": self.day, "month": self.month, "year": self.year}
-        bd = Birthdate.de_json(json_dict, bot)
+        bd = Birthdate.de_json(json_dict, offline_bot)
         assert isinstance(bd, Birthdate)
         assert bd.day == self.day
         assert bd.month == self.month
@@ -72,10 +72,10 @@ class TestBirthdateWithoutRequest(BirthdateTestBase):
         assert hash(bd1) != hash(bd4)
 
     def test_to_date(self, birthdate):
-        assert isinstance(birthdate.to_date(), date)
-        assert birthdate.to_date() == date(self.year, self.month, self.day)
+        assert isinstance(birthdate.to_date(), dtm.date)
+        assert birthdate.to_date() == dtm.date(self.year, self.month, self.day)
         new_bd = birthdate.to_date(2023)
-        assert new_bd == date(2023, self.month, self.day)
+        assert new_bd == dtm.date(2023, self.month, self.day)
 
     def test_to_date_no_year(self):
         bd = Birthdate(1, 1)

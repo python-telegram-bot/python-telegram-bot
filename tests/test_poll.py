@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from datetime import datetime, timedelta, timezone
+import datetime as dtm
 
 import pytest
 
@@ -54,7 +54,6 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
         ), "duplicate slot"
 
     def test_de_json(self):
-        assert InputPollOption.de_json({}, None) is None
 
         json_dict = {
             "text": self.text,
@@ -144,7 +143,7 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
             "text_entities": [e.to_dict() for e in self.text_entities],
         }
         poll_option = PollOption.de_json(json_dict, None)
-        assert PollOption.de_json(None, None) is None
+
         assert poll_option.api_kwargs == {}
 
         assert poll_option.text == self.text
@@ -297,7 +296,7 @@ class PollTestBase:
     ).decode("unicode-escape")
     explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     open_period = 42
-    close_date = datetime.now(timezone.utc)
+    close_date = dtm.datetime.now(dtm.timezone.utc)
     question_entities = [
         MessageEntity(MessageEntity.BOLD, 0, 4),
         MessageEntity(MessageEntity.ITALIC, 5, 8),
@@ -305,7 +304,7 @@ class PollTestBase:
 
 
 class TestPollWithoutRequest(PollTestBase):
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "question": self.question,
@@ -321,7 +320,7 @@ class TestPollWithoutRequest(PollTestBase):
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
         }
-        poll = Poll.de_json(json_dict, bot)
+        poll = Poll.de_json(json_dict, offline_bot)
         assert poll.api_kwargs == {}
 
         assert poll.id == self.id_
@@ -339,11 +338,11 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll.explanation == self.explanation
         assert poll.explanation_entities == tuple(self.explanation_entities)
         assert poll.open_period == self.open_period
-        assert abs(poll.close_date - self.close_date) < timedelta(seconds=1)
+        assert abs(poll.close_date - self.close_date) < dtm.timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
         assert poll.question_entities == tuple(self.question_entities)
 
-    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
             "id": self.id_,
             "question": self.question,
@@ -361,7 +360,7 @@ class TestPollWithoutRequest(PollTestBase):
         }
 
         poll_raw = Poll.de_json(json_dict, raw_bot)
-        poll_bot = Poll.de_json(json_dict, bot)
+        poll_bot = Poll.de_json(json_dict, offline_bot)
         poll_bot_tz = Poll.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable

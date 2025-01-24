@@ -11,7 +11,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-7.9-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-8.2-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API version
 
@@ -70,7 +70,7 @@ Introduction
 
 This library provides a pure Python, asynchronous interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions **3.8+**.
+It's compatible with Python versions **3.9+**.
 
 In addition to the pure API implementation, this library features several convenience methods and shortcuts as well as a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
@@ -81,7 +81,7 @@ After installing_ the library, be sure to check out the section on `working with
 Telegram API support
 ~~~~~~~~~~~~~~~~~~~~
 
-All types and methods of the Telegram Bot API **7.9** are natively supported by this library.
+All types and methods of the Telegram Bot API **8.2** are natively supported by this library.
 In addition, Bot API functionality not yet natively included can still be used as described `in our wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Bot-API-Forward-Compatibility>`_.
 
 Notable Features
@@ -121,7 +121,7 @@ To enable you to verify that a release file that you downloaded was indeed provi
 
 Starting with v21.4, all releases are signed via `sigstore <https://www.sigstore.dev>`_.
 The corresponding signature files are uploaded to the `GitHub releases page`_.
-To verify the signature, please install the `sigstore Python client <https://pypi.org/project/sigstore/>`_ and follow the instructions for `verifying signatures from GitHub Actions <https://github.com/sigstore/sigstore-python#signatures-from-github-actions>`_. As input for the ``--repository`` parameter, please use the value ``python-telegram-bot/python-telegram-bot``.
+To verify the signature, please install the `sigstore Python client <https://pypi.org/project/sigstore/>`_ and follow the instructions for `verifying signatures from GitHub Actions <https://github.com/sigstore/sigstore-python?tab=readme-ov-file>`_. As input for the ``--repository`` parameter, please use the value ``python-telegram-bot/python-telegram-bot``.
 
 Earlier releases are signed with a GPG key.
 The signatures are uploaded to both the `GitHub releases page`_ and the `PyPI project <https://pypi.org/project/python-telegram-bot/>`_ and end with a suffix ``.asc``.
@@ -155,10 +155,10 @@ PTB can be installed with optional dependencies:
 * ``pip install "python-telegram-bot[passport]"`` installs the `cryptography>=39.0.1 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
 * ``pip install "python-telegram-bot[socks]"`` installs `httpx[socks] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to work behind a Socks5 server.
 * ``pip install "python-telegram-bot[http2]"`` installs `httpx[http2] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to use HTTP/2.
-* ``pip install "python-telegram-bot[rate-limiter]"`` installs `aiolimiter~=1.1.0 <https://aiolimiter.readthedocs.io/en/stable/>`_. Use this, if you want to use ``telegram.ext.AIORateLimiter``.
+* ``pip install "python-telegram-bot[rate-limiter]"`` installs `aiolimiter~=1.1,<1.3 <https://aiolimiter.readthedocs.io/en/stable/>`_. Use this, if you want to use ``telegram.ext.AIORateLimiter``.
 * ``pip install "python-telegram-bot[webhooks]"`` installs the `tornado~=6.4 <https://www.tornadoweb.org/en/stable/>`_ library. Use this, if you want to use ``telegram.ext.Updater.start_webhook``/``telegram.ext.Application.run_webhook``.
 * ``pip install "python-telegram-bot[callback-data]"`` installs the `cachetools>=5.3.3,<5.6.0 <https://cachetools.readthedocs.io/en/latest/>`_ library. Use this, if you want to use `arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_.
-* ``pip install "python-telegram-bot[job-queue]"`` installs the `APScheduler~=3.10.4 <https://apscheduler.readthedocs.io/en/3.x/>`_ library and enforces `pytz>=2018.6 <https://pypi.org/project/pytz/>`_, where ``pytz`` is a dependency of ``APScheduler``. Use this, if you want to use the ``telegram.ext.JobQueue``.
+* ``pip install "python-telegram-bot[job-queue]"`` installs the `APScheduler>=3.10.4,<3.12.0 <https://apscheduler.readthedocs.io/en/3.x/>`_ library. Use this, if you want to use the ``telegram.ext.JobQueue``.
 
 To install multiple optional dependencies, separate them by commas, e.g. ``pip install "python-telegram-bot[socks,webhooks]"``.
 
@@ -230,6 +230,6 @@ License
 -------
 
 You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_.
-Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
+Derivative works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
 
-.. _`GitHub releases page`: https://github.com/python-telegram-bot/python-telegram-bot/releases>
+.. _`GitHub releases page`: https://github.com/python-telegram-bot/python-telegram-bot/releases

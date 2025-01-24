@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
 
@@ -97,14 +98,10 @@ class InlineQueryResultsButton(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["InlineQueryResultsButton"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InlineQueryResultsButton":
         """See :meth:`telegram.TelegramObject.de_json`."""
-        if not data:
-            return None
 
-        data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
+        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
 
         return super().de_json(data=data, bot=bot)
 

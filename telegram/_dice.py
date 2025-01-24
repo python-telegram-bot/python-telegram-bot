@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
-from typing import Final, List, Optional
+from typing import Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -114,8 +114,8 @@ class Dice(TelegramObject):
 
     .. versionadded:: 13.4
     """
-    ALL_EMOJI: Final[List[str]] = list(constants.DiceEmoji)
-    """List[:obj:`str`]: A list of all available dice emoji."""
+    ALL_EMOJI: Final[list[str]] = list(constants.DiceEmoji)
+    """list[:obj:`str`]: A list of all available dice emoji."""
 
     MIN_VALUE: Final[int] = constants.DiceLimit.MIN_VALUE
     """:const:`telegram.constants.DiceLimit.MIN_VALUE`

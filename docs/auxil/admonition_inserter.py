@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -16,31 +16,43 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 import collections.abc
+import contextlib
 import inspect
 import re
 import typing
 from collections import defaultdict
-from typing import Any, Iterator, Literal, Union
+from types import FunctionType
+from typing import Any, Iterator, Literal, Union, Generator
 from tests.auxil.slots import mro_slots
 
 import telegram
 import telegram.ext
+
+# Some external & internal imports are necessary to make the symbols available during type resolution.
 import telegram.ext._utils.types
 import telegram._utils.types
 import telegram._utils.defaultvalue
 from socket import socket
 from apscheduler.job import Job as APSJob
 
-tg_objects = vars(telegram)
-tg_objects.update(vars(telegram._utils.types))
-tg_objects.update(vars(telegram._utils.defaultvalue))
-tg_objects.update(vars(telegram.ext))
-tg_objects.update(vars(telegram.ext._utils.types))
-tg_objects.update(vars(telegram.ext._applicationbuilder))
-tg_objects.update({"socket": socket, "APSJob": APSJob})
+# Define the namespace for type resolution. This helps dealing with the internal imports that
+# we do in many places
+TG_NAMESPACE = vars(telegram)
+TG_NAMESPACE.update(vars(telegram._utils.types))
+TG_NAMESPACE.update(vars(telegram._utils.defaultvalue))
+TG_NAMESPACE.update(vars(telegram.ext))
+TG_NAMESPACE.update(vars(telegram.ext._utils.types))
+TG_NAMESPACE.update(vars(telegram.ext._applicationbuilder))
+TG_NAMESPACE.update({"socket": socket, "APSJob": APSJob})
 
 
-def _iter_own_public_methods(cls: type) -> Iterator[tuple[str, type]]:
+class PublicMethod(typing.NamedTuple):
+    name: str
+    method: FunctionType
+
+
+
+def _iter_own_public_methods(cls: type) -> Iterator[PublicMethod]:
     """Iterates over methods of a class that are not protected/private,
     not camelCase and not inherited from the parent class.
 
@@ -48,13 +60,14 @@ def _iter_own_public_methods(cls: type) -> Iterator[tuple[str, type]]:
 
     This function is defined outside the class because it is used to create class constants.
     """
-    return (
-        m
-        for m in inspect.getmembers(cls, predicate=inspect.isfunction)  # not .ismethod
-        if not m[0].startswith("_")
-        and m[0].islower()  # to avoid camelCase methods
-        and m[0] in cls.__dict__  # method is not inherited from parent class
-    )
+    # Use .isfunction() instead of .ismethod() because we want to include static methods.
+    for m in inspect.getmembers(cls, predicate=inspect.isfunction):
+        if (
+            not m[0].startswith("_")
+            and m[0].islower()  # to avoid camelCase methods
+            and m[0] in cls.__dict__  # method is not inherited from parent class
+        ):
+            yield PublicMethod(m[0], m[1])
 
 
 class AdmonitionInserter:
@@ -79,11 +92,12 @@ class AdmonitionInserter:
     ForwardRef('DefaultValue[DVValueType]')
     """
 
-    METHOD_NAMES_FOR_BOT_AND_APPBUILDER: typing.ClassVar[dict[type, str]] = {
-        cls: tuple(m[0] for m in _iter_own_public_methods(cls))  # m[0] means we take only names
+    METHOD_NAMES_FOR_BOT_APP_APPBUILDER: typing.ClassVar[dict[type, str]] = {
+        cls: tuple(m.name for m in _iter_own_public_methods(cls))
         for cls in (telegram.Bot, telegram.ext.ApplicationBuilder, telegram.ext.Application)
     }
-    """A dictionary mapping Bot and ApplicationBuilder classes to their relevant methods that will
+    """A dictionary mapping Bot, Application & ApplicationBuilder classes to their relevant methods
+    that will
     be mentioned in 'Returned in' and 'Use in' admonitions in other classes' docstrings.
     Methods must be public, not aliases, not inherited from TelegramObject.
     """
@@ -101,13 +115,20 @@ class AdmonitionInserter:
         """Dictionary with admonitions. Contains sub-dictionaries, one per admonition type.
         Each sub-dictionary matches bot methods (for "Shortcuts") or telegram classes (for other
         admonition types) to texts of admonitions, e.g.:
+        
         ```
         {
-        "use_in": {<class 'telegram._chatinvitelink.ChatInviteLink'>:
-        <"Use in" admonition for ChatInviteLink>, ...},
-        "available_in": {<class 'telegram._chatinvitelink.ChatInviteLink'>:
-        <"Available in" admonition">, ...},
-        "returned_in": {...}
+            "use_in": {
+                <class 'telegram._chatinvitelink.ChatInviteLink'>:
+                    <"Use in" admonition for ChatInviteLink>,
+                ...
+            },
+            "available_in": {
+                <class 'telegram._chatinvitelink.ChatInviteLink'>:
+                    <"Available in" admonition">,
+                ...
+            },
+            "returned_in": {...}
         }
         ```
         """
@@ -146,34 +167,6 @@ class AdmonitionInserter:
         # i.e. {telegram._files.sticker.Sticker: {":attr:`telegram.Message.sticker`", ...}}
         attrs_for_class = defaultdict(set)
 
-        # The following regex is supposed to capture a class name in a line like this:
-        # media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
-        #
-        # Note that even if such typing description spans over multiple lines but each line ends
-        # with a backslash (otherwise Sphinx will throw an error)
-        # (e.g. EncryptedPassportElement.data), then Sphinx will combine these lines into a single
-        # line automatically, and it will contain no backslash (only some extra many whitespaces
-        # from the indentation).
-
-        attr_docstr_pattern = re.compile(
-            r"^\s*(?P<attr_name>[a-z_]+)"  # Any number of spaces, named group for attribute
-            r"\s?\("  # Optional whitespace, opening parenthesis
-            r".*"  # Any number of characters (that could denote a built-in type)
-            r":(class|obj):`.+`"  # Marker of a classref, class name in backticks
-            r".*\):"  # Any number of characters, closing parenthesis, colon.
-            # The ^ colon above along with parenthesis is important because it makes sure that
-            # the class is mentioned in the attribute description, not in free text.
-            r".*$",  # Any number of characters, end of string (end of line)
-            re.VERBOSE,
-        )
-
-        # for properties: there is no attr name in docstring.  Just check if there's a class name.
-        prop_docstring_pattern = re.compile(r":(class|obj):`.+`.*:")
-
-        # pattern for iterating over potentially many class names in docstring for one attribute.
-        # Tilde is optional (sometimes it is in the docstring, sometimes not).
-        single_class_name_pattern = re.compile(r":(class|obj):`~?(?P<class_name>[\w.]*)`")
-
         classes_to_inspect = inspect.getmembers(telegram, inspect.isclass) + inspect.getmembers(
             telegram.ext, inspect.isclass
         )
@@ -184,32 +177,15 @@ class AdmonitionInserter:
             # docstrings.
             name_of_inspected_class_in_docstr = self._generate_class_name_for_link(inspected_class)
 
-            # Parsing part of the docstring with attributes (parsing of properties follows later)
-            # docstring_lines = inspect.getdoc(inspected_class).splitlines()
-            # lines_with_attrs = []
-            # for idx, line in enumerate(docstring_lines):
-            #     if line.strip() == "Attributes:":
-            #         lines_with_attrs = docstring_lines[idx + 1 :]
-            #         break
-
-            # for line in lines_with_attrs:
-            #     if not (line_match := attr_docstr_pattern.match(line)):
-            #         continue
-
-            #     target_attr = line_match.group("attr_name")
-            #     # a typing description of one attribute can contain multiple classes
-                # for match in single_class_name_pattern.finditer(line):
-                    # name_of_class_in_attr = match.group("class_name")
-
-            # Writing to dictionary: matching the class found in the docstring
+            # Writing to dictionary: matching the class found in the type hint
             # and its subclasses to the attribute of the class being inspected.
-            # The class in the attribute docstring (or its subclass) is the key,
+            # The class in the attribute typehint (or its subclass) is the key,
             # ReST link to attribute of the class currently being inspected is the value.
 
             # best effort - args of __init__ means not all attributes are covered, but there is no
-            # other way to get type hints of all attributes, other than doing ast parsing maybe. 
+            # other way to get type hints of all attributes, other than doing ast parsing maybe.
             # (Docstring parsing was discontinued with the closing of #4414)
-            type_hints = typing.get_type_hints(inspected_class.__init__, localns=tg_objects)
+            type_hints = typing.get_type_hints(inspected_class.__init__, localns=TG_NAMESPACE)
             class_attrs = [slot for slot in mro_slots(inspected_class) if not slot.startswith("_")]
             for target_attr in class_attrs:
                 try:
@@ -237,7 +213,7 @@ class AdmonitionInserter:
                     continue
 
                 # fget is used to access the actual function under the property wrapper
-                type_hints = typing.get_type_hints(getattr(inspected_class, prop_name).fget, localns=tg_objects)
+                type_hints = typing.get_type_hints(getattr(inspected_class, prop_name).fget, localns=TG_NAMESPACE)
 
                 # Writing to dictionary: matching the class found in the docstring and its
                 # subclasses to the property of the class being inspected.
@@ -268,12 +244,12 @@ class AdmonitionInserter:
         # i.e. {<class 'telegram._message.Message'>: {:meth:`telegram.Bot.send_message`, ...}}
         methods_for_class = defaultdict(set)
 
-        for cls, method_names in self.METHOD_NAMES_FOR_BOT_AND_APPBUILDER.items():
+        for cls, method_names in self.METHOD_NAMES_FOR_BOT_APP_APPBUILDER.items():
             for method_name in method_names:
                 method_link = self._generate_link_to_method(method_name, cls)
                 arg = getattr(cls, method_name)
                 print(arg, method_name)
-                ret_type_hint = typing.get_type_hints(arg, localns=tg_objects)
+                ret_type_hint = typing.get_type_hints(arg, localns=TG_NAMESPACE)
 
                 try:
                     self._resolve_arg_and_add_link(
@@ -317,6 +293,7 @@ class AdmonitionInserter:
                 continue
 
             for method_name, method in _iter_own_public_methods(cls):
+                print(f"{cls=}, {cls.__module__=}")
                 # .getsourcelines() returns a tuple. Item [1] is an int
                 for line in inspect.getsourcelines(method)[0]:
                     if not (bot_method_match := bot_method_pattern.search(line)):
@@ -340,12 +317,12 @@ class AdmonitionInserter:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
         methods_for_class = defaultdict(set)
 
-        for cls, method_names in self.METHOD_NAMES_FOR_BOT_AND_APPBUILDER.items():
+        for cls, method_names in self.METHOD_NAMES_FOR_BOT_APP_APPBUILDER.items():
             for method_name in method_names:
                 method_link = self._generate_link_to_method(method_name, cls)
 
                 arg = getattr(cls, method_name)
-                param_type_hints = typing.get_type_hints(arg, localns=tg_objects)
+                param_type_hints = typing.get_type_hints(arg, localns=TG_NAMESPACE)
                 param_type_hints.pop("return", None)
                 try:
                     self._resolve_arg_and_add_link(
@@ -373,7 +350,7 @@ class AdmonitionInserter:
         for idx, value in list(enumerate(lines)):
             if value.startswith(
                 (
-                    ".. seealso:",
+                    # ".. seealso:",
                     # The docstring contains heading "Examples:", but Sphinx will have it converted
                     # to ".. admonition: Examples":
                     ".. admonition:: Examples",
@@ -446,12 +423,12 @@ class AdmonitionInserter:
         return admonition_for_class
 
     @staticmethod
-    def _generate_class_name_for_link(cls: type) -> str:
+    def _generate_class_name_for_link(cls_: type) -> str:
         """Generates class name that can be used in a ReST link."""
 
         # Check for potential presence of ".ext.", we will need to keep it.
-        ext = ".ext" if ".ext." in str(cls) else ""
-        return f"telegram{ext}.{cls.__name__}"
+        ext = ".ext" if ".ext." in str(cls_) else ""
+        return f"telegram{ext}.{cls_.__name__}"
 
     def _generate_link_to_method(self, method_name: str, cls: type) -> str:
         """Generates a ReST link to a method of a telegram class."""
@@ -459,13 +436,13 @@ class AdmonitionInserter:
         return f":meth:`{self._generate_class_name_for_link(cls)}.{method_name}`"
 
     @staticmethod
-    def _iter_subclasses(cls: type) -> Iterator:
-        if not hasattr(cls, "__subclasses__") or cls is telegram.TelegramObject:
+    def _iter_subclasses(cls_: type) -> Iterator:
+        if not hasattr(cls_, "__subclasses__") or cls_ is telegram.TelegramObject:
             return iter([])
         return (
             # exclude private classes
             c
-            for c in cls.__subclasses__()
+            for c in cls_.__subclasses__()
             if not str(c).split(".")[-1].startswith("_")
         )
 
@@ -538,80 +515,6 @@ class AdmonitionInserter:
             recurse_type(type_hint)
         print(f"{telegram_classes=}")
         return list(telegram_classes)
-        # origin = typing.get_origin(arg)
-
-        # if (
-        #     origin in (collections.abc.Callable, typing.IO)
-        #     or arg is None
-        #     # no other check available (by type or origin) for these:
-        #     or str(type(arg)) in ("<class 'typing._SpecialForm'>", "<class 'ellipsis'>")
-        # ):
-        #     pass
-
-        # # RECURSIVE CALLS
-        # # for cases like Union[Sequence....
-        # elif origin in (
-        #     Union,
-        #     collections.abc.Coroutine,
-        #     collections.abc.Sequence,
-        # ):
-        #     for sub_arg in typing.get_args(arg):
-        #         yield from self._resolve_arg(sub_arg)
-
-        # elif isinstance(arg, typing.TypeVar):
-        #     # gets access to the "bound=..." parameter
-        #     yield from self._resolve_arg(arg.__bound__)
-        # # END RECURSIVE CALLS
-
-        # elif isinstance(arg, typing.ForwardRef):
-        #     m = self.FORWARD_REF_PATTERN.match(str(arg))
-        #     # We're sure it's a ForwardRef, so, unless it belongs to known exceptions,
-        #     # the class must be resolved.
-        #     # If it isn't resolved, we'll have the program throw an exception to be sure.
-        #     try:
-        #         cls = self._resolve_class(m.group("class_name"))
-        #     except AttributeError as exc:
-        #         # skip known ForwardRef's that need not be resolved to a Telegram class
-        #         if self.FORWARD_REF_SKIP_PATTERN.match(str(arg)):
-        #             pass
-        #         else:
-        #             raise NotImplementedError(f"Could not process ForwardRef: {arg}") from exc
-        #     else:
-        #         yield cls
-
-        # # For custom generics like telegram.ext._application.Application[~BT, ~CCT, ~UD...].
-        # # This must come before the check for isinstance(type) because GenericAlias can also be
-        # # recognized as type if it belongs to <class 'types.GenericAlias'>.
-        # elif str(type(arg)) in (
-        #     "<class 'typing._GenericAlias'>",
-        #     "<class 'types.GenericAlias'>",
-        #     "<class 'typing._LiteralGenericAlias'>",
-        # ):
-        #     if "telegram" in str(arg):
-        #         # get_origin() of telegram.ext._application.Application[~BT, ~CCT, ~UD...]
-        #         # will produce <class 'telegram.ext._application.Application'>
-        #         yield origin
-
-        # elif isinstance(arg, type):
-        #     if "telegram" in str(arg):
-        #         yield arg
-
-        # # For some reason "InlineQueryResult", "InputMedia" & some others are currently not
-        # # recognized as ForwardRefs and are identified as plain strings.
-        # elif isinstance(arg, str):
-        #     # args like "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]" can be recognized as strings.
-        #     # Remove whatever is in the square brackets because it doesn't need to be parsed.
-        #     arg = re.sub(r"\[.+]", "", arg)
-
-        #     cls = self._resolve_class(arg)
-        #     # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
-        #     if cls is not None:
-        #         yield cls
-
-        # else:
-        # raise NotImplementedError(
-        #     f"Cannot process argument {arg} of type {type(arg)} (origin {origin})"
-        # )
 
     @staticmethod
     def _resolve_class(name: str) -> Union[type, None]:
@@ -631,16 +534,14 @@ class AdmonitionInserter:
             f"telegram.ext.{name}",
             f"telegram.ext.filters.{name}",
         ):
-            try:
-                return eval(option)
             # NameError will be raised if trying to eval just name and it doesn't work, e.g.
             # "Name 'ApplicationBuilder' is not defined".
             # AttributeError will be raised if trying to e.g. eval f"telegram.{name}" when the
             # class denoted by `name` actually belongs to `telegram.ext`:
             # "module 'telegram' has no attribute 'ApplicationBuilder'".
             # If neither option works, this is not a PTB class.
-            except (NameError, AttributeError):
-                continue
+            with contextlib.suppress(NameError, AttributeError):
+                return eval(option)
         return None
 
 

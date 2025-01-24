@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@
 
 from telegram import Update
 from telegram.ext._handlers.basehandler import BaseHandler
-from telegram.ext._utils.types import CCT
+from telegram.ext._utils.types import CCT, RT
 
 
-class PollAnswerHandler(BaseHandler[Update, CCT]):
+class PollAnswerHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle Telegram updates that contain a
     :attr:`poll answer <telegram.Update.poll_answer>`.
 

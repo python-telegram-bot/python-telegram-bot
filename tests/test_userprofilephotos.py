@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -41,9 +41,9 @@ class TestUserProfilePhotosWithoutRequest(UserProfilePhotosTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"total_count": 2, "photos": [[y.to_dict() for y in x] for x in self.photos]}
-        user_profile_photos = UserProfilePhotos.de_json(json_dict, bot)
+        user_profile_photos = UserProfilePhotos.de_json(json_dict, offline_bot)
         assert user_profile_photos.api_kwargs == {}
         assert user_profile_photos.total_count == self.total_count
         assert user_profile_photos.photos == tuple(tuple(p) for p in self.photos)

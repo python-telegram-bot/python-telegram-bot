@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import datetime
 import logging
 import sys
+import zoneinfo
 from pathlib import Path
-from typing import Dict, List
 from uuid import uuid4
 
 import pytest
@@ -37,16 +36,14 @@ from telegram import (
     Update,
     User,
 )
-from telegram.ext import ApplicationBuilder, Defaults, Updater
-from telegram.ext.filters import MessageFilter, UpdateFilter
-from tests.auxil.build_messages import DATE
-from tests.auxil.ci_bots import BOT_INFO_PROVIDER
-from tests.auxil.constants import PRIVATE_KEY
-from tests.auxil.envvars import RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
+from telegram.ext import Defaults
+from tests.auxil.build_messages import DATE, make_message
+from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
+from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
+from tests.auxil.envvars import GITHUB_ACTIONS, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
-from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
-from tests.auxil.timezones import BasicTimezone
+from tests.auxil.pytest_classes import PytestBot, make_bot
 
 if TEST_WITH_OPT_DEPS:
     import pytz
@@ -77,7 +74,7 @@ def no_rerun_after_xfail_or_flood(error, name, test: pytest.Function, plugin):
     return not (xfail_present or did_we_flood)
 
 
-def pytest_collection_modifyitems(items: List[pytest.Item]):
+def pytest_collection_modifyitems(items: list[pytest.Item]):
     """Here we add a flaky marker to all request making tests and a (no_)req marker to the rest."""
     for item in items:  # items are the test methods
         parent = item.parent  # Get the parent of the item (class, or module if defined outside)
@@ -99,6 +96,39 @@ def pytest_collection_modifyitems(items: List[pytest.Item]):
             parent.add_marker(pytest.mark.no_req)
 
 
+if GITHUB_ACTIONS and JOB_INDEX == 0:
+    # let's not slow down the tests too much with these additional checks
+    # that's why we run them only in GitHub actions and only on *one* of the several test
+    # matrix entries
+    @pytest.fixture(autouse=True)
+    def _disallow_requests_in_without_request_tests(request):
+        """This fixture prevents tests that don't require requests from using the online-bot.
+        This is a sane-effort approach on trying to prevent requests from being made in the
+        *WithoutRequest classes. Note that we can not prevent all requests, as one can still
+        manually build a `Bot` object or use `httpx` directly. See #4317 and #4465 for some
+        discussion.
+        """
+
+        if type(request).__name__ == "SubRequest":
+            # Some fixtures used in the *WithoutRequests test classes do use requests, e.g.
+            # `animation`. Separating that would be too much effort, hence we allow that.
+            # Unfortunately the `SubRequest` class is not public, so we check only the name for
+            # less dependency on pytest's internal structure.
+            return
+
+        if not request.cls:
+            return
+        name = request.cls.__name__
+        if not name.endswith("WithoutRequest") or not request.fixturenames:
+            return
+
+        if "bot" in request.fixturenames:
+            pytest.fail(
+                f"Test function {request.function} in test class {name} should not have a `bot` "
+                f"fixture. Use `offline_bot` instead."
+            )
+
+
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
 # session. See https://github.com/pytest-dev/pytest-asyncio/issues/68 for more details.
 @pytest.fixture(scope="session")
@@ -113,27 +143,36 @@ def event_loop(request):
 
 
 @pytest.fixture(scope="session")
-def bot_info() -> Dict[str, str]:
+def bot_info() -> dict[str, str]:
     return BOT_INFO_PROVIDER.get_info()
 
 
 @pytest.fixture(scope="session")
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
-    async with make_bot(bot_info) as _bot:
+    async with make_bot(bot_info, offline=False) as _bot:
+        yield _bot
+
+
+@pytest.fixture(scope="session")
+async def offline_bot(bot_info):
+    """Makes an offline Bot instance with the given bot_info
+    Note that in tests/ext we also override the `bot` fixture to return the offline bot instead.
+    """
+    async with make_bot(bot_info, offline=True) as _bot:
         yield _bot
 
 
 @pytest.fixture
 def one_time_bot(bot_info):
     """A function scoped bot since the session bot would shutdown when `async with app` finishes"""
-    return make_bot(bot_info)
+    return make_bot(bot_info, offline=False)
 
 
 @pytest.fixture(scope="session")
 async def cdc_bot(bot_info):
     """Makes an ExtBot instance with the given bot_info that uses arbitrary callback_data"""
-    async with make_bot(bot_info, arbitrary_callback_data=True) as _bot:
+    async with make_bot(bot_info, arbitrary_callback_data=True, offline=False) as _bot:
         yield _bot
 
 
@@ -163,7 +202,7 @@ async def default_bot(request, bot_info):
     # If the bot is already created, return it. Else make a new one.
     default_bot = _default_bots.get(defaults)
     if default_bot is None:
-        default_bot = make_bot(bot_info, defaults=defaults)
+        default_bot = make_bot(bot_info, defaults=defaults, offline=False)
         await default_bot.initialize()
         _default_bots[defaults] = default_bot  # Defaults object is hashable
     return default_bot
@@ -175,7 +214,7 @@ async def tz_bot(timezone, bot_info):
     try:  # If the bot is already created, return it. Saves time since get_me is not called again.
         return _default_bots[defaults]
     except KeyError:
-        default_bot = make_bot(bot_info, defaults=defaults)
+        default_bot = make_bot(bot_info, defaults=defaults, offline=False)
         await default_bot.initialize()
         _default_bots[defaults] = default_bot
         return default_bot
@@ -212,28 +251,6 @@ def subscription_channel_id(bot_info):
 
 
 @pytest.fixture
-async def app(bot_info):
-    # We build a new bot each time so that we use `app` in a context manager without problems
-    application = (
-        ApplicationBuilder().bot(make_bot(bot_info)).application_class(PytestApplication).build()
-    )
-    yield application
-    if application.running:
-        await application.stop()
-        await application.shutdown()
-
-
-@pytest.fixture
-async def updater(bot_info):
-    # We build a new bot each time so that we use `updater` in a context manager without problems
-    up = Updater(bot=make_bot(bot_info), update_queue=asyncio.Queue())
-    yield up
-    if up.running:
-        await up.stop()
-        await up.shutdown()
-
-
-@pytest.fixture
 def thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
@@ -245,21 +262,28 @@ def class_thumb_file():
         yield f
 
 
-@pytest.fixture(
-    scope="class",
-    params=[{"class": MessageFilter}, {"class": UpdateFilter}],
-    ids=["MessageFilter", "UpdateFilter"],
-)
-def mock_filter(request):
-    class MockFilter(request.param["class"]):
-        def __init__(self):
-            super().__init__()
-            self.tested = False
+@pytest.fixture(scope="session")
+async def emoji_id(bot):
+    emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
+    first_sticker = emoji_sticker_list[0]
+    return first_sticker.custom_emoji_id
 
-        def filter(self, _):
-            self.tested = True
 
-    return MockFilter()
+@pytest.fixture
+async def real_topic(bot, emoji_id, forum_group_id):
+    result = await bot.create_forum_topic(
+        chat_id=forum_group_id,
+        name=TEST_TOPIC_NAME,
+        icon_color=TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id=emoji_id,
+    )
+
+    yield result
+
+    result = await bot.delete_forum_topic(
+        chat_id=forum_group_id, message_thread_id=result.message_thread_id
+    )
+    assert result is True, "Topic was not deleted"
 
 
 def _get_false_update_fixture_decorator_params():
@@ -283,12 +307,20 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
+@pytest.fixture(
+    scope="session",
+    params=[pytz.timezone, zoneinfo.ZoneInfo] if TEST_WITH_OPT_DEPS else [zoneinfo.ZoneInfo],
+)
+def _tz_implementation(request):
+    # This fixture is used to parametrize the timezone fixture
+    # This is similar to what @pyttest.mark.parametrize does but for fixtures
+    # However, this is needed only internally for the `tzinfo` fixture, so we keep it private
+    return request.param
+
+
 @pytest.fixture(scope="session", params=["Europe/Berlin", "Asia/Singapore", "UTC"])
-def tzinfo(request):
-    if TEST_WITH_OPT_DEPS:
-        return pytz.timezone(request.param)
-    hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
-    return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
+def tzinfo(request, _tz_implementation):
+    return _tz_implementation(request.param)
 
 
 @pytest.fixture(scope="session")
@@ -299,3 +331,13 @@ def timezone(tzinfo):
 @pytest.fixture
 def tmp_file(tmp_path) -> Path:
     return tmp_path / uuid4().hex
+
+
+@pytest.fixture(scope="session")
+def dummy_message():
+    return make_message("dummy_message")
+
+
+@pytest.fixture(scope="session")
+def dummy_message_dict(dummy_message):
+    return dummy_message.to_dict()

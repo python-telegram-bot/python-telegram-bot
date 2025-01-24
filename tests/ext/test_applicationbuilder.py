@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,7 @@ class TestApplicationBuilder:
         arguments = inspect.signature(HTTPXRequest.__init__).parameters.keys()
         prefix = "get_updates_" if get_updates else ""
         for argument in arguments:
-            if argument == "self":
+            if argument in ("self", "httpx_kwargs"):
                 continue
             if argument == "media_write_timeout" and get_updates:
                 # get_updates never makes media requests

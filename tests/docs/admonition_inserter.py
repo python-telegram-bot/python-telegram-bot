@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -98,7 +98,7 @@ class TestAdmonitionInserter:
             (
                 "available_in",
                 telegram.Sticker,
-                ":attr:`telegram.StickerSet.stickers`",  # Tuple[telegram.Sticker]
+                ":attr:`telegram.StickerSet.stickers`",  # tuple[telegram.Sticker]
             ),
             (
                 "available_in",
@@ -114,6 +114,11 @@ class TestAdmonitionInserter:
                 "returned_in",
                 telegram.ChatMember,
                 ":meth:`telegram.Bot.get_chat_member`",
+            ),
+            (
+                "returned_in",
+                telegram.GameHighScore,
+                ":meth:`telegram.Bot.get_game_high_scores`",
             ),
             (
                 "returned_in",

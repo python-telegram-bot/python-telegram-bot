@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2024
+#  Copyright (C) 2015-2025
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import ODVInput
 from telegram.error import BadRequest, RetryAfter, TimedOut
-from telegram.request import HTTPXRequest, RequestData
+from telegram.request import BaseRequest, HTTPXRequest, RequestData
 
 
 class NonchalantHttpxRequest(HTTPXRequest):
@@ -58,6 +58,33 @@ class NonchalantHttpxRequest(HTTPXRequest):
             pytest.xfail(f"Not waiting for flood control: {e}")
         except TimedOut as e:
             pytest.xfail(f"Ignoring TimedOut error: {e}")
+
+
+class OfflineRequest(BaseRequest):
+    """This Request class disallows making requests to Telegram's servers.
+    Use this in tests that should not depend on the network.
+    """
+
+    async def initialize(self) -> None:
+        pass
+
+    async def shutdown(self) -> None:
+        pass
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    async def do_request(
+        self,
+        url: str,
+        method: str,
+        request_data: Optional[RequestData] = None,
+        read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+        write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+    ) -> tuple[int, bytes]:
+        pytest.fail("OfflineRequest: Network access disallowed in this test")
 
 
 async def expect_bad_request(func, message, reason):

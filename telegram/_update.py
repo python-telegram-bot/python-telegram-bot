@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Final, List, Optional, Union
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._business import BusinessConnection, BusinessMessagesDeleted
@@ -30,10 +30,12 @@ from telegram._choseninlineresult import ChosenInlineResult
 from telegram._inline.inlinequery import InlineQuery
 from telegram._message import Message
 from telegram._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
+from telegram._paidmedia import PaidMediaPurchased
 from telegram._payment.precheckoutquery import PreCheckoutQuery
 from telegram._payment.shippingquery import ShippingQuery
 from telegram._poll import Poll, PollAnswer
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
@@ -156,6 +158,11 @@ class Update(TelegramObject):
 
             .. versionadded:: 21.1
 
+        purchased_paid_media (:class:`telegram.PaidMediaPurchased`, optional): A user purchased
+            paid media with a non-empty payload sent by the bot in a non-channel chat.
+
+            .. versionadded:: 21.6
+
 
     Attributes:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
@@ -263,6 +270,11 @@ class Update(TelegramObject):
             were deleted from a connected business account.
 
             .. versionadded:: 21.1
+
+        purchased_paid_media (:class:`telegram.PaidMediaPurchased`): Optional. A user purchased
+            paid media with a non-empty payload sent by the bot in a non-channel chat.
+
+            .. versionadded:: 21.6
     """
 
     __slots__ = (
@@ -290,6 +302,7 @@ class Update(TelegramObject):
         "poll",
         "poll_answer",
         "pre_checkout_query",
+        "purchased_paid_media",
         "removed_chat_boost",
         "shipping_query",
         "update_id",
@@ -383,8 +396,15 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.DELETED_BUSINESS_MESSAGES`
 
     .. versionadded:: 21.1"""
-    ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
-    """List[:obj:`str`]: A list of all available update types.
+
+    PURCHASED_PAID_MEDIA: Final[str] = constants.UpdateType.PURCHASED_PAID_MEDIA
+    """:const:`telegram.constants.UpdateType.PURCHASED_PAID_MEDIA`
+
+    .. versionadded:: 21.6
+    """
+
+    ALL_TYPES: Final[list[str]] = list(constants.UpdateType)
+    """list[:obj:`str`]: A list of all available update types.
 
     .. versionadded:: 13.5"""
 
@@ -413,6 +433,7 @@ class Update(TelegramObject):
         business_message: Optional[Message] = None,
         edited_business_message: Optional[Message] = None,
         deleted_business_messages: Optional[BusinessMessagesDeleted] = None,
+        purchased_paid_media: Optional[PaidMediaPurchased] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -444,6 +465,7 @@ class Update(TelegramObject):
         self.deleted_business_messages: Optional[BusinessMessagesDeleted] = (
             deleted_business_messages
         )
+        self.purchased_paid_media: Optional[PaidMediaPurchased] = purchased_paid_media
 
         self._effective_user: Optional[User] = None
         self._effective_sender: Optional[Union[User, Chat]] = None
@@ -474,6 +496,9 @@ class Update(TelegramObject):
         .. versionchanged:: 21.1
             This property now also considers :attr:`business_connection`, :attr:`business_message`
             and :attr:`edited_business_message`.
+
+        .. versionchanged:: 21.6
+            This property now also considers :attr:`purchased_paid_media`.
 
         Example:
             * If :attr:`message` is present, this will give
@@ -530,6 +555,9 @@ class Update(TelegramObject):
 
         elif self.business_connection:
             user = self.business_connection.user
+
+        elif self.purchased_paid_media:
+            user = self.purchased_paid_media.from_user
 
         self._effective_user = user
         return user
@@ -601,7 +629,8 @@ class Update(TelegramObject):
         This is the case, if :attr:`inline_query`,
         :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
         :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
-        :attr:`poll_answer`, or :attr:`business_connection` is present.
+        :attr:`poll_answer`, :attr:`business_connection`, or :attr:`purchased_paid_media`
+        is present.
 
         .. versionchanged:: 21.1
             This property now also considers :attr:`business_message`,
@@ -729,44 +758,56 @@ class Update(TelegramObject):
         return message
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Update"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Update":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["message"] = Message.de_json(data.get("message"), bot)
-        data["edited_message"] = Message.de_json(data.get("edited_message"), bot)
-        data["inline_query"] = InlineQuery.de_json(data.get("inline_query"), bot)
-        data["chosen_inline_result"] = ChosenInlineResult.de_json(
-            data.get("chosen_inline_result"), bot
+        data["message"] = de_json_optional(data.get("message"), Message, bot)
+        data["edited_message"] = de_json_optional(data.get("edited_message"), Message, bot)
+        data["inline_query"] = de_json_optional(data.get("inline_query"), InlineQuery, bot)
+        data["chosen_inline_result"] = de_json_optional(
+            data.get("chosen_inline_result"), ChosenInlineResult, bot
         )
-        data["callback_query"] = CallbackQuery.de_json(data.get("callback_query"), bot)
-        data["shipping_query"] = ShippingQuery.de_json(data.get("shipping_query"), bot)
-        data["pre_checkout_query"] = PreCheckoutQuery.de_json(data.get("pre_checkout_query"), bot)
-        data["channel_post"] = Message.de_json(data.get("channel_post"), bot)
-        data["edited_channel_post"] = Message.de_json(data.get("edited_channel_post"), bot)
-        data["poll"] = Poll.de_json(data.get("poll"), bot)
-        data["poll_answer"] = PollAnswer.de_json(data.get("poll_answer"), bot)
-        data["my_chat_member"] = ChatMemberUpdated.de_json(data.get("my_chat_member"), bot)
-        data["chat_member"] = ChatMemberUpdated.de_json(data.get("chat_member"), bot)
-        data["chat_join_request"] = ChatJoinRequest.de_json(data.get("chat_join_request"), bot)
-        data["chat_boost"] = ChatBoostUpdated.de_json(data.get("chat_boost"), bot)
-        data["removed_chat_boost"] = ChatBoostRemoved.de_json(data.get("removed_chat_boost"), bot)
-        data["message_reaction"] = MessageReactionUpdated.de_json(
-            data.get("message_reaction"), bot
+        data["callback_query"] = de_json_optional(data.get("callback_query"), CallbackQuery, bot)
+        data["shipping_query"] = de_json_optional(data.get("shipping_query"), ShippingQuery, bot)
+        data["pre_checkout_query"] = de_json_optional(
+            data.get("pre_checkout_query"), PreCheckoutQuery, bot
         )
-        data["message_reaction_count"] = MessageReactionCountUpdated.de_json(
-            data.get("message_reaction_count"), bot
+        data["channel_post"] = de_json_optional(data.get("channel_post"), Message, bot)
+        data["edited_channel_post"] = de_json_optional(
+            data.get("edited_channel_post"), Message, bot
         )
-        data["business_connection"] = BusinessConnection.de_json(
-            data.get("business_connection"), bot
+        data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
+        data["poll_answer"] = de_json_optional(data.get("poll_answer"), PollAnswer, bot)
+        data["my_chat_member"] = de_json_optional(
+            data.get("my_chat_member"), ChatMemberUpdated, bot
         )
-        data["business_message"] = Message.de_json(data.get("business_message"), bot)
-        data["edited_business_message"] = Message.de_json(data.get("edited_business_message"), bot)
-        data["deleted_business_messages"] = BusinessMessagesDeleted.de_json(
-            data.get("deleted_business_messages"), bot
+        data["chat_member"] = de_json_optional(data.get("chat_member"), ChatMemberUpdated, bot)
+        data["chat_join_request"] = de_json_optional(
+            data.get("chat_join_request"), ChatJoinRequest, bot
+        )
+        data["chat_boost"] = de_json_optional(data.get("chat_boost"), ChatBoostUpdated, bot)
+        data["removed_chat_boost"] = de_json_optional(
+            data.get("removed_chat_boost"), ChatBoostRemoved, bot
+        )
+        data["message_reaction"] = de_json_optional(
+            data.get("message_reaction"), MessageReactionUpdated, bot
+        )
+        data["message_reaction_count"] = de_json_optional(
+            data.get("message_reaction_count"), MessageReactionCountUpdated, bot
+        )
+        data["business_connection"] = de_json_optional(
+            data.get("business_connection"), BusinessConnection, bot
+        )
+        data["business_message"] = de_json_optional(data.get("business_message"), Message, bot)
+        data["edited_business_message"] = de_json_optional(
+            data.get("edited_business_message"), Message, bot
+        )
+        data["deleted_business_messages"] = de_json_optional(
+            data.get("deleted_business_messages"), BusinessMessagesDeleted, bot
+        )
+        data["purchased_paid_media"] = de_json_optional(
+            data.get("purchased_paid_media"), PaidMediaPurchased, bot
         )
 
         return super().de_json(data=data, bot=bot)

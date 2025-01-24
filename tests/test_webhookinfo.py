@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
 import time
-from datetime import datetime
 
 import pytest
 
@@ -72,7 +72,7 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
             == self.last_synchronization_error_date
         )
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "url": self.url,
             "has_custom_certificate": self.has_custom_certificate,
@@ -83,26 +83,23 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
             "ip_address": self.ip_address,
             "last_synchronization_error_date": self.last_synchronization_error_date,
         }
-        webhook_info = WebhookInfo.de_json(json_dict, bot)
+        webhook_info = WebhookInfo.de_json(json_dict, offline_bot)
         assert webhook_info.api_kwargs == {}
 
         assert webhook_info.url == self.url
         assert webhook_info.has_custom_certificate == self.has_custom_certificate
         assert webhook_info.pending_update_count == self.pending_update_count
-        assert isinstance(webhook_info.last_error_date, datetime)
+        assert isinstance(webhook_info.last_error_date, dtm.datetime)
         assert webhook_info.last_error_date == from_timestamp(self.last_error_date)
         assert webhook_info.max_connections == self.max_connections
         assert webhook_info.allowed_updates == tuple(self.allowed_updates)
         assert webhook_info.ip_address == self.ip_address
-        assert isinstance(webhook_info.last_synchronization_error_date, datetime)
+        assert isinstance(webhook_info.last_synchronization_error_date, dtm.datetime)
         assert webhook_info.last_synchronization_error_date == from_timestamp(
             self.last_synchronization_error_date
         )
 
-        none = WebhookInfo.de_json(None, bot)
-        assert none is None
-
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "url": self.url,
             "has_custom_certificate": self.has_custom_certificate,
@@ -113,7 +110,7 @@ class TestWebhookInfoWithoutRequest(WebhookInfoTestBase):
             "ip_address": self.ip_address,
             "last_synchronization_error_date": self.last_synchronization_error_date,
         }
-        webhook_info_bot = WebhookInfo.de_json(json_dict, bot)
+        webhook_info_bot = WebhookInfo.de_json(json_dict, offline_bot)
         webhook_info_raw = WebhookInfo.de_json(json_dict, raw_bot)
         webhook_info_tz = WebhookInfo.de_json(json_dict, tz_bot)
 

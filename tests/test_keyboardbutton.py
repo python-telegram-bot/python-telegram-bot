@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -81,7 +81,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button_dict["request_users"] == keyboard_button.request_users.to_dict()
 
     @pytest.mark.parametrize("request_user", [True, False])
-    def test_de_json(self, bot, request_user):
+    def test_de_json(self, request_user):
         json_dict = {
             "text": self.text,
             "request_location": self.request_location,
@@ -107,9 +107,6 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button.web_app == self.web_app
         assert keyboard_button.request_chat == self.request_chat
         assert keyboard_button.request_users == self.request_users
-
-        none = KeyboardButton.de_json({}, None)
-        assert none is None
 
     def test_equality(self):
         a = KeyboardButton("test", request_contact=True)

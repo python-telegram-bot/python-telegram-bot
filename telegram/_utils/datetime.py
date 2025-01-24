@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+import contextlib
 import datetime as dtm
 import time
 from typing import TYPE_CHECKING, Optional, Union
@@ -34,22 +35,26 @@ from typing import TYPE_CHECKING, Optional, Union
 if TYPE_CHECKING:
     from telegram import Bot
 
-# pytz is only available if it was installed as dependency of APScheduler, so we make a little
-# workaround here
-DTM_UTC = dtm.timezone.utc
+UTC = dtm.timezone.utc
 try:
     import pytz
-
-    UTC = pytz.utc
 except ImportError:
-    UTC = DTM_UTC  # type: ignore[assignment]
+    pytz = None  # type: ignore[assignment]
 
 
-def _localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
-    """Localize the datetime, where UTC is handled depending on whether pytz is available or not"""
-    if tzinfo is DTM_UTC:
-        return datetime.replace(tzinfo=DTM_UTC)
-    return tzinfo.localize(datetime)  # type: ignore[attr-defined]
+def localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
+    """Localize the datetime, both for pytz and zoneinfo timezones."""
+    if tzinfo is UTC:
+        return datetime.replace(tzinfo=UTC)
+
+    with contextlib.suppress(AttributeError):
+        # Since pytz might not be available, we need the suppress context manager
+        if isinstance(tzinfo, pytz.BaseTzInfo):
+            return tzinfo.localize(datetime)
+
+    if datetime.tzinfo is None:
+        return datetime.replace(tzinfo=tzinfo)
+    return datetime.astimezone(tzinfo)
 
 
 def to_float_timestamp(
@@ -87,7 +92,7 @@ def to_float_timestamp(
             will be raised.
         tzinfo (:class:`datetime.tzinfo`, optional): If :paramref:`time_object` is a naive object
             from the :mod:`datetime` module, it will be interpreted as this timezone. Defaults to
-            ``pytz.utc``, if available, and :attr:`datetime.timezone.utc` otherwise.
+            :attr:`datetime.timezone.utc` otherwise.
 
             Note:
                 Only to be used by ``telegram.ext``.
@@ -121,6 +126,12 @@ def to_float_timestamp(
         return reference_timestamp + time_object
 
     if tzinfo is None:
+        # We do this here rather than in the signature to ensure that we can make calls like
+        # to_float_timestamp(
+        #     time, tzinfo=bot.defaults.tzinfo if bot.defaults else None
+        # )
+        # This ensures clean separation of concerns, i.e. the default timezone should not be
+        # the responsibility of the caller
         tzinfo = UTC
 
     if isinstance(time_object, dtm.time):
@@ -132,7 +143,9 @@ def to_float_timestamp(
 
         aware_datetime = dtm.datetime.combine(reference_date, time_object)
         if aware_datetime.tzinfo is None:
-            aware_datetime = _localize(aware_datetime, tzinfo)
+            # datetime.combine uses the tzinfo of `time_object`, which might be None
+            # so we still need to localize
+            aware_datetime = localize(aware_datetime, tzinfo)
 
         # if the time of day has passed today, use tomorrow
         if reference_time > aware_datetime.timetz():
@@ -140,7 +153,7 @@ def to_float_timestamp(
         return _datetime_to_float_timestamp(aware_datetime)
     if isinstance(time_object, dtm.datetime):
         if time_object.tzinfo is None:
-            time_object = _localize(time_object, tzinfo)
+            time_object = localize(time_object, tzinfo)
         return _datetime_to_float_timestamp(time_object)
 
     raise TypeError(f"Unable to convert {type(time_object).__name__} object to timestamp")

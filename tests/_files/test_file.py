@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryFile, mkstemp
 
@@ -107,14 +108,14 @@ class TestFileWithoutRequest(FileTestBase):
             assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.file_id,
             "file_unique_id": self.file_unique_id,
             "file_path": self.file_path,
             "file_size": self.file_size,
         }
-        new_file = File.de_json(json_dict, bot)
+        new_file = File.de_json(json_dict, offline_bot)
         assert new_file.api_kwargs == {}
 
         assert new_file.file_id == self.file_id
@@ -131,11 +132,11 @@ class TestFileWithoutRequest(FileTestBase):
         assert file_dict["file_path"] == file.file_path
         assert file_dict["file_size"] == file.file_size
 
-    def test_equality(self, bot):
-        a = File(self.file_id, self.file_unique_id, bot)
-        b = File("", self.file_unique_id, bot)
+    def test_equality(self, offline_bot):
+        a = File(self.file_id, self.file_unique_id, offline_bot)
+        b = File("", self.file_unique_id, offline_bot)
         c = File(self.file_id, self.file_unique_id, None)
-        d = File("", "", bot)
+        d = File("", "", offline_bot)
         e = Voice(self.file_id, self.file_unique_id, 0)
 
         assert a == b
@@ -181,21 +182,6 @@ class TestFileWithoutRequest(FileTestBase):
             os.close(file_handle)
             custom_path.unlink(missing_ok=True)
 
-    async def test_download_no_filename(self, monkeypatch, file):
-        async def test(*args, **kwargs):
-            return self.file_content
-
-        file.file_path = None
-
-        monkeypatch.setattr(file.get_bot().request, "retrieve", test)
-        out_file = await file.download_to_drive()
-
-        assert str(out_file)[-len(file.file_id) :] == file.file_id
-        try:
-            assert out_file.read_bytes() == self.file_content
-        finally:
-            out_file.unlink(missing_ok=True)
-
     async def test_download_file_obj(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content
@@ -223,7 +209,7 @@ class TestFileWithoutRequest(FileTestBase):
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
 
-    async def test_download_encrypted(self, monkeypatch, bot, encrypted_file):
+    async def test_download_encrypted(self, monkeypatch, offline_bot, encrypted_file):
         async def test(*args, **kwargs):
             return data_file("image_encrypted.jpg").read_bytes()
 
@@ -271,6 +257,14 @@ class TestFileWithoutRequest(FileTestBase):
         assert buf3 is buf2
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
+
+    async def test_download_no_file_path(self):
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_to_drive()
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_to_memory(BytesIO())
+        with pytest.raises(RuntimeError, match="No `file_path` available"):
+            await File(self.file_id, self.file_unique_id).download_as_bytearray()
 
 
 class TestFileWithRequest(FileTestBase):

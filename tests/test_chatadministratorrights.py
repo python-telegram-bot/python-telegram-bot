@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2024
+# Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ class TestChatAdministratorRightsWithoutRequest:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot, chat_admin_rights):
+    def test_de_json(self, offline_bot, chat_admin_rights):
         json_dict = {
             "can_change_info": True,
             "can_delete_messages": True,
@@ -68,7 +68,7 @@ class TestChatAdministratorRightsWithoutRequest:
             "can_edit_stories": True,
             "can_delete_stories": True,
         }
-        chat_administrator_rights_de = ChatAdministratorRights.de_json(json_dict, bot)
+        chat_administrator_rights_de = ChatAdministratorRights.de_json(json_dict, offline_bot)
         assert chat_administrator_rights_de.api_kwargs == {}
 
         assert chat_admin_rights == chat_administrator_rights_de
