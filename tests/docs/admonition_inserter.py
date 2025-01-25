@@ -106,6 +106,21 @@ class TestAdmonitionInserter:
                 ":attr:`telegram.EncryptedPassportElement.data`",
             ),
             (
+                "available_in",
+                telegram.ext.JobQueue,
+                ":attr:`telegram.ext.CallbackContext.job_queue`",
+            ),
+            (
+                "available_in",
+                telegram.ext.Application,
+                ":attr:`telegram.ext.CallbackContext.application`",
+            ),
+            (
+                "available_in",
+                telegram.Bot,
+                ":attr:`telegram.ext.CallbackContext.bot`",
+            ),
+            (
                 "returned_in",
                 telegram.StickerSet,
                 ":meth:`telegram.Bot.get_sticker_set`",

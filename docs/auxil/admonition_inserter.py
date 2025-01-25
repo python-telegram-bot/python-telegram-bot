@@ -97,13 +97,6 @@ class AdmonitionInserter:
     start and end markers.
     """
 
-    FORWARD_REF_SKIP_PATTERN = re.compile(r"^ForwardRef\('DefaultValue\[\w+]'\)$")
-    """A pattern that will be used to skip known ForwardRef's that need not be resolved
-    to a Telegram class, e.g.:
-    ForwardRef('DefaultValue[None]')
-    ForwardRef('DefaultValue[DVValueType]')
-    """
-
     METHOD_NAMES_FOR_BOT_APP_APPBUILDER: typing.ClassVar[dict[type, str]] = {
         cls: tuple(m.name for m in _iter_own_public_methods(cls))
         for cls in (telegram.Bot, telegram.ext.ApplicationBuilder, telegram.ext.Application)
@@ -201,6 +194,7 @@ class AdmonitionInserter:
                         dict_of_methods_for_class=attrs_for_class,
                         link=f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`",
                         type_hints={target_attr: type_hints.get(target_attr)},
+                        resolve_nested_type_vars=False,
                     )
                 except NotImplementedError as e:
                     raise NotImplementedError(
@@ -232,7 +226,8 @@ class AdmonitionInserter:
                     self._resolve_arg_and_add_link(
                         dict_of_methods_for_class=attrs_for_class,
                         link=f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`",
-                        type_hints={prop_name: type_hints.get(target_attr)},
+                        type_hints={prop_name: type_hints.get("return")},
+                        resolve_nested_type_vars=False,
                     )
                 except NotImplementedError as e:
                     raise NotImplementedError(
@@ -528,6 +523,14 @@ class AdmonitionInserter:
                 recurse_type(type_.__bound__, next_is_recursed_from_ptb_class)
             elif inspect.isclass(type_) and "telegram" in inspect.getmodule(type_).__name__:
                 telegram_classes.add(type_)
+            elif isinstance(type_, typing.ForwardRef):
+                # Resolving ForwardRef is not easy. https://peps.python.org/pep-0749/ will
+                # hopefully make it better by introducing typing.resolve_forward_ref() in py3.14
+                # but that's not there yet
+                # So for now we fall back to a best effort approach of guessing if the class is
+                # available in tg or tg.ext
+                with contextlib.suppress(AttributeError):
+                    telegram_classes.add(self._resolve_class(type_.__forward_arg__))
 
         for type_hint in type_hints.values():
             if type_hint is not None:
