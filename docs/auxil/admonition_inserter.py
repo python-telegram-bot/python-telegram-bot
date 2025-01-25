@@ -479,7 +479,9 @@ class AdmonitionInserter:
                 dict_of_methods_for_class[subclass].add(link)
 
     def _resolve_arg(
-        self, type_hints: dict[str, type], resolve_nested_type_vars: bool
+        self,
+        type_hints: dict[str, type],
+        resolve_nested_type_vars: bool,
     ) -> list[type]:
         """Analyzes an argument of a method and recursively yields classes that the argument
         or its sub-arguments (in cases like Union[...]) belong to, if they can be resolved to

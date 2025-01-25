@@ -121,6 +121,11 @@ class TestAdmonitionInserter:
                 ":attr:`telegram.ext.CallbackContext.bot`",
             ),
             (
+                "available_in",
+                telegram.Bot,
+                ":attr:`telegram.ext.Application.bot`",
+            ),
+            (
                 "returned_in",
                 telegram.StickerSet,
                 ":meth:`telegram.Bot.get_sticker_set`",
