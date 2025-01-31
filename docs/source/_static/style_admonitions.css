@@ -61,5 +61,5 @@
 }
 .admonition.returned-in > ul, .admonition.available-in > ul, .admonition.use-in > ul, .admonition.shortcuts > ul {
   max-height: 200px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }

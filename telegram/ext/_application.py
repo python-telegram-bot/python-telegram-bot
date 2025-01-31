@@ -235,7 +235,7 @@ class Application(
     """
 
     __slots__ = (
-        (  # noqa: RUF005
+        (
             "__create_task_tasks",
             "__update_fetcher_task",
             "__update_persistence_event",
@@ -270,9 +270,7 @@ class Application(
         # Allowing '__weakref__' creation here since we need it for the JobQueue
         # Currently the __weakref__ slot is already created
         # in the AsyncContextManager base class for pythons < 3.13
-        + ("__weakref__",)
-        if sys.version_info >= (3, 13)
-        else ()
+        + (("__weakref__",) if sys.version_info >= (3, 13) else ())
     )
 
     def __init__(
