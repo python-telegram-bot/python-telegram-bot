@@ -117,9 +117,12 @@ class RequestParameter:
             return to_timestamp(value), []
         if isinstance(value, dtm.timedelta):
             seconds = value.total_seconds()
+            # We convert to int for completeness for whole seconds
             if seconds.is_integer():
                 return int(seconds), []
-            return value.total_seconds(), []
+            # The Bot API doesn't document behavior for fractions of seconds so far, but we don't
+            # want to silently drop them
+            return seconds, []
         if isinstance(value, StringEnum):
             return value.value, []
         if isinstance(value, InputFile):
