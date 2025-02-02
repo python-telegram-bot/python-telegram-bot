@@ -23,6 +23,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+import datetime as dtm
 from collections.abc import Collection
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Callable, Literal, Optional, TypeVar, Union
@@ -93,3 +94,5 @@ SocketOpt = Union[
 ]
 
 BaseUrl = Union[str, Callable[[str], str]]
+
+TimePeriod = Union[int, dtm.timedelta]

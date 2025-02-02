@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import os
 from pathlib import Path
 
@@ -214,12 +215,13 @@ class TestAudioWithoutRequest(AudioTestBase):
 
 
 class TestAudioWithRequest(AudioTestBase):
-    async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
+    @pytest.mark.parametrize("duration", [3, dtm.timedelta(seconds=3)])
+    async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file, duration):
         message = await bot.send_audio(
             chat_id,
             audio=audio_file,
             caption=self.caption,
-            duration=self.duration,
+            duration=duration,
             performer=self.performer,
             title=self.title,
             disable_notification=False,
