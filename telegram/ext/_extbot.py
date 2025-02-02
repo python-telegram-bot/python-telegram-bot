@@ -94,6 +94,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
+    BaseUrl,
     CorrectOptionID,
     FileInput,
     JSONDict,
@@ -191,8 +192,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     def __init__(
         self: "ExtBot[None]",
         token: str,
-        base_url: str = "https://api.telegram.org/bot",
-        base_file_url: str = "https://api.telegram.org/file/bot",
+        base_url: BaseUrl = "https://api.telegram.org/bot",
+        base_file_url: BaseUrl = "https://api.telegram.org/file/bot",
         request: Optional[BaseRequest] = None,
         get_updates_request: Optional[BaseRequest] = None,
         private_key: Optional[bytes] = None,
@@ -206,8 +207,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     def __init__(
         self: "ExtBot[RLARGS]",
         token: str,
-        base_url: str = "https://api.telegram.org/bot",
-        base_file_url: str = "https://api.telegram.org/file/bot",
+        base_url: BaseUrl = "https://api.telegram.org/bot",
+        base_file_url: BaseUrl = "https://api.telegram.org/file/bot",
         request: Optional[BaseRequest] = None,
         get_updates_request: Optional[BaseRequest] = None,
         private_key: Optional[bytes] = None,
@@ -221,8 +222,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     def __init__(
         self,
         token: str,
-        base_url: str = "https://api.telegram.org/bot",
-        base_file_url: str = "https://api.telegram.org/file/bot",
+        base_url: BaseUrl = "https://api.telegram.org/bot",
+        base_file_url: BaseUrl = "https://api.telegram.org/file/bot",
         request: Optional[BaseRequest] = None,
         get_updates_request: Optional[BaseRequest] = None,
         private_key: Optional[bytes] = None,

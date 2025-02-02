@@ -97,7 +97,7 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload test results to Codecov
-        uses: codecov/test-results-action@9739113ad922ea0a9abb4b2c0f8bf6a4aa8ef820 # v1.0.1
+        uses: codecov/test-results-action@4e79e65778be1cecd5df25e14af1eafb6df80ea9 # v1.0.2
         if: ${{ !cancelled() }}
         with:
           files: .test_report_no_optionals_junit.xml,.test_report_optionals_junit.xml

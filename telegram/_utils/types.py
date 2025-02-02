@@ -26,7 +26,7 @@ Warning:
 import datetime as dtm
 from collections.abc import Collection
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Literal, Optional, TypeVar, Union
+from typing import IO, TYPE_CHECKING, Any, Callable, Literal, Optional, TypeVar, Union
 
 if TYPE_CHECKING:
     from telegram import (
@@ -92,5 +92,7 @@ SocketOpt = Union[
     tuple[int, int, Union[bytes, bytearray]],
     tuple[int, int, None, int],
 ]
+
+BaseUrl = Union[str, Callable[[str], str]]
 
 TimePeriod = Union[int, dtm.timedelta]

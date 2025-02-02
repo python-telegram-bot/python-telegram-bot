@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-# This module is intentionally named without "test_" prefix.
-# These tests are supposed to be run on GitHub when building docs.
-# The tests require Python 3.9+ (just like AdmonitionInserter being tested),
-# so they cannot be included in the main suite while older versions of Python are supported.
+"""
+This module is intentionally named without "test_" prefix.
+These tests are supposed to be run on GitHub when building docs.
+The tests require Python 3.10+ (just like AdmonitionInserter being tested),
+so they cannot be included in the main suite while older versions of Python are supported.
+"""
 
 import collections.abc
 
@@ -104,6 +106,26 @@ class TestAdmonitionInserter:
                 ":attr:`telegram.EncryptedPassportElement.data`",
             ),
             (
+                "available_in",
+                telegram.ext.JobQueue,
+                ":attr:`telegram.ext.CallbackContext.job_queue`",
+            ),
+            (
+                "available_in",
+                telegram.ext.Application,
+                ":attr:`telegram.ext.CallbackContext.application`",
+            ),
+            (
+                "available_in",
+                telegram.Bot,
+                ":attr:`telegram.ext.CallbackContext.bot`",
+            ),
+            (
+                "available_in",
+                telegram.Bot,
+                ":attr:`telegram.ext.Application.bot`",
+            ),
+            (
                 "returned_in",
                 telegram.StickerSet,
                 ":meth:`telegram.Bot.get_sticker_set`",
@@ -112,6 +134,11 @@ class TestAdmonitionInserter:
                 "returned_in",
                 telegram.ChatMember,
                 ":meth:`telegram.Bot.get_chat_member`",
+            ),
+            (
+                "returned_in",
+                telegram.GameHighScore,
+                ":meth:`telegram.Bot.get_game_high_scores`",
             ),
             (
                 "returned_in",
@@ -134,6 +161,18 @@ class TestAdmonitionInserter:
                 # this method in CallbackQuery contains two return statements,
                 # one of which is with Bot
                 ":meth:`telegram.CallbackQuery.edit_message_caption`",
+            ),
+            (
+                "shortcuts",
+                telegram.Bot.ban_chat_member,
+                # ban_member is defined on the private parent class _ChatBase
+                ":meth:`telegram.Chat.ban_member`",
+            ),
+            (
+                "shortcuts",
+                telegram.Bot.ban_chat_member,
+                # ban_member is defined on the private parent class _ChatBase
+                ":meth:`telegram.ChatFullInfo.ban_member`",
             ),
             (
                 "use_in",
@@ -205,8 +244,15 @@ class TestAdmonitionInserter:
                 "returned_in",
                 telegram.ext.CallbackContext,
                 # -> Application[BT, CCT, UD, CD, BD, JQ].
-                # In this case classes inside square brackets must not be parsed
+                # The type vars are not really part of the return value, so we don't expect them
                 ":meth:`telegram.ext.ApplicationBuilder.build`",
+            ),
+            (
+                "returned_in",
+                telegram.Bot,
+                # -> Application[BT, CCT, UD, CD, BD, JQ].
+                # The type vars are not really part of the return value, so we don't expect them
+                ":meth:`telegram.ext.ApplicationBuilder.bot`",
             ),
         ],
     )
