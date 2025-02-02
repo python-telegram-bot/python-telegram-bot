@@ -8,10 +8,15 @@ on:
     branches:
       - master
 
+permissions: {}
+
 jobs:
   test-sphinx-build:
     name: test-sphinx-build
     runs-on: ${{matrix.os}}
+    permissions:
+      # for uploading artifacts
+      actions: write
     strategy:
       matrix:
         python-version: ['3.10']

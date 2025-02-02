@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, reopened]
 
+permissions: {}
+
 jobs:
   process-dependabot-prs:
     permissions:
