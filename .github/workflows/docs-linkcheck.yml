@@ -7,6 +7,8 @@ on:
     paths:
       - .github/workflows/docs-linkcheck.yml
 
+permissions: {}
+
 jobs:
   test-sphinx-build:
     name: test-sphinx-linkcheck
