@@ -1,0 +1,195 @@
+#!/usr/bin/env python
+# pylint: disable=unused-argument
+# This program is dedicated to the public domain under the CC0 license.
+"""Simple state machine to handle user support.
+One admin is supported. The admin can have one active conversation at a time. Other users
+are put on hold until the admin finishes the current conversation.
+In each conversation, the admin and the user take turns to send messages.
+"""
+import logging
+from typing import Optional
+
+from telegram import Update
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
+    FiniteStateMachine,
+    MessageHandler,
+    State,
+    filters,
+)
+
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("telegram").setLevel(logging.WARNING)
+logging.getLogger("telegram.ext.Application").setLevel(logging.DEBUG)
+
+logger = logging.getLogger(__name__)
+
+
+class UserSupportMachine(FiniteStateMachine[Optional[int]]):
+
+    HOLD = State("HOLD")
+    WELCOMING = State("WELCOMING")
+    WAITING_FOR_REPLY = State("WAITING_FOR_REPLY")
+    WRITING = State("WRITING")
+
+    def __init__(self, admin_id: int):
+        self.admin_id = admin_id
+        self._states: dict[int, State] = {}
+        super().__init__()
+
+    def _get_admin_state(self) -> State:
+        return self._states.get(self.admin_id, State.IDLE)
+
+    def get_active_key_state(self, update: object) -> tuple[Optional[int], State]:
+        if not isinstance(update, Update):
+            return None, State.IDLE
+        if not (user := update.effective_user):
+            return None, State.IDLE
+
+        # Admin is easy - just return the state
+        admin_state = self._get_admin_state()
+        if user.id == self.admin_id:
+            logging.debug("Returning admin state: %s", admin_state)
+            return self.admin_id, admin_state
+
+        # If the user state is already non-idle, we are already in the business logic
+        if (user_state := self._states.get(user.id, State.IDLE)) != State.IDLE:
+            logging.debug("Returning user state: %s", user_state)
+            return user.id, user_state
+
+        # On first interaction, we need to determine what to do with the user
+        # if the admin is not idle, we put the user on hold. Otherwise, they may send the first
+        # message, and we put the admin in waiting for reply to avoid another user occupying the
+        # admin first
+        effective_user_state = self.HOLD if admin_state != State.IDLE else self.WELCOMING
+        self.do_set_state(user.id, effective_user_state)
+        if effective_user_state == self.WELCOMING:
+            self.do_set_state(self.admin_id, self.WAITING_FOR_REPLY)
+
+        logging.debug("Returning user state: %s", effective_user_state)
+        return user.id, effective_user_state
+
+    def do_set_state(self, key: int, state: State) -> None:
+        key_name = "admin" if key == self.admin_id else key
+        logging.debug("Setting %s state to %s", key_name, state)
+        self._states[key] = state
+
+
+async def welcome_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.effective_message.forward(context.bot_data["admin_id"])
+    await update.effective_message.reply_text(
+        "Welcome! Your message has been forwarded to the admin. They will get back to you soon.",
+    )
+    await context.set_state(UserSupportMachine.WAITING_FOR_REPLY)
+    await context.fsm.set_state(context.bot_data["admin_id"], UserSupportMachine.WRITING)
+    context.bot_data["active_user"] = update.effective_user.id
+
+
+async def conversation_timeout(context: ContextTypes.DEFAULT_TYPE) -> None:
+    active_user = context.bot_data.get("active_user")
+    admin_id = context.bot_data["admin_id"]
+
+    async def handle(user_id: int) -> None:
+        await context.bot.send_message(
+            user_id, "The conversation has been stopped due to inactivity."
+        )
+        await context.fsm.set_state(user_id, State.IDLE)
+
+    if active_user:
+        await handle(active_user)
+    await handle(admin_id)
+
+
+async def handle_reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Cancel the conversation timeout
+    if job := context.bot_data.get("conversation_timeout"):
+        job.schedule_removal()
+
+    if not (active_user := context.bot_data.get("active_user")):
+        logger.warning("No active user found, ignoring message")
+
+    target = (
+        active_user
+        if update.effective_user.id == (admin_id := context.bot_data["admin_id"])
+        else admin_id
+    )
+    await context.bot.send_message(target, update.effective_message.text)
+    logging.debug("Forwarded message to %s", target)
+    await context.set_state(UserSupportMachine.WAITING_FOR_REPLY)
+    logging.debug("Done setting state to WAITING_FOR_REPLY for %s", target)
+    await context.fsm.set_state(target, UserSupportMachine.WRITING)
+    logging.debug("Done setting state to WRITING for %s, context.fsm_key")
+
+    # Reset the conversation timeout
+    job = context.job_queue.run_once(conversation_timeout, 30)
+    context.bot_data["conversation_timeout"] = job
+
+
+async def stop_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    text = "The conversation has been stopped."
+    admin_id = context.bot_data["admin_id"]
+    active_user = context.bot_data.get("active_user")
+
+    await context.bot.send_message(admin_id, text)
+    await context.fsm.set_state(admin_id, State.IDLE)
+    if active_user:
+        await context.bot.send_message(active_user, text)
+        await context.fsm.set_state(active_user, State.IDLE)
+
+
+async def hold_melody(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.effective_message.reply_text(
+        "You have been put on hold. The admin will get back to you soon. Please hear some music "
+        "while you wait: https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    )
+
+
+async def not_your_turn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.effective_message.reply_text(
+        "It's not your turn yet. Please wait for the other party to reply to your message."
+    )
+
+
+def main() -> None:
+    application = Application.builder().token("TOKEN").build()
+    application.fsm = UserSupportMachine(admin_id=123456789)
+    application.bot_data["admin_id"] = application.fsm.admin_id
+
+    # Users are welcomed only if they are in the corresponding state
+    application.add_handler(
+        MessageHandler(~filters.User(application.fsm.admin_id), welcome_user),
+        state=UserSupportMachine.WELCOMING,
+    )
+
+    # Conversation logic:
+    # * forward messages between user and admin
+    # * stop the conversation at any time (admin or user)
+    # * point out that the other party is currently writing
+    application.add_handler(
+        MessageHandler(filters.ALL, handle_reply), state=UserSupportMachine.WRITING
+    )
+    application.add_handler(
+        CommandHandler("stop", stop_conversation),
+        state=UserSupportMachine.WAITING_FOR_REPLY | UserSupportMachine.WRITING,
+    )
+    application.add_handler(
+        MessageHandler(filters.ALL, not_your_turn), state=UserSupportMachine.WAITING_FOR_REPLY
+    )
+
+    # If the admin is busy, put the user on hold
+    application.add_handler(
+        MessageHandler(filters.ALL, hold_melody), state=UserSupportMachine.HOLD
+    )
+
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+
+if __name__ == "__main__":
+    main()
