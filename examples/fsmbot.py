@@ -17,6 +17,7 @@ from telegram.ext import (
     FiniteStateMachine,
     MessageHandler,
     State,
+    StateInfo,
     filters,
 )
 
@@ -43,45 +44,44 @@ class UserSupportMachine(FiniteStateMachine[Optional[int]]):
         self.admin_id = admin_id
         super().__init__()
 
-    def _get_admin_state(self) -> State:
-        return self._states.get(self.admin_id, State.IDLE)
+    def _get_admin_state(self) -> tuple[State, int]:
+        return self._states[self.admin_id]
 
-    def get_active_key_state(self, update: object) -> tuple[Optional[int], State]:
-        if not isinstance(update, Update):
-            return None, State.IDLE
-        if not (user := update.effective_user):
-            return None, State.IDLE
+    def get_state_info(self, update: object) -> StateInfo[Optional[int]]:
+        if not isinstance(update, Update) or not (user := update.effective_user):
+            key = None
+            state, version = self.states[key]
+            return StateInfo(key=key, state=state, version=version)
 
         # Admin is easy - just return the state
-        admin_state = self._get_admin_state()
+        admin_state, admin_version = self._get_admin_state()
         if user.id == self.admin_id:
             logging.debug("Returning admin state: %s", admin_state)
-            return self.admin_id, admin_state
+            return StateInfo(self.admin_id, admin_state, admin_version)
 
         # If the user state is active in the conversation, we can just return that state
-        if (user_state := self._states.get(user.id, State.IDLE)).matches(
-            self.WELCOMING | self.WRITING | self.WAITING_FOR_REPLY
-        ):
+        user_state, user_version = self._states[user.id]
+        if user_state.matches(self.WELCOMING | self.WRITING | self.WAITING_FOR_REPLY):
             logging.debug("Returning user state: %s", user_state)
-            return user.id, user_state
+            return StateInfo(user.id, user_state, user_version)
 
         # On first interaction, we need to determine what to do with the user
         # if the admin is not idle, we put the user on hold. Otherwise, they may send the first
         # message, and we put the admin in waiting for reply to avoid another user occupying the
         # admin first
         effective_user_state = self.HOLD if admin_state != State.IDLE else self.WELCOMING
-        self._do_set_state(user.id, effective_user_state)
+        self._do_set_state(user.id, effective_user_state, user_version)
         if effective_user_state == self.WELCOMING:
             self._do_set_state(self.admin_id, self.WAITING_FOR_REPLY)
 
         logging.debug("Returning user state: %s", effective_user_state)
-        return user.id, effective_user_state
+        return StateInfo(user.id, effective_user_state, user_version)
 
 
 async def welcome_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.effective_message.forward(context.bot_data["admin_id"])
     suffix = ""
-    if UserSupportMachine.HOLD in context.fsm.get_state_history(context.fsm_key)[:-1]:
+    if UserSupportMachine.HOLD in context.fsm.get_state_history(context.fsm_state_info.key)[:-1]:
         suffix = " Thank you for patiently waiting. We hope you enjoyed the music."
 
     await update.effective_message.reply_text(

@@ -31,10 +31,9 @@ from telegram.ext._fsm import FiniteStateMachine, State
 from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
-    import collections
     from asyncio import Future, Queue
 
-    from telegram.ext import Application, Job, JobQueue
+    from telegram.ext import Application, Job, JobQueue, StateInfo
     from telegram.ext._utils.types import CCT
 
 _STORING_DATA_WIKI = (
@@ -124,10 +123,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         "args",
         "coroutine",
         "error",
-        "fsm_key",
+        "fsm_state_info",
         "job",
         "matches",
-        "state",
     )
 
     def __init__(
@@ -146,8 +144,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.coroutine: Optional[
             Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
-        self.state: State = State.IDLE
-        self.fsm_key: Optional[collections.abc.Hashable] = None
+        self.fsm_state_info: StateInfo = None  # type: ignore[assignment]
 
     @property
     def application(self) -> "Application[BT, ST, UD, CD, BD, Any]":
@@ -281,20 +278,20 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self.application.fsm
 
     def fsm_semaphore(self) -> asyncio.BoundedSemaphore:
-        return self.fsm.get_semaphore(self.fsm_key)
+        return self.fsm.get_semaphore(self.fsm_state_info.key)
 
     async def set_state(self, state: State) -> None:
-        await self.fsm.set_state(self.fsm_key, state)
+        await self.fsm.set_state(self.fsm_state_info.key, state, self.fsm_state_info.version)
 
     def set_state_nowait(self, state: State) -> None:
-        self.fsm.set_state_nowait(self.fsm_key, state)
+        self.fsm.set_state_nowait(self.fsm_state_info.key, state, self.fsm_state_info.version)
 
     @contextlib.asynccontextmanager
     async def as_fsm_state(self, state: State) -> AsyncIterator[None]:
         async with self.fsm_semaphore():
             await self.set_state(state)
             yield
-            await self.set_state(self.state)
+            await self.set_state(self.fsm_state_info.state)
 
     @classmethod
     def from_error(

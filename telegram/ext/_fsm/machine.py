@@ -5,6 +5,7 @@ import abc
 import asyncio
 import datetime as dtm
 import logging
+import time
 import weakref
 from collections import defaultdict, deque
 from collections.abc import Hashable, Mapping, MutableSequence, Sequence
@@ -24,6 +25,13 @@ _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
 
 
+class StateInfo(Generic[_KT]):
+    def __init__(self: "StateInfo[_KT]", key: _KT, state: State, version: int) -> None:
+        self.key: _KT = key
+        self.state: State = state
+        self.version: int = version
+
+
 class FiniteStateMachine(abc.ABC, Generic[_KT]):
     def __init__(self) -> None:
         self._semaphores: MutableMapping[_KT, asyncio.BoundedSemaphore] = (
@@ -32,7 +40,9 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
 
         # There is likely litte benefit for a user to customize how exactly the states are stored
         # and accessed. So we make this private and only provide a read-only view.
-        self.__states: dict[_KT, State] = {}
+        self.__states: dict[_KT, tuple[State, int]] = defaultdict(
+            lambda: (State.IDLE, time.perf_counter_ns())
+        )
         self._states = MappingProxyType(self.__states)
 
         self.__job_queue: Optional[weakref.ReferenceType[JobQueue]] = None
@@ -41,7 +51,7 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
         )
 
     @property
-    def states(self) -> Mapping[_KT, State]:
+    def states(self) -> Mapping[_KT, tuple[State, int]]:
         return self._states
 
     def store_state_history(self, key: _KT, state: State) -> None:
@@ -59,7 +69,7 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
         return self._semaphores.setdefault(key, asyncio.BoundedSemaphore(1))
 
     @abc.abstractmethod
-    def get_active_key_state(self, update: object) -> tuple[Hashable, State]:
+    def get_state_info(self, update: object) -> StateInfo[_KT]:
         """Returns exactly one active state for the update.
         If more than one stored key applies to the update, one must chosen.
         It's recommended to select the most specific one.
@@ -75,8 +85,11 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
             busy.
         """
 
-    def _do_set_state(self, key: _KT, state: State) -> None:
+    def _do_set_state(self, key: _KT, state: State, version: Optional[int] = None) -> None:
         """Protected method to set the state for the specified key.
+
+        The version can be optionally used for optimistic locking. If the version does not match
+        the current version, the state should not be updated.
 
         Important:
             This should be used exclusively by methods of this class and subclasses.
@@ -85,6 +98,9 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
         _LOGGER.debug("Setting %s state to %s", key, state)
         if state is State.ANY:
             raise ValueError("State.ANY is not supported in set_state")
+
+        if version and version != self._states.get(key, (None, None))[1]:
+            raise ValueError("Optimistic locking failed. Not updating state.")
 
         if jq := self._get_job_queue(raise_exception=False):
             # This is a rather tight coupling between FSM and JobQueue
@@ -97,21 +113,22 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
                 _LOGGER.debug("Cancelling timeout job %s", job)
                 job.schedule_removal()
 
-        self.__states[key] = state
+        # important to use time.perf_counter_ns() here, as time_ns() is not monotonic
+        self.__states[key] = (state, time.perf_counter_ns())
         # Doing this *after* do_set_state so that any exceptions are raised before the history
         # is updated
         self.store_state_history(key, state)
 
-    async def set_state(self, key: _KT, state: State) -> None:
+    async def set_state(self, key: _KT, state: State, version: Optional[int] = None) -> None:
         """Store the state for the specified key."""
         async with self.get_semaphore(key):
-            self._do_set_state(key, state)
+            self._do_set_state(key, state, version)
 
-    def set_state_nowait(self, key: _KT, state: State) -> None:
+    def set_state_nowait(self, key: _KT, state: State, version: Optional[int] = None) -> None:
         """Store the state for the specified key without waiting for a semaphore."""
         if self.get_semaphore(key).locked():
             raise asyncio.InvalidStateError("Semaphore is locked")
-        self._do_set_state(key, state)
+        self._do_set_state(key, state, version)
 
     @staticmethod
     def _build_job_name(keys: Sequence[_KT]) -> str:
@@ -163,8 +180,8 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
 
 
 class SingleStateMachine(FiniteStateMachine[None]):
-    def get_active_key_state(self, update: object) -> tuple[None, State]:  # noqa: ARG002
-        return None, State.IDLE
+    def get_state_info(self, update: object) -> StateInfo[None]:  # noqa: ARG002
+        return StateInfo(None, State.IDLE, 0)
 
     def do_set_state(self, key: None, state: State) -> None:
         pass

@@ -60,6 +60,7 @@ __all__ = (
     "SimpleUpdateProcessor",
     "SingleStateMachine",
     "State",
+    "StateInfo",
     "StringCommandHandler",
     "StringRegexHandler",
     "TypeHandler",
@@ -80,7 +81,7 @@ from ._contexttypes import ContextTypes
 from ._defaults import Defaults
 from ._dictpersistence import DictPersistence
 from ._extbot import ExtBot
-from ._fsm import FiniteStateMachine, SingleStateMachine, State
+from ._fsm import FiniteStateMachine, SingleStateMachine, State, StateInfo
 from ._handlers.basehandler import BaseHandler
 from ._handlers.businessconnectionhandler import BusinessConnectionHandler
 from ._handlers.businessmessagesdeletedhandler import BusinessMessagesDeletedHandler

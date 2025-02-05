@@ -19,7 +19,6 @@
 """This module contains the Application class."""
 
 import asyncio
-import collections.abc
 import contextlib
 import inspect
 import itertools
@@ -49,7 +48,7 @@ from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
-from telegram.ext._fsm import SingleStateMachine, State
+from telegram.ext._fsm import SingleStateMachine, State, StateInfo
 from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
@@ -1282,28 +1281,29 @@ class Application(
         # Processing updates before initialize() is a problem e.g. if persistence is used
         self._check_initialized()
 
-        fsm_key, fsm_state = self.fsm.get_active_key_state(update)
+        fsm_state_info = self.fsm.get_state_info(update)
 
         for state, state_handlers in self.handlers.items():
-            if state.matches(fsm_state):
+            if state.matches(fsm_state_info.state):
                 _LOGGER.debug("Processing in state %s", state)
                 was_handled = await self.__process_update_groups(
-                    update, state_handlers, state, fsm_key
+                    update, state_handlers, fsm_state_info
                 )
                 if was_handled:
                     _LOGGER.debug(
                         "Update was handled in state %s. Stopping further processing", state
                     )
                     return
-        _LOGGER.debug("No handlers found for key %s in state %s", fsm_key, fsm_state)
+        _LOGGER.debug(
+            "No handlers found for key %s in state %s", fsm_state_info.key, fsm_state_info.state
+        )
         return
 
     async def __process_update_groups(
         self,
         update: object,
         state_handlers: dict[int, list[BaseHandler]],
-        fsm_state: State,
-        fsm_key: collections.abc.Hashable,
+        fsm_state_info: StateInfo,
     ) -> bool:
         context = None
         was_handled = False
@@ -1320,8 +1320,7 @@ class Application(
                     if not context:  # build a context if not already built
                         try:
                             context = self.context_types.context.from_update(update, self)
-                            context.state = fsm_state
-                            context.fsm_key = fsm_key
+                            context.fsm_state_info = fsm_state_info
                         except Exception as exc:
                             _LOGGER.critical(
                                 (
