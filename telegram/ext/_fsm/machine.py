@@ -6,7 +6,9 @@ import asyncio
 import datetime as dtm
 import logging
 import weakref
-from collections.abc import Hashable, Sequence
+from collections import defaultdict, deque
+from collections.abc import Hashable, Mapping, MutableSequence, Sequence
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Generic, Literal, Optional, TypeVar, Union, overload
 
 from telegram.ext._fsm.states import State
@@ -27,7 +29,28 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
         self._semaphores: MutableMapping[_KT, asyncio.BoundedSemaphore] = (
             weakref.WeakValueDictionary()
         )
+
+        # There is likely litte benefit for a user to customize how exactly the states are stored
+        # and accessed. So we make this private and only provide a read-only view.
+        self.__states: dict[_KT, State] = {}
+        self._states = MappingProxyType(self.__states)
+
         self.__job_queue: Optional[weakref.ReferenceType[JobQueue]] = None
+        self.__history: Mapping[_KT, MutableSequence[State]] = defaultdict(
+            lambda: deque(maxlen=10)
+        )
+
+    @property
+    def states(self) -> Mapping[_KT, State]:
+        return self._states
+
+    def store_state_history(self, key: _KT, state: State) -> None:
+        # Making this public so that users can override if they want to customize the history
+        # E.g., they could want to store more/fewer states, also depending on the key
+        self.__history[key].append(state)
+
+    def get_state_history(self, key: _KT) -> Sequence[State]:
+        return list(self.__history[key])
 
     def get_semaphore(self, key: _KT) -> asyncio.BoundedSemaphore:
         """Returns a semaphore that is unique for this key at runtime.
@@ -52,19 +75,14 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
             busy.
         """
 
-    @abc.abstractmethod
-    def do_set_state(self, key: _KT, state: State) -> None:
-        """Store the state for the specified key.
-        If the state is ``FSMState.IDLE``, it's recommended to drop the key from the in-memory
-        data.
-
-        Warning:
-            This method should not be directly accessed by user code.
-            It is intended for internal use in this class only.
-            Instead, use :meth:`set_state`
-        """
-
     def _do_set_state(self, key: _KT, state: State) -> None:
+        """Protected method to set the state for the specified key.
+
+        Important:
+            This should be used exclusively by methods of this class and subclasses.
+            It should *not* be called directly by users of this class!
+        """
+        _LOGGER.debug("Setting %s state to %s", key, state)
         if state is State.ANY:
             raise ValueError("State.ANY is not supported in set_state")
 
@@ -79,7 +97,10 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
                 _LOGGER.debug("Cancelling timeout job %s", job)
                 job.schedule_removal()
 
-        return self.do_set_state(key, state)
+        self.__states[key] = state
+        # Doing this *after* do_set_state so that any exceptions are raised before the history
+        # is updated
+        self.store_state_history(key, state)
 
     async def set_state(self, key: _KT, state: State) -> None:
         """Store the state for the specified key."""

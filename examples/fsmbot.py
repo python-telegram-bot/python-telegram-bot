@@ -41,7 +41,6 @@ class UserSupportMachine(FiniteStateMachine[Optional[int]]):
 
     def __init__(self, admin_id: int):
         self.admin_id = admin_id
-        self._states: dict[int, State] = {}
         super().__init__()
 
     def _get_admin_state(self) -> State:
@@ -59,8 +58,10 @@ class UserSupportMachine(FiniteStateMachine[Optional[int]]):
             logging.debug("Returning admin state: %s", admin_state)
             return self.admin_id, admin_state
 
-        # If the user state is already non-idle, we are already in the business logic
-        if (user_state := self._states.get(user.id, State.IDLE)) != State.IDLE:
+        # If the user state is active in the conversation, we can just return that state
+        if (user_state := self._states.get(user.id, State.IDLE)).matches(
+            self.WELCOMING | self.WRITING | self.WAITING_FOR_REPLY
+        ):
             logging.debug("Returning user state: %s", user_state)
             return user.id, user_state
 
@@ -69,23 +70,23 @@ class UserSupportMachine(FiniteStateMachine[Optional[int]]):
         # message, and we put the admin in waiting for reply to avoid another user occupying the
         # admin first
         effective_user_state = self.HOLD if admin_state != State.IDLE else self.WELCOMING
-        self.do_set_state(user.id, effective_user_state)
+        self._do_set_state(user.id, effective_user_state)
         if effective_user_state == self.WELCOMING:
-            self.do_set_state(self.admin_id, self.WAITING_FOR_REPLY)
+            self._do_set_state(self.admin_id, self.WAITING_FOR_REPLY)
 
         logging.debug("Returning user state: %s", effective_user_state)
         return user.id, effective_user_state
 
-    def do_set_state(self, key: int, state: State) -> None:
-        key_name = "admin" if key == self.admin_id else key
-        logging.debug("Setting %s state to %s", key_name, state)
-        self._states[key] = state
-
 
 async def welcome_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.effective_message.forward(context.bot_data["admin_id"])
+    suffix = ""
+    if UserSupportMachine.HOLD in context.fsm.get_state_history(context.fsm_key)[:-1]:
+        suffix = " Thank you for patiently waiting. We hope you enjoyed the music."
+
     await update.effective_message.reply_text(
-        "Welcome! Your message has been forwarded to the admin. They will get back to you soon.",
+        "Welcome! Your message has been forwarded to the admin. "
+        f"They will get back to you soon.{suffix}"
     )
     await context.set_state(UserSupportMachine.WAITING_FOR_REPLY)
     await context.fsm.set_state(context.bot_data["admin_id"], UserSupportMachine.WRITING)
@@ -175,12 +176,13 @@ def main() -> None:
     # * forward messages between user and admin
     # * stop the conversation at any time (admin or user)
     # * point out that the other party is currently writing
-    application.add_handler(
-        MessageHandler(filters.TEXT, handle_reply), state=UserSupportMachine.WRITING
-    )
+    # Important: Order matters!
     application.add_handler(
         CommandHandler("stop", stop_conversation),
         state=UserSupportMachine.WAITING_FOR_REPLY | UserSupportMachine.WRITING,
+    )
+    application.add_handler(
+        MessageHandler(filters.TEXT, handle_reply), state=UserSupportMachine.WRITING
     )
     application.add_handler(
         MessageHandler(filters.TEXT, not_your_turn), state=UserSupportMachine.WAITING_FOR_REPLY
