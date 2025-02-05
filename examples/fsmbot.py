@@ -157,14 +157,20 @@ async def not_your_turn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
 
 
+async def unsupported_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.effective_message.reply_text("This message is not supported.")
+
+
 def main() -> None:
-    application = Application.builder().token("TOKEN").build()
-    application.fsm = UserSupportMachine(admin_id=123456789)
+    application = (
+        Application.builder().token("703777048:AAGp2FbKNX3xd9JRTNSyCgt2Dv76jqr45aA").build()
+    )
+    application.fsm = UserSupportMachine(admin_id=74540223)
     application.bot_data["admin_id"] = application.fsm.admin_id
 
     # Users are welcomed only if they are in the corresponding state
     application.add_handler(
-        MessageHandler(~filters.User(application.fsm.admin_id), welcome_user),
+        MessageHandler(~filters.User(application.fsm.admin_id) & filters.TEXT, welcome_user),
         state=UserSupportMachine.WELCOMING,
     )
 
@@ -173,20 +179,23 @@ def main() -> None:
     # * stop the conversation at any time (admin or user)
     # * point out that the other party is currently writing
     application.add_handler(
-        MessageHandler(filters.ALL, handle_reply), state=UserSupportMachine.WRITING
+        MessageHandler(filters.TEXT, handle_reply), state=UserSupportMachine.WRITING
     )
     application.add_handler(
         CommandHandler("stop", stop_conversation),
         state=UserSupportMachine.WAITING_FOR_REPLY | UserSupportMachine.WRITING,
     )
     application.add_handler(
-        MessageHandler(filters.ALL, not_your_turn), state=UserSupportMachine.WAITING_FOR_REPLY
+        MessageHandler(filters.TEXT, not_your_turn), state=UserSupportMachine.WAITING_FOR_REPLY
     )
 
     # If the admin is busy, put the user on hold
     application.add_handler(
-        MessageHandler(filters.ALL, hold_melody), state=UserSupportMachine.HOLD
+        MessageHandler(filters.TEXT, hold_melody), state=UserSupportMachine.HOLD
     )
+
+    # Fallback
+    application.add_handler(MessageHandler(filters.ALL, unsupported_message), state=State.ANY)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

@@ -56,16 +56,21 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
             Instead, use :meth:`set_state`
         """
 
+    def _do_set_state(self, key: _KT, state: State) -> None:
+        if state is State.ANY:
+            raise ValueError("State.ANY is not supported in set_state")
+        return self.do_set_state(key, state)
+
     async def set_state(self, key: _KT, state: State) -> None:
         """Store the state for the specified key."""
         async with self.get_semaphore(key):
-            self.do_set_state(key, state)
+            self._do_set_state(key, state)
 
     def set_state_nowait(self, key: _KT, state: State) -> None:
         """Store the state for the specified key without waiting for a semaphore."""
         if self.get_semaphore(key).locked():
             raise asyncio.InvalidStateError("Semaphore is locked")
-        self.do_set_state(key, state)
+        self._do_set_state(key, state)
 
 
 class SingleStateMachine(FiniteStateMachine[None]):

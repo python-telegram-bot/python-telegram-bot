@@ -14,6 +14,11 @@ class State(abc.ABC):
     __xor_cache: ClassVar[dict[tuple[str, str], "_XORState"]] = {}
 
     IDLE: "State"
+    """Default State for all Finite State Machines"""
+    ANY: "State"
+    """Special State that matches any other State. Useful to define fallback behavior.
+    *Not* supported in ``set_state`` method of FSMs.
+    """
 
     def __init__(self, uid: Optional[str] = None):
         effective_uid = uid or uuid4().hex
@@ -61,7 +66,13 @@ class State(abc.ABC):
         return self.uid == state.uid
 
 
+class _AnyState(State):
+    def matches(self, state: "State") -> bool:  # noqa: ARG002
+        return True
+
+
 State.IDLE = State("IDLE")
+State.ANY = _AnyState("ANY")
 
 
 class _XORState(State):

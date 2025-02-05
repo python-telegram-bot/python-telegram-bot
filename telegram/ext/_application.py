@@ -19,6 +19,7 @@
 """This module contains the Application class."""
 
 import asyncio
+import collections.abc
 import contextlib
 import inspect
 import itertools
@@ -1281,17 +1282,32 @@ class Application(
         # Processing updates before initialize() is a problem e.g. if persistence is used
         self._check_initialized()
 
-        context = None
-        any_blocking = False  # Flag which is set to True if any handler specifies block=True
         fsm_key, fsm_state = self.fsm.get_active_key_state(update)
 
-        for state, state_handlers_ in self.handlers.items():
+        for state, state_handlers in self.handlers.items():
             if state.matches(fsm_state):
-                state_handlers = state_handlers_
-                break
-        else:
-            _LOGGER.debug("No handlers found for key %s in state %s", fsm_key, fsm_state)
-            return
+                _LOGGER.debug("Processing in state %s", state)
+                was_handled = await self.__process_update_groups(
+                    update, state_handlers, state, fsm_key
+                )
+                if was_handled:
+                    _LOGGER.debug(
+                        "Update was handled in state %s. Stopping further processing", state
+                    )
+                    return
+        _LOGGER.debug("No handlers found for key %s in state %s", fsm_key, fsm_state)
+        return
+
+    async def __process_update_groups(
+        self,
+        update: object,
+        state_handlers: dict[int, list[BaseHandler]],
+        fsm_state: State,
+        fsm_key: collections.abc.Hashable,
+    ) -> bool:
+        context = None
+        was_handled = False
+        any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
         for handlers in state_handlers.values():
             try:
@@ -1299,6 +1315,7 @@ class Application(
                     check = handler.check_update(update)  # Should the handler handle this update?
                     if check is None or check is False:
                         continue
+                    was_handled = True
 
                     if not context:  # build a context if not already built
                         try:
@@ -1314,7 +1331,7 @@ class Application(
                                 update,
                                 exc_info=exc,
                             )
-                            return
+                            return True
                         await context.refresh_data()
                     coroutine: Coroutine = handler.handle_update(update, self, check, context)
 
@@ -1353,6 +1370,8 @@ class Application(
             # blocking handler - the non-blocking handlers mark the update again when finished
             # (in __create_task_callback)
             self._mark_for_persistence_update(update=update)
+
+        return was_handled
 
     def add_handler(
         self,
