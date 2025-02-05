@@ -108,10 +108,6 @@ async def conversation_timeout(context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def handle_reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # Cancel the conversation timeout
-    if job := context.bot_data.get("conversation_timeout"):
-        job.schedule_removal()
-
     if not (active_user := context.bot_data.get("active_user")):
         logger.warning("No active user found, ignoring message")
 
@@ -127,9 +123,11 @@ async def handle_reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await context.fsm.set_state(target, UserSupportMachine.WRITING)
     logging.debug("Done setting state to WRITING for %s, context.fsm_key")
 
-    # Reset the conversation timeout
-    job = context.job_queue.run_once(conversation_timeout, 30)
-    context.bot_data["conversation_timeout"] = job
+    context.fsm.schedule_timeout(
+        when=30,
+        callback=conversation_timeout,
+        cancel_keys=[active_user, admin_id],
+    )
 
 
 async def stop_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -162,10 +160,9 @@ async def unsupported_message(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 def main() -> None:
-    application = (
-        Application.builder().token("703777048:AAGp2FbKNX3xd9JRTNSyCgt2Dv76jqr45aA").build()
-    )
-    application.fsm = UserSupportMachine(admin_id=74540223)
+    application = Application.builder().token("TOKEN").build()
+    application.fsm = UserSupportMachine(admin_id=123456)
+    application.fsm.set_job_queue(application.job_queue)
     application.bot_data["admin_id"] = application.fsm.admin_id
 
     # Users are welcomed only if they are in the corresponding state

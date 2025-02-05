@@ -97,7 +97,7 @@ class JobQueue(Generic[CCT]):
 
     """
 
-    __slots__ = ("_application", "_executor", "scheduler")
+    __slots__ = ("__weakref__", "_application", "_executor", "scheduler")
     _CRON_MAPPING = ("sun", "mon", "tue", "wed", "thu", "fri", "sat")
 
     def __init__(self) -> None:
