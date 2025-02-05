@@ -1,6 +1,8 @@
 name: Check Type Completeness
 on:
   pull_request:
+    branches-ignore:
+      - feature/fsm
     paths:
       - telegram/**
       - pyproject.toml

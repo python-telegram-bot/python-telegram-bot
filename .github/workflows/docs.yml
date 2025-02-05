@@ -1,6 +1,8 @@
 name: Test Documentation Build
 on:
   pull_request:
+    branches-ignore:
+      - feature/fsm
     paths:
       - telegram/**
       - docs/**

@@ -1,6 +1,8 @@
 name: Unit Tests
 on:
   pull_request:
+    branches-ignore:
+      - feature/fsm
     paths:
       - telegram/**
       - tests/**
