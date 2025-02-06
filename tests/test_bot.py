@@ -681,7 +681,7 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize(
         "default_bot",
-        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        [{"parse_mode": "Markdown", "link_preview_options": LinkPreviewOptions(is_disabled=True)}],
         indirect=True,
     )
     @pytest.mark.parametrize(
@@ -976,7 +976,7 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize(
         "default_bot",
-        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        [{"parse_mode": "Markdown", "link_preview_options": LinkPreviewOptions(is_disabled=True)}],
         indirect=True,
     )
     async def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
@@ -4209,7 +4209,7 @@ class TestBotWithRequest:
                 ]
             )
             await poll_message.stop_poll(reply_markup=reply_markup)
-            helper_message = await poll_message.reply_text("temp", quote=True)
+            helper_message = await poll_message.reply_text("temp", do_quote=True)
             message = helper_message.reply_to_message
             inline_keyboard = message.reply_markup.inline_keyboard
 
