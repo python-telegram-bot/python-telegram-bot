@@ -1,9 +1,3 @@
-.. _ptb-changelog:
-
-=========
-Changelog
-=========
-
 Version 21.10
 =============
 

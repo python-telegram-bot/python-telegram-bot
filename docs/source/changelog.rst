@@ -1,1 +1,5 @@
-.. include:: ../../CHANGES.rst
+.. _ptb-changelog:
+
+.. chango:: Changelog
+
+.. include:: ../../changes/LEGACY.rst
