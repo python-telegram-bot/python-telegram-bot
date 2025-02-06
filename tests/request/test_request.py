@@ -48,7 +48,6 @@ from telegram.error import (
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
@@ -413,9 +412,7 @@ class TestHTTPXRequestWithoutRequest:
     def _reset(self):
         self.test_flag = None
 
-    # We parametrize this to make sure that the legacy `proxy_url` argument is still supported
-    @pytest.mark.parametrize("proxy_argument", ["proxy", "proxy_url"])
-    def test_init(self, monkeypatch, proxy_argument):
+    def test_init(self, monkeypatch):
         @dataclass
         class Client:
             timeout: object
@@ -436,31 +433,19 @@ class TestHTTPXRequestWithoutRequest:
         assert request._client.http1 is True
         assert not request._client.http2
 
-        kwargs = {
-            "connection_pool_size": 42,
-            proxy_argument: "proxy",
-            "connect_timeout": 43,
-            "read_timeout": 44,
-            "write_timeout": 45,
-            "pool_timeout": 46,
-        }
-        request = HTTPXRequest(**kwargs)
+        request = HTTPXRequest(
+            connection_pool_size=42,
+            proxy="proxy",
+            connect_timeout=43,
+            read_timeout=44,
+            write_timeout=45,
+            pool_timeout=46,
+        )
         assert request._client.proxy == "proxy"
         assert request._client.limits == httpx.Limits(
             max_connections=42, max_keepalive_connections=42
         )
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
-
-    def test_proxy_mutually_exclusive(self):
-        with pytest.raises(ValueError, match="mutually exclusive"):
-            HTTPXRequest(proxy="proxy", proxy_url="proxy_url")
-
-    def test_proxy_url_deprecation_warning(self, recwarn):
-        HTTPXRequest(proxy_url="http://127.0.0.1:3128")
-        assert len(recwarn) == 1
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert "`proxy_url` is deprecated" in str(recwarn[0].message)
-        assert recwarn[0].filename == __file__, "incorrect stacklevel"
 
     async def test_multiple_inits_and_shutdowns(self, monkeypatch):
         self.test_flag = defaultdict(int)

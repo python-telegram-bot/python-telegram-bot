@@ -35,7 +35,6 @@ from telegram._utils.types import (
     ODVInput,
     SocketOpt,
 )
-from telegram._utils.warnings import warn
 from telegram.ext._application import Application
 from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
@@ -45,7 +44,6 @@ from telegram.ext._updater import Updater
 from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD
 from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Update
@@ -123,6 +121,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
+
+    .. versionchanged:: NEXT.VERSION
+        Removed deprecated methods ``proxy_url`` and ``get_updates_proxy_url``.
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
     """
@@ -516,30 +517,6 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._connection_pool_size = connection_pool_size
         return self
 
-    def proxy_url(self: BuilderType, proxy_url: str) -> BuilderType:
-        """Legacy name for :meth:`proxy`, kept for backward compatibility.
-
-        .. seealso:: :meth:`get_updates_proxy`
-
-        .. deprecated:: 20.7
-
-        Args:
-            proxy_url (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): See
-                :paramref:`telegram.ext.ApplicationBuilder.proxy.proxy`.
-
-        Returns:
-            :class:`ApplicationBuilder`: The same builder with the updated argument.
-        """
-        warn(
-            PTBDeprecationWarning(
-                "20.7",
-                "`ApplicationBuilder.proxy_url` is deprecated. Use `ApplicationBuilder.proxy` "
-                "instead.",
-            ),
-            stacklevel=2,
-        )
-        return self.proxy(proxy_url)
-
     def proxy(self: BuilderType, proxy: Union[str, httpx.Proxy, httpx.URL]) -> BuilderType:
         """Sets the proxy for the :paramref:`~telegram.request.HTTPXRequest.proxy`
         parameter of :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
@@ -749,30 +726,6 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._request_param_check(name="connection_pool_size", get_updates=True)
         self._get_updates_connection_pool_size = get_updates_connection_pool_size
         return self
-
-    def get_updates_proxy_url(self: BuilderType, get_updates_proxy_url: str) -> BuilderType:
-        """Legacy name for :meth:`get_updates_proxy`, kept for backward compatibility.
-
-        .. seealso:: :meth:`proxy`
-
-        .. deprecated:: 20.7
-
-        Args:
-            get_updates_proxy_url (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): See
-                :paramref:`telegram.ext.ApplicationBuilder.get_updates_proxy.get_updates_proxy`.
-
-        Returns:
-            :class:`ApplicationBuilder`: The same builder with the updated argument.
-        """
-        warn(
-            PTBDeprecationWarning(
-                "20.7",
-                "`ApplicationBuilder.get_updates_proxy_url` is deprecated. Use "
-                "`ApplicationBuilder.get_updates_proxy` instead.",
-            ),
-            stacklevel=2,
-        )
-        return self.get_updates_proxy(get_updates_proxy_url)
 
     def get_updates_proxy(
         self: BuilderType, get_updates_proxy: Union[str, httpx.Proxy, httpx.URL]
