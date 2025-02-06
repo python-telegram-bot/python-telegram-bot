@@ -930,6 +930,9 @@ class Message(MaybeInaccessibleMessage):
 
     .. |reply_same_thread| replace:: If :paramref:`message_thread_id` is not provided,
        this will reply to the same thread (topic) of the original message.
+
+    .. |quote_removed| replace:: Removed deprecated parameter ``quote``. Use :paramref:`do_quote`
+         instead.
     """
 
     # fmt: on
@@ -1757,6 +1760,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -1834,6 +1840,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Note:
             :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
@@ -1916,6 +1925,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -1993,6 +2005,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -2067,6 +2082,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -2145,6 +2163,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -2228,6 +2249,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -2309,6 +2333,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -2394,6 +2421,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -2472,6 +2502,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -2552,6 +2585,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -2636,6 +2672,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -2712,6 +2751,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -2791,6 +2833,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -2874,6 +2919,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -2953,6 +3001,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -3039,6 +3090,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -3119,6 +3173,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -3232,6 +3289,9 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
+
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
@@ -3320,6 +3380,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Warning:
             As of API 5.2 :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>`
@@ -3534,6 +3597,9 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionchanged:: 21.1
                 |reply_same_thread|
+
+        .. versionchanged:: NEXT.VERSION
+            |quote_removed|
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
