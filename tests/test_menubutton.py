@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from copy import deepcopy
-
 import pytest
 
 from telegram import (
@@ -32,134 +30,189 @@ from telegram.constants import MenuButtonType
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(
-    scope="module",
-    params=[
-        MenuButton.DEFAULT,
-        MenuButton.WEB_APP,
-        MenuButton.COMMANDS,
-    ],
-)
-def scope_type(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=[
-        MenuButtonDefault,
-        MenuButtonCommands,
-        MenuButtonWebApp,
-    ],
-    ids=[
-        MenuButton.DEFAULT,
-        MenuButton.COMMANDS,
-        MenuButton.WEB_APP,
-    ],
-)
-def scope_class(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=[
-        (MenuButtonDefault, MenuButton.DEFAULT),
-        (MenuButtonCommands, MenuButton.COMMANDS),
-        (MenuButtonWebApp, MenuButton.WEB_APP),
-    ],
-    ids=[
-        MenuButton.DEFAULT,
-        MenuButton.COMMANDS,
-        MenuButton.WEB_APP,
-    ],
-)
-def scope_class_and_type(request):
-    return request.param
-
-
-@pytest.fixture(scope="module")
-def menu_button(scope_class_and_type):
-    # We use de_json here so that we don't have to worry about which class gets which arguments
-    return scope_class_and_type[0].de_json(
-        {
-            "type": scope_class_and_type[1],
-            "text": MenuButtonTestBase.text,
-            "web_app": MenuButtonTestBase.web_app.to_dict(),
-        },
-        bot=None,
-    )
+@pytest.fixture
+def menu_button():
+    return MenuButton(MenuButtonTestBase.type)
 
 
 class MenuButtonTestBase:
-    text = "button_text"
-    web_app = WebAppInfo(url="https://python-telegram-bot.org/web_app")
+    type = MenuButtonType.DEFAULT
+    text = "this is a test string"
+    web_app = WebAppInfo(url="https://python-telegram-bot.org")
 
 
-# All the scope types are very similar, so we test everything via parametrization
 class TestMenuButtonWithoutRequest(MenuButtonTestBase):
     def test_slot_behaviour(self, menu_button):
-        for attr in menu_button.__slots__:
-            assert getattr(menu_button, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(menu_button)) == len(set(mro_slots(menu_button))), "duplicate slot"
+        inst = menu_button
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, scope_class_and_type):
-        cls = scope_class_and_type[0]
-        type_ = scope_class_and_type[1]
-
-        json_dict = {"type": type_, "text": self.text, "web_app": self.web_app.to_dict()}
-        menu_button = MenuButton.de_json(json_dict, offline_bot)
-        assert set(menu_button.api_kwargs.keys()) == {"text", "web_app"} - set(cls.__slots__)
-
-        assert isinstance(menu_button, MenuButton)
-        assert type(menu_button) is cls
-        assert menu_button.type == type_
-        if "web_app" in cls.__slots__:
-            assert menu_button.web_app == self.web_app
-        if "text" in cls.__slots__:
-            assert menu_button.text == self.text
-
-    def test_de_json_invalid_type(self, offline_bot):
-        json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
-        menu_button = MenuButton.de_json(json_dict, offline_bot)
-        assert menu_button.api_kwargs == {"text": self.text, "web_app": self.web_app.to_dict()}
-
-        assert type(menu_button) is MenuButton
-        assert menu_button.type == "invalid"
-
-    def test_de_json_subclass(self, scope_class, offline_bot):
-        """This makes sure that e.g. MenuButtonDefault(data) never returns a
-        MenuButtonChat instance."""
-        json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
-        assert type(scope_class.de_json(json_dict, offline_bot)) is scope_class
-
-    def test_de_json_empty_data(self, scope_class):
-        if scope_class in (MenuButtonWebApp,):
-            pytest.skip(
-                "This test is not relevant for subclasses that have more attributes than just type"
-            )
-        assert isinstance(scope_class.de_json({}, None), scope_class)
-
-    def test_to_dict(self, menu_button):
-        menu_button_dict = menu_button.to_dict()
-
-        assert isinstance(menu_button_dict, dict)
-        assert menu_button_dict["type"] == menu_button.type
-        if hasattr(menu_button, "web_app"):
-            assert menu_button_dict["web_app"] == menu_button.web_app.to_dict()
-        if hasattr(menu_button, "text"):
-            assert menu_button_dict["text"] == menu_button.text
-
-    def test_type_enum_conversion(self):
-        assert type(MenuButton("commands").type) is MenuButtonType
+    def test_type_enum_conversion(self, menu_button):
+        assert type(MenuButton("default").type) is MenuButtonType
         assert MenuButton("unknown").type == "unknown"
 
-    def test_equality(self, menu_button, offline_bot):
-        a = MenuButton("base_type")
-        b = MenuButton("base_type")
-        c = menu_button
-        d = deepcopy(menu_button)
-        e = Dice(4, "emoji")
+    def test_de_json(self, offline_bot):
+        data = {"type": "unknown"}
+        transaction_partner = MenuButton.de_json(data, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "unknown"
+
+    @pytest.mark.parametrize(
+        ("mb_type", "subclass"),
+        [
+            ("commands", MenuButtonCommands),
+            ("web_app", MenuButtonWebApp),
+            ("default", MenuButtonDefault),
+        ],
+    )
+    def test_de_json_subclass(self, offline_bot, mb_type, subclass):
+        json_dict = {
+            "type": mb_type,
+            "web_app": self.web_app.to_dict(),
+            "text": self.text,
+        }
+        mb = MenuButton.de_json(json_dict, offline_bot)
+
+        assert type(mb) is subclass
+        assert set(mb.api_kwargs.keys()) == set(json_dict.keys()) - set(subclass.__slots__) - {
+            "type"
+        }
+        assert mb.type == mb_type
+
+    def test_to_dict(self, menu_button):
+        assert menu_button.to_dict() == {"type": menu_button.type}
+
+    def test_equality(self, menu_button):
+        a = menu_button
+        b = MenuButton(self.type)
+        c = MenuButton("unknown")
+        d = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def menu_button_commands():
+    return MenuButtonCommands()
+
+
+class TestMenuButtonCommandsWithoutRequest(MenuButtonTestBase):
+    type = MenuButtonType.COMMANDS
+
+    def test_slot_behaviour(self, menu_button_commands):
+        inst = menu_button_commands
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        transaction_partner = MenuButtonCommands.de_json({}, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "commands"
+
+    def test_to_dict(self, menu_button_commands):
+        assert menu_button_commands.to_dict() == {"type": menu_button_commands.type}
+
+    def test_equality(self, menu_button_commands):
+        a = menu_button_commands
+        b = MenuButtonCommands()
+        c = Dice(5, "test")
+        d = MenuButtonDefault()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def menu_button_default():
+    return MenuButtonDefault()
+
+
+class TestMenuButtonDefaultWithoutRequest(MenuButtonTestBase):
+    type = MenuButtonType.DEFAULT
+
+    def test_slot_behaviour(self, menu_button_default):
+        inst = menu_button_default
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        transaction_partner = MenuButtonDefault.de_json({}, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "default"
+
+    def test_to_dict(self, menu_button_default):
+        assert menu_button_default.to_dict() == {"type": menu_button_default.type}
+
+    def test_equality(self, menu_button_default):
+        a = menu_button_default
+        b = MenuButtonDefault()
+        c = Dice(5, "test")
+        d = MenuButtonCommands()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def menu_button_web_app():
+    return MenuButtonWebApp(
+        web_app=TestMenuButtonWebAppWithoutRequest.web_app,
+        text=TestMenuButtonWebAppWithoutRequest.text,
+    )
+
+
+class TestMenuButtonWebAppWithoutRequest(MenuButtonTestBase):
+    type = MenuButtonType.WEB_APP
+
+    def test_slot_behaviour(self, menu_button_web_app):
+        inst = menu_button_web_app
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {"web_app": self.web_app.to_dict(), "text": self.text}
+        transaction_partner = MenuButtonWebApp.de_json(json_dict, offline_bot)
+        assert transaction_partner.api_kwargs == {}
+        assert transaction_partner.type == "web_app"
+        assert transaction_partner.web_app == self.web_app
+        assert transaction_partner.text == self.text
+
+    def test_to_dict(self, menu_button_web_app):
+        assert menu_button_web_app.to_dict() == {
+            "type": menu_button_web_app.type,
+            "web_app": menu_button_web_app.web_app.to_dict(),
+            "text": menu_button_web_app.text,
+        }
+
+    def test_equality(self, menu_button_web_app):
+        a = menu_button_web_app
+        b = MenuButtonWebApp(web_app=self.web_app, text=self.text)
+        c = MenuButtonWebApp(web_app=self.web_app, text="other text")
+        d = MenuButtonWebApp(web_app=WebAppInfo(url="https://example.org"), text=self.text)
+        e = Dice(5, "test")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -172,25 +225,3 @@ class TestMenuButtonWithoutRequest(MenuButtonTestBase):
 
         assert a != e
         assert hash(a) != hash(e)
-
-        assert c == d
-        assert hash(c) == hash(d)
-
-        assert c != e
-        assert hash(c) != hash(e)
-
-        if hasattr(c, "web_app"):
-            json_dict = c.to_dict()
-            json_dict["web_app"] = WebAppInfo("https://foo.bar/web_app").to_dict()
-            f = c.__class__.de_json(json_dict, offline_bot)
-
-            assert c != f
-            assert hash(c) != hash(f)
-
-        if hasattr(c, "text"):
-            json_dict = c.to_dict()
-            json_dict["text"] = "other text"
-            g = c.__class__.de_json(json_dict, offline_bot)
-
-            assert c != g
-            assert hash(c) != hash(g)

@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Final, Optional
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils import enum
 from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
@@ -99,7 +100,7 @@ class ChatMember(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
         self.user: User = user
-        self.status: str = status
+        self.status: str = enum.get_member(constants.ChatMemberStatus, status, status)
 
         self._id_attrs = (self.user, self.status)
 

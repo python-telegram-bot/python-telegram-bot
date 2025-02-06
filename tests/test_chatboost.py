@@ -16,8 +16,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import datetime as dtm
-import inspect
-from copy import deepcopy
 
 import pytest
 
@@ -43,25 +41,229 @@ from tests.auxil.slots import mro_slots
 
 
 class ChatBoostDefaults:
+    source = ChatBoostSource.PREMIUM
     chat_id = 1
     boost_id = "2"
     giveaway_message_id = 3
     is_unclaimed = False
     chat = Chat(1, "group")
     user = User(1, "user", False)
-    date = to_timestamp(dtm.datetime.utcnow())
+    date = dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0)
     default_source = ChatBoostSourcePremium(user)
     prize_star_count = 99
+    boost = ChatBoost(
+        boost_id=boost_id,
+        add_date=date,
+        expiration_date=date,
+        source=default_source,
+    )
 
 
 @pytest.fixture(scope="module")
-def chat_boost_removed():
-    return ChatBoostRemoved(
-        chat=ChatBoostDefaults.chat,
-        boost_id=ChatBoostDefaults.boost_id,
-        remove_date=ChatBoostDefaults.date,
-        source=ChatBoostDefaults.default_source,
+def chat_boost_source():
+    return ChatBoostSource(
+        source=ChatBoostDefaults.source,
     )
+
+
+class TestChatBoostSourceWithoutRequest(ChatBoostDefaults):
+    def test_slot_behaviour(self, chat_boost_source):
+        inst = chat_boost_source
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_type_enum_conversion(self, chat_boost_source):
+        assert type(ChatBoostSource("premium").source) is ChatBoostSources
+        assert ChatBoostSource("unknown").source == "unknown"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "source": "unknown",
+        }
+        cbs = ChatBoostSource.de_json(json_dict, offline_bot)
+
+        assert cbs.api_kwargs == {}
+        assert cbs.source == "unknown"
+
+    @pytest.mark.parametrize(
+        ("cb_source", "subclass"),
+        [
+            ("premium", ChatBoostSourcePremium),
+            ("gift_code", ChatBoostSourceGiftCode),
+            ("giveaway", ChatBoostSourceGiveaway),
+        ],
+    )
+    def test_de_json_subclass(self, offline_bot, cb_source, subclass):
+        json_dict = {
+            "source": cb_source,
+            "user": ChatBoostDefaults.user.to_dict(),
+            "giveaway_message_id": ChatBoostDefaults.giveaway_message_id,
+        }
+        cbs = ChatBoostSource.de_json(json_dict, offline_bot)
+
+        assert type(cbs) is subclass
+        assert set(cbs.api_kwargs.keys()) == set(json_dict.keys()) - set(subclass.__slots__) - {
+            "source"
+        }
+        assert cbs.source == cb_source
+
+    def test_to_dict(self, chat_boost_source):
+        chat_boost_source_dict = chat_boost_source.to_dict()
+
+        assert isinstance(chat_boost_source_dict, dict)
+        assert chat_boost_source_dict["source"] == chat_boost_source.source
+
+    def test_equality(self, chat_boost_source):
+        a = chat_boost_source
+        b = ChatBoostSource(source=ChatBoostDefaults.source)
+        c = ChatBoostSource(source="unknown")
+        d = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture(scope="module")
+def chat_boost_source_premium():
+    return ChatBoostSourcePremium(
+        user=TestChatBoostSourcePremiumWithoutRequest.user,
+    )
+
+
+class TestChatBoostSourcePremiumWithoutRequest(ChatBoostDefaults):
+    source = ChatBoostSources.PREMIUM
+
+    def test_slot_behaviour(self, chat_boost_source_premium):
+        inst = chat_boost_source_premium
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "user": self.user.to_dict(),
+        }
+        cbsp = ChatBoostSourcePremium.de_json(json_dict, offline_bot)
+
+        assert cbsp.api_kwargs == {}
+        assert cbsp.user == self.user
+
+    def test_to_dict(self, chat_boost_source_premium):
+        chat_boost_source_premium_dict = chat_boost_source_premium.to_dict()
+
+        assert isinstance(chat_boost_source_premium_dict, dict)
+        assert chat_boost_source_premium_dict["source"] == self.source
+        assert chat_boost_source_premium_dict["user"] == self.user.to_dict()
+
+    def test_equality(self, chat_boost_source_premium):
+        a = chat_boost_source_premium
+        b = ChatBoostSourcePremium(user=self.user)
+        c = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+
+@pytest.fixture(scope="module")
+def chat_boost_source_gift_code():
+    return ChatBoostSourceGiftCode(
+        user=TestChatBoostSourceGiftCodeWithoutRequest.user,
+    )
+
+
+class TestChatBoostSourceGiftCodeWithoutRequest(ChatBoostDefaults):
+    source = ChatBoostSources.GIFT_CODE
+
+    def test_slot_behaviour(self, chat_boost_source_gift_code):
+        inst = chat_boost_source_gift_code
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "user": self.user.to_dict(),
+        }
+        cbsgc = ChatBoostSourceGiftCode.de_json(json_dict, offline_bot)
+
+        assert cbsgc.api_kwargs == {}
+        assert cbsgc.user == self.user
+
+    def test_to_dict(self, chat_boost_source_gift_code):
+        chat_boost_source_gift_code_dict = chat_boost_source_gift_code.to_dict()
+
+        assert isinstance(chat_boost_source_gift_code_dict, dict)
+        assert chat_boost_source_gift_code_dict["source"] == self.source
+        assert chat_boost_source_gift_code_dict["user"] == self.user.to_dict()
+
+    def test_equality(self, chat_boost_source_gift_code):
+        a = chat_boost_source_gift_code
+        b = ChatBoostSourceGiftCode(user=self.user)
+        c = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+
+@pytest.fixture(scope="module")
+def chat_boost_source_giveaway():
+    return ChatBoostSourceGiveaway(
+        user=TestChatBoostSourceGiveawayWithoutRequest.user,
+        giveaway_message_id=TestChatBoostSourceGiveawayWithoutRequest.giveaway_message_id,
+    )
+
+
+class TestChatBoostSourceGiveawayWithoutRequest(ChatBoostDefaults):
+    source = ChatBoostSources.GIVEAWAY
+
+    def test_slot_behaviour(self, chat_boost_source_giveaway):
+        inst = chat_boost_source_giveaway
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "user": self.user.to_dict(),
+            "giveaway_message_id": self.giveaway_message_id,
+        }
+        cbsg = ChatBoostSourceGiveaway.de_json(json_dict, offline_bot)
+
+        assert cbsg.api_kwargs == {}
+        assert cbsg.user == self.user
+        assert cbsg.giveaway_message_id == self.giveaway_message_id
+
+    def test_to_dict(self, chat_boost_source_giveaway):
+        chat_boost_source_giveaway_dict = chat_boost_source_giveaway.to_dict()
+
+        assert isinstance(chat_boost_source_giveaway_dict, dict)
+        assert chat_boost_source_giveaway_dict["source"] == self.source
+        assert chat_boost_source_giveaway_dict["user"] == self.user.to_dict()
+        assert chat_boost_source_giveaway_dict["giveaway_message_id"] == self.giveaway_message_id
+
+    def test_equality(self, chat_boost_source_giveaway):
+        a = chat_boost_source_giveaway
+        b = ChatBoostSourceGiveaway(user=self.user, giveaway_message_id=self.giveaway_message_id)
+        c = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
 
 
 @pytest.fixture(scope="module")
@@ -74,189 +276,6 @@ def chat_boost():
     )
 
 
-@pytest.fixture(scope="module")
-def chat_boost_updated(chat_boost):
-    return ChatBoostUpdated(
-        chat=ChatBoostDefaults.chat,
-        boost=chat_boost,
-    )
-
-
-def chat_boost_source_gift_code():
-    return ChatBoostSourceGiftCode(
-        user=ChatBoostDefaults.user,
-    )
-
-
-def chat_boost_source_giveaway():
-    return ChatBoostSourceGiveaway(
-        user=ChatBoostDefaults.user,
-        giveaway_message_id=ChatBoostDefaults.giveaway_message_id,
-        is_unclaimed=ChatBoostDefaults.is_unclaimed,
-        prize_star_count=ChatBoostDefaults.prize_star_count,
-    )
-
-
-def chat_boost_source_premium():
-    return ChatBoostSourcePremium(
-        user=ChatBoostDefaults.user,
-    )
-
-
-@pytest.fixture(scope="module")
-def user_chat_boosts(chat_boost):
-    return UserChatBoosts(
-        boosts=[chat_boost],
-    )
-
-
-@pytest.fixture
-def chat_boost_source(request):
-    return request.param()
-
-
-ignored = ["self", "api_kwargs"]
-
-
-def make_json_dict(instance: ChatBoostSource, include_optional_args: bool = False) -> dict:
-    """Used to make the json dict which we use for testing de_json. Similar to iter_args()"""
-    json_dict = {"source": instance.source}
-    sig = inspect.signature(instance.__class__.__init__)
-
-    for param in sig.parameters.values():
-        if param.name in ignored:  # ignore irrelevant params
-            continue
-
-        val = getattr(instance, param.name)
-        if hasattr(val, "to_dict"):  # convert the user object or any future ones to dict.
-            val = val.to_dict()
-        json_dict[param.name] = val
-
-    return json_dict
-
-
-def iter_args(
-    instance: ChatBoostSource, de_json_inst: ChatBoostSource, include_optional: bool = False
-):
-    """
-    We accept both the regular instance and de_json created instance and iterate over them for
-    easy one line testing later one.
-    """
-    yield instance.source, de_json_inst.source  # yield this here cause it's not available in sig.
-
-    sig = inspect.signature(instance.__class__.__init__)
-    for param in sig.parameters.values():
-        if param.name in ignored:
-            continue
-        inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
-        if isinstance(json_at, dtm.datetime):  # Convert dtm to int
-            json_at = to_timestamp(json_at)
-        if (
-            param.default is not inspect.Parameter.empty and include_optional
-        ) or param.default is inspect.Parameter.empty:
-            yield inst_at, json_at
-
-
-@pytest.mark.parametrize(
-    "chat_boost_source",
-    [
-        chat_boost_source_gift_code,
-        chat_boost_source_giveaway,
-        chat_boost_source_premium,
-    ],
-    indirect=True,
-)
-class TestChatBoostSourceTypesWithoutRequest:
-    def test_slot_behaviour(self, chat_boost_source):
-        inst = chat_boost_source
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    def test_de_json_required_args(self, offline_bot, chat_boost_source):
-        cls = chat_boost_source.__class__
-
-        json_dict = make_json_dict(chat_boost_source)
-        const_boost_source = ChatBoostSource.de_json(json_dict, offline_bot)
-        assert const_boost_source.api_kwargs == {}
-
-        assert isinstance(const_boost_source, ChatBoostSource)
-        assert isinstance(const_boost_source, cls)
-        for chat_mem_type_at, const_chat_mem_at in iter_args(
-            chat_boost_source, const_boost_source
-        ):
-            assert chat_mem_type_at == const_chat_mem_at
-
-    def test_de_json_all_args(self, offline_bot, chat_boost_source):
-        json_dict = make_json_dict(chat_boost_source, include_optional_args=True)
-        const_boost_source = ChatBoostSource.de_json(json_dict, offline_bot)
-        assert const_boost_source.api_kwargs == {}
-
-        assert isinstance(const_boost_source, ChatBoostSource)
-        assert isinstance(const_boost_source, chat_boost_source.__class__)
-        for c_mem_type_at, const_c_mem_at in iter_args(
-            chat_boost_source, const_boost_source, True
-        ):
-            assert c_mem_type_at == const_c_mem_at
-
-    def test_de_json_invalid_source(self, chat_boost_source, offline_bot):
-        json_dict = {"source": "invalid"}
-        chat_boost_source = ChatBoostSource.de_json(json_dict, offline_bot)
-
-        assert type(chat_boost_source) is ChatBoostSource
-        assert chat_boost_source.source == "invalid"
-
-    def test_de_json_subclass(self, chat_boost_source, offline_bot):
-        """This makes sure that e.g. ChatBoostSourcePremium(data, offline_bot) never returns a
-        ChatBoostSourceGiftCode instance."""
-        cls = chat_boost_source.__class__
-        json_dict = make_json_dict(chat_boost_source, True)
-        assert type(cls.de_json(json_dict, offline_bot)) is cls
-
-    def test_to_dict(self, chat_boost_source):
-        chat_boost_dict = chat_boost_source.to_dict()
-
-        assert isinstance(chat_boost_dict, dict)
-        assert chat_boost_dict["source"] == chat_boost_source.source
-        assert chat_boost_dict["user"] == chat_boost_source.user.to_dict()
-
-        for slot in chat_boost_source.__slots__:  # additional verification for the optional args
-            if slot == "user":  # we already test "user" above:
-                continue
-            assert getattr(chat_boost_source, slot) == chat_boost_dict[slot]
-
-    def test_equality(self, chat_boost_source):
-        a = ChatBoostSource(source="status")
-        b = ChatBoostSource(source="status")
-        c = chat_boost_source
-        d = deepcopy(chat_boost_source)
-        e = Dice(4, "emoji")
-
-        assert a == b
-        assert hash(a) == hash(b)
-
-        assert a != c
-        assert hash(a) != hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)
-
-        assert c == d
-        assert hash(c) == hash(d)
-
-        assert c != e
-        assert hash(c) != hash(e)
-
-    def test_enum_init(self, chat_boost_source):
-        cbs = ChatBoostSource(source="foo")
-        assert cbs.source == "foo"
-        cbs = ChatBoostSource(source="premium")
-        assert cbs.source == ChatBoostSources.PREMIUM
-
-
 class TestChatBoostWithoutRequest(ChatBoostDefaults):
     def test_slot_behaviour(self, chat_boost):
         inst = chat_boost
@@ -266,30 +285,24 @@ class TestChatBoostWithoutRequest(ChatBoostDefaults):
 
     def test_de_json(self, offline_bot, chat_boost):
         json_dict = {
-            "boost_id": "2",
-            "add_date": self.date,
-            "expiration_date": self.date,
+            "boost_id": self.boost_id,
+            "add_date": to_timestamp(self.date),
+            "expiration_date": to_timestamp(self.date),
             "source": self.default_source.to_dict(),
         }
         cb = ChatBoost.de_json(json_dict, offline_bot)
 
-        assert isinstance(cb, ChatBoost)
-        assert isinstance(cb.add_date, dtm.datetime)
-        assert isinstance(cb.expiration_date, dtm.datetime)
-        assert isinstance(cb.source, ChatBoostSource)
-        with cb._unfrozen():
-            cb.add_date = to_timestamp(cb.add_date)
-            cb.expiration_date = to_timestamp(cb.expiration_date)
-
-        # We don't compare cbu.boost to self.boost because we have to update the _id_attrs (sigh)
-        for slot in cb.__slots__:
-            assert getattr(cb, slot) == getattr(chat_boost, slot), f"attribute {slot} differs"
+        assert cb.api_kwargs == {}
+        assert cb.boost_id == self.boost_id
+        assert (cb.add_date) == self.date
+        assert (cb.expiration_date) == self.date
+        assert cb.source == self.default_source
 
     def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "boost_id": "2",
-            "add_date": self.date,
-            "expiration_date": self.date,
+            "add_date": to_timestamp(self.date),
+            "expiration_date": to_timestamp(self.date),
             "source": self.default_source.to_dict(),
         }
 
@@ -310,8 +323,8 @@ class TestChatBoostWithoutRequest(ChatBoostDefaults):
 
         assert isinstance(chat_boost_dict, dict)
         assert chat_boost_dict["boost_id"] == chat_boost.boost_id
-        assert chat_boost_dict["add_date"] == chat_boost.add_date
-        assert chat_boost_dict["expiration_date"] == chat_boost.expiration_date
+        assert chat_boost_dict["add_date"] == to_timestamp(chat_boost.add_date)
+        assert chat_boost_dict["expiration_date"] == to_timestamp(chat_boost.expiration_date)
         assert chat_boost_dict["source"] == chat_boost.source.to_dict()
 
     def test_equality(self):
@@ -341,6 +354,14 @@ class TestChatBoostWithoutRequest(ChatBoostDefaults):
         assert hash(a) != hash(c)
 
 
+@pytest.fixture(scope="module")
+def chat_boost_updated(chat_boost):
+    return ChatBoostUpdated(
+        chat=ChatBoostDefaults.chat,
+        boost=chat_boost,
+    )
+
+
 class TestChatBoostUpdatedWithoutRequest(ChatBoostDefaults):
     def test_slot_behaviour(self, chat_boost_updated):
         inst = chat_boost_updated
@@ -351,25 +372,13 @@ class TestChatBoostUpdatedWithoutRequest(ChatBoostDefaults):
     def test_de_json(self, offline_bot, chat_boost):
         json_dict = {
             "chat": self.chat.to_dict(),
-            "boost": {
-                "boost_id": "2",
-                "add_date": self.date,
-                "expiration_date": self.date,
-                "source": self.default_source.to_dict(),
-            },
+            "boost": self.boost.to_dict(),
         }
         cbu = ChatBoostUpdated.de_json(json_dict, offline_bot)
 
-        assert isinstance(cbu, ChatBoostUpdated)
+        assert cbu.api_kwargs == {}
         assert cbu.chat == self.chat
-        # We don't compare cbu.boost to chat_boost because we have to update the _id_attrs (sigh)
-        with cbu.boost._unfrozen():
-            cbu.boost.add_date = to_timestamp(cbu.boost.add_date)
-            cbu.boost.expiration_date = to_timestamp(cbu.boost.expiration_date)
-        for slot in cbu.boost.__slots__:  # Assumes _id_attrs are same as slots
-            assert getattr(cbu.boost, slot) == getattr(chat_boost, slot), f"attr {slot} differs"
-
-    # no need to test localization since that is already tested in the above class.
+        assert cbu.boost == self.boost
 
     def test_to_dict(self, chat_boost_updated):
         chat_boost_updated_dict = chat_boost_updated.to_dict()
@@ -414,6 +423,16 @@ class TestChatBoostUpdatedWithoutRequest(ChatBoostDefaults):
         assert hash(a) != hash(c)
 
 
+@pytest.fixture(scope="module")
+def chat_boost_removed():
+    return ChatBoostRemoved(
+        chat=ChatBoostDefaults.chat,
+        boost_id=ChatBoostDefaults.boost_id,
+        remove_date=ChatBoostDefaults.date,
+        source=ChatBoostDefaults.default_source,
+    )
+
+
 class TestChatBoostRemovedWithoutRequest(ChatBoostDefaults):
     def test_slot_behaviour(self, chat_boost_removed):
         inst = chat_boost_removed
@@ -424,23 +443,23 @@ class TestChatBoostRemovedWithoutRequest(ChatBoostDefaults):
     def test_de_json(self, offline_bot, chat_boost_removed):
         json_dict = {
             "chat": self.chat.to_dict(),
-            "boost_id": "2",
-            "remove_date": self.date,
+            "boost_id": self.boost_id,
+            "remove_date": to_timestamp(self.date),
             "source": self.default_source.to_dict(),
         }
         cbr = ChatBoostRemoved.de_json(json_dict, offline_bot)
 
-        assert isinstance(cbr, ChatBoostRemoved)
+        assert cbr.api_kwargs == {}
         assert cbr.chat == self.chat
         assert cbr.boost_id == self.boost_id
-        assert to_timestamp(cbr.remove_date) == self.date
+        assert cbr.remove_date == self.date
         assert cbr.source == self.default_source
 
     def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
             "chat": self.chat.to_dict(),
-            "boost_id": "2",
-            "remove_date": self.date,
+            "boost_id": self.boost_id,
+            "remove_date": to_timestamp(self.date),
             "source": self.default_source.to_dict(),
         }
 
@@ -462,7 +481,9 @@ class TestChatBoostRemovedWithoutRequest(ChatBoostDefaults):
         assert isinstance(chat_boost_removed_dict, dict)
         assert chat_boost_removed_dict["chat"] == chat_boost_removed.chat.to_dict()
         assert chat_boost_removed_dict["boost_id"] == chat_boost_removed.boost_id
-        assert chat_boost_removed_dict["remove_date"] == chat_boost_removed.remove_date
+        assert chat_boost_removed_dict["remove_date"] == to_timestamp(
+            chat_boost_removed.remove_date
+        )
         assert chat_boost_removed_dict["source"] == chat_boost_removed.source.to_dict()
 
     def test_equality(self):
@@ -492,6 +513,13 @@ class TestChatBoostRemovedWithoutRequest(ChatBoostDefaults):
         assert hash(a) != hash(c)
 
 
+@pytest.fixture(scope="module")
+def user_chat_boosts(chat_boost):
+    return UserChatBoosts(
+        boosts=[chat_boost],
+    )
+
+
 class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
     def test_slot_behaviour(self, user_chat_boosts):
         inst = user_chat_boosts
@@ -502,22 +530,13 @@ class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
     def test_de_json(self, offline_bot, user_chat_boosts):
         json_dict = {
             "boosts": [
-                {
-                    "boost_id": "2",
-                    "add_date": self.date,
-                    "expiration_date": self.date,
-                    "source": self.default_source.to_dict(),
-                }
+                self.boost.to_dict(),
             ]
         }
         ucb = UserChatBoosts.de_json(json_dict, offline_bot)
 
-        assert isinstance(ucb, UserChatBoosts)
-        assert isinstance(ucb.boosts[0], ChatBoost)
-        assert ucb.boosts[0].boost_id == self.boost_id
-        assert to_timestamp(ucb.boosts[0].add_date) == self.date
-        assert to_timestamp(ucb.boosts[0].expiration_date) == self.date
-        assert ucb.boosts[0].source == self.default_source
+        assert ucb.api_kwargs == {}
+        assert ucb.boosts[0] == self.boost
 
     def test_to_dict(self, user_chat_boosts):
         user_chat_boosts_dict = user_chat_boosts.to_dict()
