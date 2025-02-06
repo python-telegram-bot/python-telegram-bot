@@ -48,6 +48,7 @@ from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
+from telegram.ext._fsm import SingleStateMachine, State, StateInfo
 from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
@@ -59,7 +60,7 @@ if TYPE_CHECKING:
     from socket import socket
 
     from telegram import Message
-    from telegram.ext import ConversationHandler, JobQueue
+    from telegram.ext import ConversationHandler, FiniteStateMachine, JobQueue
     from telegram.ext._applicationbuilder import InitApplicationBuilder
     from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
     from telegram.ext._jobqueue import Job
@@ -266,6 +267,7 @@ class Application(
             "update_queue",
             "updater",
             "user_data",
+            "fsm",
         )
         # Allowing '__weakref__' creation here since we need it for the JobQueue
         # Currently the __weakref__ slot is already created
@@ -301,11 +303,12 @@ class Application(
                 stacklevel=2,
             )
 
+        self.fsm: FiniteStateMachine = SingleStateMachine()
         self.bot: BT = bot
         self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
-        self.handlers: dict[int, list[BaseHandler[Any, CCT, Any]]] = {}
+        self.handlers: dict[State, dict[int, list[BaseHandler[Any, CCT, Any]]]] = {}
         self.error_handlers: dict[
             HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
         ] = {}
@@ -1278,19 +1281,46 @@ class Application(
         # Processing updates before initialize() is a problem e.g. if persistence is used
         self._check_initialized()
 
+        fsm_state_info = self.fsm.get_state_info(update)
+
+        for state, state_handlers in self.handlers.items():
+            if state.matches(fsm_state_info.state):
+                _LOGGER.debug("Processing in state %s", state)
+                was_handled = await self.__process_update_groups(
+                    update, state_handlers, fsm_state_info
+                )
+                if was_handled:
+                    _LOGGER.debug(
+                        "Update was handled in state %s. Stopping further processing", state
+                    )
+                    return
+        _LOGGER.debug(
+            "No handlers found for key %s in state %s", fsm_state_info.key, fsm_state_info.state
+        )
+        return
+
+    async def __process_update_groups(
+        self,
+        update: object,
+        state_handlers: dict[int, list[BaseHandler]],
+        fsm_state_info: StateInfo,
+    ) -> bool:
         context = None
+        was_handled = False
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
-        for handlers in self.handlers.values():
+        for handlers in state_handlers.values():
             try:
                 for handler in handlers:
                     check = handler.check_update(update)  # Should the handler handle this update?
                     if check is None or check is False:
                         continue
+                    was_handled = True
 
                     if not context:  # build a context if not already built
                         try:
                             context = self.context_types.context.from_update(update, self)
+                            context.fsm_state_info = fsm_state_info
                         except Exception as exc:
                             _LOGGER.critical(
                                 (
@@ -1300,7 +1330,7 @@ class Application(
                                 update,
                                 exc_info=exc,
                             )
-                            return
+                            return True
                         await context.refresh_data()
                     coroutine: Coroutine = handler.handle_update(update, self, check, context)
 
@@ -1340,7 +1370,14 @@ class Application(
             # (in __create_task_callback)
             self._mark_for_persistence_update(update=update)
 
-    def add_handler(self, handler: BaseHandler[Any, CCT, Any], group: int = DEFAULT_GROUP) -> None:
+        return was_handled
+
+    def add_handler(
+        self,
+        handler: BaseHandler[Any, CCT, Any],
+        group: int = DEFAULT_GROUP,
+        state: State = State.IDLE,
+    ) -> None:
         """Register a handler.
 
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
@@ -1399,11 +1436,11 @@ class Application(
                     stacklevel=2,
                 )
 
-        if group not in self.handlers:
-            self.handlers[group] = []
-            self.handlers = dict(sorted(self.handlers.items()))  # lower -> higher groups
+        state_handlers = self.handlers.setdefault(state, {})
+        if group not in state_handlers:
+            state_handlers[group] = []
 
-        self.handlers[group].append(handler)
+        state_handlers[group].append(handler)
 
     def add_handlers(
         self,
@@ -1475,10 +1512,11 @@ class Application(
             group (:obj:`object`, optional): The group identifier. Default is ``0``.
 
         """
-        if handler in self.handlers[group]:
-            self.handlers[group].remove(handler)
-            if not self.handlers[group]:
-                del self.handlers[group]
+        for state_handlers in self.handlers.values():
+            if handler in state_handlers[group]:
+                state_handlers[group].remove(handler)
+                if not state_handlers[group]:
+                    del state_handlers[group]
 
     def drop_chat_data(self, chat_id: int) -> None:
         """Drops the corresponding entry from the :attr:`chat_data`. Will also be deleted from
