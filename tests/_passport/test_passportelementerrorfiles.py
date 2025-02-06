@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import PassportElementErrorFiles, PassportElementErrorSelfie
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -49,8 +48,8 @@ class TestPassportElementErrorFilesWithoutRequest(PassportElementErrorFilesTestB
     def test_expected_values(self, passport_element_error_files):
         assert passport_element_error_files.source == self.source
         assert passport_element_error_files.type == self.type_
-        assert isinstance(passport_element_error_files.file_hashes, list)
-        assert passport_element_error_files.file_hashes == self.file_hashes
+        assert isinstance(passport_element_error_files.file_hashes, tuple)
+        assert passport_element_error_files.file_hashes == tuple(self.file_hashes)
         assert passport_element_error_files.message == self.message
 
     def test_to_dict(self, passport_element_error_files):
@@ -88,13 +87,3 @@ class TestPassportElementErrorFilesWithoutRequest(PassportElementErrorFilesTestB
 
         assert a != f
         assert hash(a) != hash(f)
-
-    def test_file_hashes_deprecated(self, passport_element_error_files, recwarn):
-        passport_element_error_files.file_hashes
-        assert len(recwarn) == 1
-        assert (
-            "The attribute `file_hashes` will return a tuple instead of a list in future major"
-            " versions." in str(recwarn[0].message)
-        )
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__

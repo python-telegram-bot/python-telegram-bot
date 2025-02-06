@@ -72,8 +72,6 @@ class ParamTypeCheckingExceptions:
         ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
         ("reaction", False): "ReactionType",  # + str
         ("options", False): "InputPollOption",  # + str
-        # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
-        ("file_hashes", True): "list[str]",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
@@ -111,11 +109,6 @@ class ParamTypeCheckingExceptions:
 
     # These classes' params are all ODVInput, so we ignore them in the defaults type checking.
     IGNORED_DEFAULTS_CLASSES = {"LinkPreviewOptions"}
-
-    # TODO: Remove this in v22 when it becomes a datetime (also remove from arg_type_checker.py)
-    DATETIME_EXCEPTIONS = {
-        "file_date",
-    }
 
 
 # Arguments *added* to the official API

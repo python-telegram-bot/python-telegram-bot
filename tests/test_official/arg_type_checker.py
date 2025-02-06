@@ -190,8 +190,6 @@ def check_param_type(
         or "Unix time" in tg_parameter.param_description
     ):
         log("Checking that `%s` is a datetime!\n", ptb_param.name)
-        if ptb_param.name in PTCE.DATETIME_EXCEPTIONS:
-            return True, mapped_type
         # If it's a class, we only accept datetime as the parameter
         mapped_type = dtm.datetime if is_class else mapped_type | dtm.datetime
 

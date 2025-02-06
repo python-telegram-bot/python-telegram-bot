@@ -19,12 +19,12 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram PassportElementError."""
 
+from collections.abc import Sequence
 from typing import Optional
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
 
 
 class PassportElementError(TelegramObject):
@@ -168,23 +168,30 @@ class PassportElementErrorFiles(PassportElementError):
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (list[:obj:`str`]): List of base64-encoded file hashes.
+        file_hashes (Sequence[:obj:`str`]): List of base64-encoded file hashes.
+
+            .. versionchanged:: NEXT.VERSION
+                |sequenceargs|
         message (:obj:`str`): Error message.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
+        file_hashes (tuple[:obj:`str`]): List of base64-encoded file hashes.
+
+            .. versionchanged:: NEXT.VERSION
+                |tupleclassattrs|
         message (:obj:`str`): Error message.
 
     """
 
-    __slots__ = ("_file_hashes",)
+    __slots__ = ("file_hashes",)
 
     def __init__(
         self,
         type: str,
-        file_hashes: list[str],
+        file_hashes: Sequence[str],
         message: str,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -192,32 +199,9 @@ class PassportElementErrorFiles(PassportElementError):
         # Required
         super().__init__("files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self._file_hashes: list[str] = file_hashes
+            self.file_hashes: tuple[str, ...] = parse_sequence_arg(file_hashes)
 
-            self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict` for details."""
-        data = super().to_dict(recursive)
-        data["file_hashes"] = self._file_hashes
-        return data
-
-    @property
-    def file_hashes(self) -> list[str]:
-        """List of base64-encoded file hashes.
-
-        .. deprecated:: 20.6
-            This attribute will return a tuple instead of a list in future major versions.
-        """
-        warn(
-            PTBDeprecationWarning(
-                "20.6",
-                "The attribute `file_hashes` will return a tuple instead of a list in future major"
-                " versions.",
-            ),
-            stacklevel=2,
-        )
-        return self._file_hashes
+            self._id_attrs = (self.source, self.type, self.message, self.file_hashes)
 
 
 class PassportElementErrorFrontSide(PassportElementError):
@@ -386,7 +370,10 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
             ``"internal_passport"``, ``"utility_bill"``, ``"bank_statement"``,
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (list[:obj:`str`]): List of base64-encoded file hashes.
+        file_hashes (Sequence[:obj:`str`]): List of base64-encoded file hashes.
+
+            .. versionchanged:: NEXT.VERSION
+                |sequenceargs|
         message (:obj:`str`): Error message.
 
     Attributes:
@@ -394,16 +381,20 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
             ``"internal_passport"``, ``"utility_bill"``, ``"bank_statement"``,
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
+        file_hashes (tuple[:obj:`str`]): List of base64-encoded file hashes.
+
+            .. versionchanged:: NEXT.VERSION
+                |tupleclassattrs|
         message (:obj:`str`): Error message.
 
     """
 
-    __slots__ = ("_file_hashes",)
+    __slots__ = ("file_hashes",)
 
     def __init__(
         self,
         type: str,
-        file_hashes: list[str],
+        file_hashes: Sequence[str],
         message: str,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -411,33 +402,9 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         # Required
         super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self._file_hashes: list[str] = file_hashes
+            self.file_hashes: tuple[str, ...] = parse_sequence_arg(file_hashes)
 
-            self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict` for details."""
-        data = super().to_dict(recursive)
-        data["file_hashes"] = self._file_hashes
-        return data
-
-    @property
-    def file_hashes(self) -> list[str]:
-        """List of base64-encoded file hashes.
-
-        .. deprecated:: 20.6
-            This attribute will return a tuple instead of a list in future major versions.
-        """
-        warn(
-            PTBDeprecationWarning(
-                "20.6",
-                "The attribute `file_hashes` will return a tuple instead of a list in future major"
-                " versions. See the stability policy:"
-                " https://docs.python-telegram-bot.org/en/stable/stability_policy.html",
-            ),
-            stacklevel=2,
-        )
-        return self._file_hashes
+            self._id_attrs = (self.source, self.type, self.message, self.file_hashes)
 
 
 class PassportElementErrorUnspecified(PassportElementError):
