@@ -1068,11 +1068,6 @@ class TestFilters:
         assert filters.StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
         update.message.write_access_allowed = None
 
-        update.message.api_kwargs = {"user_shared": "user_shared"}
-        assert filters.StatusUpdate.ALL.check_update(update)
-        assert filters.StatusUpdate.USER_SHARED.check_update(update)
-        update.message.api_kwargs = {}
-
         update.message.users_shared = "users_shared"
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.USERS_SHARED.check_update(update)
@@ -1334,15 +1329,12 @@ class TestFilters:
 
     def test_filters_chat_id(self, update):
         assert not filters.Chat(chat_id=1).check_update(update)
-        assert filters.CHAT.check_update(update)
         update.message.chat.id = 1
         assert filters.Chat(chat_id=1).check_update(update)
-        assert filters.CHAT.check_update(update)
         update.message.chat.id = 2
         assert filters.Chat(chat_id=[1, 2]).check_update(update)
         assert not filters.Chat(chat_id=[3, 4]).check_update(update)
         update.message.chat = None
-        assert not filters.CHAT.check_update(update)
         assert not filters.Chat(chat_id=[3, 4]).check_update(update)
 
     def test_filters_chat_username(self, update):
