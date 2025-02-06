@@ -1487,13 +1487,8 @@ class Message(MaybeInaccessibleMessage):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def _do_quote(
-        self, do_quote: Optional[bool], reply_to_message_id: Optional[int] = None
-    ) -> Optional[ReplyParameters]:
+    def _do_quote(self, do_quote: Optional[bool]) -> Optional[ReplyParameters]:
         """Modify kwargs for replying with or without quoting."""
-        if reply_to_message_id is not None:
-            return ReplyParameters(reply_to_message_id)
-
         if do_quote is not None:
             if do_quote:
                 return ReplyParameters(self.message_id)

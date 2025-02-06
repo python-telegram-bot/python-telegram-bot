@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-import contextlib
 import datetime as dtm
 from copy import copy
 
@@ -448,18 +447,7 @@ class TestMessageWithoutRequest(MessageTestBase):
     async def check_quote_parsing(
         message: Message, method, bot_method_name: str, args, monkeypatch
     ):
-        """Used in testing reply_* below. Makes sure that quote and do_quote are handled
-        correctly
-        """
-        with contextlib.suppress(TypeError):
-            # for newer methods that don't have the deprecated argument
-            with pytest.raises(ValueError, match="`quote` and `do_quote` are mutually exclusive"):
-                await method(*args, quote=True, do_quote=True)
-
-            # for newer methods that don't have the deprecated argument
-            with pytest.warns(PTBDeprecationWarning, match="`quote` parameter is deprecated"):
-                await method(*args, quote=True)
-
+        """Used in testing reply_* below. Makes sure that do_quote is handled correctly"""
         with pytest.raises(
             ValueError,
             match="`reply_to_message_id` and `reply_parameters` are mutually exclusive.",
@@ -471,17 +459,13 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         monkeypatch.setattr(message.get_bot(), bot_method_name, make_assertion)
 
-        for param in ("quote", "do_quote"):
-            with contextlib.suppress(TypeError):
-                # for newer methods that don't have the deprecated argument
-                chat_id, reply_parameters = await method(*args, **{param: True})
-                if chat_id != message.chat.id:
-                    pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
-                if reply_parameters is None or reply_parameters.message_id != message.message_id:
-                    pytest.fail(
-                        f"reply_parameters is {reply_parameters} "
-                        "but should be {message.message_id}"
-                    )
+        for value in (True, False):
+            chat_id, reply_parameters = await method(*args, do_quote=value)
+            if chat_id != message.chat.id:
+                pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
+            expected = ReplyParameters(message.message_id) if value else None
+            if reply_parameters != expected:
+                pytest.fail(f"reply_parameters is {reply_parameters} but should be {expected}")
 
         input_chat_id = object()
         input_reply_parameters = ReplyParameters(message_id=1, chat_id=42)
