@@ -82,7 +82,7 @@ async def unsafe_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     await context.fsm.set_state(context.fsm_state_info.key, ConcurrentMachine.UPDATING_BALANCE)
 
-    # At this point, the semaphore is released such that multiple updates can update
+    # At this point, the lock is released such that multiple updates can update
     # the balance concurrently. This can lead to race conditions.
     await update_balance(context, update)
 
@@ -95,7 +95,7 @@ async def safe_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     await asyncio.sleep(1)
 
     async with context.as_fsm_state(ConcurrentMachine.UPDATING_BALANCE):
-        # At this point, the semaphore is acquired such that only one update can update
+        # At this point, the lock is acquired such that only one update can update
         # the balance at a time. This prevents race conditions.
         await update_balance(context, update)
 

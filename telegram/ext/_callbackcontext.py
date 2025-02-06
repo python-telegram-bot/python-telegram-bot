@@ -277,8 +277,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     def fsm(self) -> FiniteStateMachine:
         return self.application.fsm
 
-    def fsm_semaphore(self) -> asyncio.BoundedSemaphore:
-        return self.fsm.get_semaphore(self.fsm_state_info.key)
+    def fsm_semaphore(self) -> asyncio.Lock:
+        return self.fsm.get_lock(self.fsm_state_info.key)
 
     async def set_state(self, state: State) -> None:
         await self.fsm.set_state(self.fsm_state_info.key, state, self.fsm_state_info.version)
