@@ -64,8 +64,9 @@ class InlineQuery(TelegramObject):
 
     .. versionchanged:: NEXT.VERSION
         Removed constants ``MIN_START_PARAMETER_LENGTH`` and ``MAX_START_PARAMETER_LENGTH``.
-        Use :attr:`telegram.constants.InlineQueryLimit.MIN_START_PARAMETER_LENGTH` and
-        :attr:`telegram.constants.InlineQueryLimit.MAX_START_PARAMETER_LENGTH` instead.
+        Use :attr:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH` and
+        :attr:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`
+        instead.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
