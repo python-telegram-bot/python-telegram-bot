@@ -69,7 +69,7 @@ class TestPassportFileWithoutRequest(PassportFileTestBase):
         assert passport_file_dict["file_id"] == passport_file.file_id
         assert passport_file_dict["file_unique_id"] == passport_file.file_unique_id
         assert passport_file_dict["file_size"] == passport_file.file_size
-        assert passport_file_dict["file_date"] == passport_file.file_date
+        assert passport_file_dict["file_date"] == to_timestamp(passport_file.file_date)
 
     def test_de_json_localization(self, passport_file, tz_bot, offline_bot, raw_bot):
         json_dict = {
@@ -85,9 +85,7 @@ class TestPassportFileWithoutRequest(PassportFileTestBase):
 
         # comparing utcoffsets because comparing timezones is unpredicatable
         date_offset = pf_tz.file_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            pf_tz.subscription_expiration_date.replace(tzinfo=None)
-        )
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(pf_tz.file_date.replace(tzinfo=None))
 
         assert pf_raw.file_date.tzinfo == UTC
         assert pf.file_date.tzinfo == UTC

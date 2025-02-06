@@ -72,9 +72,8 @@ class TestPassportElementErrorTranslationFilesWithoutRequest(
             passport_element_error_translation_files_dict["message"]
             == passport_element_error_translation_files.message
         )
-        assert (
-            passport_element_error_translation_files_dict["file_hashes"]
-            == passport_element_error_translation_files.file_hashes
+        assert passport_element_error_translation_files_dict["file_hashes"] == list(
+            passport_element_error_translation_files.file_hashes
         )
 
     def test_equality(self):
