@@ -1484,15 +1484,15 @@ class Message(MaybeInaccessibleMessage):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def _quote(
-        self, quote: Optional[bool], reply_to_message_id: Optional[int] = None
+    def _do_quote(
+        self, do_quote: Optional[bool], reply_to_message_id: Optional[int] = None
     ) -> Optional[ReplyParameters]:
         """Modify kwargs for replying with or without quoting."""
         if reply_to_message_id is not None:
             return ReplyParameters(reply_to_message_id)
 
-        if quote is not None:
-            if quote:
+        if do_quote is not None:
+            if do_quote:
                 return ReplyParameters(self.message_id)
 
         else:
@@ -1675,29 +1675,14 @@ class Message(MaybeInaccessibleMessage):
     async def _parse_quote_arguments(
         self,
         do_quote: Optional[Union[bool, _ReplyKwargs]],
-        quote: Optional[bool],
         reply_to_message_id: Optional[int],
         reply_parameters: Optional["ReplyParameters"],
     ) -> tuple[Union[str, int], ReplyParameters]:
-        if quote and do_quote:
-            raise ValueError("The arguments `quote` and `do_quote` are mutually exclusive")
-
         if reply_to_message_id is not None and reply_parameters is not None:
             raise ValueError(
                 "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
             )
 
-        if quote is not None:
-            warn(
-                PTBDeprecationWarning(
-                    "20.8",
-                    "The `quote` parameter is deprecated in favor of the `do_quote` parameter. "
-                    "Please update your code to use `do_quote` instead.",
-                ),
-                stacklevel=2,
-            )
-
-        effective_do_quote = quote or do_quote
         chat_id: Union[str, int] = self.chat_id
 
         # reply_parameters and reply_to_message_id overrule the do_quote parameter
@@ -1705,11 +1690,11 @@ class Message(MaybeInaccessibleMessage):
             effective_reply_parameters = reply_parameters
         elif reply_to_message_id is not None:
             effective_reply_parameters = ReplyParameters(message_id=reply_to_message_id)
-        elif isinstance(effective_do_quote, dict):
-            effective_reply_parameters = effective_do_quote["reply_parameters"]
-            chat_id = effective_do_quote["chat_id"]
+        elif isinstance(do_quote, dict):
+            effective_reply_parameters = do_quote["reply_parameters"]
+            chat_id = do_quote["chat_id"]
         else:
-            effective_reply_parameters = self._quote(effective_do_quote)
+            effective_reply_parameters = self._do_quote(do_quote)
 
         return chat_id, effective_reply_parameters
 
@@ -1750,7 +1735,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         disable_web_page_preview: Optional[bool] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1774,10 +1758,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -1788,7 +1768,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
@@ -1830,7 +1810,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         disable_web_page_preview: Optional[bool] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1861,10 +1840,6 @@ class Message(MaybeInaccessibleMessage):
             Telegram for backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -1874,7 +1849,7 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
@@ -1916,7 +1891,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         disable_web_page_preview: Optional[bool] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1943,10 +1917,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -1956,7 +1926,7 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
@@ -1998,7 +1968,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         disable_web_page_preview: Optional[bool] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2025,10 +1994,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2038,7 +2003,7 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
@@ -2078,7 +2043,6 @@ class Message(MaybeInaccessibleMessage):
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2105,10 +2069,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2121,7 +2081,7 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.error.TelegramError`
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_media_group(
@@ -2164,7 +2124,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: Optional[str] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2188,10 +2147,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2202,7 +2157,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_photo(
@@ -2251,7 +2206,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: Optional[str] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2275,10 +2229,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2289,7 +2239,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_audio(
@@ -2338,7 +2288,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: Optional[str] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2362,10 +2311,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2376,7 +2321,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_document(
@@ -2427,7 +2372,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: Optional[str] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2451,10 +2395,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2465,7 +2405,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_animation(
@@ -2511,7 +2451,6 @@ class Message(MaybeInaccessibleMessage):
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2535,10 +2474,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2549,7 +2484,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_sticker(
@@ -2596,7 +2531,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: Optional[str] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2620,10 +2554,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2634,7 +2564,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_video(
@@ -2684,7 +2614,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: Optional[str] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2708,10 +2637,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2722,7 +2647,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_video_note(
@@ -2766,7 +2691,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: Optional[str] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2790,10 +2714,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2804,7 +2724,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_voice(
@@ -2850,7 +2770,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         location: Optional[Location] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2874,10 +2793,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2888,7 +2803,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_location(
@@ -2937,7 +2852,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         venue: Optional[Venue] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2961,10 +2875,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2975,7 +2885,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_venue(
@@ -3022,7 +2932,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         contact: Optional[Contact] = None,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3046,10 +2955,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -3060,7 +2965,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_contact(
@@ -3112,7 +3017,6 @@ class Message(MaybeInaccessibleMessage):
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3136,10 +3040,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -3150,7 +3050,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_poll(
@@ -3198,7 +3098,6 @@ class Message(MaybeInaccessibleMessage):
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3222,10 +3121,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -3236,7 +3131,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_dice(
@@ -3315,7 +3210,6 @@ class Message(MaybeInaccessibleMessage):
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3339,10 +3233,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -3355,7 +3245,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_game(
@@ -3410,7 +3300,6 @@ class Message(MaybeInaccessibleMessage):
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3445,10 +3334,6 @@ class Message(MaybeInaccessibleMessage):
             :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>` is optional.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -3459,7 +3344,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_invoice(
@@ -3628,7 +3513,6 @@ class Message(MaybeInaccessibleMessage):
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3652,11 +3536,6 @@ class Message(MaybeInaccessibleMessage):
                 |reply_same_thread|
 
         Keyword Args:
-            quote (:obj:`bool`, optional): |reply_quote|
-
-                .. versionadded:: 13.1
-                .. deprecated:: 20.8
-                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -3667,7 +3546,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().copy_message(
@@ -3738,7 +3617,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, None, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_paid_media(
             chat_id=chat_id,
