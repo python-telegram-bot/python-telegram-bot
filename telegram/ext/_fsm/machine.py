@@ -3,12 +3,13 @@
 
 import abc
 import asyncio
+import contextlib
 import datetime as dtm
 import logging
 import time
 import weakref
 from collections import defaultdict, deque
-from collections.abc import Hashable, Mapping, MutableSequence, Sequence
+from collections.abc import AsyncIterator, Hashable, Mapping, MutableSequence, Sequence
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Generic, Literal, Optional, TypeVar, Union, overload
 
@@ -85,7 +86,9 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
             busy.
         """
 
-    def _do_set_state(self, key: _KT, state: State, version: Optional[int] = None) -> None:
+    def _do_set_state(
+        self, key: _KT, state: State, version: Optional[int] = None
+    ) -> StateInfo[_KT]:
         """Protected method to set the state for the specified key.
 
         The version can be optionally used for optimistic locking. If the version does not match
@@ -118,6 +121,7 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
         # Doing this *after* do_set_state so that any exceptions are raised before the history
         # is updated
         self.store_state_history(key, state)
+        return StateInfo(key, state, self._states[key][1])
 
     async def set_state(self, key: _KT, state: State, version: Optional[int] = None) -> None:
         """Store the state for the specified key."""
@@ -129,6 +133,17 @@ class FiniteStateMachine(abc.ABC, Generic[_KT]):
         if self.get_semaphore(key).locked():
             raise asyncio.InvalidStateError("Semaphore is locked")
         self._do_set_state(key, state, version)
+
+    @contextlib.asynccontextmanager
+    async def as_state(self, key: _KT, state: State) -> AsyncIterator[None]:
+        """Context manager to set the state for the specified key and reset it afterwards."""
+        async with self.get_semaphore(key):
+            current_state, current_version = self.states[key]
+            new_version = self._do_set_state(key, state, current_version).version
+            try:
+                yield
+            finally:
+                self._do_set_state(key, current_state, new_version)
 
     @staticmethod
     def _build_job_name(keys: Sequence[_KT]) -> str:

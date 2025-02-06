@@ -18,8 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
 import asyncio
-import contextlib
-from collections.abc import AsyncIterator, Awaitable, Generator
+from collections.abc import Awaitable, Generator
+from contextlib import AbstractAsyncContextManager
 from re import Match
 from typing import TYPE_CHECKING, Any, Generic, NoReturn, Optional, TypeVar, Union
 
@@ -286,12 +286,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     def set_state_nowait(self, state: State) -> None:
         self.fsm.set_state_nowait(self.fsm_state_info.key, state, self.fsm_state_info.version)
 
-    @contextlib.asynccontextmanager
-    async def as_fsm_state(self, state: State) -> AsyncIterator[None]:
-        async with self.fsm_semaphore():
-            await self.set_state(state)
-            yield
-            await self.set_state(self.fsm_state_info.state)
+    def as_fsm_state(self, state: State) -> AbstractAsyncContextManager[None]:
+        return self.fsm.as_state(self.fsm_state_info.key, state)
 
     @classmethod
     def from_error(
