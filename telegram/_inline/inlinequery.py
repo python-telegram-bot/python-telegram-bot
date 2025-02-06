@@ -29,7 +29,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import Bot, InlineQueryResult
@@ -141,7 +141,7 @@ class InlineQuery(TelegramObject):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        cache_time: Optional[int] = None,
+        cache_time: Optional[TimePeriod] = None,
         is_personal: Optional[bool] = None,
         next_offset: Optional[str] = None,
         button: Optional[InlineQueryResultsButton] = None,

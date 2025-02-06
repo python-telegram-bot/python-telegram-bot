@@ -28,7 +28,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import JSONDict, ODVInput, ReplyMarkup, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import (
@@ -164,7 +164,7 @@ class CallbackQuery(TelegramObject):
         text: Optional[str] = None,
         show_alert: Optional[bool] = None,
         url: Optional[str] = None,
-        cache_time: Optional[int] = None,
+        cache_time: Optional[TimePeriod] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -471,7 +471,7 @@ class CallbackQuery(TelegramObject):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

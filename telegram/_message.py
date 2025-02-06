@@ -77,6 +77,7 @@ from telegram._utils.types import (
     MarkdownVersion,
     ODVInput,
     ReplyMarkup,
+    TimePeriod,
 )
 from telegram._utils.warnings import warn
 from telegram._videochat import (
@@ -2232,7 +2233,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_audio(
         self,
         audio: Union[FileInput, "Audio"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         performer: Optional[str] = None,
         title: Optional[str] = None,
         caption: Optional[str] = None,
@@ -2406,7 +2407,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_animation(
         self,
         animation: Union[FileInput, "Animation"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
         caption: Optional[str] = None,
@@ -2574,7 +2575,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_video(
         self,
         video: Union[FileInput, "Video"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -2669,7 +2670,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_video_note(
         self,
         video_note: Union[FileInput, "VideoNote"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         length: Optional[int] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -2750,7 +2751,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_voice(
         self,
         voice: Union[FileInput, "Voice"],
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
@@ -2836,7 +2837,7 @@ class Message(MaybeInaccessibleMessage):
         longitude: Optional[float] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -3098,7 +3099,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        open_period: Optional[int] = None,
+        open_period: Optional[TimePeriod] = None,
         close_date: Optional[Union[int, dtm.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -3980,7 +3981,7 @@ class Message(MaybeInaccessibleMessage):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

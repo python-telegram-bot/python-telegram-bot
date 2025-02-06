@@ -26,7 +26,15 @@ import httpx
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
-from telegram._utils.types import DVInput, DVType, FilePathInput, HTTPVersion, ODVInput, SocketOpt
+from telegram._utils.types import (
+    BaseUrl,
+    DVInput,
+    DVType,
+    FilePathInput,
+    HTTPVersion,
+    ODVInput,
+    SocketOpt,
+)
 from telegram._utils.warnings import warn
 from telegram.ext._application import Application
 from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
@@ -164,8 +172,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def __init__(self: "InitApplicationBuilder"):
         self._token: DVType[str] = DefaultValue("")
-        self._base_url: DVType[str] = DefaultValue("https://api.telegram.org/bot")
-        self._base_file_url: DVType[str] = DefaultValue("https://api.telegram.org/file/bot")
+        self._base_url: DVType[BaseUrl] = DefaultValue("https://api.telegram.org/bot")
+        self._base_file_url: DVType[BaseUrl] = DefaultValue("https://api.telegram.org/file/bot")
         self._connection_pool_size: DVInput[int] = DEFAULT_NONE
         self._proxy: DVInput[Union[str, httpx.Proxy, httpx.URL]] = DEFAULT_NONE
         self._socket_options: DVInput[Collection[SocketOpt]] = DEFAULT_NONE
@@ -378,15 +386,19 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._token = token
         return self
 
-    def base_url(self: BuilderType, base_url: str) -> BuilderType:
+    def base_url(self: BuilderType, base_url: BaseUrl) -> BuilderType:
         """Sets the base URL for :attr:`telegram.ext.Application.bot`. If not called,
         will default to ``'https://api.telegram.org/bot'``.
 
         .. seealso:: :paramref:`telegram.Bot.base_url`,
             :wiki:`Local Bot API Server <Local-Bot-API-Server>`, :meth:`base_file_url`
 
+        .. versionchanged:: NEXT.VERSION
+           Supports callable input and string formatting.
+
         Args:
-            base_url (:obj:`str`): The URL.
+            base_url (:obj:`str` | Callable[[:obj:`str`], :obj:`str`]): The URL or
+                input for the URL as accepted by :paramref:`telegram.Bot.base_url`.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -396,15 +408,19 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._base_url = base_url
         return self
 
-    def base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
+    def base_file_url(self: BuilderType, base_file_url: BaseUrl) -> BuilderType:
         """Sets the base file URL for :attr:`telegram.ext.Application.bot`. If not
         called, will default to ``'https://api.telegram.org/file/bot'``.
 
         .. seealso:: :paramref:`telegram.Bot.base_file_url`,
             :wiki:`Local Bot API Server <Local-Bot-API-Server>`, :meth:`base_url`
 
+        .. versionchanged:: NEXT.VERSION
+           Supports callable input and string formatting.
+
         Args:
-            base_file_url (:obj:`str`): The URL.
+            base_file_url (:obj:`str` | Callable[[:obj:`str`], :obj:`str`]): The URL or
+                input for the URL as accepted by :paramref:`telegram.Bot.base_file_url`.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.

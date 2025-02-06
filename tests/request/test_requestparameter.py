@@ -83,6 +83,7 @@ class TestRequestParameterWithoutRequest:
             (ChatType.PRIVATE, "private"),
             (MessageEntity("type", 1, 1), {"type": "type", "offset": 1, "length": 1}),
             (dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5), 1573431976),
+            (dtm.timedelta(days=42), 42 * 24 * 60 * 60),
             (
                 [
                     True,
@@ -99,6 +100,19 @@ class TestRequestParameterWithoutRequest:
         request_parameter = RequestParameter.from_input("key", value)
         assert request_parameter.value == expected_value
         assert request_parameter.input_files is None
+
+    @pytest.mark.parametrize(
+        ("value", "expected_type", "expected_value"),
+        [
+            (dtm.timedelta(seconds=1), int, 1),
+            (dtm.timedelta(milliseconds=1), float, 0.001),
+        ],
+    )
+    def test_from_input_timedelta(self, value, expected_type, expected_value):
+        request_parameter = RequestParameter.from_input("key", value)
+        assert request_parameter.value == expected_value
+        assert request_parameter.input_files is None
+        assert isinstance(request_parameter.value, expected_type)
 
     def test_from_input_inputfile(self):
         inputfile_1 = InputFile("data1", filename="inputfile_1", attach=True)

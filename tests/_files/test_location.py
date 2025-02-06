@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 
 import pytest
 
@@ -238,12 +239,16 @@ class TestLocationWithRequest:
         assert not unprotected.has_protected_content
 
     @pytest.mark.xfail
-    async def test_send_live_location(self, bot, chat_id):
+    @pytest.mark.parametrize(
+        ("live_period", "edit_live_period"),
+        [(80, 200), (dtm.timedelta(seconds=80), dtm.timedelta(seconds=200))],
+    )
+    async def test_send_live_location(self, bot, chat_id, live_period, edit_live_period):
         message = await bot.send_location(
             chat_id=chat_id,
             latitude=52.223880,
             longitude=5.166146,
-            live_period=80,
+            live_period=live_period,
             horizontal_accuracy=50,
             heading=90,
             proximity_alert_radius=1000,
@@ -266,7 +271,7 @@ class TestLocationWithRequest:
             horizontal_accuracy=30,
             heading=10,
             proximity_alert_radius=500,
-            live_period=200,
+            live_period=edit_live_period,
         )
 
         assert pytest.approx(message2.location.latitude, rel=1e-5) == 52.223098
@@ -276,7 +281,7 @@ class TestLocationWithRequest:
         assert message2.location.proximity_alert_radius == 500
         assert message2.location.live_period == 200
 
-        await bot.stop_message_live_location(message.chat_id, message.message_id)
+        assert await bot.stop_message_live_location(message.chat_id, message.message_id)
         with pytest.raises(BadRequest, match="Message can't be edited"):
             await bot.edit_message_live_location(
                 message.chat_id, message.message_id, latitude=52.223880, longitude=5.164306

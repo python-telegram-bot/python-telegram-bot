@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
+import datetime as dtm
 
 from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
@@ -53,6 +54,12 @@ class ParamTypeCheckingExceptions:
         },
         "replace_sticker_in_set": {
             "old_sticker$": Sticker,
+        },
+        # The underscore will match any method
+        r"\w+_[\w_]+": {
+            "duration": dtm.timedelta,
+            r"\w+_period": dtm.timedelta,
+            "cache_time": dtm.timedelta,
         },
     }
 
