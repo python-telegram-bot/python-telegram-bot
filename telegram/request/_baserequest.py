@@ -29,7 +29,6 @@ from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict, ODVInput
-from telegram._utils.warnings import warn
 from telegram._version import __version__ as ptb_ver
 from telegram.error import (
     BadRequest,
@@ -42,7 +41,6 @@ from telegram.error import (
     TelegramError,
 )
 from telegram.request._requestdata import RequestData
-from telegram.warnings import PTBDeprecationWarning
 
 RT = TypeVar("RT", bound="BaseRequest")
 
@@ -305,31 +303,6 @@ class BaseRequest(
             TelegramError
 
         """
-        # Import needs to be here since HTTPXRequest is a subclass of BaseRequest
-        from telegram.request import HTTPXRequest  # pylint: disable=import-outside-toplevel
-
-        # 20 is the documented default value for all the media related bot methods and custom
-        # implementations of BaseRequest may explicitly rely on that. Hence, we follow the
-        # standard deprecation policy and deprecate starting with version 20.7.
-        # For our own implementation HTTPXRequest, we can handle that ourselves, so we skip the
-        # warning in that case.
-        has_files = request_data and request_data.multipart_data
-        if (
-            has_files
-            and not isinstance(self, HTTPXRequest)
-            and isinstance(write_timeout, DefaultValue)
-        ):
-            warn(
-                PTBDeprecationWarning(
-                    "20.7",
-                    f"The `write_timeout` parameter passed to {self.__class__.__name__}.do_request"
-                    " will default to `BaseRequest.DEFAULT_NONE` instead of 20 in future versions "
-                    "for *all* methods of the `Bot` class, including methods sending media.",
-                ),
-                stacklevel=3,
-            )
-            write_timeout = 20
-
         try:
             code, payload = await self.do_request(
                 url=url,

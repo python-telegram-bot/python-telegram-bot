@@ -404,62 +404,6 @@ class TestRequestWithoutRequest:
         with pytest.raises(NotImplementedError):
             SimpleRequest().read_timeout
 
-    @pytest.mark.parametrize("media", [True, False])
-    async def test_timeout_propagation_write_timeout(
-        self, monkeypatch, media, input_media_photo, recwarn  # noqa: F811
-    ):
-        class CustomRequest(BaseRequest):
-            async def initialize(self_) -> None:
-                pass
-
-            async def shutdown(self_) -> None:
-                pass
-
-            async def do_request(self_, *args, **kwargs) -> tuple[int, bytes]:
-                self.test_flag = (
-                    kwargs.get("read_timeout"),
-                    kwargs.get("connect_timeout"),
-                    kwargs.get("write_timeout"),
-                    kwargs.get("pool_timeout"),
-                )
-                return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
-
-        custom_request = CustomRequest()
-        data = {"string": "string", "int": 1, "float": 1.0}
-        if media:
-            data["media"] = input_media_photo
-        request_data = RequestData(
-            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
-        )
-
-        # First make sure that custom timeouts are always respected
-        await custom_request.post(
-            "url", request_data, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
-        )
-        assert self.test_flag == (1, 2, 3, 4)
-
-        # Now also ensure that the default timeout for media requests is 20 seconds
-        await custom_request.post("url", request_data)
-        assert self.test_flag == (
-            DEFAULT_NONE,
-            DEFAULT_NONE,
-            20 if media else DEFAULT_NONE,
-            DEFAULT_NONE,
-        )
-
-        print("warnings")
-        for entry in recwarn:
-            print(entry.message)
-        if media:
-            assert len(recwarn) == 1
-            assert "will default to `BaseRequest.DEFAULT_NONE` instead of 20" in str(
-                recwarn[0].message
-            )
-            assert recwarn[0].category is PTBDeprecationWarning
-            assert recwarn[0].filename == __file__
-        else:
-            assert len(recwarn) == 0
-
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestHTTPXRequestWithoutRequest:
@@ -728,7 +672,7 @@ class TestHTTPXRequestWithoutRequest:
 
     @pytest.mark.parametrize("media", [True, False])
     async def test_do_request_write_timeout(
-        self, monkeypatch, media, httpx_request, input_media_photo, recwarn  # noqa: F811
+        self, monkeypatch, media, httpx_request, input_media_photo  # noqa: F811
     ):
         async def request(_, **kwargs):
             self.test_flag = kwargs.get("timeout")
@@ -752,10 +696,6 @@ class TestHTTPXRequestWithoutRequest:
         # Now also ensure that the default timeout for media requests is 20 seconds
         await httpx_request.post("url", request_data)
         assert self.test_flag == httpx.Timeout(read=5, connect=5, write=20 if media else 5, pool=1)
-
-        # Just for double-checking, since warnings are issued for implementations of BaseRequest
-        # other than HTTPXRequest
-        assert len(recwarn) == 0
 
     @pytest.mark.parametrize("init", [True, False])
     async def test_setting_media_write_timeout(

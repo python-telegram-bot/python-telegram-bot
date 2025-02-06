@@ -2269,7 +2269,7 @@ class TestBotWithoutRequest:
         assert test_flag == (
             DEFAULT_NONE,
             DEFAULT_NONE,
-            20,
+            DEFAULT_NONE,
             DEFAULT_NONE,
         )
 
