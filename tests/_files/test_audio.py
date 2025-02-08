@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import os
 from pathlib import Path
 
@@ -150,7 +151,9 @@ class TestAudioWithoutRequest(AudioTestBase):
         assert await offline_bot.send_audio(chat_id, audio_file, filename="custom_filename")
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_audio_local_files(self, monkeypatch, offline_bot, chat_id, local_mode):
+    async def test_send_audio_local_files(
+        self, dummy_message_dict, monkeypatch, offline_bot, chat_id, local_mode
+    ):
         try:
             offline_bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local Bot API set up
@@ -166,6 +169,7 @@ class TestAudioWithoutRequest(AudioTestBase):
                     test_flag = isinstance(data.get("audio"), InputFile) and isinstance(
                         data.get("thumbnail"), InputFile
                     )
+                return dummy_message_dict
 
             monkeypatch.setattr(offline_bot, "_post", make_assertion)
             await offline_bot.send_audio(chat_id, file, thumbnail=file)
@@ -211,12 +215,13 @@ class TestAudioWithoutRequest(AudioTestBase):
 
 
 class TestAudioWithRequest(AudioTestBase):
-    async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
+    @pytest.mark.parametrize("duration", [3, dtm.timedelta(seconds=3)])
+    async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file, duration):
         message = await bot.send_audio(
             chat_id,
             audio=audio_file,
             caption=self.caption,
-            duration=self.duration,
+            duration=duration,
             performer=self.performer,
             title=self.title,
             disable_notification=False,

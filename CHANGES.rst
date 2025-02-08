@@ -86,7 +86,7 @@ Major Changes
 Documentation Improvements
 --------------------------
 
-- Documentation Improvements (:pr:`4565` by `Snehashish06 <https://github.com/Snehashish06>`_, :pr:`4573`)
+- Documentation Improvements (:pr:`4565` by Snehashish06, :pr:`4573`)
 
 Version 21.7
 ============

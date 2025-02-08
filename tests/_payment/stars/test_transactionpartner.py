@@ -114,9 +114,6 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
         assert transaction_partner.api_kwargs == {}
         assert transaction_partner.type == "unknown"
 
-        assert TransactionPartner.de_json(None, offline_bot) is None
-        assert TransactionPartner.de_json({}, offline_bot) is None
-
     @pytest.mark.parametrize(
         ("tp_type", "subclass"),
         [
@@ -191,9 +188,6 @@ class TestTransactionPartnerAffiliateProgramWithoutRequest(TransactionPartnerTes
         assert tp.commission_per_mille == self.commission_per_mille
         assert tp.sponsor_user == self.sponsor_user
 
-        assert TransactionPartnerAffiliateProgram.de_json(None, offline_bot) is None
-        assert TransactionPartnerAffiliateProgram.de_json({}, offline_bot) is None
-
     def test_to_dict(self, transaction_partner_affiliate_program):
         json_dict = transaction_partner_affiliate_program.to_dict()
         assert json_dict["type"] == self.type
@@ -242,8 +236,6 @@ class TestTransactionPartnerFragmentWithoutRequest(TransactionPartnerTestBase):
         assert tp.api_kwargs == {}
         assert tp.type == "fragment"
         assert tp.withdrawal_state == self.withdrawal_state
-
-        assert TransactionPartnerFragment.de_json(None, offline_bot) is None
 
     def test_to_dict(self, transaction_partner_fragment):
         json_dict = transaction_partner_fragment.to_dict()
@@ -303,9 +295,6 @@ class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
         assert tp.paid_media_payload == self.paid_media_payload
         assert tp.subscription_period == self.subscription_period
 
-        assert TransactionPartnerUser.de_json(None, offline_bot) is None
-        assert TransactionPartnerUser.de_json({}, offline_bot) is None
-
     def test_to_dict(self, transaction_partner_user):
         json_dict = transaction_partner_user.to_dict()
         assert json_dict["type"] == self.type
@@ -355,8 +344,6 @@ class TestTransactionPartnerOtherWithoutRequest(TransactionPartnerTestBase):
         assert tp.api_kwargs == {}
         assert tp.type == "other"
 
-        assert TransactionPartnerOther.de_json(None, offline_bot) is None
-
     def test_to_dict(self, transaction_partner_other):
         json_dict = transaction_partner_other.to_dict()
         assert json_dict == {"type": self.type}
@@ -396,8 +383,6 @@ class TestTransactionPartnerTelegramAdsWithoutRequest(TransactionPartnerTestBase
         tp = TransactionPartnerTelegramAds.de_json(json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "telegram_ads"
-
-        assert TransactionPartnerTelegramAds.de_json(None, offline_bot) is None
 
     def test_to_dict(self, transaction_partner_telegram_ads):
         json_dict = transaction_partner_telegram_ads.to_dict()
@@ -441,8 +426,6 @@ class TestTransactionPartnerTelegramApiWithoutRequest(TransactionPartnerTestBase
         assert tp.api_kwargs == {}
         assert tp.type == "telegram_api"
         assert tp.request_count == self.request_count
-
-        assert TransactionPartnerTelegramApi.de_json(None, offline_bot) is None
 
     def test_to_dict(self, transaction_partner_telegram_api):
         json_dict = transaction_partner_telegram_api.to_dict()

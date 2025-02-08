@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -84,16 +84,11 @@ class UsersShared(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["UsersShared"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UsersShared":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["users"] = SharedUser.de_list(data.get("users"), bot)
+        data["users"] = de_list_optional(data.get("users"), SharedUser, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -175,16 +170,11 @@ class ChatShared(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ChatShared"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatShared":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
         return super().de_json(data=data, bot=bot)
 
 
@@ -255,14 +245,9 @@ class SharedUser(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["SharedUser"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SharedUser":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
         return super().de_json(data=data, bot=bot)

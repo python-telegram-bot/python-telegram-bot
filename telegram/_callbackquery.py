@@ -26,8 +26,9 @@ from telegram._files.location import Location
 from telegram._message import MaybeInaccessibleMessage, Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import JSONDict, ODVInput, ReplyMarkup, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import (
@@ -149,17 +150,12 @@ class CallbackQuery(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["CallbackQuery"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "CallbackQuery":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["from_user"] = User.de_json(data.pop("from", None), bot)
-        data["message"] = Message.de_json(data.get("message"), bot)
+        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
+        data["message"] = de_json_optional(data.get("message"), Message, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -168,7 +164,7 @@ class CallbackQuery(TelegramObject):
         text: Optional[str] = None,
         show_alert: Optional[bool] = None,
         url: Optional[str] = None,
-        cache_time: Optional[int] = None,
+        cache_time: Optional[TimePeriod] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -475,7 +471,7 @@ class CallbackQuery(TelegramObject):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

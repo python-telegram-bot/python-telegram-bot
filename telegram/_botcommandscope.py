@@ -84,9 +84,7 @@ class BotCommandScope(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["BotCommandScope"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BotCommandScope":
         """Converts JSON data to the appropriate :class:`BotCommandScope` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -103,9 +101,6 @@ class BotCommandScope(TelegramObject):
 
         """
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         _class_mapping: dict[str, type[BotCommandScope]] = {
             cls.DEFAULT: BotCommandScopeDefault,

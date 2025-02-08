@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import os
 from pathlib import Path
 
@@ -157,7 +158,7 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_video_note_local_files(
-        self, monkeypatch, offline_bot, chat_id, local_mode
+        self, monkeypatch, offline_bot, chat_id, local_mode, dummy_message_dict
     ):
         try:
             offline_bot._local_mode = local_mode
@@ -176,6 +177,7 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
                     test_flag = isinstance(data.get("video_note"), InputFile) and isinstance(
                         data.get("thumbnail"), InputFile
                     )
+                return dummy_message_dict
 
             monkeypatch.setattr(offline_bot, "_post", make_assertion)
             await offline_bot.send_video_note(chat_id, file, thumbnail=file)
@@ -223,11 +225,14 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
 
 
 class TestVideoNoteWithRequest(VideoNoteTestBase):
-    async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
+    @pytest.mark.parametrize("duration", [3, dtm.timedelta(seconds=3)])
+    async def test_send_all_args(
+        self, bot, chat_id, video_note_file, video_note, thumb_file, duration
+    ):
         message = await bot.send_video_note(
             chat_id,
             video_note_file,
-            duration=self.duration,
+            duration=duration,
             length=self.length,
             disable_notification=False,
             protect_content=True,

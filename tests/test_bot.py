@@ -43,6 +43,7 @@ from telegram import (
     Chat,
     ChatAdministratorRights,
     ChatFullInfo,
+    ChatInviteLink,
     ChatPermissions,
     Dice,
     InlineKeyboardButton,
@@ -104,6 +105,7 @@ from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
 
 from .auxil.build_messages import make_message
+from .auxil.dummy_objects import get_dummy_object
 
 
 @pytest.fixture
@@ -191,7 +193,7 @@ def bot_methods(ext_bot=True, include_camel_case=False, include_do_api_request=F
             ids.append(f"{cls.__name__}.{name}")
 
     return pytest.mark.parametrize(
-        argnames="bot_class, bot_method_name,bot_method", argvalues=arg_values, ids=ids
+        argnames=("bot_class", "bot_method_name", "bot_method"), argvalues=arg_values, ids=ids
     )
 
 
@@ -233,7 +235,9 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     def test_slot_behaviour(self, bot_class, offline_bot):
-        inst = bot_class(offline_bot.token)
+        inst = bot_class(
+            offline_bot.token, request=OfflineRequest(1), get_updates_request=OfflineRequest(1)
+        )
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -241,6 +245,71 @@ class TestBotWithoutRequest:
     async def test_no_token_passed(self):
         with pytest.raises(InvalidToken, match="You must pass the token"):
             Bot("")
+
+    def test_base_url_parsing_basic(self, caplog):
+        with caplog.at_level(logging.DEBUG):
+            bot = Bot(
+                token="!!Test String!!",
+                base_url="base/",
+                base_file_url="base/",
+                request=OfflineRequest(1),
+                get_updates_request=OfflineRequest(1),
+            )
+
+        assert bot.base_url == "base/!!Test String!!"
+        assert bot.base_file_url == "base/!!Test String!!"
+
+        assert len(caplog.records) >= 2
+        messages = [record.getMessage() for record in caplog.records]
+        assert "Set Bot API URL: base/!!Test String!!" in messages
+        assert "Set Bot API File URL: base/!!Test String!!" in messages
+
+    @pytest.mark.parametrize(
+        "insert_key", ["token", "TOKEN", "bot_token", "BOT_TOKEN", "bot-token", "BOT-TOKEN"]
+    )
+    def test_base_url_parsing_string_format(self, insert_key, caplog):
+        string = f"{{{insert_key}}}"
+
+        with caplog.at_level(logging.DEBUG):
+            bot = Bot(
+                token="!!Test String!!",
+                base_url=string,
+                base_file_url=string,
+                request=OfflineRequest(1),
+                get_updates_request=OfflineRequest(1),
+            )
+
+        assert bot.base_url == "!!Test String!!"
+        assert bot.base_file_url == "!!Test String!!"
+
+        assert len(caplog.records) >= 2
+        messages = [record.getMessage() for record in caplog.records]
+        assert "Set Bot API URL: !!Test String!!" in messages
+        assert "Set Bot API File URL: !!Test String!!" in messages
+
+        with pytest.raises(KeyError, match="unsupported insertion: unknown"):
+            Bot("token", base_url="{unknown}{token}")
+
+    def test_base_url_parsing_callable(self, caplog):
+        def build_url(_: str) -> str:
+            return "!!Test String!!"
+
+        with caplog.at_level(logging.DEBUG):
+            bot = Bot(
+                token="some-token",
+                base_url=build_url,
+                base_file_url=build_url,
+                request=OfflineRequest(1),
+                get_updates_request=OfflineRequest(1),
+            )
+
+        assert bot.base_url == "!!Test String!!"
+        assert bot.base_file_url == "!!Test String!!"
+
+        assert len(caplog.records) >= 2
+        messages = [record.getMessage() for record in caplog.records]
+        assert "Set Bot API URL: !!Test String!!" in messages
+        assert "Set Bot API File URL: !!Test String!!" in messages
 
     async def test_repr(self):
         offline_bot = Bot(token="some_token", base_file_url="")
@@ -407,9 +476,10 @@ class TestBotWithoutRequest:
         ("cls", "logger_name"), [(Bot, "telegram.Bot"), (ExtBot, "telegram.ext.ExtBot")]
     )
     async def test_bot_method_logging(self, offline_bot: PytestExtBot, cls, logger_name, caplog):
+        instance = cls(offline_bot.token)
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
-            await cls(offline_bot.token).get_me()
+            await instance.get_me()
             # Only for stabilizing this test-
             if len(caplog.records) == 4:
                 for idx, record in enumerate(caplog.records):
@@ -487,17 +557,11 @@ class TestBotWithoutRequest:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
-        # Mocking get_me within check_defaults_handling messes with the cached values like
-        # Bot.{bot, username, id, …}` unless we return the expected User object.
-        return_value = (
-            offline_bot.bot if bot_method_name.lower().replace("_", "") == "getme" else None
-        )
-
         # Check that ExtBot does the right thing
         bot_method = getattr(offline_bot, bot_method_name)
         raw_bot_method = getattr(raw_bot, bot_method_name)
-        assert await check_defaults_handling(bot_method, offline_bot, return_value=return_value)
-        assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
+        assert await check_defaults_handling(bot_method, offline_bot)
+        assert await check_defaults_handling(raw_bot_method, raw_bot)
 
     @pytest.mark.parametrize(
         ("name", "method"), inspect.getmembers(Bot, predicate=inspect.isfunction)
@@ -723,11 +787,14 @@ class TestBotWithoutRequest:
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     @pytest.mark.parametrize("button_type", ["start", "web_app"])
-    async def test_answer_inline_query(self, monkeypatch, offline_bot, raw_bot, button_type):
+    @pytest.mark.parametrize("cache_time", [74, dtm.timedelta(seconds=74)])
+    async def test_answer_inline_query(
+        self, monkeypatch, offline_bot, raw_bot, button_type, cache_time
+    ):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             expected = {
-                "cache_time": 300,
+                "cache_time": 74,
                 "results": [
                     {
                         "title": "first",
@@ -807,7 +874,7 @@ class TestBotWithoutRequest:
             assert await bot_type.answer_inline_query(
                 1234,
                 results=results,
-                cache_time=300,
+                cache_time=cache_time,
                 is_personal=True,
                 next_offset="42",
                 button=button,
@@ -1263,21 +1330,22 @@ class TestBotWithoutRequest:
         assert await offline_bot.set_chat_administrator_custom_title(2, 32, "custom_title")
 
     # TODO: Needs improvement. Need an incoming callbackquery to test
-    async def test_answer_callback_query(self, monkeypatch, offline_bot):
+    @pytest.mark.parametrize("cache_time", [74, dtm.timedelta(seconds=74)])
+    async def test_answer_callback_query(self, monkeypatch, offline_bot, cache_time):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters == {
                 "callback_query_id": 23,
                 "show_alert": True,
                 "url": "no_url",
-                "cache_time": 1,
+                "cache_time": 74,
                 "text": "answer",
             }
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
         assert await offline_bot.answer_callback_query(
-            23, text="answer", show_alert=True, url="no_url", cache_time=1
+            23, text="answer", show_alert=True, url="no_url", cache_time=cache_time
         )
 
     @pytest.mark.parametrize("drop_pending_updates", [True, False])
@@ -1432,7 +1500,9 @@ class TestBotWithoutRequest:
         )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_set_chat_photo_local_files(self, monkeypatch, offline_bot, chat_id, local_mode):
+    async def test_set_chat_photo_local_files(
+        self, dummy_message_dict, monkeypatch, offline_bot, chat_id, local_mode
+    ):
         try:
             offline_bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local Bot API set up
@@ -1628,7 +1698,7 @@ class TestBotWithoutRequest:
         message = Message(
             1,
             dtm.datetime.utcnow(),
-            None,
+            get_dummy_object(Chat),
             reply_markup=offline_bot.callback_data_cache.process_keyboard(reply_markup),
         )
         message._unfreeze()
@@ -1642,7 +1712,7 @@ class TestBotWithoutRequest:
                     message_type: Message(
                         1,
                         dtm.datetime.utcnow(),
-                        None,
+                        get_dummy_object(Chat),
                         pinned_message=message,
                         reply_to_message=Message.de_json(message.to_dict(), offline_bot),
                     )
@@ -1785,7 +1855,7 @@ class TestBotWithoutRequest:
         message = Message(
             1,
             dtm.datetime.utcnow(),
-            None,
+            get_dummy_object(Chat),
             reply_markup=reply_markup,
             via_bot=bot.bot if self_sender else User(1, "first", False),
         )
@@ -2228,14 +2298,32 @@ class TestBotWithoutRequest:
             api_kwargs={"chat_id": 2, "user_id": 32, "until_date": until_timestamp},
         )
 
-    async def test_business_connection_id_argument(self, offline_bot, monkeypatch):
+    async def test_business_connection_id_argument(
+        self, offline_bot, monkeypatch, dummy_message_dict
+    ):
         """We can't connect to a business acc, so we just test that the correct data is passed.
         We also can't test every single method easily, so we just test a few. Our linting will
         catch any unused args with the others."""
+        return_values = asyncio.Queue()
+        await return_values.put(dummy_message_dict)
+        await return_values.put(
+            Poll(
+                id="42",
+                question="question",
+                options=[PollOption("option", 0)],
+                total_voter_count=5,
+                is_closed=True,
+                is_anonymous=True,
+                type="regular",
+                allows_multiple_answers=False,
+            ).to_dict()
+        )
+        await return_values.put(True)
+        await return_values.put(True)
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters.get("business_connection_id") == 42
-            return {}
+            return await return_values.get()
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
@@ -2348,6 +2436,9 @@ class TestBotWithoutRequest:
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters.get("subscription_period") == 2592000
             assert request_data.parameters.get("subscription_price") == 6
+            return ChatInviteLink(
+                "https://t.me/joinchat/invite_link", User(1, "first", False), False, False, False
+            ).to_dict()
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
@@ -2696,7 +2787,9 @@ class TestBotWithRequest:
         assert quiz_task.done()
 
     @pytest.mark.parametrize(
-        ("open_period", "close_date"), [(5, None), (None, True)], ids=["open_period", "close_date"]
+        ("open_period", "close_date"),
+        [(5, None), (dtm.timedelta(seconds=5), None), (None, True)],
+        ids=["open_period", "open_period-dtm", "close_date"],
     )
     async def test_send_open_period(self, bot, super_group_id, open_period, close_date):
         question = "Is this a test?"
@@ -4398,13 +4491,14 @@ class TestBotWithRequest:
         assert isinstance(transactions, StarTransactions)
         assert len(transactions.transactions) == 0
 
+    @pytest.mark.parametrize("subscription_period", [2592000, dtm.timedelta(days=30)])
     async def test_create_edit_chat_subscription_link(
-        self, bot, subscription_channel_id, channel_id
+        self, bot, subscription_channel_id, channel_id, subscription_period
     ):
         sub_link = await bot.create_chat_subscription_invite_link(
             subscription_channel_id,
             name="sub_name",
-            subscription_period=2592000,
+            subscription_period=subscription_period,
             subscription_price=13,
         )
         assert sub_link.name == "sub_name"

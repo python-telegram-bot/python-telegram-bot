@@ -47,6 +47,7 @@ from telegram import (
     PreCheckoutQuery,
     ReactionCount,
     ReactionTypeEmoji,
+    ShippingAddress,
     ShippingQuery,
     Update,
     User,
@@ -158,7 +159,11 @@ params = [
     {"edited_channel_post": channel_post},
     {"inline_query": InlineQuery(1, User(1, "", False), "", "")},
     {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
-    {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
+    {
+        "shipping_query": ShippingQuery(
+            "id", User(1, "", False), "", ShippingAddress("", "", "", "", "", "")
+        )
+    },
     {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
     {"poll": Poll("id", "?", [PollOption(".", 1)], False, False, False, Poll.REGULAR, True)},
     {
@@ -251,11 +256,6 @@ class TestUpdateWithoutRequest(UpdateTestBase):
                 i += 1
                 assert getattr(update, _type) == paramdict[_type]
         assert i == 1
-
-    def test_update_de_json_empty(self, offline_bot):
-        update = Update.de_json(None, offline_bot)
-
-        assert update is None
 
     def test_to_dict(self, update):
         update_dict = update.to_dict()

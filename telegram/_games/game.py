@@ -24,7 +24,7 @@ from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
 
@@ -124,16 +124,13 @@ class Game(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Game"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Game":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
-        data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
-        data["animation"] = Animation.de_json(data.get("animation"), bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
+        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
+        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
 
         return super().de_json(data=data, bot=bot)
 

@@ -68,9 +68,7 @@ class RevenueWithdrawalState(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["RevenueWithdrawalState"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "RevenueWithdrawalState":
         """Converts JSON data to the appropriate :class:`RevenueWithdrawalState` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -83,9 +81,6 @@ class RevenueWithdrawalState(TelegramObject):
 
         """
         data = cls._parse_data(data)
-
-        if (cls is RevenueWithdrawalState and not data) or data is None:
-            return None
 
         _class_mapping: dict[str, type[RevenueWithdrawalState]] = {
             cls.PENDING: RevenueWithdrawalStatePending,
@@ -156,13 +151,10 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["RevenueWithdrawalStateSucceeded"]:
+        cls, data: JSONDict, bot: Optional["Bot"] = None
+    ) -> "RevenueWithdrawalStateSucceeded":
         """See :meth:`telegram.RevenueWithdrawalState.de_json`."""
         data = cls._parse_data(data)
-
-        if not data:
-            return None
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)

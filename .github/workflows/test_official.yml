@@ -11,6 +11,8 @@ on:
     # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
     - cron: '7 3 * * 1,5'
 
+permissions: {}
+
 jobs:
   check-conformity:
     name: check-conformity
@@ -25,7 +27,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies

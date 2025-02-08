@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Final, Literal, Optional, Union
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
+from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -77,17 +78,9 @@ class ReactionType(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ReactionType"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReactionType":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
-
-        if data is None:
-            return None
-
-        if not data and cls is ReactionType:
-            return None
 
         _class_mapping: dict[str, type[ReactionType]] = {
             cls.EMOJI: ReactionTypeEmoji,
@@ -230,15 +223,10 @@ class ReactionCount(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
-    ) -> Optional["ReactionCount"]:
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReactionCount":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        if not data:
-            return None
-
-        data["type"] = ReactionType.de_json(data.get("type"), bot)
+        data["type"] = de_json_optional(data.get("type"), ReactionType, bot)
 
         return super().de_json(data=data, bot=bot)

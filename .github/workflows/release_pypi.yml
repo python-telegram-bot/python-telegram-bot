@@ -4,19 +4,24 @@ on:
   # manually trigger the workflow
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   build:
     name: Build Distribution
     runs-on: ubuntu-latest
     outputs:
       TAG: ${{ steps.get_tag.outputs.TAG }}
+    permissions:
+      # for uploading artifacts
+      actions: write
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: "3.x"
       - name: Install pypa/build
@@ -46,6 +51,7 @@ jobs:
       url: https://pypi.org/p/python-telegram-bot
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
+      actions: read  # for downloading artifacts
 
     steps:
       - name: Download all the dists
@@ -64,6 +70,7 @@ jobs:
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for sigstore
+      actions: write  # for up/downloading artifacts
 
     steps:
       - name: Download all the dists
@@ -100,6 +107,7 @@ jobs:
 
     permissions:
       contents: write  # IMPORTANT: mandatory for making GitHub Releases
+      actions: read  # for downloading artifacts
 
     steps:
       - name: Download all the dists
