@@ -4631,8 +4631,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
         Whenever there is an update for the bot, Telegram will send an HTTPS POST request to the
-        specified url, containing An Update. In case of an unsuccessful request,
-        Telegram will give up after a reasonable amount of attempts.
+        specified url, containing An Update. In case of an unsuccessful request
+        (a request with response
+        `HTTP status code <https://en.wikipedia.org/wiki/List_of_HTTP_status_codes>`_different
+        from ``2XY``),
+        Telegram will repeat the request and give up after a reasonable amount of attempts.
 
         If you'd like to make sure that the Webhook was set by you, you can specify secret data in
         the parameter :paramref:`secret_token`. If specified, the request will contain a header
@@ -6964,7 +6967,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.constants.StickerFormat.STATIC` for a
                 ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
                 for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a
-                WEBM video.
+                ``.WEBM`` video.
 
                 .. versionadded:: 21.1
 
@@ -6978,7 +6981,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
                 kilobytes in size; see
                 `the docs <https://core.telegram.org/stickers#animation-requirements>`_ for
-                animated sticker technical requirements, or a **.WEBM** video with the thumbnail up
+                animated sticker technical requirements, or a ``.WEBM`` video with the thumbnail up
                 to :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
                 kilobytes in size; see
                 `this <https://core.telegram.org/stickers#video-requirements>`_ for video sticker
@@ -9905,7 +9908,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Verifies a chat on behalf of the organization which is represented by the bot.
+        """Verifies a chat |org-verify| which is represented by the bot.
 
         .. versionadded:: 21.10
 
@@ -9947,7 +9950,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Verifies a user on behalf of the organization which is represented by the bot.
+        """Verifies a user |org-verify| which is represented by the bot.
 
         .. versionadded:: 21.10
 
@@ -9988,8 +9991,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Removes verification from a chat that is currently verified on behalf of the
-        organization represented by the bot.
+        """Removes verification from a chat that is currently verified |org-verify|
+        represented by the bot.
 
 
 
@@ -10027,8 +10030,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Removes verification from a user who is currently verified on behalf of the
-        organization represented by the bot.
+        """Removes verification from a user who is currently verified |org-verify|
+        represented by the bot.
 
 
 
