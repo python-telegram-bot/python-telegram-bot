@@ -16,10 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import Bot, File, PassportElementError, PassportFile
-from telegram.warnings import PTBDeprecationWarning
+from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -44,7 +46,7 @@ class PassportFileTestBase:
     file_id = "data"
     file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_size = 50
-    file_date = 1532879128
+    file_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
 class TestPassportFileWithoutRequest(PassportFileTestBase):
@@ -67,7 +69,27 @@ class TestPassportFileWithoutRequest(PassportFileTestBase):
         assert passport_file_dict["file_id"] == passport_file.file_id
         assert passport_file_dict["file_unique_id"] == passport_file.file_unique_id
         assert passport_file_dict["file_size"] == passport_file.file_size
-        assert passport_file_dict["file_date"] == passport_file.file_date
+        assert passport_file_dict["file_date"] == to_timestamp(passport_file.file_date)
+
+    def test_de_json_localization(self, passport_file, tz_bot, offline_bot, raw_bot):
+        json_dict = {
+            "file_id": self.file_id,
+            "file_unique_id": self.file_unique_id,
+            "file_size": self.file_size,
+            "file_date": to_timestamp(self.file_date),
+        }
+
+        pf = PassportFile.de_json(json_dict, offline_bot)
+        pf_raw = PassportFile.de_json(json_dict, raw_bot)
+        pf_tz = PassportFile.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        date_offset = pf_tz.file_date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(pf_tz.file_date.replace(tzinfo=None))
+
+        assert pf_raw.file_date.tzinfo == UTC
+        assert pf.file_date.tzinfo == UTC
+        assert date_offset == tz_bot_offset
 
     def test_equality(self):
         a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)
@@ -88,16 +110,6 @@ class TestPassportFileWithoutRequest(PassportFileTestBase):
 
         assert a != e
         assert hash(a) != hash(e)
-
-    def test_file_date_deprecated(self, passport_file, recwarn):
-        passport_file.file_date
-        assert len(recwarn) == 1
-        assert (
-            "The attribute `file_date` will return a datetime instead of an integer in future"
-            " major versions." in str(recwarn[0].message)
-        )
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__
 
     async def test_get_file_instance_method(self, monkeypatch, passport_file):
         async def make_assertion(*_, **kwargs):

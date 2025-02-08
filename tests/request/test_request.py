@@ -45,10 +45,9 @@ from telegram.error import (
     TelegramError,
     TimedOut,
 )
-from telegram.request import BaseRequest, RequestData
+from telegram.request import RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
@@ -390,76 +389,6 @@ class TestRequestWithoutRequest:
         )
         assert self.test_flag == (1, 2, 3, 4)
 
-    def test_read_timeout_not_implemented(self):
-        class SimpleRequest(BaseRequest):
-            async def do_request(self, *args, **kwargs):
-                raise httpx.ReadTimeout("read timeout")
-
-            async def initialize(self) -> None:
-                pass
-
-            async def shutdown(self) -> None:
-                pass
-
-        with pytest.raises(NotImplementedError):
-            SimpleRequest().read_timeout
-
-    @pytest.mark.parametrize("media", [True, False])
-    async def test_timeout_propagation_write_timeout(
-        self, monkeypatch, media, input_media_photo, recwarn  # noqa: F811
-    ):
-        class CustomRequest(BaseRequest):
-            async def initialize(self_) -> None:
-                pass
-
-            async def shutdown(self_) -> None:
-                pass
-
-            async def do_request(self_, *args, **kwargs) -> tuple[int, bytes]:
-                self.test_flag = (
-                    kwargs.get("read_timeout"),
-                    kwargs.get("connect_timeout"),
-                    kwargs.get("write_timeout"),
-                    kwargs.get("pool_timeout"),
-                )
-                return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
-
-        custom_request = CustomRequest()
-        data = {"string": "string", "int": 1, "float": 1.0}
-        if media:
-            data["media"] = input_media_photo
-        request_data = RequestData(
-            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
-        )
-
-        # First make sure that custom timeouts are always respected
-        await custom_request.post(
-            "url", request_data, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
-        )
-        assert self.test_flag == (1, 2, 3, 4)
-
-        # Now also ensure that the default timeout for media requests is 20 seconds
-        await custom_request.post("url", request_data)
-        assert self.test_flag == (
-            DEFAULT_NONE,
-            DEFAULT_NONE,
-            20 if media else DEFAULT_NONE,
-            DEFAULT_NONE,
-        )
-
-        print("warnings")
-        for entry in recwarn:
-            print(entry.message)
-        if media:
-            assert len(recwarn) == 1
-            assert "will default to `BaseRequest.DEFAULT_NONE` instead of 20" in str(
-                recwarn[0].message
-            )
-            assert recwarn[0].category is PTBDeprecationWarning
-            assert recwarn[0].filename == __file__
-        else:
-            assert len(recwarn) == 0
-
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestHTTPXRequestWithoutRequest:
@@ -469,9 +398,7 @@ class TestHTTPXRequestWithoutRequest:
     def _reset(self):
         self.test_flag = None
 
-    # We parametrize this to make sure that the legacy `proxy_url` argument is still supported
-    @pytest.mark.parametrize("proxy_argument", ["proxy", "proxy_url"])
-    def test_init(self, monkeypatch, proxy_argument):
+    def test_init(self, monkeypatch):
         @dataclass
         class Client:
             timeout: object
@@ -492,31 +419,19 @@ class TestHTTPXRequestWithoutRequest:
         assert request._client.http1 is True
         assert not request._client.http2
 
-        kwargs = {
-            "connection_pool_size": 42,
-            proxy_argument: "proxy",
-            "connect_timeout": 43,
-            "read_timeout": 44,
-            "write_timeout": 45,
-            "pool_timeout": 46,
-        }
-        request = HTTPXRequest(**kwargs)
+        request = HTTPXRequest(
+            connection_pool_size=42,
+            proxy="proxy",
+            connect_timeout=43,
+            read_timeout=44,
+            write_timeout=45,
+            pool_timeout=46,
+        )
         assert request._client.proxy == "proxy"
         assert request._client.limits == httpx.Limits(
             max_connections=42, max_keepalive_connections=42
         )
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
-
-    def test_proxy_mutually_exclusive(self):
-        with pytest.raises(ValueError, match="mutually exclusive"):
-            HTTPXRequest(proxy="proxy", proxy_url="proxy_url")
-
-    def test_proxy_url_deprecation_warning(self, recwarn):
-        HTTPXRequest(proxy_url="http://127.0.0.1:3128")
-        assert len(recwarn) == 1
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert "`proxy_url` is deprecated" in str(recwarn[0].message)
-        assert recwarn[0].filename == __file__, "incorrect stacklevel"
 
     async def test_multiple_inits_and_shutdowns(self, monkeypatch):
         self.test_flag = defaultdict(int)
@@ -728,7 +643,7 @@ class TestHTTPXRequestWithoutRequest:
 
     @pytest.mark.parametrize("media", [True, False])
     async def test_do_request_write_timeout(
-        self, monkeypatch, media, httpx_request, input_media_photo, recwarn  # noqa: F811
+        self, monkeypatch, media, httpx_request, input_media_photo  # noqa: F811
     ):
         async def request(_, **kwargs):
             self.test_flag = kwargs.get("timeout")
@@ -752,10 +667,6 @@ class TestHTTPXRequestWithoutRequest:
         # Now also ensure that the default timeout for media requests is 20 seconds
         await httpx_request.post("url", request_data)
         assert self.test_flag == httpx.Timeout(read=5, connect=5, write=20 if media else 5, pool=1)
-
-        # Just for double-checking, since warnings are issued for implementations of BaseRequest
-        # other than HTTPXRequest
-        assert len(recwarn) == 0
 
     @pytest.mark.parametrize("init", [True, False])
     async def test_setting_media_write_timeout(

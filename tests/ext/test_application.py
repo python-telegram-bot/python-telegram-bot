@@ -1516,49 +1516,6 @@ class TestApplication:
                 found_log = True
         assert found_log
 
-    @pytest.mark.parametrize(
-        "timeout_name",
-        ["read_timeout", "connect_timeout", "write_timeout", "pool_timeout", "poll_interval"],
-    )
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Can't send signals without stopping whole process on windows",
-    )
-    def test_run_polling_timeout_deprecation_warnings(
-        self, timeout_name, monkeypatch, recwarn, app
-    ):
-        def thread_target():
-            waited = 0
-            while not app.running:
-                time.sleep(0.05)
-                waited += 0.05
-                if waited > 5:
-                    pytest.fail("App apparently won't start")
-
-            time.sleep(0.05)
-
-            os.kill(os.getpid(), signal.SIGINT)
-
-        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
-
-        thread = Thread(target=thread_target)
-        thread.start()
-
-        kwargs = {timeout_name: 42}
-        app.run_polling(drop_pending_updates=True, close_loop=False, **kwargs)
-        thread.join()
-
-        if timeout_name == "poll_interval":
-            assert len(recwarn) == 0
-            return
-
-        assert len(recwarn) == 1
-        assert "Setting timeouts via `Application.run_polling` is deprecated." in str(
-            recwarn[0].message
-        )
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
-
     @pytest.mark.skipif(
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",

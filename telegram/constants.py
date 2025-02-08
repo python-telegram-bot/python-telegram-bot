@@ -1372,6 +1372,12 @@ class InlineQueryLimit(IntEnum):
     of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
+
+    .. versionchanged:: NEXT.VERSION
+        Removed deprecated attributes ``InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH`` and
+        ``InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH``. Please instead use
+        :attr:`InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH` and
+        :attr:`InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`.
     """
 
     __slots__ = ()
@@ -1386,22 +1392,6 @@ class InlineQueryLimit(IntEnum):
     MAX_QUERY_LENGTH = 256
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.InlineQuery.query` parameter of :class:`telegram.InlineQuery`."""
-    MIN_SWITCH_PM_TEXT_LENGTH = 1
-    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
-    :meth:`telegram.Bot.answer_inline_query`.
-
-    .. deprecated:: 20.3
-        Deprecated in favor of :attr:`InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`.
-    """
-    MAX_SWITCH_PM_TEXT_LENGTH = 64
-    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
-    :meth:`telegram.Bot.answer_inline_query`.
-
-    .. deprecated:: 20.3
-        Deprecated in favor of :attr:`InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`.
-    """
 
 
 class InlineQueryResultLimit(IntEnum):
@@ -1434,12 +1424,12 @@ class InlineQueryResultsButtonLimit(IntEnum):
 
     __slots__ = ()
 
-    MIN_START_PARAMETER_LENGTH = InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH
+    MIN_START_PARAMETER_LENGTH = 1
     """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.InlineQueryResultsButton.start_parameter` parameter of
     :meth:`telegram.InlineQueryResultsButton`."""
 
-    MAX_START_PARAMETER_LENGTH = InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH
+    MAX_START_PARAMETER_LENGTH = 64
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.InlineQueryResultsButton.start_parameter` parameter of
     :meth:`telegram.InlineQueryResultsButton`."""

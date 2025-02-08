@@ -95,7 +95,7 @@ from telegram.error import BadRequest, EndPointNotFound, InvalidToken
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTIONS
@@ -681,7 +681,7 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize(
         "default_bot",
-        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        [{"parse_mode": "Markdown", "link_preview_options": LinkPreviewOptions(is_disabled=True)}],
         indirect=True,
     )
     @pytest.mark.parametrize(
@@ -976,7 +976,7 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize(
         "default_bot",
-        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        [{"parse_mode": "Markdown", "link_preview_options": LinkPreviewOptions(is_disabled=True)}],
         indirect=True,
     )
     async def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
@@ -2255,6 +2255,10 @@ class TestBotWithoutRequest:
                 )
                 return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
 
+            @property
+            def read_timeout(self):
+                return 1
+
         custom_request = CustomRequest()
 
         offline_bot = Bot(offline_bot.token, request=custom_request)
@@ -2269,7 +2273,7 @@ class TestBotWithoutRequest:
         assert test_flag == (
             DEFAULT_NONE,
             DEFAULT_NONE,
-            20,
+            DEFAULT_NONE,
             DEFAULT_NONE,
         )
 
@@ -3218,36 +3222,6 @@ class TestBotWithRequest:
         assert isinstance(updates, tuple)
         if updates:
             assert isinstance(updates[0], Update)
-
-    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
-    async def test_get_updates_read_timeout_deprecation_warning(
-        self, bot, recwarn, monkeypatch, bot_class
-    ):
-        # Using the normal HTTPXRequest should not issue any warnings
-        await bot.get_updates()
-        assert len(recwarn) == 0
-
-        # Now let's test deprecation warning when using get_updates for other BaseRequest
-        # subclasses (we just monkeypatch the existing HTTPXRequest for this)
-        read_timeout = None
-
-        async def catch_timeouts(*args, **kwargs):
-            nonlocal read_timeout
-            read_timeout = kwargs.get("read_timeout")
-            return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
-
-        monkeypatch.setattr(HTTPXRequest, "read_timeout", BaseRequest.read_timeout)
-        monkeypatch.setattr(HTTPXRequest, "do_request", catch_timeouts)
-
-        bot = bot_class(get_updates_request=HTTPXRequest(), token=bot.token)
-        await bot.get_updates()
-
-        assert len(recwarn) == 1
-        assert "does not override the property `read_timeout`" in str(recwarn[0].message)
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
-
-        assert read_timeout == 2
 
     @pytest.mark.parametrize(
         ("read_timeout", "timeout", "expected"),
@@ -4209,7 +4183,7 @@ class TestBotWithRequest:
                 ]
             )
             await poll_message.stop_poll(reply_markup=reply_markup)
-            helper_message = await poll_message.reply_text("temp", quote=True)
+            helper_message = await poll_message.reply_text("temp", do_quote=True)
             message = helper_message.reply_to_message
             inline_keyboard = message.reply_markup.inline_keyboard
 
