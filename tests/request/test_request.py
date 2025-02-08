@@ -45,7 +45,7 @@ from telegram.error import (
     TelegramError,
     TimedOut,
 )
-from telegram.request import BaseRequest, RequestData
+from telegram.request import RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
@@ -388,20 +388,6 @@ class TestRequestWithoutRequest:
             "url", None, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
         )
         assert self.test_flag == (1, 2, 3, 4)
-
-    def test_read_timeout_not_implemented(self):
-        class SimpleRequest(BaseRequest):
-            async def do_request(self, *args, **kwargs):
-                raise httpx.ReadTimeout("read timeout")
-
-            async def initialize(self) -> None:
-                pass
-
-            async def shutdown(self) -> None:
-                pass
-
-        with pytest.raises(NotImplementedError):
-            SimpleRequest().read_timeout
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")

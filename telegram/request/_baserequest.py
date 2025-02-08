@@ -131,22 +131,19 @@ class BaseRequest(
         await self.shutdown()
 
     @property
+    @abc.abstractmethod
     def read_timeout(self) -> Optional[float]:
         """This property must return the default read timeout in seconds used by this class.
         More precisely, the returned value should be the one used when
         :paramref:`post.read_timeout` of :meth:post` is not passed/equal to :attr:`DEFAULT_NONE`.
 
         .. versionadded:: 20.7
-
-        Warning:
-            For now this property does not need to be implemented by subclasses and will raise
-            :exc:`NotImplementedError` if accessed without being overridden. However, in future
-            versions, this property will be abstract and must be implemented by subclasses.
+        .. versionchanged:: NEXT.VERSION
+            This property is now required to be implemented by subclasses.
 
         Returns:
             :obj:`float` | :obj:`None`: The read timeout in seconds.
         """
-        raise NotImplementedError
 
     @abc.abstractmethod
     async def initialize(self) -> None:
