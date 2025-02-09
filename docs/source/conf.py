@@ -8,6 +8,11 @@ from pathlib import Path
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 from sphinx.application import Sphinx
 
+if sys.version_info < (3, 12):
+    # Due to dependency on chango
+    raise RuntimeError("This documentation needs at least Python 3.12")
+
+
 sys.path.insert(0, str(Path("../..").resolve().absolute()))
 
 # -- General configuration ------------------------------------------------
@@ -36,6 +41,7 @@ needs_sphinx = "8.1.3"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "chango.sphinx_ext",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
@@ -51,6 +57,9 @@ extensions = [
 # Temporary. See #4387
 if os.environ.get("READTHEDOCS", "") == "True":
     extensions.append("sphinx_build_compatibility.extension")
+
+# Configuration for the chango sphinx directive
+chango_pyproject_toml_path = Path(__file__).parent.parent.parent
 
 # For shorter links to Wiki in docstrings
 extlinks = {

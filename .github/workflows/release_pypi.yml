@@ -119,13 +119,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           TAG: ${{ needs.build.outputs.TAG }}
-        # Create a tag and a GitHub Release. The description can be changed later, as for now
-        # we don't define it through this workflow.
+        # Create a tag and a GitHub Release. The description is filled by the static template, we
+        # just insert the correct tag in the template.
         run: >-
+          sed "s/{tag}/$TAG/g" .github/workflows/assets/release_template.html |
           gh release create
           "$TAG"
           --repo '${{ github.repository }}'
-          --generate-notes
+          --notes-file -
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -137,3 +138,27 @@ jobs:
           gh release upload
           "$TAG" dist/**
           --repo '${{ github.repository }}'
+
+  telegram-channel:
+    name: Publish to Telegram Channel
+    needs:
+        - github-release
+
+    runs-on: ubuntu-latest
+    environment:
+      name: release_pypi
+    permissions: {}
+
+    steps:
+      - name: Publish to Telegram Channel
+        env:
+          TAG: ${{ needs.build.outputs.TAG }}
+          # This sercet is configured only for the `pypi-release` branch
+          BOT_TOKEN: ${{ secrets.CHANNEL_BOT_TOKEN }}
+        run: >-
+          sed "s/{tag}/$TAG/g" .github/workflows/assets/release_template.html |
+          curl
+          -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage"
+          -d "chat_id=@pythontelegrambotchannel"
+          -d "parse_mode=HTML"
+          --data-urlencode "text@-"
