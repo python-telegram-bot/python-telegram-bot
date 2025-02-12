@@ -16,9 +16,8 @@ bot.
 """
 
 import logging
-import asyncio
 
-from telegram import ForceReply, Update, error
+from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
 # Enable logging
@@ -55,7 +54,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token("6134338481:AAHxO-DxfxjCu7HL67VMFDWWrv6E8rZexRQ").build()
+    application = Application.builder().token("TOKEN").build()
 
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
@@ -65,23 +64,7 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     # Run the bot until the user presses Ctrl-C
-    loop = asyncio.get_event_loop()
-    while True:
-        try:
-            loop.run_until_complete(application.initialize())
-        except error.NetworkError:
-            loop.run_until_complete(asyncio.sleep(2))
-            pass
-        else:
-            break
-    loop.run_until_complete(application.start())
-    loop.run_until_complete(application.updater.start_polling())
-    try:
-        loop.run_forever()
-    except (KeyboardInterrupt, SystemExit):
-        loop.run_until_complete(application.updater.stop())
-        loop.run_until_complete(application.stop())
-        loop.run_until_complete(application.shutdown())
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
