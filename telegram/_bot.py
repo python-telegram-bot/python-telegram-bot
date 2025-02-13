@@ -1955,6 +1955,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
+        cover: Optional[FileInput] = None,
+        start_timestamp: Optional[int] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2002,6 +2004,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                     |time-period-input|
             width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
+            cover (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): Cover for the video in the message. |fileinputnopath|
+
+                .. versionadded:: NEXT.VERSION
+            start_timestamp (:obj:`int`, optional): Start timestamp for the video in the message.
+
+                .. versionadded:: NEXT.VERSION
             caption (:obj:`str`, optional): Video caption (may also be used when resending videos
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -2088,6 +2097,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "width": width,
             "height": height,
             "supports_streaming": supports_streaming,
+            "cover": self._parse_file_input(cover, attach=True) if cover else None,
+            "start_timestamp": start_timestamp,
             "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
             "show_caption_above_media": show_caption_above_media,
