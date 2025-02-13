@@ -17,11 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Video."""
-from typing import Optional
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Optional
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
+from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class Video(_BaseThumbedMedium):
@@ -48,6 +53,13 @@ class Video(_BaseThumbedMedium):
         thumbnail (:class:`telegram.PhotoSize`, optional): Video thumbnail.
 
             .. versionadded:: 20.2
+        cover (Sequence[:class:`telegram.PhotoSize`], optional): Available sizes of the cover of
+            the video in the message.
+
+            .. versionadded:: NEXT.VERSION
+        start_timestamp (:obj:`int`, optional): Timestamp in seconds from which the video
+            will play in the message
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -64,9 +76,24 @@ class Video(_BaseThumbedMedium):
         thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
 
             .. versionadded:: 20.2
+        cover (tuple[:class:`telegram.PhotoSize`]): Optional, Available sizes of the cover of
+            the video in the message.
+
+            .. versionadded:: NEXT.VERSION
+        start_timestamp (:obj:`int`): Optional, Timestamp in seconds from which the video
+            will play in the message
+            .. versionadded:: NEXT.VERSION
     """
 
-    __slots__ = ("duration", "file_name", "height", "mime_type", "width")
+    __slots__ = (
+        "cover",
+        "duration",
+        "file_name",
+        "height",
+        "mime_type",
+        "start_timestamp",
+        "width",
+    )
 
     def __init__(
         self,
@@ -79,6 +106,8 @@ class Video(_BaseThumbedMedium):
         file_size: Optional[int] = None,
         file_name: Optional[str] = None,
         thumbnail: Optional[PhotoSize] = None,
+        cover: Optional[Sequence[PhotoSize]] = None,
+        start_timestamp: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -97,3 +126,14 @@ class Video(_BaseThumbedMedium):
             # Optional
             self.mime_type: Optional[str] = mime_type
             self.file_name: Optional[str] = file_name
+            self.cover: Optional[Sequence[PhotoSize]] = parse_sequence_arg(cover)
+            self.start_timestamp: Optional[int] = start_timestamp
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Video":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["cover"] = de_list_optional(data.get("cover"), PhotoSize, bot)
+
+        return super().de_json(data=data, bot=bot)

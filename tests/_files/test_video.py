@@ -46,6 +46,8 @@ class VideoTestBase:
     mime_type = "video/mp4"
     supports_streaming = True
     file_name = "telegram.mp4"
+    start_timestamp = 10
+    cover = (PhotoSize("file_id", "unique_id", 640, 360, file_size=0),)
     thumb_width = 180
     thumb_height = 320
     thumb_file_size = 1767
@@ -92,6 +94,8 @@ class TestVideoWithoutRequest(VideoTestBase):
             "mime_type": self.mime_type,
             "file_size": self.file_size,
             "file_name": self.file_name,
+            "start_timestamp": self.start_timestamp,
+            "cover": [photo_size.to_dict() for photo_size in self.cover],
         }
         json_video = Video.de_json(json_dict, offline_bot)
         assert json_video.api_kwargs == {}
@@ -104,6 +108,8 @@ class TestVideoWithoutRequest(VideoTestBase):
         assert json_video.mime_type == self.mime_type
         assert json_video.file_size == self.file_size
         assert json_video.file_name == self.file_name
+        assert json_video.start_timestamp == self.start_timestamp
+        assert json_video.cover == self.cover
 
     def test_to_dict(self, video):
         video_dict = video.to_dict()
