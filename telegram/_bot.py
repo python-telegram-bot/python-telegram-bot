@@ -9889,8 +9889,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         # also we should raise a deprecation warnung if anything is passed by
         # position since it will be moved, not sure how
         if gift_id is None:
-            raise TypeError("This was temporarily moved to optional,"
-                            " you must pass it as the description states.")
+            raise TypeError("Missing required argument `gift_id`.")
         data: JSONDict = {
             "user_id": user_id,
             "gift_id": gift_id.id if isinstance(gift_id, Gift) else gift_id,
