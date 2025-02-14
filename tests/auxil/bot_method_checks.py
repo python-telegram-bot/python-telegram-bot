@@ -351,6 +351,9 @@ def build_kwargs(
                 allow_sending_without_reply=manually_passed_value,
                 quote_parse_mode=manually_passed_value,
             )
+        # TODO remove when gift_id isnt marked as optional anymore, tags: deprecated NEXT.VERSION
+        elif name == "gift_id":
+            kws[name] = "GIFT-ID"
 
     return kws
 
@@ -650,6 +653,7 @@ async def check_defaults_handling(
                 expected_defaults_value=expected_defaults_value,
             )
             request.post = assertion_callback
+            print(kwargs)
             await method(**kwargs)
 
             # 2: test that we get the manually passed non-None value

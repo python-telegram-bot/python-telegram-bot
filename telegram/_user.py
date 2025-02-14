@@ -1670,7 +1670,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             await bot.send_gift( user_id=update.effective_user.id, *args, **kwargs )
+             await bot.send_gift(user_id=update.effective_user.id, *args, **kwargs )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_gift`.
 
@@ -1680,6 +1680,7 @@ class User(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
         """
         return await self.get_bot().send_gift(
+            chat_id=None,
             user_id=self.id,
             gift_id=gift_id,
             text=text,

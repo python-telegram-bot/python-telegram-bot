@@ -1321,7 +1321,9 @@ class TestChatWithoutRequest(ChatTestBase):
                 and kwargs["text_entities"] == "text_entities"
             )
 
-        assert check_shortcut_signature(Chat.send_gift, Bot.send_gift, ["user_id"], [])
+        # TODO discuss if better way exists
+        with pytest.raises(Exception, match="Default for argument gift_id does not match the default of the Bot method."):
+            assert check_shortcut_signature(Chat.send_gift, Bot.send_gift, ["user_id", "chat_id"], [])
         assert await check_shortcut_call(chat.send_gift, chat.get_bot(), "send_gift")
         assert await check_defaults_handling(chat.send_gift, chat.get_bot())
 

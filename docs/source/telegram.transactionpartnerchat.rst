@@ -1,7 +1,7 @@
-TransactionPartnerUser
+TransactionPartnerChat
 ======================
 
-.. autoclass:: telegram.TransactionPartnerUser
+.. autoclass:: telegram.TransactionPartnerChat
     :members:
     :show-inheritance:
     :inherited-members: TransactionPartner
