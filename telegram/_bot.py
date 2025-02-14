@@ -9561,7 +9561,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_canceled": is_canceled,
         }
         return await self._post(
-            "editUserStartSubscription",
+            "editUserStarSubscription",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
