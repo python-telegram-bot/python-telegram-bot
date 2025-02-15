@@ -1218,6 +1218,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        video_start_timestamp: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1242,6 +1243,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 original message was sent (or channel username in the format ``@channelusername``).
             message_id (:obj:`int`): Message identifier in the chat specified in
                 :paramref:`from_chat_id`.
+            video_start_timestamp (:obj:`int`, optional): New start timestamp for the
+                forwarded video in the message
+
+                .. versionadded:: NEXT.VERSION
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1260,6 +1265,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "chat_id": chat_id,
             "from_chat_id": from_chat_id,
             "message_id": message_id,
+            "video_start_timestamp": video_start_timestamp,
         }
 
         return await self._send_message(
@@ -7985,6 +7991,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        video_start_timestamp: Optional[int] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -8004,6 +8011,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
             message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
+            video_start_timestamp (:obj:`int`, optional): New start timestamp for the
+                copied video in the message
+
+                .. versionadded:: NEXT.VERSION
             caption (:obj:`str`, optional): New caption for media,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing. If not specified, the original caption is kept.
@@ -8094,6 +8105,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "reply_parameters": reply_parameters,
             "show_caption_above_media": show_caption_above_media,
             "allow_paid_broadcast": allow_paid_broadcast,
+            "video_start_timestamp": video_start_timestamp,
         }
 
         result = await self._post(
