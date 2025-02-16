@@ -185,6 +185,8 @@ class TestGiftWithoutRequest(GiftTestBase):
             pay_for_upgrade=True,
             chat_id="chat_id",
         )
+        with pytest.raises(TypeError, match="Missing required argument `gift_id`."):
+            await offline_bot.send_gift()
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     @pytest.mark.parametrize(
