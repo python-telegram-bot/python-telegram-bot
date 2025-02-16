@@ -1,0 +1,37 @@
+   const express = require('express');
+   const bodyParser = require('body-parser');
+   const request = require('request');
+
+   const app = express();
+   const TOKEN = 7971311805:AAFkATwbei3EVGYrH0ge_qwtb4Tnsf6QV2k
+
+   app.use(bodyParser.json());
+
+   app.post(/webhook, (req, res) => {
+       const chatId = req.body.message.chat.id;
+       const text = req.body.message.text;
+
+       // Respuesta simple
+       if (text === '/start') {
+           sendMessage(chatId, '¡Hola! Soy tu bot.');
+       } else {
+           sendMessage(chatId, 'No entendí tu mensaje.');
+       }
+
+       res.sendStatus(200);
+   });
+
+   function sendMessage(chatId, text) {
+       request.post(https://api.telegram.org/bot${TOKEN}/sendMessage, {
+           json: {
+               chat_id: chatId,
+               text: text
+           }
+       });
+   }
+
+   const PORT = process.env.PORT || 3000;
+   app.listen(PORT, () => {
+       console.log(Server is running on port ${PORT});
+   });
+   
