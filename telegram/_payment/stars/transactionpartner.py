@@ -235,6 +235,7 @@ class TransactionPartnerChat(TransactionPartner):
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
+
 class TransactionPartnerFragment(TransactionPartner):
     """Describes a withdrawal transaction with Fragment.
 
