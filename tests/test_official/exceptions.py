@@ -198,6 +198,8 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
+    # here for backwards compatibility
+    "send_gift": {"gift_id"},
 }
 
 
