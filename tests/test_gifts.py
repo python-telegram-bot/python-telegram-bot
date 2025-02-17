@@ -164,6 +164,30 @@ class TestGiftWithoutRequest(GiftTestBase):
             pay_for_upgrade=True,
         )
 
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            user_id = request_data.parameters["chat_id"] == "chat_id"
+            gift_id = request_data.parameters["gift_id"] == "gift_id"
+            text = request_data.parameters["text"] == "text"
+            text_parse_mode = request_data.parameters["text_parse_mode"] == "text_parse_mode"
+            tes = request_data.parameters["text_entities"] == [
+                me.to_dict() for me in text_entities
+            ]
+            pay_for_upgrade = request_data.parameters["pay_for_upgrade"] is True
+
+            return user_id and gift_id and text and text_parse_mode and tes and pay_for_upgrade
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_gift(
+            gift_id=gift,
+            text="text",
+            text_parse_mode="text_parse_mode",
+            text_entities=text_entities,
+            pay_for_upgrade=True,
+            chat_id="chat_id",
+        )
+        with pytest.raises(TypeError, match="Missing required argument `gift_id`."):
+            await offline_bot.send_gift()
+
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     @pytest.mark.parametrize(
         ("passed_value", "expected_value"),

@@ -9852,7 +9852,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def send_gift(
         self,
         user_id: Optional[int] = None,
-        gift_id: Union[str, Gift] = None,
+        gift_id: Union[str, Gift] = None,  # type: ignore
         text: Optional[str] = None,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Optional[Sequence["MessageEntity"]] = None,
