@@ -2372,7 +2372,9 @@ class TestApplication:
 
         def thread_target():
             asyncio.set_event_loop(asyncio.new_event_loop())
-            app = ApplicationBuilder().bot(offline_bot).build()
+            app = (
+                ApplicationBuilder().bot(offline_bot).application_class(PytestApplication).build()
+            )
 
             async def initialize(*args, **kwargs):
                 self.count += 1
