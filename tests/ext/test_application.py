@@ -2380,7 +2380,10 @@ class TestApplication:
 
             monkeypatch.setattr(app, "initialize", initialize)
             method = functools.partial(
-                getattr(app, method_name), bootstrap_retries=retries, close_loop=False
+                getattr(app, method_name),
+                bootstrap_retries=retries,
+                close_loop=False,
+                stop_signals=None,
             )
 
             if exception_class == InvalidToken:
