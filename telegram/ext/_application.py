@@ -1053,7 +1053,7 @@ class Application(
             action_cb=self.initialize,
             description="Bootstrap Initialize Application",
             max_retries=max_retries,
-            interval=0,
+            interval=1,
         )
 
     def __run(
