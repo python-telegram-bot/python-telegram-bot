@@ -164,6 +164,16 @@ class TestGiftWithoutRequest(GiftTestBase):
             pay_for_upgrade=True,
         )
 
+    async def test_send_gift_without_gift_id(self, offline_bot, gift, monkeypatch):
+        # Only here because we have to temporarily mark gift_id as optional.
+        # tags: deprecated NEXT.VERSION
+
+        # We can't send actual gifts, so we just check that the correct parameters are passed
+        text_entities = [
+            MessageEntity(MessageEntity.TEXT_LINK, 0, 4, "url"),
+            MessageEntity(MessageEntity.BOLD, 5, 9),
+        ]
+
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             user_id = request_data.parameters["chat_id"] == "chat_id"
             gift_id = request_data.parameters["gift_id"] == "gift_id"

@@ -731,6 +731,8 @@ class TestUserWithoutRequest(UserTestBase):
                 and kwargs["text_entities"] == "text_entities"
             )
 
+        # TODO discuss if better way exists
+        # tags: deprecated NEXT.VERSION
         with pytest.raises(
             Exception,
             match="Default for argument gift_id does not match the default of the Bot method.",

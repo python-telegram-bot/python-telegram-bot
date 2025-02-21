@@ -653,7 +653,6 @@ async def check_defaults_handling(
                 expected_defaults_value=expected_defaults_value,
             )
             request.post = assertion_callback
-            print(kwargs)
             await method(**kwargs)
 
             # 2: test that we get the manually passed non-None value
