@@ -610,9 +610,9 @@ class TestChatWithoutRequest(ChatTestBase):
             "title",
             "description",
             "payload",
-            "provider_token",
             "currency",
             "prices",
+            "provider_token",
         )
 
     async def test_instance_method_send_location(self, monkeypatch, chat):
