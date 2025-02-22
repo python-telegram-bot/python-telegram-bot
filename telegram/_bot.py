@@ -5177,9 +5177,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         title: str,
         description: str,
         payload: str,
-        provider_token: Optional[str],  # This arg is now optional as of Bot API 7.4
         currency: str,
         prices: Sequence["LabeledPrice"],
+        provider_token: Optional[str] = None,
         start_parameter: Optional[str] = None,
         photo_url: Optional[str] = None,
         photo_size: Optional[int] = None,
@@ -5232,13 +5232,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use it for your internal processes.
-            provider_token (:obj:`str`): Payments provider token, obtained via
+            provider_token (:obj:`str`, optional): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. deprecated:: 21.3
-                    As of Bot API 7.4, this parameter is now optional and future versions of the
-                    library will make it optional as well.
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 7.4 made this parameter is optional and this is now reflected in the
+                    function signature.
 
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_. Pass ``XTR`` for
@@ -8252,9 +8252,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         title: str,
         description: str,
         payload: str,
-        provider_token: Optional[str],  # This arg is now optional as of Bot API 7.4
         currency: str,
         prices: Sequence["LabeledPrice"],
+        provider_token: Optional[str] = None,
         max_tip_amount: Optional[int] = None,
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         provider_data: Optional[Union[str, object]] = None,
@@ -8296,13 +8296,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use it for your internal processes.
-            provider_token (:obj:`str`): Payments provider token, obtained via
+            provider_token (:obj:`str`, optional): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. deprecated:: 21.3
-                    As of Bot API 7.4, this parameter is now optional and future versions of the
-                    library will make it optional as well.
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 7.4 made this parameter is optional and this is now reflected in the
+                    function signature.
 
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_. Pass ``XTR`` for
