@@ -176,7 +176,7 @@ class TestGiftWithoutRequest(GiftTestBase):
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             user_id = request_data.parameters["chat_id"] == "chat_id"
-            gift_id = request_data.parameters["gift_id"] == "gift_id"
+            gift_id = request_data.parameters["gift_id"] == "some_id"
             text = request_data.parameters["text"] == "text"
             text_parse_mode = request_data.parameters["text_parse_mode"] == "text_parse_mode"
             tes = request_data.parameters["text_entities"] == [
