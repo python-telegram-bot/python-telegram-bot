@@ -58,6 +58,8 @@ def input_media_video(class_thumb_file):
         parse_mode=InputMediaVideoTestBase.parse_mode,
         caption_entities=InputMediaVideoTestBase.caption_entities,
         thumbnail=class_thumb_file,
+        cover=class_thumb_file,
+        start_timestamp=InputMediaVideoTestBase.start_timestamp,
         supports_streaming=InputMediaVideoTestBase.supports_streaming,
         has_spoiler=InputMediaVideoTestBase.has_spoiler,
         show_caption_above_media=InputMediaVideoTestBase.show_caption_above_media,
@@ -130,6 +132,8 @@ def input_paid_media_video(class_thumb_file):
     return InputPaidMediaVideo(
         media=InputMediaVideoTestBase.media,
         thumbnail=class_thumb_file,
+        cover=class_thumb_file,
+        start_timestamp=InputMediaVideoTestBase.start_timestamp,
         width=InputMediaVideoTestBase.width,
         height=InputMediaVideoTestBase.height,
         duration=InputMediaVideoTestBase.duration,
@@ -144,6 +148,7 @@ class InputMediaVideoTestBase:
     width = 3
     height = 4
     duration = 5
+    start_timestamp = 3
     parse_mode = "HTML"
     supports_streaming = True
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
@@ -169,6 +174,8 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video.caption_entities == tuple(self.caption_entities)
         assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumbnail, InputFile)
+        assert isinstance(input_media_video.cover, InputFile)
+        assert input_media_video.start_timestamp == self.start_timestamp
         assert input_media_video.has_spoiler == self.has_spoiler
         assert input_media_video.show_caption_above_media == self.show_caption_above_media
 
@@ -194,6 +201,8 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
             input_media_video_dict["show_caption_above_media"]
             == input_media_video.show_caption_above_media
         )
+        assert input_media_video_dict["cover"] == input_media_video.cover
+        assert input_media_video_dict["start_timestamp"] == input_media_video.start_timestamp
 
     def test_with_video(self, video):
         # fixture found in test_video
@@ -214,10 +223,13 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
 
     def test_with_local_files(self):
         input_media_video = InputMediaVideo(
-            data_file("telegram.mp4"), thumbnail=data_file("telegram.jpg")
+            data_file("telegram.mp4"),
+            thumbnail=data_file("telegram.jpg"),
+            cover=data_file("telegram.jpg"),
         )
         assert input_media_video.media == data_file("telegram.mp4").as_uri()
         assert input_media_video.thumbnail == data_file("telegram.jpg").as_uri()
+        assert input_media_video.cover == data_file("telegram.jpg").as_uri()
 
     def test_type_enum_conversion(self):
         # Since we have a lot of different test classes for all the input media types, we test this
@@ -565,6 +577,8 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_paid_media_video.duration == self.duration
         assert input_paid_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_paid_media_video.thumbnail, InputFile)
+        assert isinstance(input_paid_media_video.cover, InputFile)
+        assert input_paid_media_video.start_timestamp == self.start_timestamp
 
     def test_to_dict(self, input_paid_media_video):
         input_paid_media_video_dict = input_paid_media_video.to_dict()
@@ -578,6 +592,11 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
             == input_paid_media_video.supports_streaming
         )
         assert input_paid_media_video_dict["thumbnail"] == input_paid_media_video.thumbnail
+        assert input_paid_media_video_dict["cover"] == input_paid_media_video.cover
+        assert (
+            input_paid_media_video_dict["start_timestamp"]
+            == input_paid_media_video.start_timestamp
+        )
 
     def test_with_video(self, video):
         # fixture found in test_video
@@ -596,10 +615,13 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
 
     def test_with_local_files(self):
         input_paid_media_video = InputPaidMediaVideo(
-            data_file("telegram.mp4"), thumbnail=data_file("telegram.jpg")
+            data_file("telegram.mp4"),
+            thumbnail=data_file("telegram.jpg"),
+            cover=data_file("telegram.jpg"),
         )
         assert input_paid_media_video.media == data_file("telegram.mp4").as_uri()
         assert input_paid_media_video.thumbnail == data_file("telegram.jpg").as_uri()
+        assert input_paid_media_video.cover == data_file("telegram.jpg").as_uri()
 
 
 @pytest.fixture(scope="module")
