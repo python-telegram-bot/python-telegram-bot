@@ -4468,12 +4468,13 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def send_gift(
         self,
-        user_id: int,
-        gift_id: Union[str, Gift],
+        user_id: Optional[int] = None,
+        gift_id: Union[str, Gift] = None,  # type: ignore
         text: Optional[str] = None,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Optional[Sequence["MessageEntity"]] = None,
         pay_for_upgrade: Optional[bool] = None,
+        chat_id: Optional[Union[str, int]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4484,6 +4485,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> bool:
         return await super().send_gift(
             user_id=user_id,
+            chat_id=chat_id,
             gift_id=gift_id,
             text=text,
             text_parse_mode=text_parse_mode,

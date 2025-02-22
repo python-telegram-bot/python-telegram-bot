@@ -9804,7 +9804,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> Gifts:
-        """Returns the list of gifts that can be sent by the bot to users.
+        """Returns the list of gifts that can be sent by the bot to users and channel chats.
         Requires no parameters.
 
         .. versionadded:: 21.8
@@ -9828,12 +9828,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
     async def send_gift(
         self,
-        user_id: int,
-        gift_id: Union[str, Gift],
+        user_id: Optional[int] = None,
+        gift_id: Union[str, Gift] = None,  # type: ignore
         text: Optional[str] = None,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Optional[Sequence["MessageEntity"]] = None,
         pay_for_upgrade: Optional[bool] = None,
+        chat_id: Optional[Union[str, int]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -9841,15 +9842,23 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Sends a gift to the given user.
-        The gift can't be converted to Telegram Stars by the user
+        """Sends a gift to the given user or channel chat.
+        The gift can't be converted to Telegram Stars by the receiver.
 
         .. versionadded:: 21.8
 
         Args:
-            user_id (:obj:`int`): Unique identifier of the target user that will receive the gift
+            user_id (:obj:`int`, optional): Required if :paramref:`chat_id` is not specified.
+                Unique identifier of the target user that will receive the gift.
+
+                .. versionchanged:: NEXT.VERSION
+                    Now optional.
             gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
                 :class:`~telegram.Gift` object
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`user_id`
+                is not specified. |chat_id_channel| It will receive the gift.
+
+                .. versionadded:: NEXT.VERSION
             text (:obj:`str`, optional): Text that will be shown along with the gift;
                 0- :tg-const:`telegram.constants.GiftLimit.MAX_TEXT_LENGTH` characters
             text_parse_mode (:obj:`str`, optional): Mode for parsing entities.
@@ -9876,6 +9885,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
+        # TODO: Remove when stability policy allows, tags: deprecated NEXT.VERSION
+        # also we should raise a deprecation warnung if anything is passed by
+        # position since it will be moved, not sure how
+        if gift_id is None:
+            raise TypeError("Missing required argument `gift_id`.")
         data: JSONDict = {
             "user_id": user_id,
             "gift_id": gift_id.id if isinstance(gift_id, Gift) else gift_id,
@@ -9883,6 +9897,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "text_parse_mode": text_parse_mode,
             "text_entities": text_entities,
             "pay_for_upgrade": pay_for_upgrade,
+            "chat_id": chat_id,
         }
         return await self._post(
             "sendGift",

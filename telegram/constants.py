@@ -2659,6 +2659,11 @@ class TransactionPartnerType(StringEnum):
 
     .. versionadded:: 21.9
     """
+    CHAT = "chat"
+    """:obj:`str`: Transaction with a chat.
+
+    .. versionadded:: NEXT.VERSION
+    """
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""
     OTHER = "other"

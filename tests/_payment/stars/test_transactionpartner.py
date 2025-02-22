@@ -22,12 +22,14 @@ import pytest
 
 from telegram import (
     AffiliateInfo,
+    Chat,
     Gift,
     PaidMediaVideo,
     RevenueWithdrawalStatePending,
     Sticker,
     TransactionPartner,
     TransactionPartnerAffiliateProgram,
+    TransactionPartnerChat,
     TransactionPartnerFragment,
     TransactionPartnerOther,
     TransactionPartnerTelegramAds,
@@ -95,6 +97,10 @@ class TransactionPartnerTestBase:
         amount=42,
     )
     request_count = 42
+    chat = Chat(
+        id=3,
+        type=Chat.CHANNEL,
+    )
 
 
 class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
@@ -123,6 +129,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             ("telegram_ads", TransactionPartnerTelegramAds),
             ("telegram_api", TransactionPartnerTelegramApi),
             ("other", TransactionPartnerOther),
+            ("chat", TransactionPartnerChat),
         ],
     )
     def test_subclass(self, offline_bot, tp_type, subclass):
@@ -441,6 +448,60 @@ class TestTransactionPartnerTelegramApiWithoutRequest(TransactionPartnerTestBase
             request_count=0,
         )
         d = User(id=1, is_bot=False, first_name="user", last_name="user")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def transaction_partner_chat():
+    return TransactionPartnerChat(
+        chat=TransactionPartnerTestBase.chat,
+        gift=TransactionPartnerTestBase.gift,
+    )
+
+
+class TestTransactionPartnerChatWithoutRequest(TransactionPartnerTestBase):
+    type = TransactionPartnerType.CHAT
+
+    def test_slot_behaviour(self, transaction_partner_chat):
+        inst = transaction_partner_chat
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "chat": self.chat.to_dict(),
+            "gift": self.gift.to_dict(),
+        }
+        tp = TransactionPartnerChat.de_json(json_dict, offline_bot)
+        assert tp.api_kwargs == {}
+        assert tp.type == "chat"
+        assert tp.chat == self.chat
+        assert tp.gift == self.gift
+
+    def test_to_dict(self, transaction_partner_chat):
+        json_dict = transaction_partner_chat.to_dict()
+        assert json_dict["type"] == self.type
+        assert json_dict["chat"] == self.chat.to_dict()
+        assert json_dict["gift"] == self.gift.to_dict()
+
+    def test_equality(self, transaction_partner_chat):
+        a = transaction_partner_chat
+        b = TransactionPartnerChat(
+            chat=self.chat,
+        )
+        c = TransactionPartnerChat(
+            chat=Chat(id=1, type=Chat.CHANNEL),
+        )
+        d = Chat(id=1, type=Chat.CHANNEL)
 
         assert a == b
         assert hash(a) == hash(b)

@@ -3462,18 +3462,25 @@ class _ChatBase(TelegramObject):
 
              await bot.send_gift(user_id=update.effective_chat.id, *args, **kwargs )
 
+        or::
+
+            await bot.send_gift(chat_id=update.effective_chat.id, *args, **kwargs )
+
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_gift`.
 
         Caution:
-            Can only work, if the chat is a private chat, see :attr:`type`.
+            Will only work if the chat is a private or channel chat, see :attr:`type`.
 
         .. versionadded:: 21.8
+
+        .. versionchanged:: NEXT.VERSION
+
+            Added support for channel chats.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
         """
         return await self.get_bot().send_gift(
-            user_id=self.id,
             gift_id=gift_id,
             text=text,
             text_parse_mode=text_parse_mode,
@@ -3484,6 +3491,7 @@ class _ChatBase(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            **{"chat_id" if self.type == Chat.CHANNEL else "user_id": self.id},
         )
 
     async def verify(

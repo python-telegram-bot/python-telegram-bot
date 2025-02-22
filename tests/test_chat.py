@@ -1312,7 +1312,7 @@ class TestChatWithoutRequest(ChatTestBase):
         )
 
     async def test_instance_method_send_gift(self, monkeypatch, chat):
-        async def make_assertion(*_, **kwargs):
+        async def make_assertion_private(*_, **kwargs):
             return (
                 kwargs["user_id"] == chat.id
                 and kwargs["gift_id"] == "gift_id"
@@ -1321,11 +1321,39 @@ class TestChatWithoutRequest(ChatTestBase):
                 and kwargs["text_entities"] == "text_entities"
             )
 
-        assert check_shortcut_signature(Chat.send_gift, Bot.send_gift, ["user_id"], [])
-        assert await check_shortcut_call(chat.send_gift, chat.get_bot(), "send_gift")
+        async def make_assertion_channel(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["gift_id"] == "gift_id"
+                and kwargs["text"] == "text"
+                and kwargs["text_parse_mode"] == "text_parse_mode"
+                and kwargs["text_entities"] == "text_entities"
+            )
+
+        # TODO discuss if better way exists
+        # tags: deprecated NEXT.VERSION
+        with pytest.raises(
+            Exception,
+            match="Default for argument gift_id does not match the default of the Bot method.",
+        ):
+            assert check_shortcut_signature(
+                Chat.send_gift, Bot.send_gift, ["user_id", "chat_id"], []
+            )
+        assert await check_shortcut_call(
+            chat.send_gift, chat.get_bot(), "send_gift", ["user_id", "chat_id"]
+        )
         assert await check_defaults_handling(chat.send_gift, chat.get_bot())
 
-        monkeypatch.setattr(chat.get_bot(), "send_gift", make_assertion)
+        monkeypatch.setattr(chat.get_bot(), "send_gift", make_assertion_private)
+        chat.type = chat.PRIVATE
+        assert await chat.send_gift(
+            gift_id="gift_id",
+            text="text",
+            text_parse_mode="text_parse_mode",
+            text_entities="text_entities",
+        )
+        monkeypatch.setattr(chat.get_bot(), "send_gift", make_assertion_channel)
+        chat.type = chat.CHANNEL
         assert await chat.send_gift(
             gift_id="gift_id",
             text="text",
