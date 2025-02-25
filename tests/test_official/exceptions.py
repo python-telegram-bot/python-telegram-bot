@@ -96,8 +96,6 @@ class ParamTypeCheckingExceptions:
         },
         "Input(Paid)?Media.*": {
             "media": str,  # actual: Union[str, InputMedia*, FileInput]
-        },
-        "Input(Paid)?Media(?!Photo).*": {
             "thumbnail": str,  # actual: Union[str, FileInput]
         },
         "EncryptedPassportElement": {
