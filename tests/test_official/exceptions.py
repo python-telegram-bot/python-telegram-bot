@@ -96,6 +96,7 @@ class ParamTypeCheckingExceptions:
         },
         "Input(Paid)?Media.*": {
             "media": str,  # actual: Union[str, InputMedia*, FileInput]
+            # see also https://github.com/tdlib/telegram-bot-api/issues/707
             "thumbnail": str,  # actual: Union[str, FileInput]
         },
         "EncryptedPassportElement": {
