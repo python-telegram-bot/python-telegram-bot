@@ -497,6 +497,7 @@ class TestTransactionPartnerChatWithoutRequest(TransactionPartnerTestBase):
         a = transaction_partner_chat
         b = TransactionPartnerChat(
             chat=self.chat,
+            gift=self.gift,
         )
         c = TransactionPartnerChat(
             chat=Chat(id=1, type=Chat.CHANNEL),
