@@ -269,9 +269,9 @@ class TestInvoiceWithRequest(InvoiceTestBase):
                     self.title,
                     self.description,
                     self.payload,
-                    provider_token,
                     self.currency,
                     self.prices,
+                    provider_token,
                     **kwargs,
                 )
                 for kwargs in ({}, {"protect_content": False})
@@ -301,7 +301,6 @@ class TestInvoiceWithRequest(InvoiceTestBase):
                 self.title,
                 self.description,
                 self.payload,
-                "",  # using tg stars
                 "XTR",
                 [self.prices[0]],
                 allow_sending_without_reply=custom,
@@ -315,9 +314,9 @@ class TestInvoiceWithRequest(InvoiceTestBase):
                 self.title,
                 self.description,
                 self.payload,
-                provider_token,
                 self.currency,
                 self.prices,
+                provider_token,
                 reply_to_message_id=reply_to_message.message_id,
             )
             assert message.reply_to_message is None
@@ -328,9 +327,9 @@ class TestInvoiceWithRequest(InvoiceTestBase):
                     self.title,
                     self.description,
                     self.payload,
-                    provider_token,
                     self.currency,
                     self.prices,
+                    provider_token,
                     reply_to_message_id=reply_to_message.message_id,
                 )
 
@@ -340,9 +339,9 @@ class TestInvoiceWithRequest(InvoiceTestBase):
             self.title,
             self.description,
             self.payload,
-            provider_token,
             self.currency,
             self.prices,
+            provider_token=provider_token,
             max_tip_amount=self.max_tip_amount,
             suggested_tip_amounts=self.suggested_tip_amounts,
             start_parameter=self.start_parameter,
