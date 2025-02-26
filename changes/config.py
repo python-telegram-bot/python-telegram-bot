@@ -52,7 +52,7 @@ class ChangoSectionChangeNote(
             "⚙️ documentation": "documentation",
             "⚙️ tests": "internal",
             "⚙️ ci-cd": "internal",
-            "⚙️ security :lock:": "security",
+            "⚙️ security": "security",
             "⚙️ examples": "documentation",
             "⚙️ type-hinting": "other",
             "🛠 refactor": "internal",
