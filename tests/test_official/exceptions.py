@@ -47,7 +47,7 @@ class ParamTypeCheckingExceptions:
             "animation": Animation,
             "voice": Voice,
             "sticker": Sticker,
-            # TODO: Deprecated and will be corrected (and readded) in next major PTB version:
+            # TODO: Deprecated and will be corrected (and readded) in next major bot API release:
             # "gift_id": Gift,
         },
         "(delete|set)_sticker.*": {
@@ -73,7 +73,7 @@ class ParamTypeCheckingExceptions:
         ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
         ("reaction", False): "ReactionType",  # + str
         ("options", False): "InputPollOption",  # + str
-        # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
+        # TODO: Deprecated and will be corrected (and removed) in next bot api release
         ("file_hashes", True): "list[str]",
     }
 
@@ -200,7 +200,7 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
-    # here for backwards compatibility
+    # here for backwards compatibility. Todo: remove on next bot api release
     "send_gift": {"gift_id"},
 }
 

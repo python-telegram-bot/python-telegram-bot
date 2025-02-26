@@ -3493,8 +3493,6 @@ class _ChatBase(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
         """
         return await self.get_bot().send_gift(
-            chat_id=self.id if self.type == Chat.CHANNEL else None,
-            user_id=self.id if self.type == Chat.PRIVATE else None,
             gift_id=gift_id,
             text=text,
             text_parse_mode=text_parse_mode,
@@ -3505,6 +3503,7 @@ class _ChatBase(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            **{"chat_id" if self.type == Chat.CHANNEL else "user_id": self.id},
         )
 
     async def verify(
