@@ -112,7 +112,7 @@ from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -4564,19 +4564,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         if not isinstance(read_timeout, DefaultValue):
             arg_read_timeout: float = read_timeout or 0
         else:
-            try:
-                arg_read_timeout = self._request[0].read_timeout or 0
-            except NotImplementedError:
-                arg_read_timeout = 2
-                self._warn(
-                    PTBDeprecationWarning(
-                        "20.7",
-                        f"The class {self._request[0].__class__.__name__} does not override "
-                        "the property `read_timeout`. Overriding this property will be mandatory "
-                        "in future versions. Using 2 seconds as fallback.",
-                    ),
-                    stacklevel=2,
-                )
+            arg_read_timeout = self._request[0].read_timeout or 0
 
         # Ideally we'd use an aggressive read timeout for the polling. However,
         # * Short polling should return within 2 seconds.

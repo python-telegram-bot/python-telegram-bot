@@ -32,8 +32,8 @@ from docs.auxil.kwargs_insertion import (
     find_insert_pos_for_kwargs,
     get_updates_read_timeout_addition,
     keyword_args,
-    media_write_timeout_deprecation,
-    media_write_timeout_deprecation_methods,
+    media_write_timeout_change,
+    media_write_timeout_change_methods,
 )
 from docs.auxil.link_code import LINE_NUMBERS
 
@@ -116,9 +116,9 @@ def autodoc_process_docstring(
 
             if (
                 "post.write_timeout`. Defaults to" in to_insert
-                and method_name in media_write_timeout_deprecation_methods
+                and method_name in media_write_timeout_change_methods
             ):
-                effective_insert: list[str] = media_write_timeout_deprecation
+                effective_insert: list[str] = media_write_timeout_change
             elif get_updates and to_insert.lstrip().startswith("read_timeout"):
                 effective_insert = [to_insert, *get_updates_read_timeout_addition]
             else:

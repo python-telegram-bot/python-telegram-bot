@@ -18,13 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
 import datetime as dtm
-from typing import Any, NoReturn, Optional, final
+from typing import TYPE_CHECKING, Any, NoReturn, Optional, final
 
-from telegram import LinkPreviewOptions
 from telegram._utils.datetime import UTC
-from telegram._utils.types import ODVInput
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
+
+if TYPE_CHECKING:
+    from telegram import LinkPreviewOptions
 
 
 @final
@@ -38,23 +39,15 @@ class Defaults:
         Removed the argument and attribute ``timeout``. Specify default timeout behavior for the
         networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
 
+    .. versionchanged:: NEXT.VERSION
+        Removed deprecated arguments and properties ``disable_web_page_preview`` and ``quote``.
+        Use :paramref:`link_preview_options` and :paramref:`do_quote` instead.
+
     Parameters:
         parse_mode (:obj:`str`, optional): |parse_mode|
         disable_notification (:obj:`bool`, optional): |disable_notification|
-        disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
-            message. Mutually exclusive with :paramref:`link_preview_options`.
-
-            .. deprecated:: 20.8
-                Use :paramref:`link_preview_options` instead. This parameter will be removed in
-                future versions.
-
         allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|.
             Will be used for :attr:`telegram.ReplyParameters.allow_sending_without_reply`.
-        quote (:obj:`bool`, optional): |reply_quote|
-
-            .. deprecated:: 20.8
-                Use :paramref:`do_quote` instead. This parameter will be removed in future
-                versions.
         tzinfo (:class:`datetime.tzinfo`, optional): A timezone to be used for all date(time)
             inputs appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
             somewhere, it will be assumed to be in :paramref:`tzinfo`. Defaults to
@@ -135,8 +128,6 @@ class Defaults:
         self,
         parse_mode: Optional[str] = None,
         disable_notification: Optional[bool] = None,
-        disable_web_page_preview: Optional[bool] = None,
-        quote: Optional[bool] = None,
         tzinfo: dtm.tzinfo = UTC,
         block: bool = True,
         allow_sending_without_reply: Optional[bool] = None,
@@ -164,37 +155,9 @@ class Defaults:
                 stacklevel=2,
             )
 
-        if disable_web_page_preview is not None and link_preview_options is not None:
-            raise ValueError(
-                "`disable_web_page_preview` and `link_preview_options` are mutually exclusive."
-            )
-        if quote is not None and do_quote is not None:
-            raise ValueError("`quote` and `do_quote` are mutually exclusive")
-        if disable_web_page_preview is not None:
-            warn(
-                PTBDeprecationWarning(
-                    "20.8",
-                    "`Defaults.disable_web_page_preview` is deprecated. Use "
-                    "`Defaults.link_preview_options` instead.",
-                ),
-                stacklevel=2,
-            )
-            self._link_preview_options: Optional[LinkPreviewOptions] = LinkPreviewOptions(
-                is_disabled=disable_web_page_preview
-            )
-        else:
-            self._link_preview_options = link_preview_options
+        self._link_preview_options = link_preview_options
+        self._do_quote = do_quote
 
-        if quote is not None:
-            warn(
-                PTBDeprecationWarning(
-                    "20.8", "`Defaults.quote` is deprecated. Use `Defaults.do_quote` instead."
-                ),
-                stacklevel=2,
-            )
-            self._do_quote: Optional[bool] = quote
-        else:
-            self._do_quote = do_quote
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
@@ -223,9 +186,9 @@ class Defaults:
             (
                 self._parse_mode,
                 self._disable_notification,
-                self.disable_web_page_preview,
+                self._link_preview_options,
                 self._allow_sending_without_reply,
-                self.quote,
+                self._do_quote,
                 self._tzinfo,
                 self._block,
                 self._protect_content,
@@ -330,23 +293,6 @@ class Defaults:
         )
 
     @property
-    def disable_web_page_preview(self) -> ODVInput[bool]:
-        """:obj:`bool`: Optional. Disables link previews for links in all outgoing
-        messages.
-
-        .. deprecated:: 20.8
-            Use :attr:`link_preview_options` instead. This attribute will be removed in future
-            versions.
-        """
-        return self._link_preview_options.is_disabled if self._link_preview_options else None
-
-    @disable_web_page_preview.setter
-    def disable_web_page_preview(self, _: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to disable_web_page_preview after initialization."
-        )
-
-    @property
     def allow_sending_without_reply(self) -> Optional[bool]:
         """:obj:`bool`: Optional. Pass :obj:`True`, if the message
         should be sent even if the specified replied-to message is not found.
@@ -358,20 +304,6 @@ class Defaults:
         raise AttributeError(
             "You can not assign a new value to allow_sending_without_reply after initialization."
         )
-
-    @property
-    def quote(self) -> Optional[bool]:
-        """:obj:`bool`: Optional. |reply_quote|
-
-        .. deprecated:: 20.8
-            Use :attr:`do_quote` instead. This attribute will be removed in future
-            versions.
-        """
-        return self._do_quote if self._do_quote is not None else None
-
-    @quote.setter
-    def quote(self, _: object) -> NoReturn:
-        raise AttributeError("You can not assign a new value to quote after initialization.")
 
     @property
     def tzinfo(self) -> dtm.tzinfo:

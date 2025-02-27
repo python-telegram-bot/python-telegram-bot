@@ -25,11 +25,9 @@ import httpx
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.types import HTTPVersion, ODVInput, SocketOpt
-from telegram._utils.warnings import warn
 from telegram.error import NetworkError, TimedOut
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
-from telegram.warnings import PTBDeprecationWarning
 
 # Note to future devs:
 # Proxies are currently only tested manually. The httpx development docs have a nice guide on that:
@@ -45,6 +43,9 @@ class HTTPXRequest(BaseRequest):
 
     .. versionadded:: 20.0
 
+    .. versionchanged:: NEXT.VERSION
+        Removed the deprecated parameter ``proxy_url``. Use :paramref:`proxy` instead.
+
     Args:
         connection_pool_size (:obj:`int`, optional): Number of connections to keep in the
             connection pool. Defaults to ``1``.
@@ -52,10 +53,6 @@ class HTTPXRequest(BaseRequest):
             Note:
                 Independent of the value, one additional connection will be reserved for
                 :meth:`telegram.Bot.get_updates`.
-        proxy_url (:obj:`str`, optional): Legacy name for :paramref:`proxy`, kept for backward
-            compatibility. Defaults to :obj:`None`.
-
-            .. deprecated:: 20.7
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server.
             This value is used unless a different value is passed to :meth:`do_request`.
@@ -145,7 +142,6 @@ class HTTPXRequest(BaseRequest):
     def __init__(
         self,
         connection_pool_size: int = 1,
-        proxy_url: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
@@ -156,18 +152,6 @@ class HTTPXRequest(BaseRequest):
         media_write_timeout: Optional[float] = 20.0,
         httpx_kwargs: Optional[dict[str, Any]] = None,
     ):
-        if proxy_url is not None and proxy is not None:
-            raise ValueError("The parameters `proxy_url` and `proxy` are mutually exclusive.")
-
-        if proxy_url is not None:
-            proxy = proxy_url
-            warn(
-                PTBDeprecationWarning(
-                    "20.7", "The parameter `proxy_url` is deprecated. Use `proxy` instead."
-                ),
-                stacklevel=2,
-            )
-
         self._http_version = http_version
         self._media_write_timeout = media_write_timeout
         timeout = httpx.Timeout(

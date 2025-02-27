@@ -47,29 +47,29 @@ keyword_args = [
     "",
 ]
 
-media_write_timeout_deprecation_methods = [
-    "send_photo",
+media_write_timeout_change_methods = [
+    "add_sticker_to_set",
+    "create_new_sticker_set",
+    "send_animation",
     "send_audio",
     "send_document",
+    "send_media_group",
+    "send_photo",
     "send_sticker",
     "send_video",
     "send_video_note",
-    "send_animation",
     "send_voice",
-    "send_media_group",
     "set_chat_photo",
     "upload_sticker_file",
-    "add_sticker_to_set",
-    "create_new_sticker_set",
 ]
-media_write_timeout_deprecation = [
+media_write_timeout_change = [
     "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
     "        :paramref:`telegram.request.BaseRequest.post.write_timeout`. By default, ``20`` "
     "        seconds are used as write timeout."
     "",
     "",
-    "       .. deprecated:: 20.7",
-    "           In future versions, the default value will be changed to "
+    "       .. versionchanged:: NEXT.VERSION",
+    "           The default value changed to "
     "           :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
     "",
     "",

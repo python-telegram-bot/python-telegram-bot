@@ -34,6 +34,9 @@ This module contains filters for use with :class:`telegram.ext.MessageHandler`,
        * Filters which do both (like ``Filters.text``) are now split as ready-to-use version
          ``filters.TEXT`` and class version ``filters.Text(...)``.
 
+.. versionchanged:: NEXT.VERSION
+    Removed deprecated attribute `CHAT`.
+
 """
 
 __all__ = (
@@ -43,7 +46,6 @@ __all__ = (
     "AUDIO",
     "BOOST_ADDED",
     "CAPTION",
-    "CHAT",
     "COMMAND",
     "CONTACT",
     "EFFECT_ID",
@@ -857,21 +859,6 @@ class Chat(_ChatUserBaseFilter):
                 disallow through.
         """
         return super()._remove_chat_ids(chat_id)
-
-
-class _Chat(MessageFilter):
-    __slots__ = ()
-
-    def filter(self, message: Message) -> bool:
-        return bool(message.chat)
-
-
-CHAT = _Chat(name="filters.CHAT")
-"""This filter filters *any* message that has a :attr:`telegram.Message.chat`.
-
-.. deprecated:: 20.8
-   This filter has no effect since :attr:`telegram.Message.chat` is always present.
-"""
 
 
 class ChatType:  # A convenience namespace for Chat types.
@@ -1915,6 +1902,9 @@ class StatusUpdate:
 
     Caution:
         ``filters.StatusUpdate`` itself is *not* a filter, but just a convenience namespace.
+
+    .. versionchanged:: NEXT.VERSION
+        Removed deprecated attribute `USER_SHARED`.
     """
 
     __slots__ = ()
@@ -1948,7 +1938,6 @@ class StatusUpdate:
                 or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
                 or StatusUpdate.REFUNDED_PAYMENT.check_update(update)
                 or StatusUpdate.USERS_SHARED.check_update(update)
-                or StatusUpdate.USER_SHARED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_SCHEDULED.check_update(update)
@@ -2202,28 +2191,6 @@ class StatusUpdate:
     REFUNDED_PAYMENT = _RefundedPayment("filters.StatusUpdate.REFUNDED_PAYMENT")
     """Messages that contain :attr:`telegram.Message.refunded_payment`.
     .. versionadded:: 21.4
-    """
-
-    class _UserShared(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.api_kwargs.get("user_shared"))
-
-    USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
-    """Messages that contain ``"user_shared"`` in :attr:`telegram.TelegramObject.api_kwargs`.
-
-    Warning:
-        This will only catch the legacy ``user_shared`` field, not the
-        new :attr:`telegram.Message.users_shared` attribute!
-
-    .. versionchanged:: 21.0
-       Now relies on :attr:`telegram.TelegramObject.api_kwargs` as the native attribute
-       ``Message.user_shared`` was removed.
-
-    .. versionadded:: 20.1
-    .. deprecated:: 20.8
-       Use :attr:`USERS_SHARED` instead.
     """
 
     class _UsersShared(MessageFilter):

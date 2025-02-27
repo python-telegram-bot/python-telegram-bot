@@ -740,10 +740,6 @@ class Application(
         poll_interval: float = 0.0,
         timeout: int = 10,
         bootstrap_retries: int = -1,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         allowed_updates: Optional[Sequence[str]] = None,
         drop_pending_updates: Optional[bool] = None,
         close_loop: bool = True,
@@ -775,6 +771,11 @@ class Application(
 
         .. include:: inclusions/application_run_tip.rst
 
+        .. versionchanged::
+            Removed the deprecated parameters ``read_timeout``, ``write_timeout``,
+            ``connect_timeout``, and ``pool_timeout``. Use the corresponding methods in
+            :class:`telegram.ext.ApplicationBuilder` instead.
+
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
@@ -787,38 +788,6 @@ class Application(
                 *   0 - no retries
                 * > 0 - retry up to X times
 
-            read_timeout (:obj:`float`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-                .. versionchanged:: 20.7
-                    Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of
-                    ``2``.
-
-                .. deprecated:: 20.7
-                    Deprecated in favor of setting the timeout via
-                    :meth:`telegram.ext.ApplicationBuilder.get_updates_read_timeout`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-                .. deprecated:: 20.7
-                    Deprecated in favor of setting the timeout via
-                    :meth:`telegram.ext.ApplicationBuilder.get_updates_write_timeout`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-                .. deprecated:: 20.7
-                    Deprecated in favor of setting the timeout via
-                    :meth:`telegram.ext.ApplicationBuilder.get_updates_connect_timeout`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-                .. deprecated:: 20.7
-                    Deprecated in favor of setting the timeout via
-                    :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
             allowed_updates (Sequence[:obj:`str`], optional): Passed to
@@ -850,16 +819,6 @@ class Application(
                 "Application.run_polling is only available if the application has an Updater."
             )
 
-        if (read_timeout, write_timeout, connect_timeout, pool_timeout) != ((DEFAULT_NONE,) * 4):
-            warn(
-                PTBDeprecationWarning(
-                    "20.6",
-                    "Setting timeouts via `Application.run_polling` is deprecated. "
-                    "Please use `ApplicationBuilder.get_updates_*_timeout` instead.",
-                ),
-                stacklevel=2,
-            )
-
         def error_callback(exc: TelegramError) -> None:
             self.create_task(self.process_error(error=exc, update=None))
 
@@ -868,10 +827,6 @@ class Application(
                 poll_interval=poll_interval,
                 timeout=timeout,
                 bootstrap_retries=bootstrap_retries,
-                read_timeout=read_timeout,
-                write_timeout=write_timeout,
-                connect_timeout=connect_timeout,
-                pool_timeout=pool_timeout,
                 allowed_updates=allowed_updates,
                 drop_pending_updates=drop_pending_updates,
                 error_callback=error_callback,  # if there is an error in fetching updates
