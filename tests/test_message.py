@@ -2216,9 +2216,9 @@ class TestMessageWithoutRequest(MessageTestBase):
             "title",
             "description",
             "payload",
-            "provider_token",
             "currency",
             "prices",
+            "provider_token",
         )
         await self.check_quote_parsing(
             message,

@@ -388,8 +388,8 @@ class BackgroundTypeWallpaper(BackgroundType):
 
 class BackgroundTypePattern(BackgroundType):
     """
-    The background is a `PNG` or `TGV` (gzipped subset of `SVG` with `MIME` type
-    `"application/x-tgwallpattern"`) pattern to be combined with the background fill
+    The background is a ``.PNG`` or ``.TGV`` (gzipped subset of ``SVG`` with ``MIME`` type
+    ``"application/x-tgwallpattern"``) pattern to be combined with the background fill
     chosen by the user.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are

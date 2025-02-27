@@ -4648,8 +4648,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
         Whenever there is an update for the bot, Telegram will send an HTTPS POST request to the
-        specified url, containing An Update. In case of an unsuccessful request,
-        Telegram will give up after a reasonable amount of attempts.
+        specified url, containing An Update. In case of an unsuccessful request
+        (a request with response
+        `HTTP status code <https://en.wikipedia.org/wiki/List_of_HTTP_status_codes>`_different
+        from ``2XY``),
+        Telegram will repeat the request and give up after a reasonable amount of attempts.
 
         If you'd like to make sure that the Webhook was set by you, you can specify secret data in
         the parameter :paramref:`secret_token`. If specified, the request will contain a header
@@ -5194,9 +5197,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         title: str,
         description: str,
         payload: str,
-        provider_token: Optional[str],  # This arg is now optional as of Bot API 7.4
         currency: str,
         prices: Sequence["LabeledPrice"],
+        provider_token: Optional[str] = None,
         start_parameter: Optional[str] = None,
         photo_url: Optional[str] = None,
         photo_size: Optional[int] = None,
@@ -5249,13 +5252,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use it for your internal processes.
-            provider_token (:obj:`str`): Payments provider token, obtained via
+            provider_token (:obj:`str`, optional): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. deprecated:: 21.3
-                    As of Bot API 7.4, this parameter is now optional and future versions of the
-                    library will make it optional as well.
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 7.4 made this parameter is optional and this is now reflected in the
+                    function signature.
 
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_. Pass ``XTR`` for
@@ -6981,7 +6984,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.constants.StickerFormat.STATIC` for a
                 ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
                 for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a
-                WEBM video.
+                ``.WEBM`` video.
 
                 .. versionadded:: 21.1
 
@@ -6995,7 +6998,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
                 kilobytes in size; see
                 `the docs <https://core.telegram.org/stickers#animation-requirements>`_ for
-                animated sticker technical requirements, or a **.WEBM** video with the thumbnail up
+                animated sticker technical requirements, or a ``.WEBM`` video with the thumbnail up
                 to :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
                 kilobytes in size; see
                 `this <https://core.telegram.org/stickers#video-requirements>`_ for video sticker
@@ -8275,9 +8278,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         title: str,
         description: str,
         payload: str,
-        provider_token: Optional[str],  # This arg is now optional as of Bot API 7.4
         currency: str,
         prices: Sequence["LabeledPrice"],
+        provider_token: Optional[str] = None,
         max_tip_amount: Optional[int] = None,
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         provider_data: Optional[Union[str, object]] = None,
@@ -8319,13 +8322,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use it for your internal processes.
-            provider_token (:obj:`str`): Payments provider token, obtained via
+            provider_token (:obj:`str`, optional): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. deprecated:: 21.3
-                    As of Bot API 7.4, this parameter is now optional and future versions of the
-                    library will make it optional as well.
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 7.4 made this parameter is optional and this is now reflected in the
+                    function signature.
 
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_. Pass ``XTR`` for
@@ -9584,7 +9587,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_canceled": is_canceled,
         }
         return await self._post(
-            "editUserStartSubscription",
+            "editUserStarSubscription",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -9943,7 +9946,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Verifies a chat on behalf of the organization which is represented by the bot.
+        """Verifies a chat |org-verify| which is represented by the bot.
 
         .. versionadded:: 21.10
 
@@ -9985,7 +9988,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Verifies a user on behalf of the organization which is represented by the bot.
+        """Verifies a user |org-verify| which is represented by the bot.
 
         .. versionadded:: 21.10
 
@@ -10026,8 +10029,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Removes verification from a chat that is currently verified on behalf of the
-        organization represented by the bot.
+        """Removes verification from a chat that is currently verified |org-verify|
+        represented by the bot.
 
 
 
@@ -10065,8 +10068,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Removes verification from a user who is currently verified on behalf of the
-        organization represented by the bot.
+        """Removes verification from a user who is currently verified |org-verify|
+        represented by the bot.
 
 
 

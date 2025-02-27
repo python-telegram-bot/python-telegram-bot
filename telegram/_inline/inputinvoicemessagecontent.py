@@ -35,9 +35,11 @@ class InputInvoiceMessageContent(InputMessageContent):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`title`, :attr:`description`, :attr:`payload`,
-    :attr:`provider_token`, :attr:`currency` and :attr:`prices` are equal.
+    :attr:`currency` and :attr:`prices` are equal.
 
     .. versionadded:: 13.5
+    .. versionchanged:: NEXT.VERSION
+       :attr:`provider_token` is no longer considered for equality comparison.
 
     Args:
         title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
@@ -49,13 +51,13 @@ class InputInvoiceMessageContent(InputMessageContent):
             :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
             :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be displayed
             to the user, use it for your internal processes.
-        provider_token (:obj:`str`): Payment provider token, obtained via
+        provider_token (:obj:`str`, optional): Payment provider token, obtained via
             `@Botfather <https://t.me/Botfather>`_. Pass an empty string for payments in
             |tg_stars|.
 
-            .. deprecated:: 21.3
-                As of Bot API 7.4, this parameter is now optional and future versions of the
-                library will make it optional as well.
+            .. versionchanged:: NEXT.VERSION
+                Bot API 7.4 made this parameter is optional and this is now reflected in the
+                class signature.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_.
             Pass ``XTR`` for payments in |tg_stars|.
@@ -199,9 +201,9 @@ class InputInvoiceMessageContent(InputMessageContent):
         title: str,
         description: str,
         payload: str,
-        provider_token: Optional[str],  # This arg is now optional since Bot API 7.4
         currency: str,
         prices: Sequence[LabeledPrice],
+        provider_token: Optional[str] = None,
         max_tip_amount: Optional[int] = None,
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         provider_data: Optional[str] = None,
@@ -225,10 +227,10 @@ class InputInvoiceMessageContent(InputMessageContent):
             self.title: str = title
             self.description: str = description
             self.payload: str = payload
-            self.provider_token: Optional[str] = provider_token
             self.currency: str = currency
             self.prices: tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
             # Optionals
+            self.provider_token: Optional[str] = provider_token
             self.max_tip_amount: Optional[int] = max_tip_amount
             self.suggested_tip_amounts: tuple[int, ...] = parse_sequence_arg(suggested_tip_amounts)
             self.provider_data: Optional[str] = provider_data
@@ -248,7 +250,6 @@ class InputInvoiceMessageContent(InputMessageContent):
                 self.title,
                 self.description,
                 self.payload,
-                self.provider_token,
                 self.currency,
                 self.prices,
             )
