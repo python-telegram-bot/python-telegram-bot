@@ -103,9 +103,6 @@ class ParamTypeCheckingExceptions:
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },
-        # TODO: Deprecated and will be corrected (and removed) in next major PTB
-        #  version:
-        "send_gift": {"gift_id": str},  # actual: Non optional
     }
 
     # param names ignored in the param type checking in classes for the `tg.Defaults` case.
