@@ -50,6 +50,7 @@ from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._updater import Updater
+from telegram.ext._utils.networkloop import network_retry_loop
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RT, UD, ConversationKey, HandlerCallback
@@ -739,7 +740,7 @@ class Application(
         self,
         poll_interval: float = 0.0,
         timeout: int = 10,
-        bootstrap_retries: int = -1,
+        bootstrap_retries: int = 0,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -780,12 +781,18 @@ class Application(
                 Telegram in seconds. Default is ``0.0``.
             timeout (:obj:`int`, optional): Passed to
                 :paramref:`telegram.Bot.get_updates.timeout`. Default is ``10`` seconds.
-            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
-                :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
+            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase
+                (calling :meth:`initialize` and the boostrapping of
+                :meth:`telegram.ext.Updater.start_polling`)
+                will retry on failures on the Telegram server.
 
-                * < 0 - retry indefinitely (default)
-                *   0 - no retries
+                * < 0 - retry indefinitely
+                *   0 - no retries (default)
                 * > 0 - retry up to X times
+
+                .. versionchanged:: NEXT.VERSION
+                    The default value will be changed to from ``-1`` to ``0``. Indefinite retries
+                    during bootstrapping are not recommended.
 
             read_timeout (:obj:`float`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to
@@ -876,8 +883,9 @@ class Application(
                 drop_pending_updates=drop_pending_updates,
                 error_callback=error_callback,  # if there is an error in fetching updates
             ),
-            close_loop=close_loop,
             stop_signals=stop_signals,
+            bootstrap_retries=bootstrap_retries,
+            close_loop=close_loop,
         )
 
     def run_webhook(
@@ -946,8 +954,10 @@ class Application(
             url_path (:obj:`str`, optional): Path inside url. Defaults to `` '' ``
             cert (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL certificate file.
             key (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL key file.
-            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
-                :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
+            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase
+                (calling :meth:`initialize` and the boostrapping of
+                :meth:`telegram.ext.Updater.start_polling`)
+                will retry on failures on the Telegram server.
 
                 * < 0 - retry indefinitely
                 *   0 - no retries (default)
@@ -1033,18 +1043,28 @@ class Application(
                 secret_token=secret_token,
                 unix=unix,
             ),
-            close_loop=close_loop,
             stop_signals=stop_signals,
+            bootstrap_retries=bootstrap_retries,
+            close_loop=close_loop,
+        )
+
+    async def _bootstrap_initialize(self, max_retries: int) -> None:
+        await network_retry_loop(
+            action_cb=self.initialize,
+            description="Bootstrap Initialize Application",
+            max_retries=max_retries,
+            interval=1,
         )
 
     def __run(
         self,
         updater_coroutine: Coroutine,
         stop_signals: ODVInput[Sequence[int]],
+        bootstrap_retries: int,
         close_loop: bool = True,
     ) -> None:
         # Calling get_event_loop() should still be okay even in py3.10+ as long as there is a
-        # running event loop or we are in the main thread, which are the intended use cases.
+        # running event loop, or we are in the main thread, which are the intended use cases.
         # See the docs of get_event_loop() and get_running_loop() for more info
         loop = asyncio.get_event_loop()
 
@@ -1064,7 +1084,7 @@ class Application(
             )
 
         try:
-            loop.run_until_complete(self.initialize())
+            loop.run_until_complete(self._bootstrap_initialize(max_retries=bootstrap_retries))
             if self.post_init:
                 loop.run_until_complete(self.post_init(self))
             if self.__stop_running_marker.is_set():
