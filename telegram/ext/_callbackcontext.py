@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
-
+import asyncio
 from collections.abc import Awaitable, Generator
+from contextlib import AbstractAsyncContextManager
 from re import Match
 from typing import TYPE_CHECKING, Any, Generic, NoReturn, Optional, TypeVar, Union
 
@@ -26,12 +27,13 @@ from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
 from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
+from telegram.ext._fsm import FiniteStateMachine, State
 from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
     from asyncio import Future, Queue
 
-    from telegram.ext import Application, Job, JobQueue
+    from telegram.ext import Application, Job, JobQueue, StateInfo
     from telegram.ext._utils.types import CCT
 
 _STORING_DATA_WIKI = (
@@ -121,6 +123,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         "args",
         "coroutine",
         "error",
+        "fsm_state_info",
         "job",
         "matches",
     )
@@ -141,6 +144,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.coroutine: Optional[
             Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
+        self.fsm_state_info: StateInfo = None  # type: ignore[assignment]
 
     @property
     def application(self) -> "Application[BT, ST, UD, CD, BD, Any]":
@@ -268,6 +272,22 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             raise RuntimeError(  # noqa: TRY004
                 "telegram.Bot does not allow for arbitrary callback data."
             )
+
+    @property
+    def fsm(self) -> FiniteStateMachine:
+        return self.application.fsm
+
+    def fsm_semaphore(self) -> asyncio.Lock:
+        return self.fsm.get_lock(self.fsm_state_info.key)
+
+    async def set_state(self, state: State) -> None:
+        await self.fsm.set_state(self.fsm_state_info.key, state, self.fsm_state_info.version)
+
+    def set_state_nowait(self, state: State) -> None:
+        self.fsm.set_state_nowait(self.fsm_state_info.key, state, self.fsm_state_info.version)
+
+    def as_fsm_state(self, state: State) -> AbstractAsyncContextManager[None]:
+        return self.fsm.as_state(self.fsm_state_info.key, state)
 
     @classmethod
     def from_error(
