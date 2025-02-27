@@ -1,0 +1,5 @@
+documentation = "Add `chango <https://chango.readthedocs.io/stable/>`_ As Changelog Management Tool"
+[[pull_requests]]
+uid = "4672"
+author_uid = "Bibo-Joshi"
+closes_threads = ["4321"]

@@ -105,6 +105,11 @@ search-paths = ["telegram"]
 [tool.hatch.build]
 packages = ["telegram"]
 
+# CHANGO
+[tool.chango]
+sys_path = "changes"
+chango_instance = { name= "chango_instance", module = "config" }
+
 # BLACK:
 [tool.black]
 line-length = 99
