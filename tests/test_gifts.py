@@ -135,40 +135,8 @@ class TestGiftWithoutRequest(GiftTestBase):
         ],
         ids=["string", "Gift"],
     )
-    async def test_send_gift(self, offline_bot, gift, monkeypatch):
-        # We can't send actual gifts, so we just check that the correct parameters are passed
-        text_entities = [
-            MessageEntity(MessageEntity.TEXT_LINK, 0, 4, "url"),
-            MessageEntity(MessageEntity.BOLD, 5, 9),
-        ]
-
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            user_id = request_data.parameters["user_id"] == "user_id"
-            gift_id = request_data.parameters["gift_id"] == "gift_id"
-            text = request_data.parameters["text"] == "text"
-            text_parse_mode = request_data.parameters["text_parse_mode"] == "text_parse_mode"
-            tes = request_data.parameters["text_entities"] == [
-                me.to_dict() for me in text_entities
-            ]
-            pay_for_upgrade = request_data.parameters["pay_for_upgrade"] is True
-
-            return user_id and gift_id and text and text_parse_mode and tes and pay_for_upgrade
-
-        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.send_gift(
-            "user_id",
-            gift,
-            "text",
-            text_parse_mode="text_parse_mode",
-            text_entities=text_entities,
-            pay_for_upgrade=True,
-        )
-
     @pytest.mark.parametrize("id_name", ["user_id", "chat_id"])
-    async def test_send_gift_user_chat_id(self, offline_bot, gift, monkeypatch, id_name):
-        # Only here because we have to temporarily mark gift_id as optional.
-        # tags: deprecated NEXT.VERSION
-
+    async def test_send_gift(self, offline_bot, gift, monkeypatch, id_name):
         # We can't send actual gifts, so we just check that the correct parameters are passed
         text_entities = [
             MessageEntity(MessageEntity.TEXT_LINK, 0, 4, "url"),
@@ -177,7 +145,7 @@ class TestGiftWithoutRequest(GiftTestBase):
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             received_id = request_data.parameters[id_name] == id_name
-            gift_id = request_data.parameters["gift_id"] == "some_id"
+            gift_id = request_data.parameters["gift_id"] == "gift_id"
             text = request_data.parameters["text"] == "text"
             text_parse_mode = request_data.parameters["text_parse_mode"] == "text_parse_mode"
             tes = request_data.parameters["text_entities"] == [
@@ -189,17 +157,13 @@ class TestGiftWithoutRequest(GiftTestBase):
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_gift(
-            gift_id=gift,
-            text="text",
+            gift,
+            "text",
             text_parse_mode="text_parse_mode",
             text_entities=text_entities,
             pay_for_upgrade=True,
             **{id_name: id_name},
         )
-
-    async def test_send_gift_without_gift_id(self, offline_bot):
-        with pytest.raises(TypeError, match="Missing required argument `gift_id`."):
-            await offline_bot.send_gift()
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     @pytest.mark.parametrize(
