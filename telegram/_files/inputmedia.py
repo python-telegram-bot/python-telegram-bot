@@ -214,6 +214,13 @@ class InputPaidMediaVideo(InputPaidMedia):
             Lastly you can pass an existing :class:`telegram.Video` object to send.
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
+        cover (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): Cover for the video in the message. |fileinputnopath|
+
+            .. versionchanged:: NEXT.VERSION
+        start_timestamp (:obj:`int`, optional): Start timestamp for the video in the message
+
+            .. versionchanged:: NEXT.VERSION
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int`, optional): Video duration in seconds.
@@ -225,6 +232,13 @@ class InputPaidMediaVideo(InputPaidMedia):
             :tg-const:`telegram.constants.InputPaidMediaType.VIDEO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Video to send.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
+        cover (:class:`telegram.InputFile`): Optional. Cover for the video in the message.
+            |fileinputnopath|
+
+            .. versionchanged:: NEXT.VERSION
+        start_timestamp (:obj:`int`): Optional. Start timestamp for the video in the message
+
+            .. versionchanged:: NEXT.VERSION
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration in seconds.
@@ -232,7 +246,15 @@ class InputPaidMediaVideo(InputPaidMedia):
             suitable for streaming.
     """
 
-    __slots__ = ("duration", "height", "supports_streaming", "thumbnail", "width")
+    __slots__ = (
+        "cover",
+        "duration",
+        "height",
+        "start_timestamp",
+        "supports_streaming",
+        "thumbnail",
+        "width",
+    )
 
     def __init__(
         self,
@@ -242,6 +264,8 @@ class InputPaidMediaVideo(InputPaidMedia):
         height: Optional[int] = None,
         duration: Optional[int] = None,
         supports_streaming: Optional[bool] = None,
+        cover: Optional[FileInput] = None,
+        start_timestamp: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -264,6 +288,10 @@ class InputPaidMediaVideo(InputPaidMedia):
             self.height: Optional[int] = height
             self.duration: Optional[int] = duration
             self.supports_streaming: Optional[bool] = supports_streaming
+            self.cover: Optional[Union[InputFile, str]] = (
+                parse_file_input(cover, attach=True, local_mode=True) if cover else None
+            )
+            self.start_timestamp: Optional[int] = start_timestamp
 
 
 class InputMediaAnimation(InputMedia):
@@ -536,6 +564,13 @@ class InputMediaVideo(InputMedia):
                 optional): |thumbdocstringnopath|
 
             .. versionadded:: 20.2
+        cover (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): Cover for the video in the message. |fileinputnopath|
+
+            .. versionchanged:: NEXT.VERSION
+        start_timestamp (:obj:`int`, optional): Start timestamp for the video in the message
+
+            .. versionchanged:: NEXT.VERSION
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
             .. versionadded:: 21.3
@@ -568,13 +603,22 @@ class InputMediaVideo(InputMedia):
         show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
 
             .. versionadded:: 21.3
+        cover (:class:`telegram.InputFile`): Optional. Cover for the video in the message.
+            |fileinputnopath|
+
+            .. versionchanged:: NEXT.VERSION
+        start_timestamp (:obj:`int`): Optional. Start timestamp for the video in the message
+
+            .. versionchanged:: NEXT.VERSION
     """
 
     __slots__ = (
+        "cover",
         "duration",
         "has_spoiler",
         "height",
         "show_caption_above_media",
+        "start_timestamp",
         "supports_streaming",
         "thumbnail",
         "width",
@@ -594,6 +638,8 @@ class InputMediaVideo(InputMedia):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         show_caption_above_media: Optional[bool] = None,
+        cover: Optional[FileInput] = None,
+        start_timestamp: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -625,6 +671,10 @@ class InputMediaVideo(InputMedia):
             self.supports_streaming: Optional[bool] = supports_streaming
             self.has_spoiler: Optional[bool] = has_spoiler
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.cover: Optional[Union[InputFile, str]] = (
+                parse_file_input(cover, attach=True, local_mode=True) if cover else None
+            )
+            self.start_timestamp: Optional[int] = start_timestamp
 
 
 class InputMediaAudio(InputMedia):

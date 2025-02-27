@@ -1328,6 +1328,8 @@ class User(TelegramObject):
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
+        cover: Optional[FileInput] = None,
+        start_timestamp: Optional[int] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1369,6 +1371,8 @@ class User(TelegramObject):
             parse_mode=parse_mode,
             supports_streaming=supports_streaming,
             thumbnail=thumbnail,
+            cover=cover,
+            start_timestamp=start_timestamp,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
@@ -1670,7 +1674,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             await bot.send_gift( user_id=update.effective_user.id, *args, **kwargs )
+             await bot.send_gift(user_id=update.effective_user.id, *args, **kwargs )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_gift`.
 
@@ -1680,6 +1684,7 @@ class User(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
         """
         return await self.get_bot().send_gift(
+            chat_id=None,
             user_id=self.id,
             gift_id=gift_id,
             text=text,
@@ -1707,6 +1712,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        video_start_timestamp: Optional[int] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1734,6 +1740,7 @@ class User(TelegramObject):
             from_chat_id=from_chat_id,
             message_id=message_id,
             caption=caption,
+            video_start_timestamp=video_start_timestamp,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
             disable_notification=disable_notification,
@@ -1766,6 +1773,7 @@ class User(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        video_start_timestamp: Optional[int] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1793,6 +1801,7 @@ class User(TelegramObject):
             chat_id=chat_id,
             message_id=message_id,
             caption=caption,
+            video_start_timestamp=video_start_timestamp,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
             disable_notification=disable_notification,
@@ -1908,6 +1917,7 @@ class User(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        video_start_timestamp: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1933,6 +1943,7 @@ class User(TelegramObject):
             chat_id=self.id,
             from_chat_id=from_chat_id,
             message_id=message_id,
+            video_start_timestamp=video_start_timestamp,
             disable_notification=disable_notification,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1950,6 +1961,7 @@ class User(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        video_start_timestamp: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1976,6 +1988,7 @@ class User(TelegramObject):
             from_chat_id=self.id,
             chat_id=chat_id,
             message_id=message_id,
+            video_start_timestamp=video_start_timestamp,
             disable_notification=disable_notification,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
