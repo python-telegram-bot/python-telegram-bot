@@ -1236,7 +1236,7 @@ class GiftLimit(IntEnum):
 
     __slots__ = ()
 
-    MAX_TEXT_LENGTH = 255
+    MAX_TEXT_LENGTH = 128
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.send_gift.text` parameter of :meth:`~telegram.Bot.send_gift`.
     """
