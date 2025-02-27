@@ -155,7 +155,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=2)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=3)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1236,9 +1236,12 @@ class GiftLimit(IntEnum):
 
     __slots__ = ()
 
-    MAX_TEXT_LENGTH = 255
+    MAX_TEXT_LENGTH = 128
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.send_gift.text` parameter of :meth:`~telegram.Bot.send_gift`.
+
+    .. versionchanged:: NEXT.VERSION
+       Updated Value to 128 based on Bot API 8.3
     """
 
 
@@ -2658,6 +2661,11 @@ class TransactionPartnerType(StringEnum):
     """:obj:`str`: Transaction with Affiliate Program.
 
     .. versionadded:: 21.9
+    """
+    CHAT = "chat"
+    """:obj:`str`: Transaction with a chat.
+
+    .. versionadded:: NEXT.VERSION
     """
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""

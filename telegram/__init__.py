@@ -238,6 +238,7 @@ __all__ = (
     "TextQuote",
     "TransactionPartner",
     "TransactionPartnerAffiliateProgram",
+    "TransactionPartnerChat",
     "TransactionPartnerFragment",
     "TransactionPartnerOther",
     "TransactionPartnerTelegramAds",
@@ -275,6 +276,7 @@ from telegram._payment.stars.startransactions import StarTransaction, StarTransa
 from telegram._payment.stars.transactionpartner import (
     TransactionPartner,
     TransactionPartnerAffiliateProgram,
+    TransactionPartnerChat,
     TransactionPartnerFragment,
     TransactionPartnerOther,
     TransactionPartnerTelegramAds,

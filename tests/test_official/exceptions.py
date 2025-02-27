@@ -19,7 +19,7 @@
 """This module contains exceptions to our API compared to the official API."""
 import datetime as dtm
 
-from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
+from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -47,7 +47,8 @@ class ParamTypeCheckingExceptions:
             "animation": Animation,
             "voice": Voice,
             "sticker": Sticker,
-            "gift_id": Gift,
+            # TODO: Deprecated and will be corrected (and readded) in next major bot API release:
+            # "gift_id": Gift,
         },
         "(delete|set)_sticker.*": {
             "sticker$": Sticker,
@@ -72,36 +73,40 @@ class ParamTypeCheckingExceptions:
         ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
         ("reaction", False): "ReactionType",  # + str
         ("options", False): "InputPollOption",  # + str
-        # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
+        # TODO: Deprecated and will be corrected (and removed) in next bot api release
         ("file_hashes", True): "list[str]",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
     # too complex to compare/predict with official API
     # structure: class/method_name: {param_name: reduced form of annotation}
-    COMPLEX_TYPES = (
-        {  # (param_name, is_class (i.e appears in a class?)): reduced form of annotation
-            "send_poll": {"correct_option_id": int},  # actual: Literal
-            "get_file": {
-                "file_id": str,  # actual: Union[str, objs_with_file_id_attr]
-            },
-            r"\w+invite_link": {
-                "invite_link": str,  # actual: Union[str, ChatInviteLink]
-            },
-            "send_invoice|create_invoice_link": {
-                "provider_data": str,  # actual: Union[str, obj]
-            },
-            "InlineKeyboardButton": {
-                "callback_data": str,  # actual: Union[str, obj]
-            },
-            "Input(Paid)?Media.*": {
-                "media": str,  # actual: Union[str, InputMedia*, FileInput]
-            },
-            "EncryptedPassportElement": {
-                "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
-            },
-        }
-    )
+    COMPLEX_TYPES = {
+        "send_poll": {"correct_option_id": int},  # actual: Literal
+        "get_file": {
+            "file_id": str,  # actual: Union[str, objs_with_file_id_attr]
+        },
+        r"\w+invite_link": {
+            "invite_link": str,  # actual: Union[str, ChatInviteLink]
+        },
+        "send_invoice|create_invoice_link": {
+            "provider_data": str,  # actual: Union[str, obj]
+        },
+        "InlineKeyboardButton": {
+            "callback_data": str,  # actual: Union[str, obj]
+        },
+        "Input(Paid)?Media.*": {
+            "media": str,  # actual: Union[str, InputMedia*, FileInput]
+            # see also https://github.com/tdlib/telegram-bot-api/issues/707
+            "thumbnail": str,  # actual: Union[str, FileInput]
+            "cover": str,  # actual: Union[str, FileInput]
+        },
+        "EncryptedPassportElement": {
+            "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
+        },
+        # TODO: Deprecated and will be corrected (and removed) in next major PTB
+        #  version:
+        "send_gift": {"gift_id": str},  # actual: Non optional
+    }
 
     # param names ignored in the param type checking in classes for the `tg.Defaults` case.
     IGNORED_DEFAULTS_PARAM_NAMES = {
@@ -198,6 +203,8 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
+    # here for backwards compatibility. Todo: remove on next bot api release
+    "send_gift": {"gift_id"},
 }
 
 
