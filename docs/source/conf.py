@@ -113,6 +113,9 @@ linkcheck_ignore = [
     r"https://github\.com/python-telegram-bot/python-telegram-bot/wiki/[\w\-_,]+\#",
     # The LGPL license link regularly causes network errors for some reason
     re.escape("https://www.gnu.org/licenses/lgpl-3.0.html"),
+    # The doc-fixes branch may not always exist - doesn't matter, we only link to it from the
+    # contributing guide
+    re.escape("https://docs.python-telegram-bot.org/en/doc-fixes"),
 ]
 linkcheck_allowed_redirects = {
     # Redirects to the default version are okay
