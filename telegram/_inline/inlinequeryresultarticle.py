@@ -38,7 +38,7 @@ class InlineQueryResultArticle(InlineQueryResult):
     .. versionchanged:: 20.5
       Removed the deprecated arguments and attributes ``thumb_*``.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.11
         Removed the deprecated argument and attribute ``hide_url``.
 
     Args:

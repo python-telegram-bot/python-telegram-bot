@@ -98,7 +98,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         :tg-const:`telegram.constants.FloodLimit.PAID_MESSAGES_PER_SECOND` messages per second by
         paying a fee in Telegram Stars.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.11
             This class automatically takes the
             :paramref:`~telegram.Bot.send_message.allow_paid_broadcast` parameter into account and
             throttles the requests accordingly.

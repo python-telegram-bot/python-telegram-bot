@@ -113,7 +113,7 @@ class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], AB
             This value is a snapshot of the current number of updates being processed. It may
             change immediately after being read.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.11
         """
         return self.max_concurrent_updates - self._semaphore.current_value
 

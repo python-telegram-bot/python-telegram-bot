@@ -56,7 +56,7 @@ class TransactionPartner(TelegramObject):
 
     .. versionadded:: 21.4
 
-    ..versionchanged:: NEXT.VERSION
+    ..versionchanged:: 21.11
         Added :class:`TransactionPartnerChat`
 
     Args:
@@ -76,7 +76,7 @@ class TransactionPartner(TelegramObject):
     CHAT: Final[str] = constants.TransactionPartnerType.CHAT
     """:const:`telegram.constants.TransactionPartnerType.CHAT`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.11
     """
     FRAGMENT: Final[str] = constants.TransactionPartnerType.FRAGMENT
     """:const:`telegram.constants.TransactionPartnerType.FRAGMENT`"""
@@ -188,7 +188,7 @@ class TransactionPartnerChat(TransactionPartner):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`chat` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.11
 
     Args:
         chat (:class:`telegram.Chat`): Information about the chat.
