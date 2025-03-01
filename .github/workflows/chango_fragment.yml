@@ -1,0 +1,29 @@
+name: Create Chango Fragment
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+
+permissions: {}
+
+jobs:
+  create-chango-fragment:
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+    name: create-chango-fragment
+    runs-on: ubuntu-latest
+    steps:
+
+      # Create the new fragment
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: Bibo-Joshi/chango@176c53372d1f8c0f1f6caabde100077bc45d41cc # v0.3.1
+        with:
+          github-token: ${{ secrets.CHANGO_PAT }}
+          query-issue-types: true
+
+
