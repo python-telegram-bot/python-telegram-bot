@@ -18,7 +18,7 @@ python:
   install:
     - method: pip
       path: .
-    - requirements: docs/requirements-docs.txt
+    - requirements: requirements-dev-all.txt
 
 build:
   os: ubuntu-22.04
