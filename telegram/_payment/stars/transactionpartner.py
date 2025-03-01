@@ -23,6 +23,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
+from telegram._chat import Chat
 from telegram._gifts import Gift
 from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
@@ -43,6 +44,7 @@ class TransactionPartner(TelegramObject):
     transactions. Currently, it can be one of:
 
     * :class:`TransactionPartnerUser`
+    * :class:`TransactionPartnerChat`
     * :class:`TransactionPartnerAffiliateProgram`
     * :class:`TransactionPartnerFragment`
     * :class:`TransactionPartnerTelegramAds`
@@ -53,6 +55,9 @@ class TransactionPartner(TelegramObject):
     considered equal, if their :attr:`type` is equal.
 
     .. versionadded:: 21.4
+
+    ..versionchanged:: NEXT.VERSION
+        Added :class:`TransactionPartnerChat`
 
     Args:
         type (:obj:`str`): The type of the transaction partner.
@@ -67,6 +72,11 @@ class TransactionPartner(TelegramObject):
     """:const:`telegram.constants.TransactionPartnerType.AFFILIATE_PROGRAM`
 
     .. versionadded:: 21.9
+    """
+    CHAT: Final[str] = constants.TransactionPartnerType.CHAT
+    """:const:`telegram.constants.TransactionPartnerType.CHAT`
+
+    .. versionadded:: NEXT.VERSION
     """
     FRAGMENT: Final[str] = constants.TransactionPartnerType.FRAGMENT
     """:const:`telegram.constants.TransactionPartnerType.FRAGMENT`"""
@@ -103,6 +113,7 @@ class TransactionPartner(TelegramObject):
 
         _class_mapping: dict[str, type[TransactionPartner]] = {
             cls.AFFILIATE_PROGRAM: TransactionPartnerAffiliateProgram,
+            cls.CHAT: TransactionPartnerChat,
             cls.FRAGMENT: TransactionPartnerFragment,
             cls.USER: TransactionPartnerUser,
             cls.TELEGRAM_ADS: TransactionPartnerTelegramAds,
@@ -167,6 +178,60 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
         data = cls._parse_data(data)
 
         data["sponsor_user"] = de_json_optional(data.get("sponsor_user"), User, bot)
+
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
+
+
+class TransactionPartnerChat(TransactionPartner):
+    """Describes a transaction with a chat.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`chat` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        chat (:class:`telegram.Chat`): Information about the chat.
+        gift (:class:`telegram.Gift`, optional): The gift sent to the chat by the bot.
+
+    Attributes:
+        type (:obj:`str`): The type of the transaction partner,
+            always :tg-const:`telegram.TransactionPartner.CHAT`.
+        chat (:class:`telegram.Chat`): Information about the chat.
+        gift (:class:`telegram.Gift`): Optional. The gift sent to the user by the bot.
+
+    """
+
+    __slots__ = (
+        "chat",
+        "gift",
+    )
+
+    def __init__(
+        self,
+        chat: Chat,
+        gift: Optional[Gift] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
+        super().__init__(type=TransactionPartner.CHAT, api_kwargs=api_kwargs)
+
+        with self._unfrozen():
+            self.chat: Chat = chat
+            self.gift: Optional[Gift] = gift
+
+            self._id_attrs = (
+                self.type,
+                self.chat,
+            )
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TransactionPartnerChat":
+        """See :meth:`telegram.TransactionPartner.de_json`."""
+        data = cls._parse_data(data)
+
+        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
+        data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
