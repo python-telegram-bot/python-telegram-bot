@@ -111,6 +111,8 @@ linkcheck_ignore = [
     # Anchors are apparently inserted by GitHub dynamically, so let's skip checking them
     "https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples#",
     r"https://github\.com/python-telegram-bot/python-telegram-bot/wiki/[\w\-_,]+\#",
+    # THe LGPL license link regularly causes network errors for some reason
+    re.escape("https://www.gnu.org/licenses/lgpl-3.0.html"),
 ]
 linkcheck_allowed_redirects = {
     # Redirects to the default version are okay
