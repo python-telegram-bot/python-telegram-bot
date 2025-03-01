@@ -19,7 +19,7 @@
 """This module contains a network retry loop implementation.
 Its specifically tailored to handling the Telegram API and its errors.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 21.11
 
 Hint:
     It was originally part of the `Updater` class, but as part of #4657 it was extracted into its

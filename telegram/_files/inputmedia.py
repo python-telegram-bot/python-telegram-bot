@@ -217,10 +217,10 @@ class InputPaidMediaVideo(InputPaidMedia):
         cover (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): Cover for the video in the message. |fileinputnopath|
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
         start_timestamp (:obj:`int`, optional): Start timestamp for the video in the message
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int`, optional): Video duration in seconds.
@@ -235,10 +235,10 @@ class InputPaidMediaVideo(InputPaidMedia):
         cover (:class:`telegram.InputFile`): Optional. Cover for the video in the message.
             |fileinputnopath|
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
         start_timestamp (:obj:`int`): Optional. Start timestamp for the video in the message
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration in seconds.
@@ -567,10 +567,10 @@ class InputMediaVideo(InputMedia):
         cover (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): Cover for the video in the message. |fileinputnopath|
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
         start_timestamp (:obj:`int`, optional): Start timestamp for the video in the message
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
             .. versionadded:: 21.3
@@ -606,10 +606,10 @@ class InputMediaVideo(InputMedia):
         cover (:class:`telegram.InputFile`): Optional. Cover for the video in the message.
             |fileinputnopath|
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
         start_timestamp (:obj:`int`): Optional. Start timestamp for the video in the message
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
     """
 
     __slots__ = (

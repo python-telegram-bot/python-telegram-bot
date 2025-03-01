@@ -245,7 +245,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 Example:
                     ``"https://api.telegram.org/bot{token}/test"``
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
                Supports callable input and string formatting.
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
             If the string contains ``{token}``, it will be replaced with the bot's
@@ -262,7 +262,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 Example:
                     ``"https://api.telegram.org/file/bot{token}/test"``
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
                Supports callable input and string formatting.
         request (:class:`telegram.request.BaseRequest`, optional): Pre initialized
             :class:`telegram.request.BaseRequest` instances. Will be used for all bot methods
@@ -1246,7 +1246,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             video_start_timestamp (:obj:`int`, optional): New start timestamp for the
                 forwarded video in the message
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.11
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1564,7 +1564,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent audio
                 in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -2006,17 +2006,17 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent video
                 in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
             cover (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): Cover for the video in the message. |fileinputnopath|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.11
             start_timestamp (:obj:`int`, optional): Start timestamp for the video in the message.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.11
             caption (:obj:`str`, optional): Video caption (may also be used when resending videos
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -2192,7 +2192,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent video
                 in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             length (:obj:`int`, optional): Video width and height, i.e. diameter of the video
                 message.
@@ -2344,7 +2344,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent
                 animation in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
@@ -2528,7 +2528,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the voice
                 message in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
@@ -2842,7 +2842,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
                 locations that can be edited indefinitely.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
                 moving, in degrees. Must be between
@@ -3012,7 +3012,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
                 .. versionadded:: 21.2.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
@@ -3709,7 +3709,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 time in seconds that the
                 result of the inline query may be cached on the server. Defaults to ``300``.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on
                 the server side only for the user that sent the query. By default,
@@ -4161,7 +4161,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 time in seconds that the
                 result of the callback query may be cached client-side. Defaults to 0.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
 
         Returns:
@@ -5256,7 +5256,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     Bot API 7.4 made this parameter is optional and this is now reflected in the
                     function signature.
 
@@ -7387,7 +7387,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.MAX_OPEN_PERIOD`. Can't be used together with
                 :paramref:`close_date`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
                 timestamp) when the poll will be automatically closed. Must be at least
@@ -8017,7 +8017,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             video_start_timestamp (:obj:`int`, optional): New start timestamp for the
                 copied video in the message
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.11
             caption (:obj:`str`, optional): New caption for media,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing. If not specified, the original caption is kept.
@@ -8326,7 +8326,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     Bot API 7.4 made this parameter is optional and this is now reflected in the
                     function signature.
 
@@ -9734,7 +9734,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 active for before the next payment. Currently, it must always be
                 :tg-const:`telegram.constants.ChatSubscriptionLimit.SUBSCRIPTION_PERIOD` (30 days).
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             subscription_price (:obj:`int`): The number of Telegram Stars a user must pay initially
                 and after each subsequent subscription period to be a member of the chat;
@@ -9878,14 +9878,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             user_id (:obj:`int`, optional): Required if :paramref:`chat_id` is not specified.
                 Unique identifier of the target user that will receive the gift.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     Now optional.
             gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
                 :class:`~telegram.Gift` object
             chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`user_id`
                 is not specified. |chat_id_channel| It will receive the gift.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.11
             text (:obj:`str`, optional): Text that will be shown along with the gift;
                 0- :tg-const:`telegram.constants.GiftLimit.MAX_TEXT_LENGTH` characters
             text_parse_mode (:obj:`str`, optional): Mode for parsing entities.
@@ -9912,7 +9912,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        # TODO: Remove when stability policy allows, tags: deprecated NEXT.VERSION
+        # TODO: Remove when stability policy allows, tags: deprecated 21.11
         # also we should raise a deprecation warnung if anything is passed by
         # position since it will be moved, not sure how
         if gift_id is None:

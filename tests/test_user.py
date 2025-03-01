@@ -732,7 +732,7 @@ class TestUserWithoutRequest(UserTestBase):
             )
 
         # TODO discuss if better way exists
-        # tags: deprecated NEXT.VERSION
+        # tags: deprecated 21.11
         with pytest.raises(
             Exception,
             match="Default for argument gift_id does not match the default of the Bot method.",

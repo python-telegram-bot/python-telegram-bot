@@ -167,7 +167,7 @@ class TestGiftWithoutRequest(GiftTestBase):
     @pytest.mark.parametrize("id_name", ["user_id", "chat_id"])
     async def test_send_gift_user_chat_id(self, offline_bot, gift, monkeypatch, id_name):
         # Only here because we have to temporarily mark gift_id as optional.
-        # tags: deprecated NEXT.VERSION
+        # tags: deprecated 21.11
 
         # We can't send actual gifts, so we just check that the correct parameters are passed
         text_entities = [

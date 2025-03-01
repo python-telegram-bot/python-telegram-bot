@@ -790,7 +790,7 @@ class Application(
                 *   0 - no retries (default)
                 * > 0 - retry up to X times
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     The default value will be changed to from ``-1`` to ``0``. Indefinite retries
                     during bootstrapping are not recommended.
 
