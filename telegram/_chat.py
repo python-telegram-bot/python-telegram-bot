@@ -3485,7 +3485,7 @@ class _ChatBase(TelegramObject):
 
         .. versionadded:: 21.8
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.11
 
             Added support for channel chats.
 

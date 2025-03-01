@@ -38,7 +38,7 @@ class InputInvoiceMessageContent(InputMessageContent):
     :attr:`currency` and :attr:`prices` are equal.
 
     .. versionadded:: 13.5
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.11
        :attr:`provider_token` is no longer considered for equality comparison.
 
     Args:
@@ -55,7 +55,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             `@Botfather <https://t.me/Botfather>`_. Pass an empty string for payments in
             |tg_stars|.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
                 Bot API 7.4 made this parameter is optional and this is now reflected in the
                 class signature.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on

@@ -1240,7 +1240,7 @@ class GiftLimit(IntEnum):
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.send_gift.text` parameter of :meth:`~telegram.Bot.send_gift`.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.11
        Updated Value to 128 based on Bot API 8.3
     """
 
@@ -2665,7 +2665,7 @@ class TransactionPartnerType(StringEnum):
     CHAT = "chat"
     """:obj:`str`: Transaction with a chat.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.11
     """
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""

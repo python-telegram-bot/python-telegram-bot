@@ -202,7 +202,7 @@ class ChatFullInfo(_ChatBase):
             .. versionadded:: 21.4
         can_send_gift (:obj:`bool`, optional): :obj:`True`, if gifts can be sent to the chat.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.11
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -359,7 +359,7 @@ class ChatFullInfo(_ChatBase):
             .. versionadded:: 21.4
         can_send_gift (:obj:`bool`): Optional. :obj:`True`, if gifts can be sent to the chat.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.11
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups

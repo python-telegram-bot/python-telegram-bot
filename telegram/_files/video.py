@@ -56,10 +56,10 @@ class Video(_BaseThumbedMedium):
         cover (Sequence[:class:`telegram.PhotoSize`], optional): Available sizes of the cover of
             the video in the message.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.11
         start_timestamp (:obj:`int`, optional): Timestamp in seconds from which the video
             will play in the message
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.11
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -79,10 +79,10 @@ class Video(_BaseThumbedMedium):
         cover (tuple[:class:`telegram.PhotoSize`]): Optional, Available sizes of the cover of
             the video in the message.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.11
         start_timestamp (:obj:`int`): Optional, Timestamp in seconds from which the video
             will play in the message
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.11
     """
 
     __slots__ = (
