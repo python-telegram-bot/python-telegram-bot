@@ -1,3 +1,15 @@
+Version 21.11.1
+===============
+
+*Released 2025-03-01*
+
+This is the technical changelog for version 21.11. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Documentation Improvements
+--------------------------
+
+- Fix ReadTheDocs Build (:pr:`4695`)
+
 Version 21.11
 =============
 
