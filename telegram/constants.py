@@ -155,7 +155,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=2)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=3)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1236,9 +1236,12 @@ class GiftLimit(IntEnum):
 
     __slots__ = ()
 
-    MAX_TEXT_LENGTH = 255
+    MAX_TEXT_LENGTH = 128
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.send_gift.text` parameter of :meth:`~telegram.Bot.send_gift`.
+
+    .. versionchanged:: 21.11
+       Updated Value to 128 based on Bot API 8.3
     """
 
 
@@ -2618,13 +2621,13 @@ class StickerSetLimit(IntEnum):
     :meth:`telegram.Bot.add_sticker_to_set`.
     """
     MAX_STATIC_THUMBNAIL_SIZE = 128
-    """:obj:`int`: Maximum size of the thumbnail if it is a **.WEBP** or **.PNG** in kilobytes,
+    """:obj:`int`: Maximum size of the thumbnail if it is a ``.WEBP`` or ``.PNG`` in kilobytes,
     as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
     MAX_ANIMATED_THUMBNAIL_SIZE = 32
-    """:obj:`int`: Maximum size of the thumbnail if it is a **.TGS** or **.WEBM** in kilobytes,
+    """:obj:`int`: Maximum size of the thumbnail if it is a ``.TGS`` or ``.WEBM`` in kilobytes,
     as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
     STATIC_THUMB_DIMENSIONS = 100
-    """:obj:`int`: Exact height and width of the thumbnail if it is a **.WEBP** or **.PNG** in
+    """:obj:`int`: Exact height and width of the thumbnail if it is a ``.WEBP`` or ``.PNG`` in
     pixels, as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
 
 
@@ -2658,6 +2661,11 @@ class TransactionPartnerType(StringEnum):
     """:obj:`str`: Transaction with Affiliate Program.
 
     .. versionadded:: 21.9
+    """
+    CHAT = "chat"
+    """:obj:`str`: Transaction with a chat.
+
+    .. versionadded:: 21.11
     """
     FRAGMENT = "fragment"
     """:obj:`str`: Withdrawal transaction with Fragment."""

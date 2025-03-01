@@ -245,7 +245,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 Example:
                     ``"https://api.telegram.org/bot{token}/test"``
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
                Supports callable input and string formatting.
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
             If the string contains ``{token}``, it will be replaced with the bot's
@@ -262,7 +262,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 Example:
                     ``"https://api.telegram.org/file/bot{token}/test"``
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.11
                Supports callable input and string formatting.
         request (:class:`telegram.request.BaseRequest`, optional): Pre initialized
             :class:`telegram.request.BaseRequest` instances. Will be used for all bot methods
@@ -1218,6 +1218,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        video_start_timestamp: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1242,6 +1243,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 original message was sent (or channel username in the format ``@channelusername``).
             message_id (:obj:`int`): Message identifier in the chat specified in
                 :paramref:`from_chat_id`.
+            video_start_timestamp (:obj:`int`, optional): New start timestamp for the
+                forwarded video in the message
+
+                .. versionadded:: 21.11
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1260,6 +1265,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "chat_id": chat_id,
             "from_chat_id": from_chat_id,
             "message_id": message_id,
+            "video_start_timestamp": video_start_timestamp,
         }
 
         return await self._send_message(
@@ -1558,7 +1564,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent audio
                 in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -1955,6 +1961,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
+        cover: Optional[FileInput] = None,
+        start_timestamp: Optional[int] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1998,10 +2006,17 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent video
                 in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
+            cover (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): Cover for the video in the message. |fileinputnopath|
+
+                .. versionadded:: 21.11
+            start_timestamp (:obj:`int`, optional): Start timestamp for the video in the message.
+
+                .. versionadded:: 21.11
             caption (:obj:`str`, optional): Video caption (may also be used when resending videos
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -2088,6 +2103,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "width": width,
             "height": height,
             "supports_streaming": supports_streaming,
+            "cover": self._parse_file_input(cover, attach=True) if cover else None,
+            "start_timestamp": start_timestamp,
             "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
             "show_caption_above_media": show_caption_above_media,
@@ -2175,7 +2192,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent video
                 in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             length (:obj:`int`, optional): Video width and height, i.e. diameter of the video
                 message.
@@ -2327,7 +2344,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of sent
                 animation in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
@@ -2511,7 +2528,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the voice
                 message in seconds.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
@@ -2825,7 +2842,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
                 locations that can be edited indefinitely.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
                 moving, in degrees. Must be between
@@ -2995,7 +3012,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
                 .. versionadded:: 21.2.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             business_connection_id (:obj:`str`, optional): |business_id_str_edit|
 
@@ -3692,7 +3709,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 time in seconds that the
                 result of the inline query may be cached on the server. Defaults to ``300``.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on
                 the server side only for the user that sent the query. By default,
@@ -4144,7 +4161,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 time in seconds that the
                 result of the callback query may be cached client-side. Defaults to 0.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
 
         Returns:
@@ -4631,8 +4648,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
         Whenever there is an update for the bot, Telegram will send an HTTPS POST request to the
-        specified url, containing An Update. In case of an unsuccessful request,
-        Telegram will give up after a reasonable amount of attempts.
+        specified url, containing An Update. In case of an unsuccessful request
+        (a request with response
+        `HTTP status code <https://en.wikipedia.org/wiki/List_of_HTTP_status_codes>`_different
+        from ``2XY``),
+        Telegram will repeat the request and give up after a reasonable amount of attempts.
 
         If you'd like to make sure that the Webhook was set by you, you can specify secret data in
         the parameter :paramref:`secret_token`. If specified, the request will contain a header
@@ -5177,9 +5197,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         title: str,
         description: str,
         payload: str,
-        provider_token: Optional[str],  # This arg is now optional as of Bot API 7.4
         currency: str,
         prices: Sequence["LabeledPrice"],
+        provider_token: Optional[str] = None,
         start_parameter: Optional[str] = None,
         photo_url: Optional[str] = None,
         photo_size: Optional[int] = None,
@@ -5232,13 +5252,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use it for your internal processes.
-            provider_token (:obj:`str`): Payments provider token, obtained via
+            provider_token (:obj:`str`, optional): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. deprecated:: 21.3
-                    As of Bot API 7.4, this parameter is now optional and future versions of the
-                    library will make it optional as well.
+                .. versionchanged:: 21.11
+                    Bot API 7.4 made this parameter is optional and this is now reflected in the
+                    function signature.
 
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_. Pass ``XTR`` for
@@ -6964,7 +6984,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.constants.StickerFormat.STATIC` for a
                 ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
                 for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a
-                WEBM video.
+                ``.WEBM`` video.
 
                 .. versionadded:: 21.1
 
@@ -6978,7 +6998,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
                 kilobytes in size; see
                 `the docs <https://core.telegram.org/stickers#animation-requirements>`_ for
-                animated sticker technical requirements, or a **.WEBM** video with the thumbnail up
+                animated sticker technical requirements, or a ``.WEBM`` video with the thumbnail up
                 to :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
                 kilobytes in size; see
                 `this <https://core.telegram.org/stickers#video-requirements>`_ for video sticker
@@ -7367,7 +7387,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.MAX_OPEN_PERIOD`. Can't be used together with
                 :paramref:`close_date`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
                 timestamp) when the poll will be automatically closed. Must be at least
@@ -7974,6 +7994,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reply_parameters: Optional["ReplyParameters"] = None,
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        video_start_timestamp: Optional[int] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -7993,6 +8014,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
             message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
+            video_start_timestamp (:obj:`int`, optional): New start timestamp for the
+                copied video in the message
+
+                .. versionadded:: 21.11
             caption (:obj:`str`, optional): New caption for media,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing. If not specified, the original caption is kept.
@@ -8083,6 +8108,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "reply_parameters": reply_parameters,
             "show_caption_above_media": show_caption_above_media,
             "allow_paid_broadcast": allow_paid_broadcast,
+            "video_start_timestamp": video_start_timestamp,
         }
 
         result = await self._post(
@@ -8252,9 +8278,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         title: str,
         description: str,
         payload: str,
-        provider_token: Optional[str],  # This arg is now optional as of Bot API 7.4
         currency: str,
         prices: Sequence["LabeledPrice"],
+        provider_token: Optional[str] = None,
         max_tip_amount: Optional[int] = None,
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         provider_data: Optional[Union[str, object]] = None,
@@ -8296,13 +8322,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use it for your internal processes.
-            provider_token (:obj:`str`): Payments provider token, obtained via
+            provider_token (:obj:`str`, optional): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. deprecated:: 21.3
-                    As of Bot API 7.4, this parameter is now optional and future versions of the
-                    library will make it optional as well.
+                .. versionchanged:: 21.11
+                    Bot API 7.4 made this parameter is optional and this is now reflected in the
+                    function signature.
 
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_. Pass ``XTR`` for
@@ -9274,7 +9300,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """
-        Use this method to change the chosen reactions on a message. Service messages can't be
+        Use this method to change the chosen reactions on a message. Service messages of some types
+        can't be
         reacted to. Automatically forwarded messages from a channel to its discussion group have
         the same available reactions as messages in the channel. Bots can't use paid reactions.
 
@@ -9561,7 +9588,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_canceled": is_canceled,
         }
         return await self._post(
-            "editUserStartSubscription",
+            "editUserStarSubscription",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -9707,7 +9734,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 active for before the next payment. Currently, it must always be
                 :tg-const:`telegram.constants.ChatSubscriptionLimit.SUBSCRIPTION_PERIOD` (30 days).
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.11
                     |time-period-input|
             subscription_price (:obj:`int`): The number of Telegram Stars a user must pay initially
                 and after each subsequent subscription period to be a member of the chat;
@@ -9804,7 +9831,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> Gifts:
-        """Returns the list of gifts that can be sent by the bot to users.
+        """Returns the list of gifts that can be sent by the bot to users and channel chats.
         Requires no parameters.
 
         .. versionadded:: 21.8
@@ -9828,12 +9855,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
     async def send_gift(
         self,
-        user_id: int,
-        gift_id: Union[str, Gift],
+        user_id: Optional[int] = None,
+        gift_id: Union[str, Gift] = None,  # type: ignore
         text: Optional[str] = None,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Optional[Sequence["MessageEntity"]] = None,
         pay_for_upgrade: Optional[bool] = None,
+        chat_id: Optional[Union[str, int]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -9841,15 +9869,23 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Sends a gift to the given user.
-        The gift can't be converted to Telegram Stars by the user
+        """Sends a gift to the given user or channel chat.
+        The gift can't be converted to Telegram Stars by the receiver.
 
         .. versionadded:: 21.8
 
         Args:
-            user_id (:obj:`int`): Unique identifier of the target user that will receive the gift
+            user_id (:obj:`int`, optional): Required if :paramref:`chat_id` is not specified.
+                Unique identifier of the target user that will receive the gift.
+
+                .. versionchanged:: 21.11
+                    Now optional.
             gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
                 :class:`~telegram.Gift` object
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`user_id`
+                is not specified. |chat_id_channel| It will receive the gift.
+
+                .. versionadded:: 21.11
             text (:obj:`str`, optional): Text that will be shown along with the gift;
                 0- :tg-const:`telegram.constants.GiftLimit.MAX_TEXT_LENGTH` characters
             text_parse_mode (:obj:`str`, optional): Mode for parsing entities.
@@ -9876,6 +9912,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
+        # TODO: Remove when stability policy allows, tags: deprecated 21.11
+        # also we should raise a deprecation warnung if anything is passed by
+        # position since it will be moved, not sure how
+        if gift_id is None:
+            raise TypeError("Missing required argument `gift_id`.")
         data: JSONDict = {
             "user_id": user_id,
             "gift_id": gift_id.id if isinstance(gift_id, Gift) else gift_id,
@@ -9883,6 +9924,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "text_parse_mode": text_parse_mode,
             "text_entities": text_entities,
             "pay_for_upgrade": pay_for_upgrade,
+            "chat_id": chat_id,
         }
         return await self._post(
             "sendGift",
@@ -9905,7 +9947,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Verifies a chat on behalf of the organization which is represented by the bot.
+        """Verifies a chat |org-verify| which is represented by the bot.
 
         .. versionadded:: 21.10
 
@@ -9947,7 +9989,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Verifies a user on behalf of the organization which is represented by the bot.
+        """Verifies a user |org-verify| which is represented by the bot.
 
         .. versionadded:: 21.10
 
@@ -9988,8 +10030,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Removes verification from a chat that is currently verified on behalf of the
-        organization represented by the bot.
+        """Removes verification from a chat that is currently verified |org-verify|
+        represented by the bot.
 
 
 
@@ -10027,8 +10069,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Removes verification from a user who is currently verified on behalf of the
-        organization represented by the bot.
+        """Removes verification from a user who is currently verified |org-verify|
+        represented by the bot.
 
 
 
