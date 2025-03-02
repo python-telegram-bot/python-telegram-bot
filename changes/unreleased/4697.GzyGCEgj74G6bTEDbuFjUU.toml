@@ -1,4 +1,3 @@
-dependencies = "Bump github/codeql-action from 3.28.8 to 3.28.10"
 internal = "Bump github/codeql-action from 3.28.8 to 3.28.10"
 [[pull_requests]]
 uid = "4697"
