@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects used for request chats/users service messages."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
@@ -243,6 +243,26 @@ class SharedUser(TelegramObject):
         self._id_attrs = (self.user_id,)
 
         self._freeze()
+
+    @property
+    def name(self) -> Union[str, None]:
+        """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
+        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
+        """
+        if self.username:
+            return f"@{self.username}"
+        return self.full_name
+
+    @property
+    def full_name(self) -> Union[str, None]:
+        """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
+        available) :attr:`last_name`, otherwise None.
+        """
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        if self.first_name or self.last_name:
+            return f"{self.first_name or self.last_name}"
+        return None
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SharedUser":

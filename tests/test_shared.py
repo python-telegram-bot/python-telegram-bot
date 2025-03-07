@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 
+from unittest.mock import patch
+
 import pytest
 
 from telegram import ChatShared, PhotoSize, SharedUser, UsersShared
@@ -228,3 +230,32 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_name(self, shared_user, ):
+        with shared_user._unfrozen():
+            assert shared_user.name == "@user"
+            with patch.object(shared_user, 'username', None):
+                assert shared_user.name == "first last"
+            with patch.multiple(
+                    shared_user,
+                    last_name=None,
+                    first_name=None,
+            ):
+                assert shared_user.full_name is None
+
+    def test_full_name(self, shared_user):
+        with shared_user._unfrozen():
+            # Test `and` (both exists)
+            assert shared_user.full_name == "first last"
+            # Test `or` (one of them exists)
+            with patch.object(shared_user, 'first_name', None):
+                assert shared_user.full_name == "last"
+            with patch.object(shared_user, 'last_name', None):
+                assert shared_user.full_name == "first"
+            # Test None (None of them exists)
+            with patch.multiple(
+                    shared_user,
+                    last_name=None,
+                    first_name=None,
+            ):
+                assert shared_user.full_name is None
