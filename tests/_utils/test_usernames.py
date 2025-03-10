@@ -21,7 +21,7 @@ from __future__ import annotations
 import pytest
 from typing import TYPE_CHECKING
 from telegram import SharedUser
-from tests.test_user import user
+from tests.test_user import user  # noqa: F401 noqa: F811
 from telegram._utils.usernames import get_name, get_full_name, get_link
 
 if TYPE_CHECKING:
@@ -40,32 +40,33 @@ def shared_user():
     return result
 
 
-def test_get_name(user, ):
-    assert get_name(user=user) == "@username"
-    user.username = None
-    assert get_name(user=user) == "first\u2022name last\u2022name"
+def test_get_name(user: UserLike, shared_user: MiniUserLike, ):  # noqa: F811
+    assert get_name(user=user) == get_name(user=shared_user) == "@username"
+    shared_user.username = user.username = None
+    assert get_name(user=user) == get_name(user=shared_user) == "first\u2022name last\u2022name"
 
 
-def test_full_name_both_exists(user: UserLike, shared_user: MiniUserLike, ):
-    assert get_full_name(user=user) == get_full_name(user=shared_user) == "first\u2022name last\u2022name"
+def test_full_name_both_exists(user: UserLike, shared_user: MiniUserLike, ):  # noqa: F811
+    expected = "first\u2022name last\u2022name"
+    assert get_full_name(user=user) == get_full_name(user=shared_user) == expected
 
 
-def test_full_name_last_name_missed(user: UserLike, shared_user: MiniUserLike, ):
+def test_full_name_last_name_missed(user: UserLike, shared_user: MiniUserLike, ):  # noqa: F811
     user.last_name = shared_user.last_name = None
     assert get_full_name(user=user) == get_full_name(user=shared_user) == "first\u2022name"
 
 
-def test_full_name_first_name_missed(user: UserLike, shared_user: MiniUserLike, ):
+def test_full_name_first_name_missed(user: UserLike, shared_user: MiniUserLike, ):  # noqa: F811
     user.first_name = shared_user.first_name = None
     assert get_full_name(user=user) == get_full_name(user=shared_user) == "last\u2022name"
 
 
-def test_full_name_both_missed(user: UserLike, shared_user: MiniUserLike, ):
+def test_full_name_both_missed(user: UserLike, shared_user: MiniUserLike, ):  # noqa: F811
     user.first_name = user.last_name = shared_user.first_name = shared_user.last_name = None
     assert get_full_name(user=user) is get_full_name(user=shared_user) is None
 
 
-def test_link(user: UserLike, shared_user: MiniUserLike, ):
+def test_link(user: UserLike, shared_user: MiniUserLike, ):  # noqa: F811
     assert get_link(user=user, ) == get_link(user=shared_user, ) == f"https://t.me/{user.username}"
     user.username = shared_user.username = None
     assert get_link(user=user, ) is get_link(user=shared_user, ) is None

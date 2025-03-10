@@ -26,6 +26,7 @@ from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.usernames import get_name, get_full_name, get_link
 from telegram._utils.types import (
     CorrectOptionID,
     FileInput,
@@ -34,7 +35,6 @@ from telegram._utils.types import (
     ReplyMarkup,
     TimePeriod,
 )
-from telegram._utils.usernames import get_name, get_full_name, get_link
 from telegram.helpers import mention_html as helpers_mention_html
 from telegram.helpers import mention_markdown as helpers_mention_markdown
 

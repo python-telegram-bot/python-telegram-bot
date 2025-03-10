@@ -23,8 +23,8 @@ from typing import TYPE_CHECKING, Optional, Union
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
-from telegram._utils.types import JSONDict
 from telegram._utils.usernames import get_name, get_full_name, get_link
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram._bot import Bot

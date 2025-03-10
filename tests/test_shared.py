@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 
-from unittest.mock import patch
-
 import pytest
 
 from telegram import ChatShared, PhotoSize, SharedUser, UsersShared
@@ -230,4 +228,3 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
-

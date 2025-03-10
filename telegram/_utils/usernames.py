@@ -16,22 +16,20 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
-
+"""Shared properties to extract username, first_name, last_name values if filled."""
 from __future__ import annotations
-import typing
-"""This module contains auxiliary functionality for building strings for __repr__ method."""
+from typing import Protocol, overload
 
 
-class UserLikeOptional(typing.Protocol):
+class UserLikeOptional(Protocol):
     """
     Note:
         `User`, `Contact` (and maybe some other) objects always have first_name,
          unlike the `Chat` and `Shared`, were they are optional.
          The `last_name` is always optional.
     """
-    last_name: typing.Optional[str]
-    username: typing.Optional[str]
+    last_name: str | None
+    username: str | None
 
 
 class UserLike(UserLikeOptional):
@@ -51,15 +49,15 @@ class MiniUserLike(UserLikeOptional):
          unlike the `Chat` and `Shared`, were they are optional.
          The `last_name` is always optional.
     """
-    first_name: typing.Optional[str]
+    first_name: str | None
 
 
-@typing.overload
+@overload
 def get_name(user: UserLike) -> str:
     ...
 
 
-@typing.overload
+@overload
 def get_name(user: MiniUserLike) -> str | None:
     ...
 
@@ -74,11 +72,12 @@ def get_name(user: UserLike | MiniUserLike) -> str | None:
     return get_full_name(user=user, )
 
 
-@typing.overload
+@overload
 def get_full_name(user: UserLike) -> str:
     ...
 
-@typing.overload
+
+@overload
 def get_full_name(user: MiniUserLike) -> str | None:
     ...
 
