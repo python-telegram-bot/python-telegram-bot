@@ -20,6 +20,7 @@
 
 from collections.abc import Awaitable, Generator
 from re import Match
+from types import TracebackType
 from typing import TYPE_CHECKING, Any, Generic, NoReturn, Optional, TypeVar, Union
 
 from telegram._callbackquery import CallbackQuery
@@ -141,6 +142,22 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.coroutine: Optional[
             Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
+
+    async def __aenter__(self) -> "CallbackContext[BT, UD, CD, BD]":
+        """|async_context_manager| :meth:`enters to the callback context.
+
+        Returns:
+            The callback context instance.
+        """
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """|async_context_manager| :meth:`exits from the callback context."""
 
     @property
     def application(self) -> "Application[BT, ST, UD, CD, BD, Any]":

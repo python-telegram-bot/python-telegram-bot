@@ -1300,6 +1300,7 @@ class Application(
 
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
+        tasks = []
 
         for handlers in self.handlers.values():
             try:
@@ -1321,6 +1322,7 @@ class Application(
                                 exc_info=exc,
                             )
                             return
+                        await context.__aenter__()  # pylint: disable=unnecessary-dunder-call
                         await context.refresh_data()
                     coroutine: Coroutine = handler.handle_update(update, self, check, context)
 
@@ -1330,13 +1332,15 @@ class Application(
                         and self.bot.defaults
                         and not self.bot.defaults.block
                     ):
-                        self.create_task(
-                            coroutine,
-                            update=update,
-                            name=(
-                                f"Application:{self.bot.id}:process_update_non_blocking"
-                                f":{handler}"
-                            ),
+                        tasks.append(
+                            self.create_task(
+                                coroutine,
+                                update=update,
+                                name=(
+                                    f"Application:{self.bot.id}:process_update_non_blocking"
+                                    f":{handler}"
+                                ),
+                            )
                         )
                     else:
                         any_blocking = True
@@ -1353,6 +1357,22 @@ class Application(
                 if await self.process_error(update=update, error=exc):
                     _LOGGER.debug("Error handler stopped further handlers.")
                     break
+
+        if context is not None:
+            exit_ctx_coro = context.__aexit__(None, None, None)
+            if tasks:
+                fut = asyncio.gather(*tasks)
+                self.__create_ctx_task(
+                    context,
+                    fut,
+                    update=update,
+                    name=f"Application:{self.bot.id}:process_update_non_blocking",
+                )
+            else:
+                try:
+                    await exit_ctx_coro
+                except Exception as exc:
+                    await self.process_error(update=update, error=exc)
 
         if any_blocking:
             # Only need to mark the update for persistence if there was at least one
@@ -1912,7 +1932,8 @@ class Application(
                     and self.bot.defaults
                     and not self.bot.defaults.block
                 ):
-                    self.__create_task(
+                    self.__create_ctx_task(
+                        context,
                         callback(update, context),
                         update=update,
                         is_error_handler=True,
@@ -1920,7 +1941,8 @@ class Application(
                     )
                 else:
                     try:
-                        await callback(update, context)
+                        async with context:
+                            await callback(update, context)
                     except ApplicationHandlerStop:
                         return True
                     except Exception as exc:
@@ -1933,3 +1955,22 @@ class Application(
 
         _LOGGER.exception("No error handlers are registered, logging exception.", exc_info=error)
         return False
+
+    def __create_ctx_task(
+        self,
+        context: CCT,
+        coroutine: _CoroType[RT],
+        update: Optional[object] = None,
+        is_error_handler: bool = False,
+        name: Optional[str] = None,
+    ) -> "asyncio.Task[RT]":
+        task = self.__create_task(
+            coroutine, update=update, is_error_handler=is_error_handler, name=name
+        )
+        task.add_done_callback(
+            lambda _: self.__create_task(
+                context.__aexit__(None, None, None),
+                name=f"{name}:done_callback",
+            )
+        )
+        return task

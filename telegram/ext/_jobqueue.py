@@ -993,8 +993,9 @@ class Job(Generic[CCT]):
                 )
                 return
 
-            await context.refresh_data()
-            await self.callback(context)
+            async with context:
+                await context.refresh_data()
+                await self.callback(context)
         except Exception as exc:
             await application.create_task(
                 application.process_error(None, exc, job=self),
