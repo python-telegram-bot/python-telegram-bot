@@ -61,9 +61,9 @@ async def start_with_shipping_callback(update: Update, context: ContextTypes.DEF
         title,
         description,
         payload,
-        PAYMENT_PROVIDER_TOKEN,
         currency,
         prices,
+        provider_token=PAYMENT_PROVIDER_TOKEN,
         need_name=True,
         need_phone_number=True,
         need_email=True,
@@ -90,7 +90,13 @@ async def start_without_shipping_callback(
     # optionally pass need_name=True, need_phone_number=True,
     # need_email=True, need_shipping_address=True, is_flexible=True
     await context.bot.send_invoice(
-        chat_id, title, description, payload, PAYMENT_PROVIDER_TOKEN, currency, prices
+        chat_id,
+        title,
+        description,
+        payload,
+        currency,
+        prices,
+        provider_token=PAYMENT_PROVIDER_TOKEN,
     )
 
 

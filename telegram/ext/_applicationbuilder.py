@@ -394,7 +394,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. seealso:: :paramref:`telegram.Bot.base_url`,
             :wiki:`Local Bot API Server <Local-Bot-API-Server>`, :meth:`base_file_url`
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.11
            Supports callable input and string formatting.
 
         Args:
@@ -416,7 +416,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. seealso:: :paramref:`telegram.Bot.base_file_url`,
             :wiki:`Local Bot API Server <Local-Bot-API-Server>`, :meth:`base_url`
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.11
            Supports callable input and string formatting.
 
         Args:

@@ -23,9 +23,7 @@ from typing import TYPE_CHECKING, Optional
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
 from telegram.constants import InlineQueryResultType
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
@@ -40,6 +38,9 @@ class InlineQueryResultArticle(InlineQueryResult):
     .. versionchanged:: 20.5
       Removed the deprecated arguments and attributes ``thumb_*``.
 
+    .. versionchanged:: 21.11
+        Removed the deprecated argument and attribute ``hide_url``.
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
@@ -50,12 +51,9 @@ class InlineQueryResultArticle(InlineQueryResult):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         url (:obj:`str`, optional): URL of the result.
-        hide_url (:obj:`bool`, optional): Pass :obj:`True`, if you don't want the URL to be shown
-            in the message.
 
-            .. deprecated:: 21.10
-                This attribute will be removed in future PTB versions. Pass an empty string as URL
-                instead.
+            Tip:
+                Pass an empty string as URL if you don't want the URL to be shown in the message.
         description (:obj:`str`, optional): Short description of the result.
         thumbnail_url (:obj:`str`, optional): Url of the thumbnail for the result.
 
@@ -78,12 +76,6 @@ class InlineQueryResultArticle(InlineQueryResult):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         url (:obj:`str`): Optional. URL of the result.
-        hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
-            in the message.
-
-            .. deprecated:: 21.10
-                This attribute will be removed in future PTB versions. Pass an empty string as URL
-                instead.
         description (:obj:`str`): Optional. Short description of the result.
         thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
 
@@ -99,7 +91,6 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     __slots__ = (
         "description",
-        "hide_url",
         "input_message_content",
         "reply_markup",
         "thumbnail_height",
@@ -116,7 +107,6 @@ class InlineQueryResultArticle(InlineQueryResult):
         input_message_content: "InputMessageContent",
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         url: Optional[str] = None,
-        hide_url: Optional[bool] = None,
         description: Optional[str] = None,
         thumbnail_url: Optional[str] = None,
         thumbnail_width: Optional[int] = None,
@@ -133,16 +123,6 @@ class InlineQueryResultArticle(InlineQueryResult):
             # Optional
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.url: Optional[str] = url
-            if hide_url is not None:
-                warn(
-                    PTBDeprecationWarning(
-                        "21.10",
-                        "The argument `hide_url` will be removed in future PTB"
-                        "versions. Pass an empty string as URL instead.",
-                    ),
-                    stacklevel=2,
-                )
-            self.hide_url: Optional[bool] = hide_url
             self.description: Optional[str] = description
             self.thumbnail_url: Optional[str] = thumbnail_url
             self.thumbnail_width: Optional[int] = thumbnail_width

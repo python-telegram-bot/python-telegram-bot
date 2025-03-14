@@ -1,8 +1,62 @@
-.. _ptb-changelog:
+Version 21.11.1
+===============
 
-=========
-Changelog
-=========
+*Released 2025-03-01*
+
+This is the technical changelog for version 21.11. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Documentation Improvements
+--------------------------
+
+- Fix ReadTheDocs Build (:pr:`4695`)
+
+Version 21.11
+=============
+
+*Released 2025-03-01*
+
+This is the technical changelog for version 21.11. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes and New Features
+------------------------------
+
+- Full Support for Bot API 8.3 (:pr:`4676` closes :issue:`4677`, :pr:`4682` by `aelkheir <https://github.com/aelkheir>`_, :pr:`4690` by `aelkheir <https://github.com/aelkheir>`_, :pr:`4691` by `aelkheir <https://github.com/aelkheir>`_)
+- Make ``provider_token`` Argument Optional (:pr:`4689`)
+- Remove Deprecated ``InlineQueryResultArticle.hide_url`` (:pr:`4640` closes :issue:`4638`)
+- Accept ``datetime.timedelta`` Input in ``Bot`` Method Parameters (:pr:`4651`)
+- Extend Customization Support for ``Bot.base_(file_)url`` (:pr:`4632` closes :issue:`3355`)
+- Support ``allow_paid_broadcast`` in ``AIORateLimiter`` (:pr:`4627` closes :issue:`4578`)
+- Add ``BaseUpdateProcessor.current_concurrent_updates`` (:pr:`4626` closes :issue:`3984`)
+
+Minor Changes and Bug Fixes
+---------------------------
+
+- Add Bootstrapping Logic to ``Application.run_*`` (:pr:`4673` closes :issue:`4657`)
+- Fix a Bug in ``edit_user_star_subscription`` (:pr:`4681` by `vavasik800 <https://github.com/vavasik800>`_)
+- Simplify Handling of Empty Data in ``TelegramObject.de_json`` and Friends (:pr:`4617` closes :issue:`4614`)
+
+Documentation Improvements
+--------------------------
+
+- Documentation Improvements (:pr:`4641`)
+- Overhaul Admonition Insertion in Documentation (:pr:`4462` closes :issue:`4414`)
+
+Internal Changes
+----------------
+
+- Stabilize Linkcheck Test (:pr:`4693`)
+- Bump ``pre-commit`` Hooks to Latest Versions (:pr:`4643`)
+- Refactor Tests for ``TelegramObject`` Classes with Subclasses (:pr:`4654` closes :issue:`4652`)
+- Use Fine Grained Permissions for GitHub Actions Workflows (:pr:`4668`)
+
+Dependency Updates
+------------------
+
+- Bump ``actions/setup-python`` from 5.3.0 to 5.4.0 (:pr:`4665`)
+- Bump ``dependabot/fetch-metadata`` from 2.2.0 to 2.3.0 (:pr:`4666`)
+- Bump ``actions/stale`` from 9.0.0 to 9.1.0 (:pr:`4667`)
+- Bump ``astral-sh/setup-uv`` from 5.1.0 to 5.2.2 (:pr:`4664`)
+- Bump ``codecov/test-results-action`` from 1.0.1 to 1.0.2 (:pr:`4663`)
 
 Version 21.10
 =============

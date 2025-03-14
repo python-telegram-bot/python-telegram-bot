@@ -1617,6 +1617,7 @@ class TestBotWithoutRequest:
                     == [MessageEntity(MessageEntity.BOLD, 0, 4).to_dict()],
                     data["protect_content"] is True,
                     data["message_thread_id"] == 1,
+                    data["video_start_timestamp"] == 999,
                 ]
             ):
                 pytest.fail("I got wrong parameters in post")
@@ -1628,6 +1629,7 @@ class TestBotWithoutRequest:
             from_chat_id=chat_id,
             message_id=media_message.message_id,
             caption=caption,
+            video_start_timestamp=999,
             caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 4)],
             parse_mode=ParseMode.HTML,
             reply_to_message_id=media_message.message_id,

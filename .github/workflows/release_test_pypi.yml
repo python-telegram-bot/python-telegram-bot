@@ -60,7 +60,7 @@ jobs:
           name: python-package-distributions
           path: dist/
       - name: Publish to Test PyPI
-        uses: pypa/gh-action-pypi-publish@67339c736fd9354cd4f8cb0b744f2b82a74b5c70 # v1.12.3
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
         with:
           repository-url: https://test.pypi.org/legacy/
 
@@ -121,14 +121,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           TAG: ${{ needs.build.outputs.TAG }}
-        # Create a GitHub Release *draft*. The description can be changed later, as for now
-        # we don't define it through this workflow.
+        # Create a tag and a GitHub Release *draft*. The description is filled by the static
+        # template, we just insert the correct tag in the template.
         run: >-
+          sed "s/{tag}/$TAG/g" .github/workflows/assets/release_template.html |
           gh release create
           "$TAG"
           --repo '${{ github.repository }}'
-          --generate-notes
           --draft
+          --notes-file -
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}

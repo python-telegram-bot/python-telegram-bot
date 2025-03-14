@@ -343,9 +343,9 @@ class TestUserWithoutRequest(UserTestBase):
             "title",
             "description",
             "payload",
-            "provider_token",
             "currency",
             "prices",
+            "provider_token",
         )
 
     async def test_instance_method_send_location(self, monkeypatch, user):
@@ -731,8 +731,18 @@ class TestUserWithoutRequest(UserTestBase):
                 and kwargs["text_entities"] == "text_entities"
             )
 
-        assert check_shortcut_signature(user.send_gift, Bot.send_gift, ["user_id"], [])
-        assert await check_shortcut_call(user.send_gift, user.get_bot(), "send_gift")
+        # TODO discuss if better way exists
+        # tags: deprecated 21.11
+        with pytest.raises(
+            Exception,
+            match="Default for argument gift_id does not match the default of the Bot method.",
+        ):
+            assert check_shortcut_signature(
+                user.send_gift, Bot.send_gift, ["user_id", "chat_id"], []
+            )
+        assert await check_shortcut_call(
+            user.send_gift, user.get_bot(), "send_gift", ["chat_id", "user_id"]
+        )
         assert await check_defaults_handling(user.send_gift, user.get_bot())
 
         monkeypatch.setattr(user.get_bot(), "send_gift", make_assertion)

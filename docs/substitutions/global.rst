@@ -98,4 +98,6 @@
 
 .. |tz-naive-dtms| replace:: For timezone naive :obj:`datetime.datetime` objects, the default timezone of the bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
 
+.. |org-verify| replace:: `on behalf of the organization <https://telegram.org/verify#third-party-verification>`__
+
 .. |time-period-input| replace:: :class:`datetime.timedelta` objects are accepted in addition to plain :obj:`int` values.
