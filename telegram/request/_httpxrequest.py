@@ -43,7 +43,7 @@ class HTTPXRequest(BaseRequest):
 
     .. versionadded:: 20.0
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.0
         Removed the deprecated parameter ``proxy_url``. Use :paramref:`proxy` instead.
 
     Args:

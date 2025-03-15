@@ -62,7 +62,7 @@ class InlineQuery(TelegramObject):
         ``auto_pagination``. Use a named argument for those,
         and notice that some positional arguments changed position as a result.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.0
         Removed constants ``MIN_START_PARAMETER_LENGTH`` and ``MAX_START_PARAMETER_LENGTH``.
         Use :attr:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH` and
         :attr:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`

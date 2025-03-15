@@ -34,7 +34,7 @@ This module contains filters for use with :class:`telegram.ext.MessageHandler`,
        * Filters which do both (like ``Filters.text``) are now split as ready-to-use version
          ``filters.TEXT`` and class version ``filters.Text(...)``.
 
-.. versionchanged:: NEXT.VERSION
+.. versionchanged:: 22.0
     Removed deprecated attribute `CHAT`.
 
 """
@@ -1903,7 +1903,7 @@ class StatusUpdate:
     Caution:
         ``filters.StatusUpdate`` itself is *not* a filter, but just a convenience namespace.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.0
         Removed deprecated attribute `USER_SHARED`.
     """
 

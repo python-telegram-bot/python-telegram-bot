@@ -39,7 +39,7 @@ class Defaults:
         Removed the argument and attribute ``timeout``. Specify default timeout behavior for the
         networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.0
         Removed deprecated arguments and properties ``disable_web_page_preview`` and ``quote``.
         Use :paramref:`link_preview_options` and :paramref:`do_quote` instead.
 

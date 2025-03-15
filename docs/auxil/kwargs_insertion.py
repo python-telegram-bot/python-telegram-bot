@@ -68,7 +68,7 @@ media_write_timeout_change = [
     "        seconds are used as write timeout."
     "",
     "",
-    "       .. versionchanged:: NEXT.VERSION",
+    "       .. versionchanged:: 22.0",
     "           The default value changed to "
     "           :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
     "",
