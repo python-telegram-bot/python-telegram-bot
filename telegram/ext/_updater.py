@@ -217,7 +217,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         .. versionchanged:: 20.0
             Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             Removed the deprecated arguments ``read_timeout``, ``write_timeout``,
             ``connect_timeout``, and ``pool_timeout`` in favor of setting the timeouts via
             the corresponding methods of :class:`telegram.ext.ApplicationBuilder`. or

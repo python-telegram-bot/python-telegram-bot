@@ -170,7 +170,7 @@ class PassportElementErrorFiles(PassportElementError):
             ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (Sequence[:obj:`str`]): List of base64-encoded file hashes.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.0
                 |sequenceargs|
         message (:obj:`str`): Error message.
 
@@ -180,7 +180,7 @@ class PassportElementErrorFiles(PassportElementError):
             ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (tuple[:obj:`str`]): List of base64-encoded file hashes.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.0
                 |tupleclassattrs|
         message (:obj:`str`): Error message.
 
@@ -372,7 +372,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (Sequence[:obj:`str`]): List of base64-encoded file hashes.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.0
                 |sequenceargs|
         message (:obj:`str`): Error message.
 
@@ -383,7 +383,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (tuple[:obj:`str`]): List of base64-encoded file hashes.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.0
                 |tupleclassattrs|
         message (:obj:`str`): Error message.
 

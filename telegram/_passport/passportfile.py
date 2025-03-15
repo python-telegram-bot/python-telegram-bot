@@ -47,7 +47,7 @@ class PassportFile(TelegramObject):
         file_size (:obj:`int`): File size in bytes.
         file_date (:class:`datetime.datetime`): Time when the file was uploaded.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.0
                 Accepts only :class:`datetime.datetime` instead of :obj:`int`.
                 |datetime_localization|
 
@@ -60,7 +60,7 @@ class PassportFile(TelegramObject):
         file_size (:obj:`int`): File size in bytes.
         file_date (:class:`datetime.datetime`): Time when the file was uploaded.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.0
                 Returns :class:`datetime.datetime` instead of :obj:`int`.
                 |datetime_localization|
     """

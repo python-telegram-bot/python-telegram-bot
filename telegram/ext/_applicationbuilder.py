@@ -122,7 +122,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.0
         Removed deprecated methods ``proxy_url`` and ``get_updates_proxy_url``.
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern

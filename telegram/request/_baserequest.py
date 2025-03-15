@@ -138,7 +138,7 @@ class BaseRequest(
         :paramref:`post.read_timeout` of :meth:post` is not passed/equal to :attr:`DEFAULT_NONE`.
 
         .. versionadded:: 20.7
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             This property is now required to be implemented by subclasses.
 
         Returns:

@@ -1755,7 +1755,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -1836,7 +1836,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Note:
@@ -1920,7 +1920,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2000,7 +2000,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2078,7 +2078,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2159,7 +2159,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2244,7 +2244,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2329,7 +2329,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2416,7 +2416,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2498,7 +2498,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2583,7 +2583,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2671,7 +2671,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2751,7 +2751,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2833,7 +2833,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -2918,7 +2918,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -3001,7 +3001,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -3089,7 +3089,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -3173,7 +3173,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -3288,7 +3288,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:
@@ -3380,7 +3380,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Warning:
@@ -3602,7 +3602,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 21.1
                 |reply_same_thread|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.0
             |quote_removed|
 
         Keyword Args:

@@ -1376,7 +1376,7 @@ class InlineQueryLimit(IntEnum):
 
     .. versionadded:: 20.0
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.0
         Removed deprecated attributes ``InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH`` and
         ``InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH``. Please instead use
         :attr:`InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH` and
