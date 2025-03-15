@@ -47,9 +47,10 @@ class InlineQueryResultsButton(TelegramObject):
             inside the Web App.
         start_parameter (:obj:`str`, optional):  Deep-linking parameter for the
             :guilabel:`/start` message sent to the bot when user presses the switch button.
-            :tg-const:`telegram.InlineQuery.MIN_SWITCH_PM_TEXT_LENGTH`-
-            :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
-            only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
+            :tg-const:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`
+            -
+            :tg-const:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`
+            characters, only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
 
             Example:
                 An inline bot that sends YouTube videos can ask the user to connect the bot to
@@ -67,10 +68,10 @@ class InlineQueryResultsButton(TelegramObject):
             user presses the button. The Web App will be able to switch back to the inline mode
             using the method ``web_app_switch_inline_query`` inside the Web App.
         start_parameter (:obj:`str`): Optional. Deep-linking parameter for the
-            :guilabel:`/start` message sent to the bot when user presses the switch button.
-            :tg-const:`telegram.InlineQuery.MIN_SWITCH_PM_TEXT_LENGTH`-
-            :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
-            only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
+            :tg-const:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`
+            -
+            :tg-const:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`
+            characters, only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
 
     """
 

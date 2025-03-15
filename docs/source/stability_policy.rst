@@ -1,3 +1,5 @@
+.. _stability-policy:
+
 Stability Policy
 ================
 

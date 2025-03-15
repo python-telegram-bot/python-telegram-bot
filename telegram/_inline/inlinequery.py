@@ -62,6 +62,12 @@ class InlineQuery(TelegramObject):
         ``auto_pagination``. Use a named argument for those,
         and notice that some positional arguments changed position as a result.
 
+    .. versionchanged:: NEXT.VERSION
+        Removed constants ``MIN_START_PARAMETER_LENGTH`` and ``MAX_START_PARAMETER_LENGTH``.
+        Use :attr:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH` and
+        :attr:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`
+        instead.
+
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
@@ -201,16 +207,6 @@ class InlineQuery(TelegramObject):
     """:const:`telegram.constants.InlineQueryLimit.RESULTS`
 
     .. versionadded:: 13.2
-    """
-    MIN_SWITCH_PM_TEXT_LENGTH: Final[int] = constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH
-    """:const:`telegram.constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH`
-
-    .. versionadded:: 20.0
-    """
-    MAX_SWITCH_PM_TEXT_LENGTH: Final[int] = constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH
-    """:const:`telegram.constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH`
-
-    .. versionadded:: 20.0
     """
     MAX_OFFSET_LENGTH: Final[int] = constants.InlineQueryLimit.MAX_OFFSET_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.MAX_OFFSET_LENGTH`
