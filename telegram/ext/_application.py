@@ -1301,6 +1301,7 @@ class Application(
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
         tasks = []
+        ctx_initialized = False
 
         for handlers in self.handlers.values():
             try:
@@ -1322,7 +1323,6 @@ class Application(
                                 exc_info=exc,
                             )
                             return
-                        await context.__aenter__()  # pylint: disable=unnecessary-dunder-call
                         await context.refresh_data()
                     coroutine: Coroutine = handler.handle_update(update, self, check, context)
 
@@ -1344,6 +1344,9 @@ class Application(
                         )
                     else:
                         any_blocking = True
+                        if not ctx_initialized:
+                            await context.__aenter__()  # pylint: disable=unnecessary-dunder-call
+                            ctx_initialized = True
                         await coroutine
                     break  # Only a max of 1 handler per group is handled
 
@@ -1359,18 +1362,17 @@ class Application(
                     break
 
         if context is not None:
-            exit_ctx_coro = context.__aexit__(None, None, None)
             if tasks:
-                fut = asyncio.gather(*tasks)
-                self.__create_ctx_task(
-                    context,
-                    fut,
-                    update=update,
-                    name=f"Application:{self.bot.id}:process_update_non_blocking",
+                self.create_task(
+                    self.__wrapped_coro(context, asyncio.gather(*tasks), ctx_initialized),
+                    name=(
+                        f"Application:{self.bot.id}:process_update_non_blocking"
+                        f":context:__aexit__"
+                    ),
                 )
-            else:
+            elif ctx_initialized:
                 try:
-                    await exit_ctx_coro
+                    await context.__aexit__(None, None, None)
                 except Exception as exc:
                     await self.process_error(update=update, error=exc)
 
@@ -1932,9 +1934,8 @@ class Application(
                     and self.bot.defaults
                     and not self.bot.defaults.block
                 ):
-                    self.__create_ctx_task(
-                        context,
-                        callback(update, context),
+                    self.__create_task(
+                        self.__wrapped_coro(context, callback(update, context)),
                         update=update,
                         is_error_handler=True,
                         name=f"Application:{self.bot.id}:process_error:non_blocking",
@@ -1956,21 +1957,15 @@ class Application(
         _LOGGER.exception("No error handlers are registered, logging exception.", exc_info=error)
         return False
 
-    def __create_ctx_task(
+    async def __wrapped_coro(
         self,
         context: CCT,
-        coroutine: _CoroType[RT],
-        update: Optional[object] = None,
-        is_error_handler: bool = False,
-        name: Optional[str] = None,
-    ) -> "asyncio.Task[RT]":
-        task = self.__create_task(
-            coroutine, update=update, is_error_handler=is_error_handler, name=name
-        )
-        task.add_done_callback(
-            lambda _: self.__create_task(
-                context.__aexit__(None, None, None),
-                name=f"{name}:done_callback",
-            )
-        )
-        return task
+        coroutine: Awaitable[Any],
+        initialized: bool = False,
+    ) -> None:
+        if not initialized:
+            await context.__aenter__()  # pylint: disable=unnecessary-dunder-call
+        try:
+            await coroutine
+        finally:
+            await context.__aexit__(None, None, None)
