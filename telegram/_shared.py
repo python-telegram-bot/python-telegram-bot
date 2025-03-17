@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects used for request chats/users service messages."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
+from telegram._utils.usernames import get_name, get_full_name, get_link
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -243,6 +244,27 @@ class SharedUser(TelegramObject):
         self._id_attrs = (self.user_id,)
 
         self._freeze()
+
+    @property
+    def name(self) -> Union[str, None]:
+        """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
+        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
+        """
+        return get_name(user=self, )
+
+    @property
+    def full_name(self) -> Union[str, None]:
+        """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
+        available) :attr:`last_name`, otherwise None.
+        """
+        return get_full_name(user=self, )
+
+    @property
+    def link(self) -> Union[str, None]:
+        """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
+        available) :attr:`last_name`, otherwise None.
+        """
+        return get_link(user=self, )
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SharedUser":

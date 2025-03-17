@@ -39,6 +39,7 @@ from telegram._utils.types import (
     ReplyMarkup,
     TimePeriod,
 )
+from telegram._utils.usernames import get_link
 from telegram.helpers import escape_markdown
 from telegram.helpers import mention_html as helpers_mention_html
 from telegram.helpers import mention_markdown as helpers_mention_markdown
@@ -162,9 +163,7 @@ class _ChatBase(TelegramObject):
         """:obj:`str`: Convenience property. If the chat has a :attr:`~Chat.username`, returns a
         t.me link of the chat.
         """
-        if self.username:
-            return f"https://t.me/{self.username}"
-        return None
+        return get_link(user=self)
 
     def mention_markdown(self, name: Optional[str] = None) -> str:
         """
