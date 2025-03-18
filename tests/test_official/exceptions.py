@@ -19,7 +19,7 @@
 """This module contains exceptions to our API compared to the official API."""
 import datetime as dtm
 
-from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
+from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -47,8 +47,7 @@ class ParamTypeCheckingExceptions:
             "animation": Animation,
             "voice": Voice,
             "sticker": Sticker,
-            # TODO: Deprecated and will be corrected (and readded) in next major bot API release:
-            # "gift_id": Gift,
+            "gift_id": Gift,
         },
         "(delete|set)_sticker.*": {
             "sticker$": Sticker,
@@ -101,9 +100,6 @@ class ParamTypeCheckingExceptions:
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },
-        # TODO: Deprecated and will be corrected (and removed) in next major PTB
-        #  version:
-        "send_gift": {"gift_id": str},  # actual: Non optional
     }
 
     # param names ignored in the param type checking in classes for the `tg.Defaults` case.
@@ -196,8 +192,6 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
-    # here for backwards compatibility. Todo: remove on next bot api release
-    "send_gift": {"gift_id"},
 }
 
 
