@@ -1,0 +1,5 @@
+other = "Fix: move initialize flag up in _bot.py"
+[[pull_requests]]
+uid = "4733"
+author_uid = "Poolitzer"
+closes_threads = []
