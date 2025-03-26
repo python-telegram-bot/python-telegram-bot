@@ -829,13 +829,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             return
 
         await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
+        self._initialized = True
         # Since the bot is to be initialized only once, we can also use it for
         # verifying the token passed and raising an exception if it's invalid.
         try:
             await self.get_me()
         except InvalidToken as exc:
             raise InvalidToken(f"The token `{self._token}` was rejected by the server.") from exc
-        self._initialized = True
 
     async def shutdown(self) -> None:
         """Stop & clear resources used by this class. Currently just calls
