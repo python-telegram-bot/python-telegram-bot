@@ -1,0 +1,5 @@
+dependencies = "Bump pytest-asyncio from 0.21.2 to 0.26.0"
+[[pull_requests]]
+uid = "4735"
+author_uid = "dependabot[bot]"
+closes_threads = []
