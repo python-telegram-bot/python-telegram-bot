@@ -1,4 +1,3 @@
-dependencies = "Bump actions/download-artifact from 4.1.8 to 4.2.1"
 internal = "Bump actions/download-artifact from 4.1.8 to 4.2.1"
 [[pull_requests]]
 uid = "4745"
