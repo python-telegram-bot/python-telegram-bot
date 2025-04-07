@@ -56,7 +56,7 @@ class TransactionPartner(TelegramObject):
 
     .. versionadded:: 21.4
 
-    ..versionchanged:: 21.11
+    .. versionchanged:: 21.11
         Added :class:`TransactionPartnerChat`
 
     Args:
