@@ -1,4 +1,4 @@
-documentation = "Add missing 'Returns' field in `User.get_profile_photos`."
+documentation = "Add missing ``Returns`` field in ``User.get_profile_photos``."
 [[pull_requests]]
 uid = "4740"
 author_uid = "aelkheir"
