@@ -1,0 +1,5 @@
+other = "Bump `pre-commit` Hooks to Latest Versions"
+[[pull_requests]]
+uid = "4748"
+author_uid = "pre-commit-ci[bot]"
+closes_threads = []
