@@ -1,0 +1,17 @@
+from telegram import Bot
+from telegram.ext import Updater, CommandHandler
+
+# BotFather'dan olingan token
+TOKEN = '7942274515:AAFKO9YdYAbGtoJF3SkbsL-0jDQw9jmnHIo' 
+def start(update, context):
+    update.message.reply_text("Salom! Men yangi botman!")
+
+def main():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
