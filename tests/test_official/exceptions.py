@@ -113,6 +113,10 @@ class ParamTypeCheckingExceptions:
             "duration": float,  # actual: dtm.timedelta
             "cover_frame_timestamp": float,  # actual: dtm.timedelta
         },
+        "ChatFullInfo": {
+            "slow_mode_delay": int,  # actual: Union[int, dtm.timedelta]
+            "message_auto_delete_time": int,  # actual: Union[int, dtm.timedelta]
+        },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },

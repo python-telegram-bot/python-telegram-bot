@@ -101,3 +101,5 @@
 .. |org-verify| replace:: `on behalf of the organization <https://telegram.org/verify#third-party-verification>`__
 
 .. |time-period-input| replace:: :class:`datetime.timedelta` objects are accepted in addition to plain :obj:`int` values.
+
+.. |timespan-seconds-deprecated| replace:: In a future major version this will be of type :obj:`datetime.timedelta`. You can opt-in early by setting the `PTB_TIMEDELTA` environment variable.

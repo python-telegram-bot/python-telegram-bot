@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram ChatFullInfo."""
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._birthdate import Birthdate
 from telegram._chat import Chat, _ChatBase
@@ -29,9 +29,18 @@ from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._gifts import AcceptedGiftTypes
 from telegram._reaction import ReactionType
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import (
+    de_json_optional,
+    de_list_optional,
+    parse_period_arg,
+    parse_sequence_arg,
+)
+from telegram._utils.datetime import (
+    extract_tzinfo_from_defaults,
+    from_timestamp,
+    get_timedelta_value,
+)
+from telegram._utils.types import JSONDict, TimePeriod
 from telegram._utils.warnings import warn
 from telegram._utils.warnings_transition import (
     build_deprecation_warning_message,
@@ -166,17 +175,23 @@ class ChatFullInfo(_ChatBase):
             (by sending date).
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups.
-        slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user.
+        slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`, optional): For supergroups,
+            the minimum allowed delay between consecutive messages sent by each unprivileged user.
+
+            .. versionchanged:: NEXT.VERSION
+                |time-period-input|
         unrestrict_boost_count (:obj:`int`, optional): For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions.
 
             .. versionadded:: 21.0
-        message_auto_delete_time (:obj:`int`, optional): The time after which all messages sent to
-            the chat will be automatically deleted; in seconds.
+        message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`, optional): The time
+            after which all messages sent to the chat will be automatically deleted; in seconds.
 
             .. versionadded:: 13.4
+
+            .. versionchanged:: NEXT.VERSION
+                |time-period-input|
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators.
@@ -331,17 +346,23 @@ class ChatFullInfo(_ChatBase):
             (by sending date).
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups.
-        slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user.
+        slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`): Optional. For supergroups,
+            the minimum allowed delay between consecutive messages sent by each unprivileged user.
+
+            .. deprecated:: NEXT.VERSION
+                |timespan-seconds-deprecated|
         unrestrict_boost_count (:obj:`int`): Optional. For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions.
 
             .. versionadded:: 21.0
-        message_auto_delete_time (:obj:`int`): Optional. The time after which all messages sent to
-            the chat will be automatically deleted; in seconds.
+        message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`): Optional. The time
+            after which all messages sent to the chat will be automatically deleted; in seconds.
 
             .. versionadded:: 13.4
+
+            .. deprecated:: NEXT.VERSION
+                |timespan-seconds-deprecated|
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators.
@@ -383,6 +404,8 @@ class ChatFullInfo(_ChatBase):
 
     __slots__ = (
         "_can_send_gift",
+        "_message_auto_delete_time",
+        "_slow_mode_delay",
         "accent_color_id",
         "accepted_gift_types",
         "active_usernames",
@@ -411,14 +434,12 @@ class ChatFullInfo(_ChatBase):
         "linked_chat_id",
         "location",
         "max_reaction_count",
-        "message_auto_delete_time",
         "permissions",
         "personal_chat",
         "photo",
         "pinned_message",
         "profile_accent_color_id",
         "profile_background_custom_emoji_id",
-        "slow_mode_delay",
         "sticker_set_name",
         "unrestrict_boost_count",
     )
@@ -456,9 +477,9 @@ class ChatFullInfo(_ChatBase):
         invite_link: Optional[str] = None,
         pinned_message: Optional["Message"] = None,
         permissions: Optional[ChatPermissions] = None,
-        slow_mode_delay: Optional[int] = None,
+        slow_mode_delay: Optional[TimePeriod] = None,
         unrestrict_boost_count: Optional[int] = None,
-        message_auto_delete_time: Optional[int] = None,
+        message_auto_delete_time: Optional[TimePeriod] = None,
         has_aggressive_anti_spam_enabled: Optional[bool] = None,
         has_hidden_members: Optional[bool] = None,
         has_protected_content: Optional[bool] = None,
@@ -513,9 +534,9 @@ class ChatFullInfo(_ChatBase):
             self.invite_link: Optional[str] = invite_link
             self.pinned_message: Optional[Message] = pinned_message
             self.permissions: Optional[ChatPermissions] = permissions
-            self.slow_mode_delay: Optional[int] = slow_mode_delay
-            self.message_auto_delete_time: Optional[int] = (
-                int(message_auto_delete_time) if message_auto_delete_time is not None else None
+            self._slow_mode_delay: Optional[dtm.timedelta] = parse_period_arg(slow_mode_delay)
+            self._message_auto_delete_time: Optional[dtm.timedelta] = parse_period_arg(
+                message_auto_delete_time
             )
             self.has_protected_content: Optional[bool] = has_protected_content
             self.has_visible_history: Optional[bool] = has_visible_history
@@ -576,6 +597,14 @@ class ChatFullInfo(_ChatBase):
         )
         return self._can_send_gift
 
+    @property
+    def slow_mode_delay(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(self._slow_mode_delay)
+
+    @property
+    def message_auto_delete_time(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(self._message_auto_delete_time)
+
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatFullInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -600,6 +629,13 @@ class ChatFullInfo(_ChatBase):
             Message,
         )
 
+        data["slow_mode_delay"] = (
+            dtm.timedelta(seconds=s) if (s := data.get("slow_mode_delay")) else None
+        )
+        data["message_auto_delete_time"] = (
+            dtm.timedelta(seconds=s) if (s := data.get("message_auto_delete_time")) else None
+        )
+
         data["pinned_message"] = de_json_optional(data.get("pinned_message"), Message, bot)
         data["permissions"] = de_json_optional(data.get("permissions"), ChatPermissions, bot)
         data["location"] = de_json_optional(data.get("location"), ChatLocation, bot)
@@ -617,3 +653,10 @@ class ChatFullInfo(_ChatBase):
         )
 
         return super().de_json(data=data, bot=bot)
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        out = super().to_dict(recursive)
+        out["slow_mode_delay"] = self.slow_mode_delay
+        out["message_auto_delete_time"] = self.message_auto_delete_time
+        return out
