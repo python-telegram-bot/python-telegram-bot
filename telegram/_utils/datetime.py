@@ -29,8 +29,13 @@ Warning:
 """
 import contextlib
 import datetime as dtm
+import os
 import time
 from typing import TYPE_CHECKING, Optional, Union
+
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
+from tests.auxil.envvars import env_var_2_bool
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -224,3 +229,25 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     if dt_obj.tzinfo is None:
         dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
     return dt_obj.timestamp()
+
+
+def get_timedelta_value(value: Optional[dtm.timedelta]) -> Optional[Union[int, dtm.timedelta]]:
+    """
+    Convert a `datetime.timedelta` to seconds or return it as-is, based on environment config.
+    """
+    if value is None:
+        return None
+
+    if env_var_2_bool(os.getenv("PTB_TIMEDELTA")):
+        return value
+
+    warn(
+        PTBDeprecationWarning(
+            "NEXT.VERSION",
+            "In a future major version this will be of type `datetime.timedelta`."
+            " You can opt-in early by setting the `PTB_TIMEDELTA` environment variable.",
+        ),
+        stacklevel=2,
+    )
+    # We don't want to silently drop fractions, so float is returned and we slience mypy
+    return value.total_seconds()  # type: ignore[return-value]
