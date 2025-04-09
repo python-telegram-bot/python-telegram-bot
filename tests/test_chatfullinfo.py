@@ -367,7 +367,6 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
     @pytest.mark.parametrize("field_name", ["slow_mode_delay", "message_auto_delete_time"])
     @pytest.mark.parametrize("period", [30, dtm.timedelta(seconds=30)])
     def test_time_period_int_deprecated(self, PTB_TIMEDELTA, recwarn, field_name, period):
-
         cfi = ChatFullInfo(
             id=123456,
             type="dummy_type",
@@ -392,7 +391,6 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             assert len(recwarn) == warn_count + 1
             assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
             assert recwarn[-1].category is PTBDeprecationWarning
-
             assert isinstance(value, (int, float))
         else:
             assert len(recwarn) == warn_count
