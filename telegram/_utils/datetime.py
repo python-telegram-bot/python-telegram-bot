@@ -231,9 +231,13 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     return dt_obj.timestamp()
 
 
-def get_timedelta_value(value: Optional[dtm.timedelta]) -> Optional[Union[int, dtm.timedelta]]:
+def get_timedelta_value(value: Optional[dtm.timedelta]) -> Optional[Union[float, dtm.timedelta]]:
     """
     Convert a `datetime.timedelta` to seconds or return it as-is, based on environment config.
+
+    This utility is part of the migration process from integer-based time representations
+    to using `datetime.timedelta`. The behavior is controlled by the `PTB_TIMEDELTA`
+    environment variable
     """
     if value is None:
         return None
@@ -249,5 +253,4 @@ def get_timedelta_value(value: Optional[dtm.timedelta]) -> Optional[Union[int, d
         ),
         stacklevel=2,
     )
-    # We don't want to silently drop fractions, so float is returned and we slience mypy
-    return value.total_seconds()  # type: ignore[return-value]
+    return value.total_seconds()

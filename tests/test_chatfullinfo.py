@@ -107,8 +107,8 @@ class ChatFullInfoTestBase:
         can_change_info=False,
         can_invite_users=True,
     )
-    slow_mode_delay = 30
-    message_auto_delete_time = 60
+    slow_mode_delay = dtm.timedelta(seconds=30)
+    message_auto_delete_time = dtm.timedelta(60)
     bio = "I'm a Barbie Girl in a Barbie World"
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), "Barbie World")
@@ -157,7 +157,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
 
         assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, PTB_TIMEDELTA):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "title": self.title,
@@ -170,8 +170,8 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "sticker_set_name": self.sticker_set_name,
             "can_set_sticker_set": self.can_set_sticker_set,
             "permissions": self.permissions.to_dict(),
-            "slow_mode_delay": self.slow_mode_delay,
-            "message_auto_delete_time": self.message_auto_delete_time,
+            "slow_mode_delay": self.slow_mode_delay.total_seconds(),
+            "message_auto_delete_time": self.message_auto_delete_time.total_seconds(),
             "bio": self.bio,
             "business_intro": self.business_intro.to_dict(),
             "business_location": self.business_location.to_dict(),
@@ -205,10 +205,6 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "can_send_paid_media": self.can_send_paid_media,
         }
 
-        def get_period(attr):
-            value = getattr(self, attr)
-            return dtm.timedelta(seconds=value) if PTB_TIMEDELTA else value
-
         cfi = ChatFullInfo.de_json(json_dict, offline_bot)
         assert cfi.api_kwargs == {}
         assert cfi.id == self.id_
@@ -219,8 +215,8 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi.sticker_set_name == self.sticker_set_name
         assert cfi.can_set_sticker_set == self.can_set_sticker_set
         assert cfi.permissions == self.permissions
-        assert cfi.slow_mode_delay == get_period("slow_mode_delay")
-        assert cfi.message_auto_delete_time == get_period("message_auto_delete_time")
+        assert cfi._slow_mode_delay == self.slow_mode_delay
+        assert cfi._message_auto_delete_time == self.message_auto_delete_time
         assert cfi.bio == self.bio
         assert cfi.business_intro == self.business_intro
         assert cfi.business_location == self.business_location
@@ -280,7 +276,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_bot_raw.emoji_status_expiration_date.tzinfo == UTC
         assert emoji_expire_offset_tz == emoji_expire_offset
 
-    def test_to_dict(self, chat_full_info, PTB_TIMEDELTA):
+    def test_to_dict(self, chat_full_info):
         cfi = chat_full_info
         cfi_dict = cfi.to_dict()
 
@@ -290,7 +286,10 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["type"] == cfi.type
         assert cfi_dict["username"] == cfi.username
         assert cfi_dict["permissions"] == cfi.permissions.to_dict()
-        assert cfi_dict["slow_mode_delay"] == cfi.slow_mode_delay
+        assert cfi_dict["slow_mode_delay"] == int(self.slow_mode_delay.total_seconds())
+        assert cfi_dict["message_auto_delete_time"] == int(
+            self.message_auto_delete_time.total_seconds()
+        )
         assert cfi_dict["bio"] == cfi.bio
         assert cfi_dict["business_intro"] == cfi.business_intro.to_dict()
         assert cfi_dict["business_location"] == cfi.business_location.to_dict()
@@ -364,9 +363,26 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         ):
             chat_full_info.can_send_gift
 
+    def test_time_period_properties(self, PTB_TIMEDELTA, chat_full_info):
+        cfi = chat_full_info
+        if PTB_TIMEDELTA:
+            assert cfi.slow_mode_delay == self.slow_mode_delay
+            assert isinstance(cfi.slow_mode_delay, dtm.timedelta)
+
+            assert cfi.message_auto_delete_time == self.message_auto_delete_time
+            assert isinstance(cfi.message_auto_delete_time, dtm.timedelta)
+        else:
+            assert cfi.slow_mode_delay == int(self.slow_mode_delay.total_seconds())
+            assert isinstance(cfi.slow_mode_delay, int)
+
+            assert cfi.message_auto_delete_time == int(
+                self.message_auto_delete_time.total_seconds()
+            )
+            assert isinstance(cfi.message_auto_delete_time, int)
+
     @pytest.mark.parametrize("field_name", ["slow_mode_delay", "message_auto_delete_time"])
     @pytest.mark.parametrize("period", [30, dtm.timedelta(seconds=30)])
-    def test_time_period_int_deprecated(self, PTB_TIMEDELTA, recwarn, field_name, period):
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, field_name, period):
         cfi = ChatFullInfo(
             id=123456,
             type="dummy_type",
@@ -394,7 +410,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             assert isinstance(value, (int, float))
         else:
             assert len(recwarn) == warn_count
-            assert isinstance(getattr(cfi, field_name), dtm.timedelta)
+            assert isinstance(value, dtm.timedelta)
 
     def test_always_tuples_attributes(self):
         cfi = ChatFullInfo(

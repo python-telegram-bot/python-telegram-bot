@@ -599,11 +599,17 @@ class ChatFullInfo(_ChatBase):
 
     @property
     def slow_mode_delay(self) -> Optional[Union[int, dtm.timedelta]]:
-        return get_timedelta_value(self._slow_mode_delay)
+        value = get_timedelta_value(self._slow_mode_delay)
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        return value  # type: ignore[return-value]
 
     @property
     def message_auto_delete_time(self) -> Optional[Union[int, dtm.timedelta]]:
-        return get_timedelta_value(self._message_auto_delete_time)
+        value = get_timedelta_value(self._message_auto_delete_time)
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        return value  # type: ignore[return-value]
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatFullInfo":
@@ -657,6 +663,13 @@ class ChatFullInfo(_ChatBase):
     def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         out = super().to_dict(recursive)
-        out["slow_mode_delay"] = self.slow_mode_delay
-        out["message_auto_delete_time"] = self.message_auto_delete_time
+
+        keys = ("slow_mode_delay", "message_auto_delete_time")
+        for key in keys:
+            if (value := getattr(self, "_" + key)) is not None:
+                seconds = value.total_seconds()
+                out[key] = int(seconds) if seconds.is_integer() else seconds
+            elif not recursive:
+                out[key] = value
+
         return out
