@@ -27,7 +27,6 @@ from random import randrange
 import pytest
 
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from tests.auxil.build_messages import make_message, make_message_update
@@ -296,10 +295,6 @@ class TestUpdater:
         received_kwargs = {}
         expected_kwargs = {
             "timeout": 0,
-            "read_timeout": "read_timeout",
-            "connect_timeout": "connect_timeout",
-            "write_timeout": "write_timeout",
-            "pool_timeout": "pool_timeout",
             "allowed_updates": "allowed_updates",
         }
 
@@ -422,10 +417,6 @@ class TestUpdater:
 
         expected = {
             "timeout": 10,
-            "read_timeout": DEFAULT_NONE,
-            "write_timeout": DEFAULT_NONE,
-            "connect_timeout": DEFAULT_NONE,
-            "pool_timeout": DEFAULT_NONE,
             "allowed_updates": None,
             "api_kwargs": None,
         }
@@ -466,10 +457,6 @@ class TestUpdater:
 
             expected = {
                 "timeout": 42,
-                "read_timeout": 43,
-                "write_timeout": 44,
-                "connect_timeout": 45,
-                "pool_timeout": 46,
                 "allowed_updates": ["message"],
                 "api_kwargs": None,
             }
@@ -477,10 +464,6 @@ class TestUpdater:
             await update_queue.put(Update(update_id=2))
             await updater.start_polling(
                 timeout=42,
-                read_timeout=43,
-                write_timeout=44,
-                connect_timeout=45,
-                pool_timeout=46,
                 allowed_updates=["message"],
             )
             await update_queue.join()

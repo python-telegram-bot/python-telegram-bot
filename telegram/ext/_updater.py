@@ -26,10 +26,10 @@ from pathlib import Path
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union
 
-from telegram._utils.defaultvalue import DEFAULT_80, DEFAULT_IP, DEFAULT_NONE, DefaultValue
+from telegram._utils.defaultvalue import DEFAULT_80, DEFAULT_IP, DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
-from telegram._utils.types import DVType, ODVInput
+from telegram._utils.types import DVType
 from telegram.error import TelegramError
 from telegram.ext._utils.networkloop import network_retry_loop
 
@@ -208,10 +208,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         poll_interval: float = 0.0,
         timeout: int = 10,
         bootstrap_retries: int = 0,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         allowed_updates: Optional[Sequence[str]] = None,
         drop_pending_updates: Optional[bool] = None,
         error_callback: Optional[Callable[[TelegramError], None]] = None,
@@ -220,6 +216,12 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
 
         .. versionchanged:: 20.0
             Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates`.
+
+        .. versionchanged:: 22.0
+            Removed the deprecated arguments ``read_timeout``, ``write_timeout``,
+            ``connect_timeout``, and ``pool_timeout`` in favor of setting the timeouts via
+            the corresponding methods of :class:`telegram.ext.ApplicationBuilder`. or
+            by specifying the timeout via :paramref:`telegram.Bot.get_updates_request`.
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -236,41 +238,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 .. versionchanged:: 21.11
                     The default value will be changed to from ``-1`` to ``0``. Indefinite retries
                     during bootstrapping are not recommended.
-            read_timeout (:obj:`float`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-                .. versionchanged:: 20.7
-                    Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of
-                    ``2``.
-                .. deprecated:: 20.7
-                    Deprecated in favor of setting the timeout via
-                    :meth:`telegram.ext.ApplicationBuilder.get_updates_read_timeout` or
-                    :paramref:`telegram.Bot.get_updates_request`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-                .. deprecated:: 20.7
-                    Deprecated in favor of setting the timeout via
-                    :meth:`telegram.ext.ApplicationBuilder.get_updates_write_timeout` or
-                    :paramref:`telegram.Bot.get_updates_request`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-                .. deprecated:: 20.7
-                    Deprecated in favor of setting the timeout via
-                    :meth:`telegram.ext.ApplicationBuilder.get_updates_connect_timeout` or
-                    :paramref:`telegram.Bot.get_updates_request`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-                .. deprecated:: 20.7
-                    Deprecated in favor of setting the timeout via
-                    :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout` or
-                    :paramref:`telegram.Bot.get_updates_request`.
             allowed_updates (Sequence[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
 
@@ -324,10 +291,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 await self._start_polling(
                     poll_interval=poll_interval,
                     timeout=timeout,
-                    read_timeout=read_timeout,
-                    write_timeout=write_timeout,
-                    connect_timeout=connect_timeout,
-                    pool_timeout=pool_timeout,
                     bootstrap_retries=bootstrap_retries,
                     drop_pending_updates=drop_pending_updates,
                     allowed_updates=allowed_updates,
@@ -347,10 +310,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         self,
         poll_interval: float,
         timeout: int,
-        read_timeout: ODVInput[float],
-        write_timeout: ODVInput[float],
-        connect_timeout: ODVInput[float],
-        pool_timeout: ODVInput[float],
         bootstrap_retries: int,
         drop_pending_updates: Optional[bool],
         allowed_updates: Optional[Sequence[str]],
@@ -376,10 +335,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 updates = await self.bot.get_updates(
                     offset=self._last_update_id,
                     timeout=timeout,
-                    read_timeout=read_timeout,
-                    connect_timeout=connect_timeout,
-                    write_timeout=write_timeout,
-                    pool_timeout=pool_timeout,
                     allowed_updates=allowed_updates,
                 )
             except TelegramError:
@@ -440,10 +395,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                     offset=self._last_update_id,
                     # We don't want to do long polling here!
                     timeout=0,
-                    read_timeout=read_timeout,
-                    connect_timeout=connect_timeout,
-                    write_timeout=write_timeout,
-                    pool_timeout=pool_timeout,
                     allowed_updates=allowed_updates,
                 )
             except TelegramError:

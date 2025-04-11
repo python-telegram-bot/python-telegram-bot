@@ -71,6 +71,10 @@ class OfflineRequest(BaseRequest):
     async def shutdown(self) -> None:
         pass
 
+    @property
+    def read_timeout(self):
+        return 1
+
     def __init__(self, *args, **kwargs):
         pass
 

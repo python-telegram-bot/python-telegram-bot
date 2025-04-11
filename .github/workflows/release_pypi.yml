@@ -21,7 +21,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
         with:
           python-version: "3.x"
       - name: Install pypa/build
@@ -55,12 +55,12 @@ jobs:
 
     steps:
       - name: Download all the dists
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: python-package-distributions
           path: dist/
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@67339c736fd9354cd4f8cb0b744f2b82a74b5c70 # v1.12.3
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
 
   compute-signatures:
     name: Compute SHA1 Sums and Sign with Sigstore
@@ -74,7 +74,7 @@ jobs:
 
     steps:
       - name: Download all the dists
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: python-package-distributions
           path: dist/
@@ -111,7 +111,7 @@ jobs:
 
     steps:
       - name: Download all the dists
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: python-package-distributions-and-signatures
           path: dist/
@@ -119,13 +119,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           TAG: ${{ needs.build.outputs.TAG }}
-        # Create a tag and a GitHub Release. The description can be changed later, as for now
-        # we don't define it through this workflow.
+        # Create a tag and a GitHub Release. The description is filled by the static template, we
+        # just insert the correct tag in the template.
         run: >-
+          sed "s/{tag}/$TAG/g" .github/workflows/assets/release_template.html |
           gh release create
           "$TAG"
           --repo '${{ github.repository }}'
-          --generate-notes
+          --notes-file -
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -137,3 +138,27 @@ jobs:
           gh release upload
           "$TAG" dist/**
           --repo '${{ github.repository }}'
+
+  telegram-channel:
+    name: Publish to Telegram Channel
+    needs:
+        - github-release
+
+    runs-on: ubuntu-latest
+    environment:
+      name: release_pypi
+    permissions: {}
+
+    steps:
+      - name: Publish to Telegram Channel
+        env:
+          TAG: ${{ needs.build.outputs.TAG }}
+          # This secret is configured only for the `pypi-release` branch
+          BOT_TOKEN: ${{ secrets.CHANNEL_BOT_TOKEN }}
+        run: >-
+          sed "s/{tag}/$TAG/g" .github/workflows/assets/release_template.html |
+          curl
+          -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage"
+          -d "chat_id=@pythontelegrambotchannel"
+          -d "parse_mode=HTML"
+          --data-urlencode "text@-"

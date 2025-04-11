@@ -112,7 +112,7 @@ from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -829,13 +829,15 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             return
 
         await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
+        # this needs to be set before we call get_me, since this can trigger an error in the
+        # request backend, which would then NOT lead to a proper shutdown if this flag isn't set
+        self._initialized = True
         # Since the bot is to be initialized only once, we can also use it for
         # verifying the token passed and raising an exception if it's invalid.
         try:
             await self.get_me()
         except InvalidToken as exc:
             raise InvalidToken(f"The token `{self._token}` was rejected by the server.") from exc
-        self._initialized = True
 
     async def shutdown(self) -> None:
         """Stop & clear resources used by this class. Currently just calls
@@ -4581,19 +4583,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         if not isinstance(read_timeout, DefaultValue):
             arg_read_timeout: float = read_timeout or 0
         else:
-            try:
-                arg_read_timeout = self._request[0].read_timeout or 0
-            except NotImplementedError:
-                arg_read_timeout = 2
-                self._warn(
-                    PTBDeprecationWarning(
-                        "20.7",
-                        f"The class {self._request[0].__class__.__name__} does not override "
-                        "the property `read_timeout`. Overriding this property will be mandatory "
-                        "in future versions. Using 2 seconds as fallback.",
-                    ),
-                    stacklevel=2,
-                )
+            arg_read_timeout = self._request[0].read_timeout or 0
 
         # Ideally we'd use an aggressive read timeout for the polling. However,
         # * Short polling should return within 2 seconds.

@@ -85,6 +85,10 @@ class TestBaseRateLimiter:
             async def shutdown(self) -> None:
                 pass
 
+            @property
+            def read_timeout(self):
+                return 1
+
             async def do_request(self, *args, **kwargs):
                 if TestBaseRateLimiter.request_received is None:
                     TestBaseRateLimiter.request_received = []
@@ -162,6 +166,10 @@ class TestAIORateLimiter:
 
         async def shutdown(self) -> None:
             pass
+
+        @property
+        def read_timeout(self):
+            return 1
 
         async def do_request(self, *args, **kwargs):
             request_data = kwargs.get("request_data")
