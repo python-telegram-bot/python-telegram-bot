@@ -1,0 +1,6 @@
+breaking = "Drop Backward Compatibility for `user_id` in `send_gift`"
+features = "Drop Backward Compatibility for `user_id` in `send_gift`"
+[[pull_requests]]
+uid = "4692"
+author_uid = "Bibo-Joshi"
+closes_threads = []
