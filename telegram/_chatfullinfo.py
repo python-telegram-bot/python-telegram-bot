@@ -350,7 +350,7 @@ class ChatFullInfo(_ChatBase):
             the minimum allowed delay between consecutive messages sent by each unprivileged user.
 
             .. deprecated:: NEXT.VERSION
-                |timespan-seconds-deprecated|
+                |time-period-int-deprecated|
         unrestrict_boost_count (:obj:`int`): Optional. For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions.
@@ -362,7 +362,7 @@ class ChatFullInfo(_ChatBase):
             .. versionadded:: 13.4
 
             .. deprecated:: NEXT.VERSION
-                |timespan-seconds-deprecated|
+                |time-period-int-deprecated|
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators.
