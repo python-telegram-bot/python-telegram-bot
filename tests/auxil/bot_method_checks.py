@@ -351,9 +351,6 @@ def build_kwargs(
                 allow_sending_without_reply=manually_passed_value,
                 quote_parse_mode=manually_passed_value,
             )
-        # TODO remove when gift_id isnt marked as optional anymore, tags: deprecated 21.11
-        elif name == "gift_id":
-            kws[name] = "GIFT-ID"
 
     return kws
 
