@@ -23,12 +23,15 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Protocol, TypeVar
+from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union
 
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from typing import type_check_only
@@ -48,6 +51,30 @@ def parse_sequence_arg(arg: Optional[Sequence[T]]) -> tuple[T, ...]:
         :obj:`Tuple`: The sequence converted to a tuple or an empty tuple.
     """
     return tuple(arg) if arg else ()
+
+
+def parse_period_arg(arg: Optional[TimePeriod]) -> Union[dtm.timedelta, None]:
+    """Parses an optional time period in seconds into a timedelta
+
+    Args:
+        arg (:obj:`int` | :class:`datetime.timedelta`, optional): The time period to parse.
+
+    Returns:
+        :obj:`timedelta`: The time period converted to a timedelta object or :obj:`None`.
+    """
+    if arg is None:
+        return None
+    if isinstance(arg, (int, float)):
+        warn(
+            PTBDeprecationWarning(
+                "NEXT.VERSION",
+                "In a future major version this will be of type `datetime.timedelta`."
+                " You can opt-in early by setting the `PTB_TIMEDELTA` environment variable.",
+            ),
+            stacklevel=2,
+        )
+        return dtm.timedelta(seconds=arg)
+    return arg
 
 
 def parse_lpo_and_dwpp(
