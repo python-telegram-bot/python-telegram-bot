@@ -28,6 +28,7 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -41,7 +42,7 @@ from tests.auxil.slots import mro_slots
 class VideoTestBase:
     width = 360
     height = 640
-    duration = 5
+    duration = dtm.timedelta(seconds=5)
     file_size = 326534
     mime_type = "video/mp4"
     supports_streaming = True
@@ -80,7 +81,7 @@ class TestVideoWithoutRequest(VideoTestBase):
     def test_expected_values(self, video):
         assert video.width == self.width
         assert video.height == self.height
-        assert video.duration == self.duration
+        assert video._duration == self.duration
         assert video.file_size == self.file_size
         assert video.mime_type == self.mime_type
 
@@ -90,7 +91,7 @@ class TestVideoWithoutRequest(VideoTestBase):
             "file_unique_id": self.video_file_unique_id,
             "width": self.width,
             "height": self.height,
-            "duration": self.duration,
+            "duration": int(self.duration.total_seconds()),
             "mime_type": self.mime_type,
             "file_size": self.file_size,
             "file_name": self.file_name,
@@ -104,7 +105,7 @@ class TestVideoWithoutRequest(VideoTestBase):
         assert json_video.file_unique_id == self.video_file_unique_id
         assert json_video.width == self.width
         assert json_video.height == self.height
-        assert json_video.duration == self.duration
+        assert json_video._duration == self.duration
         assert json_video.mime_type == self.mime_type
         assert json_video.file_size == self.file_size
         assert json_video.file_name == self.file_name
@@ -119,10 +120,49 @@ class TestVideoWithoutRequest(VideoTestBase):
         assert video_dict["file_unique_id"] == video.file_unique_id
         assert video_dict["width"] == video.width
         assert video_dict["height"] == video.height
-        assert video_dict["duration"] == video.duration
+        assert video_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(video_dict["duration"], int)
         assert video_dict["mime_type"] == video.mime_type
         assert video_dict["file_size"] == video.file_size
         assert video_dict["file_name"] == video.file_name
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, video):
+        if PTB_TIMEDELTA:
+            assert video.duration == self.duration
+            assert isinstance(video.duration, dtm.timedelta)
+        else:
+            assert video.duration == int(self.duration.total_seconds())
+            assert isinstance(video.duration, int)
+
+    @pytest.mark.parametrize("duration", [5, dtm.timedelta(seconds=5)])
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
+        video = Video(
+            "video_id",
+            "unique_id",
+            12,
+            12,
+            duration=duration,
+        )
+
+        if isinstance(duration, int):
+            assert len(recwarn) == 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
+        else:
+            assert len(recwarn) == 0
+
+        warn_count = len(recwarn)
+        value = video.duration
+
+        if not PTB_TIMEDELTA:
+            # An additional warning from property access
+            assert len(recwarn) == warn_count + 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
+            assert recwarn[-1].category is PTBDeprecationWarning
+            assert isinstance(value, (int, float))
+        else:
+            assert len(recwarn) == warn_count
+            assert isinstance(value, dtm.timedelta)
 
     def test_equality(self, video):
         a = Video(video.file_id, video.file_unique_id, self.width, self.height, self.duration)

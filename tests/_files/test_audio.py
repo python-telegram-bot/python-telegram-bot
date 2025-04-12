@@ -28,6 +28,7 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -43,7 +44,7 @@ class AudioTestBase:
     performer = "Leandro Toledo"
     title = "Teste"
     file_name = "telegram.mp3"
-    duration = 3
+    duration = dtm.timedelta(seconds=3)
     # audio_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp3'
     # Shortened link, the above one is cached with the wrong duration.
     audio_file_url = "https://goo.gl/3En24v"
@@ -71,7 +72,7 @@ class TestAudioWithoutRequest(AudioTestBase):
         assert audio.file_unique_id
 
     def test_expected_values(self, audio):
-        assert audio.duration == self.duration
+        assert audio._duration == self.duration
         assert audio.performer is None
         assert audio.title is None
         assert audio.mime_type == self.mime_type
@@ -84,7 +85,7 @@ class TestAudioWithoutRequest(AudioTestBase):
         json_dict = {
             "file_id": self.audio_file_id,
             "file_unique_id": self.audio_file_unique_id,
-            "duration": self.duration,
+            "duration": int(self.duration.total_seconds()),
             "performer": self.performer,
             "title": self.title,
             "file_name": self.file_name,
@@ -97,7 +98,7 @@ class TestAudioWithoutRequest(AudioTestBase):
 
         assert json_audio.file_id == self.audio_file_id
         assert json_audio.file_unique_id == self.audio_file_unique_id
-        assert json_audio.duration == self.duration
+        assert json_audio._duration == self.duration
         assert json_audio.performer == self.performer
         assert json_audio.title == self.title
         assert json_audio.file_name == self.file_name
@@ -111,10 +112,47 @@ class TestAudioWithoutRequest(AudioTestBase):
         assert isinstance(audio_dict, dict)
         assert audio_dict["file_id"] == audio.file_id
         assert audio_dict["file_unique_id"] == audio.file_unique_id
-        assert audio_dict["duration"] == audio.duration
+        assert audio_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(audio_dict["duration"], int)
         assert audio_dict["mime_type"] == audio.mime_type
         assert audio_dict["file_size"] == audio.file_size
         assert audio_dict["file_name"] == audio.file_name
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, audio):
+        if PTB_TIMEDELTA:
+            assert audio.duration == self.duration
+            assert isinstance(audio.duration, dtm.timedelta)
+        else:
+            assert audio.duration == int(self.duration.total_seconds())
+            assert isinstance(audio.duration, int)
+
+    @pytest.mark.parametrize("duration", [3, dtm.timedelta(seconds=3)])
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
+        audio = Audio(
+            "id",
+            "unique_id",
+            duration=duration,
+        )
+
+        if isinstance(duration, int):
+            assert len(recwarn) == 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
+        else:
+            assert len(recwarn) == 0
+
+        warn_count = len(recwarn)
+        value = audio.duration
+
+        if not PTB_TIMEDELTA:
+            # An additional warning from property access
+            assert len(recwarn) == warn_count + 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
+            assert recwarn[-1].category is PTBDeprecationWarning
+            assert isinstance(value, (int, float))
+        else:
+            assert len(recwarn) == warn_count
+            assert isinstance(value, dtm.timedelta)
 
     def test_equality(self, audio):
         a = Audio(audio.file_id, audio.file_unique_id, audio.duration)
@@ -237,7 +275,7 @@ class TestAudioWithRequest(AudioTestBase):
         assert isinstance(message.audio.file_unique_id, str)
         assert message.audio.file_unique_id is not None
         assert message.audio.file_id is not None
-        assert message.audio.duration == self.duration
+        assert message.audio._duration == self.duration
         assert message.audio.performer == self.performer
         assert message.audio.title == self.title
         assert message.audio.file_name == self.file_name

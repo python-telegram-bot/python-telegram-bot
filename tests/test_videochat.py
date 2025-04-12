@@ -28,6 +28,7 @@ from telegram import (
     VideoChatStarted,
 )
 from telegram._utils.datetime import UTC, to_timestamp
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -60,7 +61,7 @@ class TestVideoChatStartedWithoutRequest:
 
 
 class TestVideoChatEndedWithoutRequest:
-    duration = 100
+    duration = dtm.timedelta(seconds=100)
 
     def test_slot_behaviour(self):
         action = VideoChatEnded(8)
@@ -69,27 +70,62 @@ class TestVideoChatEndedWithoutRequest:
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self):
-        json_dict = {"duration": self.duration}
+        json_dict = {"duration": int(self.duration.total_seconds())}
         video_chat_ended = VideoChatEnded.de_json(json_dict, None)
         assert video_chat_ended.api_kwargs == {}
 
-        assert video_chat_ended.duration == self.duration
+        assert video_chat_ended._duration == self.duration
 
     def test_to_dict(self):
         video_chat_ended = VideoChatEnded(self.duration)
         video_chat_dict = video_chat_ended.to_dict()
 
         assert isinstance(video_chat_dict, dict)
-        assert video_chat_dict["duration"] == self.duration
+        assert video_chat_dict["duration"] == int(self.duration.total_seconds())
+
+    def test_time_period_properties(self, PTB_TIMEDELTA):
+        vce = VideoChatEnded(duration=self.duration)
+        if PTB_TIMEDELTA:
+            assert vce.duration == self.duration
+            assert isinstance(vce.duration, dtm.timedelta)
+        else:
+            assert vce.duration == int(self.duration.total_seconds())
+            assert isinstance(vce.duration, int)
+
+    @pytest.mark.parametrize("duration", [100, dtm.timedelta(seconds=100)])
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
+        video_chat_ended = VideoChatEnded(duration)
+
+        if isinstance(duration, int):
+            assert len(recwarn) == 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
+        else:
+            assert len(recwarn) == 0
+
+        warn_count = len(recwarn)
+        value = video_chat_ended.duration
+
+        if not PTB_TIMEDELTA:
+            assert len(recwarn) == warn_count + 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
+            assert recwarn[-1].category is PTBDeprecationWarning
+            assert isinstance(value, (int, float))
+        else:
+            assert len(recwarn) == warn_count
+            assert isinstance(value, dtm.timedelta)
 
     def test_equality(self):
         a = VideoChatEnded(100)
         b = VideoChatEnded(100)
+        x = VideoChatEnded(dtm.timedelta(seconds=100))
         c = VideoChatEnded(50)
         d = VideoChatStarted()
 
         assert a == b
         assert hash(a) == hash(b)
+        assert b == x
+        assert hash(b) == hash(x)
 
         assert a != c
         assert hash(a) != hash(c)

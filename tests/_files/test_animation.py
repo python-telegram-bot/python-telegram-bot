@@ -28,6 +28,7 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -43,7 +44,7 @@ class AnimationTestBase:
     animation_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     width = 320
     height = 180
-    duration = 1
+    duration = dtm.timedelta(seconds=1)
     # animation_file_url = 'https://python-telegram-bot.org/static/testfiles/game.gif'
     # Shortened link, the above one is cached with the wrong duration.
     animation_file_url = "http://bit.ly/2L18jua"
@@ -77,7 +78,7 @@ class TestAnimationWithoutRequest(AnimationTestBase):
             "file_unique_id": self.animation_file_unique_id,
             "width": self.width,
             "height": self.height,
-            "duration": self.duration,
+            "duration": self.duration.total_seconds(),
             "thumbnail": animation.thumbnail.to_dict(),
             "file_name": self.file_name,
             "mime_type": self.mime_type,
@@ -90,6 +91,7 @@ class TestAnimationWithoutRequest(AnimationTestBase):
         assert animation.file_name == self.file_name
         assert animation.mime_type == self.mime_type
         assert animation.file_size == self.file_size
+        assert animation._duration == self.duration
 
     def test_to_dict(self, animation):
         animation_dict = animation.to_dict()
@@ -99,11 +101,50 @@ class TestAnimationWithoutRequest(AnimationTestBase):
         assert animation_dict["file_unique_id"] == animation.file_unique_id
         assert animation_dict["width"] == animation.width
         assert animation_dict["height"] == animation.height
-        assert animation_dict["duration"] == animation.duration
+        assert animation_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(animation_dict["duration"], int)
         assert animation_dict["thumbnail"] == animation.thumbnail.to_dict()
         assert animation_dict["file_name"] == animation.file_name
         assert animation_dict["mime_type"] == animation.mime_type
         assert animation_dict["file_size"] == animation.file_size
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, animation):
+        if PTB_TIMEDELTA:
+            assert animation.duration == self.duration
+            assert isinstance(animation.duration, dtm.timedelta)
+        else:
+            assert animation.duration == int(self.duration.total_seconds())
+            assert isinstance(animation.duration, int)
+
+    @pytest.mark.parametrize("duration", [1, dtm.timedelta(seconds=1)])
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
+        animation = Animation(
+            self.animation_file_id,
+            self.animation_file_unique_id,
+            self.height,
+            self.width,
+            duration=duration,
+        )
+
+        if isinstance(duration, int):
+            assert len(recwarn) == 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
+        else:
+            assert len(recwarn) == 0
+
+        warn_count = len(recwarn)
+        value = animation.duration
+
+        if not PTB_TIMEDELTA:
+            # An additional warning from property access
+            assert len(recwarn) == warn_count + 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
+            assert recwarn[-1].category is PTBDeprecationWarning
+            assert isinstance(value, (int, float))
+        else:
+            assert len(recwarn) == warn_count
+            assert isinstance(value, dtm.timedelta)
 
     def test_equality(self):
         a = Animation(

@@ -17,10 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Voice."""
-from typing import Optional
+import datetime as dtm
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._files._basemedium import _BaseMedium
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class Voice(_BaseMedium):
@@ -35,7 +41,11 @@ class Voice(_BaseMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in
+            seconds as defined by the sender.
+
+            .. versionchanged:: NEXT.VERSION
+                |time-period-input|
         mime_type (:obj:`str`, optional): MIME type of the file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
 
@@ -45,19 +55,23 @@ class Voice(_BaseMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in seconds as
+            defined by the sender.
+
+            .. deprecated:: NEXT.VERSION
+                |time-period-int-deprecated|
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.
 
     """
 
-    __slots__ = ("duration", "mime_type")
+    __slots__ = ("_duration", "mime_type")
 
     def __init__(
         self,
         file_id: str,
         file_unique_id: str,
-        duration: int,
+        duration: TimePeriod,
         mime_type: Optional[str] = None,
         file_size: Optional[int] = None,
         *,
@@ -71,6 +85,32 @@ class Voice(_BaseMedium):
         )
         with self._unfrozen():
             # Required
-            self.duration: int = duration
+            self._duration: dtm.timedelta = parse_period_arg(duration)  # type: ignore[assignment]
             # Optional
             self.mime_type: Optional[str] = mime_type
+
+    @property
+    def duration(self) -> Union[int, dtm.timedelta]:
+        value = get_timedelta_value(self._duration)
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        return value  # type: ignore[return-value]
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Voice":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
+
+        return super().de_json(data=data, bot=bot)
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        out = super().to_dict(recursive)
+        if self._duration is not None:
+            seconds = self._duration.total_seconds()
+            out["duration"] = int(seconds) if seconds.is_integer() else seconds
+        elif not recursive:
+            out["duration"] = self._duration
+        return out

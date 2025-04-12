@@ -17,11 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Animation."""
-from typing import Optional
+import datetime as dtm
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class Animation(_BaseThumbedMedium):
@@ -41,7 +47,11 @@ class Animation(_BaseThumbedMedium):
             Can't be used to download or reuse the file.
         width (:obj:`int`): Video width as defined by the sender.
         height (:obj:`int`): Video height as defined by the sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the video
+            in seconds as defined by the sender.
+
+            .. versionchanged:: NEXT.VERSION
+                |time-period-input|
         file_name (:obj:`str`, optional): Original animation filename as defined by the sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
@@ -58,7 +68,11 @@ class Animation(_BaseThumbedMedium):
             Can't be used to download or reuse the file.
         width (:obj:`int`): Video width as defined by the sender.
         height (:obj:`int`): Video height as defined by the sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in seconds
+            as defined by the sender.
+
+            .. deprecated:: NEXT.VERSION
+                |time-period-int-deprecated|
         file_name (:obj:`str`): Optional. Original animation filename as defined by the sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.
@@ -69,7 +83,7 @@ class Animation(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ("duration", "file_name", "height", "mime_type", "width")
+    __slots__ = ("_duration", "file_name", "height", "mime_type", "width")
 
     def __init__(
         self,
@@ -77,7 +91,7 @@ class Animation(_BaseThumbedMedium):
         file_unique_id: str,
         width: int,
         height: int,
-        duration: int,
+        duration: TimePeriod,
         file_name: Optional[str] = None,
         mime_type: Optional[str] = None,
         file_size: Optional[int] = None,
@@ -96,7 +110,32 @@ class Animation(_BaseThumbedMedium):
             # Required
             self.width: int = width
             self.height: int = height
-            self.duration: int = duration
+            self._duration: dtm.timedelta = parse_period_arg(duration)  # type: ignore[assignment]
             # Optional
             self.mime_type: Optional[str] = mime_type
             self.file_name: Optional[str] = file_name
+
+    @property
+    def duration(self) -> Union[int, dtm.timedelta]:
+        value = get_timedelta_value(self._duration)
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        return value  # type: ignore[return-value]
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Animation":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+        data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
+
+        return super().de_json(data=data, bot=bot)
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        out = super().to_dict(recursive)
+        if self._duration is not None:
+            seconds = self._duration.total_seconds()
+            out["duration"] = int(seconds) if seconds.is_integer() else seconds
+        elif not recursive:
+            out["duration"] = self._duration
+        return out
