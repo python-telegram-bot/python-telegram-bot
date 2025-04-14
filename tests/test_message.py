@@ -2820,6 +2820,31 @@ class TestMessageWithoutRequest(MessageTestBase):
         monkeypatch.setattr(message.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
         assert await message.unpin_all_forum_topic_messages()
 
+    async def test_read_business_message(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["business_connection_id"] == message.business_connection_id
+                and kwargs["message_id"] == message.message_id,
+            )
+
+        assert check_shortcut_signature(
+            Message.read_business_message,
+            Bot.read_business_message,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.read_business_message,
+            message.get_bot(),
+            "read_business_message",
+            shortcut_kwargs=["chat_id", "message_id", "business_connection_id"],
+        )
+        assert await check_defaults_handling(message.read_business_message, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "read_business_message", make_assertion)
+        assert await message.read_business_message()
+
     def test_attachement_successful_payment_deprecated(self, message, recwarn):
         message.successful_payment = "something"
         # kinda unnecessary to assert but one needs to call the function ofc so. Here we are.

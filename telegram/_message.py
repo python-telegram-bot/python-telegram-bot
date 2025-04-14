@@ -4479,6 +4479,43 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
         )
 
+    async def read_business_message(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.read_business_message(
+                chat_id=message.chat_id,
+                message_id=message.message_id,
+                business_connection_id=message.business_connection_id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.read_business_message`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().read_business_message(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
