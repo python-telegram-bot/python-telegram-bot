@@ -9484,7 +9484,7 @@ READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
-            "message_ids": parse_sequence_arg(message_ids),
+            "message_ids": message_ids,
         }
         return await self._post(
             "deleteBusinessMessages",
