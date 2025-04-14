@@ -1,4 +1,4 @@
-internal = "Fine Tune Release Workflow ⚙️ ci-cid affected functionality: ci-cid 🔗 github-actions related technology: github-actions"
+internal = "Fine Tune Release Workflow"
 [[pull_requests]]
 uid = "4758"
 author_uid = "Bibo-Joshi"
