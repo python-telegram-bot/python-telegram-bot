@@ -48,6 +48,8 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
+from typing_extensions import Self
+
 from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
@@ -380,7 +382,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         self._freeze()
 
-    async def __aenter__(self: BT) -> BT:
+    async def __aenter__(self) -> Self:
         """
         |async_context_manager| :meth:`initializes <initialize>` the Bot.
 
@@ -3928,7 +3930,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        file_path = cast(dict, result).get("file_path")
+        file_path = cast("dict", result).get("file_path")
         if file_path and not is_local_file(file_path):
             result["file_path"] = f"{self._base_file_url}/{file_path}"
 
@@ -4591,7 +4593,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         #   waiting for the server to return and there's no way of knowing the connection had been
         #   dropped in real time.
         result = cast(
-            list[JSONDict],
+            "list[JSONDict]",
             await self._post(
                 "getUpdates",
                 data,
@@ -9401,6 +9403,233 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def read_business_message(
+        self,
+        business_connection_id: str,
+        chat_id: int,
+        message_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Marks incoming message as read on behalf of a business account.
+        Requires the ``can_read_messages`` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection on
+                behalf of which to read the message.
+            chat_id (:obj:`int`): Unique identifier of the chat in which the message was received.
+                The chat must have been active in the last
+                :tg-const:`~telegram.constants.BusinessLimit.\
+READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
+            message_id (:obj:`int`): Unique identifier of the message to mark as read.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "chat_id": chat_id,
+            "message_id": message_id,
+        }
+        return await self._post(
+            "readBusinessMessage",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_business_messages(
+        self,
+        business_connection_id: str,
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Delete messages on behalf of a business account. Requires the
+        ``can_delete_outgoing_messages`` business bot right to delete messages sent by the bot
+        itself, or the ``can_delete_all_messages`` business bot right to delete any message.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`int` | :obj:`str`): Unique identifier of the business
+                connection on behalf of which to delete the messages
+            message_ids (Sequence[:obj:`int`]):  A list of
+                :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` identifiers of messages
+                to delete. See :meth:`delete_message` for limitations on which messages can be
+                deleted.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "message_ids": parse_sequence_arg(message_ids),
+        }
+        return await self._post(
+            "deleteBusinessMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_name(
+        self,
+        business_connection_id: str,
+        first_name: str,
+        last_name: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the first and last name of a managed business account. Requires the
+        ``can_change_name`` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`int` | :obj:`str`): Unique identifier of the business
+                connection
+            first_name (:obj:`str`): New first name of the business account;
+                :tg-const:`telegram.constants.BusinessLimit.MIN_NAME_LENGTH`-
+                :tg-const:`telegram.constants.BusinessLimit.MAX_NAME_LENGTH` characters.
+            last_name (:obj:`str`, optional): New last name of the business account;
+                0-:tg-const:`telegram.constants.BusinessLimit.MAX_NAME_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "first_name": first_name,
+            "last_name": last_name,
+        }
+        return await self._post(
+            "setBusinessAccountName",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_username(
+        self,
+        business_connection_id: str,
+        username: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the username of a managed business account. Requires the
+        ``can_change_username`` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            username (:obj:`str`, optional): New business account username;
+                0-:tg-const:`telegram.constants.BusinessLimit.MAX_USERNAME_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "username": username,
+        }
+        return await self._post(
+            "setBusinessAccountUsername",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_bio(
+        self,
+        business_connection_id: str,
+        bio: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the bio of a managed business account. Requires the ``can_change_bio`` business
+        bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            bio (:obj:`str`, optional): The new value of the bio for the business account;
+                0-:tg-const:`telegram.constants.BusinessLimit.MAX_BIO_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "bio": bio,
+        }
+        return await self._post(
+            "setBusinessAccountBio",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def replace_sticker_in_set(
         self,
         user_id: int,
@@ -10338,6 +10567,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_message_reaction`"""
     getBusinessConnection = get_business_connection
     """Alias for :meth:`get_business_connection`"""
+    readBusinessMessage = read_business_message
+    """Alias for :meth:`read_business_message`"""
+    deleteBusinessMessages = delete_business_messages
+    """Alias for :meth:`delete_business_messages`"""
+    setBusinessAccountName = set_business_account_name
+    """Alias for :meth:`set_business_account_name`"""
+    setBusinessAccountUsername = set_business_account_username
+    """Alias for :meth:`set_business_account_username`"""
+    setBusinessAccountBio = set_business_account_bio
+    """Alias for :meth:`set_business_account_bio`"""
     replaceStickerInSet = replace_sticker_in_set
     """Alias for :meth:`replace_sticker_in_set`"""
     refundStarPayment = refund_star_payment
