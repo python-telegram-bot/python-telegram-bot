@@ -253,7 +253,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 return
 
             if not isinstance(arbitrary_callback_data, bool):
-                maxsize = cast("int", arbitrary_callback_data)
+                maxsize = cast(int, arbitrary_callback_data)
             else:
                 maxsize = 1024
 
