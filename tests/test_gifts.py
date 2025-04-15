@@ -21,6 +21,7 @@ from collections.abc import Sequence
 import pytest
 
 from telegram import BotCommand, Gift, GiftInfo, Gifts, MessageEntity, Sticker
+from telegram._gifts import AcceptedGiftTypes
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.request import RequestData
 from tests.auxil.slots import mro_slots
@@ -388,6 +389,75 @@ class TestGiftInfoWithoutRequest(GiftInfoTestBase):
                 sticker=Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
                 star_count=5,
             ),
+        )
+        d = BotCommand("start", "description")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def accepted_gift_types():
+    return AcceptedGiftTypes(
+        unlimited_gifts=AcceptedGiftTypesTestBase.unlimited_gifts,
+        limited_gifts=AcceptedGiftTypesTestBase.limited_gifts,
+        unique_gifts=AcceptedGiftTypesTestBase.unique_gifts,
+        premium_subscription=AcceptedGiftTypesTestBase.premium_subscription,
+    )
+
+
+class AcceptedGiftTypesTestBase:
+    unlimited_gifts = False
+    limited_gifts = True
+    unique_gifts = True
+    premium_subscription = True
+
+
+class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
+    def test_slot_behaviour(self, accepted_gift_types):
+        for attr in accepted_gift_types.__slots__:
+            assert getattr(accepted_gift_types, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(accepted_gift_types)) == len(
+            set(mro_slots(accepted_gift_types))
+        ), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "unlimited_gifts": self.unlimited_gifts,
+            "limited_gifts": self.limited_gifts,
+            "unique_gifts": self.unique_gifts,
+            "premium_subscription": self.premium_subscription,
+        }
+        accepted_gift_types = AcceptedGiftTypes.de_json(json_dict, offline_bot)
+        assert accepted_gift_types.api_kwargs == {}
+        assert accepted_gift_types.unlimited_gifts == self.unlimited_gifts
+        assert accepted_gift_types.limited_gifts == self.limited_gifts
+        assert accepted_gift_types.unique_gifts == self.unique_gifts
+        assert accepted_gift_types.premium_subscription == self.premium_subscription
+
+    def test_to_dict(self, accepted_gift_types):
+        json_dict = accepted_gift_types.to_dict()
+        assert json_dict["unlimited_gifts"] == self.unlimited_gifts
+        assert json_dict["limited_gifts"] == self.limited_gifts
+        assert json_dict["unique_gifts"] == self.unique_gifts
+        assert json_dict["premium_subscription"] == self.premium_subscription
+
+    def test_equality(self, accepted_gift_types):
+        a = accepted_gift_types
+        b = AcceptedGiftTypes(
+            self.unlimited_gifts, self.limited_gifts, self.unique_gifts, self.premium_subscription
+        )
+        c = AcceptedGiftTypes(
+            not self.unlimited_gifts,
+            self.limited_gifts,
+            self.unique_gifts,
+            self.premium_subscription,
         )
         d = BotCommand("start", "description")
 

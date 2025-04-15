@@ -4,6 +4,7 @@ Available Types
 .. toctree::
     :titlesonly:
 
+    telegram.acceptedgifttypes
     telegram.animation
     telegram.audio
     telegram.birthdate

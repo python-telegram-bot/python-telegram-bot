@@ -296,3 +296,62 @@ class GiftInfo(TelegramObject):
             raise RuntimeError("This GiftInfo has no 'text'.")
 
         return parse_message_entities(self.text, self.entities, types)
+
+
+class AcceptedGiftTypes(TelegramObject):
+    """This object describes the types of gifts that can be gifted to a user or a chat.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal if their :attr:`unlimited_gifts`, :attr:`limited_gifts`,
+    :attr:`unique_gifts` and :attr:`premium_subscription` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        unlimited_gifts (:class:`bool`): :obj:`True`, if unlimited regular gifts are accepted.
+        limited_gifts (:class:`bool`): :obj:`True`, if limited regular gifts are accepted.
+        unique_gifts (:class:`bool`): :obj:`True`, if unique gifts or gifts that can be upgraded
+            to unique for free are accepted.
+        premium_subscription (:class:`bool`): :obj:`True`, if a Telegram Premium subscription
+            is accepted.
+
+    Attributes:
+        unlimited_gifts (:class:`bool`): :obj:`True`, if unlimited regular gifts are accepted.
+        limited_gifts (:class:`bool`): :obj:`True`, if limited regular gifts are accepted.
+        unique_gifts (:class:`bool`): :obj:`True`, if unique gifts or gifts that can be upgraded
+            to unique for free are accepted.
+        premium_subscription (:class:`bool`): :obj:`True`, if a Telegram Premium subscription
+            is accepted.
+
+    """
+
+    __slots__ = (
+        "limited_gifts",
+        "premium_subscription",
+        "unique_gifts",
+        "unlimited_gifts",
+    )
+
+    def __init__(
+        self,
+        unlimited_gifts: bool,
+        limited_gifts: bool,
+        unique_gifts: bool,
+        premium_subscription: bool,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.unlimited_gifts: bool = unlimited_gifts
+        self.limited_gifts: bool = limited_gifts
+        self.unique_gifts: bool = unique_gifts
+        self.premium_subscription: bool = premium_subscription
+
+        self._id_attrs = (
+            self.unlimited_gifts,
+            self.limited_gifts,
+            self.unique_gifts,
+            self.premium_subscription,
+        )
+
+        self._freeze()
