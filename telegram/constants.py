@@ -103,6 +103,7 @@ __all__ = [
     "StickerSetLimit",
     "StickerType",
     "TransactionPartnerType",
+    "UniqueGiftInfoOrigin",
     "UpdateType",
     "UserProfilePhotosLimit",
     "VerifyLimit",
@@ -1984,6 +1985,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 20.8
     """
+    GIFT = "gift"
+    """:obj:`str`: Messages with :attr:`telegram.Message.gift`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
 
@@ -2067,6 +2073,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
     TEXT = "text"
     """:obj:`str`: Messages with :attr:`telegram.Message.text`."""
+    UNIQUE_GIFT = "unique_gift"
+    """:obj:`str`: Messages with :attr:`telegram.Message.unique_gift`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     USERS_SHARED = "users_shared"
     """:obj:`str`: Messages with :attr:`telegram.Message.users_shared`.
 
@@ -2808,6 +2819,21 @@ class PollType(StringEnum):
     """:obj:`str`: regular polls."""
     QUIZ = "quiz"
     """:obj:`str`: quiz polls."""
+
+
+class UniqueGiftInfoOrigin(StringEnum):
+    """This enum contains the available origins for :class:`telegram.UniqueGiftInfo`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    UPGRADE = "upgrade"
+    """:obj:`str` gift upgraded"""
+    TRANSFER = "transfer"
+    """:obj:`str` gift transfered"""
 
 
 class UpdateType(StringEnum):

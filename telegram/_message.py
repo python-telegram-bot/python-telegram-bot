@@ -49,6 +49,7 @@ from telegram._forumtopic import (
     GeneralForumTopicUnhidden,
 )
 from telegram._games.game import Game
+from telegram._gifts import GiftInfo
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
@@ -64,6 +65,7 @@ from telegram._reply import ReplyParameters
 from telegram._shared import ChatShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
+from telegram._uniquegift import UniqueGiftInfo
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
@@ -525,6 +527,14 @@ class Message(MaybeInaccessibleMessage):
             with the bot.
 
             .. versionadded:: 20.1
+        gift (:class:`telegram.GiftInfo`, optional): Service message: a regular gift was sent
+            or received.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift (:class:`telegram.UniqueGiftInfo`, optional): Service message: a unique gift
+            was sent or received
+
+            .. versionadded:: NEXT.VERSION
         giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
             scheduled giveaway was created
 
@@ -853,6 +863,14 @@ class Message(MaybeInaccessibleMessage):
             with the bot.
 
             .. versionadded:: 20.1
+        gift (:class:`telegram.GiftInfo`): Optional. Service message: a regular gift was sent
+            or received.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift (:class:`telegram.UniqueGiftInfo`): Optional. Service message: a unique gift
+            was sent or received
+
+            .. versionadded:: NEXT.VERSION
         giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
             scheduled giveaway was created
 
@@ -966,6 +984,7 @@ class Message(MaybeInaccessibleMessage):
         "game",
         "general_forum_topic_hidden",
         "general_forum_topic_unhidden",
+        "gift",
         "giveaway",
         "giveaway_completed",
         "giveaway_created",
@@ -1008,6 +1027,7 @@ class Message(MaybeInaccessibleMessage):
         "successful_payment",
         "supergroup_chat_created",
         "text",
+        "unique_gift",
         "users_shared",
         "venue",
         "via_bot",
@@ -1109,6 +1129,8 @@ class Message(MaybeInaccessibleMessage):
         show_caption_above_media: Optional[bool] = None,
         paid_media: Optional[PaidMediaInfo] = None,
         refunded_payment: Optional[RefundedPayment] = None,
+        gift: Optional[GiftInfo] = None,
+        unique_gift: Optional[UniqueGiftInfo] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1212,6 +1234,8 @@ class Message(MaybeInaccessibleMessage):
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
             self.paid_media: Optional[PaidMediaInfo] = paid_media
             self.refunded_payment: Optional[RefundedPayment] = refunded_payment
+            self.gift: Optional[GiftInfo] = gift
+            self.unique_gift: Optional[UniqueGiftInfo] = unique_gift
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1346,6 +1370,8 @@ class Message(MaybeInaccessibleMessage):
         data["refunded_payment"] = de_json_optional(
             data.get("refunded_payment"), RefundedPayment, bot
         )
+        data["gift"] = de_json_optional(data.get("gift"), GiftInfo, bot)
+        data["unique_gift"] = de_json_optional(data.get("unique_gift"), UniqueGiftInfo, bot)
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel

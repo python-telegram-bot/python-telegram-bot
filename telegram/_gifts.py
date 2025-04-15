@@ -22,8 +22,10 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
 from telegram._files.sticker import Sticker
+from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -145,3 +147,152 @@ class Gifts(TelegramObject):
 
         data["gifts"] = de_list_optional(data.get("gifts"), Gift, bot)
         return super().de_json(data=data, bot=bot)
+
+
+class GiftInfo(TelegramObject):
+    """Describes a service message about a regular gift that was sent or received.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal if their :attr:`gift` is equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        gift (:class:`Gift`): Information about the gift.
+        owned_gift_id (:obj:`str`, optional): Unique identifier of the received gift for the bot;
+            only present for gifts received on behalf of business accounts
+        convert_star_count (:obj:`int`, optional) Number of Telegram Stars that can be claimed by
+            the receiver by converting the gift; omitted if conversion to Telegram Stars
+            is impossible
+        prepaid_upgrade_star_count (:obj:`int`, optional): Number of Telegram Stars that were
+            prepaid by the sender for the ability to upgrade the gift
+        can_be_upgraded (:obj:`bool`, optional): :obj:`True`, if the gift can be upgraded
+            to a unique gift.
+        text (:obj:`str`, optional): Text of the message that was added to the gift.
+        entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities that
+            appear in the text.
+        is_private (:obj:`bool`, optional): :obj:`True`, if the sender and gift text are
+            shown only to the gift receiver; otherwise, everyone will be able to see them.
+
+    Attributes:
+        gift (:class:`Gift`): Information about the gift.
+        owned_gift_id (:obj:`str`): Optional. Unique identifier of the received gift for the bot;
+            only present for gifts received on behalf of business accounts
+        convert_star_count (:obj:`int`): Optional. Number of Telegram Stars that can be claimed by
+            the receiver by converting the gift; omitted if conversion to Telegram Stars
+            is impossible
+        prepaid_upgrade_star_count (:obj:`int`): Optional. Number of Telegram Stars that were
+            prepaid by the sender for the ability to upgrade the gift
+        can_be_upgraded (:obj:`bool`): Optional. :obj:`True`, if the gift can be upgraded
+            to a unique gift.
+        text (:obj:`str`): Optional. Text of the message that was added to the gift.
+        entities (Sequence[:class:`telegram.MessageEntity`]): Optional. Special entities that
+            appear in the text.
+        is_private (:obj:`bool`): Optional. :obj:`True`, if the sender and gift text are
+            shown only to the gift receiver; otherwise, everyone will be able to see them.
+
+    """
+
+    __slots__ = (
+        "can_be_upgraded",
+        "convert_star_count",
+        "entities",
+        "gift",
+        "is_private",
+        "owned_gift_id",
+        "prepaid_upgrade_star_count",
+        "text",
+    )
+
+    def __init__(
+        self,
+        gift: Gift,
+        owned_gift_id: Optional[str] = None,
+        convert_star_count: Optional[int] = None,
+        prepaid_upgrade_star_count: Optional[int] = None,
+        can_be_upgraded: Optional[bool] = None,
+        text: Optional[str] = None,
+        entities: Optional[Sequence[MessageEntity]] = None,
+        is_private: Optional[bool] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        # Required
+        self.gift: Gift = gift
+        # Optional
+        self.owned_gift_id: Optional[str] = owned_gift_id
+        self.convert_star_count: Optional[int] = convert_star_count
+        self.prepaid_upgrade_star_count: Optional[int] = prepaid_upgrade_star_count
+        self.can_be_upgraded: Optional[bool] = can_be_upgraded
+        self.text: Optional[str] = text
+        self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+        self.is_private: Optional[bool] = is_private
+
+        self._id_attrs = (self.gift,)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "GiftInfo":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
+        data["entities"] = de_list_optional(data.get("entities"), MessageEntity, bot)
+
+        return super().de_json(data=data, bot=bot)
+
+    def parse_entity(self, entity: MessageEntity) -> str:
+        """Returns the text in :attr:`text`
+        from a given :class:`telegram.MessageEntity` of :attr:`entities`.
+
+        Note:
+            This method is present because Telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
+            (That is, you can't just slice ``Message.text`` with the offset and length.)
+
+        Args:
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
+                be an entity that belongs to :attr:`entities`.
+
+        Returns:
+            :obj:`str`: The text of the given entity.
+
+        Raises:
+            RuntimeError: If the gift info has no text.
+
+        """
+        if not self.text:
+            raise RuntimeError("This GiftInfo has no 'text'.")
+
+        return parse_message_entity(self.text, entity)
+
+    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
+        """
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
+        It contains entities from this gift info's text filtered by their ``type`` attribute as
+        the key, and the text that each entity belongs to as the value of the :obj:`dict`.
+
+        Note:
+            This method should always be used instead of the :attr:`entities`
+            attribute, since it calculates the correct substring from the message text based on
+            UTF-16 codepoints. See :attr:`parse_entity` for more info.
+
+        Args:
+            types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+                    ``type`` attribute of an entity is contained in this list, it will be returned.
+                    Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
+
+        Returns:
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            the text that belongs to them, calculated based on UTF-16 codepoints.
+
+        Raises:
+            RuntimeError: If the gift info has no text.
+
+        """
+        if not self.text:
+            raise RuntimeError("This GiftInfo has no 'text'.")
+
+        return parse_message_entities(self.text, self.entities, types)
