@@ -46,6 +46,7 @@ __all__ = [
     "BotDescriptionLimit",
     "BotNameLimit",
     "BulkRequestLimit",
+    "BusinessLimit",
     "CallbackQueryLimit",
     "ChatAction",
     "ChatBoostSources",
@@ -700,6 +701,40 @@ class BulkRequestLimit(IntEnum):
     """:obj:`int`: Minimum number of messages required for bulk actions."""
     MAX_LIMIT = 100
     """:obj:`int`: Maximum number of messages required for bulk actions."""
+
+
+class BusinessLimit(IntEnum):
+    """This enum contains limitations related to handling business accounts. The enum members
+    of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT = int(dtm.timedelta(hours=24).total_seconds())
+    """:obj:`int`: Time in seconds in which the chat must have been active for
+    :meth:`~telegram.Bot.read_business_message` to work.
+    """
+    MIN_NAME_LENGTH = 1
+    """:obj:`int`: Minimum length of the name of a business account. Relevant only for
+    :paramref:`~telegram.Bot.set_business_account_name.first_name` of
+    :meth:`telegram.Bot.set_business_account_name`.
+    """
+    MAX_NAME_LENGTH = 64
+    """:obj:`int`: Maximum length of the name of a business account. Relevant for the parameters
+    of :meth:`telegram.Bot.set_business_account_name`.
+    """
+    MAX_USERNAME_LENGTH = 32
+    """::obj:`int`: Maximum length of the username of a business account. Relevant for
+    :paramref:`~telegram.Bot.set_business_account_username.username` of
+    :meth:`telegram.Bot.set_business_account_username`.
+    """
+    MAX_BIO_LENGTH = 140
+    """:obj:`int`: Maximum length of the bio of a business account. Relevant for
+    :paramref:`~telegram.Bot.set_business_account_bio.bio` of
+    :meth:`telegram.Bot.set_business_account_bio`.
+    """
 
 
 class CallbackQueryLimit(IntEnum):
