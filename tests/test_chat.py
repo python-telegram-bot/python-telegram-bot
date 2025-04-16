@@ -1400,6 +1400,11 @@ class TestChatWithoutRequest(ChatTestBase):
         )
         assert await check_defaults_handling(chat.read_business_message, chat.get_bot())
 
+        monkeypatch.setattr(chat.get_bot(), "read_business_message", make_assertion)
+        assert await chat.read_business_message(
+            message_id="message_id", business_connection_id="business_connection_id"
+        )
+
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
