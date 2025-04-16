@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from typing import Union
 
 from telegram import (
+    AcceptedGiftTypes,
     BotCommand,
     BotDescription,
     BotName,
@@ -74,6 +75,9 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
         type="dummy_type",
         accent_color_id=1,
         max_reaction_count=1,
+        accepted_gift_types=AcceptedGiftTypes(
+            unlimited_gifts=True, limited_gifts=True, unique_gifts=True, premium_subscription=True
+        ),
     ),
     "ChatInviteLink": ChatInviteLink(
         "dummy_invite_link",

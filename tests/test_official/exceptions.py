@@ -152,6 +152,7 @@ PTB_EXTRA_PARAMS = {
     # backwards compatibility for api 9.0 changes
     # tags: deprecated NEXT.VERSION, bot api 9.0
     "BusinessConnection": {"can_reply"},
+    "ChatFullInfo": {"can_send_gift"},
 }
 
 
@@ -198,6 +199,7 @@ IGNORED_PARAM_REQUIREMENTS = {
     # backwards compatibility for api 9.0 changes
     # tags: deprecated NEXT.VERSION, bot api 9.0
     "BusinessConnection": {"is_enabled"},
+    "ChatFullInfo": {"accepted_gift_types"},
 }
 
 
