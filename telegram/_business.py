@@ -30,9 +30,154 @@ from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings_transition import warn_about_deprecated_attr_in_property
 
 if TYPE_CHECKING:
     from telegram import Bot
+
+
+class BusinessBotRights(TelegramObject):
+    """
+    This object represents the rights of a business bot.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if all their attributes are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        can_reply (:obj:`bool`, optional): True, if the bot can send and edit messages in the
+            private chats that had incoming messages in the last 24 hours.
+        can_read_messages (:obj:`bool`, optional): True, if the bot can mark incoming private
+            messages as read.
+        can_delete_outgoing_messages (:obj:`bool`, optional): True, if the bot can delete messages
+            sent by the bot.
+        can_delete_all_messages (:obj:`bool`, optional): True, if the bot can delete all private
+            messages in managed chats.
+        can_edit_name (:obj:`bool`, optional): True, if the bot can edit the first and last name
+            of the business account.
+        can_edit_bio (:obj:`bool`, optional): True, if the bot can edit the bio of the
+            business account.
+        can_edit_profile_photo (:obj:`bool`, optional): True, if the bot can edit the profile
+            photo of the business account.
+        can_edit_username (:obj:`bool`, optional): True, if the bot can edit the username of the
+            business account.
+        can_change_gift_settings (:obj:`bool`, optional): True, if the bot can change the privacy
+            settings pertaining to gifts for the business account.
+        can_view_gifts_and_stars (:obj:`bool`, optional): True, if the bot can view gifts and the
+            amount of Telegram Stars owned by the business account.
+        can_convert_gifts_to_stars (:obj:`bool`, optional): True, if the bot can convert regular
+            gifts owned by the business account to Telegram Stars.
+        can_transfer_and_upgrade_gifts (:obj:`bool`, optional): True, if the bot can transfer and
+            upgrade gifts owned by the business account.
+        can_transfer_stars (:obj:`bool`, optional): True, if the bot can transfer Telegram Stars
+            received by the business account to its own account, or use them to upgrade and
+            transfer gifts.
+        can_manage_stories (:obj:`bool`, optional): True, if the bot can post, edit and delete
+            stories on behalf of the business account.
+
+    Attributes:
+        can_reply (:obj:`bool`): Optional. True, if the bot can send and edit messages in the
+            private chats that had incoming messages in the last 24 hours.
+        can_read_messages (:obj:`bool`): Optional. True, if the bot can mark incoming private
+            messages as read.
+        can_delete_outgoing_messages (:obj:`bool`): Optional. True, if the bot can delete messages
+            sent by the bot.
+        can_delete_all_messages (:obj:`bool`): Optional. True, if the bot can delete all private
+            messages in managed chats.
+        can_edit_name (:obj:`bool`): Optional. True, if the bot can edit the first and last name
+            of the business account.
+        can_edit_bio (:obj:`bool`): Optional. True, if the bot can edit the bio of the
+            business account.
+        can_edit_profile_photo (:obj:`bool`): Optional. True, if the bot can edit the profile
+            photo of the business account.
+        can_edit_username (:obj:`bool`): Optional. True, if the bot can edit the username of the
+            business account.
+        can_change_gift_settings (:obj:`bool`): Optional. True, if the bot can change the privacy
+            settings pertaining to gifts for the business account.
+        can_view_gifts_and_stars (:obj:`bool`): Optional. True, if the bot can view gifts and the
+            amount of Telegram Stars owned by the business account.
+        can_convert_gifts_to_stars (:obj:`bool`): Optional. True, if the bot can convert regular
+            gifts owned by the business account to Telegram Stars.
+        can_transfer_and_upgrade_gifts (:obj:`bool`): Optional. True, if the bot can transfer and
+            upgrade gifts owned by the business account.
+        can_transfer_stars (:obj:`bool`): Optional. True, if the bot can transfer Telegram Stars
+            received by the business account to its own account, or use them to upgrade and
+            transfer gifts.
+        can_manage_stories (:obj:`bool`): Optional. True, if the bot can post, edit and delete
+            stories on behalf of the business account.
+    """
+
+    __slots__ = (
+        "can_change_gift_settings",
+        "can_convert_gifts_to_stars",
+        "can_delete_all_messages",
+        "can_delete_outgoing_messages",
+        "can_edit_bio",
+        "can_edit_name",
+        "can_edit_profile_photo",
+        "can_edit_username",
+        "can_manage_stories",
+        "can_read_messages",
+        "can_reply",
+        "can_transfer_and_upgrade_gifts",
+        "can_transfer_stars",
+        "can_view_gifts_and_stars",
+    )
+
+    def __init__(
+        self,
+        can_reply: Optional[bool] = None,
+        can_read_messages: Optional[bool] = None,
+        can_delete_outgoing_messages: Optional[bool] = None,
+        can_delete_all_messages: Optional[bool] = None,
+        can_edit_name: Optional[bool] = None,
+        can_edit_bio: Optional[bool] = None,
+        can_edit_profile_photo: Optional[bool] = None,
+        can_edit_username: Optional[bool] = None,
+        can_change_gift_settings: Optional[bool] = None,
+        can_view_gifts_and_stars: Optional[bool] = None,
+        can_convert_gifts_to_stars: Optional[bool] = None,
+        can_transfer_and_upgrade_gifts: Optional[bool] = None,
+        can_transfer_stars: Optional[bool] = None,
+        can_manage_stories: Optional[bool] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.can_reply: Optional[bool] = can_reply
+        self.can_read_messages: Optional[bool] = can_read_messages
+        self.can_delete_outgoing_messages: Optional[bool] = can_delete_outgoing_messages
+        self.can_delete_all_messages: Optional[bool] = can_delete_all_messages
+        self.can_edit_name: Optional[bool] = can_edit_name
+        self.can_edit_bio: Optional[bool] = can_edit_bio
+        self.can_edit_profile_photo: Optional[bool] = can_edit_profile_photo
+        self.can_edit_username: Optional[bool] = can_edit_username
+        self.can_change_gift_settings: Optional[bool] = can_change_gift_settings
+        self.can_view_gifts_and_stars: Optional[bool] = can_view_gifts_and_stars
+        self.can_convert_gifts_to_stars: Optional[bool] = can_convert_gifts_to_stars
+        self.can_transfer_and_upgrade_gifts: Optional[bool] = can_transfer_and_upgrade_gifts
+        self.can_transfer_stars: Optional[bool] = can_transfer_stars
+        self.can_manage_stories: Optional[bool] = can_manage_stories
+
+        self._id_attrs = (
+            self.can_reply,
+            self.can_read_messages,
+            self.can_delete_outgoing_messages,
+            self.can_delete_all_messages,
+            self.can_edit_name,
+            self.can_edit_bio,
+            self.can_edit_profile_photo,
+            self.can_edit_username,
+            self.can_change_gift_settings,
+            self.can_view_gifts_and_stars,
+            self.can_convert_gifts_to_stars,
+            self.can_transfer_and_upgrade_gifts,
+            self.can_transfer_stars,
+            self.can_manage_stories,
+        )
+
+        self._freeze()
 
 
 class BusinessConnection(TelegramObject):
@@ -41,9 +186,11 @@ class BusinessConnection(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`id`, :attr:`user`, :attr:`user_chat_id`, :attr:`date`,
-    :attr:`can_reply`, and :attr:`is_enabled` are equal.
+    :attr:`rights`, and :attr:`is_enabled` are equal.
 
     .. versionadded:: 21.1
+    .. versionchanged:: NEXT.VERSION
+        Equality comparison now considers :attr:`rights` instead of :attr:`can_reply`.
 
     Args:
         id (:obj:`str`): Unique identifier of the business connection.
@@ -53,7 +200,13 @@ class BusinessConnection(TelegramObject):
         date (:obj:`datetime.datetime`): Date the connection was established in Unix time.
         can_reply (:obj:`bool`): True, if the bot can act on behalf of the business account in
             chats that were active in the last 24 hours.
+
+            .. deprecated:: NEXT.VERSION
+                Bot API 9.0 deprecated this argument in favor of :paramref:`rights`
         is_enabled (:obj:`bool`): True, if the connection is active.
+        rights (:class:`BusinessBotRights`, optional): Rights of the business bot.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`str`): Unique identifier of the business connection.
@@ -61,16 +214,18 @@ class BusinessConnection(TelegramObject):
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who created the
             business connection.
         date (:obj:`datetime.datetime`): Date the connection was established in Unix time.
-        can_reply (:obj:`bool`): True, if the bot can act on behalf of the business account in
-            chats that were active in the last 24 hours.
         is_enabled (:obj:`bool`): True, if the connection is active.
+        rights (:class:`BusinessBotRights`): Optional. Rights of the business bot.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
-        "can_reply",
+        "_can_reply",
         "date",
         "id",
         "is_enabled",
+        "rights",
         "user",
         "user_chat_id",
     )
@@ -83,6 +238,7 @@ class BusinessConnection(TelegramObject):
         date: dtm.datetime,
         can_reply: bool,
         is_enabled: bool,
+        rights: Optional[BusinessBotRights] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -91,19 +247,36 @@ class BusinessConnection(TelegramObject):
         self.user: User = user
         self.user_chat_id: int = user_chat_id
         self.date: dtm.datetime = date
-        self.can_reply: bool = can_reply
+        self._can_reply: bool = can_reply
         self.is_enabled: bool = is_enabled
+        self.rights: Optional[BusinessBotRights] = rights
 
         self._id_attrs = (
             self.id,
             self.user,
             self.user_chat_id,
             self.date,
-            self.can_reply,
+            self.rights,
             self.is_enabled,
         )
 
         self._freeze()
+
+    @property
+    def can_reply(self) -> bool:
+        """:obj:`bool`: True, if the bot can act on behalf of the business account in
+        chats that were active in the last 24 hours.
+
+        .. deprecated:: NEXT.VERSION
+            Bot API 9.0 deprecated this argument in favor of :attr:`rights`
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="can_reply",
+            new_attr_name="rights",
+            bot_api_version="9.0",
+            ptb_version="NEXT.VERSION",
+        )
+        return self._can_reply
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessConnection":
@@ -115,6 +288,7 @@ class BusinessConnection(TelegramObject):
 
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
         data["user"] = de_json_optional(data.get("user"), User, bot)
+        data["rights"] = de_json_optional(data.get("rights"), BusinessBotRights, bot)
 
         return super().de_json(data=data, bot=bot)
 

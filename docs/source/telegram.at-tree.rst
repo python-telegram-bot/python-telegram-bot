@@ -19,6 +19,7 @@ Available Types
     telegram.botdescription
     telegram.botname
     telegram.botshortdescription
+    telegram.businessbotrights
     telegram.businessconnection
     telegram.businessintro
     telegram.businesslocation
