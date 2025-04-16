@@ -712,7 +712,7 @@ class BusinessLimit(IntEnum):
 
     __slots__ = ()
 
-    READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT = dtm.timedelta(hours=24).total_seconds()
+    READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT = int(dtm.timedelta(hours=24).total_seconds())
     """:obj:`int`: Time in seconds in which the chat must have been active for
     :meth:`~telegram.Bot.read_business_message` to work.
     """
