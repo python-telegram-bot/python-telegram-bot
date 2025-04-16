@@ -340,12 +340,31 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
         assert bc1 != bc4
         assert hash(bc1) != hash(bc4)
 
-    def test_can_reply_property_deprecation(self, business_connection):
+    def test_can_reply_argument_property_deprecation(self, business_connection):
+        with pytest.warns(PTBDeprecationWarning, match=r"9\.0.*can\_reply") as record:
+            assert BusinessConnection(
+                id=self.id_,
+                user=self.user,
+                user_chat_id=self.user_chat_id,
+                date=self.date,
+                can_reply=True,
+                is_enabled=self.is_enabled,
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
         with pytest.warns(PTBDeprecationWarning, match=r"9\.0.*can\_reply") as record:
             assert business_connection.can_reply is self.can_reply
 
         assert record[0].category == PTBDeprecationWarning
         assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_is_enabled_remains_required(self):
+        with pytest.raises(TypeError):
+            BusinessConnection(
+                id=self.id_, user=self.user, user_chat_id=self.user_chat_id, date=self.date
+            )
 
 
 class TestBusinessMessagesDeleted(BusinessTestBase):

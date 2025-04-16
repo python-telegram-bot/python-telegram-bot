@@ -30,7 +30,12 @@ from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings_transition import warn_about_deprecated_attr_in_property
+from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
+)
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -198,11 +203,11 @@ class BusinessConnection(TelegramObject):
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who created the
             business connection.
         date (:obj:`datetime.datetime`): Date the connection was established in Unix time.
-        can_reply (:obj:`bool`): True, if the bot can act on behalf of the business account in
-            chats that were active in the last 24 hours.
+        can_reply (:obj:`bool`, optional): True, if the bot can act on behalf of the business
+            account in chats that were active in the last 24 hours.
 
             .. deprecated:: NEXT.VERSION
-                Bot API 9.0 deprecated this argument in favor of :paramref:`rights`
+                Bot API 9.0 deprecated this argument in favor of :paramref:`rights`.
         is_enabled (:obj:`bool`): True, if the connection is active.
         rights (:class:`BusinessBotRights`, optional): Rights of the business bot.
 
@@ -236,18 +241,37 @@ class BusinessConnection(TelegramObject):
         user: "User",
         user_chat_id: int,
         date: dtm.datetime,
-        can_reply: bool,
-        is_enabled: bool,
+        can_reply: Optional[bool] = None,
+        # temporarily optional to account for changed signature
+        # tags: deprecated NEXT.VERSION; bot api 9.0
+        is_enabled: Optional[bool] = None,
         rights: Optional[BusinessBotRights] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
+        if is_enabled is None:
+            raise TypeError("Missing required argument `is_enabled`")
+
+        if can_reply is not None:
+            warn(
+                PTBDeprecationWarning(
+                    version="NEXT.VERSION",
+                    message=build_deprecation_warning_message(
+                        deprecated_name="can_reply",
+                        new_name="rights",
+                        bot_api_version="9.0",
+                        object_type="parameter",
+                    ),
+                ),
+                stacklevel=2,
+            )
+
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
         self.user: User = user
         self.user_chat_id: int = user_chat_id
         self.date: dtm.datetime = date
-        self._can_reply: bool = can_reply
+        self._can_reply: Optional[bool] = can_reply
         self.is_enabled: bool = is_enabled
         self.rights: Optional[BusinessBotRights] = rights
 
@@ -263,8 +287,8 @@ class BusinessConnection(TelegramObject):
         self._freeze()
 
     @property
-    def can_reply(self) -> bool:
-        """:obj:`bool`: True, if the bot can act on behalf of the business account in
+    def can_reply(self) -> Optional[bool]:
+        """:obj:`bool`: Optional. True, if the bot can act on behalf of the business account in
         chats that were active in the last 24 hours.
 
         .. deprecated:: NEXT.VERSION
