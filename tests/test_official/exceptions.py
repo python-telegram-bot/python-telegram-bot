@@ -144,6 +144,7 @@ PTB_EXTRA_PARAMS = {
     "ReactionType": {"type"},  # attributes common to all subclasses
     "BackgroundType": {"type"},  # attributes common to all subclasses
     "BackgroundFill": {"type"},  # attributes common to all subclasses
+    "OwnedGift": {"type"},  # attributes common to all subclasses
     "InputTextMessageContent": {"disable_web_page_preview"},  # convenience arg, here for bw compat
     "RevenueWithdrawalState": {"type"},  # attributes common to all subclasses
     "TransactionPartner": {"type"},  # attributes common to all subclasses
@@ -181,6 +182,7 @@ PTB_IGNORED_PARAMS = {
     r"TransactionPartner\w+": {"type"},
     r"PaidMedia\w+": {"type"},
     r"InputPaidMedia\w+": {"type"},
+    r"OwnedGift\w+": {"type"},
 }
 
 

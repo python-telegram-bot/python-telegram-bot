@@ -69,6 +69,7 @@ from telegram import (
     MenuButton,
     Message,
     MessageId,
+    OwnedGifts,
     PhotoSize,
     Poll,
     PreparedInlineMessage,
@@ -4262,6 +4263,42 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_business_account_gifts(
+        self,
+        business_connection_id: str,
+        exclude_unsaved: Optional[bool] = None,
+        exclude_saved: Optional[bool] = None,
+        exclude_unlimited: Optional[bool] = None,
+        exclude_limited: Optional[bool] = None,
+        exclude_unique: Optional[bool] = None,
+        sort_by_price: Optional[bool] = None,
+        offset: Optional[str] = None,
+        limit: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> OwnedGifts:
+        return await super().get_business_account_gifts(
+            business_connection_id=business_connection_id,
+            exclude_unsaved=exclude_unsaved,
+            exclude_saved=exclude_saved,
+            exclude_unlimited=exclude_unlimited,
+            exclude_limited=exclude_limited,
+            exclude_unique=exclude_unique,
+            sort_by_price=sort_by_price,
+            offset=offset,
+            limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def read_business_message(
         self,
         business_connection_id: str,
@@ -4826,6 +4863,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     getUserChatBoosts = get_user_chat_boosts
     setMessageReaction = set_message_reaction
     getBusinessConnection = get_business_connection
+    getBusinessAccountGifts = get_business_account_gifts
     readBusinessMessage = read_business_message
     deleteBusinessMessages = delete_business_messages
     setBusinessAccountName = set_business_account_name

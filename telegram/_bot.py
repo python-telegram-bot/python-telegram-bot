@@ -81,6 +81,7 @@ from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
+from telegram._ownedgift import OwnedGifts
 from telegram._payment.stars.startransactions import StarTransactions
 from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
@@ -9401,6 +9402,80 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def get_business_account_gifts(
+        self,
+        business_connection_id: str,
+        exclude_unsaved: Optional[bool] = None,
+        exclude_saved: Optional[bool] = None,
+        exclude_unlimited: Optional[bool] = None,
+        exclude_limited: Optional[bool] = None,
+        exclude_unique: Optional[bool] = None,
+        sort_by_price: Optional[bool] = None,
+        offset: Optional[str] = None,
+        limit: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> OwnedGifts:
+        """
+        Returns the gifts received and owned by a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_view_gifts_and_stars` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            exclude_unsaved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that aren't
+                saved to the account's profile page.
+            exclude_saved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that are saved
+                to the account's profile page.
+            exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can
+                be purchased an unlimited number of times.
+            exclude_limited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
+                purchased a limited number of times.
+            exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts.
+            sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
+                instead of send date. Sorting is applied before pagination.
+            offset (:obj:`str`, optional): Offset of the first entry to return as received from
+                the previous request; use empty string to get the first chunk of results.
+            limit (:obj:`int`, optional): The maximum number of gifts to be returned;
+                :tg-const:`telegram.constants.BusinessLimit.MIN_GIFT_RESULTS`-\
+                :tg-const:`telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`.
+                Defaults to :tg-const:`telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`.
+
+        Returns:
+            :class:`telegram.OwnedGifts`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "exclude_unsaved": exclude_unsaved,
+            "exclude_saved": exclude_saved,
+            "exclude_unlimited": exclude_unlimited,
+            "exclude_limited": exclude_limited,
+            "exclude_unique": exclude_unique,
+            "sort_by_price": sort_by_price,
+            "offset": offset,
+            "limit": limit,
+        }
+
+        return OwnedGifts.de_json(
+            await self._post(
+                "getBusinessAccountGifts",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
     async def read_business_message(
         self,
         business_connection_id: str,
@@ -10565,6 +10640,8 @@ READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_user_chat_boosts`"""
     setMessageReaction = set_message_reaction
     """Alias for :meth:`set_message_reaction`"""
+    getBusinessAccountGifts = get_business_account_gifts
+    """Alias for :meth:`get_business_account_gifts`"""
     getBusinessConnection = get_business_connection
     """Alias for :meth:`get_business_connection`"""
     readBusinessMessage = read_business_message

@@ -21,6 +21,10 @@ import datetime as dtm
 import pytest
 
 from telegram import BusinessConnection, User
+from telegram._files.sticker import Sticker
+from telegram._gifts import Gift
+from telegram._ownedgift import OwnedGiftRegular, OwnedGifts
+from telegram._utils.datetime import UTC
 
 
 class BusinessMethodsTestBase:
@@ -48,6 +52,55 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
         monkeypatch.setattr(offline_bot.request, "do_request", do_request)
         obj = await offline_bot.get_business_connection(business_connection_id=self.bci)
         assert isinstance(obj, BusinessConnection)
+
+    @pytest.mark.parametrize("bool_param", [True, False, None])
+    async def test_get_business_account_gifts(self, offline_bot, monkeypatch, bool_param):
+        offset = 50
+        limit = 50
+        owned_gifts = OwnedGifts(
+            total_count=1,
+            gifts=[
+                OwnedGiftRegular(
+                    gift=Gift(
+                        id="id1",
+                        sticker=Sticker(
+                            "file_id", "file_unique_id", 512, 512, False, False, "regular"
+                        ),
+                        star_count=5,
+                    ),
+                    send_date=dtm.datetime.now(tz=UTC).replace(microsecond=0),
+                    owned_gift_id="some_id_1",
+                )
+            ],
+        ).to_json()
+
+        async def do_request_and_make_assertions(*args, **kwargs):
+            data = kwargs.get("request_data").parameters
+            assert data.get("business_connection_id") == self.bci
+            assert data.get("exclude_unsaved") is bool_param
+            assert data.get("exclude_saved") is bool_param
+            assert data.get("exclude_unlimited") is bool_param
+            assert data.get("exclude_limited") is bool_param
+            assert data.get("exclude_unique") is bool_param
+            assert data.get("sort_by_price") is bool_param
+            assert data.get("offset") == offset
+            assert data.get("limit") == limit
+
+            return 200, f'{{"ok": true, "result": {owned_gifts}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", do_request_and_make_assertions)
+        obj = await offline_bot.get_business_account_gifts(
+            business_connection_id=self.bci,
+            exclude_unsaved=bool_param,
+            exclude_saved=bool_param,
+            exclude_unlimited=bool_param,
+            exclude_limited=bool_param,
+            exclude_unique=bool_param,
+            sort_by_price=bool_param,
+            offset=offset,
+            limit=limit,
+        )
+        assert isinstance(obj, OwnedGifts)
 
     async def test_read_business_message(self, offline_bot, monkeypatch):
         chat_id = 43

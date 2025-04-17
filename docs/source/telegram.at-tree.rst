@@ -119,6 +119,10 @@ Available Types
     telegram.messageoriginuser
     telegram.messagereactioncountupdated
     telegram.messagereactionupdated
+    telegram.ownedgift.rst
+    telegram.ownedgiftregular.rst
+    telegram.ownedgifts.rst
+    telegram.ownedgiftunique.rst
     telegram.paidmedia
     telegram.paidmediainfo
     telegram.paidmediaphoto

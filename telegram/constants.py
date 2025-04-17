@@ -86,6 +86,7 @@ __all__ = [
     "MessageLimit",
     "MessageOriginType",
     "MessageType",
+    "OwnedGiftType",
     "PaidMediaType",
     "ParseMode",
     "PollLimit",
@@ -735,6 +736,16 @@ class BusinessLimit(IntEnum):
     """:obj:`int`: Maximum length of the bio of a business account. Relevant for
     :paramref:`~telegram.Bot.set_business_account_bio.bio` of
     :meth:`telegram.Bot.set_business_account_bio`.
+    """
+    MIN_GIFT_RESULTS = 1
+    """:obj:`int`: Minimum number of gifts to be returned. Relevant for
+    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+    :meth:`telegram.Bot.get_business_account_gifts`.
+    """
+    MAX_GIFT_RESULTS = 100
+    """:obj:`int`: Maximum number of gifts to be returned. Relevant for
+    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+    :meth:`telegram.Bot.get_business_account_gifts`.
     """
 
 
@@ -2109,6 +2120,21 @@ class MessageType(StringEnum):
 
     .. versionadded:: 20.8
     """
+
+
+class OwnedGiftType(StringEnum):
+    """This enum contains the available types of :class:`telegram.OwnedGift`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    REGULAR = "regular"
+    """:obj:`str`: a regular owned gift."""
+    UNIQUE = "unique"
+    """:obj:`str`: a unique owned gift."""
 
 
 class PaidMediaType(StringEnum):
