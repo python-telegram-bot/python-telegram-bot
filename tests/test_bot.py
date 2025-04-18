@@ -543,7 +543,7 @@ class TestBotWithoutRequest:
         if bot_method_name.replace("_", "").lower() != "getupdates" and bot_class is ExtBot:
             assert rate_arg in param_names, f"{bot_method} is missing the parameter `{rate_arg}`"
 
-    @bot_methods(ext_bot=False)
+    @bot_methods()
     async def test_defaults_handling(
         self,
         bot_class,

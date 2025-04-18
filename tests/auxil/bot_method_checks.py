@@ -35,6 +35,7 @@ from telegram import (
     InlineQueryResultArticle,
     InlineQueryResultCachedPhoto,
     InputMediaPhoto,
+    InputPaidMediaPhoto,
     InputTextMessageContent,
     LinkPreviewOptions,
     ReplyParameters,
@@ -285,8 +286,13 @@ def build_kwargs(
             elif name in ["prices", "commands", "errors"]:
                 kws[name] = []
             elif name == "media":
-                media = InputMediaPhoto("media", parse_mode=manually_passed_value)
-                if "list" in str(param.annotation).lower():
+                if "star_count" in signature.parameters:
+                    media = InputPaidMediaPhoto("media")
+                else:
+                    media = InputMediaPhoto("media", parse_mode=manually_passed_value)
+
+                param_annotation = str(param.annotation).lower()
+                if "sequence" in param_annotation or "list" in param_annotation:
                     kws[name] = [media]
                 else:
                     kws[name] = media
@@ -507,7 +513,8 @@ async def make_assertion(
             )
 
     media = data.pop("media", None)
-    if media:
+    paid_media = media and data.pop("star_count", None)
+    if media and not paid_media:
         if isinstance(media, dict) and isinstance(media.get("type", None), InputMediaType):
             check_input_media(media)
         else:
