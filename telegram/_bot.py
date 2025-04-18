@@ -9512,7 +9512,7 @@ READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
     ) -> bool:
         """
         Changes the first and last name of a managed business account. Requires the
-        :attr:`~telegram.BusinessBotRights.can_change_name` business bot right.
+        :attr:`~telegram.BusinessBotRights.can_edit_name` business bot right.
 
         .. versionadded:: NEXT.VERSION
 
@@ -9559,7 +9559,7 @@ READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
     ) -> bool:
         """
         Changes the username of a managed business account. Requires the
-        :attr:`~telegram.BusinessBotRights.can_change_username` business bot right.
+        :attr:`~telegram.BusinessBotRights.can_edit_username` business bot right.
 
         .. versionadded:: NEXT.VERSION
 
@@ -9601,7 +9601,7 @@ READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
     ) -> bool:
         """
         Changes the bio of a managed business account. Requires the
-        :attr:`~telegram.BusinessBotRights.can_change_bio` business bot right.
+        :attr:`~telegram.BusinessBotRights.can_edit_bio` business bot right.
 
         .. versionadded:: NEXT.VERSION
 
