@@ -3506,6 +3506,41 @@ class _ChatBase(TelegramObject):
             **{"chat_id" if self.type == Chat.CHANNEL else "user_id": self.id},
         )
 
+    async def transfer_gift(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        star_count: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.transfer_gift(new_owner_chat_id=update.effective_chat.id, *args, **kwargs )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.transfer_gift`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().transfer_gift(
+            new_owner_chat_id=self.id,
+            business_connection_id=business_connection_id,
+            owned_gift_id=owned_gift_id,
+            star_count=star_count,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def verify(
         self,
         custom_description: Optional[str] = None,

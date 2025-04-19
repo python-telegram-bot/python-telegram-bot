@@ -1926,6 +1926,7 @@ class StatusUpdate:
                 or StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
                 or StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN.check_update(update)
                 or StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN.check_update(update)
+                or StatusUpdate.GIFT.check_update(update)
                 or StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
                 or StatusUpdate.GIVEAWAY_CREATED.check_update(update)
                 or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
@@ -1937,6 +1938,7 @@ class StatusUpdate:
                 or StatusUpdate.PINNED_MESSAGE.check_update(update)
                 or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
                 or StatusUpdate.REFUNDED_PAYMENT.check_update(update)
+                or StatusUpdate.UNIQUE_GIFT.check_update(update)
                 or StatusUpdate.USERS_SHARED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
@@ -2079,6 +2081,18 @@ class StatusUpdate:
     .. versionadded:: 20.0
     """
 
+    class _Gift(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.gift)
+
+    GIFT = _Gift(name="filters.StatusUpdate.GIFT")
+    """Messages that contain :attr:`telegram.Message.gift`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
     class _GiveawayCreated(MessageFilter):
         __slots__ = ()
 
@@ -2191,6 +2205,18 @@ class StatusUpdate:
     REFUNDED_PAYMENT = _RefundedPayment("filters.StatusUpdate.REFUNDED_PAYMENT")
     """Messages that contain :attr:`telegram.Message.refunded_payment`.
     .. versionadded:: 21.4
+    """
+
+    class _UniqueGift(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.unique_gift)
+
+    UNIQUE_GIFT = _UniqueGift(name="filters.StatusUpdate.UNIQUE_GIFT")
+    """Messages that contain :attr:`telegram.Message.unique_gift`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
     class _UsersShared(MessageFilter):

@@ -20,6 +20,7 @@
 
 __author__ = "devs@python-telegram-bot.org"
 __all__ = (
+    "AcceptedGiftTypes",
     "AffiliateInfo",
     "Animation",
     "Audio",
@@ -104,6 +105,7 @@ __all__ = (
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
     "Gift",
+    "GiftInfo",
     "Gifts",
     "Giveaway",
     "GiveawayCompleted",
@@ -181,6 +183,10 @@ __all__ = (
     "MessageReactionCountUpdated",
     "MessageReactionUpdated",
     "OrderInfo",
+    "OwnedGift",
+    "OwnedGiftRegular",
+    "OwnedGiftUnique",
+    "OwnedGifts",
     "PaidMedia",
     "PaidMediaInfo",
     "PaidMediaPhoto",
@@ -245,6 +251,12 @@ __all__ = (
     "TransactionPartnerTelegramAds",
     "TransactionPartnerTelegramApi",
     "TransactionPartnerUser",
+    "UniqueGift",
+    "UniqueGiftBackdrop",
+    "UniqueGiftBackdropColors",
+    "UniqueGiftInfo",
+    "UniqueGiftModel",
+    "UniqueGiftSymbol",
     "Update",
     "User",
     "UserChatBoosts",
@@ -393,7 +405,7 @@ from ._forumtopic import (
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
-from ._gifts import Gift, Gifts
+from ._gifts import AcceptedGiftTypes, Gift, GiftInfo, Gifts
 from ._giveaway import Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -445,6 +457,7 @@ from ._messageorigin import (
     MessageOriginUser,
 )
 from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
+from ._ownedgift import OwnedGift, OwnedGiftRegular, OwnedGifts, OwnedGiftUnique
 from ._paidmedia import (
     PaidMedia,
     PaidMediaInfo,
@@ -510,6 +523,14 @@ from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
+from ._uniquegift import (
+    UniqueGift,
+    UniqueGiftBackdrop,
+    UniqueGiftBackdropColors,
+    UniqueGiftInfo,
+    UniqueGiftModel,
+    UniqueGiftSymbol,
+)
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
