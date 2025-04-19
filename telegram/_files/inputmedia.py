@@ -51,7 +51,7 @@ class InputMedia(TelegramObject):
 
     Args:
         media_type (:obj:`str`): Type of media that the instance represents.
-        media (:obj:`str` :class:`~telegram.InputFile`): File to send.
+        media (:obj:`str` | :class:`~telegram.InputFile`): File to send.
             |fileinputnopath|
         caption (:obj:`str`, optional): Caption of the media to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
