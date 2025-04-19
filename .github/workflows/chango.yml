@@ -25,16 +25,13 @@ jobs:
           persist-credentials: false
       - name: Check PR Title
         id: check_title
-        run: |
-          echo "PR title: ${{ github.event.pull_request.title }}"
-          if [[ "$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')" =~ ^bump\ version\ to\ .* ]]; then  # zizmor: ignore[template-injection]
+        run: | # zizmor: ignore[template-injection]
+          if [[ "$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')" =~ ^bump\ version\ to\ .* ]]; then
             echo "COMMIT_AND_PUSH=false" >> $GITHUB_OUTPUT
             echo "IS_RELEASE_PR=true" >> $GITHUB_OUTPUT
-            echo "Regex does match"
           else
             echo "COMMIT_AND_PUSH=true" >> $GITHUB_OUTPUT
             echo "IS_RELEASE_PR=false" >> $GITHUB_OUTPUT
-            echo "Regex does not match"
           fi
 
       # Create the new fragment
@@ -67,8 +64,8 @@ jobs:
       - name: Do Release
         run: |
           pip install . -r docs/requirements-docs.txt
-          UID=$(python -c "from telegram import __version__; print(f'v{__version__}')")
-          chango release --uid $UID
+          VERSION_TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
+          chango release --uid VERSION_TAG
 
       - name: Commit & Push
         uses: stefanzweifel/git-auto-commit-action@e348103e9026cc0eee72ae06630dbe30c8bf7a79 # v5.1.0
