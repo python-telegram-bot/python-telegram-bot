@@ -27,7 +27,7 @@ jobs:
         id: check_title
         run: |
           echo "PR title: ${{ github.event.pull_request.title }}"
-          if [[ "${{ github.event.pull_request.title }}" =~ ^(?i)Bump\ Version\ to\ .* ]]; then # zizmor: ignore[template-injection]
+          if [[ "$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')" =~ ^bump\ version\ to\ .* ]]; then  # zizmor: ignore[template-injection]
             echo "COMMIT_AND_PUSH=false" >> $GITHUB_OUTPUT
             echo "IS_RELEASE_PR=true" >> $GITHUB_OUTPUT
             echo "Regex does match"
