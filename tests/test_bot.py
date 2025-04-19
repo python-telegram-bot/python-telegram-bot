@@ -402,6 +402,21 @@ class TestBotWithoutRequest:
 
         assert self.test_flag == "stop"
 
+    async def test_shutdown_at_error_in_request_in_init(self, monkeypatch, offline_bot):
+        async def get_me_error():
+            raise httpx.HTTPError("BadRequest wrong token sry :(")
+
+        async def shutdown(*args):
+            self.test_flag = "stop"
+
+        monkeypatch.setattr(offline_bot, "get_me", get_me_error)
+        monkeypatch.setattr(offline_bot, "shutdown", shutdown)
+
+        async with offline_bot:
+            pass
+
+        assert self.test_flag == "stop"
+
     async def test_equality(self):
         async with (
             make_bot(token=FALLBACKS[0]["token"]) as a,
@@ -528,7 +543,7 @@ class TestBotWithoutRequest:
         if bot_method_name.replace("_", "").lower() != "getupdates" and bot_class is ExtBot:
             assert rate_arg in param_names, f"{bot_method} is missing the parameter `{rate_arg}`"
 
-    @bot_methods(ext_bot=False)
+    @bot_methods()
     async def test_defaults_handling(
         self,
         bot_class,

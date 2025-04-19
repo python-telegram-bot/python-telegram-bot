@@ -62,6 +62,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
+    InputPaidMedia,
     InputPollOption,
     LinkPreviewOptions,
     Location,
@@ -114,7 +115,6 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InputPaidMedia,
         InputSticker,
         LabeledPrice,
         MessageEntity,
@@ -466,7 +466,11 @@ class ExtBot(Bot, Generic[RLARGS]):
                 with copied_val._unfrozen():
                     copied_val.parse_mode = self.defaults.parse_mode
                 data[key] = copied_val
-            elif key == "media" and isinstance(val, Sequence):
+            elif (
+                key == "media"
+                and isinstance(val, Sequence)
+                and not isinstance(val[0], InputPaidMedia)
+            ):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
@@ -4476,13 +4480,13 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def send_gift(
         self,
-        user_id: Optional[int] = None,
-        gift_id: Union[str, Gift] = None,  # type: ignore
+        gift_id: Union[str, Gift],
         text: Optional[str] = None,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Optional[Sequence["MessageEntity"]] = None,
         pay_for_upgrade: Optional[bool] = None,
         chat_id: Optional[Union[str, int]] = None,
+        user_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
