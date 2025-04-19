@@ -1,0 +1,5 @@
+other = "Use `timedelta` to represent time periods in classes"
+[[pull_requests]]
+uid = "4750"
+author_uid = "aelkheir"
+closes_threads = []
