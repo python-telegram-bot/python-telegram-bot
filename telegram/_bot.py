@@ -9863,8 +9863,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         The gift can't be converted to Telegram Stars by the receiver.
 
         .. versionadded:: 21.8
-        .. versionchanged:: NEXT.VERSION
-           Bot API 8.3 made :paramref:`user_id` optional. In version NEXT.VERSION, the methods
+        .. versionchanged:: 22.0
+           Bot API 8.3 made :paramref:`user_id` optional. In version 22.0, the methods
            signature was changed accordingly.
 
         Args:
