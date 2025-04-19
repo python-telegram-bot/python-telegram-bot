@@ -65,7 +65,7 @@ jobs:
         run: |
           pip install . -r docs/requirements-docs.txt
           VERSION_TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
-          chango release --uid VERSION_TAG
+          chango release --uid $VERSION_TAG
 
       - name: Commit & Push
         uses: stefanzweifel/git-auto-commit-action@e348103e9026cc0eee72ae06630dbe30c8bf7a79 # v5.1.0
