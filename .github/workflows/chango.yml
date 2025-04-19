@@ -53,6 +53,7 @@ jobs:
         if: steps.check_title.outputs.IS_RELEASE_PR == 'true'
         run: |
           cd ./target-repo
+          git add changes/unreleased/*
           pip install . -r docs/requirements-docs.txt
           VERSION_TAG=$(python -c "from telegram import __version__; print(f'{__version__}')")
           chango release --uid $VERSION_TAG
