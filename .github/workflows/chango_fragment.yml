@@ -1,4 +1,4 @@
-name: Create Chango Fragment
+name: Chango
 on:
   pull_request:
     types:
@@ -14,17 +14,60 @@ jobs:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
       contents: write
-    name: create-chango-fragment
+    name: Create chango Fragment
     runs-on: ubuntu-latest
-    steps:
+    outputs:
+      IS_RELEASE_PR: ${{ steps.check_title.outputs.IS_RELEASE_PR }}
 
-      # Create the new fragment
+    steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+      - name: Check PR Title
+        id: check_title
+        run: |
+          if [[ "${{ github.event.pull_request.title }}" =~ ^(?i)Bump\ Version\ to\ .* ]]; then
+            echo "COMMIT_AND_PUSH=false" >> $GITHUB_OUTPUT
+            echo "IS_RELEASE_PR=true" >> $GITHUB_OUTPUT
+          else
+            echo "COMMIT_AND_PUSH=true" >> $GITHUB_OUTPUT
+            echo "IS_RELEASE_PR=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Create the new fragment
       - uses: Bibo-Joshi/chango@9d6bd9d7612eca5fab2c5161687011be59baaf19 # v0.4.0
         with:
           github-token: ${{ secrets.CHANGO_PAT }}
           query-issue-types: true
+          commit-and-push: ${{ steps.check_title.outputs.COMMIT_AND_PUSH }}
 
+  release:
+    name: release
+    needs: create-chango-fragment
+    if: ${{ needs.create-chango-fragment.outputs.IS_RELEASE_PR == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
 
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+        with:
+          python-version: "3.x"
+
+      - name: Do Release
+        run: |
+          pip install . -r docs/requirements-docs.txt
+          UID=$(python -c "from telegram import __version__; print(f'v{__version__}')")
+          chango release --uid $UID
+
+      - name: Commit & Push
+        uses: stefanzweifel/git-auto-commit-action@e348103e9026cc0eee72ae06630dbe30c8bf7a79 # v5.1.0
+        with:
+          commit_message: "Do chango Release"
