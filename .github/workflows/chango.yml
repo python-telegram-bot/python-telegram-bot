@@ -64,7 +64,7 @@ jobs:
       - name: Do Release
         run: |
           pip install . -r docs/requirements-docs.txt
-          VERSION_TAG=$(python -c "from telegram import __version__; print(f'v{__version__}')")
+          VERSION_TAG=$(python -c "from telegram import __version__; print(f'{__version__}')")
           chango release --uid $VERSION_TAG
 
       - name: Commit & Push
