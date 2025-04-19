@@ -1384,6 +1384,27 @@ class TestChatWithoutRequest(ChatTestBase):
         monkeypatch.setattr(chat.get_bot(), "remove_chat_verification", make_assertion)
         assert await chat.remove_verification()
 
+    async def test_instance_method_read_business_message(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["business_connection_id"] == "business_connection_id"
+                and kwargs["message_id"] == "message_id"
+            )
+
+        assert check_shortcut_signature(
+            Chat.read_business_message, Bot.read_business_message, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.read_business_message, chat.get_bot(), "read_business_message"
+        )
+        assert await check_defaults_handling(chat.read_business_message, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "read_business_message", make_assertion)
+        assert await chat.read_business_message(
+            message_id="message_id", business_connection_id="business_connection_id"
+        )
+
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):

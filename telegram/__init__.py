@@ -46,6 +46,7 @@ __all__ = (
     "BotDescription",
     "BotName",
     "BotShortDescription",
+    "BusinessBotRights",
     "BusinessConnection",
     "BusinessIntro",
     "BusinessLocation",
@@ -301,6 +302,7 @@ from ._botcommandscope import (
 from ._botdescription import BotDescription, BotShortDescription
 from ._botname import BotName
 from ._business import (
+    BusinessBotRights,
     BusinessConnection,
     BusinessIntro,
     BusinessLocation,
