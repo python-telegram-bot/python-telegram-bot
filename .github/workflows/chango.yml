@@ -67,6 +67,12 @@ jobs:
           VERSION_TAG=$(python -c "from telegram import __version__; print(f'{__version__}')")
           chango release --uid $VERSION_TAG
 
+      - name: Debug Logging
+        run: | 
+          git status
+          git config --list
+          ls -la .git
+
       - name: Commit & Push
         uses: stefanzweifel/git-auto-commit-action@e348103e9026cc0eee72ae06630dbe30c8bf7a79 # v5.1.0
         with:
