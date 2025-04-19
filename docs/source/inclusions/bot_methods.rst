@@ -423,6 +423,14 @@
       - Used for setting the business account username.
     * - :meth:`~telegram.Bot.set_business_account_bio`
       - Used for setting the business account bio.
+    * - :meth:`~telegram.Bot.set_business_account_gift_settings`
+      - Used for setting the business account gift settings.
+    * - :meth:`~telegram.Bot.convert_gift_to_stars`
+      - Used for converting owned reqular gifts to stars.
+    * - :meth:`~telegram.Bot.upgrade_gift`
+      - Used for upgrading owned regular gifts to unique ones.
+    * - :meth:`~telegram.Bot.transfer_gift`
+      - Used for transferring owned unique gifts to another user.
 
 
 .. raw:: html

@@ -22,7 +22,7 @@ import pytest
 
 from telegram import BusinessConnection, User
 from telegram._files.sticker import Sticker
-from telegram._gifts import Gift
+from telegram._gifts import AcceptedGiftTypes, Gift
 from telegram._ownedgift import OwnedGiftRegular, OwnedGifts
 from telegram._utils.datetime import UTC
 
@@ -171,3 +171,80 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.set_business_account_bio(business_connection_id=self.bci, bio=bio)
+
+    async def test_set_business_account_gift_settings(self, offline_bot, monkeypatch):
+        show_gift_button = True
+        accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
+
+        async def make_assertion(*args, **kwargs):
+            data = kwargs.get("request_data").json_parameters
+            assert data.get("business_connection_id") == self.bci
+            assert data.get("show_gift_button") == "true"
+            assert data.get("accepted_gift_types") == accepted_gift_types.to_json()
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.set_business_account_gift_settings(
+            business_connection_id=self.bci,
+            show_gift_button=show_gift_button,
+            accepted_gift_types=accepted_gift_types,
+        )
+
+    async def test_convert_gift_to_stars(self, offline_bot, monkeypatch):
+        owned_gift_id = "some_id"
+
+        async def make_assertion(*args, **kwargs):
+            data = kwargs.get("request_data").parameters
+            assert data.get("business_connection_id") == self.bci
+            assert data.get("owned_gift_id") == owned_gift_id
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.convert_gift_to_stars(
+            business_connection_id=self.bci,
+            owned_gift_id=owned_gift_id,
+        )
+
+    @pytest.mark.parametrize("keep_original_details", [True, None])
+    @pytest.mark.parametrize("star_count", [100, None])
+    async def test_upgrade_gift(self, offline_bot, monkeypatch, keep_original_details, star_count):
+        owned_gift_id = "some_id"
+
+        async def make_assertion(*args, **kwargs):
+            data = kwargs.get("request_data").parameters
+            assert data.get("business_connection_id") == self.bci
+            assert data.get("owned_gift_id") == owned_gift_id
+            assert data.get("keep_original_details") is keep_original_details
+            assert data.get("star_count") == star_count
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.upgrade_gift(
+            business_connection_id=self.bci,
+            owned_gift_id=owned_gift_id,
+            keep_original_details=keep_original_details,
+            star_count=star_count,
+        )
+
+    @pytest.mark.parametrize("star_count", [100, None])
+    async def test_transfer_gift(self, offline_bot, monkeypatch, star_count):
+        owned_gift_id = "some_id"
+        new_owner_chat_id = 123
+
+        async def make_assertion(*args, **kwargs):
+            data = kwargs.get("request_data").parameters
+            assert data.get("business_connection_id") == self.bci
+            assert data.get("owned_gift_id") == owned_gift_id
+            assert data.get("new_owner_chat_id") == new_owner_chat_id
+            assert data.get("star_count") == star_count
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.transfer_gift(
+            business_connection_id=self.bci,
+            owned_gift_id=owned_gift_id,
+            new_owner_chat_id=new_owner_chat_id,
+            star_count=star_count,
+        )

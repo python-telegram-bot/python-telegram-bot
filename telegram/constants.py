@@ -714,9 +714,12 @@ class BusinessLimit(IntEnum):
 
     __slots__ = ()
 
-    READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT = int(dtm.timedelta(hours=24).total_seconds())
-    """:obj:`int`: Time in seconds in which the chat must have been active for
-    :meth:`~telegram.Bot.read_business_message` to work.
+    CHAT_ACTIVITY_TIMEOUT = int(dtm.timedelta(hours=24).total_seconds())
+    """:obj:`int`: Time in seconds in which the chat must have been active for. Relevant for
+    :paramref:`~telegram.Bot.read_business_message.chat_id`
+    of :meth:`~telegram.Bot.read_business_message` and
+    :paramref:`~telegram.Bot.transfer_gift.new_owner_chat_id`
+    of :meth:`~telegram.Bot.transfer_gift`.
     """
     MIN_NAME_LENGTH = 1
     """:obj:`int`: Minimum length of the name of a business account. Relevant only for

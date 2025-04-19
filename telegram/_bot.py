@@ -75,7 +75,7 @@ from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
-from telegram._gifts import Gift, Gifts
+from telegram._gifts import AcceptedGiftTypes, Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._menubutton import MenuButton
@@ -9500,7 +9500,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int`): Unique identifier of the chat in which the message was received.
                 The chat must have been active in the last
                 :tg-const:`~telegram.constants.BusinessLimit.\
-READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
+CHAT_ACTIVITY_TIMEOUT` seconds.
             message_id (:obj:`int`): Unique identifier of the message to mark as read.
 
         Returns:
@@ -9697,6 +9697,211 @@ READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
         }
         return await self._post(
             "setBusinessAccountBio",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_gift_settings(
+        self,
+        business_connection_id: str,
+        show_gift_button: bool,
+        accepted_gift_types: AcceptedGiftTypes,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the privacy settings pertaining to incoming gifts in a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_change_gift_settings` business
+        bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            show_gift_button (:obj:`bool`): Pass :obj:`True`, if a button for sending a gift to the
+                user or by the business account must always be shown in the input field.
+            accepted_gift_types (:class:`telegram.AcceptedGiftTypes`): Types of gifts accepted by
+                the business account.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "show_gift_button": show_gift_button,
+            "accepted_gift_types": accepted_gift_types,
+        }
+        return await self._post(
+            "setBusinessAccountGiftSettings",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def convert_gift_to_stars(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Converts a given regular gift to Telegram Stars. Requires the
+        :attr:`~telegram.BusinessBotRights.can_convert_gifts_to_stars` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            owned_gift_id (:obj:`str`): Unique identifier of the regular gift that should be
+                converted to Telegram Stars.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "owned_gift_id": owned_gift_id,
+        }
+        return await self._post(
+            "convertGiftToStars",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def upgrade_gift(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        keep_original_details: Optional[bool] = None,
+        star_count: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Upgrades a given regular gift to a unique gift. Requires the
+        :attr:`~telegram.BusinessBotRights.can_transfer_and_upgrade_gifts` business bot right.
+        Additionally requires the :attr:`~telegram.BusinessBotRights.can_transfer_stars` business
+        bot right if the upgrade is paid.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            owned_gift_id (:obj:`str`): Unique identifier of the regular gift that should be
+                upgraded to a unique one.
+            keep_original_details (:obj:`bool`, optional): Pass :obj:`True` to keep the original
+                gift text, sender and receiver in the upgraded gift
+            star_count (:obj:`int`, optional): The amount of Telegram Stars that will
+                be paid for the upgrade from the business account balance. If
+                ``gift.prepaid_upgrade_star_count > 0``, then pass ``0``, otherwise,
+                the :attr:`~telegram.BusinessBotRights.can_transfer_stars`
+                business bot right is required and :attr:`telegram.Gift.upgrade_star_count`
+                must be passed.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "owned_gift_id": owned_gift_id,
+            "keep_original_details": keep_original_details,
+            "star_count": star_count,
+        }
+        return await self._post(
+            "upgradeGift",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def transfer_gift(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        new_owner_chat_id: int,
+        star_count: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Transfers an owned unique gift to another user. Requires the
+        :attr:`~telegram.BusinessBotRights.can_transfer_and_upgrade_gifts` business bot right.
+        Requires :attr:`~telegram.BusinessBotRights.can_transfer_stars` business bot right if the
+        transfer is paid.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            owned_gift_id (:obj:`str`): Unique identifier of the regular gift that should be
+                transferred.
+            new_owner_chat_id (:obj:`int`): Unique identifier of the chat which will
+                own the gift. The chat must be active in the last
+                :tg-const:`~telegram.constants.BusinessLimit.\
+CHAT_ACTIVITY_TIMEOUT` seconds.
+            star_count (:obj:`int`, optional): The amount of Telegram Stars that will be paid for
+                the transfer from the business account balance. If positive, then
+                the :attr:`~telegram.BusinessBotRights.can_transfer_stars` business bot
+                right is required.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "owned_gift_id": owned_gift_id,
+            "new_owner_chat_id": new_owner_chat_id,
+            "star_count": star_count,
+        }
+        return await self._post(
+            "transferGift",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -10654,6 +10859,14 @@ READ_BUSINESS_MESSAGE_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`set_business_account_username`"""
     setBusinessAccountBio = set_business_account_bio
     """Alias for :meth:`set_business_account_bio`"""
+    setBusinessAccountGiftSettings = set_business_account_gift_settings
+    """Alias for :meth:`set_business_account_gift_settings`"""
+    convertGiftToStars = convert_gift_to_stars
+    """Alias for :meth:`convert_gift_to_stars`"""
+    upgradeGift = upgrade_gift
+    """Alias for :meth:`upgrade_gift`"""
+    transferGift = transfer_gift
+    """Alias for :meth:`transfer_gift`"""
     replaceStickerInSet = replace_sticker_in_set
     """Alias for :meth:`replace_sticker_in_set`"""
     refundStarPayment = refund_star_payment
