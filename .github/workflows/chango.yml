@@ -30,12 +30,12 @@ jobs:
           if [[ "${{ github.event.pull_request.title }}" =~ ^(?i)Bump\ Version\ to\ .* ]]; then # zizmor: ignore[template-injection]
             echo "COMMIT_AND_PUSH=false" >> $GITHUB_OUTPUT
             echo "IS_RELEASE_PR=true" >> $GITHUB_OUTPUT
+            echo "Regex does match"
           else
             echo "COMMIT_AND_PUSH=true" >> $GITHUB_OUTPUT
             echo "IS_RELEASE_PR=false" >> $GITHUB_OUTPUT
+            echo "Regex does not match"
           fi
-          echo "COMMIT_AND_PUSH=${{ steps.check_title.outputs.COMMIT_AND_PUSH }}"
-          echo "IS_RELEASE_PR=${{ steps.check_title.outputs.IS_RELEASE_PR }}"
 
       # Create the new fragment
       - uses: Bibo-Joshi/chango@9d6bd9d7612eca5fab2c5161687011be59baaf19 # v0.4.0
