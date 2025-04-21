@@ -246,12 +246,24 @@ class TestOwnedGiftRegularWithoutRequest(OwnedGiftTestBase):
 
         assert owned_gift_regular.parse_entity(entity) == "test"
 
+        with pytest.raises(RuntimeError, match="OwnedGiftRegular has no"):
+            OwnedGiftRegular(
+                gift=self.gift,
+                send_date=self.send_date,
+            ).parse_entity(entity)
+
     def test_parse_entities(self, owned_gift_regular):
         entity = MessageEntity(MessageEntity.BOLD, 0, 4)
         entity_2 = MessageEntity(MessageEntity.ITALIC, 5, 8)
 
         assert owned_gift_regular.parse_entities(MessageEntity.BOLD) == {entity: "test"}
         assert owned_gift_regular.parse_entities() == {entity: "test", entity_2: "text"}
+
+        with pytest.raises(RuntimeError, match="OwnedGiftRegular has no"):
+            OwnedGiftRegular(
+                gift=self.gift,
+                send_date=self.send_date,
+            ).parse_entities()
 
     def test_equality(self, owned_gift_regular):
         a = owned_gift_regular

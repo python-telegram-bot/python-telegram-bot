@@ -327,7 +327,7 @@ class OwnedGiftRegular(OwnedGift):
 
         """
         if not self.text:
-            raise RuntimeError("This OwnedGifRegular has no 'text'.")
+            raise RuntimeError("This OwnedGiftRegular has no 'text'.")
 
         return parse_message_entities(self.text, self.entities, types)
 

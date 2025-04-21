@@ -373,12 +373,22 @@ class TestGiftInfoWithoutRequest(GiftInfoTestBase):
 
         assert gift_info.parse_entity(entity) == "test"
 
+        with pytest.raises(RuntimeError, match="GiftInfo has no"):
+            GiftInfo(
+                gift=self.gift,
+            ).parse_entity(entity)
+
     def test_parse_entities(self, gift_info):
         entity = MessageEntity(MessageEntity.BOLD, 0, 4)
         entity_2 = MessageEntity(MessageEntity.ITALIC, 5, 8)
 
         assert gift_info.parse_entities(MessageEntity.BOLD) == {entity: "test"}
         assert gift_info.parse_entities() == {entity: "test", entity_2: "text"}
+
+        with pytest.raises(RuntimeError, match="GiftInfo has no"):
+            GiftInfo(
+                gift=self.gift,
+            ).parse_entities()
 
     def test_equality(self, gift_info):
         a = gift_info
