@@ -77,7 +77,7 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
-    telegram.giftinfo.rst
+    telegram.giftinfo
     telegram.giveaway
     telegram.giveawaycompleted
     telegram.giveawaycreated
@@ -119,10 +119,10 @@ Available Types
     telegram.messageoriginuser
     telegram.messagereactioncountupdated
     telegram.messagereactionupdated
-    telegram.ownedgift.rst
-    telegram.ownedgiftregular.rst
-    telegram.ownedgifts.rst
-    telegram.ownedgiftunique.rst
+    telegram.ownedgift
+    telegram.ownedgiftregular
+    telegram.ownedgifts
+    telegram.ownedgiftunique
     telegram.paidmedia
     telegram.paidmediainfo
     telegram.paidmediaphoto
@@ -148,12 +148,12 @@ Available Types
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.textquote
-    telegram.uniquegift.rst
-    telegram.uniquegiftbackdrop.rst
-    telegram.uniquegiftbackdropcolors.rst
-    telegram.uniquegiftinfo.rst
-    telegram.uniquegiftmodel.rst
-    telegram.uniquegiftsymbol.rst
+    telegram.uniquegift
+    telegram.uniquegiftbackdrop
+    telegram.uniquegiftbackdropcolors
+    telegram.uniquegiftinfo
+    telegram.uniquegiftmodel
+    telegram.uniquegiftsymbol
     telegram.update
     telegram.user
     telegram.userchatboosts

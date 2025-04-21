@@ -168,7 +168,8 @@ class OwnedGiftRegular(OwnedGift):
         owned_gift_id (:obj:`str`, optional): Unique identifier of the gift for the bot; for
             gifts received on behalf of business accounts only.
         sender_user (:class:`telegram.User`, optional): Sender of the gift if it is a known user.
-        send_date (:obj:`datetime.datetime`): Date the gift was sent in Unix time.
+        send_date (:obj:`datetime.datetime`): Date the gift was sent as :class:`datetime.datetime`.
+            |datetime_localization|.
         text (:obj:`str`, optional): Text of the message that was added to the gift.
         entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities that
             appear in the text.
@@ -192,7 +193,8 @@ class OwnedGiftRegular(OwnedGift):
         owned_gift_id (:obj:`str`): Optional. Unique identifier of the gift for the bot; for
             gifts received on behalf of business accounts only.
         sender_user (:class:`telegram.User`): Optional. Sender of the gift if it is a known user.
-        send_date (:obj:`datetime.datetime`): Date the gift was sent in Unix time.
+        send_date (:obj:`datetime.datetime`): Date the gift was sent as :class:`datetime.datetime`.
+            |datetime_localization|.
         text (:obj:`str`): Optional. Text of the message that was added to the gift.
         entities (Sequence[:class:`telegram.MessageEntity`]): Optional. Special entities that
             appear in the text.
@@ -282,7 +284,7 @@ class OwnedGiftRegular(OwnedGift):
         Note:
             This method is present because Telegram calculates the offset and length in
             UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
-            (That is, you can't just slice ``Message.text`` with the offset and length.)
+            (That is, you can't just slice ``OwnedGiftRegular.text`` with the offset and length.)
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
@@ -344,7 +346,8 @@ class OwnedGiftUnique(OwnedGift):
         owned_gift_id (:obj:`str`, optional): Unique identifier of the received gift for the
             bot; for gifts received on behalf of business accounts only.
         sender_user (:class:`telegram.User`, optional): Sender of the gift if it is a known user.
-        send_date (:obj:`datetime.datetime`): Date the gift was sent in Unix time.
+        send_date (:obj:`datetime.datetime`): Date the gift was sent as :class:`datetime.datetime`.
+            |datetime_localization|.
         is_saved (:obj:`bool`, optional): :obj:`True`, if the gift is displayed on the account's
             profile page; for gifts received on behalf of business accounts only.
         can_be_transferred (:obj:`bool`, optional): :obj:`True`, if the gift can be transferred to
@@ -358,7 +361,8 @@ class OwnedGiftUnique(OwnedGift):
         owned_gift_id (:obj:`str`): Optional. Unique identifier of the received gift for the
             bot; for gifts received on behalf of business accounts only.
         sender_user (:class:`telegram.User`): Optional. Sender of the gift if it is a known user.
-        send_date (:obj:`datetime.datetime`): Date the gift was sent in Unix time.
+        send_date (:obj:`datetime.datetime`): Date the gift was sent as :class:`datetime.datetime`.
+            |datetime_localization|.
         is_saved (:obj:`bool`): Optional. :obj:`True`, if the gift is displayed on the account's
             profile page; for gifts received on behalf of business accounts only.
         can_be_transferred (:obj:`bool`): Optional. :obj:`True`, if the gift can be transferred to
