@@ -154,6 +154,9 @@ __all__ = (
     "InputPaidMediaVideo",
     "InputPollOption",
     "InputSticker",
+    "InputStoryContent",
+    "InputStoryContentPhoto",
+    "InputStoryContentVideo",
     "InputTextMessageContent",
     "InputVenueMessageContent",
     "Invoice",
@@ -366,6 +369,11 @@ from ._chatpermissions import ChatPermissions
 from ._choseninlineresult import ChosenInlineResult
 from ._copytextbutton import CopyTextButton
 from ._dice import Dice
+from ._files._inputstorycontent import (
+    InputStoryContent,
+    InputStoryContentPhoto,
+    InputStoryContentVideo,
+)
 from ._files.animation import Animation
 from ._files.audio import Audio
 from ._files.chatphoto import ChatPhoto

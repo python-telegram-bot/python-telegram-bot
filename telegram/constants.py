@@ -75,6 +75,8 @@ __all__ = [
     "InlineQueryResultsButtonLimit",
     "InputMediaType",
     "InputPaidMediaType",
+    "InputStoryContentLimit",
+    "InputStoryContentType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
     "LocationLimit",
@@ -1417,6 +1419,68 @@ class InputPaidMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
     VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+
+
+class InputStoryContentLimit(StringEnum):
+    """This enum contains limitations for :class:`telegram.InputStoryContentPhoto`/
+    :class:`telegram.InputStoryContentVideo`. The enum members of this enumeration are instances
+    of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PHOTOSIZE_UPLOAD = FileSizeLimit.PHOTOSIZE_UPLOAD  # (10MB)
+    """:obj:`int`: Maximum file size of the photo to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto` in Bytes.
+    """
+    PHOTO_WIDTH = 1080
+    """:obj:`int`: Horizontal resolution of the photo to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto`.
+    """
+    PHOTO_HEIGHT = 1920
+    """:obj:`int`: Vertical resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto`.
+    """
+    VIDEOSIZE_UPLOAD = int(30e6)  # (30MB)
+    """:obj:`int`: Maximum file size of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo` in Bytes.
+    """
+    VIDEO_WIDTH = 720
+    """:obj:`int`: Horizontal resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+    VIDEO_HEIGHT = 1080
+    """:obj:`int`: Vertical resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+    MAX_VIDEO_DURATION = int(dtm.timedelta(seconds=60).total_seconds())
+    """:obj:`int`: Maximum duration of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.duration` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+
+
+class InputStoryContentType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputStoryContent`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 21.4
+    """
+
+    __slots__ = ()
+
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputStoryContentPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputStoryContentVideo`."""
 
 
 class InlineQueryLimit(IntEnum):
