@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
-"""This module contains objects that represent paid media in Telegram."""
+"""This module contains objects that represent owned gifts."""
 
 import datetime as dtm
 from collections.abc import Sequence
