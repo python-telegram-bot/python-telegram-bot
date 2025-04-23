@@ -23,7 +23,7 @@ from copy import deepcopy
 
 import pytest
 
-from telegram import Dice, PaidMedia, User
+from telegram import Dice, User
 from telegram._files.sticker import Sticker
 from telegram._gifts import Gift
 from telegram._messageentity import MessageEntity
@@ -107,7 +107,7 @@ class TestOwnedGiftWithoutRequest(OwnedGiftTestBase):
 
     def test_type_enum_conversion(self, owned_gift):
         assert type(OwnedGift("regular").type) is OwnedGiftType
-        assert PaidMedia("unknown").type == "unknown"
+        assert OwnedGift("unknown").type == "unknown"
 
     def test_de_json(self, offline_bot):
         data = {"type": "unknown"}
@@ -154,7 +154,7 @@ class TestOwnedGiftWithoutRequest(OwnedGiftTestBase):
     def test_equality(self, owned_gift):
         a = owned_gift
         b = OwnedGift(self.type)
-        c = PaidMedia("unknown")
+        c = OwnedGift("unknown")
         d = Dice(5, "test")
 
         assert a == b
