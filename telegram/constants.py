@@ -105,6 +105,9 @@ __all__ = [
     "StickerLimit",
     "StickerSetLimit",
     "StickerType",
+    "StoryAreaPositionLimit",
+    "StoryAreaTypeLimit",
+    "StoryAreaTypeType",
     "TransactionPartnerType",
     "UniqueGiftInfoOrigin",
     "UpdateType",
@@ -2775,6 +2778,69 @@ class StickerType(StringEnum):
     """:obj:`str`: Mask sticker."""
     CUSTOM_EMOJI = "custom_emoji"
     """:obj:`str`: Custom emoji sticker."""
+
+
+class StoryAreaPositionLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.StoryAreaPosition`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_ROTATION_ANGLE = 360
+    """:obj:`int`: Maximum value allowed for:
+        :paramref:`~telegram.StoryAreaPosition.rotation_angle` parameter of
+        :class:`telegram.StoryAreaPosition`
+    """
+
+
+class StoryAreaTypeLimit(IntEnum):
+    """This enum contains limitations for subclasses of :class:`telegram.StoryAreaType`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_LOCATION_AREAS = 10
+    """:obj:`int`: Maximum number of location areas that a story can have.
+    """
+    MAX_SUGGESTED_REACTION_AREAS = 5
+    """:obj:`int`: Maximum number of suggested reaction areas that a story can have.
+    """
+    MAX_LINK_AREAS = 3
+    """:obj:`int`: Maximum number of link areas that a story can have.
+    """
+    MAX_WEATHER_AREAS = 3
+    """:obj:`int`: Maximum number of weather areas that a story can have.
+    """
+    MAX_UNIQUE_GIFT_AREAS = 1
+    """:obj:`int`: Maximum number of unique gift areas that a story can have.
+    """
+
+
+class StoryAreaTypeType(StringEnum):
+    """This enum contains the available types of :class:`telegram.StoryAreaType`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    LOCATION = "location"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeLocation`."""
+    SUGGESTED_REACTION = "suggested_reaction"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeSuggestedReaction`."""
+    LINK = "link"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeLink`."""
+    WEATHER = "weather"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeWeather`."""
+    UNIQUE_GIFT = "unique_gift"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeUniqueGift`."""
 
 
 class TransactionPartnerType(StringEnum):

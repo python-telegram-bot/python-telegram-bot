@@ -157,6 +157,7 @@ PTB_EXTRA_PARAMS = {
     "PaidMedia": {"type"},  # attributes common to all subclasses
     "InputPaidMedia": {"type", "media"},  # attributes common to all subclasses
     "InputStoryContent": {"type"},  # attributes common to all subclasses
+    "StoryAreaType": {"type"},  # attributes common to all subclasses
     # backwards compatibility for api 9.0 changes
     # tags: deprecated NEXT.VERSION, bot api 9.0
     "BusinessConnection": {"can_reply"},
@@ -191,6 +192,7 @@ PTB_IGNORED_PARAMS = {
     r"InputPaidMedia\w+": {"type"},
     r"OwnedGift\w+": {"type"},
     r"InputStoryContent\w+": {"type"},
+    r"StoryAreaType\w+": {"type"},
 }
 
 

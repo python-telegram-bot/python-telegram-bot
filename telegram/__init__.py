@@ -167,6 +167,7 @@ __all__ = (
     "LabeledPrice",
     "LinkPreviewOptions",
     "Location",
+    "LocationAddress",
     "LoginUrl",
     "MaskPosition",
     "MaybeInaccessibleMessage",
@@ -242,6 +243,14 @@ __all__ = (
     "Sticker",
     "StickerSet",
     "Story",
+    "StoryArea",
+    "StoryAreaPosition",
+    "StoryAreaType",
+    "StoryAreaTypeLink",
+    "StoryAreaTypeLocation",
+    "StoryAreaTypeSuggestedReaction",
+    "StoryAreaTypeUniqueGift",
+    "StoryAreaTypeWeather",
     "SuccessfulPayment",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
@@ -529,6 +538,17 @@ from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
 from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story
+from ._storyarea import (
+    LocationAddress,
+    StoryArea,
+    StoryAreaPosition,
+    StoryAreaType,
+    StoryAreaTypeLink,
+    StoryAreaTypeLocation,
+    StoryAreaTypeSuggestedReaction,
+    StoryAreaTypeUniqueGift,
+    StoryAreaTypeWeather,
+)
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
 from ._uniquegift import (
