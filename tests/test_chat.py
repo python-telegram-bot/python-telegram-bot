@@ -1353,6 +1353,28 @@ class TestChatWithoutRequest(ChatTestBase):
             text_entities="text_entities",
         )
 
+    @pytest.mark.parametrize("star_count", [100, None])
+    async def test_instance_method_transfer_gift(self, monkeypatch, chat, star_count):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["new_owner_chat_id"] == chat.id
+                and kwargs["owned_gift_id"] == "owned_gift_id"
+                and kwargs["star_count"] == star_count
+            )
+
+        assert check_shortcut_signature(
+            Chat.transfer_gift, Bot.transfer_gift, ["new_owner_chat_id"], []
+        )
+        assert await check_shortcut_call(chat.transfer_gift, chat.get_bot(), "transfer_gift")
+        assert await check_defaults_handling(chat.transfer_gift, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "transfer_gift", make_assertion)
+        assert await chat.transfer_gift(
+            owned_gift_id="owned_gift_id",
+            star_count=star_count,
+            business_connection_id="business_connection_id",
+        )
+
     async def test_instance_method_verify_chat(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return (

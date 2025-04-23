@@ -4,6 +4,7 @@ Available Types
 .. toctree::
     :titlesonly:
 
+    telegram.acceptedgifttypes
     telegram.animation
     telegram.audio
     telegram.birthdate
@@ -76,6 +77,7 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
+    telegram.giftinfo
     telegram.giveaway
     telegram.giveawaycompleted
     telegram.giveawaycreated
@@ -117,6 +119,10 @@ Available Types
     telegram.messageoriginuser
     telegram.messagereactioncountupdated
     telegram.messagereactionupdated
+    telegram.ownedgift
+    telegram.ownedgiftregular
+    telegram.ownedgifts
+    telegram.ownedgiftunique
     telegram.paidmedia
     telegram.paidmediainfo
     telegram.paidmediaphoto
@@ -142,6 +148,12 @@ Available Types
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.textquote
+    telegram.uniquegift
+    telegram.uniquegiftbackdrop
+    telegram.uniquegiftbackdropcolors
+    telegram.uniquegiftinfo
+    telegram.uniquegiftmodel
+    telegram.uniquegiftsymbol
     telegram.update
     telegram.user
     telegram.userchatboosts
