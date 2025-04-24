@@ -9771,7 +9771,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Requires the :attr:`~telegram.BusinessBotRights.can_edit_profile_photo` business
         bot right.
 
-        .. versionadded:: NEXT.VERISON
+        .. versionadded:: NEXT.VERSION
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -9818,7 +9818,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Requires the :attr:`~telegram.BusinessBotRights.can_edit_profile_photo` business
         bot right.
 
-        .. versionadded:: NEXT.VERISON
+        .. versionadded:: NEXT.VERSION
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.

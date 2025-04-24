@@ -101,15 +101,14 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
     Args:
         animation (:term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
             :class:`pathlib.Path` |): The animated profile photo. |uploadinputnopath|
-        main_frame_timestamp (:class:`datetiteme.timedelta` | :obj:`int` | :obj:`float`, optional):
+        main_frame_timestamp (:class:`datetime.timedelta` | :obj:`int` | :obj:`float`, optional):
             Timestamp in seconds of the frame that will be used as the static profile photo.
             Defaults to ``0.0``.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATED`.
         animation (:class:`telegram.InputFile` | :obj:`str`): The animated profile photo.
-        main_frame_timestamp (:class:`datetiteme.timedelta`): Optional. Timestamp in seconds of the
-            frame that will be used as the static profile photo.
+        main_frame_timestamp (:class:`datetime.timedelta`): Optional. Timestamp in seconds of the
     """
 
     __slots__ = ("animation", "main_frame_timestamp")
