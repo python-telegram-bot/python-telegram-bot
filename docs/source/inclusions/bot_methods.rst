@@ -417,6 +417,8 @@
       - Used for marking a message as read.
     * - :meth:`~telegram.Bot.delete_business_messages`
       - Used for deleting business messages.
+    * - :meth:`~telegram.Bot.remove_business_account_profile_photo`
+      - Used for removing the business accounts profile photo
     * - :meth:`~telegram.Bot.set_business_account_name`
       - Used for setting the business account name.
     * - :meth:`~telegram.Bot.set_business_account_username`
@@ -425,6 +427,8 @@
       - Used for setting the business account bio.
     * - :meth:`~telegram.Bot.set_business_account_gift_settings`
       - Used for setting the business account gift settings.
+    * - :meth:`~telegram.Bot.set_business_account_profile_photo`
+      - Used for stetting the business accounts profile photo
     * - :meth:`~telegram.Bot.convert_gift_to_stars`
       - Used for converting owned reqular gifts to stars.
     * - :meth:`~telegram.Bot.upgrade_gift`

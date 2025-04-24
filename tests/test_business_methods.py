@@ -20,11 +20,14 @@ import datetime as dtm
 
 import pytest
 
-from telegram import BusinessConnection, User
+from telegram import BusinessConnection, InputProfilePhotoStatic, User
 from telegram._files.sticker import Sticker
 from telegram._gifts import AcceptedGiftTypes, Gift
 from telegram._ownedgift import OwnedGiftRegular, OwnedGifts
 from telegram._utils.datetime import UTC
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram.constants import InputProfilePhotoType
+from tests.auxil.files import data_file
 
 
 class BusinessMethodsTestBase:
@@ -248,3 +251,77 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             new_owner_chat_id=new_owner_chat_id,
             star_count=star_count,
         )
+
+    @pytest.mark.parametrize("is_public", [True, False, None, DEFAULT_NONE])
+    async def test_set_business_account_profile_photo(self, offline_bot, monkeypatch, is_public):
+        async def make_assertion(*args, **kwargs):
+            request_data = kwargs.get("request_data")
+            params = request_data.parameters
+            assert params.get("business_connection_id") == self.bci
+            if is_public is DEFAULT_NONE:
+                assert "is_public" not in params
+            else:
+                assert params.get("is_public") == is_public
+
+            assert (photo_dict := params.get("photo")).get("type") == InputProfilePhotoType.STATIC
+            assert (photo_attach := photo_dict["photo"]).startswith("attach://")
+            assert isinstance(
+                request_data.multipart_data.get(photo_attach.removeprefix("attach://")), tuple
+            )
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "photo": InputProfilePhotoStatic(
+                photo=data_file("telegram.jpg").read_bytes(),
+            ),
+        }
+        if is_public is not DEFAULT_NONE:
+            kwargs["is_public"] = is_public
+
+        assert await offline_bot.set_business_account_profile_photo(**kwargs)
+
+    async def test_set_business_account_profile_photo_local_file(self, offline_bot, monkeypatch):
+        async def make_assertion(*args, **kwargs):
+            request_data = kwargs.get("request_data")
+            params = request_data.parameters
+            assert params.get("business_connection_id") == self.bci
+
+            assert (photo_dict := params.get("photo")).get("type") == InputProfilePhotoType.STATIC
+            assert photo_dict["photo"] == data_file("telegram.jpg").as_uri()
+            assert not request_data.multipart_data
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "photo": InputProfilePhotoStatic(
+                photo=data_file("telegram.jpg"),
+            ),
+        }
+
+        assert await offline_bot.set_business_account_profile_photo(**kwargs)
+
+    @pytest.mark.parametrize("is_public", [True, False, None, DEFAULT_NONE])
+    async def test_remove_business_account_profile_photo(
+        self, offline_bot, monkeypatch, is_public
+    ):
+        async def make_assertion(*args, **kwargs):
+            data = kwargs.get("request_data").parameters
+            assert data.get("business_connection_id") == self.bci
+            if is_public is DEFAULT_NONE:
+                assert "is_public" not in data
+            else:
+                assert data.get("is_public") == is_public
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        kwargs = {"business_connection_id": self.bci}
+        if is_public is not DEFAULT_NONE:
+            kwargs["is_public"] = is_public
+
+        assert await offline_bot.remove_business_account_profile_photo(**kwargs)
