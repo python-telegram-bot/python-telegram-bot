@@ -4446,7 +4446,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_business_account_profile_photo(
         self,
         business_connection_id: str,
-        photo: InputProfilePhoto,
+        photo: "InputProfilePhoto",
         is_public: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
