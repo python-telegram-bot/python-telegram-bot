@@ -95,6 +95,9 @@ Available Types
     telegram.inputpaidmedia
     telegram.inputpaidmediaphoto
     telegram.inputpaidmediavideo
+    telegram.inputprofilephoto
+    telegram.inputprofilephotoanimated
+    telegram.inputprofilephotostatic
     telegram.inputpolloption
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
