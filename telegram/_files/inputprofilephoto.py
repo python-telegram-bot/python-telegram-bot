@@ -71,6 +71,7 @@ class InputProfilePhotoStatic(InputProfilePhoto):
             :class:`pathlib.Path` |): The static profile photo. |uploadinputnopath|
 
     Attributes:
+        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.STATIC`.
         photo (:class:`telegram.InputFile` | :obj:`str`): The static profile photo.
 
     """
@@ -105,6 +106,7 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
             Defaults to ``0.0``.
 
     Attributes:
+        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATED`.
         animation (:class:`telegram.InputFile` | :obj:`str`): The animated profile photo.
         main_frame_timestamp (:class:`datetiteme.timedelta`): Optional. Timestamp in seconds of the
             frame that will be used as the static profile photo.
