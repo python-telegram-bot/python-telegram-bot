@@ -116,7 +116,7 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
     def __init__(
         self,
         animation: FileInput,
-        main_frame_timestamp: Union[float, dtm.timedelta, None] = 0.0,
+        main_frame_timestamp: Union[float, dtm.timedelta, None] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
