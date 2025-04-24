@@ -63,6 +63,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
+    InputPaidMedia,
     InputPollOption,
     LinkPreviewOptions,
     Location,
@@ -116,7 +117,6 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InputPaidMedia,
         InputSticker,
         LabeledPrice,
         MessageEntity,
@@ -468,7 +468,11 @@ class ExtBot(Bot, Generic[RLARGS]):
                 with copied_val._unfrozen():
                     copied_val.parse_mode = self.defaults.parse_mode
                 data[key] = copied_val
-            elif key == "media" and isinstance(val, Sequence):
+            elif (
+                key == "media"
+                and isinstance(val, Sequence)
+                and not isinstance(val[0], InputPaidMedia)
+            ):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
