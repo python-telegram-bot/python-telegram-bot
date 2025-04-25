@@ -106,7 +106,7 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
             Defaults to ``0.0``.
 
     Attributes:
-        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATED`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InputProfilePhotoType.ANIMATED`.
         animation (:class:`telegram.InputFile` | :obj:`str`): The animated profile photo.
         main_frame_timestamp (:class:`datetime.timedelta`): Optional. Timestamp in seconds of the
     """
