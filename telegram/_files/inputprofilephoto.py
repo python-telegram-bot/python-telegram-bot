@@ -71,7 +71,7 @@ class InputProfilePhotoStatic(InputProfilePhoto):
             :class:`pathlib.Path` |): The static profile photo. |uploadinputnopath|
 
     Attributes:
-        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.STATIC`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InputProfilePhotoType.STATIC`.
         photo (:class:`telegram.InputFile` | :obj:`str`): The static profile photo.
 
     """
