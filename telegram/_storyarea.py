@@ -433,5 +433,6 @@ class StoryArea(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.position: StoryAreaPosition = position
         self.type: StoryAreaType = type
-
         self._id_attrs = (self.position, self.type)
+
+        self._freeze()
