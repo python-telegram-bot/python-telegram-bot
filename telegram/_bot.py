@@ -87,6 +87,7 @@ from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
+from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._update import Update
 from telegram._user import User
@@ -125,11 +126,13 @@ if TYPE_CHECKING:
         InputMediaPhoto,
         InputMediaVideo,
         InputSticker,
+        InputStoryContent,
         LabeledPrice,
         LinkPreviewOptions,
         MessageEntity,
         PassportElementError,
         ShippingOption,
+        StoryArea,
     )
 
 BT = TypeVar("BT", bound="Bot")
@@ -9573,6 +9576,217 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def post_story(
+        self,
+        business_connection_id: str,
+        content: "InputStoryContent",
+        active_period: TimePeriod,
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        areas: Optional[Sequence["StoryArea"]] = None,
+        post_to_chat_page: Optional[bool] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Story:
+        """
+        Posts a story on behalf of a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            content (:class:`telegram.InputStoryContent`): Content of the story.
+            active_period (:obj:`int` | :class:`datetime.timedelta`, optional): Period after which
+                the story is moved to the archive, in seconds; must be one of
+                :tg-const:`~telegram.constants.StoryLimit.ACTIVITY_SIX_HOURS`,
+                :tg-const:`~telegram.constants.StoryLimit.ACTIVITY_TWELVE_HOURS`,
+                :tg-const:`~telegram.constants.StoryLimit.ACTIVITY_ONE_DAY`,
+                or :tg-const:`~telegram.constants.StoryLimit.ACTIVITY_TWO_DAYS`.
+            caption (:obj:`str`, optional): Caption of the story,
+                0-:tg-const:`~telegram.constants.StoryLimit.CAPTION_LENGTH` characters after
+                entities parsing.
+            parse_mode (:obj:`str`, optional): Mode for parsing entities in the story caption.
+                See the constants in :class:`telegram.constants.ParseMode` for the
+                available modes.
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
+            areas (Sequence[:class:`telegram.StoryArea`], optional): Sequence of clickable areas to
+                be shown on the story.
+
+                Note:
+                    Each type of clickable area in :paramref:`areas` has its own maximum limit:
+
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LOCATION_AREAS`
+                      of :class:`telegram.StoryAreaTypeLocation`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.\
+MAX_SUGGESTED_REACTION_AREAS` of :class:`telegram.StoryAreaTypeSuggestedReaction`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LINK_AREAS`
+                      of :class:`telegram.StoryAreaTypeLink`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_WEATHER_AREAS`
+                      of :class:`telegram.StoryAreaTypeWeather`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.\
+MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
+            post_to_chat_page (:class:`telegram.InputStoryContent`, optional): Pass :obj:`True` to
+                keep the story accessible after it expires.
+            protect_content (:obj:`bool`, optional): Pass :obj:`True` if the content of the story
+                must be protected from forwarding and screenshotting
+
+        Returns:
+            :class:`Story`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "content": content,
+            "active_period": active_period,
+            "caption": caption,
+            "parse_mode": parse_mode,
+            "caption_entities": caption_entities,
+            "areas": areas,
+            "post_to_chat_page": post_to_chat_page,
+            "protect_content": protect_content,
+        }
+        return Story.de_json(
+            await self._post(
+                "postStory",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
+    async def edit_story(
+        self,
+        business_connection_id: str,
+        story_id: int,
+        content: "InputStoryContent",
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        areas: Optional[Sequence["StoryArea"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Story:
+        """
+        Edits a story previously posted by the bot on behalf of a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            story_id (:obj:`int`): Unique identifier of the story to edit.
+            content (:class:`telegram.InputStoryContent`): Content of the story.
+            caption (:obj:`str`, optional): Caption of the story,
+                0-:tg-const:`~telegram.constants.StoryLimit.CAPTION_LENGTH` characters after
+                entities parsing.
+            parse_mode (:obj:`str`, optional): Mode for parsing entities in the story caption.
+                See the constants in :class:`telegram.constants.ParseMode` for the
+                available modes.
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
+            areas (Sequence[:class:`telegram.StoryArea`], optional): Sequence of clickable areas to
+                be shown on the story.
+
+                Note:
+                    Each type of clickable area in :paramref:`areas` has its own maximum limit:
+
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LOCATION_AREAS`
+                      of :class:`telegram.StoryAreaTypeLocation`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.\
+MAX_SUGGESTED_REACTION_AREAS` of :class:`telegram.StoryAreaTypeSuggestedReaction`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LINK_AREAS`
+                      of :class:`telegram.StoryAreaTypeLink`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_WEATHER_AREAS`
+                      of :class:`telegram.StoryAreaTypeWeather`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.\
+MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
+
+        Returns:
+            :class:`Story`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "story_id": story_id,
+            "content": content,
+            "caption": caption,
+            "parse_mode": parse_mode,
+            "caption_entities": caption_entities,
+            "areas": areas,
+        }
+        return Story.de_json(
+            await self._post(
+                "editStory",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
+    async def delete_story(
+        self,
+        business_connection_id: str,
+        story_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Deletes a story previously posted by the bot on behalf of a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection on behalf of which to delete the messages
+            message_ids (:obj:`int`): Unique identifier of the story to delete.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "story_id": story_id,
+        }
+        return await self._post(
+            "deleteBusinessMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def set_business_account_name(
         self,
         business_connection_id: str,
@@ -10853,6 +11067,12 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`read_business_message`"""
     deleteBusinessMessages = delete_business_messages
     """Alias for :meth:`delete_business_messages`"""
+    postStory = post_story
+    """Alias for :meth:`post_story`"""
+    editStory = edit_story
+    """Alias for :meth:`edit_story`"""
+    deleteStory = delete_story
+    """Alias for :meth:`delete_story`"""
     setBusinessAccountName = set_business_account_name
     """Alias for :meth:`set_business_account_name`"""
     setBusinessAccountUsername = set_business_account_username

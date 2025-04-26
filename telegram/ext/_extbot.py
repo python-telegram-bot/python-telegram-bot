@@ -80,6 +80,7 @@ from telegram import (
     StarTransactions,
     Sticker,
     StickerSet,
+    Story,
     TelegramObject,
     Update,
     User,
@@ -118,10 +119,12 @@ if TYPE_CHECKING:
         InputMediaVideo,
         InputPaidMedia,
         InputSticker,
+        InputStoryContent,
         LabeledPrice,
         MessageEntity,
         PassportElementError,
         ShippingOption,
+        StoryArea,
     )
     from telegram.ext import BaseRateLimiter, Defaults
 
@@ -4346,6 +4349,96 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def post_story(
+        self,
+        business_connection_id: str,
+        content: "InputStoryContent",
+        active_period: TimePeriod,
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        areas: Optional[Sequence["StoryArea"]] = None,
+        post_to_chat_page: Optional[bool] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Story:
+        return await super().post_story(
+            business_connection_id=business_connection_id,
+            content=content,
+            active_period=active_period,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            areas=areas,
+            post_to_chat_page=post_to_chat_page,
+            protect_content=protect_content,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def edit_story(
+        self,
+        business_connection_id: str,
+        story_id: int,
+        content: "InputStoryContent",
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        areas: Optional[Sequence["StoryArea"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Story:
+        return await super().edit_story(
+            business_connection_id=business_connection_id,
+            story_id=story_id,
+            content=content,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            areas=areas,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def delete_story(
+        self,
+        business_connection_id: str,
+        story_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().delete_story(
+            business_connection_id=business_connection_id,
+            story_id=story_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def set_business_account_name(
         self,
         business_connection_id: str,
@@ -4965,6 +5058,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     getBusinessAccountGifts = get_business_account_gifts
     readBusinessMessage = read_business_message
     deleteBusinessMessages = delete_business_messages
+    postStory = post_story
+    editStory = edit_story
+    deleteStory = delete_story
     setBusinessAccountName = set_business_account_name
     setBusinessAccountUsername = set_business_account_username
     setBusinessAccountBio = set_business_account_bio

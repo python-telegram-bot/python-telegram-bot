@@ -108,6 +108,7 @@ __all__ = [
     "StoryAreaPositionLimit",
     "StoryAreaTypeLimit",
     "StoryAreaTypeType",
+    "StoryLimit",
     "TransactionPartnerType",
     "UniqueGiftInfoOrigin",
     "UpdateType",
@@ -2841,6 +2842,35 @@ class StoryAreaTypeType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.StoryAreaTypeWeather`."""
     UNIQUE_GIFT = "unique_gift"
     """:obj:`str`: Type of :class:`telegram.StoryAreaTypeUniqueGift`."""
+
+
+class StoryLimit(StringEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.post_story` and
+    :meth:`~telegram.Bot.edit_story`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    CAPTION_LENGTH = 2048
+    """:obj:`int`: Maximum number of characters in :paramref:`telegram.Bot.post_story.caption`
+    parameter of :meth:`telegram.Bot.post_story` and :paramref:`telegram.Bot.edit_story.caption` of
+    :meth:`telegram.Bot.edit_story`.
+    """
+    ACTIVITY_SIX_HOURS = 6 * 3600
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_TWELVE_HOURS = 12 * 3600
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_ONE_DAY = 86400
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_TWO_DAYS = 2 * 86400
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
 
 
 class TransactionPartnerType(StringEnum):
