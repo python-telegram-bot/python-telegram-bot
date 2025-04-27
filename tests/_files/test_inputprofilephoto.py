@@ -20,10 +20,31 @@ import datetime as dtm
 
 import pytest
 
-from telegram import InputFile, InputProfilePhotoAnimated, InputProfilePhotoStatic
+from telegram import (
+    InputFile,
+    InputProfilePhoto,
+    InputProfilePhotoAnimated,
+    InputProfilePhotoStatic,
+)
 from telegram.constants import InputProfilePhotoType
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
+
+
+class TestInputProfilePhotoWithoutRequest:
+
+    def test_type_enum_conversion(self):
+        instance = InputProfilePhoto(type="static")
+        assert isinstance(instance.type, InputProfilePhotoType)
+        assert instance.type is InputProfilePhotoType.STATIC
+
+        instance = InputProfilePhoto(type="animated")
+        assert isinstance(instance.type, InputProfilePhotoType)
+        assert instance.type is InputProfilePhotoType.ANIMATED
+
+        instance = InputProfilePhoto(type="unknown")
+        assert isinstance(instance.type, str)
+        assert instance.type == "unknown"
 
 
 @pytest.fixture(scope="module")

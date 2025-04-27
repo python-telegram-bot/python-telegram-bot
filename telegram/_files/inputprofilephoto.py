@@ -47,6 +47,11 @@ class InputProfilePhoto(TelegramObject):
 
     """
 
+    STATIC = constants.InputProfilePhotoType.STATIC
+    """:obj:`str`: :tg-const:`telegram.constants.InputProfilePhotoType.STATIC`."""
+    ANIMATED = constants.InputProfilePhotoType.ANIMATED
+    """:obj:`str`: :tg-const:`telegram.constants.InputProfilePhotoType.ANIMATED`."""
+
     __slots__ = ("type",)
 
     def __init__(
@@ -56,7 +61,7 @@ class InputProfilePhoto(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.InputMediaType, type, type)
+        self.type: str = enum.get_member(constants.InputProfilePhotoType, type, type)
 
         self._freeze()
 
@@ -68,7 +73,7 @@ class InputProfilePhotoStatic(InputProfilePhoto):
 
     Args:
         photo (:term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
-            :class:`pathlib.Path` |): The static profile photo. |uploadinputnopath|
+            :class:`pathlib.Path`): The static profile photo. |uploadinputnopath|
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputProfilePhotoType.STATIC`.
@@ -100,7 +105,7 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
 
     Args:
         animation (:term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
-            :class:`pathlib.Path` |): The animated profile photo. |uploadinputnopath|
+            :class:`pathlib.Path`): The animated profile photo. |uploadinputnopath|
         main_frame_timestamp (:class:`datetime.timedelta` | :obj:`int` | :obj:`float`, optional):
             Timestamp in seconds of the frame that will be used as the static profile photo.
             Defaults to ``0.0``.
@@ -109,6 +114,7 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
         type (:obj:`str`): :tg-const:`telegram.constants.InputProfilePhotoType.ANIMATED`.
         animation (:class:`telegram.InputFile` | :obj:`str`): The animated profile photo.
         main_frame_timestamp (:class:`datetime.timedelta`): Optional. Timestamp in seconds of the
+            frame that will be used as the static profile photo. Defaults to ``0.0``.
     """
 
     __slots__ = ("animation", "main_frame_timestamp")
