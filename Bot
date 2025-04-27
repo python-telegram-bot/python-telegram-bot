@@ -1,0 +1,61 @@
+import random
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext, JobQueue
+
+# Tu TOKEN de Bot de Telegram
+TELEGRAM_TOKEN = '7192864578:AAFMfIZFIlE_TQjFK192NjV4Ab9v8o3b8fc'
+
+# Lista de señales inteligentes
+señales = [
+    "Haz clic en las esquinas primero.",
+    "Elige las casillas del centro.",
+    "Detente después de dos clics seguros.",
+    "Evita los bordes al inicio.",
+    "Prioriza abrir las filas superiores.",
+    "Retírate si aciertas tres diamantes seguidos.",
+    "Después de un error, cambia de estrategia."
+]
+
+# Funciones para comandos
+def start(update: Update, context: CallbackContext):
+    update.message.reply_text('¡Bienvenido! Comenzaré a enviarte señales para Mines.')
+    job_queue = context.job_queue
+    chat_id = update.effective_chat.id
+    context.chat_data['job'] = job_queue.run_repeating(send_signal, interval=15, first=0, context=chat_id)
+
+def stop(update: Update, context: CallbackContext):
+    job = context.chat_data.get('job')
+    if job:
+        job.schedule_removal()
+        update.message.reply_text('Detuve el envío de señales. ¡Suerte en tus jugadas!')
+    else:
+        update.message.reply_text('No tienes señales activas.')
+
+def ayuda(update: Update, context: CallbackContext):
+    update.message.reply_text(
+        "Comandos disponibles:\n"
+        "/start - Comenzar a recibir señales\n"
+        "/stop - Detener señales\n"
+        "/ayuda - Mostrar esta ayuda\n"
+        "\nRecuerda: ¡Juega con cabeza fría!"
+    )
+
+def send_signal(context: CallbackContext):
+    job = context.job
+    señal = random.choice(señales)
+    context.bot.send_message(job.context, text=f"Señal de Mines: {señal}")
+
+# Main
+def main():
+    updater = Updater(TELEGRAM_TOKEN)
+    dispatcher = updater.dispatcher
+
+    dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(CommandHandler('stop', stop))
+    dispatcher.add_handler(CommandHandler('ayuda', ayuda))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
