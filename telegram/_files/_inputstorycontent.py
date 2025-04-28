@@ -76,7 +76,7 @@ class InputStoryContentPhoto(InputStoryContent):
 
     Args:
         photo (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): The photo to post as a story. The photo must be of the
+            optional): The photo to post as a story. The photo must be of the
             size :tg-const:`telegram.constants.InputStoryContentLimit.PHOTO_WIDTH`
             x :tg-const:`telegram.constants.InputStoryContentLimit.PHOTO_HEIGHT` and must not
             exceed :tg-const:`telegram.constants.InputStoryContentLimit.PHOTOSIZE_UPLOAD` MB.
@@ -113,7 +113,7 @@ class InputStoryContentVideo(InputStoryContent):
 
     Args:
         video (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): The video to post as a story. The video must be of
+            optional): The video to post as a story. The video must be of
             the size :tg-const:`telegram.constants.InputStoryContentLimit.VIDEO_WIDTH`
             x :tg-const:`telegram.constants.InputStoryContentLimit.VIDEO_HEIGHT`,
             streamable, encoded with ``H.265`` codec, with key frames added

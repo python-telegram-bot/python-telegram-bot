@@ -9763,9 +9763,8 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         .. versionadded:: NEXT.VERSION
 
         Args:
-            business_connection_id (:obj:`str`): Unique identifier of the business
-                connection on behalf of which to delete the messages
-            message_ids (:obj:`int`): Unique identifier of the story to delete.
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            story_id (:obj:`int`): Unique identifier of the story to delete.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -9778,7 +9777,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
             "story_id": story_id,
         }
         return await self._post(
-            "deleteBusinessMessages",
+            "deleteStory",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
