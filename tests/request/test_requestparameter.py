@@ -21,8 +21,17 @@ from collections.abc import Sequence
 
 import pytest
 
-from telegram import InputFile, InputMediaPhoto, InputMediaVideo, InputSticker, MessageEntity
-from telegram._files._inputstorycontent import InputStoryContentPhoto, InputStoryContentVideo
+from telegram import (
+    InputFile,
+    InputMediaPhoto,
+    InputMediaVideo,
+    InputProfilePhotoAnimated,
+    InputProfilePhotoStatic,
+    InputSticker,
+    InputStoryContentPhoto,
+    InputStoryContentVideo,
+    MessageEntity,
+)
 from telegram.constants import ChatType
 from telegram.request._requestparameter import RequestParameter
 from tests.auxil.files import data_file
@@ -177,6 +186,42 @@ class TestRequestParameterWithoutRequest:
         assert request_parameter.value == {"type": "video"}
         assert request_parameter.input_files == [input_media.media, input_media.thumbnail]
 
+    def test_from_input_profile_photo_static(self):
+        input_profile_photo = InputProfilePhotoStatic(data_file("telegram.jpg").read_bytes())
+        expected = input_profile_photo.to_dict()
+        expected.update({"photo": input_profile_photo.photo.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_profile_photo)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_profile_photo.photo]
+
+    def test_from_input_profile_photo_animated(self):
+        input_profile_photo = InputProfilePhotoAnimated(
+            data_file("telegram2.mp4").read_bytes(),
+            main_frame_timestamp=dtm.timedelta(seconds=42, milliseconds=43),
+        )
+        expected = input_profile_photo.to_dict()
+        expected.update({"animation": input_profile_photo.animation.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_profile_photo)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_profile_photo.animation]
+
+    @pytest.mark.parametrize(
+        ("cls", "args"),
+        [
+            (InputProfilePhotoStatic, (data_file("telegram.jpg"),)),
+            (
+                InputProfilePhotoAnimated,
+                (data_file("telegram2.mp4"), dtm.timedelta(seconds=42, milliseconds=43)),
+            ),
+        ],
+    )
+    def test_from_input_profile_photo_local_files(self, cls, args):
+        input_profile_photo = cls(*args)
+        expected = input_profile_photo.to_dict()
+        requested = RequestParameter.from_input("key", input_profile_photo)
+        assert requested.value == expected
+        assert requested.input_files is None
+
     def test_from_input_inputsticker(self):
         input_sticker = InputSticker(data_file("telegram.png").read_bytes(), ["emoji"], "static")
         expected = input_sticker.to_dict()
@@ -208,7 +253,7 @@ class TestRequestParameterWithoutRequest:
             (InputStoryContentVideo, data_file("telegram2.mp4")),
         ],
     )
-    def test_from_input_profile_photo_local_files(self, cls, arg):
+    def test_from_input_story_content_local_files(self, cls, arg):
         input_story_content = cls(arg)
         expected = input_story_content.to_dict()
         requested = RequestParameter.from_input("key", input_story_content)

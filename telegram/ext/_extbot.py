@@ -63,7 +63,9 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
+    InputPaidMedia,
     InputPollOption,
+    InputProfilePhoto,
     LinkPreviewOptions,
     Location,
     MaskPosition,
@@ -117,7 +119,6 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InputPaidMedia,
         InputSticker,
         InputStoryContent,
         LabeledPrice,
@@ -471,7 +472,11 @@ class ExtBot(Bot, Generic[RLARGS]):
                 with copied_val._unfrozen():
                     copied_val.parse_mode = self.defaults.parse_mode
                 data[key] = copied_val
-            elif key == "media" and isinstance(val, Sequence):
+            elif (
+                key == "media"
+                and isinstance(val, Sequence)
+                and not isinstance(val[0], InputPaidMedia)
+            ):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
@@ -4531,6 +4536,52 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_business_account_profile_photo(
+        self,
+        business_connection_id: str,
+        photo: "InputProfilePhoto",
+        is_public: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_business_account_profile_photo(
+            business_connection_id=business_connection_id,
+            photo=photo,
+            is_public=is_public,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def remove_business_account_profile_photo(
+        self,
+        business_connection_id: str,
+        is_public: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().remove_business_account_profile_photo(
+            business_connection_id=business_connection_id,
+            is_public=is_public,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def convert_gift_to_stars(
         self,
         business_connection_id: str,
@@ -5065,6 +5116,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     setBusinessAccountUsername = set_business_account_username
     setBusinessAccountBio = set_business_account_bio
     setBusinessAccountGiftSettings = set_business_account_gift_settings
+    setBusinessAccountProfilePhoto = set_business_account_profile_photo
+    removeBusinessAccountProfilePhoto = remove_business_account_profile_photo
     convertGiftToStars = convert_gift_to_stars
     upgradeGift = upgrade_gift
     transferGift = transfer_gift

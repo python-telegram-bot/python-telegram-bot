@@ -419,6 +419,8 @@
       - Used for deleting business stories posted by the bot.
     * - :meth:`~telegram.Bot.delete_business_messages`
       - Used for deleting business messages.
+    * - :meth:`~telegram.Bot.remove_business_account_profile_photo`
+      - Used for removing the business accounts profile photo
     * - :meth:`~telegram.Bot.set_business_account_name`
       - Used for setting the business account name.
     * - :meth:`~telegram.Bot.set_business_account_username`
@@ -427,6 +429,8 @@
       - Used for setting the business account bio.
     * - :meth:`~telegram.Bot.set_business_account_gift_settings`
       - Used for setting the business account gift settings.
+    * - :meth:`~telegram.Bot.set_business_account_profile_photo`
+      - Used for setting the business accounts profile photo
     * - :meth:`~telegram.Bot.post_story`
       - Used for posting a story on behalf of business account.
     * - :meth:`~telegram.Bot.edit_story`

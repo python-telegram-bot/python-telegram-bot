@@ -75,6 +75,7 @@ __all__ = [
     "InlineQueryResultsButtonLimit",
     "InputMediaType",
     "InputPaidMediaType",
+    "InputProfilePhotoType",
     "InputStoryContentLimit",
     "InputStoryContentType",
     "InvoiceLimit",
@@ -1425,6 +1426,21 @@ class InputPaidMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
 
 
+class InputProfilePhotoType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputProfilePhoto`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    STATIC = "static"
+    """:obj:`str`: Type of :class:`telegram.InputProfilePhotoStatic`."""
+    ANIMATED = "animated"
+    """:obj:`str`: Type of :class:`telegram.InputProfilePhotoAnimated`."""
+
+
 class InputStoryContentLimit(StringEnum):
     """This enum contains limitations for :class:`telegram.InputStoryContentPhoto`/
     :class:`telegram.InputStoryContentVideo`. The enum members of this enumeration are instances
@@ -1476,7 +1492,7 @@ class InputStoryContentType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputStoryContent`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 21.4
+    .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = ()
