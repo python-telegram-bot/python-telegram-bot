@@ -104,6 +104,12 @@ class ParamTypeCheckingExceptions:
             "animation": str,  # actual: Union[str, FileInput]
             "main_frame_timestamp": float,  # actual: Union[float, dtm.timedelta]
         },
+        "InputStoryContent.*": {
+            "photo": str,  # actual: Union[str, FileInput]
+            "video": str,  # actual: Union[str, FileInput]
+            "duration": float,  # actual: dtm.timedelta
+            "cover_frame_timestamp": float,  # actual: dtm.timedelta
+        },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },
@@ -157,6 +163,8 @@ PTB_EXTRA_PARAMS = {
     "TransactionPartner": {"type"},  # attributes common to all subclasses
     "PaidMedia": {"type"},  # attributes common to all subclasses
     "InputPaidMedia": {"type", "media"},  # attributes common to all subclasses
+    "InputStoryContent": {"type"},  # attributes common to all subclasses
+    "StoryAreaType": {"type"},  # attributes common to all subclasses
     # backwards compatibility for api 9.0 changes
     # tags: deprecated NEXT.VERSION, bot api 9.0
     "BusinessConnection": {"can_reply"},
@@ -192,6 +200,8 @@ PTB_IGNORED_PARAMS = {
     r"InputPaidMedia\w+": {"type"},
     r"InputProfilePhoto\w+": {"type"},
     r"OwnedGift\w+": {"type"},
+    r"InputStoryContent\w+": {"type"},
+    r"StoryAreaType\w+": {"type"},
 }
 
 

@@ -76,6 +76,8 @@ __all__ = [
     "InputMediaType",
     "InputPaidMediaType",
     "InputProfilePhotoType",
+    "InputStoryContentLimit",
+    "InputStoryContentType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
     "LocationLimit",
@@ -104,6 +106,10 @@ __all__ = [
     "StickerLimit",
     "StickerSetLimit",
     "StickerType",
+    "StoryAreaPositionLimit",
+    "StoryAreaTypeLimit",
+    "StoryAreaTypeType",
+    "StoryLimit",
     "TransactionPartnerType",
     "UniqueGiftInfoOrigin",
     "UpdateType",
@@ -1435,6 +1441,68 @@ class InputProfilePhotoType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputProfilePhotoAnimated`."""
 
 
+class InputStoryContentLimit(StringEnum):
+    """This enum contains limitations for :class:`telegram.InputStoryContentPhoto`/
+    :class:`telegram.InputStoryContentVideo`. The enum members of this enumeration are instances
+    of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PHOTOSIZE_UPLOAD = FileSizeLimit.PHOTOSIZE_UPLOAD  # (10MB)
+    """:obj:`int`: Maximum file size of the photo to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto` in Bytes.
+    """
+    PHOTO_WIDTH = 1080
+    """:obj:`int`: Horizontal resolution of the photo to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto`.
+    """
+    PHOTO_HEIGHT = 1920
+    """:obj:`int`: Vertical resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto`.
+    """
+    VIDEOSIZE_UPLOAD = int(30e6)  # (30MB)
+    """:obj:`int`: Maximum file size of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo` in Bytes.
+    """
+    VIDEO_WIDTH = 720
+    """:obj:`int`: Horizontal resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+    VIDEO_HEIGHT = 1080
+    """:obj:`int`: Vertical resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+    MAX_VIDEO_DURATION = int(dtm.timedelta(seconds=60).total_seconds())
+    """:obj:`int`: Maximum duration of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.duration` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+
+
+class InputStoryContentType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputStoryContent`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputStoryContentPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputStoryContentVideo`."""
+
+
 class InlineQueryLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineQuery`/
     :meth:`telegram.Bot.answer_inline_query`. The enum members of this enumeration are instances
@@ -2727,6 +2795,98 @@ class StickerType(StringEnum):
     """:obj:`str`: Mask sticker."""
     CUSTOM_EMOJI = "custom_emoji"
     """:obj:`str`: Custom emoji sticker."""
+
+
+class StoryAreaPositionLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.StoryAreaPosition`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_ROTATION_ANGLE = 360
+    """:obj:`int`: Maximum value allowed for:
+        :paramref:`~telegram.StoryAreaPosition.rotation_angle` parameter of
+        :class:`telegram.StoryAreaPosition`
+    """
+
+
+class StoryAreaTypeLimit(IntEnum):
+    """This enum contains limitations for subclasses of :class:`telegram.StoryAreaType`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_LOCATION_AREAS = 10
+    """:obj:`int`: Maximum number of location areas that a story can have.
+    """
+    MAX_SUGGESTED_REACTION_AREAS = 5
+    """:obj:`int`: Maximum number of suggested reaction areas that a story can have.
+    """
+    MAX_LINK_AREAS = 3
+    """:obj:`int`: Maximum number of link areas that a story can have.
+    """
+    MAX_WEATHER_AREAS = 3
+    """:obj:`int`: Maximum number of weather areas that a story can have.
+    """
+    MAX_UNIQUE_GIFT_AREAS = 1
+    """:obj:`int`: Maximum number of unique gift areas that a story can have.
+    """
+
+
+class StoryAreaTypeType(StringEnum):
+    """This enum contains the available types of :class:`telegram.StoryAreaType`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    LOCATION = "location"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeLocation`."""
+    SUGGESTED_REACTION = "suggested_reaction"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeSuggestedReaction`."""
+    LINK = "link"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeLink`."""
+    WEATHER = "weather"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeWeather`."""
+    UNIQUE_GIFT = "unique_gift"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeUniqueGift`."""
+
+
+class StoryLimit(StringEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.post_story` and
+    :meth:`~telegram.Bot.edit_story`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    CAPTION_LENGTH = 2048
+    """:obj:`int`: Maximum number of characters in :paramref:`telegram.Bot.post_story.caption`
+    parameter of :meth:`telegram.Bot.post_story` and :paramref:`telegram.Bot.edit_story.caption` of
+    :meth:`telegram.Bot.edit_story`.
+    """
+    ACTIVITY_SIX_HOURS = 6 * 3600
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_TWELVE_HOURS = 12 * 3600
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_ONE_DAY = 86400
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_TWO_DAYS = 2 * 86400
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
 
 
 class TransactionPartnerType(StringEnum):

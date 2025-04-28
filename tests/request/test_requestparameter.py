@@ -28,6 +28,8 @@ from telegram import (
     InputProfilePhotoAnimated,
     InputProfilePhotoStatic,
     InputSticker,
+    InputStoryContentPhoto,
+    InputStoryContentVideo,
     MessageEntity,
 )
 from telegram.constants import ChatType
@@ -227,6 +229,36 @@ class TestRequestParameterWithoutRequest:
         request_parameter = RequestParameter.from_input("key", input_sticker)
         assert request_parameter.value == expected
         assert request_parameter.input_files == [input_sticker.sticker]
+
+    def test_from_input_story_content_photo(self):
+        input_story_content_photo = InputStoryContentPhoto(data_file("telegram.jpg").read_bytes())
+        expected = input_story_content_photo.to_dict()
+        expected.update({"photo": input_story_content_photo.photo.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_story_content_photo)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_story_content_photo.photo]
+
+    def test_from_input_story_content_video(self):
+        input_story_content_video = InputStoryContentVideo(data_file("telegram2.mp4").read_bytes())
+        expected = input_story_content_video.to_dict()
+        expected.update({"video": input_story_content_video.video.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_story_content_video)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_story_content_video.video]
+
+    @pytest.mark.parametrize(
+        ("cls", "arg"),
+        [
+            (InputStoryContentPhoto, data_file("telegram.jpg")),
+            (InputStoryContentVideo, data_file("telegram2.mp4")),
+        ],
+    )
+    def test_from_input_story_content_local_files(self, cls, arg):
+        input_story_content = cls(arg)
+        expected = input_story_content.to_dict()
+        requested = RequestParameter.from_input("key", input_story_content)
+        assert requested.value == expected
+        assert requested.input_files is None
 
     def test_from_input_str_and_bytes(self):
         input_str = "test_input"

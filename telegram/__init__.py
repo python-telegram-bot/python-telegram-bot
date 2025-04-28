@@ -157,6 +157,9 @@ __all__ = (
     "InputProfilePhotoAnimated",
     "InputProfilePhotoStatic",
     "InputSticker",
+    "InputStoryContent",
+    "InputStoryContentPhoto",
+    "InputStoryContentVideo",
     "InputTextMessageContent",
     "InputVenueMessageContent",
     "Invoice",
@@ -167,6 +170,7 @@ __all__ = (
     "LabeledPrice",
     "LinkPreviewOptions",
     "Location",
+    "LocationAddress",
     "LoginUrl",
     "MaskPosition",
     "MaybeInaccessibleMessage",
@@ -242,6 +246,14 @@ __all__ = (
     "Sticker",
     "StickerSet",
     "Story",
+    "StoryArea",
+    "StoryAreaPosition",
+    "StoryAreaType",
+    "StoryAreaTypeLink",
+    "StoryAreaTypeLocation",
+    "StoryAreaTypeSuggestedReaction",
+    "StoryAreaTypeUniqueGift",
+    "StoryAreaTypeWeather",
     "SuccessfulPayment",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
@@ -369,6 +381,11 @@ from ._chatpermissions import ChatPermissions
 from ._choseninlineresult import ChosenInlineResult
 from ._copytextbutton import CopyTextButton
 from ._dice import Dice
+from ._files._inputstorycontent import (
+    InputStoryContent,
+    InputStoryContentPhoto,
+    InputStoryContentVideo,
+)
 from ._files.animation import Animation
 from ._files.audio import Audio
 from ._files.chatphoto import ChatPhoto
@@ -529,6 +546,17 @@ from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
 from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story
+from ._storyarea import (
+    LocationAddress,
+    StoryArea,
+    StoryAreaPosition,
+    StoryAreaType,
+    StoryAreaTypeLink,
+    StoryAreaTypeLocation,
+    StoryAreaTypeSuggestedReaction,
+    StoryAreaTypeUniqueGift,
+    StoryAreaTypeWeather,
+)
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
 from ._uniquegift import (

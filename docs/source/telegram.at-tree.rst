@@ -99,12 +99,16 @@ Available Types
     telegram.inputprofilephotoanimated
     telegram.inputprofilephotostatic
     telegram.inputpolloption
+    telegram.inputstorycontent
+    telegram.inputstorycontentphoto
+    telegram.inputstorycontentvideo
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
     telegram.keyboardbuttonrequestusers
     telegram.linkpreviewoptions
     telegram.location
+    telegram.locationaddress
     telegram.loginurl
     telegram.maybeinaccessiblemessage
     telegram.menubutton
@@ -148,6 +152,14 @@ Available Types
     telegram.sentwebappmessage
     telegram.shareduser
     telegram.story
+    telegram.storyarea
+    telegram.storyareaposition
+    telegram.storyareatype
+    telegram.storyareatypelink
+    telegram.storyareatypelocation
+    telegram.storyareatypesuggestedreaction
+    telegram.storyareatypeuniquegift
+    telegram.storyareatypeweather
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.textquote

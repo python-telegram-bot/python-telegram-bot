@@ -20,13 +20,23 @@ import datetime as dtm
 
 import pytest
 
-from telegram import BusinessConnection, InputProfilePhotoStatic, User
+from telegram import (
+    BusinessConnection,
+    Chat,
+    InputProfilePhotoStatic,
+    InputStoryContentPhoto,
+    MessageEntity,
+    Story,
+    StoryAreaTypeLink,
+    StoryAreaTypeUniqueGift,
+    User,
+)
 from telegram._files.sticker import Sticker
 from telegram._gifts import AcceptedGiftTypes, Gift
 from telegram._ownedgift import OwnedGiftRegular, OwnedGifts
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram.constants import InputProfilePhotoType
+from telegram.constants import InputProfilePhotoType, InputStoryContentType
 from tests.auxil.files import data_file
 
 
@@ -325,3 +335,235 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             kwargs["is_public"] = is_public
 
         assert await offline_bot.remove_business_account_profile_photo(**kwargs)
+
+    @pytest.mark.parametrize("active_period", [dtm.timedelta(seconds=30), 30])
+    async def test_post_story_all_args(self, offline_bot, monkeypatch, active_period):
+        content = InputStoryContentPhoto(photo=data_file("telegram.jpg").read_bytes())
+        caption = "test caption"
+        caption_entities = [
+            MessageEntity(MessageEntity.BOLD, 0, 3),
+            MessageEntity(MessageEntity.ITALIC, 5, 11),
+        ]
+        parse_mode = "Markdown"
+        areas = [StoryAreaTypeLink("http_url"), StoryAreaTypeUniqueGift("unique_gift_name")]
+        post_to_chat_page = True
+        protect_content = True
+        json_story = Story(chat=Chat(123, "private"), id=123).to_json()
+
+        async def do_request_and_make_assertions(*args, **kwargs):
+            request_data = kwargs.get("request_data")
+            params = kwargs.get("request_data").parameters
+            assert params.get("business_connection_id") == self.bci
+            assert params.get("active_period") == 30
+            assert params.get("caption") == caption
+            assert params.get("caption_entities") == [e.to_dict() for e in caption_entities]
+            assert params.get("parse_mode") == parse_mode
+            assert params.get("areas") == [area.to_dict() for area in areas]
+            assert params.get("post_to_chat_page") is post_to_chat_page
+            assert params.get("protect_content") is protect_content
+
+            assert (content_dict := params.get("content")).get(
+                "type"
+            ) == InputStoryContentType.PHOTO
+            assert (photo_attach := content_dict["photo"]).startswith("attach://")
+            assert isinstance(
+                request_data.multipart_data.get(photo_attach.removeprefix("attach://")), tuple
+            )
+
+            return 200, f'{{"ok": true, "result": {json_story}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", do_request_and_make_assertions)
+        obj = await offline_bot.post_story(
+            business_connection_id=self.bci,
+            content=content,
+            active_period=active_period,
+            caption=caption,
+            caption_entities=caption_entities,
+            parse_mode=parse_mode,
+            areas=areas,
+            post_to_chat_page=post_to_chat_page,
+            protect_content=protect_content,
+        )
+        assert isinstance(obj, Story)
+
+    @pytest.mark.parametrize("active_period", [dtm.timedelta(seconds=30), 30])
+    async def test_post_story_local_file(self, offline_bot, monkeypatch, active_period):
+        json_story = Story(chat=Chat(123, "private"), id=123).to_json()
+
+        async def make_assertion(*args, **kwargs):
+            request_data = kwargs.get("request_data")
+            params = request_data.parameters
+            assert params.get("business_connection_id") == self.bci
+
+            assert (content_dict := params.get("content")).get(
+                "type"
+            ) == InputStoryContentType.PHOTO
+            assert content_dict["photo"] == data_file("telegram.jpg").as_uri()
+            assert not request_data.multipart_data
+
+            return 200, f'{{"ok": true, "result": {json_story}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "content": InputStoryContentPhoto(
+                photo=data_file("telegram.jpg"),
+            ),
+            "active_period": active_period,
+        }
+
+        assert await offline_bot.post_story(**kwargs)
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, "Markdown"), ("HTML", "HTML"), (None, None)],
+    )
+    async def test_post_story_default_parse_mode(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("parse_mode") == expected_value
+            return Story(chat=Chat(123, "private"), id=123).to_dict()
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "content": InputStoryContentPhoto(photo=data_file("telegram.jpg").read_bytes()),
+            "active_period": dtm.timedelta(seconds=20),
+            "caption": "caption",
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["parse_mode"] = passed_value
+
+        await default_bot.post_story(**kwargs)
+
+    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, True), (False, False), (None, None)],
+    )
+    async def test_post_story_default_protect_content(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("protect_content") == expected_value
+            return Story(chat=Chat(123, "private"), id=123).to_dict()
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "content": InputStoryContentPhoto(bytes("photo", encoding="utf-8")),
+            "active_period": dtm.timedelta(seconds=20),
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["protect_content"] = passed_value
+
+        await default_bot.post_story(**kwargs)
+
+    async def test_edit_story_all_args(self, offline_bot, monkeypatch):
+        story_id = 1234
+        content = InputStoryContentPhoto(photo=data_file("telegram.jpg").read_bytes())
+        caption = "test caption"
+        caption_entities = [
+            MessageEntity(MessageEntity.BOLD, 0, 3),
+            MessageEntity(MessageEntity.ITALIC, 5, 11),
+        ]
+        parse_mode = "Markdown"
+        areas = [StoryAreaTypeLink("http_url"), StoryAreaTypeUniqueGift("unique_gift_name")]
+        json_story = Story(chat=Chat(123, "private"), id=123).to_json()
+
+        async def do_request_and_make_assertions(*args, **kwargs):
+            request_data = kwargs.get("request_data")
+            params = kwargs.get("request_data").parameters
+            assert params.get("business_connection_id") == self.bci
+            assert params.get("story_id") == story_id
+            assert params.get("caption") == caption
+            assert params.get("caption_entities") == [e.to_dict() for e in caption_entities]
+            assert params.get("parse_mode") == parse_mode
+            assert params.get("areas") == [area.to_dict() for area in areas]
+
+            assert (content_dict := params.get("content")).get(
+                "type"
+            ) == InputStoryContentType.PHOTO
+            assert (photo_attach := content_dict["photo"]).startswith("attach://")
+            assert isinstance(
+                request_data.multipart_data.get(photo_attach.removeprefix("attach://")), tuple
+            )
+
+            return 200, f'{{"ok": true, "result": {json_story}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", do_request_and_make_assertions)
+        obj = await offline_bot.edit_story(
+            business_connection_id=self.bci,
+            story_id=story_id,
+            content=content,
+            caption=caption,
+            caption_entities=caption_entities,
+            parse_mode=parse_mode,
+            areas=areas,
+        )
+        assert isinstance(obj, Story)
+
+    async def test_edit_story_local_file(self, offline_bot, monkeypatch):
+        json_story = Story(chat=Chat(123, "private"), id=123).to_json()
+
+        async def make_assertion(*args, **kwargs):
+            request_data = kwargs.get("request_data")
+            params = request_data.parameters
+            assert params.get("business_connection_id") == self.bci
+
+            assert (content_dict := params.get("content")).get(
+                "type"
+            ) == InputStoryContentType.PHOTO
+            assert content_dict["photo"] == data_file("telegram.jpg").as_uri()
+            assert not request_data.multipart_data
+
+            return 200, f'{{"ok": true, "result": {json_story}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "story_id": 1234,
+            "content": InputStoryContentPhoto(
+                photo=data_file("telegram.jpg"),
+            ),
+        }
+
+        assert await offline_bot.edit_story(**kwargs)
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, "Markdown"), ("HTML", "HTML"), (None, None)],
+    )
+    async def test_edit_story_default_parse_mode(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("parse_mode") == expected_value
+            return Story(chat=Chat(123, "private"), id=123).to_dict()
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "story_id": 1234,
+            "content": InputStoryContentPhoto(photo=data_file("telegram.jpg").read_bytes()),
+            "caption": "caption",
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["parse_mode"] = passed_value
+
+        await default_bot.edit_story(**kwargs)
+
+    async def test_delete_story(self, offline_bot, monkeypatch):
+        story_id = 123
+
+        async def make_assertion(*args, **kwargs):
+            data = kwargs.get("request_data").parameters
+            assert data.get("business_connection_id") == self.bci
+            assert data.get("story_id") == story_id
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.delete_story(business_connection_id=self.bci, story_id=story_id)
