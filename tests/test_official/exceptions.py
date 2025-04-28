@@ -97,6 +97,13 @@ class ParamTypeCheckingExceptions:
             "thumbnail": str,  # actual: Union[str, FileInput]
             "cover": str,  # actual: Union[str, FileInput]
         },
+        "InputProfilePhotoStatic": {
+            "photo": str,  # actual: Union[str, FileInput]
+        },
+        "InputProfilePhotoAnimated": {
+            "animation": str,  # actual: Union[str, FileInput]
+            "main_frame_timestamp": float,  # actual: Union[float, dtm.timedelta]
+        },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },
@@ -154,6 +161,7 @@ PTB_EXTRA_PARAMS = {
     # tags: deprecated NEXT.VERSION, bot api 9.0
     "BusinessConnection": {"can_reply"},
     "ChatFullInfo": {"can_send_gift"},
+    "InputProfilePhoto": {"type"},  # attributes common to all subclasses
 }
 
 
@@ -182,6 +190,7 @@ PTB_IGNORED_PARAMS = {
     r"TransactionPartner\w+": {"type"},
     r"PaidMedia\w+": {"type"},
     r"InputPaidMedia\w+": {"type"},
+    r"InputProfilePhoto\w+": {"type"},
     r"OwnedGift\w+": {"type"},
 }
 

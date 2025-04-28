@@ -124,6 +124,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputProfilePhoto,
         InputSticker,
         LabeledPrice,
         LinkPreviewOptions,
@@ -9753,6 +9754,99 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def set_business_account_profile_photo(
+        self,
+        business_connection_id: str,
+        photo: "InputProfilePhoto",
+        is_public: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the profile photo of a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_edit_profile_photo` business
+        bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            photo (:class:`telegram.InputProfilePhoto`): The new profile photo to set.
+            is_public (:obj:`bool`, optional): Pass :obj:`True` to set the public photo, which will
+                be visible even if the main photo is hidden by the business account's privacy
+                settings. An account can have only one public photo.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "photo": photo,
+            "is_public": is_public,
+        }
+        return await self._post(
+            "setBusinessAccountProfilePhoto",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def remove_business_account_profile_photo(
+        self,
+        business_connection_id: str,
+        is_public: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Removes the current profile photo of a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_edit_profile_photo` business
+        bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            is_public (:obj:`bool`, optional): Pass :obj:`True` to remove the public photo, which
+                will be visible even if the main photo is hidden by the business account's privacy
+                settings. After the main photo is removed, the previous profile photo (if present)
+                becomes the main photo.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "is_public": is_public,
+        }
+        return await self._post(
+            "removeBusinessAccountProfilePhoto",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def convert_gift_to_stars(
         self,
         business_connection_id: str,
@@ -10861,6 +10955,10 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`set_business_account_bio`"""
     setBusinessAccountGiftSettings = set_business_account_gift_settings
     """Alias for :meth:`set_business_account_gift_settings`"""
+    setBusinessAccountProfilePhoto = set_business_account_profile_photo
+    """Alias for :meth:`set_business_account_profile_photo`"""
+    removeBusinessAccountProfilePhoto = remove_business_account_profile_photo
+    """Alias for :meth:`remove_business_account_profile_photo`"""
     convertGiftToStars = convert_gift_to_stars
     """Alias for :meth:`convert_gift_to_stars`"""
     upgradeGift = upgrade_gift
