@@ -443,6 +443,8 @@
       - Used for upgrading owned regular gifts to unique ones.
     * - :meth:`~telegram.Bot.transfer_gift`
       - Used for transferring owned unique gifts to another user.
+    * - :meth:`~telegram.Bot.transfer_business_account_stars`
+      - Used for transfering Stars from the business account balance to the bot's balance.
 
 
 .. raw:: html

@@ -4677,6 +4677,28 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def transfer_business_account_stars(
+        self,
+        business_connection_id: str,
+        star_count: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().transfer_business_account_stars(
+            business_connection_id=business_connection_id,
+            star_count=star_count,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def replace_sticker_in_set(
         self,
         user_id: int,
@@ -5143,6 +5165,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     convertGiftToStars = convert_gift_to_stars
     upgradeGift = upgrade_gift
     transferGift = transfer_gift
+    transferBusinessAccountStars = transfer_business_account_stars
     replaceStickerInSet = replace_sticker_in_set
     refundStarPayment = refund_star_payment
     getStarTransactions = get_star_transactions

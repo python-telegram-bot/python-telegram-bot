@@ -277,6 +277,22 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             star_count=star_count,
         )
 
+    async def test_transfer_business_account_stars(self, offline_bot, monkeypatch):
+        star_count = 100
+
+        async def make_assertion(*args, **kwargs):
+            data = kwargs.get("request_data").parameters
+            assert data.get("business_connection_id") == self.bci
+            assert data.get("star_count") == star_count
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.transfer_business_account_stars(
+            business_connection_id=self.bci,
+            star_count=star_count,
+        )
+
     @pytest.mark.parametrize("is_public", [True, False, None, DEFAULT_NONE])
     async def test_set_business_account_profile_photo(self, offline_bot, monkeypatch, is_public):
         async def make_assertion(*args, **kwargs):

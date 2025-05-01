@@ -759,6 +759,16 @@ class BusinessLimit(IntEnum):
     :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
     :meth:`telegram.Bot.get_business_account_gifts`.
     """
+    MIN_STAR_COUNT = 1
+    """:obj:`int`: Minimum number of Telegram Stars to be transfered. Relevant for
+    :paramref:`~telegram.Bot.transfer_business_account_stars.star_count` of
+    :meth:`telegram.Bot.transfer_business_account_stars`.
+    """
+    MAX_STAR_COUNT = 10000
+    """:obj:`int`: Maximum number of Telegram Stars to be transfered. Relevant for
+    :paramref:`~telegram.Bot.transfer_business_account_stars.star_count` of
+    :meth:`telegram.Bot.transfer_business_account_stars`.
+    """
 
 
 class CallbackQueryLimit(IntEnum):

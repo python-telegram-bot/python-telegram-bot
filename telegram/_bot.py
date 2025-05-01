@@ -10257,6 +10257,50 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def transfer_business_account_stars(
+        self,
+        business_connection_id: str,
+        star_count: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Transfers Telegram Stars from the business account balance to the bot's balance. Requires
+        the :attr:`~telegram.BusinessBotRights.can_transfer_stars` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            star_count (:obj:`int`): Number of Telegram Stars to transfer;
+                :tg-const:`~telegram.constants.BusinessLimit.MIN_STAR_COUNT`\
+-:tg-const:`~telegram.constants.BusinessLimit.MAX_STAR_COUNT`
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "star_count": star_count,
+        }
+        return await self._post(
+            "transferBusinessAccountStars",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def replace_sticker_in_set(
         self,
         user_id: int,
@@ -11226,6 +11270,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`upgrade_gift`"""
     transferGift = transfer_gift
     """Alias for :meth:`transfer_gift`"""
+    transferBusinessAccountStars = transfer_business_account_stars
+    """Alias for :meth:`transfer_business_account_stars`"""
     replaceStickerInSet = replace_sticker_in_set
     """Alias for :meth:`replace_sticker_in_set`"""
     refundStarPayment = refund_star_payment
