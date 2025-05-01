@@ -100,6 +100,8 @@ __all__ = [
     "ReactionType",
     "ReplyLimit",
     "RevenueWithdrawalStateType",
+    "StarAmount",
+    "StarAmountLimit",
     "StarTransactions",
     "StarTransactionsLimit",
     "StickerFormat",
@@ -2612,6 +2614,41 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal succeeded."""
     FAILED = "failed"
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
+
+
+class StarAmount(FloatEnum):
+    """This enum contains constants for :class:`telegram.StarAmount`.
+    The enum members of this enumeration are instances of :class:`float` and can be treated as
+    such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    NANOSTAR_VALUE = 1 / 1000000000
+    """:obj:`float`: The value of one nanostar as used in
+    :attr:`telegram.StarAmount.nanostar_amount`.
+    """
+
+
+class StarAmountLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.StarAmount`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    NANOSTAR_MIN_AMOUNT = -999999999
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.StarAmount.nanostar_amount`
+    parameter of :class:`telegram.StarAmount`.
+    """
+    NANOSTAR_MAX_AMOUNT = 999999999
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarAmount.nanostar_amount`
+    parameter of :class:`telegram.StarAmount`.
+    """
 
 
 class StarTransactions(FloatEnum):

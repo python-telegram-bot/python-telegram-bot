@@ -26,6 +26,7 @@ from telegram import (
     InputProfilePhotoStatic,
     InputStoryContentPhoto,
     MessageEntity,
+    StarAmount,
     Story,
     StoryAreaTypeLink,
     StoryAreaTypeUniqueGift,
@@ -114,6 +115,20 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             limit=limit,
         )
         assert isinstance(obj, OwnedGifts)
+
+    async def test_get_business_account_star_balance(self, offline_bot, monkeypatch):
+        star_amount_json = StarAmount(amount=100, nanostar_amount=356).to_json()
+
+        async def do_request(*args, **kwargs):
+            data = kwargs.get("request_data")
+            obj = data.parameters.get("business_connection_id")
+            if obj == self.bci:
+                return 200, f'{{"ok": true, "result": {star_amount_json}}}'.encode()
+            return 400, b'{"ok": false, "result": []}'
+
+        monkeypatch.setattr(offline_bot.request, "do_request", do_request)
+        obj = await offline_bot.get_business_account_star_balance(business_connection_id=self.bci)
+        assert isinstance(obj, StarAmount)
 
     async def test_read_business_message(self, offline_bot, monkeypatch):
         chat_id = 43

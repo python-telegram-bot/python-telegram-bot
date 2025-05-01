@@ -413,6 +413,8 @@
       - Used for getting information about the business account.
     * - :meth:`~telegram.Bot.get_business_account_gifts`
       - Used for getting gifts owned by the business account.
+    * - :meth:`~telegram.Bot.get_business_account_star_balance`
+      - Used for getting the amount of Stars owned by the business account.
     * - :meth:`~telegram.Bot.read_business_message`
       - Used for marking a message as read.
     * - :meth:`~telegram.Bot.delete_story`

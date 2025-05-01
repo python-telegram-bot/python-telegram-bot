@@ -79,6 +79,7 @@ from telegram import (
     ReactionType,
     ReplyParameters,
     SentWebAppMessage,
+    StarAmount,
     StarTransactions,
     Sticker,
     StickerSet,
@@ -4308,6 +4309,26 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_business_account_star_balance(
+        self,
+        business_connection_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> StarAmount:
+        return await super().get_business_account_star_balance(
+            business_connection_id=business_connection_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def read_business_message(
         self,
         business_connection_id: str,
@@ -5107,6 +5128,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     setMessageReaction = set_message_reaction
     getBusinessConnection = get_business_connection
     getBusinessAccountGifts = get_business_account_gifts
+    getBusinessAccountStarBalance = get_business_account_star_balance
     readBusinessMessage = read_business_message
     deleteBusinessMessages = delete_business_messages
     postStory = post_story

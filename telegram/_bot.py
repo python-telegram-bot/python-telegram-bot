@@ -82,6 +82,7 @@ from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
 from telegram._ownedgift import OwnedGifts
+from telegram._payment.stars.staramount import StarAmount
 from telegram._payment.stars.startransactions import StarTransactions
 from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
@@ -9480,6 +9481,45 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             )
         )
 
+    async def get_business_account_star_balance(
+        self,
+        business_connection_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> StarAmount:
+        """
+        Returns the amount of Telegram Stars owned by a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_view_gifts_and_stars` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+
+        Returns:
+            :class:`telegram.StarAmount`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"business_connection_id": business_connection_id}
+        return StarAmount.de_json(
+            await self._post(
+                "getBusinessAccountStarBalance",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
     async def read_business_message(
         self,
         business_connection_id: str,
@@ -11154,6 +11194,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`set_message_reaction`"""
     getBusinessAccountGifts = get_business_account_gifts
     """Alias for :meth:`get_business_account_gifts`"""
+    getBusinessAccountStarBalance = get_business_account_star_balance
+    """Alias for :meth:`get_business_account_star_balance`"""
     getBusinessConnection = get_business_connection
     """Alias for :meth:`get_business_connection`"""
     readBusinessMessage = read_business_message
