@@ -3592,7 +3592,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         if current_offset is not None:
             # Convert the string input to integer
-            current_offset_int = 0 if not current_offset else int(current_offset)
+            current_offset_int = 0 if not current_offset or current_offset == "[]" else int(current_offset)
 
             # for now set to empty string, stating that there are no more results
             # might change later
