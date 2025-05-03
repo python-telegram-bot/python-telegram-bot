@@ -125,6 +125,8 @@ linkcheck_ignore = [
     # The doc-fixes branch may not always exist - doesn't matter, we only link to it from the
     # contributing guide
     re.escape("https://docs.python-telegram-bot.org/en/doc-fixes"),
+    # Apparently has some human-verification check and gives 403 in the sphinx build
+    re.escape("https://stackoverflow.com/questions/tagged/python-telegram-bot"),
 ]
 linkcheck_allowed_redirects = {
     # Redirects to the default version are okay
