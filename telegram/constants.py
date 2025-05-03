@@ -89,8 +89,8 @@ __all__ = [
     "MessageLimit",
     "MessageOriginType",
     "MessageType",
-    "NanostarAmount",
-    "NanostarAmountLimit",
+    "Nanostar",
+    "NanostarLimit",
     "OwnedGiftType",
     "PaidMediaType",
     "ParseMode",
@@ -2221,7 +2221,7 @@ class MessageType(StringEnum):
     """
 
 
-class NanostarAmount(FloatEnum):
+class Nanostar(FloatEnum):
     """This enum contains constants for ``nanostar_amount`` parameter of
     :class:`telegram.StarAmount`, :class:`telegram.StarTransaction`
     and :class:`telegram.AffiliateInfo`.
@@ -2233,7 +2233,7 @@ class NanostarAmount(FloatEnum):
 
     __slots__ = ()
 
-    NANOSTAR_VALUE = 1 / 1000000000
+    VALUE = 1 / 1000000000
     """:obj:`float`: The value of one nanostar as used in
     :paramref:`telegram.StarTransaction.nanostar_amount`
     parameter of :class:`telegram.StarTransaction`,
@@ -2243,7 +2243,7 @@ class NanostarAmount(FloatEnum):
     """
 
 
-class NanostarAmountLimit(IntEnum):
+class NanostarLimit(IntEnum):
     """This enum contains limitations for ``nanostar_amount`` parameter of
     :class:`telegram.AffiliateInfo`, :class:`telegram.StarTransaction`
     and :class:`telegram.StarAmount`.
@@ -2254,13 +2254,13 @@ class NanostarAmountLimit(IntEnum):
 
     __slots__ = ()
 
-    NANOSTAR_MIN_AMOUNT = -999999999
+    MIN_AMOUNT = -999999999
     """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
     parameter of :class:`telegram.AffiliateInfo`
     and :paramref:`~telegram.StarAmount.nanostar_amount`
     parameter of :class:`telegram.StarAmount`.
     """
-    NANOSTAR_MAX_AMOUNT = 999999999
+    MAX_AMOUNT = 999999999
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
     parameter of :class:`telegram.StarTransaction`,
     :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
@@ -2683,18 +2683,18 @@ class StarTransactions(FloatEnum):
     .. versionadded:: 21.9
 
     .. deprecated:: NEXT.VERSION
-        This class will be removed as its only member :attr:`NANOSTAR_VALUE` will be moved
-        to :class:`telegram.constants.NanostarAmount`
+        This class will be removed as its only member :attr:`NANOSTAR_VALUE` will be replaced
+        by :attr:`telegram.constants.Nanostar.VALUE`.
     """
 
     __slots__ = ()
 
-    NANOSTAR_VALUE = NanostarAmount.NANOSTAR_VALUE
+    NANOSTAR_VALUE = Nanostar.VALUE
     """:obj:`float`: The value of one nanostar as used in
     :attr:`telegram.StarTransaction.nanostar_amount`.
 
     .. deprecated:: NEXT.VERSION
-        This member will be moved to :class:`telegram.constants.NanostarAmount`
+        This member will be replaced by :attr:`telegram.constants.Nanostar.VALUE`.
     """
 
 
@@ -2717,17 +2717,17 @@ class StarTransactionsLimit(IntEnum):
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
     # tags: deprecated NEXT.VERSION, bot api 9.0
-    NANOSTAR_MIN_AMOUNT = NanostarAmountLimit.NANOSTAR_MIN_AMOUNT
+    NANOSTAR_MIN_AMOUNT = NanostarLimit.MIN_AMOUNT
     """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
     parameter of :class:`telegram.AffiliateInfo`.
 
     .. versionadded:: 21.9
 
     .. deprecated:: NEXT.VERSION
-        This member will be moved to :class:`telegram.constants.NanostarAmountLimit`
+        This member will be replaced by :attr:`telegram.constants.NanostarLimit.MIN_AMOUNT`.
     """
     # tags: deprecated NEXT.VERSION, bot api 9.0
-    NANOSTAR_MAX_AMOUNT = NanostarAmountLimit.NANOSTAR_MAX_AMOUNT
+    NANOSTAR_MAX_AMOUNT = NanostarLimit.MAX_AMOUNT
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
     parameter of :class:`telegram.StarTransaction` and
     :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
@@ -2736,7 +2736,7 @@ class StarTransactionsLimit(IntEnum):
     .. versionadded:: 21.9
 
     .. deprecated:: NEXT.VERSION
-        This member will be moved to :class:`telegram.constants.NanostarAmountLimit`
+        This member will be replaced by :attr:`telegram.constants.NanostarLimit.MAX_AMOUNT`.
     """
 
 

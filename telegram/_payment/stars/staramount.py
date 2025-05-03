@@ -35,17 +35,17 @@ class StarAmount(TelegramObject):
     Args:
         amount (:obj:`int`): Integer amount of Telegram Stars, rounded to ``0``; can be negative.
         nanostar_amount (:obj:`int`, optional): The number of
-            :tg-const:`telegram.constants.NanostarAmount.NANOSTAR_VALUE` shares of Telegram
-            Stars; from :tg-const:`telegram.constants.NanostarAmountLimit.NANOSTAR_MIN_AMOUNT`
-            to :tg-const:`telegram.constants.NanostarAmountLimit.NANOSTAR_MAX_AMOUNT`; can be
+            :tg-const:`telegram.constants.Nanostar.VALUE` shares of Telegram
+            Stars; from :tg-const:`telegram.constants.NanostarLimit.MIN_AMOUNT`
+            to :tg-const:`telegram.constants.NanostarLimit.MAX_AMOUNT`; can be
             negative if and only if :attr:`amount` is non-positive.
 
     Attributes:
         amount (:obj:`int`): Integer amount of Telegram Stars, rounded to ``0``; can be negative.
         nanostar_amount (:obj:`int`): Optional. The number of
-            :tg-const:`telegram.constants.NanostarAmount.NANOSTAR_VALUE` shares of Telegram
-            Stars; from :tg-const:`telegram.constants.NanostarAmountLimit.NANOSTAR_MIN_AMOUNT`
-            to :tg-const:`telegram.constants.NanostarAmountLimit.NANOSTAR_MAX_AMOUNT`; can be
+            :tg-const:`telegram.constants.Nanostar.VALUE` shares of Telegram
+            Stars; from :tg-const:`telegram.constants.NanostarLimit.MIN_AMOUNT`
+            to :tg-const:`telegram.constants.NanostarLimit.MAX_AMOUNT`; can be
             negative if and only if :attr:`amount` is non-positive.
 
     """
