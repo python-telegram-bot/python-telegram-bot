@@ -446,7 +446,7 @@ class Message(MaybeInaccessibleMessage):
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
-        paid_start_count (:obj:`int`, optional): The number of Telegram Stars that were paid by the
+        paid_star_count (:obj:`int`, optional): The number of Telegram Stars that were paid by the
             sender of the message to send it
 
             .. versionadded:: NEXT.VERSION
@@ -790,7 +790,7 @@ class Message(MaybeInaccessibleMessage):
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
-        paid_start_count (:obj:`int`): Optional. The number of Telegram Stars that were paid by the
+        paid_star_count (:obj:`int`): Optional. The number of Telegram Stars that were paid by the
             sender of the message to send it
 
             .. versionadded:: NEXT.VERSION
