@@ -49,10 +49,6 @@ class HTTPXRequest(BaseRequest):
     Args:
         connection_pool_size (:obj:`int`, optional): Number of connections to keep in the
             connection pool. Defaults to ``1``.
-
-            Note:
-                Independent of the value, one additional connection will be reserved for
-                :meth:`telegram.Bot.get_updates`.
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server.
             This value is used unless a different value is passed to :meth:`do_request`.

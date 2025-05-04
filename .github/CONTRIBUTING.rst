@@ -157,45 +157,47 @@ Check-list for PRs
 This checklist is a non-exhaustive reminder of things that should be done before a PR is merged, both for you as contributor and for the maintainers.
 Feel free to copy (parts of) the checklist to the PR description to remind you or the maintainers of open points or if you have questions on anything.
 
-- Added ``.. versionadded:: NEXT.VERSION``, ``.. versionchanged:: NEXT.VERSION``, ``.. deprecated:: NEXT.VERSION`` or ``.. versionremoved:: NEXT.VERSION`` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
-- Created new or adapted existing unit tests
-- Documented code changes according to the `CSI standard <https://standards.mousepawmedia.com/en/stable/csi.html>`__
-- Added myself alphabetically to ``AUTHORS.rst`` (optional)
-- Added new classes & modules to the docs and all suitable ``__all__`` s
-- Checked the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_ in case of deprecations or changes to documented behavior
+.. code-block:: markdown
 
-**If the PR contains API changes (otherwise, you can ignore this passage)**
+    ## Check-list for PRs
 
-- Checked the Bot API specific sections of the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_
-- Created a PR to remove functionality deprecated in the previous Bot API release (`see here <https://docs.python-telegram-bot.org/en/stable/stability_policy.html#case-2>`_)
+    - [ ] Added `.. versionadded:: NEXT.VERSION`, ``.. versionchanged:: NEXT.VERSION``, ``.. deprecated:: NEXT.VERSION`` or ``.. versionremoved:: NEXT.VERSION` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
+    - [ ] Created new or adapted existing unit tests
+    - [ ] Documented code changes according to the [CSI standard](https://standards.mousepawmedia.com/en/stable/csi.html)
+    - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
+    - [ ] Added new classes & modules to the docs and all suitable ``__all__`` s
+    - [ ] Checked the [Stability Policy](https://docs.python-telegram-bot.org/stability_policy.html) in case of deprecations or changes to documented behavior
 
--  New classes:
+    **If the PR contains API changes (otherwise, you can ignore this passage)**
 
-   - Added ``self._id_attrs`` and corresponding documentation
-   - ``__init__`` accepts ``api_kwargs`` as kw-only
+    - [ ] Checked the Bot API specific sections of the [Stability Policy](https://docs.python-telegram-bot.org/stability_policy.html)
+    - [ ] Created a PR to remove functionality deprecated in the previous Bot API release ([see here](https://docs.python-telegram-bot.org/en/stable/stability_policy.html#case-2))
 
--  Added new shortcuts:
+    - New Classes
 
-   - In :class:`~telegram.Chat` & :class:`~telegram.User` for all methods that accept ``chat/user_id``
-   - In :class:`~telegram.Message` for all methods that accept ``chat_id`` and ``message_id``
-   - For new :class:`~telegram.Message` shortcuts: Added ``quote`` argument if methods accepts ``reply_to_message_id``
-   - In :class:`~telegram.CallbackQuery` for all methods that accept either ``chat_id`` and ``message_id`` or ``inline_message_id``
+        - [ ] Added `self._id_attrs` and corresponding documentation
+        - [ ] `__init__` accepts `api_kwargs` as keyword-only
 
--  If relevant:
+    - Added New Shortcuts
 
-   - Added new constants at :mod:`telegram.constants` and shortcuts to them as class variables
-   - Link new and existing constants in docstrings instead of hard-coded numbers and strings
-   - Add new message types to :attr:`telegram.Message.effective_attachment`
-   - Added new handlers for new update types
+        - [ ] In [`telegram.Chat`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.chat.html) \& [`telegram.User`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.user.html) for all methods that accept `chat/user_id`
+        - [ ] In [`telegram.Message`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.message.html) for all methods that accept `chat_id` and `message_id`
+        - [ ] For new `telegram.Message` shortcuts: Added `quote` argument if methods accept `reply_to_message_id`
+        - [ ] In [`telegram.CallbackQuery`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.callbackquery.html) for all methods that accept either `chat_id` and `message_id` or `inline_message_id`
 
-     - Add the handlers to the warning loop in the :class:`~telegram.ext.ConversationHandler`
+    - If Relevant
 
-   - Added new filters for new message (sub)types
-   - Added or updated documentation for the changed class(es) and/or method(s)
-   - Added the new method(s) to ``_extbot.py``
-   - Added or updated ``bot_methods.rst``
-   - Updated the Bot API version number in all places: ``README.rst`` (including the badge) and ``telegram.constants.BOT_API_VERSION_INFO``
-   - Added logic for arbitrary callback data in :class:`telegram.ext.ExtBot` for new methods that either accept a ``reply_markup`` in some form or have a return type that is/contains :class:`~telegram.Message`
+        - [ ] Added new constants at `telegram.constants` and shortcuts to them as class variables
+        - [ ] Linked new and existing constants in docstrings instead of hard-coded numbers and strings
+        - [ ] Added new message types to `telegram.Message.effective_attachment`
+        - [ ] Added new handlers for new update types
+            - [ ] Added the handlers to the warning loop in the [`telegram.ext.ConversationHandler`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.conversationhandler.html)
+        - [ ] Added new filters for new message (sub)types
+        - [ ] Added or updated documentation for the changed class(es) and/or method(s)
+        - [ ] Added the new method(s) to `_extbot.py`
+        - [ ] Added or updated `bot_methods.rst`
+        - [ ] Updated the Bot API version number in all places: `README.rst` (including the badge) and `telegram.constants.BOT_API_VERSION_INFO`
+        - [ ] Added logic for arbitrary callback data in `telegram.ext.ExtBot` for new methods that either accept a `reply_markup` in some form or have a return type that is/contains [`telegram.Message`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.message.html)
 
 Documenting
 ===========
