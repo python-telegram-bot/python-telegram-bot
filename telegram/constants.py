@@ -2147,6 +2147,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 21.4
     """
+    PAID_MESSAGE_PRICE_CHANGED = "paid_message_price_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_message_price_changed`.
+
+    .. versionadded:: Next.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
