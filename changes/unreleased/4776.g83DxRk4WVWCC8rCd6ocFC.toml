@@ -1,0 +1,5 @@
+internal = "Bump actions/upload-artifact from 4.5.0 to 4.6.2"
+[[pull_requests]]
+uid = "4776"
+author_uid = "dependabot"
+closes_threads = []

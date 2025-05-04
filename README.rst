@@ -19,7 +19,7 @@
    :target: https://pypistats.org/packages/python-telegram-bot
    :alt: PyPi Package Monthly Download
 
-.. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=stable
+.. image:: https://app.readthedocs.org/projects/python-telegram-bot/badge/?version=stable
    :target: https://docs.python-telegram-bot.org/en/stable/
    :alt: Documentation Status
 
