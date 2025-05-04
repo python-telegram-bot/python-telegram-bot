@@ -89,6 +89,8 @@ __all__ = [
     "MessageLimit",
     "MessageOriginType",
     "MessageType",
+    "Nanostar",
+    "NanostarLimit",
     "OwnedGiftType",
     "PaidMediaType",
     "ParseMode",
@@ -756,6 +758,16 @@ class BusinessLimit(IntEnum):
     """:obj:`int`: Maximum number of gifts to be returned. Relevant for
     :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
     :meth:`telegram.Bot.get_business_account_gifts`.
+    """
+    MIN_STAR_COUNT = 1
+    """:obj:`int`: Minimum number of Telegram Stars to be transfered. Relevant for
+    :paramref:`~telegram.Bot.transfer_business_account_stars.star_count` of
+    :meth:`telegram.Bot.transfer_business_account_stars`.
+    """
+    MAX_STAR_COUNT = 10000
+    """:obj:`int`: Maximum number of Telegram Stars to be transfered. Relevant for
+    :paramref:`~telegram.Bot.transfer_business_account_stars.star_count` of
+    :meth:`telegram.Bot.transfer_business_account_stars`.
     """
 
 
@@ -2209,6 +2221,54 @@ class MessageType(StringEnum):
     """
 
 
+class Nanostar(FloatEnum):
+    """This enum contains constants for ``nanostar_amount`` parameter of
+    :class:`telegram.StarAmount`, :class:`telegram.StarTransaction`
+    and :class:`telegram.AffiliateInfo`.
+    The enum members of this enumeration are instances of :class:`float` and can be treated as
+    such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    VALUE = 1 / 1000000000
+    """:obj:`float`: The value of one nanostar as used in
+    :paramref:`telegram.StarTransaction.nanostar_amount`
+    parameter of :class:`telegram.StarTransaction`,
+    :paramref:`telegram.StarAmount.nanostar_amount` parameter of :class:`telegram.StarAmount`
+    and :paramref:`telegram.AffiliateInfo.nanostar_amount`
+    parameter of :class:`telegram.AffiliateInfo`
+    """
+
+
+class NanostarLimit(IntEnum):
+    """This enum contains limitations for ``nanostar_amount`` parameter of
+    :class:`telegram.AffiliateInfo`, :class:`telegram.StarTransaction`
+    and :class:`telegram.StarAmount`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_AMOUNT = -999999999
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
+    parameter of :class:`telegram.AffiliateInfo`
+    and :paramref:`~telegram.StarAmount.nanostar_amount`
+    parameter of :class:`telegram.StarAmount`.
+    """
+    MAX_AMOUNT = 999999999
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
+    parameter of :class:`telegram.StarTransaction`,
+    :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
+    :class:`telegram.AffiliateInfo` and :paramref:`~telegram.StarAmount.nanostar_amount`
+    parameter of :class:`telegram.StarAmount`.
+    """
+
+
 class OwnedGiftType(StringEnum):
     """This enum contains the available types of :class:`telegram.OwnedGift`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -2614,19 +2674,27 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
 
 
+# tags: deprecated NEXT.VERSION, bot api 9.0
 class StarTransactions(FloatEnum):
     """This enum contains constants for :class:`telegram.StarTransaction`.
     The enum members of this enumeration are instances of :class:`float` and can be treated as
     such.
 
     .. versionadded:: 21.9
+
+    .. deprecated:: NEXT.VERSION
+        This class will be removed as its only member :attr:`NANOSTAR_VALUE` will be replaced
+        by :attr:`telegram.constants.Nanostar.VALUE`.
     """
 
     __slots__ = ()
 
-    NANOSTAR_VALUE = 1 / 1000000000
+    NANOSTAR_VALUE = Nanostar.VALUE
     """:obj:`float`: The value of one nanostar as used in
     :attr:`telegram.StarTransaction.nanostar_amount`.
+
+    .. deprecated:: NEXT.VERSION
+        This member will be replaced by :attr:`telegram.constants.Nanostar.VALUE`.
     """
 
 
@@ -2648,19 +2716,27 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
-    NANOSTAR_MIN_AMOUNT = -999999999
+    # tags: deprecated NEXT.VERSION, bot api 9.0
+    NANOSTAR_MIN_AMOUNT = NanostarLimit.MIN_AMOUNT
     """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
     parameter of :class:`telegram.AffiliateInfo`.
 
     .. versionadded:: 21.9
+
+    .. deprecated:: NEXT.VERSION
+        This member will be replaced by :attr:`telegram.constants.NanostarLimit.MIN_AMOUNT`.
     """
-    NANOSTAR_MAX_AMOUNT = 999999999
+    # tags: deprecated NEXT.VERSION, bot api 9.0
+    NANOSTAR_MAX_AMOUNT = NanostarLimit.MAX_AMOUNT
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
     parameter of :class:`telegram.StarTransaction` and
     :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
     :class:`telegram.AffiliateInfo`.
 
     .. versionadded:: 21.9
+
+    .. deprecated:: NEXT.VERSION
+        This member will be replaced by :attr:`telegram.constants.NanostarLimit.MAX_AMOUNT`.
     """
 
 

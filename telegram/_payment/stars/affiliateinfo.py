@@ -48,10 +48,10 @@ class AffiliateInfo(TelegramObject):
         amount (:obj:`int`): Integer amount of Telegram Stars received by the affiliate from the
             transaction, rounded to 0; can be negative for refunds
         nanostar_amount (:obj:`int`, optional): The number of
-            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            :tg-const:`~telegram.constants.Nanostar.VALUE` shares of Telegram
             Stars received by the affiliate; from
-            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MIN_AMOUNT` to
-            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`;
+            :tg-const:`~telegram.constants.NanostarLimit.MIN_AMOUNT` to
+            :tg-const:`~telegram.constants.NanostarLimit.MAX_AMOUNT`;
             can be negative for refunds
 
     Attributes:
@@ -64,10 +64,10 @@ class AffiliateInfo(TelegramObject):
         amount (:obj:`int`): Integer amount of Telegram Stars received by the affiliate from the
             transaction, rounded to 0; can be negative for refunds
         nanostar_amount (:obj:`int`): Optional. The number of
-            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            :tg-const:`~telegram.constants.Nanostar.VALUE` shares of Telegram
             Stars received by the affiliate; from
-            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MIN_AMOUNT` to
-            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`;
+            :tg-const:`~telegram.constants.NanostarLimit.MIN_AMOUNT` to
+            :tg-const:`~telegram.constants.NanostarLimit.MAX_AMOUNT`;
             can be negative for refunds
     """
 

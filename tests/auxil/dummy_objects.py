@@ -29,6 +29,7 @@ from telegram import (
     PollOption,
     PreparedInlineMessage,
     SentWebAppMessage,
+    StarAmount,
     StarTransaction,
     StarTransactions,
     Sticker,
@@ -126,6 +127,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     ),
     "PreparedInlineMessage": PreparedInlineMessage(id="dummy_id", expiration_date=_DUMMY_DATE),
     "SentWebAppMessage": SentWebAppMessage(inline_message_id="dummy_inline_message_id"),
+    "StarAmount": StarAmount(amount=100, nanostar_amount=356),
     "StarTransactions": StarTransactions(
         transactions=[StarTransaction(id="dummy_id", amount=1, date=_DUMMY_DATE)]
     ),

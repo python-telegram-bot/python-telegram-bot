@@ -241,6 +241,7 @@ __all__ = (
     "ShippingAddress",
     "ShippingOption",
     "ShippingQuery",
+    "StarAmount",
     "StarTransaction",
     "StarTransactions",
     "Sticker",
@@ -300,6 +301,7 @@ __all__ = (
     "warnings",
 )
 
+from telegram._payment.stars.staramount import StarAmount
 from telegram._payment.stars.startransactions import StarTransaction, StarTransactions
 from telegram._payment.stars.transactionpartner import (
     TransactionPartner,
