@@ -9368,6 +9368,83 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
+    async def gift_premium_subscription(
+        self,
+        user_id: int,
+        month_count: int,
+        star_count: int,
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Gifts a Telegram Premium subscription to the given user.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user who will receive a Telegram
+                Premium subscription.
+            month_count (:obj:`int`): Number of months the Telegram Premium subscription will be
+                active for the user; must be one of
+                :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_THREE`,
+                :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_SIX`,
+                or :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_TWELVE`.
+            star_count (:obj:`int`): Number of Telegram Stars to pay for the Telegram Premium
+               subscription; must be
+               :tg-const:`telegram.constants.PremiumSubscription.STARS_THREE_MONTHS`
+               for :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_THREE` months,
+               :tg-const:`telegram.constants.PremiumSubscription.STARS_SIX_MONTHS`
+               for :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_SIX` months,
+               and :tg-const:`telegram.constants.PremiumSubscription.STARS_TWELVE_MONTHS`
+               for :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_TWELVE` months.
+            text (:obj:`str`, optional): Text that will be shown along with the service message
+                about the subscription;
+                0-:tg-const:`telegram.constants.PremiumSubscription.MAX_TEXT_LENGTH` characters.
+            text_parse_mode (:obj:`str`, optional): Mode for parsing entities.
+                See :class:`telegram.constants.ParseMode` and
+                `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
+                more details. Entities other than :attr:`~MessageEntity.BOLD`,
+                :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
+                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+            text_entities (Sequence[:class:`telegram.MessageEntity`], optional): A list of special
+                entities that appear in the gift text. It can be specified instead of
+                :paramref:`text_parse_mode`. Entities other than :attr:`~MessageEntity.BOLD`,
+                :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
+                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "month_count": month_count,
+            "star_count": star_count,
+            "text": text,
+            "text_entities": text_entities,
+            "text_parse_mode": text_parse_mode,
+        }
+        return await self._post(
+            "giftPremiumSubscription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def get_business_connection(
         self,
         business_connection_id: str,
@@ -11236,6 +11313,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_user_chat_boosts`"""
     setMessageReaction = set_message_reaction
     """Alias for :meth:`set_message_reaction`"""
+    giftPremiumSubscription = gift_premium_subscription
+    """Alias for :meth:`gift_premium_subscription`"""
     getBusinessAccountGifts = get_business_account_gifts
     """Alias for :meth:`get_business_account_gifts`"""
     getBusinessAccountStarBalance = get_business_account_star_balance

@@ -394,6 +394,8 @@
       - Used for obtaining the bot's Telegram Stars transactions
     * - :meth:`~telegram.Bot.refund_star_payment`
       - Used for refunding a payment in Telegram Stars
+    * - :meth:`~telegram.Bot.gift_premium_subscription`
+      - Used for gifting Telegram Premium to another user.
 
 .. raw:: html
 
