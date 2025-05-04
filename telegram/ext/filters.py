@@ -1935,6 +1935,7 @@ class StatusUpdate:
                 or StatusUpdate.NEW_CHAT_MEMBERS.check_update(update)
                 or StatusUpdate.NEW_CHAT_PHOTO.check_update(update)
                 or StatusUpdate.NEW_CHAT_TITLE.check_update(update)
+                or StatusUpdate.PAID_MESSAGE_PRICE_CHANGED.check_update(update)
                 or StatusUpdate.PINNED_MESSAGE.check_update(update)
                 or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
                 or StatusUpdate.REFUNDED_PAYMENT.check_update(update)
@@ -2175,6 +2176,20 @@ class StatusUpdate:
 
     NEW_CHAT_TITLE = _NewChatTitle(name="filters.StatusUpdate.NEW_CHAT_TITLE")
     """Messages that contain :attr:`telegram.Message.new_chat_title`."""
+
+    class _PaidMessagePriceChanged(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.paid_message_price_changed)
+
+    PAID_MESSAGE_PRICE_CHANGED = _PaidMessagePriceChanged(
+        name="filters.StatusUpdate.PAID_MESSAGE_PRICE_CHANGED"
+    )
+    """Messages that contain :attr:`telegram.Message.paid_message_price_changed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
     class _PinnedMessage(MessageFilter):
         __slots__ = ()
