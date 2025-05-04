@@ -36,6 +36,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ReactionEmoji
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -52,6 +53,7 @@ def chat_full_info(bot):
         can_set_sticker_set=ChatFullInfoTestBase.can_set_sticker_set,
         permissions=ChatFullInfoTestBase.permissions,
         slow_mode_delay=ChatFullInfoTestBase.slow_mode_delay,
+        message_auto_delete_time=ChatFullInfoTestBase.message_auto_delete_time,
         bio=ChatFullInfoTestBase.bio,
         linked_chat_id=ChatFullInfoTestBase.linked_chat_id,
         location=ChatFullInfoTestBase.location,
@@ -104,6 +106,7 @@ class ChatFullInfoTestBase:
         can_invite_users=True,
     )
     slow_mode_delay = 30
+    message_auto_delete_time = 60
     bio = "I'm a Barbie Girl in a Barbie World"
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), "Barbie World")
@@ -150,7 +153,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
 
         assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
+    def test_de_json(self, offline_bot, PTB_TIMEDELTA):
         json_dict = {
             "id": self.id_,
             "title": self.title,
@@ -162,6 +165,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "can_set_sticker_set": self.can_set_sticker_set,
             "permissions": self.permissions.to_dict(),
             "slow_mode_delay": self.slow_mode_delay,
+            "message_auto_delete_time": self.message_auto_delete_time,
             "bio": self.bio,
             "business_intro": self.business_intro.to_dict(),
             "business_location": self.business_location.to_dict(),
@@ -194,6 +198,11 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "last_name": self.last_name,
             "can_send_paid_media": self.can_send_paid_media,
         }
+
+        def get_period(attr):
+            value = getattr(self, attr)
+            return dtm.timedelta(seconds=value) if PTB_TIMEDELTA else value
+
         cfi = ChatFullInfo.de_json(json_dict, offline_bot)
         assert cfi.id == self.id_
         assert cfi.title == self.title
@@ -202,7 +211,8 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi.sticker_set_name == self.sticker_set_name
         assert cfi.can_set_sticker_set == self.can_set_sticker_set
         assert cfi.permissions == self.permissions
-        assert cfi.slow_mode_delay == self.slow_mode_delay
+        assert cfi.slow_mode_delay == get_period("slow_mode_delay")
+        assert cfi.message_auto_delete_time == get_period("message_auto_delete_time")
         assert cfi.bio == self.bio
         assert cfi.business_intro == self.business_intro
         assert cfi.business_location == self.business_location
@@ -261,7 +271,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_bot_raw.emoji_status_expiration_date.tzinfo == UTC
         assert emoji_expire_offset_tz == emoji_expire_offset
 
-    def test_to_dict(self, chat_full_info):
+    def test_to_dict(self, chat_full_info, PTB_TIMEDELTA):
         cfi = chat_full_info
         cfi_dict = cfi.to_dict()
 
@@ -314,6 +324,39 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["can_send_paid_media"] == cfi.can_send_paid_media
 
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
+
+    @pytest.mark.parametrize("field_name", ["slow_mode_delay", "message_auto_delete_time"])
+    @pytest.mark.parametrize("period", [30, dtm.timedelta(seconds=30)])
+    def test_time_period_int_deprecated(self, PTB_TIMEDELTA, recwarn, field_name, period):
+
+        cfi = ChatFullInfo(
+            id=123456,
+            type="dummy_type",
+            accent_color_id=1,
+            max_reaction_count=1,
+            **{field_name: period},
+        )
+
+        if isinstance(period, int):
+            assert len(recwarn) == 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
+        else:
+            assert len(recwarn) == 0
+
+        warn_count = len(recwarn)
+        value = getattr(cfi, field_name)
+
+        if not PTB_TIMEDELTA:
+            # An additional warning from property access
+            assert len(recwarn) == warn_count + 1
+            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
+            assert recwarn[-1].category is PTBDeprecationWarning
+
+            assert isinstance(value, (int, float))
+        else:
+            assert len(recwarn) == warn_count
+            assert isinstance(getattr(cfi, field_name), dtm.timedelta)
 
     def test_always_tuples_attributes(self):
         cfi = ChatFullInfo(
