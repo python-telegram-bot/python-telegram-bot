@@ -55,6 +55,7 @@ from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._paidmedia import PaidMediaInfo
+from telegram._paidmessagepricechanged import PaidMessagePriceChanged
 from telegram._passport.passportdata import PassportData
 from telegram._payment.invoice import Invoice
 from telegram._payment.refundedpayment import RefundedPayment
@@ -445,6 +446,10 @@ class Message(MaybeInaccessibleMessage):
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
+        paid_start_count (:obj:`int`, optional): The number of Telegram Stars that were paid by the
+            sender of the message to send it
+
+            .. versionadded:: NEXT.VERSION
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
@@ -551,6 +556,10 @@ class Message(MaybeInaccessibleMessage):
             giveaway without public winners was completed
 
             .. versionadded:: 20.8
+        paid_message_price_changed (:class:`telegram.PaidMessagePriceChanged`, optional): Service
+            message: the price for paid messages has changed in the chat
+
+            .. versionadded:: NEXT.VERSION
         external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -781,6 +790,10 @@ class Message(MaybeInaccessibleMessage):
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
+        paid_start_count (:obj:`int`): Optional. The number of Telegram Stars that were paid by the
+            sender of the message to send it
+
+            .. versionadded:: NEXT.VERSION
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
 
             Examples:
@@ -887,6 +900,10 @@ class Message(MaybeInaccessibleMessage):
             giveaway without public winners was completed
 
             .. versionadded:: 20.8
+        paid_message_price_changed (:class:`telegram.PaidMessagePriceChanged`): Optional. Service
+            message: the price for paid messages has changed in the chat
+
+            .. versionadded:: NEXT.VERSION
         external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -1008,6 +1025,8 @@ class Message(MaybeInaccessibleMessage):
         "new_chat_photo",
         "new_chat_title",
         "paid_media",
+        "paid_message_price_changed",
+        "paid_star_count",
         "passport_data",
         "photo",
         "pinned_message",
@@ -1131,6 +1150,8 @@ class Message(MaybeInaccessibleMessage):
         refunded_payment: Optional[RefundedPayment] = None,
         gift: Optional[GiftInfo] = None,
         unique_gift: Optional[UniqueGiftInfo] = None,
+        paid_message_price_changed: Optional[PaidMessagePriceChanged] = None,
+        paid_star_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1236,6 +1257,10 @@ class Message(MaybeInaccessibleMessage):
             self.refunded_payment: Optional[RefundedPayment] = refunded_payment
             self.gift: Optional[GiftInfo] = gift
             self.unique_gift: Optional[UniqueGiftInfo] = unique_gift
+            self.paid_message_price_changed: Optional[PaidMessagePriceChanged] = (
+                paid_message_price_changed
+            )
+            self.paid_star_count: Optional[int] = paid_star_count
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1372,6 +1397,9 @@ class Message(MaybeInaccessibleMessage):
         )
         data["gift"] = de_json_optional(data.get("gift"), GiftInfo, bot)
         data["unique_gift"] = de_json_optional(data.get("unique_gift"), UniqueGiftInfo, bot)
+        data["paid_message_price_changed"] = de_json_optional(
+            data.get("paid_message_price_changed"), PaidMessagePriceChanged, bot
+        )
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
