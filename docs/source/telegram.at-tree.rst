@@ -136,6 +136,7 @@ Available Types
     telegram.paidmediapreview
     telegram.paidmediapurchased
     telegram.paidmediavideo
+    telegram.paidmessagepricechanged
     telegram.photosize
     telegram.poll
     telegram.pollanswer

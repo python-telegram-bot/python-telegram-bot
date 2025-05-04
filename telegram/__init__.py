@@ -200,6 +200,7 @@ __all__ = (
     "PaidMediaPreview",
     "PaidMediaPurchased",
     "PaidMediaVideo",
+    "PaidMessagePriceChanged",
     "PassportData",
     "PassportElementError",
     "PassportElementErrorDataField",
@@ -493,6 +494,7 @@ from ._paidmedia import (
     PaidMediaPurchased,
     PaidMediaVideo,
 )
+from ._paidmessagepricechanged import PaidMessagePriceChanged
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
