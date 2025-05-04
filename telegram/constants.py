@@ -114,6 +114,7 @@ __all__ = [
     "StoryAreaTypeType",
     "StoryLimit",
     "TransactionPartnerType",
+    "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
     "UpdateType",
     "UserProfilePhotosLimit",
@@ -3051,6 +3052,38 @@ class TransactionPartnerType(StringEnum):
     """
     USER = "user"
     """:obj:`str`: Transaction with a user."""
+
+
+class TransactionPartnerUser(StringEnum):
+    """This enum contains constants for :class:`telegram.TransactionPartnerUser`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as
+    such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    INVOICE_PAYMENT = "invoice_payment"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    PAID_MEDIA_PAYMENT = "paid_media_payment"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    GIFT_PURCHASE = "gift_purchase"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    PREMIUM_PURCHASE = "premium_purchase"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    BUSINESS_ACCOUNT_TRANSFER = "business_account_transfer"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
 
 
 class ParseMode(StringEnum):
