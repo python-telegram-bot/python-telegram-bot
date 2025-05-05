@@ -1698,6 +1698,46 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def gift_premium_subscription(
+        self,
+        month_count: int,
+        star_count: int,
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.gift_premium_subscription(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.gift_premium_subscription`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().gift_premium_subscription(
+            user_id=self.id,
+            month_count=month_count,
+            star_count=star_count,
+            text=text,
+            text_parse_mode=text_parse_mode,
+            text_entities=text_entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_copy(
         self,
         from_chat_id: Union[str, int],

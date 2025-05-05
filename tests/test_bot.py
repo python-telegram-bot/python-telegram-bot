@@ -2385,6 +2385,61 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.send_chat_action(chat_id, "action", 1, 3)
 
+    async def test_gift_premium_subscription_all_args(self, bot, monkeypatch):
+        # can't make actual request so we just test that the correct data is passed
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs.get("user_id") == 12
+                and kwargs.get("month_count") == 3
+                and kwargs.get("star_count") == 1000
+                and kwargs.get("text") == "test text"
+                and kwargs.get("text_parse_mode") == "Markdown"
+                and kwargs.get("text_entities")
+                == [
+                    MessageEntity(MessageEntity.BOLD, 0, 3),
+                    MessageEntity(MessageEntity.ITALIC, 5, 11),
+                ]
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        assert await bot.gift_premium_subscription(
+            user_id=12,
+            month_count=3,
+            star_count=1000,
+            text="test text",
+            text_parse_mode="Markdown",
+            text_entities=[
+                MessageEntity(MessageEntity.BOLD, 0, 3),
+                MessageEntity(MessageEntity.ITALIC, 5, 11),
+            ],
+        )
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, "Markdown"), ("HTML", "HTML"), (None, None)],
+    )
+    async def test_gift_premium_subscription_default_parse_mode(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        # can't make actual request so we just test that the correct data is passed
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("text_parse_mode") == expected_value
+            return True
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "user_id": 123,
+            "month_count": 3,
+            "star_count": 1000,
+            "text": "text",
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["text_parse_mode"] = passed_value
+
+        assert await default_bot.gift_premium_subscription(**kwargs)
+
     async def test_refund_star_payment(self, offline_bot, monkeypatch):
         # can't make actual request so we just test that the correct data is passed
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):

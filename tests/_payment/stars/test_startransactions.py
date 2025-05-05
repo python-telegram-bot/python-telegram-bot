@@ -63,6 +63,7 @@ class StarTransactionTestBase:
     nanostar_amount = 365
     date = to_timestamp(dtm.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC))
     source = TransactionPartnerUser(
+        transaction_type="premium_purchase",
         user=User(
             id=2,
             is_bot=False,
@@ -144,6 +145,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
             amount=3,
             date=to_timestamp(dtm.datetime.utcnow()),
             source=TransactionPartnerUser(
+                transaction_type="other_type",
                 user=User(
                     id=3,
                     is_bot=False,

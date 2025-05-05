@@ -221,6 +221,7 @@ IGNORED_PARAM_REQUIREMENTS = {
     # tags: deprecated NEXT.VERSION, bot api 9.0
     "BusinessConnection": {"is_enabled"},
     "ChatFullInfo": {"accepted_gift_types"},
+    "TransactionPartnerUser": {"transaction_type"},
 }
 
 

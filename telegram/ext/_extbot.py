@@ -4253,6 +4253,36 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def gift_premium_subscription(
+        self,
+        user_id: int,
+        month_count: int,
+        star_count: int,
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().gift_premium_subscription(
+            user_id=user_id,
+            month_count=month_count,
+            star_count=star_count,
+            text=text,
+            text_parse_mode=text_parse_mode,
+            text_entities=text_entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def get_business_connection(
         self,
         business_connection_id: str,
@@ -5148,6 +5178,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages
     getUserChatBoosts = get_user_chat_boosts
     setMessageReaction = set_message_reaction
+    giftPremiumSubscription = gift_premium_subscription
     getBusinessConnection = get_business_connection
     getBusinessAccountGifts = get_business_account_gifts
     getBusinessAccountStarBalance = get_business_account_star_balance

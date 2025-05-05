@@ -63,6 +63,7 @@ class TransactionPartnerTestBase:
         first_name="user",
         last_name="user",
     )
+    transaction_type = "premium_purchase"
     invoice_payload = "invoice_payload"
     paid_media = (
         PaidMediaVideo(
@@ -101,6 +102,7 @@ class TransactionPartnerTestBase:
         id=3,
         type=Chat.CHANNEL,
     )
+    premium_subscription_duration = 3
 
 
 class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
@@ -137,6 +139,7 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
             "type": tp_type,
             "commission_per_mille": self.commission_per_mille,
             "user": self.user.to_dict(),
+            "transaction_type": self.transaction_type,
             "request_count": self.request_count,
         }
         tp = TransactionPartner.de_json(json_dict, offline_bot)
@@ -268,11 +271,13 @@ class TestTransactionPartnerFragmentWithoutRequest(TransactionPartnerTestBase):
 @pytest.fixture
 def transaction_partner_user():
     return TransactionPartnerUser(
+        transaction_type=TransactionPartnerTestBase.transaction_type,
         user=TransactionPartnerTestBase.user,
         invoice_payload=TransactionPartnerTestBase.invoice_payload,
         paid_media=TransactionPartnerTestBase.paid_media,
         paid_media_payload=TransactionPartnerTestBase.paid_media_payload,
         subscription_period=TransactionPartnerTestBase.subscription_period,
+        premium_subscription_duration=TransactionPartnerTestBase.premium_subscription_duration,
     )
 
 
@@ -288,36 +293,48 @@ class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
     def test_de_json(self, offline_bot):
         json_dict = {
             "user": self.user.to_dict(),
+            "transaction_type": self.transaction_type,
             "invoice_payload": self.invoice_payload,
             "paid_media": [pm.to_dict() for pm in self.paid_media],
             "paid_media_payload": self.paid_media_payload,
             "subscription_period": self.subscription_period.total_seconds(),
+            "premium_subscription_duration": self.premium_subscription_duration,
         }
         tp = TransactionPartnerUser.de_json(json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "user"
         assert tp.user == self.user
+        assert tp.transaction_type == self.transaction_type
         assert tp.invoice_payload == self.invoice_payload
         assert tp.paid_media == self.paid_media
         assert tp.paid_media_payload == self.paid_media_payload
         assert tp.subscription_period == self.subscription_period
+        assert tp.premium_subscription_duration == self.premium_subscription_duration
 
     def test_to_dict(self, transaction_partner_user):
         json_dict = transaction_partner_user.to_dict()
         assert json_dict["type"] == self.type
+        assert json_dict["transaction_type"] == self.transaction_type
         assert json_dict["user"] == self.user.to_dict()
         assert json_dict["invoice_payload"] == self.invoice_payload
         assert json_dict["paid_media"] == [pm.to_dict() for pm in self.paid_media]
         assert json_dict["paid_media_payload"] == self.paid_media_payload
         assert json_dict["subscription_period"] == self.subscription_period.total_seconds()
+        assert json_dict["premium_subscription_duration"] == self.premium_subscription_duration
+
+    def test_transaction_type_is_required_argument(self):
+        with pytest.raises(TypeError, match="`transaction_type` is a required argument"):
+            TransactionPartnerUser(user=self.user)
 
     def test_equality(self, transaction_partner_user):
         a = transaction_partner_user
         b = TransactionPartnerUser(
             user=self.user,
+            transaction_type=self.transaction_type,
         )
         c = TransactionPartnerUser(
             user=User(id=1, is_bot=False, first_name="user", last_name="user"),
+            transaction_type=self.transaction_type,
         )
         d = User(id=1, is_bot=False, first_name="user", last_name="user")
 
