@@ -6,6 +6,9 @@ This includes the following:
 - Deprecated the class ``telegram.constants.StarTransactions``. Its only member ``telegram.constants.StarTransactions.NANOSTAR_VALUE`` will be replaced by ``telegram.constants.Nanostar.VALUE``.
 - Bot API 9.0 deprecated ``BusinessConnection.can_reply`` in favor of ``BusinessConnection.rights``
 - Bot API 9.0 deprecated ``ChatFullInfo.can_send_gift`` in favor of ``ChatFullInfo.accepted_gift_types``.
+- Bot API 9.0 introduced these new required fields to existing classes:
+  - ``TransactionPartnerUser.transaction_type`` 
+  Passing these values as positional arguments is deprecated. We encourage you to use keyword arguments instead, as the the signature will be updated in a future release.
 
 These deprecations are backward compatible, but we strongly recommend to update your code to use the new members.
 """

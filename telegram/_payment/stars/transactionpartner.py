@@ -299,6 +299,8 @@ class TransactionPartnerUser(TransactionPartner):
             for Telegram Premium subscriptions gifted by the bot,
             :tg-const:`telegram.constants.TransactionPartnerUser.BUSINESS_ACCOUNT_TRANSFER` for
             direct transfers from managed business accounts.
+
+            .. versionadded:: NEXT.VERSION
         user (:class:`telegram.User`): Information about the user.
         affiliate (:class:`telegram.AffiliateInfo`, optional): Information about the affiliate that
             received a commission via this transaction. Can be available only for
@@ -340,11 +342,17 @@ class TransactionPartnerUser(TransactionPartner):
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
-        transaction_type (:obj:`str`): Type of the transaction, currently one of “invoice_payment”
-            for payments via invoices, “paid_media_payment” for payments for paid media,
-            “gift_purchase” for gifts sent by the bot, “premium_purchase” for Telegram Premium
-            subscriptions gifted by the bot, “business_account_transfer” for direct transfers from
-            managed business accounts.
+        transaction_type (:obj:`str`): Type of the transaction, currently one of
+            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT` for payments via
+            invoices, :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
+            for payments for paid media,
+            :tg-const:`telegram.constants.TransactionPartnerUser.GIFT_PURCHASE` for gifts sent by
+            the bot, :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
+            for Telegram Premium subscriptions gifted by the bot,
+            :tg-const:`telegram.constants.TransactionPartnerUser.BUSINESS_ACCOUNT_TRANSFER` for
+            direct transfers from managed business accounts.
+
+            .. versionadded:: NEXT.VERSION
         user (:class:`telegram.User`): Information about the user.
         affiliate (:class:`telegram.AffiliateInfo`): Optional. Information about the affiliate that
             received a commission via this transaction. Can be available only for
@@ -413,6 +421,8 @@ class TransactionPartnerUser(TransactionPartner):
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
+
+        # tags: deprecated NEXT.VERSION, bot api 9.0
         if transaction_type is None:
             raise TypeError("`transaction_type` is a required argument since Bot API 9.0")
 
