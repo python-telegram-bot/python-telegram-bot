@@ -50,6 +50,7 @@ from telegram import (
     MessageOriginChat,
     PaidMediaInfo,
     PaidMediaPreview,
+    PaidMessagePriceChanged,
     PassportData,
     PhotoSize,
     Poll,
@@ -328,6 +329,8 @@ def message(bot):
         {"show_caption_above_media": True},
         {"paid_media": PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])},
         {"refunded_payment": RefundedPayment("EUR", 243, "payload", "charge_id", "provider_id")},
+        {"paid_star_count": 291},
+        {"paid_message_price_changed": PaidMessagePriceChanged(291)},
     ],
     ids=[
         "reply",
@@ -403,6 +406,8 @@ def message(bot):
         "show_caption_above_media",
         "paid_media",
         "refunded_payment",
+        "paid_star_count",
+        "paid_message_price_changed",
     ],
 )
 def message_params(bot, request):
