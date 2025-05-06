@@ -49,11 +49,13 @@ from telegram._forumtopic import (
     GeneralForumTopicUnhidden,
 )
 from telegram._games.game import Game
+from telegram._gifts import GiftInfo
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._paidmedia import PaidMediaInfo
+from telegram._paidmessagepricechanged import PaidMessagePriceChanged
 from telegram._passport.passportdata import PassportData
 from telegram._payment.invoice import Invoice
 from telegram._payment.refundedpayment import RefundedPayment
@@ -64,6 +66,7 @@ from telegram._reply import ReplyParameters
 from telegram._shared import ChatShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
+from telegram._uniquegift import UniqueGiftInfo
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
@@ -443,6 +446,10 @@ class Message(MaybeInaccessibleMessage):
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
+        paid_star_count (:obj:`int`, optional): The number of Telegram Stars that were paid by the
+            sender of the message to send it
+
+            .. versionadded:: NEXT.VERSION
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
@@ -525,6 +532,14 @@ class Message(MaybeInaccessibleMessage):
             with the bot.
 
             .. versionadded:: 20.1
+        gift (:class:`telegram.GiftInfo`, optional): Service message: a regular gift was sent
+            or received.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift (:class:`telegram.UniqueGiftInfo`, optional): Service message: a unique gift
+            was sent or received
+
+            .. versionadded:: NEXT.VERSION
         giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
             scheduled giveaway was created
 
@@ -541,6 +556,10 @@ class Message(MaybeInaccessibleMessage):
             giveaway without public winners was completed
 
             .. versionadded:: 20.8
+        paid_message_price_changed (:class:`telegram.PaidMessagePriceChanged`, optional): Service
+            message: the price for paid messages has changed in the chat
+
+            .. versionadded:: NEXT.VERSION
         external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -771,6 +790,10 @@ class Message(MaybeInaccessibleMessage):
             `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
+        paid_star_count (:obj:`int`): Optional. The number of Telegram Stars that were paid by the
+            sender of the message to send it
+
+            .. versionadded:: NEXT.VERSION
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
 
             Examples:
@@ -853,6 +876,14 @@ class Message(MaybeInaccessibleMessage):
             with the bot.
 
             .. versionadded:: 20.1
+        gift (:class:`telegram.GiftInfo`): Optional. Service message: a regular gift was sent
+            or received.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift (:class:`telegram.UniqueGiftInfo`): Optional. Service message: a unique gift
+            was sent or received
+
+            .. versionadded:: NEXT.VERSION
         giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
             scheduled giveaway was created
 
@@ -869,6 +900,10 @@ class Message(MaybeInaccessibleMessage):
             giveaway without public winners was completed
 
             .. versionadded:: 20.8
+        paid_message_price_changed (:class:`telegram.PaidMessagePriceChanged`): Optional. Service
+            message: the price for paid messages has changed in the chat
+
+            .. versionadded:: NEXT.VERSION
         external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -966,6 +1001,7 @@ class Message(MaybeInaccessibleMessage):
         "game",
         "general_forum_topic_hidden",
         "general_forum_topic_unhidden",
+        "gift",
         "giveaway",
         "giveaway_completed",
         "giveaway_created",
@@ -989,6 +1025,8 @@ class Message(MaybeInaccessibleMessage):
         "new_chat_photo",
         "new_chat_title",
         "paid_media",
+        "paid_message_price_changed",
+        "paid_star_count",
         "passport_data",
         "photo",
         "pinned_message",
@@ -1008,6 +1046,7 @@ class Message(MaybeInaccessibleMessage):
         "successful_payment",
         "supergroup_chat_created",
         "text",
+        "unique_gift",
         "users_shared",
         "venue",
         "via_bot",
@@ -1109,6 +1148,10 @@ class Message(MaybeInaccessibleMessage):
         show_caption_above_media: Optional[bool] = None,
         paid_media: Optional[PaidMediaInfo] = None,
         refunded_payment: Optional[RefundedPayment] = None,
+        gift: Optional[GiftInfo] = None,
+        unique_gift: Optional[UniqueGiftInfo] = None,
+        paid_message_price_changed: Optional[PaidMessagePriceChanged] = None,
+        paid_star_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1212,6 +1255,12 @@ class Message(MaybeInaccessibleMessage):
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
             self.paid_media: Optional[PaidMediaInfo] = paid_media
             self.refunded_payment: Optional[RefundedPayment] = refunded_payment
+            self.gift: Optional[GiftInfo] = gift
+            self.unique_gift: Optional[UniqueGiftInfo] = unique_gift
+            self.paid_message_price_changed: Optional[PaidMessagePriceChanged] = (
+                paid_message_price_changed
+            )
+            self.paid_star_count: Optional[int] = paid_star_count
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1345,6 +1394,11 @@ class Message(MaybeInaccessibleMessage):
         data["paid_media"] = de_json_optional(data.get("paid_media"), PaidMediaInfo, bot)
         data["refunded_payment"] = de_json_optional(
             data.get("refunded_payment"), RefundedPayment, bot
+        )
+        data["gift"] = de_json_optional(data.get("gift"), GiftInfo, bot)
+        data["unique_gift"] = de_json_optional(data.get("unique_gift"), UniqueGiftInfo, bot)
+        data["paid_message_price_changed"] = de_json_optional(
+            data.get("paid_message_price_changed"), PaidMessagePriceChanged, bot
         )
 
         # Unfortunately, this needs to be here due to cyclic imports
@@ -4472,6 +4526,43 @@ class Message(MaybeInaccessibleMessage):
             message_id=self.message_id,
             reaction=reaction,
             is_big=is_big,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def read_business_message(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.read_business_message(
+                chat_id=message.chat_id,
+                message_id=message.message_id,
+                business_connection_id=message.business_connection_id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.read_business_message`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().read_business_message(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            business_connection_id=self.business_connection_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

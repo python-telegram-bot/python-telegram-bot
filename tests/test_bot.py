@@ -38,7 +38,6 @@ from telegram import (
     BotDescription,
     BotName,
     BotShortDescription,
-    BusinessConnection,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -2372,26 +2371,6 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_message(2, "text", allow_paid_broadcast=42)
-
-    async def test_get_business_connection(self, offline_bot, monkeypatch):
-        bci = "42"
-        user = User(1, "first", False)
-        user_chat_id = 1
-        date = dtm.datetime.utcnow()
-        can_reply = True
-        is_enabled = True
-        bc = BusinessConnection(bci, user, user_chat_id, date, can_reply, is_enabled).to_json()
-
-        async def do_request(*args, **kwargs):
-            data = kwargs.get("request_data")
-            obj = data.parameters.get("business_connection_id")
-            if obj == bci:
-                return 200, f'{{"ok": true, "result": {bc}}}'.encode()
-            return 400, b'{"ok": false, "result": []}'
-
-        monkeypatch.setattr(offline_bot.request, "do_request", do_request)
-        obj = await offline_bot.get_business_connection(business_connection_id=bci)
-        assert isinstance(obj, BusinessConnection)
 
     async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
         async def make_assertion(*args, **_):

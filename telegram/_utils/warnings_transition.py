@@ -35,12 +35,12 @@ def build_deprecation_warning_message(
     object_type: str,
     bot_api_version: str,
 ) -> str:
-    """Builds a warning message for the transition in API when an object is renamed.
+    """Builds a warning message for the transition in API when an object is renamed/replaced.
 
     Returns a warning message that can be used in `warn` function.
     """
     return (
-        f"The {object_type} '{deprecated_name}' was renamed to '{new_name}' in Bot API "
+        f"The {object_type} '{deprecated_name}' was replaced by '{new_name}' in Bot API "
         f"{bot_api_version}. We recommend using '{new_name}' instead of "
         f"'{deprecated_name}'."
     )

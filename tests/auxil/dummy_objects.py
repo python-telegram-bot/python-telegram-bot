@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from typing import Union
 
 from telegram import (
+    AcceptedGiftTypes,
     BotCommand,
     BotDescription,
     BotName,
@@ -22,14 +23,18 @@ from telegram import (
     Gifts,
     MenuButton,
     MessageId,
+    OwnedGiftRegular,
+    OwnedGifts,
     Poll,
     PollOption,
     PreparedInlineMessage,
     SentWebAppMessage,
+    StarAmount,
     StarTransaction,
     StarTransactions,
     Sticker,
     StickerSet,
+    Story,
     TelegramObject,
     Update,
     User,
@@ -74,6 +79,9 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
         type="dummy_type",
         accent_color_id=1,
         max_reaction_count=1,
+        accepted_gift_types=AcceptedGiftTypes(
+            unlimited_gifts=True, limited_gifts=True, unique_gifts=True, premium_subscription=True
+        ),
     ),
     "ChatInviteLink": ChatInviteLink(
         "dummy_invite_link",
@@ -91,6 +99,22 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     "MenuButton": MenuButton(type="dummy_type"),
     "Message": make_message("dummy_text"),
     "MessageId": MessageId(123456),
+    "OwnedGifts": OwnedGifts(
+        total_count=1,
+        gifts=[
+            OwnedGiftRegular(
+                gift=Gift(
+                    id="id1",
+                    sticker=Sticker(
+                        "file_id", "file_unique_id", 512, 512, False, False, "regular"
+                    ),
+                    star_count=5,
+                ),
+                send_date=_DUMMY_DATE,
+                owned_gift_id="some_id_1",
+            )
+        ],
+    ),
     "Poll": Poll(
         id="dummy_id",
         question="dummy_question",
@@ -103,6 +127,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     ),
     "PreparedInlineMessage": PreparedInlineMessage(id="dummy_id", expiration_date=_DUMMY_DATE),
     "SentWebAppMessage": SentWebAppMessage(inline_message_id="dummy_inline_message_id"),
+    "StarAmount": StarAmount(amount=100, nanostar_amount=356),
     "StarTransactions": StarTransactions(
         transactions=[StarTransaction(id="dummy_id", amount=1, date=_DUMMY_DATE)]
     ),
@@ -113,6 +138,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
         stickers=[_DUMMY_STICKER],
         sticker_type="dummy_type",
     ),
+    "Story": Story(chat=Chat(123, "prive"), id=123),
     "str": "dummy_string",
     "Update": Update(update_id=123456),
     "User": _DUMMY_USER,

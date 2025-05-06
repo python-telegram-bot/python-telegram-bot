@@ -4,6 +4,7 @@ Available Types
 .. toctree::
     :titlesonly:
 
+    telegram.acceptedgifttypes
     telegram.animation
     telegram.audio
     telegram.birthdate
@@ -19,6 +20,7 @@ Available Types
     telegram.botdescription
     telegram.botname
     telegram.botshortdescription
+    telegram.businessbotrights
     telegram.businessconnection
     telegram.businessintro
     telegram.businesslocation
@@ -75,6 +77,7 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
+    telegram.giftinfo
     telegram.giveaway
     telegram.giveawaycompleted
     telegram.giveawaycreated
@@ -92,13 +95,20 @@ Available Types
     telegram.inputpaidmedia
     telegram.inputpaidmediaphoto
     telegram.inputpaidmediavideo
+    telegram.inputprofilephoto
+    telegram.inputprofilephotoanimated
+    telegram.inputprofilephotostatic
     telegram.inputpolloption
+    telegram.inputstorycontent
+    telegram.inputstorycontentphoto
+    telegram.inputstorycontentvideo
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
     telegram.keyboardbuttonrequestusers
     telegram.linkpreviewoptions
     telegram.location
+    telegram.locationaddress
     telegram.loginurl
     telegram.maybeinaccessiblemessage
     telegram.menubutton
@@ -116,12 +126,17 @@ Available Types
     telegram.messageoriginuser
     telegram.messagereactioncountupdated
     telegram.messagereactionupdated
+    telegram.ownedgift
+    telegram.ownedgiftregular
+    telegram.ownedgifts
+    telegram.ownedgiftunique
     telegram.paidmedia
     telegram.paidmediainfo
     telegram.paidmediaphoto
     telegram.paidmediapreview
     telegram.paidmediapurchased
     telegram.paidmediavideo
+    telegram.paidmessagepricechanged
     telegram.photosize
     telegram.poll
     telegram.pollanswer
@@ -138,9 +153,23 @@ Available Types
     telegram.sentwebappmessage
     telegram.shareduser
     telegram.story
+    telegram.storyarea
+    telegram.storyareaposition
+    telegram.storyareatype
+    telegram.storyareatypelink
+    telegram.storyareatypelocation
+    telegram.storyareatypesuggestedreaction
+    telegram.storyareatypeuniquegift
+    telegram.storyareatypeweather
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.textquote
+    telegram.uniquegift
+    telegram.uniquegiftbackdrop
+    telegram.uniquegiftbackdropcolors
+    telegram.uniquegiftinfo
+    telegram.uniquegiftmodel
+    telegram.uniquegiftsymbol
     telegram.update
     telegram.user
     telegram.userchatboosts

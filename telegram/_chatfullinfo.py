@@ -27,10 +27,17 @@ from telegram._chat import Chat, _ChatBase
 from telegram._chatlocation import ChatLocation
 from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
+from telegram._gifts import AcceptedGiftTypes
 from telegram._reaction import ReactionType
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
+)
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot, BusinessIntro, BusinessLocation, BusinessOpeningHours, Message
@@ -64,6 +71,10 @@ class ChatFullInfo(_ChatBase):
             message in the chat.
 
             .. versionadded:: 21.2
+        accepted_gift_types (:class:`telegram.AcceptedGiftTypes`): Information about types of
+            gifts that are accepted by the chat or by the corresponding user for private chats.
+
+            .. versionadded:: NEXT.VERSION
         title (:obj:`str`, optional): Title, for supergroups, channels and group chats.
         username (:obj:`str`, optional): Username, for private chats, supergroups and channels if
             available.
@@ -204,6 +215,10 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 21.11
 
+            .. deprecated:: NEXT.VERSION
+               Bot API 9.0 introduced :paramref:`accepted_gift_types`, replacing this argument.
+               Hence, this argument will be removed in future versions.
+
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
         type (:obj:`str`): Type of chat, can be either :attr:`PRIVATE`, :attr:`GROUP`,
@@ -218,6 +233,10 @@ class ChatFullInfo(_ChatBase):
             message in the chat.
 
             .. versionadded:: 21.2
+        accepted_gift_types (:class:`telegram.AcceptedGiftTypes`): Information about types of
+            gifts that are accepted by the chat or by the corresponding user for private chats.
+
+            .. versionadded:: NEXT.VERSION
         title (:obj:`str`, optional): Title, for supergroups, channels and group chats.
         username (:obj:`str`, optional): Username, for private chats, supergroups and channels if
             available.
@@ -357,16 +376,15 @@ class ChatFullInfo(_ChatBase):
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
             .. versionadded:: 21.4
-        can_send_gift (:obj:`bool`): Optional. :obj:`True`, if gifts can be sent to the chat.
-
-            .. versionadded:: 21.11
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """
 
     __slots__ = (
+        "_can_send_gift",
         "accent_color_id",
+        "accepted_gift_types",
         "active_usernames",
         "available_reactions",
         "background_custom_emoji_id",
@@ -375,7 +393,6 @@ class ChatFullInfo(_ChatBase):
         "business_intro",
         "business_location",
         "business_opening_hours",
-        "can_send_gift",
         "can_send_paid_media",
         "can_set_sticker_set",
         "custom_emoji_sticker_set_name",
@@ -452,7 +469,10 @@ class ChatFullInfo(_ChatBase):
         linked_chat_id: Optional[int] = None,
         location: Optional[ChatLocation] = None,
         can_send_paid_media: Optional[bool] = None,
+        # tags: deprecated NEXT.VERSION; bot api 9.0
         can_send_gift: Optional[bool] = None,
+        # temporarily optional to account for changed signature
+        accepted_gift_types: Optional[AcceptedGiftTypes] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -466,6 +486,22 @@ class ChatFullInfo(_ChatBase):
             is_forum=is_forum,
             api_kwargs=api_kwargs,
         )
+        if accepted_gift_types is None:
+            raise TypeError("`accepted_gift_type` is a required argument since Bot API 9.0")
+
+        if can_send_gift is not None:
+            warn(
+                PTBDeprecationWarning(
+                    "NEXT.VERSION",
+                    build_deprecation_warning_message(
+                        deprecated_name="can_send_gift",
+                        new_name="accepted_gift_types",
+                        object_type="parameter",
+                        bot_api_version="9.0",
+                    ),
+                ),
+                stacklevel=2,
+            )
 
         # Required and unique to this class-
         with self._unfrozen():
@@ -518,7 +554,27 @@ class ChatFullInfo(_ChatBase):
             self.business_location: Optional[BusinessLocation] = business_location
             self.business_opening_hours: Optional[BusinessOpeningHours] = business_opening_hours
             self.can_send_paid_media: Optional[bool] = can_send_paid_media
-            self.can_send_gift: Optional[bool] = can_send_gift
+            self._can_send_gift: Optional[bool] = can_send_gift
+            self.accepted_gift_types: AcceptedGiftTypes = accepted_gift_types
+
+    @property
+    def can_send_gift(self) -> Optional[bool]:
+        """
+        :obj:`bool`: Optional. :obj:`True`, if gifts can be sent to the chat.
+
+        .. deprecated:: NEXT.VERSION
+            As Bot API 9.0 replaces this attribute with :attr:`accepted_gift_types`, this attribute
+            will be removed in future versions.
+
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="can_send_gift",
+            new_attr_name="accepted_gift_types",
+            bot_api_version="9.0",
+            ptb_version="NEXT.VERSION",
+            stacklevel=2,
+        )
+        return self._can_send_gift
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatFullInfo":
@@ -533,6 +589,9 @@ class ChatFullInfo(_ChatBase):
         )
 
         data["photo"] = de_json_optional(data.get("photo"), ChatPhoto, bot)
+        data["accepted_gift_types"] = de_json_optional(
+            data.get("accepted_gift_types"), AcceptedGiftTypes, bot
+        )
 
         from telegram import (  # pylint: disable=import-outside-toplevel
             BusinessIntro,

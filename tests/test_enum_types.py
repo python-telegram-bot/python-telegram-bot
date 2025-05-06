@@ -32,6 +32,7 @@ exclude_dirs = {
 exclude_patterns = {
     re.compile(re.escape("self.type: ReactionType = type")),
     re.compile(re.escape("self.type: BackgroundType = type")),
+    re.compile(re.escape("self.type: StoryAreaType = type")),
 }
 
 

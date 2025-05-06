@@ -1098,6 +1098,21 @@ class TestFilters:
         assert filters.StatusUpdate.REFUNDED_PAYMENT.check_update(update)
         update.message.refunded_payment = None
 
+        update.message.gift = "gift"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIFT.check_update(update)
+        update.message.gift = None
+
+        update.message.unique_gift = "unique_gift"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.UNIQUE_GIFT.check_update(update)
+        update.message.unique_gift = None
+
+        update.message.paid_message_price_changed = "paid_message_price_changed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.PAID_MESSAGE_PRICE_CHANGED.check_update(update)
+        update.message.paid_message_price_changed = None
+
     def test_filters_forwarded(self, update, message_origin_user):
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = MessageOriginHiddenUser(dtm.datetime.utcnow(), 1)
