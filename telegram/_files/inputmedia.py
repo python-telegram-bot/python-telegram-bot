@@ -51,13 +51,8 @@ class InputMedia(TelegramObject):
 
     Args:
         media_type (:obj:`str`): Type of media that the instance represents.
-        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
-            :class:`pathlib.Path` | :class:`telegram.Animation` |  :class:`telegram.Audio` | \
-            :class:`telegram.Document` | :class:`telegram.PhotoSize` | \
-            :class:`telegram.Video`): File to send.
+        media (:obj:`str` | :class:`~telegram.InputFile`): File to send.
             |fileinputnopath|
-            Lastly you can pass an existing telegram media object of the corresponding type
-            to send.
         caption (:obj:`str`, optional): Caption of the media to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
@@ -89,7 +84,7 @@ class InputMedia(TelegramObject):
     def __init__(
         self,
         media_type: str,
-        media: Union[str, InputFile, MediaType],
+        media: Union[str, InputFile],
         caption: Optional[str] = None,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -98,7 +93,7 @@ class InputMedia(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.InputMediaType, media_type, media_type)
-        self.media: Union[str, InputFile, Animation, Audio, Document, PhotoSize, Video] = media
+        self.media: Union[str, InputFile] = media
         self.caption: Optional[str] = caption
         self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
         self.parse_mode: ODVInput[str] = parse_mode
@@ -129,11 +124,8 @@ class InputPaidMedia(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of media that the instance represents.
-        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
-            :class:`pathlib.Path` | :class:`telegram.PhotoSize` | :class:`telegram.Video`): File
+        media (:obj:`str` | :class:`~telegram.InputFile`): File
             to send. |fileinputnopath|
-            Lastly you can pass an existing telegram media object of the corresponding type
-            to send.
 
     Attributes:
         type (:obj:`str`): Type of the input media.
@@ -150,13 +142,13 @@ class InputPaidMedia(TelegramObject):
     def __init__(
         self,
         type: str,  # pylint: disable=redefined-builtin
-        media: Union[str, InputFile, PhotoSize, Video],
+        media: Union[str, InputFile],
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.InputPaidMediaType, type, type)
-        self.media: Union[str, InputFile, PhotoSize, Video] = media
+        self.media: Union[str, InputFile] = media
 
         self._freeze()
 

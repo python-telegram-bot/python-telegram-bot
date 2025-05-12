@@ -829,13 +829,15 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             return
 
         await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
+        # this needs to be set before we call get_me, since this can trigger an error in the
+        # request backend, which would then NOT lead to a proper shutdown if this flag isn't set
+        self._initialized = True
         # Since the bot is to be initialized only once, we can also use it for
         # verifying the token passed and raising an exception if it's invalid.
         try:
             await self.get_me()
         except InvalidToken as exc:
             raise InvalidToken(f"The token `{self._token}` was rejected by the server.") from exc
-        self._initialized = True
 
     async def shutdown(self) -> None:
         """Stop & clear resources used by this class. Currently just calls
@@ -9843,13 +9845,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
     async def send_gift(
         self,
-        user_id: Optional[int] = None,
-        gift_id: Union[str, Gift] = None,  # type: ignore
+        gift_id: Union[str, Gift],
         text: Optional[str] = None,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Optional[Sequence["MessageEntity"]] = None,
         pay_for_upgrade: Optional[bool] = None,
         chat_id: Optional[Union[str, int]] = None,
+        user_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -9861,15 +9863,18 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         The gift can't be converted to Telegram Stars by the receiver.
 
         .. versionadded:: 21.8
+        .. versionchanged:: NEXT.VERSION
+           Bot API 8.3 made :paramref:`user_id` optional. In version NEXT.VERSION, the methods
+           signature was changed accordingly.
 
         Args:
+            gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
+                :class:`~telegram.Gift` object
             user_id (:obj:`int`, optional): Required if :paramref:`chat_id` is not specified.
                 Unique identifier of the target user that will receive the gift.
 
                 .. versionchanged:: 21.11
                     Now optional.
-            gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
-                :class:`~telegram.Gift` object
             chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`user_id`
                 is not specified. |chat_id_channel| It will receive the gift.
 
@@ -9900,11 +9905,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        # TODO: Remove when stability policy allows, tags: deprecated 21.11
-        # also we should raise a deprecation warnung if anything is passed by
-        # position since it will be moved, not sure how
-        if gift_id is None:
-            raise TypeError("Missing required argument `gift_id`.")
         data: JSONDict = {
             "user_id": user_id,
             "gift_id": gift_id.id if isinstance(gift_id, Gift) else gift_id,
