@@ -97,6 +97,7 @@ __all__ = [
     "PollLimit",
     "PollType",
     "PollingLimit",
+    "PremiumSubscription",
     "ProfileAccentColor",
     "ReactionEmoji",
     "ReactionType",
@@ -113,6 +114,7 @@ __all__ = [
     "StoryAreaTypeType",
     "StoryLimit",
     "TransactionPartnerType",
+    "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
     "UpdateType",
     "UserProfilePhotosLimit",
@@ -2330,6 +2332,58 @@ class PollingLimit(IntEnum):
     """
 
 
+class PremiumSubscription(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.gift_premium_subscription`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_TEXT_LENGTH = 128
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.gift_premium_subscription.text`
+    parameter of :meth:`~telegram.Bot.gift_premium_subscription`.
+    """
+    MONTH_COUNT_THREE = 3
+    """:obj:`int`: Possible value for
+    :paramref:`~telegram.Bot.gift_premium_subscription.month_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`; number of months the Premium
+    subscription will be active for.
+    """
+    MONTH_COUNT_SIX = 6
+    """:obj:`int`: Possible value for
+    :paramref:`~telegram.Bot.gift_premium_subscription.month_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`; number of months the Premium
+    subscription will be active for.
+    """
+    MONTH_COUNT_TWELVE = 12
+    """:obj:`int`: Possible value for
+    :paramref:`~telegram.Bot.gift_premium_subscription.month_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`; number of months the Premium
+    subscription will be active for.
+    """
+    STARS_THREE_MONTHS = 1000
+    """:obj:`int`: Number of Telegram Stars to pay for a Premium subscription of
+    :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_THREE` months period.
+    Relevant for :paramref:`~telegram.Bot.gift_premium_subscription.star_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`.
+    """
+    STARS_SIX_MONTHS = 1500
+    """:obj:`int`: Number of Telegram Stars to pay for a Premium subscription of
+    :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_SIX` months period.
+    Relevant for :paramref:`~telegram.Bot.gift_premium_subscription.star_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`.
+    """
+    STARS_TWELVE_MONTHS = 2500
+    """:obj:`int`: Number of Telegram Stars to pay for a Premium subscription of
+    :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_TWELVE` months period.
+    Relevant for :paramref:`~telegram.Bot.gift_premium_subscription.star_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`.
+    """
+
+
 class ProfileAccentColor(Enum):
     """This enum contains the available accent colors for
     :class:`telegram.ChatFullInfo.profile_accent_color_id`.
@@ -3007,6 +3061,38 @@ class TransactionPartnerType(StringEnum):
     """
     USER = "user"
     """:obj:`str`: Transaction with a user."""
+
+
+class TransactionPartnerUser(StringEnum):
+    """This enum contains constants for :class:`telegram.TransactionPartnerUser`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as
+    such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    INVOICE_PAYMENT = "invoice_payment"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    PAID_MEDIA_PAYMENT = "paid_media_payment"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    GIFT_PURCHASE = "gift_purchase"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    PREMIUM_PURCHASE = "premium_purchase"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    BUSINESS_ACCOUNT_TRANSFER = "business_account_transfer"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
 
 
 class ParseMode(StringEnum):

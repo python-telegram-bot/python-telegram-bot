@@ -281,55 +281,115 @@ class TransactionPartnerUser(TransactionPartner):
     """Describes a transaction with a user.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`user` are equal.
+    considered equal, if their :attr:`user` and :attr:`transaction_type` are equal.
 
     .. versionadded:: 21.4
 
+    .. versionchanged:: NEXT.VERSION
+       Equality comparison now includes the new required argument :paramref:`transaction_type`,
+       introduced in Bot API 9.0.
+
     Args:
+        transaction_type (:obj:`str`): Type of the transaction, currently one of
+            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT` for payments via
+            invoices, :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
+            for payments for paid media,
+            :tg-const:`telegram.constants.TransactionPartnerUser.GIFT_PURCHASE` for gifts sent by
+            the bot, :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
+            for Telegram Premium subscriptions gifted by the bot,
+            :tg-const:`telegram.constants.TransactionPartnerUser.BUSINESS_ACCOUNT_TRANSFER` for
+            direct transfers from managed business accounts.
+
+            .. versionadded:: NEXT.VERSION
         user (:class:`telegram.User`): Information about the user.
         affiliate (:class:`telegram.AffiliateInfo`, optional): Information about the affiliate that
-            received a commission via this transaction
+            received a commission via this transaction. Can be available only for
+            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT`
+            and :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
+            transactions.
 
             .. versionadded:: 21.9
-        invoice_payload (:obj:`str`, optional): Bot-specified invoice payload.
+        invoice_payload (:obj:`str`, optional): Bot-specified invoice payload. Can be available
+            only for :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT`
+            transactions.
         subscription_period (:class:`datetime.timedelta`, optional): The duration of the paid
-            subscription
+            subscription. Can be available only for
+            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT` transactions.
 
             .. versionadded:: 21.8
         paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
-            media bought by the user.
+            media bought by the user. for
+            :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
+            transactions only.
 
             .. versionadded:: 21.5
-        paid_media_payload (:obj:`str`, optional): Bot-specified paid media payload.
+        paid_media_payload (:obj:`str`, optional): Bot-specified paid media payload. Can be
+            available only for
+            :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT` transactions.
 
             .. versionadded:: 21.6
-        gift (:class:`telegram.Gift`, optional): The gift sent to the user by the bot
+        gift (:class:`telegram.Gift`, optional): The gift sent to the user by the bot; for
+            :tg-const:`telegram.constants.TransactionPartnerUser.GIFT_PURCHASE` transactions only.
 
             .. versionadded:: 21.8
+        premium_subscription_duration (:obj:`int`, optional): Number of months the gifted Telegram
+            Premium subscription will be active for; for
+            :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
+            transactions only.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
+        transaction_type (:obj:`str`): Type of the transaction, currently one of
+            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT` for payments via
+            invoices, :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
+            for payments for paid media,
+            :tg-const:`telegram.constants.TransactionPartnerUser.GIFT_PURCHASE` for gifts sent by
+            the bot, :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
+            for Telegram Premium subscriptions gifted by the bot,
+            :tg-const:`telegram.constants.TransactionPartnerUser.BUSINESS_ACCOUNT_TRANSFER` for
+            direct transfers from managed business accounts.
+
+            .. versionadded:: NEXT.VERSION
         user (:class:`telegram.User`): Information about the user.
         affiliate (:class:`telegram.AffiliateInfo`): Optional. Information about the affiliate that
-            received a commission via this transaction
+            received a commission via this transaction. Can be available only for
+            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT`
+            and :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
+            transactions.
 
             .. versionadded:: 21.9
-        invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload.
+        invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload. Can be available
+            only for :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT`
+            transactions.
         subscription_period (:class:`datetime.timedelta`): Optional. The duration of the paid
-            subscription
+            subscription. Can be available only for
+            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT` transactions.
 
             .. versionadded:: 21.8
         paid_media (tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
-            media bought by the user.
+            media bought by the user. for
+            :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
+            transactions only.
 
             .. versionadded:: 21.5
-        paid_media_payload (:obj:`str`): Optional. Bot-specified paid media payload.
+        paid_media_payload (:obj:`str`): Optional. Bot-specified paid media payload. Can be
+            available only for
+            :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT` transactions.
 
             .. versionadded:: 21.6
-        gift (:class:`telegram.Gift`): Optional. The gift sent to the user by the bot
+        gift (:class:`telegram.Gift`): Optional. The gift sent to the user by the bot; for
+            :tg-const:`telegram.constants.TransactionPartnerUser.GIFT_PURCHASE` transactions only.
 
             .. versionadded:: 21.8
+        premium_subscription_duration (:obj:`int`): Optional. Number of months the gifted Telegram
+            Premium subscription will be active for; for
+            :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
+            transactions only.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -339,7 +399,9 @@ class TransactionPartnerUser(TransactionPartner):
         "invoice_payload",
         "paid_media",
         "paid_media_payload",
+        "premium_subscription_duration",
         "subscription_period",
+        "transaction_type",
         "user",
     )
 
@@ -352,10 +414,17 @@ class TransactionPartnerUser(TransactionPartner):
         subscription_period: Optional[dtm.timedelta] = None,
         gift: Optional[Gift] = None,
         affiliate: Optional[AffiliateInfo] = None,
+        premium_subscription_duration: Optional[int] = None,
+        # temporarily optional to account for changed signature
+        transaction_type: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
+
+        # tags: deprecated NEXT.VERSION, bot api 9.0
+        if transaction_type is None:
+            raise TypeError("`transaction_type` is a required argument since Bot API 9.0")
 
         with self._unfrozen():
             self.user: User = user
@@ -365,10 +434,13 @@ class TransactionPartnerUser(TransactionPartner):
             self.paid_media_payload: Optional[str] = paid_media_payload
             self.subscription_period: Optional[dtm.timedelta] = subscription_period
             self.gift: Optional[Gift] = gift
+            self.premium_subscription_duration: Optional[int] = premium_subscription_duration
+            self.transaction_type: str = transaction_type
 
             self._id_attrs = (
                 self.type,
                 self.user,
+                self.transaction_type,
             )
 
     @classmethod
