@@ -1588,10 +1588,10 @@ class Language(MessageFilter):
 
     def __init__(self, lang: SCT[str]):
         if isinstance(lang, str):
-            lang = cast(str, lang)
+            lang = cast("str", lang)
             self.lang: Sequence[str] = [lang]
         else:
-            lang = cast(list[str], lang)
+            lang = cast("list[str]", lang)
             self.lang = lang
         super().__init__(name=f"filters.Language({self.lang})")
 

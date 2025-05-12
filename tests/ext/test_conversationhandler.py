@@ -1438,7 +1438,7 @@ class TestConversationHandler:
         context = None
 
         async def start_callback(u, c):
-            nonlocal context, self
+            nonlocal context
             context = c
             return await self.start(u, c)
 
@@ -1459,7 +1459,6 @@ class TestConversationHandler:
         update = Update(update_id=0, message=message)
 
         async def timeout_callback(u, c):
-            nonlocal update, context
             assert u is update
             assert c is context
 

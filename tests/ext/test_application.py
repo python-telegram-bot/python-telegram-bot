@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""The integration of persistence into the application is tested in test_basepersistence.
-"""
+"""The integration of persistence into the application is tested in test_basepersistence."""
 import asyncio
 import functools
 import inspect
