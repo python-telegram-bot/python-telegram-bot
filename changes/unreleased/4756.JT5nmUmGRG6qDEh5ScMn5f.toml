@@ -8,7 +8,7 @@ This includes the following:
 - Bot API 9.0 deprecated ``ChatFullInfo.can_send_gift`` in favor of ``ChatFullInfo.accepted_gift_types``.
 - Bot API 9.0 introduced these new required fields to existing classes:
   - ``TransactionPartnerUser.transaction_type``
-  - ``ChatFullInfo.accepted_gift_types ``
+  - ``ChatFullInfo.accepted_gift_types``
 
   Passing these values as positional arguments is deprecated. We encourage you to use keyword arguments instead, as the the signature will be updated in a future release.
 
