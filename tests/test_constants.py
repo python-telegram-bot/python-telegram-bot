@@ -203,6 +203,7 @@ class TestConstantsWithoutRequest:
             "via_bot",
             "is_from_offline",
             "show_caption_above_media",
+            "paid_star_count",
         }
 
     @pytest.mark.parametrize(

@@ -958,8 +958,12 @@ class ChatSubscriptionLimit(IntEnum):
     """:obj:`int`: The number of seconds the subscription will be active."""
     MIN_PRICE = 1
     """:obj:`int`: Amount of stars a user pays, minimum amount the subscription can be set to."""
-    MAX_PRICE = 2500
-    """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to."""
+    MAX_PRICE = 10000
+    """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to.
+
+    .. versionchanged:: NEXT.VERSION
+        Bot API 9.0 changed the value to 10000.
+    """
 
 
 class BackgroundTypeLimit(IntEnum):
@@ -2144,6 +2148,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.paid_media`.
 
     .. versionadded:: 21.4
+    """
+    PAID_MESSAGE_PRICE_CHANGED = "paid_message_price_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_message_price_changed`.
+
+    .. versionadded:: Next.VERSION
     """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
@@ -3374,12 +3383,14 @@ class InvoiceLimit(IntEnum):
 
     .. versionadded:: 21.6
     """
-    MAX_STAR_COUNT = 2500
+    MAX_STAR_COUNT = 10000
     """:obj:`int`: Maximum amount of starts that must be paid to buy access to a paid media
     passed as :paramref:`~telegram.Bot.send_paid_media.star_count` parameter of
     :meth:`telegram.Bot.send_paid_media`.
 
     .. versionadded:: 21.6
+    .. versionchanged:: NEXT.VERSION
+        Bot API 9.0 changed the value to 10000.
     """
     SUBSCRIPTION_PERIOD = dtm.timedelta(days=30).total_seconds()
     """:obj:`int`: The period of time for which the subscription is active before
@@ -3388,11 +3399,13 @@ class InvoiceLimit(IntEnum):
 
     .. versionadded:: 21.8
     """
-    SUBSCRIPTION_MAX_PRICE = 2500
+    SUBSCRIPTION_MAX_PRICE = 10000
     """:obj:`int`: The maximum price of a subscription created wtih
     :meth:`telegram.Bot.create_invoice_link`.
 
     .. versionadded:: 21.9
+    .. versionchanged:: NEXT.VERSION
+        Bot API 9.0 changed the value to 10000.
     """
 
 
