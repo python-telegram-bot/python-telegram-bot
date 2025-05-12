@@ -426,7 +426,6 @@ class TestApplicationBuilder:
         httpx_request_init = HTTPXRequest.__init__
 
         def init_transport(*args, **kwargs):
-            nonlocal httpx_request_kwargs
             # This is called once for request and once for get_updates_request, so we make
             # it a list
             httpx_request_kwargs.append(kwargs.copy())

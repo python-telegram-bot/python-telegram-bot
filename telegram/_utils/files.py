@@ -59,7 +59,7 @@ def load_file(
     try:
         contents = obj.read()  # type: ignore[union-attr]
     except AttributeError:
-        return None, cast(Union[bytes, "InputFile", str, Path], obj)
+        return None, cast("Union[bytes, InputFile, str, Path]", obj)
 
     filename = guess_file_name(obj)
 
@@ -151,7 +151,7 @@ def parse_file_input(  # pylint: disable=too-many-return-statements
     if isinstance(file_input, bytes):
         return InputFile(file_input, filename=filename, attach=attach)
     if hasattr(file_input, "read"):
-        return InputFile(cast(IO, file_input), filename=filename, attach=attach)
+        return InputFile(cast("IO", file_input), filename=filename, attach=attach)
     if tg_type and isinstance(file_input, tg_type):
         return file_input.file_id  # type: ignore[attr-defined]
     return file_input

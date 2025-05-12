@@ -710,7 +710,6 @@ class TestSendMediaGroupWithoutRequest:
         self, offline_bot, chat_id, video_file, photo_file, monkeypatch
     ):
         async def make_assertion(method, url, request_data: RequestData, *args, **kwargs):
-            nonlocal input_video
             files = request_data.multipart_data
             video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
             thumb_check = (

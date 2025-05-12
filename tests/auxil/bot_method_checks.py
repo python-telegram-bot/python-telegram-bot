@@ -621,7 +621,7 @@ async def check_defaults_handling(
         kwargs_need_default.remove("parse_mode")
 
     defaults_no_custom_defaults = Defaults()
-    kwargs = {kwarg: "custom_default" for kwarg in inspect.signature(Defaults).parameters}
+    kwargs = dict.fromkeys(inspect.signature(Defaults).parameters, "custom_default")
     kwargs["tzinfo"] = zoneinfo.ZoneInfo("America/New_York")
     kwargs["link_preview_options"] = LinkPreviewOptions(
         url="custom_default", show_above_text="custom_default"

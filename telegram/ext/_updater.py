@@ -124,7 +124,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         self.__polling_task_stop_event: asyncio.Event = asyncio.Event()
         self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
-    async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
+    async def __aenter__(self: _UpdaterType) -> _UpdaterType:
         """
         |async_context_manager| :meth:`initializes <initialize>` the Updater.
 

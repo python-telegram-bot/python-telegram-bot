@@ -74,7 +74,7 @@ class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], AB
             raise ValueError("`max_concurrent_updates` must be a positive integer!")
         self._semaphore = TrackedBoundedSemaphore(self.max_concurrent_updates)
 
-    async def __aenter__(self: _BUPT) -> _BUPT:  # noqa: PYI019
+    async def __aenter__(self: _BUPT) -> _BUPT:
         """|async_context_manager| :meth:`initializes <initialize>` the Processor.
 
         Returns:

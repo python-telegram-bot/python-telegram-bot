@@ -3934,7 +3934,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        file_path = cast(dict, result).get("file_path")
+        file_path = cast("dict", result).get("file_path")
         if file_path and not is_local_file(file_path):
             result["file_path"] = f"{self._base_file_url}/{file_path}"
 
@@ -4597,7 +4597,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         #   waiting for the server to return and there's no way of knowing the connection had been
         #   dropped in real time.
         result = cast(
-            list[JSONDict],
+            "list[JSONDict]",
             await self._post(
                 "getUpdates",
                 data,

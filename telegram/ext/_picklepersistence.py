@@ -237,7 +237,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         self.callback_data: Optional[CDCData] = None
         self.conversations: Optional[dict[str, dict[tuple[Union[int, str], ...], object]]] = None
         self.context_types: ContextTypes[Any, UD, CD, BD] = cast(
-            ContextTypes[Any, UD, CD, BD], context_types or ContextTypes()
+            "ContextTypes[Any, UD, CD, BD]", context_types or ContextTypes()
         )
 
     def _load_singlefile(self) -> None:

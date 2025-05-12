@@ -599,7 +599,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
 
         current_conversations = self._conversations
         self._conversations = cast(
-            TrackingDict[ConversationKey, object],
+            "TrackingDict[ConversationKey, object]",
             TrackingDict(),
         )
         # In the conversation already processed updates
@@ -924,7 +924,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         :obj:`True` is handled.
         """
         job = cast("Job", context.job)
-        ctxt = cast(_ConversationTimeoutContext, job.data)
+        ctxt = cast("_ConversationTimeoutContext", job.data)
 
         _LOGGER.debug(
             "Conversation timeout was triggered for conversation %s!", ctxt.conversation_key
