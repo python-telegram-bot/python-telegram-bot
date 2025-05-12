@@ -15,12 +15,12 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-import collections.abc
 import contextlib
 import inspect
 import re
 import typing
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from sphinx.application import Sphinx
 
@@ -36,6 +36,10 @@ from docs.auxil.kwargs_insertion import (
     media_write_timeout_change_methods,
 )
 from docs.auxil.link_code import LINE_NUMBERS
+
+if TYPE_CHECKING:
+    import collections.abc
+
 
 ADMONITION_INSERTER = AdmonitionInserter()
 
@@ -128,7 +132,7 @@ def autodoc_process_docstring(
             insert_idx += len(effective_insert)
 
         ADMONITION_INSERTER.insert_admonitions(
-            obj=typing.cast(collections.abc.Callable, obj),
+            obj=typing.cast("collections.abc.Callable", obj),
             docstring_lines=lines,
         )
 
@@ -136,7 +140,7 @@ def autodoc_process_docstring(
     # (where applicable)
     if what == "class":
         ADMONITION_INSERTER.insert_admonitions(
-            obj=typing.cast(type, obj),  # since "what" == class, we know it's not just object
+            obj=typing.cast("type", obj),  # since "what" == class, we know it's not just object
             docstring_lines=lines,
         )
 

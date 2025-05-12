@@ -355,7 +355,7 @@ class Application(
         self.__create_task_tasks: set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
         self.__stop_running_marker = asyncio.Event()
 
-    async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
+    async def __aenter__(self: _AppType) -> _AppType:
         """|async_context_manager| :meth:`initializes <initialize>` the App.
 
         Returns:

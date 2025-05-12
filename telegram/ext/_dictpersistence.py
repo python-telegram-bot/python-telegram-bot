@@ -145,7 +145,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
                     self._callback_data = None
                 else:
                     self._callback_data = cast(
-                        CDCData,
+                        "CDCData",
                         ([(one, float(two), three) for one, two, three in data[0]], data[1]),
                     )
                 self._callback_data_json = callback_data_json

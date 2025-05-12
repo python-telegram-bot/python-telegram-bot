@@ -204,5 +204,5 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
         :attr:`CallbackContext.matches` as list with one element.
         """
         if self.pattern:
-            check_result = cast(Match, check_result)
+            check_result = cast("Match", check_result)
             context.matches = [check_result]

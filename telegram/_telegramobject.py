@@ -290,7 +290,7 @@ class TelegramObject:
         self._bot = None
 
         # get api_kwargs first because we may need to add entries to it (see try-except below)
-        api_kwargs = cast(dict[str, object], state.pop("api_kwargs", {}))
+        api_kwargs = cast("dict[str, object]", state.pop("api_kwargs", {}))
         # get _frozen before the loop to avoid setting it to True in the loop
         frozen = state.pop("_frozen", False)
 

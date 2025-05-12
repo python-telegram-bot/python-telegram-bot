@@ -347,7 +347,7 @@ class CallbackDataCache:
         for row in message.reply_markup.inline_keyboard:
             for button in row:
                 if button.callback_data:
-                    button_data = cast(str, button.callback_data)
+                    button_data = cast("str", button.callback_data)
                     keyboard_id, callback_data = self.__get_keyboard_uuid_and_button_data(
                         button_data
                     )

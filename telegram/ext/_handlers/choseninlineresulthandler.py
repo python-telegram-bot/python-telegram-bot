@@ -118,5 +118,5 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT, RT]):
         :attr:`telegram.ext.CallbackContext.matches`.
         """
         if self.pattern:
-            check_result = cast(Match, check_result)
+            check_result = cast("Match", check_result)
             context.matches = [check_result]

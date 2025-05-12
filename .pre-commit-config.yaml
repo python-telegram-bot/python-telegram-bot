@@ -7,7 +7,7 @@ ci:
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.11.8'
+    rev: 'v0.11.9'
     hooks:
     -   id: ruff
         name: ruff
