@@ -104,6 +104,9 @@ class ParamTypeCheckingExceptions:
             "animation": str,  # actual: Union[str, FileInput]
             "main_frame_timestamp": float,  # actual: Union[float, dtm.timedelta]
         },
+        "InputSticker": {
+            "sticker": str,  # actual: Union[str, FileInput]
+        },
         "InputStoryContent.*": {
             "photo": str,  # actual: Union[str, FileInput]
             "video": str,  # actual: Union[str, FileInput]
