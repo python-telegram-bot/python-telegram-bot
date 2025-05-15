@@ -48,7 +48,7 @@ class OwnedGift(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         type (:obj:`str`): Type of the owned gift.
@@ -108,7 +108,7 @@ class OwnedGifts(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`total_count` and :attr:`gifts` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         total_count (:obj:`int`): The total number of gifts owned by the user or the chat.
@@ -161,7 +161,7 @@ class OwnedGiftRegular(OwnedGift):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`gift` and :attr:`send_date` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         gift (:class:`telegram.Gift`): Information about the regular gift.
@@ -339,7 +339,7 @@ class OwnedGiftUnique(OwnedGift):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`gift` and :attr:`send_date` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         gift (:class:`telegram.UniqueGift`): Information about the unique gift.

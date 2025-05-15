@@ -449,7 +449,7 @@ class Message(MaybeInaccessibleMessage):
         paid_star_count (:obj:`int`, optional): The number of Telegram Stars that were paid by the
             sender of the message to send it
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
@@ -535,11 +535,11 @@ class Message(MaybeInaccessibleMessage):
         gift (:class:`telegram.GiftInfo`, optional): Service message: a regular gift was sent
             or received.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         unique_gift (:class:`telegram.UniqueGiftInfo`, optional): Service message: a unique gift
             was sent or received
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
             scheduled giveaway was created
 
@@ -559,7 +559,7 @@ class Message(MaybeInaccessibleMessage):
         paid_message_price_changed (:class:`telegram.PaidMessagePriceChanged`, optional): Service
             message: the price for paid messages has changed in the chat
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -793,7 +793,7 @@ class Message(MaybeInaccessibleMessage):
         paid_star_count (:obj:`int`): Optional. The number of Telegram Stars that were paid by the
             sender of the message to send it
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
 
             Examples:
@@ -879,11 +879,11 @@ class Message(MaybeInaccessibleMessage):
         gift (:class:`telegram.GiftInfo`): Optional. Service message: a regular gift was sent
             or received.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         unique_gift (:class:`telegram.UniqueGiftInfo`): Optional. Service message: a unique gift
             was sent or received
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
             scheduled giveaway was created
 
@@ -903,7 +903,7 @@ class Message(MaybeInaccessibleMessage):
         paid_message_price_changed (:class:`telegram.PaidMessagePriceChanged`): Optional. Service
             message: the price for paid messages has changed in the chat
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -4554,7 +4554,7 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.read_business_message`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.

@@ -29,7 +29,7 @@ class PaidMessagePriceChanged(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`paid_message_star_count` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         paid_message_star_count (:obj:`int`): The new number of Telegram Stars that must be paid by

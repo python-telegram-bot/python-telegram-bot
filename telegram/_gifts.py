@@ -155,7 +155,7 @@ class GiftInfo(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`gift` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         gift (:class:`Gift`): Information about the gift.
@@ -305,7 +305,7 @@ class AcceptedGiftTypes(TelegramObject):
     considered equal if their :attr:`unlimited_gifts`, :attr:`limited_gifts`,
     :attr:`unique_gifts` and :attr:`premium_subscription` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         unlimited_gifts (:class:`bool`): :obj:`True`, if unlimited regular gifts are accepted.

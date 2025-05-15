@@ -37,7 +37,7 @@ class UniqueGiftModel(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`name`, :attr:`sticker` and :attr:`rarity_per_mille` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         name (:obj:`str`): Name of the model.
@@ -92,7 +92,7 @@ class UniqueGiftSymbol(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`name`, :attr:`sticker` and :attr:`rarity_per_mille` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         name (:obj:`str`): Name of the symbol.
@@ -148,7 +148,7 @@ class UniqueGiftBackdropColors(TelegramObject):
     considered equal if their :attr:`center_color`, :attr:`edge_color`, :attr:`symbol_color`,
     and :attr:`text_color` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         center_color (:obj:`int`): The color in the center of the backdrop in RGB format.
@@ -197,7 +197,7 @@ class UniqueGiftBackdrop(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`name`, :attr:`colors`, and :attr:`rarity_per_mille` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         name (:obj:`str`): Name of the backdrop.
@@ -253,7 +253,7 @@ class UniqueGift(TelegramObject):
     considered equal if their :attr:`base_name`, :attr:`name`, :attr:`number`, :class:`model`,
     :attr:`symbol`, and :attr:`backdrop` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         base_name (:obj:`str`): Human-readable name of the regular gift from which this unique
@@ -336,7 +336,7 @@ class UniqueGiftInfo(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`gift`, and :attr:`origin` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         gift (:class:`UniqueGift`): Information about the gift.

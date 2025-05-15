@@ -285,7 +285,7 @@ class TransactionPartnerUser(TransactionPartner):
 
     .. versionadded:: 21.4
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.1
        Equality comparison now includes the new required argument :paramref:`transaction_type`,
        introduced in Bot API 9.0.
 
@@ -300,7 +300,7 @@ class TransactionPartnerUser(TransactionPartner):
             :tg-const:`telegram.constants.TransactionPartnerUser.BUSINESS_ACCOUNT_TRANSFER` for
             direct transfers from managed business accounts.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         user (:class:`telegram.User`): Information about the user.
         affiliate (:class:`telegram.AffiliateInfo`, optional): Information about the affiliate that
             received a commission via this transaction. Can be available only for
@@ -337,7 +337,7 @@ class TransactionPartnerUser(TransactionPartner):
             :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
             transactions only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
 
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
@@ -352,7 +352,7 @@ class TransactionPartnerUser(TransactionPartner):
             :tg-const:`telegram.constants.TransactionPartnerUser.BUSINESS_ACCOUNT_TRANSFER` for
             direct transfers from managed business accounts.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         user (:class:`telegram.User`): Information about the user.
         affiliate (:class:`telegram.AffiliateInfo`): Optional. Information about the affiliate that
             received a commission via this transaction. Can be available only for
@@ -389,7 +389,7 @@ class TransactionPartnerUser(TransactionPartner):
             :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
             transactions only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
 
     """
 
@@ -422,7 +422,7 @@ class TransactionPartnerUser(TransactionPartner):
     ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
 
-        # tags: deprecated NEXT.VERSION, bot api 9.0
+        # tags: deprecated 22.1, bot api 9.0
         if transaction_type is None:
             raise TypeError("`transaction_type` is a required argument since Bot API 9.0")
 

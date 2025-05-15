@@ -9386,7 +9386,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Gifts a Telegram Premium subscription to the given user.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user who will receive a Telegram
@@ -9506,7 +9506,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns the gifts received and owned by a managed business account. Requires the
         :attr:`~telegram.BusinessBotRights.can_view_gifts_and_stars` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -9572,7 +9572,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns the amount of Telegram Stars owned by a managed business account. Requires the
         :attr:`~telegram.BusinessBotRights.can_view_gifts_and_stars` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -9613,7 +9613,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Marks incoming message as read on behalf of a business account.
         Requires the :attr:`~telegram.BusinessBotRights.can_read_messages` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection on
@@ -9663,7 +9663,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         :attr:`~telegram.BusinessBotRights.can_delete_all_messages` business bot right to delete
         any message.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`int` | :obj:`str`): Unique identifier of the business
@@ -9716,7 +9716,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Posts a story on behalf of a managed business account. Requires the
         :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -9805,7 +9805,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Edits a story previously posted by the bot on behalf of a managed business account.
         Requires the :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -9878,7 +9878,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Deletes a story previously posted by the bot on behalf of a managed business account.
         Requires the :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -9920,7 +9920,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Changes the first and last name of a managed business account. Requires the
         :attr:`~telegram.BusinessBotRights.can_edit_name` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`int` | :obj:`str`): Unique identifier of the business
@@ -9967,7 +9967,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Changes the username of a managed business account. Requires the
         :attr:`~telegram.BusinessBotRights.can_edit_username` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -10009,7 +10009,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Changes the bio of a managed business account. Requires the
         :attr:`~telegram.BusinessBotRights.can_edit_bio` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -10053,7 +10053,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Requires the :attr:`~telegram.BusinessBotRights.can_change_gift_settings` business
         bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business
@@ -10101,7 +10101,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Requires the :attr:`~telegram.BusinessBotRights.can_edit_profile_photo` business
         bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -10148,7 +10148,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Requires the :attr:`~telegram.BusinessBotRights.can_edit_profile_photo` business
         bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -10192,7 +10192,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Converts a given regular gift to Telegram Stars. Requires the
         :attr:`~telegram.BusinessBotRights.can_convert_gifts_to_stars` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business
@@ -10239,7 +10239,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Additionally requires the :attr:`~telegram.BusinessBotRights.can_transfer_stars` business
         bot right if the upgrade is paid.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business
@@ -10296,7 +10296,7 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
         Requires :attr:`~telegram.BusinessBotRights.can_transfer_stars` business bot right if the
         transfer is paid.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business
@@ -10349,7 +10349,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Transfers Telegram Stars from the business account balance to the bot's balance. Requires
         the :attr:`~telegram.BusinessBotRights.can_transfer_stars` business bot right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business
@@ -10840,8 +10840,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         The gift can't be converted to Telegram Stars by the receiver.
 
         .. versionadded:: 21.8
-        .. versionchanged:: NEXT.VERSION
-           Bot API 8.3 made :paramref:`user_id` optional. In version NEXT.VERSION, the methods
+        .. versionchanged:: 22.1
+           Bot API 8.3 made :paramref:`user_id` optional. In version 22.1, the methods
            signature was changed accordingly.
 
         Args:

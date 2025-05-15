@@ -35,7 +35,7 @@ class InputStoryContent(TelegramObject):
     * :class:`telegram.InputStoryContentPhoto`
     * :class:`telegram.InputStoryContentVideo`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         type (:obj:`str`): Type of the content.
@@ -72,7 +72,7 @@ class InputStoryContent(TelegramObject):
 class InputStoryContentPhoto(InputStoryContent):
     """Describes a photo to post as a story.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         photo (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
@@ -109,7 +109,7 @@ class InputStoryContentVideo(InputStoryContent):
     """
     Describes a video to post as a story.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         video (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \

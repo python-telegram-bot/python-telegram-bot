@@ -74,7 +74,7 @@ class ChatFullInfo(_ChatBase):
         accepted_gift_types (:class:`telegram.AcceptedGiftTypes`): Information about types of
             gifts that are accepted by the chat or by the corresponding user for private chats.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         title (:obj:`str`, optional): Title, for supergroups, channels and group chats.
         username (:obj:`str`, optional): Username, for private chats, supergroups and channels if
             available.
@@ -215,7 +215,7 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 21.11
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 22.1
                Bot API 9.0 introduced :paramref:`accepted_gift_types`, replacing this argument.
                Hence, this argument will be removed in future versions.
 
@@ -236,7 +236,7 @@ class ChatFullInfo(_ChatBase):
         accepted_gift_types (:class:`telegram.AcceptedGiftTypes`): Information about types of
             gifts that are accepted by the chat or by the corresponding user for private chats.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
         title (:obj:`str`, optional): Title, for supergroups, channels and group chats.
         username (:obj:`str`, optional): Username, for private chats, supergroups and channels if
             available.
@@ -469,7 +469,7 @@ class ChatFullInfo(_ChatBase):
         linked_chat_id: Optional[int] = None,
         location: Optional[ChatLocation] = None,
         can_send_paid_media: Optional[bool] = None,
-        # tags: deprecated NEXT.VERSION; bot api 9.0
+        # tags: deprecated 22.1; bot api 9.0
         can_send_gift: Optional[bool] = None,
         # temporarily optional to account for changed signature
         accepted_gift_types: Optional[AcceptedGiftTypes] = None,
@@ -492,7 +492,7 @@ class ChatFullInfo(_ChatBase):
         if can_send_gift is not None:
             warn(
                 PTBDeprecationWarning(
-                    "NEXT.VERSION",
+                    "22.1",
                     build_deprecation_warning_message(
                         deprecated_name="can_send_gift",
                         new_name="accepted_gift_types",
@@ -562,7 +562,7 @@ class ChatFullInfo(_ChatBase):
         """
         :obj:`bool`: Optional. :obj:`True`, if gifts can be sent to the chat.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 22.1
             As Bot API 9.0 replaces this attribute with :attr:`accepted_gift_types`, this attribute
             will be removed in future versions.
 
@@ -571,7 +571,7 @@ class ChatFullInfo(_ChatBase):
             deprecated_attr_name="can_send_gift",
             new_attr_name="accepted_gift_types",
             bot_api_version="9.0",
-            ptb_version="NEXT.VERSION",
+            ptb_version="22.1",
             stacklevel=2,
         )
         return self._can_send_gift
