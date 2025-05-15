@@ -115,8 +115,8 @@ class InputPaidMedia(TelegramObject):
     """
     Base class for Telegram InputPaidMedia Objects. Currently, it can be one of:
 
-    * :class:`telegram.InputMediaPhoto`
-    * :class:`telegram.InputMediaVideo`
+    * :class:`telegram.InputPaidMediaPhoto`
+    * :class:`telegram.InputPaidMediaVideo`
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 

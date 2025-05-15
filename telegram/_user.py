@@ -247,6 +247,9 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_profile_photos`.
 
+        Returns:
+            :class:`telegram.UserProfilePhotos`
+
         """
         return await self.get_bot().get_user_profile_photos(
             user_id=self.id,

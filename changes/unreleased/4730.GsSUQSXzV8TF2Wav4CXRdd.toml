@@ -1,0 +1,9 @@
+documentation = "Documentation Improvements. Among others, add missing ``Returns`` field in ``User.get_profile_photos``"
+[[pull_requests]]
+uid = "4730"
+author_uid = "Bibo-Joshi"
+closes_threads = []
+[[pull_requests]]
+uid = "4740"
+author_uid = "aelkheir"
+closes_threads = []
