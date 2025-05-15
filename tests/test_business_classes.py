@@ -32,7 +32,9 @@ from telegram import (
     Sticker,
     User,
 )
+from telegram._business import BusinessBotRights
 from telegram._utils.datetime import UTC, to_timestamp
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -41,7 +43,20 @@ class BusinessTestBase:
     user = User(123, "test_user", False)
     user_chat_id = 123
     date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
+    can_change_gift_settings = True
+    can_convert_gifts_to_stars = True
+    can_delete_all_messages = True
+    can_delete_sent_messages = True
+    can_edit_bio = True
+    can_edit_name = True
+    can_edit_profile_photo = True
+    can_edit_username = True
+    can_manage_stories = True
+    can_read_messages = True
     can_reply = True
+    can_transfer_and_upgrade_gifts = True
+    can_transfer_stars = True
+    can_view_gifts_and_stars = True
     is_enabled = True
     message_ids = (123, 321)
     business_connection_id = "123"
@@ -60,7 +75,27 @@ class BusinessTestBase:
 
 
 @pytest.fixture(scope="module")
-def business_connection():
+def business_bot_rights():
+    return BusinessBotRights(
+        can_change_gift_settings=BusinessTestBase.can_change_gift_settings,
+        can_convert_gifts_to_stars=BusinessTestBase.can_convert_gifts_to_stars,
+        can_delete_all_messages=BusinessTestBase.can_delete_all_messages,
+        can_delete_sent_messages=BusinessTestBase.can_delete_sent_messages,
+        can_edit_bio=BusinessTestBase.can_edit_bio,
+        can_edit_name=BusinessTestBase.can_edit_name,
+        can_edit_profile_photo=BusinessTestBase.can_edit_profile_photo,
+        can_edit_username=BusinessTestBase.can_edit_username,
+        can_manage_stories=BusinessTestBase.can_manage_stories,
+        can_read_messages=BusinessTestBase.can_read_messages,
+        can_reply=BusinessTestBase.can_reply,
+        can_transfer_and_upgrade_gifts=BusinessTestBase.can_transfer_and_upgrade_gifts,
+        can_transfer_stars=BusinessTestBase.can_transfer_stars,
+        can_view_gifts_and_stars=BusinessTestBase.can_view_gifts_and_stars,
+    )
+
+
+@pytest.fixture(scope="module")
+def business_connection(business_bot_rights):
     return BusinessConnection(
         BusinessTestBase.id_,
         BusinessTestBase.user,
@@ -68,6 +103,7 @@ def business_connection():
         BusinessTestBase.date,
         BusinessTestBase.can_reply,
         BusinessTestBase.is_enabled,
+        rights=business_bot_rights,
     )
 
 
@@ -113,6 +149,90 @@ def business_opening_hours():
     )
 
 
+class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
+    def test_slot_behaviour(self, business_bot_rights):
+        inst = business_bot_rights
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_to_dict(self, business_bot_rights):
+        rights_dict = business_bot_rights.to_dict()
+
+        assert isinstance(rights_dict, dict)
+        assert rights_dict["can_reply"] is self.can_reply
+        assert rights_dict["can_read_messages"] is self.can_read_messages
+        assert rights_dict["can_delete_sent_messages"] is self.can_delete_sent_messages
+        assert rights_dict["can_delete_all_messages"] is self.can_delete_all_messages
+        assert rights_dict["can_edit_name"] is self.can_edit_name
+        assert rights_dict["can_edit_bio"] is self.can_edit_bio
+        assert rights_dict["can_edit_profile_photo"] is self.can_edit_profile_photo
+        assert rights_dict["can_edit_username"] is self.can_edit_username
+        assert rights_dict["can_change_gift_settings"] is self.can_change_gift_settings
+        assert rights_dict["can_view_gifts_and_stars"] is self.can_view_gifts_and_stars
+        assert rights_dict["can_convert_gifts_to_stars"] is self.can_convert_gifts_to_stars
+        assert rights_dict["can_transfer_and_upgrade_gifts"] is self.can_transfer_and_upgrade_gifts
+        assert rights_dict["can_transfer_stars"] is self.can_transfer_stars
+        assert rights_dict["can_manage_stories"] is self.can_manage_stories
+
+    def test_de_json(self):
+        json_dict = {
+            "can_reply": self.can_reply,
+            "can_read_messages": self.can_read_messages,
+            "can_delete_sent_messages": self.can_delete_sent_messages,
+            "can_delete_all_messages": self.can_delete_all_messages,
+            "can_edit_name": self.can_edit_name,
+            "can_edit_bio": self.can_edit_bio,
+            "can_edit_profile_photo": self.can_edit_profile_photo,
+            "can_edit_username": self.can_edit_username,
+            "can_change_gift_settings": self.can_change_gift_settings,
+            "can_view_gifts_and_stars": self.can_view_gifts_and_stars,
+            "can_convert_gifts_to_stars": self.can_convert_gifts_to_stars,
+            "can_transfer_and_upgrade_gifts": self.can_transfer_and_upgrade_gifts,
+            "can_transfer_stars": self.can_transfer_stars,
+            "can_manage_stories": self.can_manage_stories,
+        }
+
+        rights = BusinessBotRights.de_json(json_dict, None)
+        assert rights.can_reply is self.can_reply
+        assert rights.can_read_messages is self.can_read_messages
+        assert rights.can_delete_sent_messages is self.can_delete_sent_messages
+        assert rights.can_delete_all_messages is self.can_delete_all_messages
+        assert rights.can_edit_name is self.can_edit_name
+        assert rights.can_edit_bio is self.can_edit_bio
+        assert rights.can_edit_profile_photo is self.can_edit_profile_photo
+        assert rights.can_edit_username is self.can_edit_username
+        assert rights.can_change_gift_settings is self.can_change_gift_settings
+        assert rights.can_view_gifts_and_stars is self.can_view_gifts_and_stars
+        assert rights.can_convert_gifts_to_stars is self.can_convert_gifts_to_stars
+        assert rights.can_transfer_and_upgrade_gifts is self.can_transfer_and_upgrade_gifts
+        assert rights.can_transfer_stars is self.can_transfer_stars
+        assert rights.can_manage_stories is self.can_manage_stories
+        assert rights.api_kwargs == {}
+        assert isinstance(rights, BusinessBotRights)
+
+    def test_equality(self):
+        rights1 = BusinessBotRights(
+            can_reply=self.can_reply,
+        )
+
+        rights2 = BusinessBotRights(
+            can_reply=True,
+        )
+
+        rights3 = BusinessBotRights(
+            can_reply=True,
+            can_read_messages=self.can_read_messages,
+        )
+
+        assert rights1 == rights2
+        assert hash(rights1) == hash(rights2)
+        assert rights1 is not rights2
+
+        assert rights1 != rights3
+        assert hash(rights1) != hash(rights3)
+
+
 class TestBusinessConnectionWithoutRequest(BusinessTestBase):
     def test_slots(self, business_connection):
         bc = business_connection
@@ -120,7 +240,7 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
             assert getattr(bc, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(bc)) == len(set(mro_slots(bc))), "duplicate slot"
 
-    def test_de_json(self):
+    def test_de_json(self, business_bot_rights):
         json_dict = {
             "id": self.id_,
             "user": self.user.to_dict(),
@@ -128,6 +248,7 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
             "date": to_timestamp(self.date),
             "can_reply": self.can_reply,
             "is_enabled": self.is_enabled,
+            "rights": business_bot_rights.to_dict(),
         }
         bc = BusinessConnection.de_json(json_dict, None)
         assert bc.id == self.id_
@@ -136,10 +257,11 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
         assert bc.date == self.date
         assert bc.can_reply == self.can_reply
         assert bc.is_enabled == self.is_enabled
+        assert bc.rights == business_bot_rights
         assert bc.api_kwargs == {}
         assert isinstance(bc, BusinessConnection)
 
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot, business_bot_rights):
         json_dict = {
             "id": self.id_,
             "user": self.user.to_dict(),
@@ -147,6 +269,7 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
             "date": to_timestamp(self.date),
             "can_reply": self.can_reply,
             "is_enabled": self.is_enabled,
+            "rights": business_bot_rights.to_dict(),
         }
         chat_bot = BusinessConnection.de_json(json_dict, offline_bot)
         chat_bot_raw = BusinessConnection.de_json(json_dict, raw_bot)
@@ -160,25 +283,52 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
         assert chat_bot_raw.date.tzinfo == UTC
         assert date_offset_tz == date_offset
 
-    def test_to_dict(self, business_connection):
+    def test_to_dict(self, business_connection, business_bot_rights):
         bc_dict = business_connection.to_dict()
         assert isinstance(bc_dict, dict)
         assert bc_dict["id"] == self.id_
         assert bc_dict["user"] == self.user.to_dict()
         assert bc_dict["user_chat_id"] == self.user_chat_id
         assert bc_dict["date"] == to_timestamp(self.date)
-        assert bc_dict["can_reply"] == self.can_reply
         assert bc_dict["is_enabled"] == self.is_enabled
+        assert bc_dict["rights"] == business_bot_rights.to_dict()
 
-    def test_equality(self):
+    def test_equality(self, business_bot_rights):
         bc1 = BusinessConnection(
-            self.id_, self.user, self.user_chat_id, self.date, self.can_reply, self.is_enabled
+            self.id_,
+            self.user,
+            self.user_chat_id,
+            self.date,
+            self.can_reply,
+            self.is_enabled,
+            rights=business_bot_rights,
         )
         bc2 = BusinessConnection(
-            self.id_, self.user, self.user_chat_id, self.date, self.can_reply, self.is_enabled
+            self.id_,
+            self.user,
+            self.user_chat_id,
+            self.date,
+            self.can_reply,
+            self.is_enabled,
+            rights=business_bot_rights,
         )
         bc3 = BusinessConnection(
-            "321", self.user, self.user_chat_id, self.date, self.can_reply, self.is_enabled
+            "321",
+            self.user,
+            self.user_chat_id,
+            self.date,
+            self.can_reply,
+            self.is_enabled,
+            rights=business_bot_rights,
+        )
+        bc4 = BusinessConnection(
+            self.id_,
+            self.user,
+            self.user_chat_id,
+            self.date,
+            self.can_reply,
+            self.is_enabled,
+            rights=BusinessBotRights(),
         )
 
         assert bc1 == bc2
@@ -186,6 +336,35 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
 
         assert bc1 != bc3
         assert hash(bc1) != hash(bc3)
+
+        assert bc1 != bc4
+        assert hash(bc1) != hash(bc4)
+
+    def test_can_reply_argument_property_deprecation(self, business_connection):
+        with pytest.warns(PTBDeprecationWarning, match=r"9\.0.*can\_reply") as record:
+            assert BusinessConnection(
+                id=self.id_,
+                user=self.user,
+                user_chat_id=self.user_chat_id,
+                date=self.date,
+                can_reply=True,
+                is_enabled=self.is_enabled,
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+        with pytest.warns(PTBDeprecationWarning, match=r"9\.0.*can\_reply") as record:
+            assert business_connection.can_reply is self.can_reply
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_is_enabled_remains_required(self):
+        with pytest.raises(TypeError):
+            BusinessConnection(
+                id=self.id_, user=self.user, user_chat_id=self.user_chat_id, date=self.date
+            )
 
 
 class TestBusinessMessagesDeleted(BusinessTestBase):

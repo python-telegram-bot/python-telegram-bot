@@ -46,6 +46,7 @@ __all__ = [
     "BotDescriptionLimit",
     "BotNameLimit",
     "BulkRequestLimit",
+    "BusinessLimit",
     "CallbackQueryLimit",
     "ChatAction",
     "ChatBoostSources",
@@ -74,6 +75,9 @@ __all__ = [
     "InlineQueryResultsButtonLimit",
     "InputMediaType",
     "InputPaidMediaType",
+    "InputProfilePhotoType",
+    "InputStoryContentLimit",
+    "InputStoryContentType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
     "LocationLimit",
@@ -85,11 +89,15 @@ __all__ = [
     "MessageLimit",
     "MessageOriginType",
     "MessageType",
+    "Nanostar",
+    "NanostarLimit",
+    "OwnedGiftType",
     "PaidMediaType",
     "ParseMode",
     "PollLimit",
     "PollType",
     "PollingLimit",
+    "PremiumSubscription",
     "ProfileAccentColor",
     "ReactionEmoji",
     "ReactionType",
@@ -101,7 +109,13 @@ __all__ = [
     "StickerLimit",
     "StickerSetLimit",
     "StickerType",
+    "StoryAreaPositionLimit",
+    "StoryAreaTypeLimit",
+    "StoryAreaTypeType",
+    "StoryLimit",
     "TransactionPartnerType",
+    "TransactionPartnerUser",
+    "UniqueGiftInfoOrigin",
     "UpdateType",
     "UserProfilePhotosLimit",
     "VerifyLimit",
@@ -155,7 +169,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=8, minor=3)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=0)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -702,6 +716,63 @@ class BulkRequestLimit(IntEnum):
     """:obj:`int`: Maximum number of messages required for bulk actions."""
 
 
+class BusinessLimit(IntEnum):
+    """This enum contains limitations related to handling business accounts. The enum members
+    of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    CHAT_ACTIVITY_TIMEOUT = int(dtm.timedelta(hours=24).total_seconds())
+    """:obj:`int`: Time in seconds in which the chat must have been active for. Relevant for
+    :paramref:`~telegram.Bot.read_business_message.chat_id`
+    of :meth:`~telegram.Bot.read_business_message` and
+    :paramref:`~telegram.Bot.transfer_gift.new_owner_chat_id`
+    of :meth:`~telegram.Bot.transfer_gift`.
+    """
+    MIN_NAME_LENGTH = 1
+    """:obj:`int`: Minimum length of the name of a business account. Relevant only for
+    :paramref:`~telegram.Bot.set_business_account_name.first_name` of
+    :meth:`telegram.Bot.set_business_account_name`.
+    """
+    MAX_NAME_LENGTH = 64
+    """:obj:`int`: Maximum length of the name of a business account. Relevant for the parameters
+    of :meth:`telegram.Bot.set_business_account_name`.
+    """
+    MAX_USERNAME_LENGTH = 32
+    """::obj:`int`: Maximum length of the username of a business account. Relevant for
+    :paramref:`~telegram.Bot.set_business_account_username.username` of
+    :meth:`telegram.Bot.set_business_account_username`.
+    """
+    MAX_BIO_LENGTH = 140
+    """:obj:`int`: Maximum length of the bio of a business account. Relevant for
+    :paramref:`~telegram.Bot.set_business_account_bio.bio` of
+    :meth:`telegram.Bot.set_business_account_bio`.
+    """
+    MIN_GIFT_RESULTS = 1
+    """:obj:`int`: Minimum number of gifts to be returned. Relevant for
+    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+    :meth:`telegram.Bot.get_business_account_gifts`.
+    """
+    MAX_GIFT_RESULTS = 100
+    """:obj:`int`: Maximum number of gifts to be returned. Relevant for
+    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+    :meth:`telegram.Bot.get_business_account_gifts`.
+    """
+    MIN_STAR_COUNT = 1
+    """:obj:`int`: Minimum number of Telegram Stars to be transfered. Relevant for
+    :paramref:`~telegram.Bot.transfer_business_account_stars.star_count` of
+    :meth:`telegram.Bot.transfer_business_account_stars`.
+    """
+    MAX_STAR_COUNT = 10000
+    """:obj:`int`: Maximum number of Telegram Stars to be transfered. Relevant for
+    :paramref:`~telegram.Bot.transfer_business_account_stars.star_count` of
+    :meth:`telegram.Bot.transfer_business_account_stars`.
+    """
+
+
 class CallbackQueryLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.CallbackQuery`/
     :meth:`telegram.Bot.answer_callback_query`. The enum members of this enumeration are instances
@@ -887,8 +958,12 @@ class ChatSubscriptionLimit(IntEnum):
     """:obj:`int`: The number of seconds the subscription will be active."""
     MIN_PRICE = 1
     """:obj:`int`: Amount of stars a user pays, minimum amount the subscription can be set to."""
-    MAX_PRICE = 2500
-    """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to."""
+    MAX_PRICE = 10000
+    """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to.
+
+    .. versionchanged:: NEXT.VERSION
+        Bot API 9.0 changed the value to 10000.
+    """
 
 
 class BackgroundTypeLimit(IntEnum):
@@ -1367,6 +1442,83 @@ class InputPaidMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
     VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+
+
+class InputProfilePhotoType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputProfilePhoto`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    STATIC = "static"
+    """:obj:`str`: Type of :class:`telegram.InputProfilePhotoStatic`."""
+    ANIMATED = "animated"
+    """:obj:`str`: Type of :class:`telegram.InputProfilePhotoAnimated`."""
+
+
+class InputStoryContentLimit(StringEnum):
+    """This enum contains limitations for :class:`telegram.InputStoryContentPhoto`/
+    :class:`telegram.InputStoryContentVideo`. The enum members of this enumeration are instances
+    of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PHOTOSIZE_UPLOAD = FileSizeLimit.PHOTOSIZE_UPLOAD  # (10MB)
+    """:obj:`int`: Maximum file size of the photo to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto` in Bytes.
+    """
+    PHOTO_WIDTH = 1080
+    """:obj:`int`: Horizontal resolution of the photo to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto`.
+    """
+    PHOTO_HEIGHT = 1920
+    """:obj:`int`: Vertical resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentPhoto.photo` parameter of
+    :class:`telegram.InputStoryContentPhoto`.
+    """
+    VIDEOSIZE_UPLOAD = int(30e6)  # (30MB)
+    """:obj:`int`: Maximum file size of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo` in Bytes.
+    """
+    VIDEO_WIDTH = 720
+    """:obj:`int`: Horizontal resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+    VIDEO_HEIGHT = 1080
+    """:obj:`int`: Vertical resolution of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.video` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+    MAX_VIDEO_DURATION = int(dtm.timedelta(seconds=60).total_seconds())
+    """:obj:`int`: Maximum duration of the video to be passed to
+    :paramref:`~telegram.InputStoryContentVideo.duration` parameter of
+    :class:`telegram.InputStoryContentVideo`.
+    """
+
+
+class InputStoryContentType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputStoryContent`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputStoryContentPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputStoryContentVideo`."""
 
 
 class InlineQueryLimit(IntEnum):
@@ -1949,6 +2101,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 20.8
     """
+    GIFT = "gift"
+    """:obj:`str`: Messages with :attr:`telegram.Message.gift`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
 
@@ -1992,6 +2149,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 21.4
     """
+    PAID_MESSAGE_PRICE_CHANGED = "paid_message_price_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.paid_message_price_changed`.
+
+    .. versionadded:: Next.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -2032,6 +2194,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
     TEXT = "text"
     """:obj:`str`: Messages with :attr:`telegram.Message.text`."""
+    UNIQUE_GIFT = "unique_gift"
+    """:obj:`str`: Messages with :attr:`telegram.Message.unique_gift`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     USERS_SHARED = "users_shared"
     """:obj:`str`: Messages with :attr:`telegram.Message.users_shared`.
 
@@ -2063,6 +2230,69 @@ class MessageType(StringEnum):
 
     .. versionadded:: 20.8
     """
+
+
+class Nanostar(FloatEnum):
+    """This enum contains constants for ``nanostar_amount`` parameter of
+    :class:`telegram.StarAmount`, :class:`telegram.StarTransaction`
+    and :class:`telegram.AffiliateInfo`.
+    The enum members of this enumeration are instances of :class:`float` and can be treated as
+    such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    VALUE = 1 / 1000000000
+    """:obj:`float`: The value of one nanostar as used in
+    :paramref:`telegram.StarTransaction.nanostar_amount`
+    parameter of :class:`telegram.StarTransaction`,
+    :paramref:`telegram.StarAmount.nanostar_amount` parameter of :class:`telegram.StarAmount`
+    and :paramref:`telegram.AffiliateInfo.nanostar_amount`
+    parameter of :class:`telegram.AffiliateInfo`
+    """
+
+
+class NanostarLimit(IntEnum):
+    """This enum contains limitations for ``nanostar_amount`` parameter of
+    :class:`telegram.AffiliateInfo`, :class:`telegram.StarTransaction`
+    and :class:`telegram.StarAmount`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_AMOUNT = -999999999
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
+    parameter of :class:`telegram.AffiliateInfo`
+    and :paramref:`~telegram.StarAmount.nanostar_amount`
+    parameter of :class:`telegram.StarAmount`.
+    """
+    MAX_AMOUNT = 999999999
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
+    parameter of :class:`telegram.StarTransaction`,
+    :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
+    :class:`telegram.AffiliateInfo` and :paramref:`~telegram.StarAmount.nanostar_amount`
+    parameter of :class:`telegram.StarAmount`.
+    """
+
+
+class OwnedGiftType(StringEnum):
+    """This enum contains the available types of :class:`telegram.OwnedGift`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    REGULAR = "regular"
+    """:obj:`str`: a regular owned gift."""
+    UNIQUE = "unique"
+    """:obj:`str`: a unique owned gift."""
 
 
 class PaidMediaType(StringEnum):
@@ -2099,6 +2329,58 @@ class PollingLimit(IntEnum):
     MAX_LIMIT = 100
     """:obj:`int`: Maximum value allowed for the :paramref:`~telegram.Bot.get_updates.limit`
     parameter of :meth:`telegram.Bot.get_updates`.
+    """
+
+
+class PremiumSubscription(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.gift_premium_subscription`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_TEXT_LENGTH = 128
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.gift_premium_subscription.text`
+    parameter of :meth:`~telegram.Bot.gift_premium_subscription`.
+    """
+    MONTH_COUNT_THREE = 3
+    """:obj:`int`: Possible value for
+    :paramref:`~telegram.Bot.gift_premium_subscription.month_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`; number of months the Premium
+    subscription will be active for.
+    """
+    MONTH_COUNT_SIX = 6
+    """:obj:`int`: Possible value for
+    :paramref:`~telegram.Bot.gift_premium_subscription.month_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`; number of months the Premium
+    subscription will be active for.
+    """
+    MONTH_COUNT_TWELVE = 12
+    """:obj:`int`: Possible value for
+    :paramref:`~telegram.Bot.gift_premium_subscription.month_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`; number of months the Premium
+    subscription will be active for.
+    """
+    STARS_THREE_MONTHS = 1000
+    """:obj:`int`: Number of Telegram Stars to pay for a Premium subscription of
+    :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_THREE` months period.
+    Relevant for :paramref:`~telegram.Bot.gift_premium_subscription.star_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`.
+    """
+    STARS_SIX_MONTHS = 1500
+    """:obj:`int`: Number of Telegram Stars to pay for a Premium subscription of
+    :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_SIX` months period.
+    Relevant for :paramref:`~telegram.Bot.gift_premium_subscription.star_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`.
+    """
+    STARS_TWELVE_MONTHS = 2500
+    """:obj:`int`: Number of Telegram Stars to pay for a Premium subscription of
+    :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_TWELVE` months period.
+    Relevant for :paramref:`~telegram.Bot.gift_premium_subscription.star_count` parameter
+    of :meth:`~telegram.Bot.gift_premium_subscription`.
     """
 
 
@@ -2455,19 +2737,27 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
 
 
+# tags: deprecated NEXT.VERSION, bot api 9.0
 class StarTransactions(FloatEnum):
     """This enum contains constants for :class:`telegram.StarTransaction`.
     The enum members of this enumeration are instances of :class:`float` and can be treated as
     such.
 
     .. versionadded:: 21.9
+
+    .. deprecated:: NEXT.VERSION
+        This class will be removed as its only member :attr:`NANOSTAR_VALUE` will be replaced
+        by :attr:`telegram.constants.Nanostar.VALUE`.
     """
 
     __slots__ = ()
 
-    NANOSTAR_VALUE = 1 / 1000000000
+    NANOSTAR_VALUE = Nanostar.VALUE
     """:obj:`float`: The value of one nanostar as used in
     :attr:`telegram.StarTransaction.nanostar_amount`.
+
+    .. deprecated:: NEXT.VERSION
+        This member will be replaced by :attr:`telegram.constants.Nanostar.VALUE`.
     """
 
 
@@ -2489,19 +2779,27 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
-    NANOSTAR_MIN_AMOUNT = -999999999
+    # tags: deprecated NEXT.VERSION, bot api 9.0
+    NANOSTAR_MIN_AMOUNT = NanostarLimit.MIN_AMOUNT
     """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
     parameter of :class:`telegram.AffiliateInfo`.
 
     .. versionadded:: 21.9
+
+    .. deprecated:: NEXT.VERSION
+        This member will be replaced by :attr:`telegram.constants.NanostarLimit.MIN_AMOUNT`.
     """
-    NANOSTAR_MAX_AMOUNT = 999999999
+    # tags: deprecated NEXT.VERSION, bot api 9.0
+    NANOSTAR_MAX_AMOUNT = NanostarLimit.MAX_AMOUNT
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
     parameter of :class:`telegram.StarTransaction` and
     :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
     :class:`telegram.AffiliateInfo`.
 
     .. versionadded:: 21.9
+
+    .. deprecated:: NEXT.VERSION
+        This member will be replaced by :attr:`telegram.constants.NanostarLimit.MAX_AMOUNT`.
     """
 
 
@@ -2638,6 +2936,98 @@ class StickerType(StringEnum):
     """:obj:`str`: Custom emoji sticker."""
 
 
+class StoryAreaPositionLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.StoryAreaPosition`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_ROTATION_ANGLE = 360
+    """:obj:`int`: Maximum value allowed for:
+        :paramref:`~telegram.StoryAreaPosition.rotation_angle` parameter of
+        :class:`telegram.StoryAreaPosition`
+    """
+
+
+class StoryAreaTypeLimit(IntEnum):
+    """This enum contains limitations for subclasses of :class:`telegram.StoryAreaType`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_LOCATION_AREAS = 10
+    """:obj:`int`: Maximum number of location areas that a story can have.
+    """
+    MAX_SUGGESTED_REACTION_AREAS = 5
+    """:obj:`int`: Maximum number of suggested reaction areas that a story can have.
+    """
+    MAX_LINK_AREAS = 3
+    """:obj:`int`: Maximum number of link areas that a story can have.
+    """
+    MAX_WEATHER_AREAS = 3
+    """:obj:`int`: Maximum number of weather areas that a story can have.
+    """
+    MAX_UNIQUE_GIFT_AREAS = 1
+    """:obj:`int`: Maximum number of unique gift areas that a story can have.
+    """
+
+
+class StoryAreaTypeType(StringEnum):
+    """This enum contains the available types of :class:`telegram.StoryAreaType`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    LOCATION = "location"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeLocation`."""
+    SUGGESTED_REACTION = "suggested_reaction"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeSuggestedReaction`."""
+    LINK = "link"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeLink`."""
+    WEATHER = "weather"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeWeather`."""
+    UNIQUE_GIFT = "unique_gift"
+    """:obj:`str`: Type of :class:`telegram.StoryAreaTypeUniqueGift`."""
+
+
+class StoryLimit(StringEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.post_story` and
+    :meth:`~telegram.Bot.edit_story`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    CAPTION_LENGTH = 2048
+    """:obj:`int`: Maximum number of characters in :paramref:`telegram.Bot.post_story.caption`
+    parameter of :meth:`telegram.Bot.post_story` and :paramref:`telegram.Bot.edit_story.caption` of
+    :meth:`telegram.Bot.edit_story`.
+    """
+    ACTIVITY_SIX_HOURS = 6 * 3600
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_TWELVE_HOURS = 12 * 3600
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_ONE_DAY = 86400
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+    ACTIVITY_TWO_DAYS = 2 * 86400
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
+    :meth:`telegram.Bot.post_story`."""
+
+
 class TransactionPartnerType(StringEnum):
     """This enum contains the available types of :class:`telegram.TransactionPartner`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -2671,6 +3061,38 @@ class TransactionPartnerType(StringEnum):
     """
     USER = "user"
     """:obj:`str`: Transaction with a user."""
+
+
+class TransactionPartnerUser(StringEnum):
+    """This enum contains constants for :class:`telegram.TransactionPartnerUser`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as
+    such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    INVOICE_PAYMENT = "invoice_payment"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    PAID_MEDIA_PAYMENT = "paid_media_payment"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    GIFT_PURCHASE = "gift_purchase"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    PREMIUM_PURCHASE = "premium_purchase"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
+    BUSINESS_ACCOUNT_TRANSFER = "business_account_transfer"
+    """:obj:`str`: Possible value for
+    :paramref:`telegram.TransactionPartnerUser.transaction_type`.
+    """
 
 
 class ParseMode(StringEnum):
@@ -2773,6 +3195,21 @@ class PollType(StringEnum):
     """:obj:`str`: regular polls."""
     QUIZ = "quiz"
     """:obj:`str`: quiz polls."""
+
+
+class UniqueGiftInfoOrigin(StringEnum):
+    """This enum contains the available origins for :class:`telegram.UniqueGiftInfo`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    UPGRADE = "upgrade"
+    """:obj:`str` gift upgraded"""
+    TRANSFER = "transfer"
+    """:obj:`str` gift transfered"""
 
 
 class UpdateType(StringEnum):
@@ -2946,12 +3383,14 @@ class InvoiceLimit(IntEnum):
 
     .. versionadded:: 21.6
     """
-    MAX_STAR_COUNT = 2500
+    MAX_STAR_COUNT = 10000
     """:obj:`int`: Maximum amount of starts that must be paid to buy access to a paid media
     passed as :paramref:`~telegram.Bot.send_paid_media.star_count` parameter of
     :meth:`telegram.Bot.send_paid_media`.
 
     .. versionadded:: 21.6
+    .. versionchanged:: NEXT.VERSION
+        Bot API 9.0 changed the value to 10000.
     """
     SUBSCRIPTION_PERIOD = dtm.timedelta(days=30).total_seconds()
     """:obj:`int`: The period of time for which the subscription is active before
@@ -2960,11 +3399,13 @@ class InvoiceLimit(IntEnum):
 
     .. versionadded:: 21.8
     """
-    SUBSCRIPTION_MAX_PRICE = 2500
+    SUBSCRIPTION_MAX_PRICE = 10000
     """:obj:`int`: The maximum price of a subscription created wtih
     :meth:`telegram.Bot.create_invoice_link`.
 
     .. versionadded:: 21.9
+    .. versionchanged:: NEXT.VERSION
+        Bot API 9.0 changed the value to 10000.
     """
 
 

@@ -23,8 +23,10 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Optional, final
 
+from telegram._files._inputstorycontent import InputStoryContent
 from telegram._files.inputfile import InputFile
 from telegram._files.inputmedia import InputMedia, InputPaidMedia
+from telegram._files.inputprofilephoto import InputProfilePhoto, InputProfilePhotoStatic
 from telegram._files.inputsticker import InputSticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
@@ -148,6 +150,31 @@ class RequestParameter:
                 return data, [value.media, thumbnail]
 
             return data, [value.media]
+
+        if isinstance(value, InputProfilePhoto):
+            attr = "photo" if isinstance(value, InputProfilePhotoStatic) else "animation"
+            if not isinstance(media := getattr(value, attr), InputFile):
+                # We don't have to upload anything
+                return value.to_dict(), []
+
+            # We call to_dict and change the returned dict instead of overriding
+            # value.photo in case the same value is reused for another request
+            data = value.to_dict()
+            data[attr] = media.attach_uri
+            return data, [media]
+
+        if isinstance(value, InputStoryContent):
+            attr = value.type
+            if not isinstance(media := getattr(value, attr), InputFile):
+                # We don't have to upload anything
+                return value.to_dict(), []
+
+            # We call to_dict and change the returned dict instead of overriding
+            # value.photo in case the same value is reused for another request
+            data = value.to_dict()
+            data[attr] = media.attach_uri
+            return data, [media]
+
         if isinstance(value, InputSticker) and isinstance(value.sticker, InputFile):
             # We call to_dict and change the returned dict instead of overriding
             # value.sticker in case the same value is reused for another request

@@ -97,6 +97,22 @@ class ParamTypeCheckingExceptions:
             "thumbnail": str,  # actual: Union[str, FileInput]
             "cover": str,  # actual: Union[str, FileInput]
         },
+        "InputProfilePhotoStatic": {
+            "photo": str,  # actual: Union[str, FileInput]
+        },
+        "InputProfilePhotoAnimated": {
+            "animation": str,  # actual: Union[str, FileInput]
+            "main_frame_timestamp": float,  # actual: Union[float, dtm.timedelta]
+        },
+        "InputSticker": {
+            "sticker": str,  # actual: Union[str, FileInput]
+        },
+        "InputStoryContent.*": {
+            "photo": str,  # actual: Union[str, FileInput]
+            "video": str,  # actual: Union[str, FileInput]
+            "duration": float,  # actual: dtm.timedelta
+            "cover_frame_timestamp": float,  # actual: dtm.timedelta
+        },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },
@@ -144,11 +160,19 @@ PTB_EXTRA_PARAMS = {
     "ReactionType": {"type"},  # attributes common to all subclasses
     "BackgroundType": {"type"},  # attributes common to all subclasses
     "BackgroundFill": {"type"},  # attributes common to all subclasses
+    "OwnedGift": {"type"},  # attributes common to all subclasses
     "InputTextMessageContent": {"disable_web_page_preview"},  # convenience arg, here for bw compat
     "RevenueWithdrawalState": {"type"},  # attributes common to all subclasses
     "TransactionPartner": {"type"},  # attributes common to all subclasses
     "PaidMedia": {"type"},  # attributes common to all subclasses
     "InputPaidMedia": {"type", "media"},  # attributes common to all subclasses
+    "InputStoryContent": {"type"},  # attributes common to all subclasses
+    "StoryAreaType": {"type"},  # attributes common to all subclasses
+    # backwards compatibility for api 9.0 changes
+    # tags: deprecated NEXT.VERSION, bot api 9.0
+    "BusinessConnection": {"can_reply"},
+    "ChatFullInfo": {"can_send_gift"},
+    "InputProfilePhoto": {"type"},  # attributes common to all subclasses
 }
 
 
@@ -177,6 +201,10 @@ PTB_IGNORED_PARAMS = {
     r"TransactionPartner\w+": {"type"},
     r"PaidMedia\w+": {"type"},
     r"InputPaidMedia\w+": {"type"},
+    r"InputProfilePhoto\w+": {"type"},
+    r"OwnedGift\w+": {"type"},
+    r"InputStoryContent\w+": {"type"},
+    r"StoryAreaType\w+": {"type"},
 }
 
 
@@ -192,6 +220,11 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
+    # backwards compatibility for api 9.0 changes
+    # tags: deprecated NEXT.VERSION, bot api 9.0
+    "BusinessConnection": {"is_enabled"},
+    "ChatFullInfo": {"accepted_gift_types"},
+    "TransactionPartnerUser": {"transaction_type"},
 }
 
 

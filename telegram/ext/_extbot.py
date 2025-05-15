@@ -36,6 +36,7 @@ from typing import (
 from uuid import uuid4
 
 from telegram import (
+    AcceptedGiftTypes,
     Animation,
     Audio,
     Bot,
@@ -64,21 +65,25 @@ from telegram import (
     InputMedia,
     InputPaidMedia,
     InputPollOption,
+    InputProfilePhoto,
     LinkPreviewOptions,
     Location,
     MaskPosition,
     MenuButton,
     Message,
     MessageId,
+    OwnedGifts,
     PhotoSize,
     Poll,
     PreparedInlineMessage,
     ReactionType,
     ReplyParameters,
     SentWebAppMessage,
+    StarAmount,
     StarTransactions,
     Sticker,
     StickerSet,
+    Story,
     TelegramObject,
     Update,
     User,
@@ -116,10 +121,12 @@ if TYPE_CHECKING:
         InputMediaPhoto,
         InputMediaVideo,
         InputSticker,
+        InputStoryContent,
         LabeledPrice,
         MessageEntity,
         PassportElementError,
         ShippingOption,
+        StoryArea,
     )
     from telegram.ext import BaseRateLimiter, Defaults
 
@@ -4246,6 +4253,36 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def gift_premium_subscription(
+        self,
+        user_id: int,
+        month_count: int,
+        star_count: int,
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().gift_premium_subscription(
+            user_id=user_id,
+            month_count=month_count,
+            star_count=star_count,
+            text=text,
+            text_parse_mode=text_parse_mode,
+            text_entities=text_entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def get_business_connection(
         self,
         business_connection_id: str,
@@ -4259,6 +4296,432 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> BusinessConnection:
         return await super().get_business_connection(
             business_connection_id=business_connection_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_business_account_gifts(
+        self,
+        business_connection_id: str,
+        exclude_unsaved: Optional[bool] = None,
+        exclude_saved: Optional[bool] = None,
+        exclude_unlimited: Optional[bool] = None,
+        exclude_limited: Optional[bool] = None,
+        exclude_unique: Optional[bool] = None,
+        sort_by_price: Optional[bool] = None,
+        offset: Optional[str] = None,
+        limit: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> OwnedGifts:
+        return await super().get_business_account_gifts(
+            business_connection_id=business_connection_id,
+            exclude_unsaved=exclude_unsaved,
+            exclude_saved=exclude_saved,
+            exclude_unlimited=exclude_unlimited,
+            exclude_limited=exclude_limited,
+            exclude_unique=exclude_unique,
+            sort_by_price=sort_by_price,
+            offset=offset,
+            limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_business_account_star_balance(
+        self,
+        business_connection_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> StarAmount:
+        return await super().get_business_account_star_balance(
+            business_connection_id=business_connection_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def read_business_message(
+        self,
+        business_connection_id: str,
+        chat_id: int,
+        message_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().read_business_message(
+            business_connection_id=business_connection_id,
+            chat_id=chat_id,
+            message_id=message_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def delete_business_messages(
+        self,
+        business_connection_id: str,
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().delete_business_messages(
+            business_connection_id=business_connection_id,
+            message_ids=message_ids,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def post_story(
+        self,
+        business_connection_id: str,
+        content: "InputStoryContent",
+        active_period: TimePeriod,
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        areas: Optional[Sequence["StoryArea"]] = None,
+        post_to_chat_page: Optional[bool] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Story:
+        return await super().post_story(
+            business_connection_id=business_connection_id,
+            content=content,
+            active_period=active_period,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            areas=areas,
+            post_to_chat_page=post_to_chat_page,
+            protect_content=protect_content,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def edit_story(
+        self,
+        business_connection_id: str,
+        story_id: int,
+        content: "InputStoryContent",
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        areas: Optional[Sequence["StoryArea"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Story:
+        return await super().edit_story(
+            business_connection_id=business_connection_id,
+            story_id=story_id,
+            content=content,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            areas=areas,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def delete_story(
+        self,
+        business_connection_id: str,
+        story_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().delete_story(
+            business_connection_id=business_connection_id,
+            story_id=story_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_business_account_name(
+        self,
+        business_connection_id: str,
+        first_name: str,
+        last_name: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_business_account_name(
+            business_connection_id=business_connection_id,
+            first_name=first_name,
+            last_name=last_name,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_business_account_username(
+        self,
+        business_connection_id: str,
+        username: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_business_account_username(
+            business_connection_id=business_connection_id,
+            username=username,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_business_account_bio(
+        self,
+        business_connection_id: str,
+        bio: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_business_account_bio(
+            business_connection_id=business_connection_id,
+            bio=bio,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_business_account_gift_settings(
+        self,
+        business_connection_id: str,
+        show_gift_button: bool,
+        accepted_gift_types: AcceptedGiftTypes,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_business_account_gift_settings(
+            business_connection_id=business_connection_id,
+            show_gift_button=show_gift_button,
+            accepted_gift_types=accepted_gift_types,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_business_account_profile_photo(
+        self,
+        business_connection_id: str,
+        photo: "InputProfilePhoto",
+        is_public: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_business_account_profile_photo(
+            business_connection_id=business_connection_id,
+            photo=photo,
+            is_public=is_public,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def remove_business_account_profile_photo(
+        self,
+        business_connection_id: str,
+        is_public: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().remove_business_account_profile_photo(
+            business_connection_id=business_connection_id,
+            is_public=is_public,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def convert_gift_to_stars(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().convert_gift_to_stars(
+            business_connection_id=business_connection_id,
+            owned_gift_id=owned_gift_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def upgrade_gift(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        keep_original_details: Optional[bool] = None,
+        star_count: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().upgrade_gift(
+            business_connection_id=business_connection_id,
+            owned_gift_id=owned_gift_id,
+            keep_original_details=keep_original_details,
+            star_count=star_count,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def transfer_gift(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        new_owner_chat_id: int,
+        star_count: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().transfer_gift(
+            business_connection_id=business_connection_id,
+            owned_gift_id=owned_gift_id,
+            new_owner_chat_id=new_owner_chat_id,
+            star_count=star_count,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def transfer_business_account_stars(
+        self,
+        business_connection_id: str,
+        star_count: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().transfer_business_account_stars(
+            business_connection_id=business_connection_id,
+            star_count=star_count,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4715,7 +5178,25 @@ class ExtBot(Bot, Generic[RLARGS]):
     unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages
     getUserChatBoosts = get_user_chat_boosts
     setMessageReaction = set_message_reaction
+    giftPremiumSubscription = gift_premium_subscription
     getBusinessConnection = get_business_connection
+    getBusinessAccountGifts = get_business_account_gifts
+    getBusinessAccountStarBalance = get_business_account_star_balance
+    readBusinessMessage = read_business_message
+    deleteBusinessMessages = delete_business_messages
+    postStory = post_story
+    editStory = edit_story
+    deleteStory = delete_story
+    setBusinessAccountName = set_business_account_name
+    setBusinessAccountUsername = set_business_account_username
+    setBusinessAccountBio = set_business_account_bio
+    setBusinessAccountGiftSettings = set_business_account_gift_settings
+    setBusinessAccountProfilePhoto = set_business_account_profile_photo
+    removeBusinessAccountProfilePhoto = remove_business_account_profile_photo
+    convertGiftToStars = convert_gift_to_stars
+    upgradeGift = upgrade_gift
+    transferGift = transfer_gift
+    transferBusinessAccountStars = transfer_business_account_stars
     replaceStickerInSet = replace_sticker_in_set
     refundStarPayment = refund_star_payment
     getStarTransactions = get_star_transactions

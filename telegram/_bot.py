@@ -75,17 +75,20 @@ from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
-from telegram._gifts import Gift, Gifts
+from telegram._gifts import AcceptedGiftTypes, Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
+from telegram._ownedgift import OwnedGifts
+from telegram._payment.stars.staramount import StarAmount
 from telegram._payment.stars.startransactions import StarTransactions
 from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
+from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._update import Update
 from telegram._user import User
@@ -123,12 +126,15 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputProfilePhoto,
         InputSticker,
+        InputStoryContent,
         LabeledPrice,
         LinkPreviewOptions,
         MessageEntity,
         PassportElementError,
         ShippingOption,
+        StoryArea,
     )
 
 BT = TypeVar("BT", bound="Bot")
@@ -9362,6 +9368,83 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
+    async def gift_premium_subscription(
+        self,
+        user_id: int,
+        month_count: int,
+        star_count: int,
+        text: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Gifts a Telegram Premium subscription to the given user.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user who will receive a Telegram
+                Premium subscription.
+            month_count (:obj:`int`): Number of months the Telegram Premium subscription will be
+                active for the user; must be one of
+                :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_THREE`,
+                :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_SIX`,
+                or :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_TWELVE`.
+            star_count (:obj:`int`): Number of Telegram Stars to pay for the Telegram Premium
+               subscription; must be
+               :tg-const:`telegram.constants.PremiumSubscription.STARS_THREE_MONTHS`
+               for :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_THREE` months,
+               :tg-const:`telegram.constants.PremiumSubscription.STARS_SIX_MONTHS`
+               for :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_SIX` months,
+               and :tg-const:`telegram.constants.PremiumSubscription.STARS_TWELVE_MONTHS`
+               for :tg-const:`telegram.constants.PremiumSubscription.MONTH_COUNT_TWELVE` months.
+            text (:obj:`str`, optional): Text that will be shown along with the service message
+                about the subscription;
+                0-:tg-const:`telegram.constants.PremiumSubscription.MAX_TEXT_LENGTH` characters.
+            text_parse_mode (:obj:`str`, optional): Mode for parsing entities.
+                See :class:`telegram.constants.ParseMode` and
+                `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
+                more details. Entities other than :attr:`~MessageEntity.BOLD`,
+                :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
+                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+            text_entities (Sequence[:class:`telegram.MessageEntity`], optional): A list of special
+                entities that appear in the gift text. It can be specified instead of
+                :paramref:`text_parse_mode`. Entities other than :attr:`~MessageEntity.BOLD`,
+                :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
+                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "month_count": month_count,
+            "star_count": star_count,
+            "text": text,
+            "text_entities": text_entities,
+            "text_parse_mode": text_parse_mode,
+        }
+        return await self._post(
+            "giftPremiumSubscription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def get_business_connection(
         self,
         business_connection_id: str,
@@ -9399,6 +9482,900 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 api_kwargs=api_kwargs,
             ),
             bot=self,
+        )
+
+    async def get_business_account_gifts(
+        self,
+        business_connection_id: str,
+        exclude_unsaved: Optional[bool] = None,
+        exclude_saved: Optional[bool] = None,
+        exclude_unlimited: Optional[bool] = None,
+        exclude_limited: Optional[bool] = None,
+        exclude_unique: Optional[bool] = None,
+        sort_by_price: Optional[bool] = None,
+        offset: Optional[str] = None,
+        limit: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> OwnedGifts:
+        """
+        Returns the gifts received and owned by a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_view_gifts_and_stars` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            exclude_unsaved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that aren't
+                saved to the account's profile page.
+            exclude_saved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that are saved
+                to the account's profile page.
+            exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can
+                be purchased an unlimited number of times.
+            exclude_limited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
+                purchased a limited number of times.
+            exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts.
+            sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
+                instead of send date. Sorting is applied before pagination.
+            offset (:obj:`str`, optional): Offset of the first entry to return as received from
+                the previous request; use empty string to get the first chunk of results.
+            limit (:obj:`int`, optional): The maximum number of gifts to be returned;
+                :tg-const:`telegram.constants.BusinessLimit.MIN_GIFT_RESULTS`-\
+                :tg-const:`telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`.
+                Defaults to :tg-const:`telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`.
+
+        Returns:
+            :class:`telegram.OwnedGifts`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "exclude_unsaved": exclude_unsaved,
+            "exclude_saved": exclude_saved,
+            "exclude_unlimited": exclude_unlimited,
+            "exclude_limited": exclude_limited,
+            "exclude_unique": exclude_unique,
+            "sort_by_price": sort_by_price,
+            "offset": offset,
+            "limit": limit,
+        }
+
+        return OwnedGifts.de_json(
+            await self._post(
+                "getBusinessAccountGifts",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
+    async def get_business_account_star_balance(
+        self,
+        business_connection_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> StarAmount:
+        """
+        Returns the amount of Telegram Stars owned by a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_view_gifts_and_stars` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+
+        Returns:
+            :class:`telegram.StarAmount`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"business_connection_id": business_connection_id}
+        return StarAmount.de_json(
+            await self._post(
+                "getBusinessAccountStarBalance",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
+    async def read_business_message(
+        self,
+        business_connection_id: str,
+        chat_id: int,
+        message_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Marks incoming message as read on behalf of a business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_read_messages` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection on
+                behalf of which to read the message.
+            chat_id (:obj:`int`): Unique identifier of the chat in which the message was received.
+                The chat must have been active in the last
+                :tg-const:`~telegram.constants.BusinessLimit.\
+CHAT_ACTIVITY_TIMEOUT` seconds.
+            message_id (:obj:`int`): Unique identifier of the message to mark as read.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "chat_id": chat_id,
+            "message_id": message_id,
+        }
+        return await self._post(
+            "readBusinessMessage",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_business_messages(
+        self,
+        business_connection_id: str,
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Delete messages on behalf of a business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_delete_sent_messages` business bot right to
+        delete messages sent by the bot itself, or the
+        :attr:`~telegram.BusinessBotRights.can_delete_all_messages` business bot right to delete
+        any message.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`int` | :obj:`str`): Unique identifier of the business
+                connection on behalf of which to delete the messages
+            message_ids (Sequence[:obj:`int`]):  A list of
+                :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` identifiers of messages
+                to delete. See :meth:`delete_message` for limitations on which messages can be
+                deleted.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "message_ids": message_ids,
+        }
+        return await self._post(
+            "deleteBusinessMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def post_story(
+        self,
+        business_connection_id: str,
+        content: "InputStoryContent",
+        active_period: TimePeriod,
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        areas: Optional[Sequence["StoryArea"]] = None,
+        post_to_chat_page: Optional[bool] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Story:
+        """
+        Posts a story on behalf of a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            content (:class:`telegram.InputStoryContent`): Content of the story.
+            active_period (:obj:`int` | :class:`datetime.timedelta`, optional): Period after which
+                the story is moved to the archive, in seconds; must be one of
+                :tg-const:`~telegram.constants.StoryLimit.ACTIVITY_SIX_HOURS`,
+                :tg-const:`~telegram.constants.StoryLimit.ACTIVITY_TWELVE_HOURS`,
+                :tg-const:`~telegram.constants.StoryLimit.ACTIVITY_ONE_DAY`,
+                or :tg-const:`~telegram.constants.StoryLimit.ACTIVITY_TWO_DAYS`.
+            caption (:obj:`str`, optional): Caption of the story,
+                0-:tg-const:`~telegram.constants.StoryLimit.CAPTION_LENGTH` characters after
+                entities parsing.
+            parse_mode (:obj:`str`, optional): Mode for parsing entities in the story caption.
+                See the constants in :class:`telegram.constants.ParseMode` for the
+                available modes.
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
+            areas (Sequence[:class:`telegram.StoryArea`], optional): Sequence of clickable areas to
+                be shown on the story.
+
+                Note:
+                    Each type of clickable area in :paramref:`areas` has its own maximum limit:
+
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LOCATION_AREAS`
+                      of :class:`telegram.StoryAreaTypeLocation`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.\
+MAX_SUGGESTED_REACTION_AREAS` of :class:`telegram.StoryAreaTypeSuggestedReaction`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LINK_AREAS`
+                      of :class:`telegram.StoryAreaTypeLink`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_WEATHER_AREAS`
+                      of :class:`telegram.StoryAreaTypeWeather`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.\
+MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
+            post_to_chat_page (:class:`telegram.InputStoryContent`, optional): Pass :obj:`True` to
+                keep the story accessible after it expires.
+            protect_content (:obj:`bool`, optional): Pass :obj:`True` if the content of the story
+                must be protected from forwarding and screenshotting
+
+        Returns:
+            :class:`Story`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "content": content,
+            "active_period": active_period,
+            "caption": caption,
+            "parse_mode": parse_mode,
+            "caption_entities": caption_entities,
+            "areas": areas,
+            "post_to_chat_page": post_to_chat_page,
+            "protect_content": protect_content,
+        }
+        return Story.de_json(
+            await self._post(
+                "postStory",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
+    async def edit_story(
+        self,
+        business_connection_id: str,
+        story_id: int,
+        content: "InputStoryContent",
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        areas: Optional[Sequence["StoryArea"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Story:
+        """
+        Edits a story previously posted by the bot on behalf of a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            story_id (:obj:`int`): Unique identifier of the story to edit.
+            content (:class:`telegram.InputStoryContent`): Content of the story.
+            caption (:obj:`str`, optional): Caption of the story,
+                0-:tg-const:`~telegram.constants.StoryLimit.CAPTION_LENGTH` characters after
+                entities parsing.
+            parse_mode (:obj:`str`, optional): Mode for parsing entities in the story caption.
+                See the constants in :class:`telegram.constants.ParseMode` for the
+                available modes.
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
+            areas (Sequence[:class:`telegram.StoryArea`], optional): Sequence of clickable areas to
+                be shown on the story.
+
+                Note:
+                    Each type of clickable area in :paramref:`areas` has its own maximum limit:
+
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LOCATION_AREAS`
+                      of :class:`telegram.StoryAreaTypeLocation`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.\
+MAX_SUGGESTED_REACTION_AREAS` of :class:`telegram.StoryAreaTypeSuggestedReaction`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LINK_AREAS`
+                      of :class:`telegram.StoryAreaTypeLink`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_WEATHER_AREAS`
+                      of :class:`telegram.StoryAreaTypeWeather`.
+                    * Up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.\
+MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
+
+        Returns:
+            :class:`Story`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "story_id": story_id,
+            "content": content,
+            "caption": caption,
+            "parse_mode": parse_mode,
+            "caption_entities": caption_entities,
+            "areas": areas,
+        }
+        return Story.de_json(
+            await self._post(
+                "editStory",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
+    async def delete_story(
+        self,
+        business_connection_id: str,
+        story_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Deletes a story previously posted by the bot on behalf of a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            story_id (:obj:`int`): Unique identifier of the story to delete.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "story_id": story_id,
+        }
+        return await self._post(
+            "deleteStory",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_name(
+        self,
+        business_connection_id: str,
+        first_name: str,
+        last_name: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the first and last name of a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_edit_name` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`int` | :obj:`str`): Unique identifier of the business
+                connection
+            first_name (:obj:`str`): New first name of the business account;
+                :tg-const:`telegram.constants.BusinessLimit.MIN_NAME_LENGTH`-
+                :tg-const:`telegram.constants.BusinessLimit.MAX_NAME_LENGTH` characters.
+            last_name (:obj:`str`, optional): New last name of the business account;
+                0-:tg-const:`telegram.constants.BusinessLimit.MAX_NAME_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "first_name": first_name,
+            "last_name": last_name,
+        }
+        return await self._post(
+            "setBusinessAccountName",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_username(
+        self,
+        business_connection_id: str,
+        username: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the username of a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_edit_username` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            username (:obj:`str`, optional): New business account username;
+                0-:tg-const:`telegram.constants.BusinessLimit.MAX_USERNAME_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "username": username,
+        }
+        return await self._post(
+            "setBusinessAccountUsername",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_bio(
+        self,
+        business_connection_id: str,
+        bio: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the bio of a managed business account. Requires the
+        :attr:`~telegram.BusinessBotRights.can_edit_bio` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            bio (:obj:`str`, optional): The new value of the bio for the business account;
+                0-:tg-const:`telegram.constants.BusinessLimit.MAX_BIO_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "bio": bio,
+        }
+        return await self._post(
+            "setBusinessAccountBio",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_gift_settings(
+        self,
+        business_connection_id: str,
+        show_gift_button: bool,
+        accepted_gift_types: AcceptedGiftTypes,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the privacy settings pertaining to incoming gifts in a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_change_gift_settings` business
+        bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            show_gift_button (:obj:`bool`): Pass :obj:`True`, if a button for sending a gift to the
+                user or by the business account must always be shown in the input field.
+            accepted_gift_types (:class:`telegram.AcceptedGiftTypes`): Types of gifts accepted by
+                the business account.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "show_gift_button": show_gift_button,
+            "accepted_gift_types": accepted_gift_types,
+        }
+        return await self._post(
+            "setBusinessAccountGiftSettings",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_business_account_profile_photo(
+        self,
+        business_connection_id: str,
+        photo: "InputProfilePhoto",
+        is_public: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Changes the profile photo of a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_edit_profile_photo` business
+        bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            photo (:class:`telegram.InputProfilePhoto`): The new profile photo to set.
+            is_public (:obj:`bool`, optional): Pass :obj:`True` to set the public photo, which will
+                be visible even if the main photo is hidden by the business account's privacy
+                settings. An account can have only one public photo.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "photo": photo,
+            "is_public": is_public,
+        }
+        return await self._post(
+            "setBusinessAccountProfilePhoto",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def remove_business_account_profile_photo(
+        self,
+        business_connection_id: str,
+        is_public: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Removes the current profile photo of a managed business account.
+        Requires the :attr:`~telegram.BusinessBotRights.can_edit_profile_photo` business
+        bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business connection.
+            is_public (:obj:`bool`, optional): Pass :obj:`True` to remove the public photo, which
+                will be visible even if the main photo is hidden by the business account's privacy
+                settings. After the main photo is removed, the previous profile photo (if present)
+                becomes the main photo.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "is_public": is_public,
+        }
+        return await self._post(
+            "removeBusinessAccountProfilePhoto",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def convert_gift_to_stars(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Converts a given regular gift to Telegram Stars. Requires the
+        :attr:`~telegram.BusinessBotRights.can_convert_gifts_to_stars` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            owned_gift_id (:obj:`str`): Unique identifier of the regular gift that should be
+                converted to Telegram Stars.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "owned_gift_id": owned_gift_id,
+        }
+        return await self._post(
+            "convertGiftToStars",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def upgrade_gift(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        keep_original_details: Optional[bool] = None,
+        star_count: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Upgrades a given regular gift to a unique gift. Requires the
+        :attr:`~telegram.BusinessBotRights.can_transfer_and_upgrade_gifts` business bot right.
+        Additionally requires the :attr:`~telegram.BusinessBotRights.can_transfer_stars` business
+        bot right if the upgrade is paid.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            owned_gift_id (:obj:`str`): Unique identifier of the regular gift that should be
+                upgraded to a unique one.
+            keep_original_details (:obj:`bool`, optional): Pass :obj:`True` to keep the original
+                gift text, sender and receiver in the upgraded gift
+            star_count (:obj:`int`, optional): The amount of Telegram Stars that will
+                be paid for the upgrade from the business account balance. If
+                ``gift.prepaid_upgrade_star_count > 0``, then pass ``0``, otherwise,
+                the :attr:`~telegram.BusinessBotRights.can_transfer_stars`
+                business bot right is required and :attr:`telegram.Gift.upgrade_star_count`
+                must be passed.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "owned_gift_id": owned_gift_id,
+            "keep_original_details": keep_original_details,
+            "star_count": star_count,
+        }
+        return await self._post(
+            "upgradeGift",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def transfer_gift(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+        new_owner_chat_id: int,
+        star_count: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Transfers an owned unique gift to another user. Requires the
+        :attr:`~telegram.BusinessBotRights.can_transfer_and_upgrade_gifts` business bot right.
+        Requires :attr:`~telegram.BusinessBotRights.can_transfer_stars` business bot right if the
+        transfer is paid.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            owned_gift_id (:obj:`str`): Unique identifier of the regular gift that should be
+                transferred.
+            new_owner_chat_id (:obj:`int`): Unique identifier of the chat which will
+                own the gift. The chat must be active in the last
+                :tg-const:`~telegram.constants.BusinessLimit.\
+CHAT_ACTIVITY_TIMEOUT` seconds.
+            star_count (:obj:`int`, optional): The amount of Telegram Stars that will be paid for
+                the transfer from the business account balance. If positive, then
+                the :attr:`~telegram.BusinessBotRights.can_transfer_stars` business bot
+                right is required.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "owned_gift_id": owned_gift_id,
+            "new_owner_chat_id": new_owner_chat_id,
+            "star_count": star_count,
+        }
+        return await self._post(
+            "transferGift",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def transfer_business_account_stars(
+        self,
+        business_connection_id: str,
+        star_count: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Transfers Telegram Stars from the business account balance to the bot's balance. Requires
+        the :attr:`~telegram.BusinessBotRights.can_transfer_stars` business bot right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+                connection
+            star_count (:obj:`int`): Number of Telegram Stars to transfer;
+                :tg-const:`~telegram.constants.BusinessLimit.MIN_STAR_COUNT`\
+-:tg-const:`~telegram.constants.BusinessLimit.MAX_STAR_COUNT`
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "star_count": star_count,
+        }
+        return await self._post(
+            "transferBusinessAccountStars",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def replace_sticker_in_set(
@@ -10336,8 +11313,44 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`get_user_chat_boosts`"""
     setMessageReaction = set_message_reaction
     """Alias for :meth:`set_message_reaction`"""
+    giftPremiumSubscription = gift_premium_subscription
+    """Alias for :meth:`gift_premium_subscription`"""
+    getBusinessAccountGifts = get_business_account_gifts
+    """Alias for :meth:`get_business_account_gifts`"""
+    getBusinessAccountStarBalance = get_business_account_star_balance
+    """Alias for :meth:`get_business_account_star_balance`"""
     getBusinessConnection = get_business_connection
     """Alias for :meth:`get_business_connection`"""
+    readBusinessMessage = read_business_message
+    """Alias for :meth:`read_business_message`"""
+    deleteBusinessMessages = delete_business_messages
+    """Alias for :meth:`delete_business_messages`"""
+    postStory = post_story
+    """Alias for :meth:`post_story`"""
+    editStory = edit_story
+    """Alias for :meth:`edit_story`"""
+    deleteStory = delete_story
+    """Alias for :meth:`delete_story`"""
+    setBusinessAccountName = set_business_account_name
+    """Alias for :meth:`set_business_account_name`"""
+    setBusinessAccountUsername = set_business_account_username
+    """Alias for :meth:`set_business_account_username`"""
+    setBusinessAccountBio = set_business_account_bio
+    """Alias for :meth:`set_business_account_bio`"""
+    setBusinessAccountGiftSettings = set_business_account_gift_settings
+    """Alias for :meth:`set_business_account_gift_settings`"""
+    setBusinessAccountProfilePhoto = set_business_account_profile_photo
+    """Alias for :meth:`set_business_account_profile_photo`"""
+    removeBusinessAccountProfilePhoto = remove_business_account_profile_photo
+    """Alias for :meth:`remove_business_account_profile_photo`"""
+    convertGiftToStars = convert_gift_to_stars
+    """Alias for :meth:`convert_gift_to_stars`"""
+    upgradeGift = upgrade_gift
+    """Alias for :meth:`upgrade_gift`"""
+    transferGift = transfer_gift
+    """Alias for :meth:`transfer_gift`"""
+    transferBusinessAccountStars = transfer_business_account_stars
+    """Alias for :meth:`transfer_business_account_stars`"""
     replaceStickerInSet = replace_sticker_in_set
     """Alias for :meth:`replace_sticker_in_set`"""
     refundStarPayment = refund_star_payment

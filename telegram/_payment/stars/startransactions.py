@@ -52,9 +52,9 @@ class StarTransaction(TelegramObject):
             successful incoming payments from users.
         amount (:obj:`int`): Integer amount of Telegram Stars transferred by the transaction.
         nanostar_amount (:obj:`int`, optional): The number of
-            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            :tg-const:`~telegram.constants.Nanostar.VALUE` shares of Telegram
             Stars transferred by the transaction; from 0 to
-            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`
+            :tg-const:`~telegram.constants.NanostarLimit.MAX_AMOUNT`
 
             .. versionadded:: 21.9
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
@@ -72,9 +72,9 @@ class StarTransaction(TelegramObject):
             successful incoming payments from users.
         amount (:obj:`int`): Integer amount of Telegram Stars transferred by the transaction.
         nanostar_amount (:obj:`int`): Optional. The number of
-            :tg-const:`~telegram.constants.StarTransactions.NANOSTAR_VALUE` shares of Telegram
+            :tg-const:`~telegram.constants.Nanostar.VALUE` shares of Telegram
             Stars transferred by the transaction; from 0 to
-            :tg-const:`~telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT`
+            :tg-const:`~telegram.constants.NanostarLimit.MAX_AMOUNT`
 
             .. versionadded:: 21.9
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.

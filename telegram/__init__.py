@@ -20,6 +20,7 @@
 
 __author__ = "devs@python-telegram-bot.org"
 __all__ = (
+    "AcceptedGiftTypes",
     "AffiliateInfo",
     "Animation",
     "Audio",
@@ -46,6 +47,7 @@ __all__ = (
     "BotDescription",
     "BotName",
     "BotShortDescription",
+    "BusinessBotRights",
     "BusinessConnection",
     "BusinessIntro",
     "BusinessLocation",
@@ -103,6 +105,7 @@ __all__ = (
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
     "Gift",
+    "GiftInfo",
     "Gifts",
     "Giveaway",
     "GiveawayCompleted",
@@ -150,7 +153,13 @@ __all__ = (
     "InputPaidMediaPhoto",
     "InputPaidMediaVideo",
     "InputPollOption",
+    "InputProfilePhoto",
+    "InputProfilePhotoAnimated",
+    "InputProfilePhotoStatic",
     "InputSticker",
+    "InputStoryContent",
+    "InputStoryContentPhoto",
+    "InputStoryContentVideo",
     "InputTextMessageContent",
     "InputVenueMessageContent",
     "Invoice",
@@ -161,6 +170,7 @@ __all__ = (
     "LabeledPrice",
     "LinkPreviewOptions",
     "Location",
+    "LocationAddress",
     "LoginUrl",
     "MaskPosition",
     "MaybeInaccessibleMessage",
@@ -180,12 +190,17 @@ __all__ = (
     "MessageReactionCountUpdated",
     "MessageReactionUpdated",
     "OrderInfo",
+    "OwnedGift",
+    "OwnedGiftRegular",
+    "OwnedGiftUnique",
+    "OwnedGifts",
     "PaidMedia",
     "PaidMediaInfo",
     "PaidMediaPhoto",
     "PaidMediaPreview",
     "PaidMediaPurchased",
     "PaidMediaVideo",
+    "PaidMessagePriceChanged",
     "PassportData",
     "PassportElementError",
     "PassportElementErrorDataField",
@@ -227,11 +242,20 @@ __all__ = (
     "ShippingAddress",
     "ShippingOption",
     "ShippingQuery",
+    "StarAmount",
     "StarTransaction",
     "StarTransactions",
     "Sticker",
     "StickerSet",
     "Story",
+    "StoryArea",
+    "StoryAreaPosition",
+    "StoryAreaType",
+    "StoryAreaTypeLink",
+    "StoryAreaTypeLocation",
+    "StoryAreaTypeSuggestedReaction",
+    "StoryAreaTypeUniqueGift",
+    "StoryAreaTypeWeather",
     "SuccessfulPayment",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
@@ -244,6 +268,12 @@ __all__ = (
     "TransactionPartnerTelegramAds",
     "TransactionPartnerTelegramApi",
     "TransactionPartnerUser",
+    "UniqueGift",
+    "UniqueGiftBackdrop",
+    "UniqueGiftBackdropColors",
+    "UniqueGiftInfo",
+    "UniqueGiftModel",
+    "UniqueGiftSymbol",
     "Update",
     "User",
     "UserChatBoosts",
@@ -272,6 +302,7 @@ __all__ = (
     "warnings",
 )
 
+from telegram._payment.stars.staramount import StarAmount
 from telegram._payment.stars.startransactions import StarTransaction, StarTransactions
 from telegram._payment.stars.transactionpartner import (
     TransactionPartner,
@@ -301,6 +332,7 @@ from ._botcommandscope import (
 from ._botdescription import BotDescription, BotShortDescription
 from ._botname import BotName
 from ._business import (
+    BusinessBotRights,
     BusinessConnection,
     BusinessIntro,
     BusinessLocation,
@@ -352,6 +384,11 @@ from ._chatpermissions import ChatPermissions
 from ._choseninlineresult import ChosenInlineResult
 from ._copytextbutton import CopyTextButton
 from ._dice import Dice
+from ._files._inputstorycontent import (
+    InputStoryContent,
+    InputStoryContentPhoto,
+    InputStoryContentVideo,
+)
 from ._files.animation import Animation
 from ._files.audio import Audio
 from ._files.chatphoto import ChatPhoto
@@ -369,6 +406,11 @@ from ._files.inputmedia import (
     InputPaidMedia,
     InputPaidMediaPhoto,
     InputPaidMediaVideo,
+)
+from ._files.inputprofilephoto import (
+    InputProfilePhoto,
+    InputProfilePhotoAnimated,
+    InputProfilePhotoStatic,
 )
 from ._files.inputsticker import InputSticker
 from ._files.location import Location
@@ -391,7 +433,7 @@ from ._forumtopic import (
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
-from ._gifts import Gift, Gifts
+from ._gifts import AcceptedGiftTypes, Gift, GiftInfo, Gifts
 from ._giveaway import Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -443,6 +485,7 @@ from ._messageorigin import (
     MessageOriginUser,
 )
 from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
+from ._ownedgift import OwnedGift, OwnedGiftRegular, OwnedGifts, OwnedGiftUnique
 from ._paidmedia import (
     PaidMedia,
     PaidMediaInfo,
@@ -451,6 +494,7 @@ from ._paidmedia import (
     PaidMediaPurchased,
     PaidMediaVideo,
 )
+from ._paidmessagepricechanged import PaidMessagePriceChanged
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -506,8 +550,27 @@ from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
 from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story
+from ._storyarea import (
+    LocationAddress,
+    StoryArea,
+    StoryAreaPosition,
+    StoryAreaType,
+    StoryAreaTypeLink,
+    StoryAreaTypeLocation,
+    StoryAreaTypeSuggestedReaction,
+    StoryAreaTypeUniqueGift,
+    StoryAreaTypeWeather,
+)
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
+from ._uniquegift import (
+    UniqueGift,
+    UniqueGiftBackdrop,
+    UniqueGiftBackdropColors,
+    UniqueGiftInfo,
+    UniqueGiftModel,
+    UniqueGiftSymbol,
+)
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos

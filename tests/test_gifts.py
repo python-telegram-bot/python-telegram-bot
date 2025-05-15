@@ -20,7 +20,8 @@ from collections.abc import Sequence
 
 import pytest
 
-from telegram import BotCommand, Gift, Gifts, MessageEntity, Sticker
+from telegram import BotCommand, Gift, GiftInfo, Gifts, MessageEntity, Sticker
+from telegram._gifts import AcceptedGiftTypes
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.request import RequestData
 from tests.auxil.slots import mro_slots
@@ -291,3 +292,190 @@ class TestGiftsWithRequest(GiftTestBase):
     async def test_get_available_gifts(self, bot, chat_id):
         # We don't control the available gifts, so we can not make any better assertions
         assert isinstance(await bot.get_available_gifts(), Gifts)
+
+
+@pytest.fixture
+def gift_info():
+    return GiftInfo(
+        gift=GiftInfoTestBase.gift,
+        owned_gift_id=GiftInfoTestBase.owned_gift_id,
+        convert_star_count=GiftInfoTestBase.convert_star_count,
+        prepaid_upgrade_star_count=GiftInfoTestBase.prepaid_upgrade_star_count,
+        can_be_upgraded=GiftInfoTestBase.can_be_upgraded,
+        text=GiftInfoTestBase.text,
+        entities=GiftInfoTestBase.entities,
+        is_private=GiftInfoTestBase.is_private,
+    )
+
+
+class GiftInfoTestBase:
+    gift = Gift(
+        id="some_id",
+        sticker=Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
+        star_count=5,
+        total_count=10,
+        remaining_count=15,
+        upgrade_star_count=20,
+    )
+    owned_gift_id = "some_owned_gift_id"
+    convert_star_count = 100
+    prepaid_upgrade_star_count = 200
+    can_be_upgraded = True
+    text = "test text"
+    entities = (
+        MessageEntity(MessageEntity.BOLD, 0, 4),
+        MessageEntity(MessageEntity.ITALIC, 5, 8),
+    )
+    is_private = True
+
+
+class TestGiftInfoWithoutRequest(GiftInfoTestBase):
+    def test_slot_behaviour(self, gift_info):
+        for attr in gift_info.__slots__:
+            assert getattr(gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(gift_info)) == len(set(mro_slots(gift_info))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "gift": self.gift.to_dict(),
+            "owned_gift_id": self.owned_gift_id,
+            "convert_star_count": self.convert_star_count,
+            "prepaid_upgrade_star_count": self.prepaid_upgrade_star_count,
+            "can_be_upgraded": self.can_be_upgraded,
+            "text": self.text,
+            "entities": [e.to_dict() for e in self.entities],
+            "is_private": self.is_private,
+        }
+        gift_info = GiftInfo.de_json(json_dict, offline_bot)
+        assert gift_info.api_kwargs == {}
+        assert gift_info.gift == self.gift
+        assert gift_info.owned_gift_id == self.owned_gift_id
+        assert gift_info.convert_star_count == self.convert_star_count
+        assert gift_info.prepaid_upgrade_star_count == self.prepaid_upgrade_star_count
+        assert gift_info.can_be_upgraded == self.can_be_upgraded
+        assert gift_info.text == self.text
+        assert gift_info.entities == self.entities
+        assert gift_info.is_private == self.is_private
+
+    def test_to_dict(self, gift_info):
+        json_dict = gift_info.to_dict()
+        assert json_dict["gift"] == self.gift.to_dict()
+        assert json_dict["owned_gift_id"] == self.owned_gift_id
+        assert json_dict["convert_star_count"] == self.convert_star_count
+        assert json_dict["prepaid_upgrade_star_count"] == self.prepaid_upgrade_star_count
+        assert json_dict["can_be_upgraded"] == self.can_be_upgraded
+        assert json_dict["text"] == self.text
+        assert json_dict["entities"] == [e.to_dict() for e in self.entities]
+        assert json_dict["is_private"] == self.is_private
+
+    def test_parse_entity(self, gift_info):
+        entity = MessageEntity(MessageEntity.BOLD, 0, 4)
+
+        assert gift_info.parse_entity(entity) == "test"
+
+        with pytest.raises(RuntimeError, match="GiftInfo has no"):
+            GiftInfo(
+                gift=self.gift,
+            ).parse_entity(entity)
+
+    def test_parse_entities(self, gift_info):
+        entity = MessageEntity(MessageEntity.BOLD, 0, 4)
+        entity_2 = MessageEntity(MessageEntity.ITALIC, 5, 8)
+
+        assert gift_info.parse_entities(MessageEntity.BOLD) == {entity: "test"}
+        assert gift_info.parse_entities() == {entity: "test", entity_2: "text"}
+
+        with pytest.raises(RuntimeError, match="GiftInfo has no"):
+            GiftInfo(
+                gift=self.gift,
+            ).parse_entities()
+
+    def test_equality(self, gift_info):
+        a = gift_info
+        b = GiftInfo(gift=self.gift)
+        c = GiftInfo(
+            gift=Gift(
+                id="some_other_gift_id",
+                sticker=Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
+                star_count=5,
+            ),
+        )
+        d = BotCommand("start", "description")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def accepted_gift_types():
+    return AcceptedGiftTypes(
+        unlimited_gifts=AcceptedGiftTypesTestBase.unlimited_gifts,
+        limited_gifts=AcceptedGiftTypesTestBase.limited_gifts,
+        unique_gifts=AcceptedGiftTypesTestBase.unique_gifts,
+        premium_subscription=AcceptedGiftTypesTestBase.premium_subscription,
+    )
+
+
+class AcceptedGiftTypesTestBase:
+    unlimited_gifts = False
+    limited_gifts = True
+    unique_gifts = True
+    premium_subscription = True
+
+
+class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
+    def test_slot_behaviour(self, accepted_gift_types):
+        for attr in accepted_gift_types.__slots__:
+            assert getattr(accepted_gift_types, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(accepted_gift_types)) == len(
+            set(mro_slots(accepted_gift_types))
+        ), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "unlimited_gifts": self.unlimited_gifts,
+            "limited_gifts": self.limited_gifts,
+            "unique_gifts": self.unique_gifts,
+            "premium_subscription": self.premium_subscription,
+        }
+        accepted_gift_types = AcceptedGiftTypes.de_json(json_dict, offline_bot)
+        assert accepted_gift_types.api_kwargs == {}
+        assert accepted_gift_types.unlimited_gifts == self.unlimited_gifts
+        assert accepted_gift_types.limited_gifts == self.limited_gifts
+        assert accepted_gift_types.unique_gifts == self.unique_gifts
+        assert accepted_gift_types.premium_subscription == self.premium_subscription
+
+    def test_to_dict(self, accepted_gift_types):
+        json_dict = accepted_gift_types.to_dict()
+        assert json_dict["unlimited_gifts"] == self.unlimited_gifts
+        assert json_dict["limited_gifts"] == self.limited_gifts
+        assert json_dict["unique_gifts"] == self.unique_gifts
+        assert json_dict["premium_subscription"] == self.premium_subscription
+
+    def test_equality(self, accepted_gift_types):
+        a = accepted_gift_types
+        b = AcceptedGiftTypes(
+            self.unlimited_gifts, self.limited_gifts, self.unique_gifts, self.premium_subscription
+        )
+        c = AcceptedGiftTypes(
+            not self.unlimited_gifts,
+            self.limited_gifts,
+            self.unique_gifts,
+            self.premium_subscription,
+        )
+        d = BotCommand("start", "description")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
