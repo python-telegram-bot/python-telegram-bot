@@ -2091,7 +2091,7 @@ class StatusUpdate:
     GIFT = _Gift(name="filters.StatusUpdate.GIFT")
     """Messages that contain :attr:`telegram.Message.gift`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     class _GiveawayCreated(MessageFilter):
@@ -2188,7 +2188,7 @@ class StatusUpdate:
     )
     """Messages that contain :attr:`telegram.Message.paid_message_price_changed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     class _PinnedMessage(MessageFilter):
@@ -2231,7 +2231,7 @@ class StatusUpdate:
     UNIQUE_GIFT = _UniqueGift(name="filters.StatusUpdate.UNIQUE_GIFT")
     """Messages that contain :attr:`telegram.Message.unique_gift`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     class _UsersShared(MessageFilter):

@@ -720,7 +720,7 @@ class BusinessLimit(IntEnum):
     """This enum contains limitations related to handling business accounts. The enum members
     of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -961,7 +961,7 @@ class ChatSubscriptionLimit(IntEnum):
     MAX_PRICE = 10000
     """:obj:`int`: Amount of stars a user pays, maximum amount the subscription can be set to.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.1
         Bot API 9.0 changed the value to 10000.
     """
 
@@ -1448,7 +1448,7 @@ class InputProfilePhotoType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputProfilePhoto`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -1464,7 +1464,7 @@ class InputStoryContentLimit(StringEnum):
     :class:`telegram.InputStoryContentVideo`. The enum members of this enumeration are instances
     of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -1510,7 +1510,7 @@ class InputStoryContentType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputStoryContent`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -2104,7 +2104,7 @@ class MessageType(StringEnum):
     GIFT = "gift"
     """:obj:`str`: Messages with :attr:`telegram.Message.gift`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
@@ -2197,7 +2197,7 @@ class MessageType(StringEnum):
     UNIQUE_GIFT = "unique_gift"
     """:obj:`str`: Messages with :attr:`telegram.Message.unique_gift`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
     USERS_SHARED = "users_shared"
     """:obj:`str`: Messages with :attr:`telegram.Message.users_shared`.
@@ -2239,7 +2239,7 @@ class Nanostar(FloatEnum):
     The enum members of this enumeration are instances of :class:`float` and can be treated as
     such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -2260,7 +2260,7 @@ class NanostarLimit(IntEnum):
     and :class:`telegram.StarAmount`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -2284,7 +2284,7 @@ class OwnedGiftType(StringEnum):
     """This enum contains the available types of :class:`telegram.OwnedGift`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -2336,7 +2336,7 @@ class PremiumSubscription(IntEnum):
     """This enum contains limitations for :meth:`~telegram.Bot.gift_premium_subscription`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -2737,7 +2737,7 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
 
 
-# tags: deprecated NEXT.VERSION, bot api 9.0
+# tags: deprecated 22.1, bot api 9.0
 class StarTransactions(FloatEnum):
     """This enum contains constants for :class:`telegram.StarTransaction`.
     The enum members of this enumeration are instances of :class:`float` and can be treated as
@@ -2745,7 +2745,7 @@ class StarTransactions(FloatEnum):
 
     .. versionadded:: 21.9
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 22.1
         This class will be removed as its only member :attr:`NANOSTAR_VALUE` will be replaced
         by :attr:`telegram.constants.Nanostar.VALUE`.
     """
@@ -2756,7 +2756,7 @@ class StarTransactions(FloatEnum):
     """:obj:`float`: The value of one nanostar as used in
     :attr:`telegram.StarTransaction.nanostar_amount`.
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 22.1
         This member will be replaced by :attr:`telegram.constants.Nanostar.VALUE`.
     """
 
@@ -2779,17 +2779,17 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
-    # tags: deprecated NEXT.VERSION, bot api 9.0
+    # tags: deprecated 22.1, bot api 9.0
     NANOSTAR_MIN_AMOUNT = NanostarLimit.MIN_AMOUNT
     """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
     parameter of :class:`telegram.AffiliateInfo`.
 
     .. versionadded:: 21.9
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 22.1
         This member will be replaced by :attr:`telegram.constants.NanostarLimit.MIN_AMOUNT`.
     """
-    # tags: deprecated NEXT.VERSION, bot api 9.0
+    # tags: deprecated 22.1, bot api 9.0
     NANOSTAR_MAX_AMOUNT = NanostarLimit.MAX_AMOUNT
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
     parameter of :class:`telegram.StarTransaction` and
@@ -2798,7 +2798,7 @@ class StarTransactionsLimit(IntEnum):
 
     .. versionadded:: 21.9
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 22.1
         This member will be replaced by :attr:`telegram.constants.NanostarLimit.MAX_AMOUNT`.
     """
 
@@ -2940,7 +2940,7 @@ class StoryAreaPositionLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.StoryAreaPosition`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -2956,7 +2956,7 @@ class StoryAreaTypeLimit(IntEnum):
     """This enum contains limitations for subclasses of :class:`telegram.StoryAreaType`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -2982,7 +2982,7 @@ class StoryAreaTypeType(StringEnum):
     """This enum contains the available types of :class:`telegram.StoryAreaType`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -3004,7 +3004,7 @@ class StoryLimit(StringEnum):
     :meth:`~telegram.Bot.edit_story`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -3068,7 +3068,7 @@ class TransactionPartnerUser(StringEnum):
     The enum members of this enumeration are instances of :class:`str` and can be treated as
     such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -3201,7 +3201,7 @@ class UniqueGiftInfoOrigin(StringEnum):
     """This enum contains the available origins for :class:`telegram.UniqueGiftInfo`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
     """
 
     __slots__ = ()
@@ -3389,7 +3389,7 @@ class InvoiceLimit(IntEnum):
     :meth:`telegram.Bot.send_paid_media`.
 
     .. versionadded:: 21.6
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.1
         Bot API 9.0 changed the value to 10000.
     """
     SUBSCRIPTION_PERIOD = dtm.timedelta(days=30).total_seconds()
@@ -3404,7 +3404,7 @@ class InvoiceLimit(IntEnum):
     :meth:`telegram.Bot.create_invoice_link`.
 
     .. versionadded:: 21.9
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.1
         Bot API 9.0 changed the value to 10000.
     """
 

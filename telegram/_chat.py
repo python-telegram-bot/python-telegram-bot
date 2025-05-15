@@ -3524,7 +3524,7 @@ class _ChatBase(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.transfer_gift`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3621,7 +3621,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.read_business_message`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.1
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

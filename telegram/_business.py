@@ -48,7 +48,7 @@ class BusinessBotRights(TelegramObject):
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if all their attributes are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         can_reply (:obj:`bool`, optional): True, if the bot can send and edit messages in the
@@ -194,7 +194,7 @@ class BusinessConnection(TelegramObject):
     :attr:`rights`, and :attr:`is_enabled` are equal.
 
     .. versionadded:: 21.1
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.1
         Equality comparison now considers :attr:`rights` instead of :attr:`can_reply`.
 
     Args:
@@ -206,12 +206,12 @@ class BusinessConnection(TelegramObject):
         can_reply (:obj:`bool`, optional): True, if the bot can act on behalf of the business
             account in chats that were active in the last 24 hours.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 22.1
                 Bot API 9.0 deprecated this argument in favor of :paramref:`rights`.
         is_enabled (:obj:`bool`): True, if the connection is active.
         rights (:class:`BusinessBotRights`, optional): Rights of the business bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
 
     Attributes:
         id (:obj:`str`): Unique identifier of the business connection.
@@ -222,7 +222,7 @@ class BusinessConnection(TelegramObject):
         is_enabled (:obj:`bool`): True, if the connection is active.
         rights (:class:`BusinessBotRights`): Optional. Rights of the business bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.1
     """
 
     __slots__ = (
@@ -243,7 +243,7 @@ class BusinessConnection(TelegramObject):
         date: dtm.datetime,
         can_reply: Optional[bool] = None,
         # temporarily optional to account for changed signature
-        # tags: deprecated NEXT.VERSION; bot api 9.0
+        # tags: deprecated 22.1; bot api 9.0
         is_enabled: Optional[bool] = None,
         rights: Optional[BusinessBotRights] = None,
         *,
@@ -255,7 +255,7 @@ class BusinessConnection(TelegramObject):
         if can_reply is not None:
             warn(
                 PTBDeprecationWarning(
-                    version="NEXT.VERSION",
+                    version="22.1",
                     message=build_deprecation_warning_message(
                         deprecated_name="can_reply",
                         new_name="rights",
@@ -291,14 +291,14 @@ class BusinessConnection(TelegramObject):
         """:obj:`bool`: Optional. True, if the bot can act on behalf of the business account in
         chats that were active in the last 24 hours.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 22.1
             Bot API 9.0 deprecated this argument in favor of :attr:`rights`
         """
         warn_about_deprecated_attr_in_property(
             deprecated_attr_name="can_reply",
             new_attr_name="rights",
             bot_api_version="9.0",
-            ptb_version="NEXT.VERSION",
+            ptb_version="22.1",
         )
         return self._can_reply
 

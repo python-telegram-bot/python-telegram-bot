@@ -37,7 +37,7 @@ class InputProfilePhoto(TelegramObject):
     * :class:`InputProfilePhotoStatic`
     * :class:`InputProfilePhotoAnimated`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         type (:obj:`str`): Type of the profile photo.
@@ -69,7 +69,7 @@ class InputProfilePhoto(TelegramObject):
 class InputProfilePhotoStatic(InputProfilePhoto):
     """A static profile photo in the .JPG format.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         photo (:term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
@@ -101,7 +101,7 @@ class InputProfilePhotoStatic(InputProfilePhoto):
 class InputProfilePhotoAnimated(InputProfilePhoto):
     """An animated profile photo in the MPEG4 format.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         animation (:term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \

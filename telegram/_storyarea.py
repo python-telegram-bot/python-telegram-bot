@@ -33,7 +33,7 @@ class StoryAreaPosition(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if all of their attributes are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         x_percentage (:obj:`float`): The abscissa of the area's center, as a percentage of the
@@ -111,7 +111,7 @@ class LocationAddress(TelegramObject):
     considered equal, if their :attr:`country_code`, :attr:`state`, :attr:`city` and :attr:`street`
     are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         country_code (:obj:`str`): The two-letter ``ISO 3166-1 alpha-2`` country code of the
@@ -162,7 +162,7 @@ class StoryAreaType(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         type (:obj:`str`): Type of the area.
@@ -205,7 +205,7 @@ class StoryAreaTypeLocation(StoryAreaType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`latitude` and :attr:`longitude` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         latitude (:obj:`float`): Location latitude in degrees.
@@ -250,7 +250,7 @@ class StoryAreaTypeSuggestedReaction(StoryAreaType):
     considered equal, if their :attr:`reaction_type`, :attr:`is_dark` and :attr:`is_flipped`
     are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         reaction_type (:class:`ReactionType`): Type of the reaction.
@@ -295,7 +295,7 @@ class StoryAreaTypeLink(StoryAreaType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`url` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         url (:obj:`str`): ``HTTP`` or ``tg://`` URL to be opened when the area is clicked.
@@ -331,7 +331,7 @@ class StoryAreaTypeWeather(StoryAreaType):
     considered equal, if their :attr:`temperature`, :attr:`emoji` and
     :attr:`background_color` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         temperature (:obj:`float`): Temperature, in degree Celsius.
@@ -375,7 +375,7 @@ class StoryAreaTypeUniqueGift(StoryAreaType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`name` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         name (:obj:`str`): Unique name of the gift.
@@ -409,7 +409,7 @@ class StoryArea(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`position` and :attr:`type` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.1
 
     Args:
         position (:class:`telegram.StoryAreaPosition`): Position of the area.
