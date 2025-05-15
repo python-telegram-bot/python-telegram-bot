@@ -126,33 +126,15 @@ class TestAudioWithoutRequest(AudioTestBase):
             assert audio.duration == int(self.duration.total_seconds())
             assert isinstance(audio.duration, int)
 
-    @pytest.mark.parametrize("duration", [3, dtm.timedelta(seconds=3)])
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
-        audio = Audio(
-            "id",
-            "unique_id",
-            duration=duration,
-        )
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, audio):
+        audio.duration
 
-        if isinstance(duration, int):
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
             assert len(recwarn) == 1
             assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
-        else:
-            assert len(recwarn) == 0
-
-        warn_count = len(recwarn)
-        value = audio.duration
-
-        if not PTB_TIMEDELTA:
-            # An additional warning from property access
-            assert len(recwarn) == warn_count + 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
-            assert recwarn[-1].category is PTBDeprecationWarning
-            assert isinstance(value, (int, float))
-        else:
-            assert len(recwarn) == warn_count
-            assert isinstance(value, dtm.timedelta)
 
     def test_equality(self, audio):
         a = Audio(audio.file_id, audio.file_unique_id, audio.duration)

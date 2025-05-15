@@ -380,37 +380,17 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             )
             assert isinstance(cfi.message_auto_delete_time, int)
 
-    @pytest.mark.parametrize("field_name", ["slow_mode_delay", "message_auto_delete_time"])
-    @pytest.mark.parametrize("period", [30, dtm.timedelta(seconds=30)])
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, field_name, period):
-        cfi = ChatFullInfo(
-            id=123456,
-            type="dummy_type",
-            accent_color_id=1,
-            max_reaction_count=1,
-            accepted_gift_types=self.accepted_gift_types,
-            **{field_name: period},
-        )
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, chat_full_info):
+        chat_full_info.slow_mode_delay
+        chat_full_info.message_auto_delete_time
 
-        if isinstance(period, int):
-            assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
-            assert recwarn[0].category is PTBDeprecationWarning
-        else:
+        if PTB_TIMEDELTA:
             assert len(recwarn) == 0
-
-        warn_count = len(recwarn)
-        value = getattr(cfi, field_name)
-
-        if not PTB_TIMEDELTA:
-            # An additional warning from property access
-            assert len(recwarn) == warn_count + 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
-            assert recwarn[-1].category is PTBDeprecationWarning
-            assert isinstance(value, (int, float))
         else:
-            assert len(recwarn) == warn_count
-            assert isinstance(value, dtm.timedelta)
+            assert len(recwarn) == 2
+            for i in range(2):
+                assert "will be of type `datetime.timedelta`" in str(recwarn[i].message)
+                assert recwarn[i].category is PTBDeprecationWarning
 
     def test_always_tuples_attributes(self):
         cfi = ChatFullInfo(

@@ -118,34 +118,15 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
             assert video_note.duration == int(self.duration.total_seconds())
             assert isinstance(video_note.duration, int)
 
-    @pytest.mark.parametrize("duration", [3, dtm.timedelta(seconds=3)])
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
-        video_note = VideoNote(
-            "video_note_id",
-            "unique_id",
-            20,
-            duration=duration,
-        )
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, video_note):
+        video_note.duration
 
-        if isinstance(duration, int):
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
             assert len(recwarn) == 1
             assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
-        else:
-            assert len(recwarn) == 0
-
-        warn_count = len(recwarn)
-        value = video_note.duration
-
-        if not PTB_TIMEDELTA:
-            # An additional warning from property access
-            assert len(recwarn) == warn_count + 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
-            assert recwarn[-1].category is PTBDeprecationWarning
-            assert isinstance(value, (int, float))
-        else:
-            assert len(recwarn) == warn_count
-            assert isinstance(value, dtm.timedelta)
 
     def test_equality(self, video_note):
         a = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)

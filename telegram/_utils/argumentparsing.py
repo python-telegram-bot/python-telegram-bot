@@ -30,8 +30,6 @@ from typing import TYPE_CHECKING, Optional, Protocol, TypeVar
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from typing import type_check_only
@@ -65,14 +63,6 @@ def parse_period_arg(arg: Optional[TimePeriod]) -> Optional[dtm.timedelta]:
     if arg is None:
         return None
     if isinstance(arg, int):
-        warn(
-            PTBDeprecationWarning(
-                "NEXT.VERSION",
-                "In a future major version this will be of type `datetime.timedelta`."
-                " You can opt-in early by setting the `PTB_TIMEDELTA` environment variable.",
-            ),
-            stacklevel=2,
-        )
         return dtm.timedelta(seconds=arg)
     return arg
 

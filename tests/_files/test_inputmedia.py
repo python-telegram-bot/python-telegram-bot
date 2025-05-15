@@ -208,40 +208,24 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video_dict["start_timestamp"] == input_media_video.start_timestamp
 
     def test_time_period_properties(self, PTB_TIMEDELTA, input_media_video):
-        imv = input_media_video
+        duration = input_media_video.duration
+
         if PTB_TIMEDELTA:
-            assert imv.duration == self.duration
-            assert isinstance(imv.duration, dtm.timedelta)
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
         else:
-            assert imv.duration == int(self.duration.total_seconds())
-            assert isinstance(imv.duration, int)
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
 
-    @pytest.mark.parametrize("duration", [5, dtm.timedelta(seconds=5)])
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
-        input_media_video = InputMediaVideo(
-            media="media",
-            duration=duration,
-        )
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, input_media_video):
+        input_media_video.duration
 
-        if isinstance(duration, int):
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
             assert len(recwarn) == 1
             assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
-        else:
-            assert len(recwarn) == 0
-
-        warn_count = len(recwarn)
-        value = input_media_video.duration
-
-        if not PTB_TIMEDELTA:
-            # An additional warning from property access
-            assert len(recwarn) == warn_count + 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
-            assert recwarn[-1].category is PTBDeprecationWarning
-            assert isinstance(value, (int, float))
-        else:
-            assert len(recwarn) == warn_count
-            assert isinstance(value, dtm.timedelta)
 
     def test_with_video(self, video, PTB_TIMEDELTA):
         # fixture found in test_video
@@ -410,40 +394,24 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
         )
 
     def test_time_period_properties(self, PTB_TIMEDELTA, input_media_animation):
-        ima = input_media_animation
+        duration = input_media_animation.duration
+
         if PTB_TIMEDELTA:
-            assert ima.duration == self.duration
-            assert isinstance(ima.duration, dtm.timedelta)
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
         else:
-            assert ima.duration == int(self.duration.total_seconds())
-            assert isinstance(ima.duration, int)
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
 
-    @pytest.mark.parametrize("duration", [5, dtm.timedelta(seconds=5)])
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
-        input_media_animation = InputMediaAnimation(
-            media="media",
-            duration=duration,
-        )
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, input_media_animation):
+        input_media_animation.duration
 
-        if isinstance(duration, int):
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
             assert len(recwarn) == 1
             assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
-        else:
-            assert len(recwarn) == 0
-
-        warn_count = len(recwarn)
-        value = input_media_animation.duration
-
-        if not PTB_TIMEDELTA:
-            # An additional warning from property access
-            assert len(recwarn) == warn_count + 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
-            assert recwarn[-1].category is PTBDeprecationWarning
-            assert isinstance(value, (int, float))
-        else:
-            assert len(recwarn) == warn_count
-            assert isinstance(value, dtm.timedelta)
 
     def test_with_animation(self, animation):
         # fixture found in test_animation
@@ -516,40 +484,24 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
         ]
 
     def test_time_period_properties(self, PTB_TIMEDELTA, input_media_audio):
-        ima = input_media_audio
+        duration = input_media_audio.duration
+
         if PTB_TIMEDELTA:
-            assert ima.duration == self.duration
-            assert isinstance(ima.duration, dtm.timedelta)
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
         else:
-            assert ima.duration == int(self.duration.total_seconds())
-            assert isinstance(ima.duration, int)
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
 
-    @pytest.mark.parametrize("duration", [5, dtm.timedelta(seconds=5)])
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
-        input_media_audio = InputMediaAudio(
-            media="media",
-            duration=duration,
-        )
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, input_media_audio):
+        input_media_audio.duration
 
-        if isinstance(duration, int):
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
             assert len(recwarn) == 1
             assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
-        else:
-            assert len(recwarn) == 0
-
-        warn_count = len(recwarn)
-        value = input_media_audio.duration
-
-        if not PTB_TIMEDELTA:
-            # An additional warning from property access
-            assert len(recwarn) == warn_count + 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
-            assert recwarn[-1].category is PTBDeprecationWarning
-            assert isinstance(value, (int, float))
-        else:
-            assert len(recwarn) == warn_count
-            assert isinstance(value, dtm.timedelta)
 
     def test_with_audio(self, audio):
         # fixture found in test_audio
@@ -715,40 +667,24 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
         )
 
     def test_time_period_properties(self, PTB_TIMEDELTA, input_paid_media_video):
-        ipmv = input_paid_media_video
+        duration = input_paid_media_video.duration
+
         if PTB_TIMEDELTA:
-            assert ipmv.duration == self.duration
-            assert isinstance(ipmv.duration, dtm.timedelta)
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
         else:
-            assert ipmv.duration == int(self.duration.total_seconds())
-            assert isinstance(ipmv.duration, int)
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
 
-    @pytest.mark.parametrize("duration", [5, dtm.timedelta(seconds=5)])
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
-        input_paid_media_video = InputPaidMediaVideo(
-            media="media",
-            duration=duration,
-        )
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, input_paid_media_video):
+        input_paid_media_video.duration
 
-        if isinstance(duration, int):
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
             assert len(recwarn) == 1
             assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
-        else:
-            assert len(recwarn) == 0
-
-        warn_count = len(recwarn)
-        value = input_paid_media_video.duration
-
-        if not PTB_TIMEDELTA:
-            # An additional warning from property access
-            assert len(recwarn) == warn_count + 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
-            assert recwarn[-1].category is PTBDeprecationWarning
-            assert isinstance(value, (int, float))
-        else:
-            assert len(recwarn) == warn_count
-            assert isinstance(value, dtm.timedelta)
 
     def test_with_video(self, video):
         # fixture found in test_video

@@ -297,40 +297,24 @@ class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase):
         assert hash(a) != hash(d)
 
     def test_time_period_properties(self, PTB_TIMEDELTA, paid_media_preview):
-        pmp = paid_media_preview
+        duration = paid_media_preview.duration
+
         if PTB_TIMEDELTA:
-            assert pmp.duration == self.duration
-            assert isinstance(pmp.duration, dtm.timedelta)
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
         else:
-            assert pmp.duration == int(self.duration.total_seconds())
-            assert isinstance(pmp.duration, int)
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
 
-    @pytest.mark.parametrize("duration", [60, dtm.timedelta(seconds=60)])
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, duration):
-        pmp = PaidMediaPreview(
-            width=self.width,
-            height=self.height,
-            duration=duration,
-        )
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, paid_media_preview):
+        paid_media_preview.duration
 
-        if isinstance(duration, int):
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
             assert len(recwarn) == 1
             assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
-        else:
-            assert len(recwarn) == 0
-
-        warn_count = len(recwarn)
-        value = pmp.duration
-
-        if not PTB_TIMEDELTA:
-            assert len(recwarn) == warn_count + 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[-1].message)
-            assert recwarn[-1].category is PTBDeprecationWarning
-            assert isinstance(value, (int, float))
-        else:
-            assert len(recwarn) == warn_count
-            assert isinstance(value, dtm.timedelta)
 
 
 # ===========================================================================================
