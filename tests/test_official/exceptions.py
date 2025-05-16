@@ -121,6 +121,14 @@ class ParamTypeCheckingExceptions:
         "|Input(Paid)?Media(Audio|Video|Animation)": {
             "duration": int,  # actual: Union[int, dtm.timedelta]
         },
+        "InlineQueryResult.*": {
+            "live_period": int,  # actual: Union[int, dtm.timedelta]
+            "voice_duration": int,  # actual: Union[int, dtm.timedelta]
+            "audio_duration": int,  # actual: Union[int, dtm.timedelta]
+            "video_duration": int,  # actual: Union[int, dtm.timedelta]
+            "mpeg4_duration": int,  # actual: Union[int, dtm.timedelta]
+            "gif_duration": int,  # actual: Union[int, dtm.timedelta]
+        },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },
