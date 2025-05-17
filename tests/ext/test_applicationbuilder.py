@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import inspect
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -576,9 +577,12 @@ class TestApplicationBuilder:
             (None, None, 0),
             (1, None, 1),
             (None, 1, 1),
+            (None, dtm.timedelta(seconds=1), 1),
             (DEFAULT_NONE, None, 10),
             (DEFAULT_NONE, 1, 11),
+            (DEFAULT_NONE, dtm.timedelta(seconds=1), 11),
             (1, 2, 3),
+            (1, dtm.timedelta(seconds=2), 3),
         ],
     )
     async def test_get_updates_read_timeout_value_passing(
