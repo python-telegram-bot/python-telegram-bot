@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
-import datetime as dtm
 
 from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
@@ -54,12 +53,6 @@ class ParamTypeCheckingExceptions:
         },
         "replace_sticker_in_set": {
             "old_sticker$": Sticker,
-        },
-        # The underscore will match any method
-        r"\w+_[\w_]+": {
-            "duration": dtm.timedelta,
-            r"\w+_period": dtm.timedelta,
-            "cache_time": dtm.timedelta,
         },
     }
 
@@ -102,7 +95,6 @@ class ParamTypeCheckingExceptions:
         },
         "InputProfilePhotoAnimated": {
             "animation": str,  # actual: Union[str, FileInput]
-            "main_frame_timestamp": float,  # actual: Union[float, dtm.timedelta]
         },
         "InputSticker": {
             "sticker": str,  # actual: Union[str, FileInput]
@@ -110,35 +102,9 @@ class ParamTypeCheckingExceptions:
         "InputStoryContent.*": {
             "photo": str,  # actual: Union[str, FileInput]
             "video": str,  # actual: Union[str, FileInput]
-            "duration": float,  # actual: dtm.timedelta
-            "cover_frame_timestamp": float,  # actual: dtm.timedelta
         },
-        "ChatFullInfo": {
-            "slow_mode_delay": int,  # actual: Union[int, dtm.timedelta]
-            "message_auto_delete_time": int,  # actual: Union[int, dtm.timedelta]
-        },
-        "Animation|Audio|Voice|Video(Note|ChatEnded)|PaidMediaPreview"
-        "|Input(Paid)?Media(Audio|Video|Animation)": {
-            "duration": int,  # actual: Union[int, dtm.timedelta]
-        },
-        "Video": {
-            "duration": int,  # actual: Union[int, dtm.timedelta]
-            "start_timestamp": int,  # actual: Union[int, dtm.timedelta]
-        },
-        "Poll": {"open_period": int},  # actual: Union[int, dtm.timedelta]
-        "Location": {"live_period": int},  # actual: Union[int, dtm.timedelta]
-        "ChatInviteLink": {"subscription_period": int},  # actual: Union[int, dtm.timedelta]
-        "InputLocationMessageContent": {"live_period": int},  # actual: Union[int, dtm.timedelta]
-        "MessageAutoDeleteTimerChanged": {
-            "message_auto_delete_time": int
-        },  # actual: Union[int, dtm.timedelta]
-        "InlineQueryResult.*": {
-            "live_period": int,  # actual: Union[int, dtm.timedelta]
-            "voice_duration": int,  # actual: Union[int, dtm.timedelta]
-            "audio_duration": int,  # actual: Union[int, dtm.timedelta]
-            "video_duration": int,  # actual: Union[int, dtm.timedelta]
-            "mpeg4_duration": int,  # actual: Union[int, dtm.timedelta]
-            "gif_duration": int,  # actual: Union[int, dtm.timedelta]
+        "TransactionPartnerUser": {
+            "subscription_period": int,  # actual: Union[int, dtm.timedelta]
         },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
