@@ -1,5 +1,35 @@
-other = "Use `timedelta` to represent time periods in classes"
+features = "Use `timedelta` to represent time periods in classes"
+deprecations = """In this release, we're migrating attributes that represent durations/time periods from :ob:`int` type to Python's native :class:`datetime.timedelta`.
+
+Enable the ``PTB_TIMEDELTA`` environment variable to adopt :obj:`timedelta` now. Support for :obj:`int` values is deprecated and will be removed in a future major version.
+
+Affected Attributes:
+- :attr:`telegram.ChatFullInfo.slow_mode_delay` and :attr:`telegram.ChatFullInfo.message_auto_delete_time`
+- :attr:`telegram.Animation.duration`
+- :attr:`telegram.Audio.duration`
+- :attr:`telegram.Video.duration` and :attr:`telegram.Video.start_timestamp`
+- :attr:`telegram.VideoNote.duration`
+- :attr:`telegram.Voice.duration`
+- :attr:`telegram.PaidMediaPreview.duration`
+- :attr:`telegram.VideoChatEnded.duration`
+- :attr:`telegram.InputMediaVideo.duration`
+- :attr:`telegram.InputMediaAnimation.duration`
+- :attr:`telegram.InputMediaAudio.duration`
+- :attr:`telegram.InputPaidMediaVideo.duration`
+- :attr:`telegram.InlineQueryResultGif.gif_duration`
+- :attr:`telegram.InlineQueryResultMpeg4Gif.mpeg4_duration`
+- :attr:`telegram.InlineQueryResultVideo.video_duration`
+- :attr:`telegram.InlineQueryResultAudio.audio_duration`
+- :attr:`telegram.InlineQueryResultVoice.voice_duration`
+- :attr:`telegram.InlineQueryResultLocation.live_period`
+- :attr:`telegram.Poll.open_period`
+- :attr:`telegram.Location.live_period`
+- :attr:`telegram.MessageAutoDeleteTimerChanged.message_auto_delete_time`
+- :attr:`telegram.ChatInviteLink.subscription_period`
+- :attr:`telegram.InputLocationMessageContent.live_period`
+"""
+internal = "Modify test_official to handle time periods as timedelta automatically."
 [[pull_requests]]
 uid = "4750"
 author_uid = "aelkheir"
-closes_threads = []
+closes_threads = ["4575"]
