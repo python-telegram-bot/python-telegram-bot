@@ -39,6 +39,13 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
+@pytest.fixture(scope="module")
+def video(video):
+    with video._unfrozen():
+        video._start_timestamp = VideoTestBase.start_timestamp
+    return video
+
+
 class VideoTestBase:
     width = 360
     height = 640
@@ -47,7 +54,7 @@ class VideoTestBase:
     mime_type = "video/mp4"
     supports_streaming = True
     file_name = "telegram.mp4"
-    start_timestamp = 3
+    start_timestamp = dtm.timedelta(seconds=3)
     cover = (PhotoSize("file_id", "unique_id", 640, 360, file_size=0),)
     thumb_width = 180
     thumb_height = 320
@@ -84,6 +91,7 @@ class TestVideoWithoutRequest(VideoTestBase):
         assert video._duration == self.duration
         assert video.file_size == self.file_size
         assert video.mime_type == self.mime_type
+        assert video._start_timestamp == self.start_timestamp
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -95,7 +103,7 @@ class TestVideoWithoutRequest(VideoTestBase):
             "mime_type": self.mime_type,
             "file_size": self.file_size,
             "file_name": self.file_name,
-            "start_timestamp": self.start_timestamp,
+            "start_timestamp": int(self.start_timestamp.total_seconds()),
             "cover": [photo_size.to_dict() for photo_size in self.cover],
         }
         json_video = Video.de_json(json_dict, offline_bot)
@@ -109,7 +117,7 @@ class TestVideoWithoutRequest(VideoTestBase):
         assert json_video.mime_type == self.mime_type
         assert json_video.file_size == self.file_size
         assert json_video.file_name == self.file_name
-        assert json_video.start_timestamp == self.start_timestamp
+        assert json_video._start_timestamp == self.start_timestamp
         assert json_video.cover == self.cover
 
     def test_to_dict(self, video):
@@ -125,24 +133,34 @@ class TestVideoWithoutRequest(VideoTestBase):
         assert video_dict["mime_type"] == video.mime_type
         assert video_dict["file_size"] == video.file_size
         assert video_dict["file_name"] == video.file_name
+        assert video_dict["start_timestamp"] == int(self.start_timestamp.total_seconds())
+        assert isinstance(video_dict["start_timestamp"], int)
 
     def test_time_period_properties(self, PTB_TIMEDELTA, video):
         if PTB_TIMEDELTA:
             assert video.duration == self.duration
             assert isinstance(video.duration, dtm.timedelta)
+
+            assert video.start_timestamp == self.start_timestamp
+            assert isinstance(video.start_timestamp, dtm.timedelta)
         else:
             assert video.duration == int(self.duration.total_seconds())
             assert isinstance(video.duration, int)
 
+            assert video.start_timestamp == int(self.start_timestamp.total_seconds())
+            assert isinstance(video.start_timestamp, int)
+
     def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, video):
         video.duration
+        video.start_timestamp
 
         if PTB_TIMEDELTA:
             assert len(recwarn) == 0
         else:
-            assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
-            assert recwarn[0].category is PTBDeprecationWarning
+            assert len(recwarn) == 2
+            for i in range(2):
+                assert "will be of type `datetime.timedelta`" in str(recwarn[i].message)
+                assert recwarn[i].category is PTBDeprecationWarning
 
     def test_equality(self, video):
         a = Video(video.file_id, video.file_unique_id, self.width, self.height, self.duration)
@@ -286,7 +304,7 @@ class TestVideoWithRequest(VideoTestBase):
         assert message.video.thumbnail.width == self.thumb_width
         assert message.video.thumbnail.height == self.thumb_height
 
-        assert message.video.start_timestamp == self.start_timestamp
+        assert message.video._start_timestamp == self.start_timestamp
 
         assert isinstance(message.video.cover, tuple)
         assert isinstance(message.video.cover[0], PhotoSize)

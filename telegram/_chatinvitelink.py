@@ -18,13 +18,17 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents an invite link for a chat."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import de_json_optional, parse_period_arg
+from telegram._utils.datetime import (
+    extract_tzinfo_from_defaults,
+    from_timestamp,
+    get_timedelta_value,
+)
+from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -70,10 +74,13 @@ class ChatInviteLink(TelegramObject):
             created using this link.
 
             .. versionadded:: 13.8
-        subscription_period (:obj:`int`, optional): The number of seconds the subscription will be
-            active for before the next payment.
+        subscription_period (:obj:`int` | :class:`datetime.timedelta`, optional): The number of
+            seconds the subscription will be active for before the next payment.
 
             .. versionadded:: 21.5
+
+            .. versionchanged:: NEXT.VERSION
+                |time-period-input|
         subscription_price (:obj:`int`, optional): The amount of Telegram Stars a user must pay
             initially and after each subsequent subscription period to be a member of the chat
             using the link.
@@ -107,10 +114,13 @@ class ChatInviteLink(TelegramObject):
             created using this link.
 
             .. versionadded:: 13.8
-        subscription_period (:obj:`int`): Optional. The number of seconds the subscription will be
-            active for before the next payment.
+        subscription_period (:obj:`int` | :class:`datetime.timedelta`): Optional. The number of
+            seconds the subscription will be active for before the next payment.
 
             .. versionadded:: 21.5
+
+            .. deprecated:: NEXT.VERSION
+                |time-period-int-deprecated|
         subscription_price (:obj:`int`): Optional. The amount of Telegram Stars a user must pay
             initially and after each subsequent subscription period to be a member of the chat
             using the link.
@@ -120,6 +130,7 @@ class ChatInviteLink(TelegramObject):
     """
 
     __slots__ = (
+        "_subscription_period",
         "creates_join_request",
         "creator",
         "expire_date",
@@ -129,7 +140,6 @@ class ChatInviteLink(TelegramObject):
         "member_limit",
         "name",
         "pending_join_request_count",
-        "subscription_period",
         "subscription_price",
     )
 
@@ -144,7 +154,7 @@ class ChatInviteLink(TelegramObject):
         member_limit: Optional[int] = None,
         name: Optional[str] = None,
         pending_join_request_count: Optional[int] = None,
-        subscription_period: Optional[int] = None,
+        subscription_period: Optional[TimePeriod] = None,
         subscription_price: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -164,7 +174,7 @@ class ChatInviteLink(TelegramObject):
         self.pending_join_request_count: Optional[int] = (
             int(pending_join_request_count) if pending_join_request_count is not None else None
         )
-        self.subscription_period: Optional[int] = subscription_period
+        self._subscription_period: Optional[dtm.timedelta] = parse_period_arg(subscription_period)
         self.subscription_price: Optional[int] = subscription_price
 
         self._id_attrs = (
@@ -177,6 +187,13 @@ class ChatInviteLink(TelegramObject):
 
         self._freeze()
 
+    @property
+    def subscription_period(self) -> Optional[Union[int, dtm.timedelta]]:
+        value = get_timedelta_value(self._subscription_period)
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        return value  # type: ignore[return-value]
+
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatInviteLink":
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -187,5 +204,18 @@ class ChatInviteLink(TelegramObject):
 
         data["creator"] = de_json_optional(data.get("creator"), User, bot)
         data["expire_date"] = from_timestamp(data.get("expire_date", None), tzinfo=loc_tzinfo)
+        data["subscription_period"] = (
+            dtm.timedelta(seconds=s) if (s := data.get("subscription_period")) else None
+        )
 
         return super().de_json(data=data, bot=bot)
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        out = super().to_dict(recursive)
+        if self._subscription_period is not None:
+            seconds = self._subscription_period.total_seconds()
+            out["subscription_period"] = int(seconds) if seconds.is_integer() else seconds
+        elif not recursive:
+            out["subscription_period"] = self._subscription_period
+        return out

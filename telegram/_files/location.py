@@ -18,11 +18,17 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Location."""
 
-from typing import Final, Optional
+import datetime as dtm
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class Location(TelegramObject):
@@ -36,8 +42,12 @@ class Location(TelegramObject):
         latitude (:obj:`float`): Latitude as defined by the sender.
         horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
             measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
-        live_period (:obj:`int`, optional): Time relative to the message sending date, during which
-            the location can be updated, in seconds. For active live locations only.
+        live_period (:obj:`int` | :class:`datetime.timedelta`, optional): Time relative to the
+            message sending date, during which the location can be updated, in seconds. For active
+            live locations only.
+
+            .. versionchanged:: NEXT.VERSION
+                |time-period-input|
         heading (:obj:`int`, optional): The direction in which user is moving, in degrees;
             :tg-const:`telegram.Location.MIN_HEADING`-:tg-const:`telegram.Location.MAX_HEADING`.
             For active live locations only.
@@ -49,8 +59,12 @@ class Location(TelegramObject):
         latitude (:obj:`float`): Latitude as defined by the sender.
         horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
             measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
-        live_period (:obj:`int`): Optional. Time relative to the message sending date, during which
-            the location can be updated, in seconds. For active live locations only.
+        live_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Time relative to the
+            message sending date, during which the location can be updated, in seconds. For active
+            live locations only.
+
+            .. deprecated:: NEXT.VERSION
+                |time-period-int-deprecated|
         heading (:obj:`int`): Optional. The direction in which user is moving, in degrees;
             :tg-const:`telegram.Location.MIN_HEADING`-:tg-const:`telegram.Location.MAX_HEADING`.
             For active live locations only.
@@ -60,10 +74,10 @@ class Location(TelegramObject):
     """
 
     __slots__ = (
+        "_live_period",
         "heading",
         "horizontal_accuracy",
         "latitude",
-        "live_period",
         "longitude",
         "proximity_alert_radius",
     )
@@ -73,7 +87,7 @@ class Location(TelegramObject):
         longitude: float,
         latitude: float,
         horizontal_accuracy: Optional[float] = None,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
         *,
@@ -86,7 +100,7 @@ class Location(TelegramObject):
 
         # Optionals
         self.horizontal_accuracy: Optional[float] = horizontal_accuracy
-        self.live_period: Optional[int] = live_period
+        self._live_period: Optional[dtm.timedelta] = parse_period_arg(live_period)
         self.heading: Optional[int] = heading
         self.proximity_alert_radius: Optional[int] = (
             int(proximity_alert_radius) if proximity_alert_radius else None
@@ -95,6 +109,32 @@ class Location(TelegramObject):
         self._id_attrs = (self.longitude, self.latitude)
 
         self._freeze()
+
+    @property
+    def live_period(self) -> Optional[Union[int, dtm.timedelta]]:
+        value = get_timedelta_value(self._live_period)
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        return value  # type: ignore[return-value]
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Location":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["live_period"] = dtm.timedelta(seconds=s) if (s := data.get("live_period")) else None
+
+        return super().de_json(data=data, bot=bot)
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        out = super().to_dict(recursive)
+        if self._live_period is not None:
+            seconds = self._live_period.total_seconds()
+            out["live_period"] = int(seconds) if seconds.is_integer() else seconds
+        elif not recursive:
+            out["live_period"] = self._live_period
+        return out
 
     HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`

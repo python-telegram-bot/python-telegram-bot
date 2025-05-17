@@ -63,9 +63,12 @@ class Video(_BaseThumbedMedium):
             the video in the message.
 
             .. versionadded:: 21.11
-        start_timestamp (:obj:`int`, optional): Timestamp in seconds from which the video
-            will play in the message
+        start_timestamp (:obj:`int` | :class:`datetime.timedelta`, optional): Timestamp in seconds
+            from which the video will play in the message
             .. versionadded:: 21.11
+
+            .. versionchanged:: NEXT.VERSION
+                |time-period-input|
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -90,18 +93,21 @@ class Video(_BaseThumbedMedium):
             the video in the message.
 
             .. versionadded:: 21.11
-        start_timestamp (:obj:`int`): Optional, Timestamp in seconds from which the video
-            will play in the message
+        start_timestamp (:obj:`int` | :class:`datetime.timedelta`): Optional, Timestamp in seconds
+            from which the video will play in the message
             .. versionadded:: 21.11
+
+            .. deprecated:: NEXT.VERSION
+                |time-period-int-deprecated|
     """
 
     __slots__ = (
         "_duration",
+        "_start_timestamp",
         "cover",
         "file_name",
         "height",
         "mime_type",
-        "start_timestamp",
         "width",
     )
 
@@ -117,7 +123,7 @@ class Video(_BaseThumbedMedium):
         file_name: Optional[str] = None,
         thumbnail: Optional[PhotoSize] = None,
         cover: Optional[Sequence[PhotoSize]] = None,
-        start_timestamp: Optional[int] = None,
+        start_timestamp: Optional[TimePeriod] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -137,11 +143,18 @@ class Video(_BaseThumbedMedium):
             self.mime_type: Optional[str] = mime_type
             self.file_name: Optional[str] = file_name
             self.cover: Optional[Sequence[PhotoSize]] = parse_sequence_arg(cover)
-            self.start_timestamp: Optional[int] = start_timestamp
+            self._start_timestamp: Optional[dtm.timedelta] = parse_period_arg(start_timestamp)
 
     @property
     def duration(self) -> Union[int, dtm.timedelta]:
         value = get_timedelta_value(self._duration)
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        return value  # type: ignore[return-value]
+
+    @property
+    def start_timestamp(self) -> Optional[Union[int, dtm.timedelta]]:
+        value = get_timedelta_value(self._start_timestamp)
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]
@@ -152,6 +165,9 @@ class Video(_BaseThumbedMedium):
         data = cls._parse_data(data)
 
         data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
+        data["start_timestamp"] = (
+            dtm.timedelta(seconds=s) if (s := data.get("start_timestamp")) else None
+        )
         data["cover"] = de_list_optional(data.get("cover"), PhotoSize, bot)
 
         return super().de_json(data=data, bot=bot)
@@ -159,9 +175,11 @@ class Video(_BaseThumbedMedium):
     def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         out = super().to_dict(recursive)
-        if self._duration is not None:
-            seconds = self._duration.total_seconds()
-            out["duration"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["duration"] = self._duration
+        keys = ("duration", "start_timestamp")
+        for key in keys:
+            if (value := getattr(self, "_" + key)) is not None:
+                seconds = value.total_seconds()
+                out[key] = int(seconds) if seconds.is_integer() else seconds
+            elif not recursive:
+                out[key] = value
         return out

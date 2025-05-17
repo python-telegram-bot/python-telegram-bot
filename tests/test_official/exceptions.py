@@ -117,10 +117,21 @@ class ParamTypeCheckingExceptions:
             "slow_mode_delay": int,  # actual: Union[int, dtm.timedelta]
             "message_auto_delete_time": int,  # actual: Union[int, dtm.timedelta]
         },
-        "Animation|Audio|Voice|Video(Note|ChatEnded)?|PaidMediaPreview"
+        "Animation|Audio|Voice|Video(Note|ChatEnded)|PaidMediaPreview"
         "|Input(Paid)?Media(Audio|Video|Animation)": {
             "duration": int,  # actual: Union[int, dtm.timedelta]
         },
+        "Video": {
+            "duration": int,  # actual: Union[int, dtm.timedelta]
+            "start_timestamp": int,  # actual: Union[int, dtm.timedelta]
+        },
+        "Poll": {"open_period": int},  # actual: Union[int, dtm.timedelta]
+        "Location": {"live_period": int},  # actual: Union[int, dtm.timedelta]
+        "ChatInviteLink": {"subscription_period": int},  # actual: Union[int, dtm.timedelta]
+        "InputLocationMessageContent": {"live_period": int},  # actual: Union[int, dtm.timedelta]
+        "MessageAutoDeleteTimerChanged": {
+            "message_auto_delete_time": int
+        },  # actual: Union[int, dtm.timedelta]
         "InlineQueryResult.*": {
             "live_period": int,  # actual: Union[int, dtm.timedelta]
             "voice_duration": int,  # actual: Union[int, dtm.timedelta]
