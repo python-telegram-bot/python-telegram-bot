@@ -1,4 +1,4 @@
-other = "Fix a Failing Test Case"
+internal = "Fix a Failing Test Case"
 [[pull_requests]]
 uid = "4793"
 author_uid = "Bibo-Joshi"
