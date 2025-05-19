@@ -1,4 +1,4 @@
-other = "Fix Bug in Automated Channel Announcement"
+internal = "Fix Bug in Automated Channel Announcement"
 [[pull_requests]]
 uid = "4792"
 author_uid = "Bibo-Joshi"
