@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import logging
 import platform
 from collections import defaultdict
@@ -294,7 +295,7 @@ class TestUpdater:
         tracking_flag = False
         received_kwargs = {}
         expected_kwargs = {
-            "timeout": 0,
+            "timeout": dtm.timedelta(seconds=0),
             "allowed_updates": "allowed_updates",
         }
 

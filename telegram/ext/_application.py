@@ -20,6 +20,7 @@
 
 import asyncio
 import contextlib
+import datetime as dtm
 import inspect
 import itertools
 import platform
@@ -42,7 +43,7 @@ from telegram._utils.defaultvalue import (
 )
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
-from telegram._utils.types import SCT, DVType, ODVInput
+from telegram._utils.types import SCT, DVType, ODVInput, TimePeriod
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
@@ -739,7 +740,7 @@ class Application(
     def run_polling(
         self,
         poll_interval: float = 0.0,
-        timeout: int = 10,
+        timeout: TimePeriod = dtm.timedelta(seconds=10),
         bootstrap_retries: int = 0,
         allowed_updates: Optional[Sequence[str]] = None,
         drop_pending_updates: Optional[bool] = None,
@@ -780,8 +781,11 @@ class Application(
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
-            timeout (:obj:`int`, optional): Passed to
-                :paramref:`telegram.Bot.get_updates.timeout`. Default is ``10`` seconds.
+            timeout (:obj:`int` | :class:`datetime.timedelta`, optional): Passed to
+                :paramref:`telegram.Bot.get_updates.timeout`. Default is ``timedelta(seconds=10)``.
+
+                .. versionchanged:: NEXT.VERSION
+                    |time-period-input|
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase
                 (calling :meth:`initialize` and the boostrapping of
                 :meth:`telegram.ext.Updater.start_polling`)
