@@ -99,11 +99,13 @@ webhooks = [
 [tool.hatch.version]
 # dynamically evaluates the `__version__` variable in that file
 source = "code"
-path = "telegram/_version.py"
-search-paths = ["telegram"]
+path = "src/telegram/_version.py"
+search-paths = ["src"]
 
 [tool.hatch.build]
-packages = ["telegram"]
+packages = ["src/telegram"]
+package-data = {"telegram" = ["py.typed"]}
+src-layout = true
 
 # CHANGO
 [tool.chango]
@@ -136,9 +138,9 @@ select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["B018"]
 "tests/**.py" = ["RUF012", "ASYNC230", "DTZ", "ARG", "T201", "ASYNC109", "D", "S", "TRY"]
-"telegram/**.py" = ["TRY003"]
-"telegram/ext/_applicationbuilder.py" = ["TRY004"]
-"telegram/ext/filters.py" = ["D102"]
+"src/telegram/**.py" = ["TRY003"]
+"src/telegram/ext/_applicationbuilder.py" = ["TRY004"]
+"src/telegram/ext/filters.py" = ["D102"]
 "docs/**.py" = ["INP001", "ARG", "D", "TRY003", "S"]
 "examples/**.py" = ["ARG", "D", "S105", "TRY003"]
 
@@ -166,6 +168,7 @@ exclude-protected = ["_unfrozen"]
 # PYTEST:
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 addopts = "--no-success-flaky-report -rX"
 filterwarnings = [
     "error",
@@ -230,12 +233,12 @@ ignore_missing_imports = true
 # COVERAGE:
 [tool.coverage.run]
 branch = true
-source = ["telegram"]
+source = ["src/telegram"]
 parallel = true
 concurrency = ["thread", "multiprocessing"]
 omit = [
     "tests/",
-    "telegram/__main__.py"
+    "src/telegram/__main__.py"
 ]
 
 [tool.coverage.report]

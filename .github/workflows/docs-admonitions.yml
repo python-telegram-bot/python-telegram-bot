@@ -2,7 +2,7 @@ name: Test Admonitions Generation
 on:
   pull_request:
     paths:
-      - telegram/**
+      - src/telegram/**
       - docs/**
       - .github/workflows/docs-admonitions.yml
   push:

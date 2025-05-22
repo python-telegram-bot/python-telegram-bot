@@ -29,7 +29,15 @@ Setting things up
       $ pip install -r requirements-dev-all.txt
 
 
-5. Install pre-commit hooks:
+5. Install the package in development mode:
+
+   .. code-block:: bash
+      
+      $ pip install -e .
+
+   This is necessary because python-telegram-bot uses a src-based layout where the package code is located in the ``src/`` directory.
+
+6. Install pre-commit hooks:
 
    .. code-block:: bash
 

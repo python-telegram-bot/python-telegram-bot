@@ -2,7 +2,7 @@ name: Unit Tests
 on:
   pull_request:
     paths:
-      - telegram/**
+      - src/telegram/**
       - tests/**
       - .github/workflows/unit_tests.yml
       - pyproject.toml
