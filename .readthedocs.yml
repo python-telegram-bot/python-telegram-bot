@@ -27,6 +27,7 @@ build:
     python: "3"  # latest stable cpython version
   jobs:
     install:
+      - pip install -U pip
       - pip install --group 'all'  # install all the dependency groups
 
     post_build:
