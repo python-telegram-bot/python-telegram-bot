@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/chmod +x deploy.sh
+./deploy.sh/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2025
