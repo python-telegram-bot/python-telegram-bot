@@ -23,14 +23,17 @@ import importlib
 import os
 from pathlib import Path
 
+from tests.auxil.files import SOURCE_ROOT_PATH
+
 
 def test_public_submodules_dunder_all():
-    modules_to_search = list(Path("telegram").rglob("*.py"))
+    modules_to_search = list(SOURCE_ROOT_PATH.rglob("*.py"))
 
     if not modules_to_search:
         raise AssertionError("No modules found to search through, please modify this test.")
 
-    for mod_path in modules_to_search:
+    for raw_path in modules_to_search:
+        mod_path = Path(raw_path)
         path = str(mod_path)
         folder = mod_path.parent
 
@@ -52,6 +55,7 @@ def test_public_submodules_dunder_all():
 
 
 def load_module(path: Path):
+    path = path.relative_to(SOURCE_ROOT_PATH.parent)
     if path.name == "__init__.py":
         mod_name = str(path.parent).replace(os.sep, ".")  # telegram(.ext) format
     else:

@@ -23,7 +23,7 @@ import pytest
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning, PTBRuntimeWarning, PTBUserWarning
-from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.files import SOURCE_ROOT_PATH
 from tests.auxil.slots import mro_slots
 
 
@@ -66,7 +66,7 @@ class TestWarnings:
         make_assertion(PTBUserWarning)
 
     def test_warn(self, recwarn):
-        expected_file = PROJECT_ROOT_PATH / "telegram" / "_utils" / "warnings.py"
+        expected_file = SOURCE_ROOT_PATH / "_utils" / "warnings.py"
 
         warn("test message")
         assert len(recwarn) == 1
