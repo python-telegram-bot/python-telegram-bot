@@ -191,6 +191,7 @@ log_cli_format = "%(funcName)s - Line %(lineno)d - %(message)s"
 
 # MYPY:
 [tool.mypy]
+mypy_path = "src"
 warn_unused_ignores = true
 warn_unused_configs = true
 disallow_untyped_defs = true
