@@ -11,16 +11,8 @@ readme = "README.rst"
 requires-python = ">=3.9"
 license = "LGPL-3.0-only"
 license-files = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"]
-authors = [
-    { name = "Leandro Toledo", email = "devs@python-telegram-bot.org" }
-]
-keywords = [
-    "python",
-    "telegram",
-    "bot",
-    "api",
-    "wrapper",
-]
+authors = [{ name = "Leandro Toledo", email = "devs@python-telegram-bot.org" }]
+keywords = ["python", "telegram", "bot", "api", "wrapper"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -37,9 +29,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dependencies = [
-    "httpx ~= 0.27",
-]
+dependencies = ["httpx ~= 0.27"]
 
 [project.urls]
 "Homepage" = "https://python-telegram-bot.org"
@@ -61,19 +51,13 @@ dependencies = [
 # When adding new groups, make sure to update `ext` and `all` accordingly
 
 # Optional dependencies for production
-all = [
-    "python-telegram-bot[ext,http2,passport,socks]",
-]
+all = ["python-telegram-bot[ext,http2,passport,socks]"]
 callback-data = [
     # Cachetools doesn't have a strict stability policy. Let's be cautious for now.
     "cachetools>=5.3.3,<5.6.0",
 ]
-ext = [
-    "python-telegram-bot[callback-data,job-queue,rate-limiter,webhooks]",
-]
-http2 = [
-    "httpx[http2]",
-]
+ext = ["python-telegram-bot[callback-data,job-queue,rate-limiter,webhooks]"]
+http2 = ["httpx[http2]"]
 job-queue = [
     # APS doesn't have a strict stability policy. Let's be cautious for now.
     "APScheduler>=3.10.4,<3.12.0",
@@ -81,19 +65,38 @@ job-queue = [
 passport = [
     "cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1",
     # cffi is a dependency of cryptography and added support for python 3.13 in 1.17.0rc1
-    "cffi >= 1.17.0rc1; python_version > '3.12'"
+    "cffi >= 1.17.0rc1; python_version > '3.12'",
 ]
-rate-limiter = [
-    "aiolimiter>=1.1,<1.3",
-]
-socks = [
-    "httpx[socks]",
-]
+rate-limiter = ["aiolimiter>=1.1,<1.3"]
+socks = ["httpx[socks]"]
 webhooks = [
     # tornado is rather stable, but let's not allow the next major release without prior testing
     "tornado~=6.4",
 ]
 
+[dependency-groups]
+tests = [
+    "build",
+    "pytest==8.3.5",
+    "pytest-asyncio==0.21.2",
+    "pytest-xdist==3.6.1",
+    "flaky>=3.8.1",
+    "beautifulsoup4",
+    "tzdata",
+]
+docs = [
+    "chango~=0.4.0; python_version >= '3.12'",
+    "sphinx==8.2.3; python_version >= '3.11'",
+    "furo==2024.8.6",
+    "furo-sphinx-search @ git+https://github.com/harshil21/furo-sphinx-search@v0.2.0.1",
+    "sphinx-paramlinks==0.6.0",
+    "sphinxcontrib-mermaid==1.0.0",
+    "sphinx-copybutton==0.5.2",
+    "sphinx-inline-tabs==2023.4.21",
+    # Temporary. See #4387
+    "sphinx-build-compatibility @ git+https://github.com/readthedocs/sphinx-build-compatibility.git@58aabc5f207c6c2421f23d3578adc0b14af57047",
+]
+all = ["pre-commit", { include-group = "tests" }, { include-group = "docs" }]
 
 # HATCH
 [tool.hatch.version]
@@ -108,14 +111,14 @@ packages = ["telegram"]
 # CHANGO
 [tool.chango]
 sys_path = "changes"
-chango_instance = { name= "chango_instance", module = "config" }
+chango_instance = { name = "chango_instance", module = "config" }
 
 # BLACK:
 [tool.black]
 line-length = 99
 
 # ISORT:
-[tool.isort]  # black config
+[tool.isort] # black config
 profile = "black"
 line_length = 99
 
@@ -127,15 +130,66 @@ show-fixes = true
 [tool.ruff.lint]
 typing-extensions = false
 ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203"]
-select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
-          "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
-          "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB", "DOC", "TRY", 
-          "D100", "D101", "D102", "D103", "D300", "D418", "D419", "S"]
+select = [
+    "E",
+    "F",
+    "I",
+    "PL",
+    "UP",
+    "RUF",
+    "PTH",
+    "C4",
+    "B",
+    "PIE",
+    "SIM",
+    "RET",
+    "RSE",
+    "G",
+    "ISC",
+    "PT",
+    "ASYNC",
+    "TCH",
+    "SLOT",
+    "PERF",
+    "PYI",
+    "FLY",
+    "AIR",
+    "RUF022",
+    "RUF023",
+    "Q",
+    "INP",
+    "W",
+    "YTT",
+    "DTZ",
+    "ARG",
+    "T20",
+    "FURB",
+    "DOC",
+    "TRY",
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D300",
+    "D418",
+    "D419",
+    "S",
+]
 # Add "A (flake8-builtins)" after we drop pylint
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["B018"]
-"tests/**.py" = ["RUF012", "ASYNC230", "DTZ", "ARG", "T201", "ASYNC109", "D", "S", "TRY"]
+"tests/**.py" = [
+    "RUF012",
+    "ASYNC230",
+    "DTZ",
+    "ARG",
+    "T201",
+    "ASYNC109",
+    "D",
+    "S",
+    "TRY",
+]
 "telegram/**.py" = ["TRY003"]
 "telegram/ext/_applicationbuilder.py" = ["TRY004"]
 "telegram/ext/filters.py" = ["D102"]
@@ -148,11 +202,22 @@ convention = "google"
 # PYLINT:
 [tool.pylint."messages control"]
 enable = ["useless-suppression"]
-disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods",
-        "too-few-public-methods", "broad-exception-caught", "too-many-instance-attributes",
-        "fixme", "missing-function-docstring", "missing-class-docstring", "too-many-locals",
-        "too-many-lines", "too-many-branches", "too-many-statements", "cyclic-import",
-        "too-many-positional-arguments",
+disable = [
+    "duplicate-code",
+    "too-many-arguments",
+    "too-many-public-methods",
+    "too-few-public-methods",
+    "broad-exception-caught",
+    "too-many-instance-attributes",
+    "fixme",
+    "missing-function-docstring",
+    "missing-class-docstring",
+    "too-many-locals",
+    "too-many-lines",
+    "too-many-branches",
+    "too-many-statements",
+    "cyclic-import",
+    "too-many-positional-arguments",
 ]
 
 [tool.pylint.main]
@@ -178,7 +243,7 @@ filterwarnings = [
     # ignore::telegram.utils.deprecate.TelegramDeprecationWarning
 ]
 markers = [
-    "dev", # If you want to test a specific test, use this
+    "dev",    # If you want to test a specific test, use this
     "no_req",
     "req",
 ]
@@ -204,7 +269,7 @@ module = [
     "telegram._callbackquery",
     "telegram._file",
     "telegram._message",
-    "telegram._files.file"
+    "telegram._files.file",
 ]
 strict_optional = false
 
@@ -223,7 +288,7 @@ module = [
     "uvicorn.*",
     "asgiref.*",
     "django.*",
-    "apscheduler.*",  # not part of `customwebhookbot_*.py` examples
+    "apscheduler.*", # not part of `customwebhookbot_*.py` examples
 ]
 ignore_missing_imports = true
 
@@ -233,14 +298,7 @@ branch = true
 source = ["telegram"]
 parallel = true
 concurrency = ["thread", "multiprocessing"]
-omit = [
-    "tests/",
-    "telegram/__main__.py"
-]
+omit = ["tests/", "telegram/__main__.py"]
 
 [tool.coverage.report]
-exclude_also = [
-    "@overload",
-    "@abstractmethod",
-    "if TYPE_CHECKING:"
-]
+exclude_also = ["@overload", "@abstractmethod", "if TYPE_CHECKING:"]
