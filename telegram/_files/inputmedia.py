@@ -308,10 +308,7 @@ class InputPaidMediaVideo(InputPaidMedia):
 
     @property
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._duration, attribute="duration")
-        if isinstance(value, float) and value.is_integer():
-            value = int(value)
-        return value  # type: ignore[return-value]
+        return get_timedelta_value(self._duration, attribute="duration")
 
     def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -464,10 +461,7 @@ class InputMediaAnimation(InputMedia):
 
     @property
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._duration, attribute="duration")
-        if isinstance(value, float) and value.is_integer():
-            value = int(value)
-        return value  # type: ignore[return-value]
+        return get_timedelta_value(self._duration, attribute="duration")
 
 
 class InputMediaPhoto(InputMedia):
@@ -729,10 +723,7 @@ class InputMediaVideo(InputMedia):
 
     @property
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._duration, attribute="duration")
-        if isinstance(value, float) and value.is_integer():
-            value = int(value)
-        return value  # type: ignore[return-value]
+        return get_timedelta_value(self._duration, attribute="duration")
 
 
 class InputMediaAudio(InputMedia):
@@ -853,10 +844,7 @@ class InputMediaAudio(InputMedia):
 
     @property
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._duration, attribute="duration")
-        if isinstance(value, float) and value.is_integer():
-            value = int(value)
-        return value  # type: ignore[return-value]
+        return get_timedelta_value(self._duration, attribute="duration")
 
 
 class InputMediaDocument(InputMedia):

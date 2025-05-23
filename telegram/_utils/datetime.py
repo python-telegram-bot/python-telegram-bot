@@ -233,7 +233,7 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
 
 def get_timedelta_value(
     value: Optional[dtm.timedelta], attribute: str
-) -> Optional[Union[float, dtm.timedelta]]:
+) -> Optional[Union[int, dtm.timedelta]]:
     """
     Convert a `datetime.timedelta` to seconds or return it as-is, based on environment config.
 
@@ -241,19 +241,24 @@ def get_timedelta_value(
     to using `datetime.timedelta`. The behavior is controlled by the `PTB_TIMEDELTA`
     environment variable.
 
+    Note:
+        When `PTB_TIMEDELTA` is not enabled, the function will issue a deprecation warning.
+
     Args:
-        value: The timedelta value to process.
-        attribute: The name of the attribute being processed, used for warning messages.
+        value (:obj:`datetime.timedelta`): The timedelta value to process.
+        attribute (:obj:`str`): The name of the attribute at the caller scope, used for
+            warning messages.
 
     Returns:
-        :obj:`dtm.timedelta` when `PTB_TIMEDELTA=true`, otherwise :obj:`float`.
+        - :obj:`None` if :paramref:`value` is None.
+        - :obj:`datetime.timedelta` if `PTB_TIMEDELTA=true`.
+        - :obj:`int` if the total seconds is a whole number.
+        - float: otherwise.
     """
     if value is None:
         return None
-
     if env_var_2_bool(os.getenv("PTB_TIMEDELTA")):
         return value
-
     warn(
         PTBDeprecationWarning(
             "NEXT.VERSION",
@@ -263,4 +268,8 @@ def get_timedelta_value(
         ),
         stacklevel=2,
     )
-    return value.total_seconds()
+    return (
+        int(seconds)
+        if (seconds := value.total_seconds()).is_integer()
+        else seconds  # type: ignore[return-value]
+    )

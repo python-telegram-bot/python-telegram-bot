@@ -112,10 +112,7 @@ class Location(TelegramObject):
 
     @property
     def live_period(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._live_period, attribute="live_period")
-        if isinstance(value, float) and value.is_integer():
-            value = int(value)
-        return value  # type: ignore[return-value]
+        return get_timedelta_value(self._live_period, attribute="live_period")
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Location":
