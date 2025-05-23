@@ -105,7 +105,7 @@ path = "src/telegram/_version.py"
 # the source distribution will include most of the files in the root directory
 [tool.hatch.build.targets.sdist]
 exclude = [".venv*", "venv*", ".github"]
-# the wheel will only include the src/chango package
+# the wheel will only include the src/telegram package
 [tool.hatch.build.targets.wheel]
 packages = ["src/telegram"]
 
