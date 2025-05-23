@@ -27,6 +27,7 @@ Affected Attributes:
 - :attr:`telegram.MessageAutoDeleteTimerChanged.message_auto_delete_time`
 - :attr:`telegram.ChatInviteLink.subscription_period`
 - :attr:`telegram.InputLocationMessageContent.live_period`
+- :attr:`telegram.error.RetryAfter.retry_after`
 """
 internal = "Modify test_official to handle time periods as timedelta automatically."
 [[pull_requests]]
