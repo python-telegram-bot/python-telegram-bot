@@ -18,12 +18,17 @@ python:
   install:
     - method: pip
       path: .
+      extra_requirements:
+        - all  # install all optional dependencies
 
 build:
   os: ubuntu-22.04
   tools:
     python: "3"  # latest stable cpython version
   jobs:
+    install:
+      - pip install --group 'all'  # install all the dependency groups
+
     post_build:
       # Based on https://github.com/readthedocs/readthedocs.org/issues/3242#issuecomment-1410321534
       # This provides a HTML zip file for download, with the same structure as the hosted website
