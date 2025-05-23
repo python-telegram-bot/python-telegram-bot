@@ -18,7 +18,6 @@ python:
   install:
     - method: pip
       path: .
-    - requirements: requirements-dev-all.txt
 
 build:
   os: ubuntu-22.04

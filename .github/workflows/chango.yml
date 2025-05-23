@@ -54,7 +54,7 @@ jobs:
         run: |
           cd ./target-repo
           git add changes/unreleased/*
-          pip install . -r docs/requirements-docs.txt
+          pip install . --group docs
           VERSION_TAG=$(python -c "from telegram import __version__; print(f'{__version__}')")
           chango release --uid $VERSION_TAG
 
