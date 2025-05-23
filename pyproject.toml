@@ -100,12 +100,14 @@ webhooks = [
 # dynamically evaluates the `__version__` variable in that file
 source = "code"
 path = "src/telegram/_version.py"
-search-paths = ["src"]
 
-[tool.hatch.build]
+# See also https://github.com/pypa/hatch/issues/1230 for discussion
+# the source distribution will include most of the files in the root directory
+[tool.hatch.build.targets.sdist]
+exclude = [".venv*", "venv*", ".github"]
+# the wheel will only include the src/chango package
+[tool.hatch.build.targets.wheel]
 packages = ["src/telegram"]
-package-data = {"telegram" = ["py.typed"]}
-src-layout = true
 
 # CHANGO
 [tool.chango]
