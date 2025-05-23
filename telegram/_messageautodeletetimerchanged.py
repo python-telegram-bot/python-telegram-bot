@@ -75,7 +75,9 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
 
     @property
     def message_auto_delete_time(self) -> Union[int, dtm.timedelta]:
-        value = get_timedelta_value(self._message_auto_delete_time)
+        value = get_timedelta_value(
+            self._message_auto_delete_time, attribute="message_auto_delete_time"
+        )
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]

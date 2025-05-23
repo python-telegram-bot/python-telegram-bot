@@ -231,13 +231,22 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     return dt_obj.timestamp()
 
 
-def get_timedelta_value(value: Optional[dtm.timedelta]) -> Optional[Union[float, dtm.timedelta]]:
+def get_timedelta_value(
+    value: Optional[dtm.timedelta], attribute: str
+) -> Optional[Union[float, dtm.timedelta]]:
     """
     Convert a `datetime.timedelta` to seconds or return it as-is, based on environment config.
 
     This utility is part of the migration process from integer-based time representations
     to using `datetime.timedelta`. The behavior is controlled by the `PTB_TIMEDELTA`
-    environment variable
+    environment variable.
+
+    Args:
+        value: The timedelta value to process.
+        attribute: The name of the attribute being processed, used for warning messages.
+
+    Returns:
+        :obj:`dtm.timedelta` when `PTB_TIMEDELTA=true`, otherwise :obj:`float`.
     """
     if value is None:
         return None
@@ -248,8 +257,9 @@ def get_timedelta_value(value: Optional[dtm.timedelta]) -> Optional[Union[float,
     warn(
         PTBDeprecationWarning(
             "NEXT.VERSION",
-            "In a future major version this will be of type `datetime.timedelta`."
-            " You can opt-in early by setting the `PTB_TIMEDELTA` environment variable.",
+            f"In a future major version attribute `{attribute}` will be of type"
+            " `datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true`"
+            " as an environment variable.",
         ),
         stacklevel=2,
     )

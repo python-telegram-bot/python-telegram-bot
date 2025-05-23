@@ -157,7 +157,7 @@ class TestInlineQueryResultGifWithoutRequest(InlineQueryResultGifTestBase):
             assert len(recwarn) == 0
         else:
             assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert "`gif_duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):

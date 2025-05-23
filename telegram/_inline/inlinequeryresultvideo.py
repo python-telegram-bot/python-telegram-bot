@@ -193,7 +193,7 @@ class InlineQueryResultVideo(InlineQueryResult):
 
     @property
     def video_duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._video_duration)
+        value = get_timedelta_value(self._video_duration, attribute="video_duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]

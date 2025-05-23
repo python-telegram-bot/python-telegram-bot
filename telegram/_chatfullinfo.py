@@ -599,14 +599,16 @@ class ChatFullInfo(_ChatBase):
 
     @property
     def slow_mode_delay(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._slow_mode_delay)
+        value = get_timedelta_value(self._slow_mode_delay, attribute="slow_mode_delay")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]
 
     @property
     def message_auto_delete_time(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._message_auto_delete_time)
+        value = get_timedelta_value(
+            self._message_auto_delete_time, attribute="message_auto_delete_time"
+        )
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]

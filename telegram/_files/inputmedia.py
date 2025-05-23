@@ -308,7 +308,7 @@ class InputPaidMediaVideo(InputPaidMedia):
 
     @property
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._duration)
+        value = get_timedelta_value(self._duration, attribute="duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]
@@ -464,7 +464,7 @@ class InputMediaAnimation(InputMedia):
 
     @property
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._duration)
+        value = get_timedelta_value(self._duration, attribute="duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]
@@ -729,7 +729,7 @@ class InputMediaVideo(InputMedia):
 
     @property
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._duration)
+        value = get_timedelta_value(self._duration, attribute="duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]
@@ -853,7 +853,7 @@ class InputMediaAudio(InputMedia):
 
     @property
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._duration)
+        value = get_timedelta_value(self._duration, attribute="duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]

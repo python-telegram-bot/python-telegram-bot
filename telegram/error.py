@@ -243,7 +243,7 @@ class RetryAfter(TelegramError):
     @property
     def retry_after(self) -> Union[int, dtm.timedelta]:
         """Time in seconds, after which the bot can retry the request."""
-        value = get_timedelta_value(self._retry_after)
+        value = get_timedelta_value(self._retry_after, attribute="retry_after")
         return int(value) if isinstance(value, float) else value  # type: ignore[return-value]
 
     def __reduce__(self) -> tuple[type, tuple[float]]:  # type: ignore[override]

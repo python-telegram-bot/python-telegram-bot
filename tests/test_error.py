@@ -113,7 +113,7 @@ class TestErrors:
             assert type(retry_after) is dtm.timedelta
         else:
             assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert "`retry_after` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
             assert type(retry_after) is int
 

@@ -185,7 +185,7 @@ class InlineQueryResultGif(InlineQueryResult):
 
     @property
     def gif_duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._gif_duration)
+        value = get_timedelta_value(self._gif_duration, attribute="gif_duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]

@@ -168,7 +168,9 @@ class TestInlineQueryResultVideoWithoutRequest(InlineQueryResultVideoTestBase):
             assert isinstance(value, dtm.timedelta)
         else:
             assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert "`video_duration` will be of type `datetime.timedelta`" in str(
+                recwarn[0].message
+            )
             assert recwarn[0].category is PTBDeprecationWarning
             assert isinstance(value, int)
 

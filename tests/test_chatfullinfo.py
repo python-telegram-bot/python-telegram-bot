@@ -388,8 +388,8 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             assert len(recwarn) == 0
         else:
             assert len(recwarn) == 2
-            for i in range(2):
-                assert "will be of type `datetime.timedelta`" in str(recwarn[i].message)
+            for i, attr in enumerate(["slow_mode_delay", "message_auto_delete_time"]):
+                assert f"`{attr}` will be of type `datetime.timedelta`" in str(recwarn[i].message)
                 assert recwarn[i].category is PTBDeprecationWarning
 
     def test_always_tuples_attributes(self):

@@ -224,7 +224,7 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
             assert len(recwarn) == 0
         else:
             assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
     def test_with_video(self, video, PTB_TIMEDELTA):
@@ -410,7 +410,7 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
             assert len(recwarn) == 0
         else:
             assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
     def test_with_animation(self, animation):
@@ -500,7 +500,7 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
             assert len(recwarn) == 0
         else:
             assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
     def test_with_audio(self, audio):
@@ -683,7 +683,7 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
             assert len(recwarn) == 0
         else:
             assert len(recwarn) == 1
-            assert "will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
     def test_with_video(self, video):

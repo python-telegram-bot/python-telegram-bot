@@ -141,7 +141,7 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     @property
     def audio_duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._audio_duration)
+        value = get_timedelta_value(self._audio_duration, attribute="audio_duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]

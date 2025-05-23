@@ -158,8 +158,8 @@ class TestVideoWithoutRequest(VideoTestBase):
             assert len(recwarn) == 0
         else:
             assert len(recwarn) == 2
-            for i in range(2):
-                assert "will be of type `datetime.timedelta`" in str(recwarn[i].message)
+            for i, attr in enumerate(["duration", "start_timestamp"]):
+                assert f"`{attr}` will be of type `datetime.timedelta`" in str(recwarn[i].message)
                 assert recwarn[i].category is PTBDeprecationWarning
 
     def test_equality(self, video):

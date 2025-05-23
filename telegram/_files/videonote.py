@@ -105,7 +105,7 @@ class VideoNote(_BaseThumbedMedium):
 
     @property
     def duration(self) -> Union[int, dtm.timedelta]:
-        value = get_timedelta_value(self._duration)
+        value = get_timedelta_value(self._duration, attribute="duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]

@@ -138,7 +138,7 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     @property
     def voice_duration(self) -> Optional[Union[int, dtm.timedelta]]:
-        value = get_timedelta_value(self._voice_duration)
+        value = get_timedelta_value(self._voice_duration, attribute="voice_duration")
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return value  # type: ignore[return-value]
