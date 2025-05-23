@@ -25,11 +25,11 @@ Warning:
 """
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Protocol, TypeVar
+from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union
 
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from typing import type_check_only
@@ -51,7 +51,7 @@ def parse_sequence_arg(arg: Optional[Sequence[T]]) -> tuple[T, ...]:
     return tuple(arg) if arg else ()
 
 
-def parse_period_arg(arg: Optional[TimePeriod]) -> Optional[dtm.timedelta]:
+def parse_period_arg(arg: Optional[Union[int, float, dtm.timedelta]]) -> Optional[dtm.timedelta]:
     """Parses an optional time period in seconds into a timedelta
 
     Args:
@@ -62,7 +62,7 @@ def parse_period_arg(arg: Optional[TimePeriod]) -> Optional[dtm.timedelta]:
     """
     if arg is None:
         return None
-    if isinstance(arg, int):
+    if isinstance(arg, (int, float)):
         return dtm.timedelta(seconds=arg)
     return arg
 
