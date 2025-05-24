@@ -32,8 +32,7 @@ def test_public_submodules_dunder_all():
     if not modules_to_search:
         raise AssertionError("No modules found to search through, please modify this test.")
 
-    for raw_path in modules_to_search:
-        mod_path = Path(raw_path)
+    for mod_path in modules_to_search:
         path = str(mod_path)
         folder = mod_path.parent
 
