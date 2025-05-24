@@ -417,7 +417,7 @@ class TestUpdater:
         on_stop_flag = False
 
         expected = {
-            "timeout": 10,
+            "timeout": dtm.timedelta(seconds=10),
             "allowed_updates": None,
             "api_kwargs": None,
         }
@@ -457,14 +457,14 @@ class TestUpdater:
             on_stop_flag = False
 
             expected = {
-                "timeout": 42,
+                "timeout": dtm.timedelta(seconds=42),
                 "allowed_updates": ["message"],
                 "api_kwargs": None,
             }
 
             await update_queue.put(Update(update_id=2))
             await updater.start_polling(
-                timeout=42,
+                timeout=dtm.timedelta(seconds=42),
                 allowed_updates=["message"],
             )
             await update_queue.join()
