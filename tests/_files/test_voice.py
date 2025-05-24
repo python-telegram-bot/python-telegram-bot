@@ -28,6 +28,7 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -51,7 +52,7 @@ async def voice(bot, chat_id):
 
 
 class VoiceTestBase:
-    duration = 3
+    duration = dtm.timedelta(seconds=3)
     mime_type = "audio/ogg"
     file_size = 9199
     caption = "Test *voice*"
@@ -75,7 +76,7 @@ class TestVoiceWithoutRequest(VoiceTestBase):
         assert voice.file_unique_id
 
     def test_expected_values(self, voice):
-        assert voice.duration == self.duration
+        assert voice._duration == self.duration
         assert voice.mime_type == self.mime_type
         assert voice.file_size == self.file_size
 
@@ -83,7 +84,7 @@ class TestVoiceWithoutRequest(VoiceTestBase):
         json_dict = {
             "file_id": self.voice_file_id,
             "file_unique_id": self.voice_file_unique_id,
-            "duration": self.duration,
+            "duration": int(self.duration.total_seconds()),
             "mime_type": self.mime_type,
             "file_size": self.file_size,
         }
@@ -92,7 +93,7 @@ class TestVoiceWithoutRequest(VoiceTestBase):
 
         assert json_voice.file_id == self.voice_file_id
         assert json_voice.file_unique_id == self.voice_file_unique_id
-        assert json_voice.duration == self.duration
+        assert json_voice._duration == self.duration
         assert json_voice.mime_type == self.mime_type
         assert json_voice.file_size == self.file_size
 
@@ -102,9 +103,28 @@ class TestVoiceWithoutRequest(VoiceTestBase):
         assert isinstance(voice_dict, dict)
         assert voice_dict["file_id"] == voice.file_id
         assert voice_dict["file_unique_id"] == voice.file_unique_id
-        assert voice_dict["duration"] == voice.duration
+        assert voice_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(voice_dict["duration"], int)
         assert voice_dict["mime_type"] == voice.mime_type
         assert voice_dict["file_size"] == voice.file_size
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, voice):
+        if PTB_TIMEDELTA:
+            assert voice.duration == self.duration
+            assert isinstance(voice.duration, dtm.timedelta)
+        else:
+            assert voice.duration == int(self.duration.total_seconds())
+            assert isinstance(voice.duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, voice):
+        voice.duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self, voice):
         a = Voice(voice.file_id, voice.file_unique_id, self.duration)
