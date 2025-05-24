@@ -4597,7 +4597,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         read_timeout = (
             (arg_read_timeout + timeout.total_seconds())
             if isinstance(timeout, dtm.timedelta)
-            else (arg_read_timeout + timeout if isinstance(timeout, int) else arg_read_timeout)
+            else (arg_read_timeout + timeout if timeout else arg_read_timeout)
         )
 
         # Ideally we'd use an aggressive read timeout for the polling. However,

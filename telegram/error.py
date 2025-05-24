@@ -241,8 +241,8 @@ class RetryAfter(TelegramError):
             super().__init__(f"Flood control exceeded. Retry in {self.retry_after!s}")
 
     @property
-    def retry_after(self) -> Union[int, dtm.timedelta]:
-        """Time in seconds, after which the bot can retry the request."""
+    def retry_after(self) -> Union[int, dtm.timedelta]:  # noqa: D102
+        # Diableing D102 because docstring for `retry_after` is present at the class's level
         return get_timedelta_value(  # type: ignore[return-value]
             self._retry_after, attribute="retry_after"
         )

@@ -93,7 +93,7 @@ class Video(_BaseThumbedMedium):
             the video in the message.
 
             .. versionadded:: 21.11
-        start_timestamp (:obj:`int` | :class:`datetime.timedelta`): Optional, Timestamp in seconds
+        start_timestamp (:obj:`int` | :class:`datetime.timedelta`): Optional. Timestamp in seconds
             from which the video will play in the message
             .. versionadded:: 21.11
 
