@@ -1,6 +1,4 @@
-dependencies = "Implement PEP 735 Dependency Groups"
-documentation = "Implement PEP 735 Dependency Groups"
-internal = "Implement PEP 735 Dependency Groups"
+dependencies = "Implement PEP 735 Dependency Groups for Development Dependencies"
 [[pull_requests]]
 uid = "4800"
 author_uid = "harshil21"
