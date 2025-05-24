@@ -58,7 +58,7 @@ from telegram.ext import (
 from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.asyncio_helpers import call_after
 from tests.auxil.build_messages import make_message_update
-from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.files import SOURCE_ROOT_PATH
 from tests.auxil.monkeypatch import empty_get_updates, return_true
 from tests.auxil.networking import send_webhook_message
 from tests.auxil.pytest_classes import PytestApplication, PytestUpdater, make_bot
@@ -1006,7 +1006,7 @@ class TestApplication:
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
         assert (
-            Path(recwarn[0].filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_application.py"
+            Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py"
         ), "incorrect stacklevel!"
 
     async def test_non_blocking_no_error_handler(self, app, caplog):
@@ -1079,7 +1079,7 @@ class TestApplication:
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
         assert (
-            Path(recwarn[0].filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_application.py"
+            Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py"
         ), "incorrect stacklevel!"
 
     @pytest.mark.parametrize(("block", "expected_output"), [(False, 0), (True, 5)])

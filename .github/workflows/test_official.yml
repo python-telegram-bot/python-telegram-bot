@@ -2,7 +2,7 @@ name: Bot API Tests
 on:
   pull_request:
     paths:
-      - telegram/**
+      - src/telegram/**
       - tests/**
   push:
     branches:

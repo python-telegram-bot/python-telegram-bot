@@ -130,11 +130,15 @@ all = ["pre-commit", { include-group = "tests" }, { include-group = "docs" }]
 [tool.hatch.version]
 # dynamically evaluates the `__version__` variable in that file
 source = "code"
-path = "telegram/_version.py"
-search-paths = ["telegram"]
+path = "src/telegram/_version.py"
 
-[tool.hatch.build]
-packages = ["telegram"]
+# See also https://github.com/pypa/hatch/issues/1230 for discussion
+# the source distribution will include most of the files in the root directory
+[tool.hatch.build.targets.sdist]
+exclude = [".venv*", "venv*", ".github"]
+# the wheel will only include the src/telegram package
+[tool.hatch.build.targets.wheel]
+packages = ["src/telegram"]
 
 # CHANGO
 [tool.chango]
@@ -167,9 +171,9 @@ select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["B018"]
 "tests/**.py" = ["RUF012", "ASYNC230", "DTZ", "ARG", "T201", "ASYNC109", "D", "S", "TRY"]
-"telegram/**.py" = ["TRY003"]
-"telegram/ext/_applicationbuilder.py" = ["TRY004"]
-"telegram/ext/filters.py" = ["D102"]
+"src/telegram/**.py" = ["TRY003"]
+"src/telegram/ext/_applicationbuilder.py" = ["TRY004"]
+"src/telegram/ext/filters.py" = ["D102"]
 "docs/**.py" = ["INP001", "ARG", "D", "TRY003", "S"]
 "examples/**.py" = ["ARG", "D", "S105", "TRY003"]
 
@@ -197,6 +201,7 @@ exclude-protected = ["_unfrozen"]
 # PYTEST:
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 addopts = "--no-success-flaky-report -rX"
 filterwarnings = [
     "error",
@@ -219,6 +224,7 @@ log_cli_format = "%(funcName)s - Line %(lineno)d - %(message)s"
 
 # MYPY:
 [tool.mypy]
+mypy_path = "src"
 warn_unused_ignores = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -261,12 +267,12 @@ ignore_missing_imports = true
 # COVERAGE:
 [tool.coverage.run]
 branch = true
-source = ["telegram"]
+source = ["src/telegram"]
 parallel = true
 concurrency = ["thread", "multiprocessing"]
 omit = [
     "tests/",
-    "telegram/__main__.py"
+    "src/telegram/__main__.py"
 ]
 
 [tool.coverage.report]
