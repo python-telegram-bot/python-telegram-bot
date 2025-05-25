@@ -19,6 +19,7 @@
 from pathlib import Path
 
 PROJECT_ROOT_PATH = Path(__file__).parent.parent.parent.resolve()
+SOURCE_ROOT_PATH = PROJECT_ROOT_PATH / "src" / "telegram"
 TEST_DATA_PATH = PROJECT_ROOT_PATH / "tests" / "data"
 
 

@@ -60,7 +60,7 @@ from telegram.ext import (
 )
 from telegram.warnings import PTBUserWarning
 from tests.auxil.build_messages import make_command_message
-from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.files import SOURCE_ROOT_PATH
 from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
 
@@ -725,7 +725,7 @@ class TestConversationHandler:
             assert recwarn[0].category is PTBUserWarning
             assert (
                 Path(recwarn[0].filename)
-                == PROJECT_ROOT_PATH / "telegram" / "ext" / "_handlers" / "conversationhandler.py"
+                == SOURCE_ROOT_PATH / "ext" / "_handlers" / "conversationhandler.py"
             ), "wrong stacklevel!"
             assert (
                 str(recwarn[0].message)
@@ -1105,11 +1105,7 @@ class TestConversationHandler:
                 assert warning.category is PTBUserWarning
                 assert (
                     Path(warning.filename)
-                    == PROJECT_ROOT_PATH
-                    / "telegram"
-                    / "ext"
-                    / "_handlers"
-                    / "conversationhandler.py"
+                    == SOURCE_ROOT_PATH / "ext" / "_handlers" / "conversationhandler.py"
                 ), "wrong stacklevel!"
             # now set app.job_queue back to it's original value
 
@@ -1428,8 +1424,7 @@ class TestConversationHandler:
             assert str(recwarn[0].message).startswith("ApplicationHandlerStop in TIMEOUT")
             assert recwarn[0].category is PTBUserWarning
             assert (
-                Path(recwarn[0].filename)
-                == PROJECT_ROOT_PATH / "telegram" / "ext" / "_jobqueue.py"
+                Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_jobqueue.py"
             ), "wrong stacklevel!"
 
             await app.stop()

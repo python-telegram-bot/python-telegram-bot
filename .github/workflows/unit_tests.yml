@@ -2,11 +2,10 @@ name: Unit Tests
 on:
   pull_request:
     paths:
-      - telegram/**
+      - src/telegram/**
       - tests/**
       - .github/workflows/unit_tests.yml
       - pyproject.toml
-      - requirements-unit-tests.txt
   push:
     branches:
       - master
@@ -34,14 +33,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: '**/requirements*.txt'
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
           python -W ignore -m pip install -U pytest-cov
-          python -W ignore -m pip install .
-          python -W ignore -m pip install -r requirements-unit-tests.txt
-          python -W ignore -m pip install pytest-xdist
+          python -W ignore -m pip install . --group tests
 
       - name: Test with pytest
         # We run 4 different suites here
