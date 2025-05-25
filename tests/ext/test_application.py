@@ -2583,6 +2583,29 @@ class TestApplication:
             assert received_updates == {2}
             assert len(caplog.records) == 0
 
+    @pytest.mark.parametrize("change_type", ["remove", "add"])
+    async def test_process_update_handler_change_during_iteration(self, app, change_type):
+        async def dummy_callback(_, __):
+            pass
+
+        for group in range(10, 20):
+            handler = TypeHandler(int, dummy_callback)
+            app.add_handler(handler, group=group)
+
+        async def wait_callback(_, context):
+            # Trigger a change of the app.handlers dict during the iteration
+            if change_type == "remove":
+                context.application.remove_handler(handler, group)
+            else:
+                context.application.add_handler(TypeHandler(str, dummy_callback), group=42)
+
+        app.add_handler(TypeHandler(str, wait_callback))
+
+        async with app:
+            # No assertion here. We simply ensure that changing the handler dict size during
+            # the loop inside process_update doesn't raise an exception
+            await app.process_update("string update")
+
     async def test_process_error_exception_in_building_context(self, monkeypatch, caplog, app):
         # Makes sure that exceptions in building the context don't stop the application
         exception = ValueError("TestException")

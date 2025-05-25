@@ -1256,7 +1256,9 @@ class Application(
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
-        for handlers in self.handlers.values():
+        # We copy the values to a list to avoid issues with concurrent modification of the
+        # handlers dict while iterating over it via add/remove_handler.
+        for handlers in list(self.handlers.values()):
             try:
                 for handler in handlers:
                     check = handler.check_update(update)  # Should the handler handle this update?
