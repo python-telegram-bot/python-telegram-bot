@@ -1,0 +1,5 @@
+other = "Ensure Safe Handler Looping in `Application.process_update`"
+[[pull_requests]]
+uid = "4802"
+author_uid = "Bibo-Joshi"
+closes_threads = []
