@@ -1,5 +1,5 @@
-other = "Ensure Safe Handler Looping in `Application.process_update`"
+bugfixes = "Fixed a bug where calling ``Application.remove/add_handler`` during update handling can cause a ``RuntimeError`` in ``Application.process_update``. This is now prevented by raising a ``RuntimeError`` in ``Application.add_handler`` and ``Application.remove_handler`` if the application is already processing an update."
+
 [[pull_requests]]
 uid = "4802"
 author_uid = "Bibo-Joshi"
-closes_threads = []
