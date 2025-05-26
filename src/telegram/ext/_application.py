@@ -1256,10 +1256,13 @@ class Application(
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
-        # We copy the values to a list to avoid issues with concurrent modification of the
-        # handlers dict while iterating over it via add/remove_handler.
-        for handlers in list(self.handlers.values()):
+        # We deepcopy the dict to avoid issues with concurrent modification of the
+        # handlers (groups or handlers in groups) while iterating over it via add/remove_handler.
+        # Currently considered implementation detail as described in docstrings of
+        # add/remove_handler
+        for handlers in deepcopy(self.handlers).values():
             try:
+                # no copy needed b/c we deepcopy above
                 for handler in handlers:
                     check = handler.check_update(update)  # Should the handler handle this update?
                     if check is None or check is False:
@@ -1344,6 +1347,14 @@ class Application(
             to be loaded into memory while the application is already processing updates, which
             might lead to race conditions and undesired behavior. In particular, current
             conversation states may be overridden by the loaded data.
+
+        Hint:
+            This method currently has no influence on calls to :meth:`process_update` that are
+            already in progress.
+
+            Warning:
+                This behavior should currently be considered an implementation detail and not as
+                guaranteed behavior.
 
         Args:
             handler (:class:`telegram.ext.BaseHandler`): A BaseHandler instance.
@@ -1445,6 +1456,14 @@ class Application(
         self, handler: BaseHandler[Any, CCT, Any], group: int = DEFAULT_GROUP
     ) -> None:
         """Remove a handler from the specified group.
+
+        Hint:
+            This method currently has no influence on calls to :meth:`process_update` that are
+            already in progress.
+
+            Warning:
+                This behavior should currently be considered an implementation detail and not as
+                guaranteed behavior.
 
         Args:
             handler (:class:`telegram.ext.BaseHandler`): A :class:`telegram.ext.BaseHandler`
@@ -1776,6 +1795,14 @@ class Application(
         Examples:
             :any:`Errorhandler Bot <examples.errorhandlerbot>`
 
+        Hint:
+            This method currently has no influence on calls to :meth:`process_error` that are
+            already in progress.
+
+            Warning:
+                This behavior should currently be considered an implementation detail and not as
+                guaranteed behavior.
+
         .. seealso:: :wiki:`Exceptions, Warnings and Logging <Exceptions%2C-Warnings-and-Logging>`
 
         Args:
@@ -1798,6 +1825,14 @@ class Application(
 
     def remove_error_handler(self, callback: HandlerCallback[object, CCT, None]) -> None:
         """Removes an error handler.
+
+        Hint:
+            This method currently has no influence on calls to :meth:`process_error` that are
+            already in progress.
+
+            Warning:
+                This behavior should currently be considered an implementation detail and not as
+                guaranteed behavior.
 
         Args:
             callback (:term:`coroutine function`): The error handler to remove.
@@ -1840,10 +1875,12 @@ class Application(
             :class:`telegram.ext.ApplicationHandlerStop`. :obj:`False`, otherwise.
         """
         if self.error_handlers:
-            for (
-                callback,
-                block,
-            ) in self.error_handlers.items():
+            # We copy the list to avoid issues with concurrent modification of the
+            # error handlers while iterating over it via add/remove_error_handler.
+            # Currently considered implementation detail as described in docstrings of
+            # add/remove_error_handler
+            error_handler_items = list(self.error_handlers.items())
+            for callback, block in error_handler_items:
                 try:
                     context = self.context_types.context.from_error(
                         update=update,
