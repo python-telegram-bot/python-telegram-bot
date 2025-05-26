@@ -142,13 +142,3 @@ class InlineQueryResultAudio(InlineQueryResult):
     @property
     def audio_duration(self) -> Optional[Union[int, dtm.timedelta]]:
         return get_timedelta_value(self._audio_duration, attribute="audio_duration")
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._audio_duration is not None:
-            seconds = self._audio_duration.total_seconds()
-            out["audio_duration"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["audio_duration"] = self._audio_duration
-        return out

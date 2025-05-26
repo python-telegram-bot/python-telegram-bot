@@ -194,13 +194,3 @@ class InlineQueryResultVideo(InlineQueryResult):
     @property
     def video_duration(self) -> Optional[Union[int, dtm.timedelta]]:
         return get_timedelta_value(self._video_duration, attribute="video_duration")
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._video_duration is not None:
-            seconds = self._video_duration.total_seconds()
-            out["video_duration"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["video_duration"] = self._video_duration
-        return out

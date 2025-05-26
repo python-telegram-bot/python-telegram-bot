@@ -90,13 +90,3 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         )
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._message_auto_delete_time is not None:
-            seconds = self._message_auto_delete_time.total_seconds()
-            out["message_auto_delete_time"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["message_auto_delete_time"] = self._message_auto_delete_time
-        return out

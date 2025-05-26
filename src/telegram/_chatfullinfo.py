@@ -655,17 +655,3 @@ class ChatFullInfo(_ChatBase):
         )
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-
-        keys = ("slow_mode_delay", "message_auto_delete_time")
-        for key in keys:
-            if (value := getattr(self, "_" + key)) is not None:
-                seconds = value.total_seconds()
-                out[key] = int(seconds) if seconds.is_integer() else seconds
-            elif not recursive:
-                out[key] = value
-
-        return out

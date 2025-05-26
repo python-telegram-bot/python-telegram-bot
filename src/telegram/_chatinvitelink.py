@@ -206,13 +206,3 @@ class ChatInviteLink(TelegramObject):
         )
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._subscription_period is not None:
-            seconds = self._subscription_period.total_seconds()
-            out["subscription_period"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["subscription_period"] = self._subscription_period
-        return out

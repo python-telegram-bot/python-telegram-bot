@@ -186,13 +186,3 @@ class InlineQueryResultGif(InlineQueryResult):
     @property
     def gif_duration(self) -> Optional[Union[int, dtm.timedelta]]:
         return get_timedelta_value(self._gif_duration, attribute="gif_duration")
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._gif_duration is not None:
-            seconds = self._gif_duration.total_seconds()
-            out["gif_duration"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["gif_duration"] = self._gif_duration
-        return out

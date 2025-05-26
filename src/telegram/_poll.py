@@ -497,16 +497,6 @@ class Poll(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._open_period is not None:
-            seconds = self._open_period.total_seconds()
-            out["open_period"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["open_period"] = self._open_period
-        return out
-
     def parse_explanation_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`explanation` from a given :class:`telegram.MessageEntity` of
         :attr:`explanation_entities`.

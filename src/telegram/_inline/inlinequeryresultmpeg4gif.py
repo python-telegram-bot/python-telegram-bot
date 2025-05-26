@@ -188,13 +188,3 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     @property
     def mpeg4_duration(self) -> Optional[Union[int, dtm.timedelta]]:
         return get_timedelta_value(self._mpeg4_duration, attribute="mpeg4_duration")
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._mpeg4_duration is not None:
-            seconds = self._mpeg4_duration.total_seconds()
-            out["mpeg4_duration"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["mpeg4_duration"] = self._mpeg4_duration
-        return out

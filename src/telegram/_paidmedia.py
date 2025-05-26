@@ -168,16 +168,6 @@ class PaidMediaPreview(PaidMedia):
     def duration(self) -> Optional[Union[int, dtm.timedelta]]:
         return get_timedelta_value(self._duration, attribute="duration")
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._duration is not None:
-            seconds = self._duration.total_seconds()
-            out["duration"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["duration"] = self._duration
-        return out
-
 
 class PaidMediaPhoto(PaidMedia):
     """

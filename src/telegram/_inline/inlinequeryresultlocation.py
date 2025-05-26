@@ -183,16 +183,6 @@ class InlineQueryResultLocation(InlineQueryResult):
     def live_period(self) -> Optional[Union[int, dtm.timedelta]]:
         return get_timedelta_value(self._live_period, attribute="live_period")
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        out = super().to_dict(recursive)
-        if self._live_period is not None:
-            seconds = self._live_period.total_seconds()
-            out["live_period"] = int(seconds) if seconds.is_integer() else seconds
-        elif not recursive:
-            out["live_period"] = self._live_period
-        return out
-
     HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
 
