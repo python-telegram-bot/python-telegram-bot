@@ -2585,11 +2585,13 @@ class TestApplication:
 
     @pytest.mark.parametrize("change_type", ["remove", "add"])
     async def test_process_update_handler_change_groups_during_iteration(self, app, change_type):
-        async def dummy_callback(_, __):
-            pass
+        run_groups = set()
+
+        async def dummy_callback(_, __, g: int):
+            run_groups.add(g)
 
         for group in range(10, 20):
-            handler = TypeHandler(int, dummy_callback)
+            handler = TypeHandler(int, functools.partial(dummy_callback, g=group))
             app.add_handler(handler, group=group)
 
         async def wait_callback(_, context):
@@ -2597,14 +2599,18 @@ class TestApplication:
             if change_type == "remove":
                 context.application.remove_handler(handler, group)
             else:
-                context.application.add_handler(TypeHandler(str, dummy_callback), group=42)
+                context.application.add_handler(
+                    TypeHandler(int, functools.partial(dummy_callback, g=42)), group=42
+                )
 
-        app.add_handler(TypeHandler(str, wait_callback))
+        app.add_handler(TypeHandler(int, wait_callback))
 
         async with app:
-            # No assertion here. We simply ensure that changing the handler dict size during
-            # the loop inside process_update doesn't raise an exception
-            await app.process_update("string update")
+            await app.process_update(1)
+
+        # check that exactly those handlers were called that were configured when
+        # process_update was called
+        assert run_groups == set(range(10, 20))
 
     async def test_process_update_handler_change_group_during_iteration(self, app):
         async def dummy_callback(_, __):
@@ -2681,7 +2687,8 @@ class TestApplication:
             assert received_errors == {2}
             assert len(caplog.records) == 0
 
-    async def test_process_error_change_during_iteration(self, app):
+    @pytest.mark.parametrize("change_type", ["remove", "add"])
+    async def test_process_error_change_during_iteration(self, app, change_type):
         called_handlers = set()
 
         async def dummy_process_error(name: str, *_, **__):
@@ -2691,8 +2698,10 @@ class TestApplication:
         remove_error_handler = functools.partial(dummy_process_error, "remove_handler")
 
         async def trigger_change(*_, **__):
-            app.add_error_handler(add_error_handler)
-            app.remove_error_handler(remove_error_handler)
+            if change_type == "remove":
+                app.remove_error_handler(remove_error_handler)
+            else:
+                app.add_error_handler(add_error_handler)
 
         app.add_error_handler(trigger_change)
         app.add_error_handler(remove_error_handler)
