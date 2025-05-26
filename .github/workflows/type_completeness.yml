@@ -2,7 +2,7 @@ name: Check Type Completeness
 on:
   pull_request:
     paths:
-      - telegram/**
+      - src/telegram/**
       - pyproject.toml
       - .github/workflows/type_completeness.yml
   push:

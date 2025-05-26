@@ -22,12 +22,14 @@ Setting things up
 
       $ git remote add upstream https://github.com/python-telegram-bot/python-telegram-bot
 
-4. Install dependencies:
+4. Install the package in development mode as well as optional dependencies and development dependencies.
+   Note that the `--group` argument requires `pip` 25.1 or later.
 
    .. code-block:: bash
 
-      $ pip install -r requirements-dev-all.txt
+      $ pip install -e .[all] --group all
 
+   Installing the package itself is necessary because python-telegram-bot uses a src-based layout where the package code is located in the ``src/`` directory.
 
 5. Install pre-commit hooks:
 
