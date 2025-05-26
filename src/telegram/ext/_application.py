@@ -1256,13 +1256,14 @@ class Application(
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
-        # We deepcopy the dict to avoid issues with concurrent modification of the
+        # We "deepcopy" the dict to avoid issues with concurrent modification of the
         # handlers (groups or handlers in groups) while iterating over it via add/remove_handler.
         # Currently considered implementation detail as described in docstrings of
         # add/remove_handler
-        for handlers in deepcopy(self.handlers).values():
+        # do *not* use `copy.deepcopy` here, as we don't want to deepcopy the handlers themselves
+        for handlers in [v.copy() for v in self.handlers.values()]:
             try:
-                # no copy needed b/c we deepcopy above
+                # no copy needed b/c we copy above
                 for handler in handlers:
                     check = handler.check_update(update)  # Should the handler handle this update?
                     if check is None or check is False:
