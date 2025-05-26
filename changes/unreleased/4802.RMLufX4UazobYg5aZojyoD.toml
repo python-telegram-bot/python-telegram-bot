@@ -3,3 +3,4 @@ bugfixes = "Fixed a bug where calling ``Application.remove/add_handler`` during 
 [[pull_requests]]
 uid = "4802"
 author_uid = "Bibo-Joshi"
+closes_threads = ["4803"]
