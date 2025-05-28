@@ -1256,7 +1256,7 @@ class Application(
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
-        # We "deepcopy" the dict to avoid issues with concurrent modification of the
+        # We copy the lists to avoid issues with concurrent modification of the
         # handlers (groups or handlers in groups) while iterating over it via add/remove_handler.
         # Currently considered implementation detail as described in docstrings of
         # add/remove_handler
