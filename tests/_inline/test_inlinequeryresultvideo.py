@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import (
@@ -26,6 +28,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -57,7 +60,7 @@ class InlineQueryResultVideoTestBase:
     mime_type = "mime type"
     video_width = 10
     video_height = 15
-    video_duration = 15
+    video_duration = dtm.timedelta(seconds=15)
     thumbnail_url = "thumbnail url"
     title = "title"
     caption = "caption"
@@ -83,7 +86,7 @@ class TestInlineQueryResultVideoWithoutRequest(InlineQueryResultVideoTestBase):
         assert inline_query_result_video.mime_type == self.mime_type
         assert inline_query_result_video.video_width == self.video_width
         assert inline_query_result_video.video_height == self.video_height
-        assert inline_query_result_video.video_duration == self.video_duration
+        assert inline_query_result_video._video_duration == self.video_duration
         assert inline_query_result_video.thumbnail_url == self.thumbnail_url
         assert inline_query_result_video.title == self.title
         assert inline_query_result_video.description == self.description
@@ -118,10 +121,10 @@ class TestInlineQueryResultVideoWithoutRequest(InlineQueryResultVideoTestBase):
             inline_query_result_video_dict["video_height"]
             == inline_query_result_video.video_height
         )
-        assert (
-            inline_query_result_video_dict["video_duration"]
-            == inline_query_result_video.video_duration
+        assert inline_query_result_video_dict["video_duration"] == int(
+            self.video_duration.total_seconds()
         )
+        assert isinstance(inline_query_result_video_dict["video_duration"], int)
         assert (
             inline_query_result_video_dict["thumbnail_url"]
             == inline_query_result_video.thumbnail_url
@@ -147,6 +150,29 @@ class TestInlineQueryResultVideoWithoutRequest(InlineQueryResultVideoTestBase):
             inline_query_result_video_dict["show_caption_above_media"]
             == inline_query_result_video.show_caption_above_media
         )
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, inline_query_result_video):
+        iqrv = inline_query_result_video
+        if PTB_TIMEDELTA:
+            assert iqrv.video_duration == self.video_duration
+            assert isinstance(iqrv.video_duration, dtm.timedelta)
+        else:
+            assert iqrv.video_duration == int(self.video_duration.total_seconds())
+            assert isinstance(iqrv.video_duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, inline_query_result_video):
+        value = inline_query_result_video.video_duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+            assert isinstance(value, dtm.timedelta)
+        else:
+            assert len(recwarn) == 1
+            assert "`video_duration` will be of type `datetime.timedelta`" in str(
+                recwarn[0].message
+            )
+            assert recwarn[0].category is PTBDeprecationWarning
+            assert isinstance(value, int)
 
     def test_equality(self):
         a = InlineQueryResultVideo(

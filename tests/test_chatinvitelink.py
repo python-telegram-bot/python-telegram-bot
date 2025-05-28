@@ -22,6 +22,7 @@ import pytest
 
 from telegram import ChatInviteLink, User
 from telegram._utils.datetime import UTC, to_timestamp
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -56,7 +57,7 @@ class ChatInviteLinkTestBase:
     member_limit = 42
     name = "LinkName"
     pending_join_request_count = 42
-    subscription_period = 43
+    subscription_period = dtm.timedelta(seconds=43)
     subscription_price = 44
 
 
@@ -95,7 +96,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             "member_limit": self.member_limit,
             "name": self.name,
             "pending_join_request_count": str(self.pending_join_request_count),
-            "subscription_period": self.subscription_period,
+            "subscription_period": int(self.subscription_period.total_seconds()),
             "subscription_price": self.subscription_price,
         }
 
@@ -112,7 +113,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
         assert invite_link.member_limit == self.member_limit
         assert invite_link.name == self.name
         assert invite_link.pending_join_request_count == self.pending_join_request_count
-        assert invite_link.subscription_period == self.subscription_period
+        assert invite_link._subscription_period == self.subscription_period
         assert invite_link.subscription_price == self.subscription_price
 
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, creator):
@@ -154,8 +155,31 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
         assert invite_link_dict["member_limit"] == self.member_limit
         assert invite_link_dict["name"] == self.name
         assert invite_link_dict["pending_join_request_count"] == self.pending_join_request_count
-        assert invite_link_dict["subscription_period"] == self.subscription_period
+        assert invite_link_dict["subscription_period"] == int(
+            self.subscription_period.total_seconds()
+        )
+        assert isinstance(invite_link_dict["subscription_period"], int)
         assert invite_link_dict["subscription_price"] == self.subscription_price
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, invite_link):
+        if PTB_TIMEDELTA:
+            assert invite_link.subscription_period == self.subscription_period
+            assert isinstance(invite_link.subscription_period, dtm.timedelta)
+        else:
+            assert invite_link.subscription_period == int(self.subscription_period.total_seconds())
+            assert isinstance(invite_link.subscription_period, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, invite_link):
+        invite_link.subscription_period
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`subscription_period` will be of type `datetime.timedelta`" in str(
+                recwarn[0].message
+            )
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = ChatInviteLink("link", User(1, "", False), True, True, True)

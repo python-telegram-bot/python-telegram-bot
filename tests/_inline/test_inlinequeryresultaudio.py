@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import datetime as dtm
+
 import pytest
 
 from telegram import (
@@ -27,6 +29,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -52,7 +55,7 @@ class InlineQueryResultAudioTestBase:
     audio_url = "audio url"
     title = "title"
     performer = "performer"
-    audio_duration = "audio_duration"
+    audio_duration = dtm.timedelta(seconds=10)
     caption = "caption"
     parse_mode = "Markdown"
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
@@ -73,7 +76,7 @@ class TestInlineQueryResultAudioWithoutRequest(InlineQueryResultAudioTestBase):
         assert inline_query_result_audio.audio_url == self.audio_url
         assert inline_query_result_audio.title == self.title
         assert inline_query_result_audio.performer == self.performer
-        assert inline_query_result_audio.audio_duration == self.audio_duration
+        assert inline_query_result_audio._audio_duration == self.audio_duration
         assert inline_query_result_audio.caption == self.caption
         assert inline_query_result_audio.parse_mode == self.parse_mode
         assert inline_query_result_audio.caption_entities == tuple(self.caption_entities)
@@ -92,10 +95,10 @@ class TestInlineQueryResultAudioWithoutRequest(InlineQueryResultAudioTestBase):
         assert inline_query_result_audio_dict["audio_url"] == inline_query_result_audio.audio_url
         assert inline_query_result_audio_dict["title"] == inline_query_result_audio.title
         assert inline_query_result_audio_dict["performer"] == inline_query_result_audio.performer
-        assert (
-            inline_query_result_audio_dict["audio_duration"]
-            == inline_query_result_audio.audio_duration
+        assert inline_query_result_audio_dict["audio_duration"] == int(
+            self.audio_duration.total_seconds()
         )
+        assert isinstance(inline_query_result_audio_dict["audio_duration"], int)
         assert inline_query_result_audio_dict["caption"] == inline_query_result_audio.caption
         assert inline_query_result_audio_dict["parse_mode"] == inline_query_result_audio.parse_mode
         assert inline_query_result_audio_dict["caption_entities"] == [
@@ -113,6 +116,28 @@ class TestInlineQueryResultAudioWithoutRequest(InlineQueryResultAudioTestBase):
     def test_caption_entities_always_tuple(self):
         inline_query_result_audio = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
         assert inline_query_result_audio.caption_entities == ()
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, inline_query_result_audio):
+        audio_duration = inline_query_result_audio.audio_duration
+
+        if PTB_TIMEDELTA:
+            assert audio_duration == self.audio_duration
+            assert isinstance(audio_duration, dtm.timedelta)
+        else:
+            assert audio_duration == int(self.audio_duration.total_seconds())
+            assert isinstance(audio_duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, inline_query_result_audio):
+        inline_query_result_audio.audio_duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`audio_duration` will be of type `datetime.timedelta`" in str(
+                recwarn[0].message
+            )
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
