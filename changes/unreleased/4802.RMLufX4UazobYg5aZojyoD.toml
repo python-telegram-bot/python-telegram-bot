@@ -1,0 +1,14 @@
+bugfixes = """
+Fixed a bug where calling ``Application.remove/add_handler`` during update handling can cause a ``RuntimeError`` in ``Application.process_update``.
+
+.. hint::
+    Calling ``Application.add/remove_handler`` now has no influence on calls to :meth:`process_update` that are
+    already in progress. The same holds for ``Application.add/remove_error_handler`` and ``Application.process_error``, respectively.
+
+    .. warning::
+        This behavior should currently be considered an implementation detail and not as guaranteed behavior.
+"""
+[[pull_requests]]
+uid = "4802"
+author_uid = "Bibo-Joshi"
+closes_threads = ["4803"]
