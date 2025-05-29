@@ -1353,7 +1353,7 @@ class Application(
             This method currently has no influence on calls to :meth:`process_update` that are
             already in progress.
 
-            Warning:
+            .. warning::
                 This behavior should currently be considered an implementation detail and not as
                 guaranteed behavior.
 
@@ -1462,7 +1462,7 @@ class Application(
             This method currently has no influence on calls to :meth:`process_update` that are
             already in progress.
 
-            Warning:
+            .. warning::
                 This behavior should currently be considered an implementation detail and not as
                 guaranteed behavior.
 
@@ -1800,7 +1800,7 @@ class Application(
             This method currently has no influence on calls to :meth:`process_error` that are
             already in progress.
 
-            Warning:
+            .. warning::
                 This behavior should currently be considered an implementation detail and not as
                 guaranteed behavior.
 
@@ -1831,7 +1831,7 @@ class Application(
             This method currently has no influence on calls to :meth:`process_error` that are
             already in progress.
 
-            Warning:
+            .. warning::
                 This behavior should currently be considered an implementation detail and not as
                 guaranteed behavior.
 
