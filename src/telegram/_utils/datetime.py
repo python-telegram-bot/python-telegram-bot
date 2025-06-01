@@ -35,7 +35,6 @@ from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.envvars import env_var_2_bool
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -257,7 +256,7 @@ def get_timedelta_value(
     """
     if value is None:
         return None
-    if env_var_2_bool(os.getenv("PTB_TIMEDELTA")):
+    if os.getenv("PTB_TIMEDELTA", "false").lower().strip() == "true":
         return value
     warn(
         PTBDeprecationWarning(
