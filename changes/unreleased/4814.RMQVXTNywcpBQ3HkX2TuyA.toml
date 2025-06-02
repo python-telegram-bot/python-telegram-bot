@@ -1,4 +1,3 @@
-dependencies = "Bump codecov/codecov-action from 5.4.2 to 5.4.3"
 internal = "Bump codecov/codecov-action from 5.4.2 to 5.4.3"
 [[pull_requests]]
 uid = "4814"
