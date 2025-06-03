@@ -259,7 +259,7 @@ class TelegramObject:
             state (dict[:obj:`str`, :obj:`object`]): The state of the object.
         """
         out = self._get_attrs(
-            include_private=True, recursive=False, remove_bot=True, convert_default_vault=False
+            include_private=True, recursive=False, remove_bot=True, convert_default_value=False
         )
         # MappingProxyType is not pickable, so we convert it to a dict and revert in
         # __setstate__
@@ -528,7 +528,7 @@ class TelegramObject:
         include_private: bool = False,
         recursive: bool = False,
         remove_bot: bool = False,
-        convert_default_vault: bool = True,
+        convert_default_value: bool = True,
     ) -> dict[str, Union[str, object]]:
         """This method is used for obtaining the attributes of the object.
 
@@ -537,7 +537,7 @@ class TelegramObject:
             recursive (:obj:`bool`): If :obj:`True`, will convert any ``TelegramObjects`` (if
                 found) in the attributes to a dictionary. Else, preserves it as an object itself.
             remove_bot (:obj:`bool`): Whether the bot should be included in the result.
-            convert_default_vault (:obj:`bool`): Whether :class:`telegram.DefaultValue` should be
+            convert_default_value (:obj:`bool`): Whether :class:`telegram.DefaultValue` should be
                 converted to its true value. This is necessary when converting to a dictionary for
                 end users since DefaultValue is used in some classes that work with
                 `tg.ext.defaults` (like `LinkPreviewOptions`)
@@ -550,7 +550,7 @@ class TelegramObject:
         for key in self._get_attrs_names(include_private=include_private):
             value = (
                 DefaultValue.get_value(getattr(self, key, None))
-                if convert_default_vault
+                if convert_default_value
                 else getattr(self, key, None)
             )
 
