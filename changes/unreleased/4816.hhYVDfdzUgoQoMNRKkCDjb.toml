@@ -1,0 +1,5 @@
+other = "Fix typo in `TelegramObject._get_attrs`"
+[[pull_requests]]
+uid = "4816"
+author_uid = "harshil21"
+closes_threads = []
