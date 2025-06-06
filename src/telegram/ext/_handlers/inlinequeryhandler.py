@@ -120,7 +120,6 @@ class InlineQueryHandler(BaseHandler[Update, CCT, RT]):
                 return False
             if (
                 self.pattern
-                and update.inline_query.query
                 and (match := re.match(self.pattern, update.inline_query.query))
             ):
                 return match
