@@ -562,10 +562,11 @@ class TestMessageWithoutRequest(MessageTestBase):
         else:
             chat_id, reply_parameters = await coro
             if chat_id is not input_chat_id:
-                pytest.fail(f"chat_id is {chat_id} but should be {chat_id}")
+                pytest.fail(f"chat_id is {chat_id} but should be {input_chat_id}")
             if reply_parameters is not input_reply_parameters:
                 pytest.fail(
-                    f"reply_parameters is {reply_parameters} but should be {reply_parameters}"
+                    f"reply_parameters is {reply_parameters} "
+                    f"but should be {input_reply_parameters}"
                 )
 
         # test that do_quote input is overridden by reply_parameters
