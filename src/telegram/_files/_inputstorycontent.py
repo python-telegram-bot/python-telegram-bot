@@ -25,6 +25,7 @@ from telegram import constants
 from telegram._files.inputfile import InputFile
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
+from telegram._utils.argumentparsing import parse_period_arg
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict
 
@@ -158,18 +159,8 @@ class InputStoryContentVideo(InputStoryContent):
 
         with self._unfrozen():
             self.video: Union[str, InputFile] = self._parse_file_input(video)
-            self.duration: Optional[dtm.timedelta] = self._parse_period_arg(duration)
-            self.cover_frame_timestamp: Optional[dtm.timedelta] = self._parse_period_arg(
+            self.duration: Optional[dtm.timedelta] = parse_period_arg(duration)
+            self.cover_frame_timestamp: Optional[dtm.timedelta] = parse_period_arg(
                 cover_frame_timestamp
             )
             self.is_animation: Optional[bool] = is_animation
-
-    # This helper is temporarly here until we can use `argumentparsing.parse_period_arg`
-    # from https://github.com/python-telegram-bot/python-telegram-bot/pull/4750
-    @staticmethod
-    def _parse_period_arg(arg: Optional[Union[float, dtm.timedelta]]) -> Optional[dtm.timedelta]:
-        if arg is None:
-            return None
-        if isinstance(arg, dtm.timedelta):
-            return arg
-        return dtm.timedelta(seconds=arg)

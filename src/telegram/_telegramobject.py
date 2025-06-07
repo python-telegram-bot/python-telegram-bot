@@ -499,6 +499,13 @@ class TelegramObject:
             elif getattr(self, key, True) is None:
                 setattr(self, key, api_kwargs.pop(key))
 
+    def _is_deprecated_attr(self, attr: str) -> bool:
+        """Checks wheather `attr` is in the list of deprecated time period attributes."""
+        return (
+            (class_name := self.__class__.__name__) in TelegramObject._TIME_PERIOD_DEPRECATIONS
+            and attr in TelegramObject._TIME_PERIOD_DEPRECATIONS[class_name]
+        )
+
     def _get_attrs_names(self, include_private: bool) -> Iterator[str]:
         """
         Returns the names of the attributes of this object. This is used to determine which
@@ -521,7 +528,11 @@ class TelegramObject:
 
         if include_private:
             return all_attrs
-        return (attr for attr in all_attrs if not attr.startswith("_"))
+        return (
+            attr
+            for attr in all_attrs
+            if not attr.startswith("_") or self._is_deprecated_attr(attr)
+        )
 
     def _get_attrs(
         self,
@@ -558,7 +569,7 @@ class TelegramObject:
                 if recursive and hasattr(value, "to_dict"):
                     data[key] = value.to_dict(recursive=True)
                 else:
-                    data[key] = value
+                    data[key.removeprefix("_") if self._is_deprecated_attr(key) else key] = value
             elif not recursive:
                 data[key] = value
 
@@ -629,7 +640,11 @@ class TelegramObject:
             elif isinstance(value, dtm.datetime):
                 out[key] = to_timestamp(value)
             elif isinstance(value, dtm.timedelta):
-                out[key] = value.total_seconds()
+                # Converting to int here is neccassry in some cases where Bot API returns
+                # 'BadRquest' when expecting integers (e.g. Video.duration)
+                out[key] = (
+                    int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds
+                )
 
         for key in pop_keys:
             out.pop(key)
@@ -665,3 +680,30 @@ class TelegramObject:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
         """
         self._bot = bot
+
+    # We use str keys to avoid importing which causes circular dependencies
+    _TIME_PERIOD_DEPRECATIONS: ClassVar = {
+        "ChatFullInfo": ("_message_auto_delete_time", "_slow_mode_delay"),
+        "Animation": ("_duration",),
+        "Audio": ("_duration",),
+        "Video": ("_duration", "_start_timestamp"),
+        "VideoNote": ("_duration",),
+        "Voice": ("_duration",),
+        "PaidMediaPreview": ("_duration",),
+        "VideoChatEnded": ("_duration",),
+        "InputMediaVideo": ("_duration",),
+        "InputMediaAnimation": ("_duration",),
+        "InputMediaAudio": ("_duration",),
+        "InputPaidMediaVideo": ("_duration",),
+        "InlineQueryResultGif": ("_gif_duration",),
+        "InlineQueryResultMpeg4Gif": ("_mpeg4_duration",),
+        "InlineQueryResultVideo": ("_video_duration",),
+        "InlineQueryResultAudio": ("_audio_duration",),
+        "InlineQueryResultVoice": ("_voice_duration",),
+        "InlineQueryResultLocation": ("_live_period",),
+        "Poll": ("_open_period",),
+        "Location": ("_live_period",),
+        "MessageAutoDeleteTimerChanged": ("_message_auto_delete_time",),
+        "ChatInviteLink": ("_subscription_period",),
+        "InputLocationMessageContent": ("_live_period",),
+    }
