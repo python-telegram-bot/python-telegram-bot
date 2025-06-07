@@ -240,7 +240,6 @@ async def check_shortcut_call(
     for arg in ["reply_to_message_id", "allow_sending_without_reply"]:
         kwargs.pop(arg, None)
         expected_args.discard(arg)
-        ignored_args.add(arg)
 
     async def make_assertion(**kw):
         # name == value makes sure that
@@ -252,7 +251,7 @@ async def check_shortcut_call(
             if name in ignored_args
             or (value == name or (name == "reply_parameters" and value.message_id == 1))
         }
-        if not received_kwargs == expected_args:
+        if received_kwargs != expected_args:
             raise Exception(
                 f"{orig_bot_method.__name__} did not receive correct value for the parameters "
                 f"{expected_args - received_kwargs}"

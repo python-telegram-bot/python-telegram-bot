@@ -1755,8 +1755,17 @@ class Message(MaybeInaccessibleMessage):
         if reply_parameters is not None:
             effective_reply_parameters = reply_parameters
         elif reply_to_message_id is not None:
-            effective_reply_parameters = ReplyParameters(message_id=reply_to_message_id)
+            effective_reply_parameters = ReplyParameters(
+                message_id=reply_to_message_id,
+                allow_sending_without_reply=allow_sending_without_reply,
+            )
         elif isinstance(do_quote, dict):
+            if allow_sending_without_reply is not DEFAULT_NONE:
+                raise ValueError(
+                    "`allow_sending_without_reply` and `dict`-value input for `do_quote` are "
+                    "mutually exclusive."
+                )
+
             effective_reply_parameters = do_quote["reply_parameters"]
             chat_id = do_quote["chat_id"]
         else:
