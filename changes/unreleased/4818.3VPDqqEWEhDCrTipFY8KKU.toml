@@ -1,5 +1,5 @@
 bugfixes = """
-Correctly parse parameter ``allow_sending_without_reply_to`` in ``Message.reply_*`` when used in combination with ``do_quote=True``.
+Correctly parse parameter ``allow_sending_without_reply`` in ``Message.reply_*`` when used in combination with ``do_quote=True``.
 
 .. hint::
 
