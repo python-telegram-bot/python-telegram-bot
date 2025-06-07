@@ -1814,7 +1814,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -1899,7 +1898,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -1979,7 +1977,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2059,7 +2056,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2137,7 +2133,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2218,7 +2213,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2303,7 +2297,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2388,7 +2381,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2475,7 +2467,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2557,7 +2548,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2642,7 +2632,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2730,7 +2719,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2810,7 +2798,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2892,7 +2879,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -2977,7 +2963,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -3060,7 +3045,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -3148,7 +3132,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -3232,7 +3215,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -3347,7 +3329,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -3451,7 +3432,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -3661,7 +3641,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: 20.8
 
@@ -3735,7 +3714,6 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
-                Mutually exclusive with :paramref:`quote`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
