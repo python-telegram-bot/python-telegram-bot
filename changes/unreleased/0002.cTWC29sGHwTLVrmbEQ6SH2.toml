@@ -1,0 +1,5 @@
+other = "Add chango fragment for PR #1"
+[[pull_requests]]
+uid = "2"
+author_uid = "kkomi-Bot"
+closes_threads = []
