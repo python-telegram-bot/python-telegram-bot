@@ -570,7 +570,7 @@ class TelegramObject:
                 if recursive and hasattr(value, "to_dict"):
                     data[key] = value.to_dict(recursive=True)
                 else:
-                    data[key.removeprefix("_") if self._is_deprecated_attr(key) else key] = value
+                    data[key] = value
             elif not recursive:
                 data[key] = value
 
@@ -615,6 +615,7 @@ class TelegramObject:
         # datetimes to timestamps. This mostly eliminates the need for subclasses to override
         # `to_dict`
         pop_keys: set[str] = set()
+        timedelta_dict: dict = {}
         for key, value in out.items():
             if isinstance(value, (tuple, list)):
                 if not value:
@@ -643,12 +644,20 @@ class TelegramObject:
             elif isinstance(value, dtm.timedelta):
                 # Converting to int here is neccassry in some cases where Bot API returns
                 # 'BadRquest' when expecting integers (e.g. Video.duration)
-                out[key] = (
+                # not updating `out` directly to avoid changing the dict size during iteration
+                timedelta_dict[key.removeprefix("_")] = (
                     int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds
                 )
+                # This will sometimes add non-deprecated timedelta attributes to pop_keys.
+                # we'll restore them shortly.
+                pop_keys.add(key)
 
         for key in pop_keys:
             out.pop(key)
+
+        # `out.update` must to be called *after* we pop deprecated time period attributes
+        # this ensures that we restore attributes that were already using datetime.timdelta
+        out.update(timedelta_dict)
 
         # Effectively "unpack" api_kwargs into `out`:
         out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]
