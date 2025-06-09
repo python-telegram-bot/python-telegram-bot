@@ -39,11 +39,15 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
+# Override `video` fixture to provide start_timestamp
 @pytest.fixture(scope="module")
-def video(video):
-    with video._unfrozen():
-        video._start_timestamp = VideoTestBase.start_timestamp
-    return video
+async def video(bot, chat_id):
+    with data_file("telegram.mp4").open("rb") as f:
+        return (
+            await bot.send_video(
+                chat_id, video=f, start_timestamp=VideoTestBase.start_timestamp, read_timeout=50
+            )
+        ).video
 
 
 class VideoTestBase:

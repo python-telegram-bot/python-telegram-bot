@@ -18,16 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Animation."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class Animation(_BaseThumbedMedium):
@@ -110,7 +107,7 @@ class Animation(_BaseThumbedMedium):
             # Required
             self.width: int = width
             self.height: int = height
-            self._duration: dtm.timedelta = parse_period_arg(duration)  # type: ignore[assignment]
+            self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
             # Optional
             self.mime_type: Optional[str] = mime_type
             self.file_name: Optional[str] = file_name
@@ -120,11 +117,3 @@ class Animation(_BaseThumbedMedium):
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Animation":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-        data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
-
-        return super().de_json(data=data, bot=bot)

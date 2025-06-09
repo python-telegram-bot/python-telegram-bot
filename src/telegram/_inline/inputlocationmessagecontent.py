@@ -23,7 +23,7 @@ from typing import Final, Optional, Union
 
 from telegram import constants
 from telegram._inline.inputmessagecontent import InputMessageContent
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
 
@@ -114,7 +114,7 @@ class InputLocationMessageContent(InputMessageContent):
             self.longitude: float = longitude
 
             # Optionals
-            self._live_period: Optional[dtm.timedelta] = parse_period_arg(live_period)
+            self._live_period: Optional[dtm.timedelta] = to_timedelta(live_period)
             self.horizontal_accuracy: Optional[float] = horizontal_accuracy
             self.heading: Optional[int] = heading
             self.proximity_alert_radius: Optional[int] = (

@@ -31,7 +31,7 @@ from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_period_arg, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
@@ -286,7 +286,7 @@ class InputPaidMediaVideo(InputPaidMedia):
             )
             self.width: Optional[int] = width
             self.height: Optional[int] = height
-            self._duration: Optional[dtm.timedelta] = parse_period_arg(duration)
+            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
             self.supports_streaming: Optional[bool] = supports_streaming
             self.cover: Optional[Union[InputFile, str]] = (
                 parse_file_input(cover, attach=True, local_mode=True) if cover else None
@@ -432,7 +432,7 @@ class InputMediaAnimation(InputMedia):
             )
             self.width: Optional[int] = width
             self.height: Optional[int] = height
-            self._duration: Optional[dtm.timedelta] = parse_period_arg(duration)
+            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
             self.has_spoiler: Optional[bool] = has_spoiler
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
 
@@ -686,7 +686,7 @@ class InputMediaVideo(InputMedia):
         with self._unfrozen():
             self.width: Optional[int] = width
             self.height: Optional[int] = height
-            self._duration: Optional[dtm.timedelta] = parse_period_arg(duration)
+            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
             self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumbnail_input(
                 thumbnail
             )
@@ -815,7 +815,7 @@ class InputMediaAudio(InputMedia):
             self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumbnail_input(
                 thumbnail
             )
-            self._duration: Optional[dtm.timedelta] = parse_period_arg(duration)
+            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
             self.title: Optional[str] = title
             self.performer: Optional[str] = performer
 

@@ -32,8 +32,8 @@ from telegram._reaction import ReactionType
 from telegram._utils.argumentparsing import (
     de_json_optional,
     de_list_optional,
-    parse_period_arg,
     parse_sequence_arg,
+    to_timedelta,
 )
 from telegram._utils.datetime import (
     extract_tzinfo_from_defaults,
@@ -534,8 +534,8 @@ class ChatFullInfo(_ChatBase):
             self.invite_link: Optional[str] = invite_link
             self.pinned_message: Optional[Message] = pinned_message
             self.permissions: Optional[ChatPermissions] = permissions
-            self._slow_mode_delay: Optional[dtm.timedelta] = parse_period_arg(slow_mode_delay)
-            self._message_auto_delete_time: Optional[dtm.timedelta] = parse_period_arg(
+            self._slow_mode_delay: Optional[dtm.timedelta] = to_timedelta(slow_mode_delay)
+            self._message_auto_delete_time: Optional[dtm.timedelta] = to_timedelta(
                 message_auto_delete_time
             )
             self.has_protected_content: Optional[bool] = has_protected_content
@@ -629,13 +629,6 @@ class ChatFullInfo(_ChatBase):
             BusinessLocation,
             BusinessOpeningHours,
             Message,
-        )
-
-        data["slow_mode_delay"] = (
-            dtm.timedelta(seconds=s) if (s := data.get("slow_mode_delay")) else None
-        )
-        data["message_auto_delete_time"] = (
-            dtm.timedelta(seconds=s) if (s := data.get("message_auto_delete_time")) else None
         )
 
         data["pinned_message"] = de_json_optional(data.get("pinned_message"), Message, bot)

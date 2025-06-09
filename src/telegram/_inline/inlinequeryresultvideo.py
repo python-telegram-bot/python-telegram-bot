@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
-from telegram._utils.argumentparsing import parse_period_arg, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
@@ -185,7 +185,7 @@ class InlineQueryResultVideo(InlineQueryResult):
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.video_width: Optional[int] = video_width
             self.video_height: Optional[int] = video_height
-            self._video_duration: Optional[dtm.timedelta] = parse_period_arg(video_duration)
+            self._video_duration: Optional[dtm.timedelta] = to_timedelta(video_duration)
             self.description: Optional[str] = description
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content

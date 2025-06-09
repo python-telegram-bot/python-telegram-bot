@@ -103,9 +103,6 @@ class ParamTypeCheckingExceptions:
             "photo": str,  # actual: Union[str, FileInput]
             "video": str,  # actual: Union[str, FileInput]
         },
-        "TransactionPartnerUser": {
-            "subscription_period": int,  # actual: Union[int, dtm.timedelta]
-        },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },

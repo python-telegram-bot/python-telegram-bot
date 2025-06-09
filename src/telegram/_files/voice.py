@@ -18,15 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Voice."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
 
 from telegram._files._basemedium import _BaseMedium
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class Voice(_BaseMedium):
@@ -85,7 +82,7 @@ class Voice(_BaseMedium):
         )
         with self._unfrozen():
             # Required
-            self._duration: dtm.timedelta = parse_period_arg(duration)  # type: ignore[assignment]
+            self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
             # Optional
             self.mime_type: Optional[str] = mime_type
 
@@ -94,12 +91,3 @@ class Voice(_BaseMedium):
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Voice":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
-
-        return super().de_json(data=data, bot=bot)

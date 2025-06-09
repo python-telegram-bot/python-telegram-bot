@@ -19,16 +19,13 @@
 """This module contains an object that represents a Telegram Location."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import Final, Optional, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class Location(TelegramObject):
@@ -100,7 +97,7 @@ class Location(TelegramObject):
 
         # Optionals
         self.horizontal_accuracy: Optional[float] = horizontal_accuracy
-        self._live_period: Optional[dtm.timedelta] = parse_period_arg(live_period)
+        self._live_period: Optional[dtm.timedelta] = to_timedelta(live_period)
         self.heading: Optional[int] = heading
         self.proximity_alert_radius: Optional[int] = (
             int(proximity_alert_radius) if proximity_alert_radius else None
@@ -113,15 +110,6 @@ class Location(TelegramObject):
     @property
     def live_period(self) -> Optional[Union[int, dtm.timedelta]]:
         return get_timedelta_value(self._live_period, attribute="live_period")
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Location":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["live_period"] = dtm.timedelta(seconds=s) if (s := data.get("live_period")) else None
-
-        return super().de_json(data=data, bot=bot)
 
     HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`

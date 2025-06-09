@@ -531,6 +531,7 @@ class TelegramObject:
         return (
             attr
             for attr in all_attrs
+            # Include deprecated private attributes, which are exposed via properties
             if not attr.startswith("_") or self._is_deprecated_attr(attr)
         )
 

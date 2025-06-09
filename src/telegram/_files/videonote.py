@@ -19,16 +19,13 @@
 """This module contains an object that represents a Telegram VideoNote."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class VideoNote(_BaseThumbedMedium):
@@ -101,18 +98,10 @@ class VideoNote(_BaseThumbedMedium):
         with self._unfrozen():
             # Required
             self.length: int = length
-            self._duration: dtm.timedelta = parse_period_arg(duration)  # type: ignore[assignment]
+            self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
 
     @property
     def duration(self) -> Union[int, dtm.timedelta]:
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "VideoNote":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-        data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
-
-        return super().de_json(data=data, bot=bot)

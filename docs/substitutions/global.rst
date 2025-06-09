@@ -102,4 +102,4 @@
 
 .. |time-period-input| replace:: :class:`datetime.timedelta` objects are accepted in addition to plain :obj:`int` values.
 
-.. |time-period-int-deprecated| replace:: In a future major version this attribute will be of type :obj:`datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true` as an environment variable.
+.. |time-period-int-deprecated| replace:: In a future major version this attribute will be of type :obj:`datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true`  or ``PTB_TIMEDELTA=1`` as an environment variable.

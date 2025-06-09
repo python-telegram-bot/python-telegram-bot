@@ -31,8 +31,8 @@ from telegram._utils import enum
 from telegram._utils.argumentparsing import (
     de_json_optional,
     de_list_optional,
-    parse_period_arg,
     parse_sequence_arg,
+    to_timedelta,
 )
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
@@ -160,7 +160,7 @@ class PaidMediaPreview(PaidMedia):
         with self._unfrozen():
             self.width: Optional[int] = width
             self.height: Optional[int] = height
-            self._duration: Optional[dtm.timedelta] = parse_period_arg(duration)
+            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
 
             self._id_attrs = (self.type, self.width, self.height, self._duration)
 

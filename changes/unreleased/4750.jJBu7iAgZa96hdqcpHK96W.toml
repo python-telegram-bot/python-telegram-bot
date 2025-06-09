@@ -1,7 +1,7 @@
-features = "Use `timedelta` to represent time periods in classes"
-deprecations = """In this release, we're migrating attributes of Telegram objects that represent durations/time periods from having :obj:`int` type to Python's native :class:`datetime.timedelta`.
+features = "Use `timedelta` to represent time periods in class arguments and attributes"
+deprecations = """In this release, we're migrating attributes of Telegram objects that represent durations/time periods from having :obj:`int` type to Python's native :class:`datetime.timedelta`. This change is opt-in for now to allow for a smooth transition phase. It will become opt-out in future releases.
 
-Set ``PTB_TIMEDELTA=true`` as an environment variable to make these attributes return :obj:`datetime.timedelta` objects instead of integers. Support for :obj:`int` values is deprecated and will be removed in a future major version.
+Set ``PTB_TIMEDELTA=true`` or ``PTB_TIMEDELTA=1`` as an environment variable to make these attributes return :obj:`datetime.timedelta` objects instead of integers. Support for :obj:`int` values is deprecated and will be removed in a future major version.
 
 Affected Attributes:
 - :attr:`telegram.ChatFullInfo.slow_mode_delay` and :attr:`telegram.ChatFullInfo.message_auto_delete_time`

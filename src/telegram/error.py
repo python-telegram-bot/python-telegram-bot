@@ -25,7 +25,7 @@
 import datetime as dtm
 from typing import Optional, Union
 
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import TimePeriod
 
@@ -231,9 +231,7 @@ class RetryAfter(TelegramError):
     __slots__ = ("_retry_after",)
 
     def __init__(self, retry_after: TimePeriod):
-        self._retry_after: dtm.timedelta = parse_period_arg(  # type: ignore[assignment]
-            retry_after
-        )
+        self._retry_after: dtm.timedelta = to_timedelta(retry_after)  # type: ignore[assignment]
 
         if isinstance(self.retry_after, int):
             super().__init__(f"Flood control exceeded. Retry in {self.retry_after} seconds")
@@ -249,6 +247,7 @@ class RetryAfter(TelegramError):
 
     def __reduce__(self) -> tuple[type, tuple[float]]:  # type: ignore[override]
         # Until support for `int` time periods is lifted, leave pickle behaviour the same
+        # tag: deprecated: NEXT.VERSION
         return self.__class__, (int(self._retry_after.total_seconds()),)
 
 

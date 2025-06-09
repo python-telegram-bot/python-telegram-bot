@@ -21,15 +21,12 @@ deletion.
 """
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class MessageAutoDeleteTimerChanged(TelegramObject):
@@ -65,7 +62,7 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self._message_auto_delete_time: dtm.timedelta = parse_period_arg(
+        self._message_auto_delete_time: dtm.timedelta = to_timedelta(
             message_auto_delete_time
         )  # type: ignore[assignment]
 
@@ -78,15 +75,3 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         return get_timedelta_value(  # type: ignore[return-value]
             self._message_auto_delete_time, attribute="message_auto_delete_time"
         )
-
-    @classmethod
-    def de_json(
-        cls, data: JSONDict, bot: Optional["Bot"] = None
-    ) -> "MessageAutoDeleteTimerChanged":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-        data["message_auto_delete_time"] = (
-            dtm.timedelta(seconds=s) if (s := data.get("message_auto_delete_time")) else None
-        )
-
-        return super().de_json(data=data, bot=bot)

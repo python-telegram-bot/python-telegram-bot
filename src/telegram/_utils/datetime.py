@@ -250,20 +250,20 @@ def get_timedelta_value(
 
     Returns:
         - :obj:`None` if :paramref:`value` is None.
-        - :obj:`datetime.timedelta` if `PTB_TIMEDELTA=true`.
+        - :obj:`datetime.timedelta` if `PTB_TIMEDELTA=true` or ``PTB_TIMEDELTA=1``.
         - :obj:`int` if the total seconds is a whole number.
         - float: otherwise.
     """
     if value is None:
         return None
-    if os.getenv("PTB_TIMEDELTA", "false").lower().strip() == "true":
+    if os.getenv("PTB_TIMEDELTA", "false").lower().strip() in ["true", "1"]:
         return value
     warn(
         PTBDeprecationWarning(
             "NEXT.VERSION",
             f"In a future major version attribute `{attribute}` will be of type"
             " `datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true`"
-            " as an environment variable.",
+            " or ``PTB_TIMEDELTA=1`` as an environment variable.",
         ),
         stacklevel=2,
     )

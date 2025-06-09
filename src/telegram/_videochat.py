@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_period_arg, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import (
     extract_tzinfo_from_defaults,
     from_timestamp,
@@ -94,7 +94,7 @@ class VideoChatEnded(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self._duration: dtm.timedelta = parse_period_arg(duration)  # type: ignore[assignment]
+        self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
         self._id_attrs = (self._duration,)
 
         self._freeze()
@@ -104,15 +104,6 @@ class VideoChatEnded(TelegramObject):
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "VideoChatEnded":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
-
-        return super().de_json(data=data, bot=bot)
 
 
 class VideoChatParticipantsInvited(TelegramObject):

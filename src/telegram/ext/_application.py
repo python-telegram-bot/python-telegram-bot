@@ -782,7 +782,8 @@ class Application(
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
             timeout (:obj:`int` | :class:`datetime.timedelta`, optional): Passed to
-                :paramref:`telegram.Bot.get_updates.timeout`. Default is ``timedelta(seconds=10)``.
+                :paramref:`telegram.Bot.get_updates.timeout`.
+                Default is :obj:`timedelta(seconds=10)<datetime.timedelta>`.
 
                 .. versionchanged:: NEXT.VERSION
                     |time-period-input|

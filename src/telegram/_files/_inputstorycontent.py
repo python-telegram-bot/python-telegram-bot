@@ -25,7 +25,7 @@ from telegram import constants
 from telegram._files.inputfile import InputFile
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict
 
@@ -159,8 +159,8 @@ class InputStoryContentVideo(InputStoryContent):
 
         with self._unfrozen():
             self.video: Union[str, InputFile] = self._parse_file_input(video)
-            self.duration: Optional[dtm.timedelta] = parse_period_arg(duration)
-            self.cover_frame_timestamp: Optional[dtm.timedelta] = parse_period_arg(
+            self.duration: Optional[dtm.timedelta] = to_timedelta(duration)
+            self.cover_frame_timestamp: Optional[dtm.timedelta] = to_timedelta(
                 cover_frame_timestamp
             )
             self.is_animation: Optional[bool] = is_animation

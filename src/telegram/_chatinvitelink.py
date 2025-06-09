@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, parse_period_arg
+from telegram._utils.argumentparsing import de_json_optional, to_timedelta
 from telegram._utils.datetime import (
     extract_tzinfo_from_defaults,
     from_timestamp,
@@ -174,7 +174,7 @@ class ChatInviteLink(TelegramObject):
         self.pending_join_request_count: Optional[int] = (
             int(pending_join_request_count) if pending_join_request_count is not None else None
         )
-        self._subscription_period: Optional[dtm.timedelta] = parse_period_arg(subscription_period)
+        self._subscription_period: Optional[dtm.timedelta] = to_timedelta(subscription_period)
         self.subscription_price: Optional[int] = subscription_price
 
         self._id_attrs = (
@@ -201,8 +201,5 @@ class ChatInviteLink(TelegramObject):
 
         data["creator"] = de_json_optional(data.get("creator"), User, bot)
         data["expire_date"] = from_timestamp(data.get("expire_date", None), tzinfo=loc_tzinfo)
-        data["subscription_period"] = (
-            dtm.timedelta(seconds=s) if (s := data.get("subscription_period")) else None
-        )
 
         return super().de_json(data=data, bot=bot)

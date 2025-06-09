@@ -30,8 +30,8 @@ from telegram._utils import enum
 from telegram._utils.argumentparsing import (
     de_json_optional,
     de_list_optional,
-    parse_period_arg,
     parse_sequence_arg,
+    to_timedelta,
 )
 from telegram._utils.datetime import (
     extract_tzinfo_from_defaults,
@@ -465,7 +465,7 @@ class Poll(TelegramObject):
         self.explanation_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
             explanation_entities
         )
-        self._open_period: Optional[dtm.timedelta] = parse_period_arg(open_period)
+        self._open_period: Optional[dtm.timedelta] = to_timedelta(open_period)
         self.close_date: Optional[dtm.datetime] = close_date
         self.question_entities: tuple[MessageEntity, ...] = parse_sequence_arg(question_entities)
 
@@ -493,7 +493,6 @@ class Poll(TelegramObject):
         data["question_entities"] = de_list_optional(
             data.get("question_entities"), MessageEntity, bot
         )
-        data["open_period"] = dtm.timedelta(seconds=s) if (s := data.get("open_period")) else None
 
         return super().de_json(data=data, bot=bot)
 

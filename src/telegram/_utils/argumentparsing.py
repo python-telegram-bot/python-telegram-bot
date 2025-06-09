@@ -51,7 +51,7 @@ def parse_sequence_arg(arg: Optional[Sequence[T]]) -> tuple[T, ...]:
     return tuple(arg) if arg else ()
 
 
-def parse_period_arg(arg: Optional[Union[int, float, dtm.timedelta]]) -> Optional[dtm.timedelta]:
+def to_timedelta(arg: Optional[Union[int, float, dtm.timedelta]]) -> Optional[dtm.timedelta]:
     """Parses an optional time period in seconds into a timedelta
 
     Args:

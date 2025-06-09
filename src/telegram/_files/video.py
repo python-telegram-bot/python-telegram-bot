@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import de_list_optional, parse_period_arg, parse_sequence_arg
+from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
 
@@ -138,12 +138,12 @@ class Video(_BaseThumbedMedium):
             # Required
             self.width: int = width
             self.height: int = height
-            self._duration: dtm.timedelta = parse_period_arg(duration)  # type: ignore[assignment]
+            self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
             # Optional
             self.mime_type: Optional[str] = mime_type
             self.file_name: Optional[str] = file_name
             self.cover: Optional[Sequence[PhotoSize]] = parse_sequence_arg(cover)
-            self._start_timestamp: Optional[dtm.timedelta] = parse_period_arg(start_timestamp)
+            self._start_timestamp: Optional[dtm.timedelta] = to_timedelta(start_timestamp)
 
     @property
     def duration(self) -> Union[int, dtm.timedelta]:
@@ -160,10 +160,6 @@ class Video(_BaseThumbedMedium):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
-        data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
-        data["start_timestamp"] = (
-            dtm.timedelta(seconds=s) if (s := data.get("start_timestamp")) else None
-        )
         data["cover"] = de_list_optional(data.get("cover"), PhotoSize, bot)
 
         return super().de_json(data=data, bot=bot)

@@ -68,7 +68,7 @@ DATETIME_REGEX = re.compile(
     """,
     re.VERBOSE,
 )
-TIMEDELTA_REGEX = re.compile(r"(in|number of) seconds")
+TIMEDELTA_REGEX = re.compile(r"((in|number of) seconds)|(\w+_period$)")
 
 log = logging.debug
 
@@ -194,7 +194,9 @@ def check_param_type(
         mapped_type = dtm.datetime if is_class else mapped_type | dtm.datetime
 
     # 4) HANDLING TIMEDELTA:
-    elif re.search(TIMEDELTA_REGEX, tg_parameter.param_description):
+    elif re.search(TIMEDELTA_REGEX, tg_parameter.param_description) or re.search(
+        TIMEDELTA_REGEX, ptb_param.name
+    ):
         log("Checking that `%s` is a timedelta!\n", ptb_param.name)
         mapped_type = mapped_type | dtm.timedelta
 

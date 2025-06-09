@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict
 
@@ -134,9 +135,4 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
                 animation, attach=True, local_mode=True
             )
 
-            if isinstance(main_frame_timestamp, dtm.timedelta):
-                self.main_frame_timestamp: Optional[dtm.timedelta] = main_frame_timestamp
-            elif main_frame_timestamp is None:
-                self.main_frame_timestamp = None
-            else:
-                self.main_frame_timestamp = dtm.timedelta(seconds=main_frame_timestamp)
+            self.main_frame_timestamp: Optional[dtm.timedelta] = to_timedelta(main_frame_timestamp)

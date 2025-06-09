@@ -135,7 +135,7 @@ if GITHUB_ACTIONS and JOB_INDEX == 0:
             )
 
 
-@pytest.fixture(scope="module", params=["true", "false", None])
+@pytest.fixture(scope="module", params=["true", "1", "false", "gibberish", None])
 def PTB_TIMEDELTA(request):
     # Here we manually use monkeypatch to give this fixture module scope
     monkeypatch = pytest.MonkeyPatch()

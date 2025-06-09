@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Final, Optional, Union
 from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
-from telegram._utils.argumentparsing import parse_period_arg
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
 
@@ -167,7 +167,7 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.title: str = title
 
             # Optionals
-            self._live_period: Optional[dtm.timedelta] = parse_period_arg(live_period)
+            self._live_period: Optional[dtm.timedelta] = to_timedelta(live_period)
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
             self.thumbnail_url: Optional[str] = thumbnail_url
