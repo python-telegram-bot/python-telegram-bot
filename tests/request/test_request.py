@@ -334,7 +334,7 @@ class TestRequestWithoutRequest:
         if not description and code not in HTTPStatus:
             match = f"Unknown HTTPError.*{code}"
         else:
-            match = description or str(code)
+            match = description or str(code.value)
 
         with pytest.raises(exception_class, match=match):
             await httpx_request.post("", None, None)
