@@ -500,7 +500,7 @@ class TelegramObject:
                 setattr(self, key, api_kwargs.pop(key))
 
     def _is_deprecated_attr(self, attr: str) -> bool:
-        """Checks wheather `attr` is in the list of deprecated time period attributes."""
+        """Checks whether `attr` is in the list of deprecated time period attributes."""
         return (
             (class_name := self.__class__.__name__) in TelegramObject._TIME_PERIOD_DEPRECATIONS
             and attr in TelegramObject._TIME_PERIOD_DEPRECATIONS[class_name]
