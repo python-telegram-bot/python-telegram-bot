@@ -119,7 +119,8 @@ async def network_retry_loop(
             _LOGGER.info(
                 "%s %s. Adding %s seconds to the specified time.", log_prefix, exc, slack_time
             )
-            cur_interval = slack_time + exc.retry_after
+            # pylint: disable=protected-access
+            cur_interval = slack_time + exc._retry_after.total_seconds()
         except TimedOut as toe:
             _LOGGER.debug("%s Timed out: %s. Retrying immediately.", log_prefix, toe)
             # If failure is due to timeout, we should retry asap.

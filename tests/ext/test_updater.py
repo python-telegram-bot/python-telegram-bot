@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import logging
 import platform
 from collections import defaultdict
@@ -294,7 +295,7 @@ class TestUpdater:
         tracking_flag = False
         received_kwargs = {}
         expected_kwargs = {
-            "timeout": 0,
+            "timeout": dtm.timedelta(seconds=0),
             "allowed_updates": "allowed_updates",
         }
 
@@ -416,7 +417,7 @@ class TestUpdater:
         on_stop_flag = False
 
         expected = {
-            "timeout": 10,
+            "timeout": dtm.timedelta(seconds=10),
             "allowed_updates": None,
             "api_kwargs": None,
         }
@@ -456,14 +457,14 @@ class TestUpdater:
             on_stop_flag = False
 
             expected = {
-                "timeout": 42,
+                "timeout": dtm.timedelta(seconds=42),
                 "allowed_updates": ["message"],
                 "api_kwargs": None,
             }
 
             await update_queue.put(Update(update_id=2))
             await updater.start_polling(
-                timeout=42,
+                timeout=dtm.timedelta(seconds=42),
                 allowed_updates=["message"],
             )
             await update_queue.join()

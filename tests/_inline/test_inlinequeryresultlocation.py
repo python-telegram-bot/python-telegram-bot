@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import (
@@ -25,6 +27,7 @@ from telegram import (
     InlineQueryResultVoice,
     InputTextMessageContent,
 )
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -54,7 +57,7 @@ class InlineQueryResultLocationTestBase:
     longitude = 1.0
     title = "title"
     horizontal_accuracy = 999
-    live_period = 70
+    live_period = dtm.timedelta(seconds=70)
     heading = 90
     proximity_alert_radius = 1000
     thumbnail_url = "thumb url"
@@ -77,7 +80,7 @@ class TestInlineQueryResultLocationWithoutRequest(InlineQueryResultLocationTestB
         assert inline_query_result_location.latitude == self.latitude
         assert inline_query_result_location.longitude == self.longitude
         assert inline_query_result_location.title == self.title
-        assert inline_query_result_location.live_period == self.live_period
+        assert inline_query_result_location._live_period == self.live_period
         assert inline_query_result_location.thumbnail_url == self.thumbnail_url
         assert inline_query_result_location.thumbnail_width == self.thumbnail_width
         assert inline_query_result_location.thumbnail_height == self.thumbnail_height
@@ -104,10 +107,10 @@ class TestInlineQueryResultLocationWithoutRequest(InlineQueryResultLocationTestB
             == inline_query_result_location.longitude
         )
         assert inline_query_result_location_dict["title"] == inline_query_result_location.title
-        assert (
-            inline_query_result_location_dict["live_period"]
-            == inline_query_result_location.live_period
+        assert inline_query_result_location_dict["live_period"] == int(
+            self.live_period.total_seconds()
         )
+        assert isinstance(inline_query_result_location_dict["live_period"], int)
         assert (
             inline_query_result_location_dict["thumbnail_url"]
             == inline_query_result_location.thumbnail_url
@@ -137,6 +140,28 @@ class TestInlineQueryResultLocationWithoutRequest(InlineQueryResultLocationTestB
             inline_query_result_location_dict["proximity_alert_radius"]
             == inline_query_result_location.proximity_alert_radius
         )
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, inline_query_result_location):
+        live_period = inline_query_result_location.live_period
+
+        if PTB_TIMEDELTA:
+            assert live_period == self.live_period
+            assert isinstance(live_period, dtm.timedelta)
+        else:
+            assert live_period == int(self.live_period.total_seconds())
+            assert isinstance(live_period, int)
+
+    def test_time_period_int_deprecated(
+        self, recwarn, PTB_TIMEDELTA, inline_query_result_location
+    ):
+        inline_query_result_location.live_period
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`live_period` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = InlineQueryResultLocation(self.id_, self.longitude, self.latitude, self.title)
