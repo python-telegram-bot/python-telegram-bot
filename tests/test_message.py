@@ -495,9 +495,8 @@ class MessageTestBase:
 
 
 class TestMessageWithoutRequest(MessageTestBase):
-    @staticmethod
     async def check_quote_parsing(
-        message: Message, method, bot_method_name: str, args, monkeypatch
+        self, message: Message, method, bot_method_name: str, args, monkeypatch
     ):
         """Used in testing reply_* below. Makes sure that do_quote is handled correctly"""
         with pytest.raises(
@@ -506,30 +505,74 @@ class TestMessageWithoutRequest(MessageTestBase):
         ):
             await method(*args, reply_to_message_id=42, reply_parameters=42)
 
+        with pytest.raises(
+            ValueError,
+            match="`allow_sending_without_reply` and `reply_parameters` are mutually exclusive.",
+        ):
+            await method(*args, allow_sending_without_reply=True, reply_parameters=42)
+
         async def make_assertion(*args, **kwargs):
             return kwargs.get("chat_id"), kwargs.get("reply_parameters")
 
         monkeypatch.setattr(message.get_bot(), bot_method_name, make_assertion)
 
+        for aswr in (DEFAULT_NONE, True):
+            await self._check_quote_parsing(
+                message=message,
+                method=method,
+                bot_method_name=bot_method_name,
+                args=args,
+                monkeypatch=monkeypatch,
+                aswr=aswr,
+            )
+
+    @staticmethod
+    async def _check_quote_parsing(
+        message: Message, method, bot_method_name: str, args, monkeypatch, aswr
+    ):
+        # test that boolean input for do_quote is parse correctly
         for value in (True, False):
-            chat_id, reply_parameters = await method(*args, do_quote=value)
+            chat_id, reply_parameters = await method(
+                *args, do_quote=value, allow_sending_without_reply=aswr
+            )
             if chat_id != message.chat.id:
                 pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
-            expected = ReplyParameters(message.message_id) if value else None
+            expected = (
+                ReplyParameters(message.message_id, allow_sending_without_reply=aswr)
+                if value
+                else None
+            )
             if reply_parameters != expected:
                 pytest.fail(f"reply_parameters is {reply_parameters} but should be {expected}")
 
+        # test that dict input for do_quote is parsed correctly
         input_chat_id = object()
         input_reply_parameters = ReplyParameters(message_id=1, chat_id=42)
-        chat_id, reply_parameters = await method(
-            *args, do_quote={"chat_id": input_chat_id, "reply_parameters": input_reply_parameters}
+        coro = method(
+            *args,
+            do_quote={"chat_id": input_chat_id, "reply_parameters": input_reply_parameters},
+            allow_sending_without_reply=aswr,
         )
-        if chat_id is not input_chat_id:
-            pytest.fail(f"chat_id is {chat_id} but should be {chat_id}")
-        if reply_parameters is not input_reply_parameters:
-            pytest.fail(f"reply_parameters is {reply_parameters} but should be {reply_parameters}")
+        if aswr is True:
+            with pytest.raises(
+                ValueError,
+                match="`allow_sending_without_reply` and `dict`-value input",
+            ):
+                await coro
+        else:
+            chat_id, reply_parameters = await coro
+            if chat_id is not input_chat_id:
+                pytest.fail(f"chat_id is {chat_id} but should be {input_chat_id}")
+            if reply_parameters is not input_reply_parameters:
+                pytest.fail(
+                    f"reply_parameters is {reply_parameters} "
+                    f"but should be {input_reply_parameters}"
+                )
 
-        input_parameters_2 = ReplyParameters(message_id=2, chat_id=43)
+        # test that do_quote input is overridden by reply_parameters
+        input_parameters_2 = ReplyParameters(
+            message_id=message.message_id + 1, chat_id=message.chat_id + 1
+        )
         chat_id, reply_parameters = await method(
             *args,
             reply_parameters=input_parameters_2,
@@ -543,16 +586,23 @@ class TestMessageWithoutRequest(MessageTestBase):
                 f"reply_parameters is {reply_parameters} but should be {input_parameters_2}"
             )
 
+        # test that do_quote input is overridden by reply_to_message_id
         chat_id, reply_parameters = await method(
             *args,
             reply_to_message_id=42,
             # passing these here to make sure that `reply_to_message_id` has higher priority
             do_quote={"chat_id": input_chat_id, "reply_parameters": input_reply_parameters},
+            allow_sending_without_reply=aswr,
         )
         if chat_id != message.chat.id:
             pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
         if reply_parameters is None or reply_parameters.message_id != 42:
             pytest.fail(f"reply_parameters is {reply_parameters} but should be 42")
+        if reply_parameters is None or reply_parameters.allow_sending_without_reply != aswr:
+            pytest.fail(
+                f"reply_parameters.allow_sending_without_reply is "
+                f"{reply_parameters.allow_sending_without_reply} it should be {aswr}"
+            )
 
     @staticmethod
     async def check_thread_id_parsing(
