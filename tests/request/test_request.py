@@ -331,7 +331,7 @@ class TestRequestWithoutRequest:
             mocker_factory(response=server_response, return_code=code),
         )
 
-        if not description and code not in HTTPStatus:
+        if not description and code not in list(HTTPStatus):
             match = f"Unknown HTTPError.*{code}"
         else:
             match = description or str(code.value)
