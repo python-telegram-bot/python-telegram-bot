@@ -114,6 +114,8 @@ You can also install ``python-telegram-bot`` from source, though this is usually
     $ pip install build
     $ python -m build
 
+Or you can use you favored package manager (such as uv, hatch, poetry, etc.) instead of pip.
+
 Verifying Releases
 ~~~~~~~~~~~~~~~~~~
 
