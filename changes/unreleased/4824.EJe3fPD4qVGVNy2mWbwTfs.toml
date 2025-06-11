@@ -1,0 +1,5 @@
+documentation = "Mention alternative package managers in README and contribution guide"
+[[pull_requests]]
+uid = "4824"
+author_uid = "Aweryc"
+closes_threads = ["4823"]
