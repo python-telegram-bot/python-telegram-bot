@@ -127,7 +127,7 @@ docs = [
     "sphinx-inline-tabs==2023.4.21",
     # Temporary. See #4387
     "sphinx-build-compatibility @ git+https://github.com/readthedocs/sphinx-build-compatibility.git@58aabc5f207c6c2421f23d3578adc0b14af57047",
-    "pydantic @ git+https://github.com/pydantic/pydantic; python_version >= '3.14'"  # Temporary for 3.14 support, we're waiting for a new pydantic version
+    "pydantic @ git+https://github.com/pydantic/pydantic ; python_version >= '3.14'"  # Temporary for 3.14 support, we're waiting for a new pydantic version
 ]
 all = ["pre-commit", { include-group = "tests" }, { include-group = "docs" }]
 
