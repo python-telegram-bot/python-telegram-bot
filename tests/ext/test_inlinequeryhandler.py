@@ -158,12 +158,14 @@ class TestInlineQueryHandler:
 
         update = Update(
             update_id=0,
-            inline_query=InlineQuery(id="id", from_user=User(1, "test", False), query="", offset=""),
+            inline_query=InlineQuery(
+                id="id", from_user=User(1, "test", False), query="", offset=""
+            ),
         )
 
         async with app:
             await app.process_update(update)
-        
+
         assert self.test_flag
 
         self.test_flag = False
@@ -176,7 +178,7 @@ class TestInlineQueryHandler:
 
         async with app:
             await app.process_update(update_non_empty)
-            
+
         assert not self.test_flag
 
     @pytest.mark.parametrize("chat_types", [[Chat.SENDER], [Chat.SENDER, Chat.SUPERGROUP], []])

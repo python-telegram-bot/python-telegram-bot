@@ -118,10 +118,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT, RT]):
                 update.inline_query.chat_type not in self.chat_types
             ):
                 return False
-            if (
-                self.pattern
-                and (match := re.match(self.pattern, update.inline_query.query))
-            ):
+            if self.pattern and (match := re.match(self.pattern, update.inline_query.query)):
                 return match
             if not self.pattern:
                 return True
