@@ -153,7 +153,7 @@ class TestInlineQueryHandler:
             assert not handler.check_update(update)
 
     @pytest.mark.parametrize(
-    "query,expected_result",
+        ("query", "expected_result"),
         [
             pytest.param("", True, id="empty string"),
             pytest.param("not empty", False, id="non_empty_string"),
