@@ -152,7 +152,14 @@ class TestInlineQueryHandler:
             update.inline_query.query = "not_a_match"
             assert not handler.check_update(update)
 
-    async def test_empty_inline_query_pattern(self, app):
+    @pytest.mark.parametrize(
+        "query,expected_result",
+        [
+            pytest.param("", True, id="empty string"),
+            pytest.param("not empty", False, id="non_empty_string"),
+        ]
+    )
+    async def test_empty_inline_query_pattern(self, app, query, expected_result):
         handler = InlineQueryHandler(self.callback, pattern=r"^$")
         app.add_handler(handler)
 
