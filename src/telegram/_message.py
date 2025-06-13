@@ -181,8 +181,6 @@ class MaybeInaccessibleMessage(TelegramObject):
 
         .. versionadded:: 20.8
         """
-        # Once we drop support for python 3.9, this can be made a TypeGuard function:
-        # def is_accessible(self) -> TypeGuard[Message]:
         return self.date != ZERO_DATE
 
     @classmethod
