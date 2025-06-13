@@ -115,6 +115,8 @@ tests = [
     "tzdata",
     # We've deprecated support pytz, but we still need it for testing that it works with the library.
     "pytz",
+    # Install coverage:
+    "pytest-cov"
 ]
 docs = [
     "chango~=0.4.0; python_version >= '3.12'",
@@ -278,6 +280,10 @@ concurrency = ["thread", "multiprocessing"]
 omit = [
     "tests/",
     "src/telegram/__main__.py"
+]
+# Relevant for python 3.14: https://github.com/nedbat/coveragepy/issues/1983
+disable_warnings = [
+    "no-ctracer",
 ]
 
 [tool.coverage.report]

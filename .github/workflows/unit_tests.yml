@@ -36,7 +36,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -U pytest-cov
           python -W ignore -m pip install . --group tests
 
       - name: Test with pytest
