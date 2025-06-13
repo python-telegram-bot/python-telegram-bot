@@ -1,0 +1,5 @@
+documentation = "Remove `furo-sphinx-search`"
+[[pull_requests]]
+uid = "4826"
+author_uid = "harshil21"
+closes_threads = []
