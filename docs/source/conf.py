@@ -97,7 +97,6 @@ autodoc_typehints = "none"
 
 # Show docstring for special members
 autodoc_default_options = {
-    "special-members": True,
     # For some reason, __weakref__ can not be ignored by using "inherited-members" in all cases
     # so we list it here.
     "exclude-members": "__init__, __weakref__",
