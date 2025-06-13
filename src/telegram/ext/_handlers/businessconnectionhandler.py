@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BusinessConnectionHandler class."""
-from typing import Optional, TypeVar
+from typing import TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -67,8 +67,8 @@ class BusinessConnectionHandler(BaseHandler[Update, CCT, RT]):
     def __init__(
         self: "BusinessConnectionHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
-        user_id: Optional[SCT[int]] = None,
-        username: Optional[SCT[str]] = None,
+        user_id: SCT[int] | None = None,
+        username: SCT[str] | None = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)

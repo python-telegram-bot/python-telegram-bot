@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -148,18 +148,18 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type: str,
         thumbnail_url: str,
         title: str,
-        caption: Optional[str] = None,
-        video_width: Optional[int] = None,
-        video_height: Optional[int] = None,
-        video_duration: Optional[int] = None,
-        description: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
+        caption: str | None = None,
+        video_width: int | None = None,
+        video_height: int | None = None,
+        video_duration: int | None = None,
+        description: str | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        show_caption_above_media: Optional[bool] = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        show_caption_above_media: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
@@ -170,13 +170,13 @@ class InlineQueryResultVideo(InlineQueryResult):
             self.title: str = title
 
             # Optional
-            self.caption: Optional[str] = caption
+            self.caption: str | None = caption
             self.parse_mode: ODVInput[str] = parse_mode
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.video_width: Optional[int] = video_width
-            self.video_height: Optional[int] = video_height
-            self.video_duration: Optional[int] = video_duration
-            self.description: Optional[str] = description
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.video_width: int | None = video_width
+            self.video_height: int | None = video_height
+            self.video_duration: int | None = video_duration
+            self.description: str | None = description
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
+            self.show_caption_above_media: bool | None = show_caption_above_media

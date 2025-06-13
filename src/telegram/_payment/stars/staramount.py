@@ -16,11 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram StarAmount."""
 
-
-from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -55,13 +52,13 @@ class StarAmount(TelegramObject):
     def __init__(
         self,
         amount: int,
-        nanostar_amount: Optional[int] = None,
+        nanostar_amount: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.amount: int = amount
-        self.nanostar_amount: Optional[int] = nanostar_amount
+        self.nanostar_amount: int | None = nanostar_amount
 
         self._id_attrs = (self.amount, self.nanostar_amount)
 

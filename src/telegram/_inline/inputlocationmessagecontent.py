@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
-from typing import Final, Optional
+from typing import Final
 
 from telegram import constants
 from telegram._inline.inputmessagecontent import InputMessageContent
@@ -90,12 +90,12 @@ class InputLocationMessageContent(InputMessageContent):
         self,
         latitude: float,
         longitude: float,
-        live_period: Optional[int] = None,
-        horizontal_accuracy: Optional[float] = None,
-        heading: Optional[int] = None,
-        proximity_alert_radius: Optional[int] = None,
+        live_period: int | None = None,
+        horizontal_accuracy: float | None = None,
+        heading: int | None = None,
+        proximity_alert_radius: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -104,10 +104,10 @@ class InputLocationMessageContent(InputMessageContent):
             self.longitude: float = longitude
 
             # Optionals
-            self.live_period: Optional[int] = live_period
-            self.horizontal_accuracy: Optional[float] = horizontal_accuracy
-            self.heading: Optional[int] = heading
-            self.proximity_alert_radius: Optional[int] = (
+            self.live_period: int | None = live_period
+            self.horizontal_accuracy: float | None = horizontal_accuracy
+            self.heading: int | None = heading
+            self.proximity_alert_radius: int | None = (
                 int(proximity_alert_radius) if proximity_alert_radius else None
             )
 

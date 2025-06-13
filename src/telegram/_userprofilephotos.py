@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
@@ -59,7 +59,7 @@ class UserProfilePhotos(TelegramObject):
         total_count: int,
         photos: Sequence[Sequence[PhotoSize]],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -71,7 +71,7 @@ class UserProfilePhotos(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UserProfilePhotos":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UserProfilePhotos":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

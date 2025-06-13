@@ -25,12 +25,11 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from typing import Optional
 
 from telegram._utils.types import SCT
 
 
-def parse_chat_id(chat_id: Optional[SCT[int]]) -> frozenset[int]:
+def parse_chat_id(chat_id: SCT[int] | None) -> frozenset[int]:
     """Accepts a chat id or collection of chat ids and returns a frozenset of chat ids."""
     if chat_id is None:
         return frozenset()
@@ -39,7 +38,7 @@ def parse_chat_id(chat_id: Optional[SCT[int]]) -> frozenset[int]:
     return frozenset(chat_id)
 
 
-def parse_username(username: Optional[SCT[str]]) -> frozenset[str]:
+def parse_username(username: SCT[str] | None) -> frozenset[str]:
     """Accepts a username or collection of usernames and returns a frozenset of usernames.
     Strips the leading ``@`` if present.
     """

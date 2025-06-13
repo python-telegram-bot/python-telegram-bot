@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -126,14 +126,14 @@ class WebhookInfo(TelegramObject):
         url: str,
         has_custom_certificate: bool,
         pending_update_count: int,
-        last_error_date: Optional[dtm.datetime] = None,
-        last_error_message: Optional[str] = None,
-        max_connections: Optional[int] = None,
-        allowed_updates: Optional[Sequence[str]] = None,
-        ip_address: Optional[str] = None,
-        last_synchronization_error_date: Optional[dtm.datetime] = None,
+        last_error_date: dtm.datetime | None = None,
+        last_error_message: str | None = None,
+        max_connections: int | None = None,
+        allowed_updates: Sequence[str] | None = None,
+        ip_address: str | None = None,
+        last_synchronization_error_date: dtm.datetime | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -142,14 +142,12 @@ class WebhookInfo(TelegramObject):
         self.pending_update_count: int = pending_update_count
 
         # Optional
-        self.ip_address: Optional[str] = ip_address
-        self.last_error_date: Optional[dtm.datetime] = last_error_date
-        self.last_error_message: Optional[str] = last_error_message
-        self.max_connections: Optional[int] = max_connections
+        self.ip_address: str | None = ip_address
+        self.last_error_date: dtm.datetime | None = last_error_date
+        self.last_error_message: str | None = last_error_message
+        self.max_connections: int | None = max_connections
         self.allowed_updates: tuple[str, ...] = parse_sequence_arg(allowed_updates)
-        self.last_synchronization_error_date: Optional[dtm.datetime] = (
-            last_synchronization_error_date
-        )
+        self.last_synchronization_error_date: dtm.datetime | None = last_synchronization_error_date
 
         self._id_attrs = (
             self.url,
@@ -166,7 +164,7 @@ class WebhookInfo(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "WebhookInfo":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "WebhookInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

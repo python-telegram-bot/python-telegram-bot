@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a location to which a chat is connected."""
 
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._files.location import Location
@@ -58,7 +58,7 @@ class ChatLocation(TelegramObject):
         location: Location,
         address: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.location: Location = location
@@ -69,7 +69,7 @@ class ChatLocation(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatLocation":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatLocation":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

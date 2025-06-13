@@ -37,11 +37,11 @@ def check_keyboard_type(keyboard: object) -> bool:
     # string and bytes may actually be used for ReplyKeyboardMarkup in which case each button
     # would contain a single character. But that use case should be discouraged and we don't
     # allow it here.
-    if not isinstance(keyboard, Sequence) or isinstance(keyboard, (str, bytes)):
+    if not isinstance(keyboard, Sequence) or isinstance(keyboard, str | bytes):
         return False
 
     for row in keyboard:
-        if not isinstance(row, Sequence) or isinstance(row, (str, bytes)):
+        if not isinstance(row, Sequence) or isinstance(row, str | bytes):
             return False
         for inner in row:
             if isinstance(inner, Sequence) and not isinstance(inner, str):

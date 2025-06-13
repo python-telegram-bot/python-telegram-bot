@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatBoostHandler class."""
 
-from typing import Final, Optional
+from typing import Final
 
 from telegram import Update
 from telegram.ext._handlers.basehandler import BaseHandler
@@ -87,8 +87,8 @@ class ChatBoostHandler(BaseHandler[Update, CCT, RT]):
         self: "ChatBoostHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         chat_boost_types: int = CHAT_BOOST,
-        chat_id: Optional[int] = None,
-        chat_username: Optional[str] = None,
+        chat_id: int | None = None,
+        chat_username: str | None = None,
         block: bool = True,
     ):
         super().__init__(callback, block=block)

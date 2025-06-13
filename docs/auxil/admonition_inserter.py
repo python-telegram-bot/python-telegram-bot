@@ -24,7 +24,6 @@ from collections import defaultdict
 from collections.abc import Iterator
 from socket import socket
 from types import FunctionType
-from typing import Union
 
 from apscheduler.job import Job as APSJob
 
@@ -108,7 +107,7 @@ class AdmonitionInserter:
     """
 
     def __init__(self):
-        self.admonitions: dict[str, dict[Union[type, collections.abc.Callable], str]] = {
+        self.admonitions: dict[str, dict[type | collections.abc.Callable, str]] = {
             # dynamically determine which method to use to create a sub-dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
             for admonition_type in self.ALL_ADMONITION_TYPES
@@ -136,7 +135,7 @@ class AdmonitionInserter:
 
     def insert_admonitions(
         self,
-        obj: Union[type, collections.abc.Callable],
+        obj: type | collections.abc.Callable,
         docstring_lines: list[str],
     ):
         """Inserts admonitions into docstring lines for a given class or method.
@@ -541,7 +540,7 @@ class AdmonitionInserter:
         return list(telegram_classes)
 
     @staticmethod
-    def _resolve_class(name: str) -> Union[type, None]:
+    def _resolve_class(name: str) -> type | None:
         """The keys in the admonitions dictionary are not strings like "telegram.StickerSet"
         but classes like <class 'telegram._files.sticker.StickerSet'>.
 

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to chat backgrounds."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._files.document import Document
@@ -69,7 +69,7 @@ class BackgroundFill(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
@@ -79,7 +79,7 @@ class BackgroundFill(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BackgroundFill":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BackgroundFill":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -119,7 +119,7 @@ class BackgroundFillSolid(BackgroundFill):
         self,
         color: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.SOLID, api_kwargs=api_kwargs)
 
@@ -165,7 +165,7 @@ class BackgroundFillGradient(BackgroundFill):
         bottom_color: int,
         rotation_angle: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.GRADIENT, api_kwargs=api_kwargs)
 
@@ -203,7 +203,7 @@ class BackgroundFillFreeformGradient(BackgroundFill):
         self,
         colors: Sequence[int],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.FREEFORM_GRADIENT, api_kwargs=api_kwargs)
 
@@ -255,7 +255,7 @@ class BackgroundType(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
@@ -265,7 +265,7 @@ class BackgroundType(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BackgroundType":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BackgroundType":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -319,7 +319,7 @@ class BackgroundTypeFill(BackgroundType):
         fill: BackgroundFill,
         dark_theme_dimming: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.FILL, api_kwargs=api_kwargs)
 
@@ -368,10 +368,10 @@ class BackgroundTypeWallpaper(BackgroundType):
         self,
         document: Document,
         dark_theme_dimming: int,
-        is_blurred: Optional[bool] = None,
-        is_moving: Optional[bool] = None,
+        is_blurred: bool | None = None,
+        is_moving: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.WALLPAPER, api_kwargs=api_kwargs)
 
@@ -380,8 +380,8 @@ class BackgroundTypeWallpaper(BackgroundType):
             self.document: Document = document
             self.dark_theme_dimming: int = dark_theme_dimming
             # Optionals
-            self.is_blurred: Optional[bool] = is_blurred
-            self.is_moving: Optional[bool] = is_moving
+            self.is_blurred: bool | None = is_blurred
+            self.is_moving: bool | None = is_moving
 
             self._id_attrs = (self.document, self.dark_theme_dimming)
 
@@ -439,10 +439,10 @@ class BackgroundTypePattern(BackgroundType):
         document: Document,
         fill: BackgroundFill,
         intensity: int,
-        is_inverted: Optional[bool] = None,
-        is_moving: Optional[bool] = None,
+        is_inverted: bool | None = None,
+        is_moving: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.PATTERN, api_kwargs=api_kwargs)
 
@@ -452,8 +452,8 @@ class BackgroundTypePattern(BackgroundType):
             self.fill: BackgroundFill = fill
             self.intensity: int = intensity
             # Optionals
-            self.is_inverted: Optional[bool] = is_inverted
-            self.is_moving: Optional[bool] = is_moving
+            self.is_inverted: bool | None = is_inverted
+            self.is_moving: bool | None = is_moving
 
             self._id_attrs = (self.document, self.fill, self.intensity)
 
@@ -482,7 +482,7 @@ class BackgroundTypeChatTheme(BackgroundType):
         self,
         theme_name: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.CHAT_THEME, api_kwargs=api_kwargs)
 
@@ -514,7 +514,7 @@ class ChatBackground(TelegramObject):
         self,
         type: BackgroundType,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.type: BackgroundType = type
@@ -523,7 +523,7 @@ class ChatBackground(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBackground":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatBackground":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

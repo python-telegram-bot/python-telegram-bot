@@ -21,7 +21,7 @@
 import functools
 import re
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, _eval_type, get_type_hints
+from typing import TYPE_CHECKING, Any, TypeVar, _eval_type, get_type_hints
 
 from bs4 import PageElement, Tag
 
@@ -117,7 +117,7 @@ T = TypeVar("T")
 
 def extract_mappings(
     exceptions: dict[str, dict[str, T]], obj: object, param_name: str
-) -> Optional[list[T]]:
+) -> list[T] | None:
     mappings = (
         mapping for pattern, mapping in exceptions.items() if (re.match(pattern, obj.__name__))
     )

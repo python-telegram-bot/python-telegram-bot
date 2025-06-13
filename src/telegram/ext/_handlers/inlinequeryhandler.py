@@ -19,7 +19,7 @@
 """This module contains the InlineQueryHandler class."""
 import re
 from re import Match, Pattern
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -90,19 +90,19 @@ class InlineQueryHandler(BaseHandler[Update, CCT, RT]):
     def __init__(
         self: "InlineQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Optional[Union[str, Pattern[str]]] = None,
+        pattern: str | Pattern[str] | None = None,
         block: DVType[bool] = DEFAULT_TRUE,
-        chat_types: Optional[list[str]] = None,
+        chat_types: list[str] | None = None,
     ):
         super().__init__(callback, block=block)
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern: Optional[Union[str, Pattern[str]]] = pattern
-        self.chat_types: Optional[list[str]] = chat_types
+        self.pattern: str | Pattern[str] | None = pattern
+        self.chat_types: list[str] | None = chat_types
 
-    def check_update(self, update: object) -> Optional[Union[bool, Match[str]]]:
+    def check_update(self, update: object) -> bool | Match[str] | None:
         """
         Determines whether an update should be passed to this handler's :attr:`callback`.
 
@@ -133,7 +133,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT, RT]):
         context: CCT,
         update: Update,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Optional[Union[bool, Match[str]]],
+        check_result: bool | Match[str] | None,
     ) -> None:
         """Add the result of ``re.match(pattern, update.inline_query.query)`` to
         :attr:`CallbackContext.matches` as list with one element.

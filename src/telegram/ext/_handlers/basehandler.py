@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Application."""
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.repr import build_repr_with_selected_attrs
@@ -113,7 +113,7 @@ class BaseHandler(Generic[UT, CCT, RT], ABC):
         return build_repr_with_selected_attrs(self, callback=callback_name)
 
     @abstractmethod
-    def check_update(self, update: object) -> Optional[Union[bool, object]]:
+    def check_update(self, update: object) -> bool | object | None:
         """
         This method is called to determine if an update should be handled by
         this handler instance. It should always be overridden.

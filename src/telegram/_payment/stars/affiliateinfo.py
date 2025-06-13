@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes for Telegram Stars affiliates."""
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
@@ -83,18 +83,18 @@ class AffiliateInfo(TelegramObject):
         self,
         commission_per_mille: int,
         amount: int,
-        affiliate_user: Optional["User"] = None,
-        affiliate_chat: Optional["Chat"] = None,
-        nanostar_amount: Optional[int] = None,
+        affiliate_user: "User | None" = None,
+        affiliate_chat: "Chat | None" = None,
+        nanostar_amount: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.affiliate_user: Optional[User] = affiliate_user
-        self.affiliate_chat: Optional[Chat] = affiliate_chat
+        self.affiliate_user: User | None = affiliate_user
+        self.affiliate_chat: Chat | None = affiliate_chat
         self.commission_per_mille: int = commission_per_mille
         self.amount: int = amount
-        self.nanostar_amount: Optional[int] = nanostar_amount
+        self.nanostar_amount: int | None = nanostar_amount
 
         self._id_attrs = (
             self.affiliate_user,
@@ -106,7 +106,7 @@ class AffiliateInfo(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "AffiliateInfo":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "AffiliateInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

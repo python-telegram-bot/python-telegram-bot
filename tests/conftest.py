@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import logging
 import sys
 import zoneinfo
 from pathlib import Path
@@ -40,7 +39,7 @@ from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE, make_message
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
-from tests.auxil.envvars import GITHUB_ACTIONS, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTIONS, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestBot, make_bot
@@ -52,10 +51,6 @@ if TEST_WITH_OPT_DEPS:
 # Don't collect `test_official.py` on Python 3.10- since it uses newer features like X | Y syntax.
 # Docs: https://docs.pytest.org/en/7.1.x/example/pythoncollection.html#customizing-test-collection
 collect_ignore = []
-if sys.version_info < (3, 10):
-    if RUN_TEST_OFFICIAL:
-        logging.warning("Skipping test_official.py since it requires Python 3.10+")
-    collect_ignore_glob = ["test_official/*.py"]
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343

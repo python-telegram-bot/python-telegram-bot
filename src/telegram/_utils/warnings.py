@@ -26,13 +26,12 @@ Warning:
     the changelog.
 """
 import warnings
-from typing import Union
 
 from telegram.warnings import PTBUserWarning
 
 
 def warn(
-    message: Union[str, PTBUserWarning],
+    message: str | PTBUserWarning,
     category: type[Warning] = PTBUserWarning,
     stacklevel: int = 0,
 ) -> None:

@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains classes related to gifs sent by bots."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._files.sticker import Sticker
 from telegram._messageentity import MessageEntity
@@ -82,26 +82,26 @@ class Gift(TelegramObject):
         id: str,
         sticker: Sticker,
         star_count: int,
-        total_count: Optional[int] = None,
-        remaining_count: Optional[int] = None,
-        upgrade_star_count: Optional[int] = None,
+        total_count: int | None = None,
+        remaining_count: int | None = None,
+        upgrade_star_count: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
         self.sticker: Sticker = sticker
         self.star_count: int = star_count
-        self.total_count: Optional[int] = total_count
-        self.remaining_count: Optional[int] = remaining_count
-        self.upgrade_star_count: Optional[int] = upgrade_star_count
+        self.total_count: int | None = total_count
+        self.remaining_count: int | None = remaining_count
+        self.upgrade_star_count: int | None = upgrade_star_count
 
         self._id_attrs = (self.id,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Gift":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Gift":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -131,7 +131,7 @@ class Gifts(TelegramObject):
         self,
         gifts: Sequence[Gift],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.gifts: tuple[Gift, ...] = parse_sequence_arg(gifts)
@@ -141,7 +141,7 @@ class Gifts(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Gifts":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Gifts":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -207,34 +207,34 @@ class GiftInfo(TelegramObject):
     def __init__(
         self,
         gift: Gift,
-        owned_gift_id: Optional[str] = None,
-        convert_star_count: Optional[int] = None,
-        prepaid_upgrade_star_count: Optional[int] = None,
-        can_be_upgraded: Optional[bool] = None,
-        text: Optional[str] = None,
-        entities: Optional[Sequence[MessageEntity]] = None,
-        is_private: Optional[bool] = None,
+        owned_gift_id: str | None = None,
+        convert_star_count: int | None = None,
+        prepaid_upgrade_star_count: int | None = None,
+        can_be_upgraded: bool | None = None,
+        text: str | None = None,
+        entities: Sequence[MessageEntity] | None = None,
+        is_private: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.gift: Gift = gift
         # Optional
-        self.owned_gift_id: Optional[str] = owned_gift_id
-        self.convert_star_count: Optional[int] = convert_star_count
-        self.prepaid_upgrade_star_count: Optional[int] = prepaid_upgrade_star_count
-        self.can_be_upgraded: Optional[bool] = can_be_upgraded
-        self.text: Optional[str] = text
+        self.owned_gift_id: str | None = owned_gift_id
+        self.convert_star_count: int | None = convert_star_count
+        self.prepaid_upgrade_star_count: int | None = prepaid_upgrade_star_count
+        self.can_be_upgraded: bool | None = can_be_upgraded
+        self.text: str | None = text
         self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-        self.is_private: Optional[bool] = is_private
+        self.is_private: bool | None = is_private
 
         self._id_attrs = (self.gift,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "GiftInfo":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "GiftInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -268,7 +268,7 @@ class GiftInfo(TelegramObject):
 
         return parse_message_entity(self.text, entity)
 
-    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
+    def parse_entities(self, types: list[str] | None = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this gift info's text filtered by their ``type`` attribute as
@@ -339,7 +339,7 @@ class AcceptedGiftTypes(TelegramObject):
         unique_gifts: bool,
         premium_subscription: bool,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.unlimited_gifts: bool = unlimited_gifts

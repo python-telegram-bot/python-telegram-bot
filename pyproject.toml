@@ -193,13 +193,14 @@ disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods",
         "too-few-public-methods", "broad-exception-caught", "too-many-instance-attributes",
         "fixme", "missing-function-docstring", "missing-class-docstring", "too-many-locals",
         "too-many-lines", "too-many-branches", "too-many-statements", "cyclic-import",
-        "too-many-positional-arguments",
+        "too-many-positional-arguments", "invalid-sequence-index"
 ]
 
 [tool.pylint.main]
 #  run pylint across multiple cpu cores to speed it up-
 # https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
 jobs = 0
+py-version = "3.10"
 
 [tool.pylint.classes]
 exclude-protected = ["_unfrozen"]

@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PicklePersistence class."""
 import pickle
+from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Optional, TypeVar, Union, cast, overload
+from typing import Any, TypeVar, cast, overload
 
 from telegram import Bot, TelegramObject
 from telegram._utils.types import FilePathInput
@@ -86,7 +87,7 @@ class _BotPickler(pickle.Pickler):
 
         return _custom_reduction(obj)
 
-    def persistent_id(self, obj: object) -> Optional[str]:
+    def persistent_id(self, obj: object) -> str | None:
         """Used to 'mark' the Bot, so it can be replaced later. See
         https://docs.python.org/3/library/pickle.html#pickle.Pickler.persistent_id for more info
         """
@@ -108,7 +109,7 @@ class _BotUnpickler(pickle.Unpickler):
         self._bot = bot
         super().__init__(*args, **kwargs)
 
-    def persistent_load(self, pid: str) -> Optional[Bot]:
+    def persistent_load(self, pid: str) -> Bot | None:
         """Replaces the bot with the current bot if known, else it is replaced by :obj:`None`."""
         if pid == _REPLACED_KNOWN_BOT:
             return self._bot
@@ -201,7 +202,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def __init__(
         self: "PicklePersistence[dict[Any, Any], dict[Any, Any], dict[Any, Any]]",
         filepath: FilePathInput,
-        store_data: Optional[PersistenceInput] = None,
+        store_data: PersistenceInput | None = None,
         single_file: bool = True,
         on_flush: bool = False,
         update_interval: float = 60,
@@ -211,31 +212,31 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def __init__(
         self: "PicklePersistence[UD, CD, BD]",
         filepath: FilePathInput,
-        store_data: Optional[PersistenceInput] = None,
+        store_data: PersistenceInput | None = None,
         single_file: bool = True,
         on_flush: bool = False,
         update_interval: float = 60,
-        context_types: Optional[ContextTypes[Any, UD, CD, BD]] = None,
+        context_types: ContextTypes[Any, UD, CD, BD] | None = None,
     ): ...
 
     def __init__(
         self,
         filepath: FilePathInput,
-        store_data: Optional[PersistenceInput] = None,
+        store_data: PersistenceInput | None = None,
         single_file: bool = True,
         on_flush: bool = False,
         update_interval: float = 60,
-        context_types: Optional[ContextTypes[Any, UD, CD, BD]] = None,
+        context_types: ContextTypes[Any, UD, CD, BD] | None = None,
     ):
         super().__init__(store_data=store_data, update_interval=update_interval)
         self.filepath: Path = Path(filepath)
-        self.single_file: Optional[bool] = single_file
-        self.on_flush: Optional[bool] = on_flush
-        self.user_data: Optional[dict[int, UD]] = None
-        self.chat_data: Optional[dict[int, CD]] = None
-        self.bot_data: Optional[BD] = None
-        self.callback_data: Optional[CDCData] = None
-        self.conversations: Optional[dict[str, dict[tuple[Union[int, str], ...], object]]] = None
+        self.single_file: bool | None = single_file
+        self.on_flush: bool | None = on_flush
+        self.user_data: dict[int, UD] | None = None
+        self.chat_data: dict[int, CD] | None = None
+        self.bot_data: BD | None = None
+        self.callback_data: CDCData | None = None
+        self.conversations: dict[str, dict[tuple[int | str, ...], object]] | None = None
         self.context_types: ContextTypes[Any, UD, CD, BD] = cast(
             "ContextTypes[Any, UD, CD, BD]", context_types or ContextTypes()
         )
@@ -342,7 +343,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self._load_singlefile()
         return deepcopy(self.bot_data)  # type: ignore[return-value]
 
-    async def get_callback_data(self) -> Optional[CDCData]:
+    async def get_callback_data(self) -> CDCData | None:
         """Returns the callback data from the pickle file if it exists or :obj:`None`.
 
         .. versionadded:: 13.6
@@ -386,7 +387,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
     async def update_conversation(
-        self, name: str, key: ConversationKey, new_state: Optional[object]
+        self, name: str, key: ConversationKey, new_state: object | None
     ) -> None:
         """Will update the conversations for the given handler and depending on :attr:`on_flush`
         save the pickle file.

@@ -36,8 +36,6 @@ __all__ = (
     "TimedOut",
 )
 
-from typing import Optional, Union
-
 
 class TelegramError(Exception):
     """
@@ -117,7 +115,7 @@ class InvalidToken(TelegramError):
 
     __slots__ = ()
 
-    def __init__(self, message: Optional[str] = None) -> None:
+    def __init__(self, message: str | None = None) -> None:
         super().__init__("Invalid token" if message is None else message)
 
 
@@ -171,7 +169,7 @@ class TimedOut(NetworkError):
 
     __slots__ = ()
 
-    def __init__(self, message: Optional[str] = None) -> None:
+    def __init__(self, message: str | None = None) -> None:
         super().__init__(message or "Timed out")
 
 
@@ -244,7 +242,7 @@ class PassportDecryptionError(TelegramError):
 
     __slots__ = ("_msg",)
 
-    def __init__(self, message: Union[str, Exception]):
+    def __init__(self, message: str | Exception):
         super().__init__(f"PassportDecryptionError: {message}")
         self._msg = str(message)
 

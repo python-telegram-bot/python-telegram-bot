@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This modules contains objects that represents Telegram Replies"""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -190,65 +190,65 @@ class ExternalReplyInfo(TelegramObject):
     def __init__(
         self,
         origin: MessageOrigin,
-        chat: Optional[Chat] = None,
-        message_id: Optional[int] = None,
-        link_preview_options: Optional[LinkPreviewOptions] = None,
-        animation: Optional[Animation] = None,
-        audio: Optional[Audio] = None,
-        document: Optional[Document] = None,
-        photo: Optional[Sequence[PhotoSize]] = None,
-        sticker: Optional[Sticker] = None,
-        story: Optional[Story] = None,
-        video: Optional[Video] = None,
-        video_note: Optional[VideoNote] = None,
-        voice: Optional[Voice] = None,
-        has_media_spoiler: Optional[bool] = None,
-        contact: Optional[Contact] = None,
-        dice: Optional[Dice] = None,
-        game: Optional[Game] = None,
-        giveaway: Optional[Giveaway] = None,
-        giveaway_winners: Optional[GiveawayWinners] = None,
-        invoice: Optional[Invoice] = None,
-        location: Optional[Location] = None,
-        poll: Optional[Poll] = None,
-        venue: Optional[Venue] = None,
-        paid_media: Optional[PaidMediaInfo] = None,
+        chat: Chat | None = None,
+        message_id: int | None = None,
+        link_preview_options: LinkPreviewOptions | None = None,
+        animation: Animation | None = None,
+        audio: Audio | None = None,
+        document: Document | None = None,
+        photo: Sequence[PhotoSize] | None = None,
+        sticker: Sticker | None = None,
+        story: Story | None = None,
+        video: Video | None = None,
+        video_note: VideoNote | None = None,
+        voice: Voice | None = None,
+        has_media_spoiler: bool | None = None,
+        contact: Contact | None = None,
+        dice: Dice | None = None,
+        game: Game | None = None,
+        giveaway: Giveaway | None = None,
+        giveaway_winners: GiveawayWinners | None = None,
+        invoice: Invoice | None = None,
+        location: Location | None = None,
+        poll: Poll | None = None,
+        venue: Venue | None = None,
+        paid_media: PaidMediaInfo | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         self.origin: MessageOrigin = origin
-        self.chat: Optional[Chat] = chat
-        self.message_id: Optional[int] = message_id
-        self.link_preview_options: Optional[LinkPreviewOptions] = link_preview_options
-        self.animation: Optional[Animation] = animation
-        self.audio: Optional[Audio] = audio
-        self.document: Optional[Document] = document
-        self.photo: Optional[tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
-        self.sticker: Optional[Sticker] = sticker
-        self.story: Optional[Story] = story
-        self.video: Optional[Video] = video
-        self.video_note: Optional[VideoNote] = video_note
-        self.voice: Optional[Voice] = voice
-        self.has_media_spoiler: Optional[bool] = has_media_spoiler
-        self.contact: Optional[Contact] = contact
-        self.dice: Optional[Dice] = dice
-        self.game: Optional[Game] = game
-        self.giveaway: Optional[Giveaway] = giveaway
-        self.giveaway_winners: Optional[GiveawayWinners] = giveaway_winners
-        self.invoice: Optional[Invoice] = invoice
-        self.location: Optional[Location] = location
-        self.poll: Optional[Poll] = poll
-        self.venue: Optional[Venue] = venue
-        self.paid_media: Optional[PaidMediaInfo] = paid_media
+        self.chat: Chat | None = chat
+        self.message_id: int | None = message_id
+        self.link_preview_options: LinkPreviewOptions | None = link_preview_options
+        self.animation: Animation | None = animation
+        self.audio: Audio | None = audio
+        self.document: Document | None = document
+        self.photo: tuple[PhotoSize, ...] | None = parse_sequence_arg(photo)
+        self.sticker: Sticker | None = sticker
+        self.story: Story | None = story
+        self.video: Video | None = video
+        self.video_note: VideoNote | None = video_note
+        self.voice: Voice | None = voice
+        self.has_media_spoiler: bool | None = has_media_spoiler
+        self.contact: Contact | None = contact
+        self.dice: Dice | None = dice
+        self.game: Game | None = game
+        self.giveaway: Giveaway | None = giveaway
+        self.giveaway_winners: GiveawayWinners | None = giveaway_winners
+        self.invoice: Invoice | None = invoice
+        self.location: Location | None = location
+        self.poll: Poll | None = poll
+        self.venue: Venue | None = venue
+        self.paid_media: PaidMediaInfo | None = paid_media
 
         self._id_attrs = (self.origin,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ExternalReplyInfo":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ExternalReplyInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -327,17 +327,17 @@ class TextQuote(TelegramObject):
         self,
         text: str,
         position: int,
-        entities: Optional[Sequence[MessageEntity]] = None,
-        is_manual: Optional[bool] = None,
+        entities: Sequence[MessageEntity] | None = None,
+        is_manual: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         self.text: str = text
         self.position: int = position
-        self.entities: Optional[tuple[MessageEntity, ...]] = parse_sequence_arg(entities)
-        self.is_manual: Optional[bool] = is_manual
+        self.entities: tuple[MessageEntity, ...] | None = parse_sequence_arg(entities)
+        self.is_manual: bool | None = is_manual
 
         self._id_attrs = (
             self.text,
@@ -347,7 +347,7 @@ class TextQuote(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TextQuote":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TextQuote":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -424,33 +424,31 @@ class ReplyParameters(TelegramObject):
     def __init__(
         self,
         message_id: int,
-        chat_id: Optional[Union[int, str]] = None,
+        chat_id: int | str | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: Optional[str] = None,
+        quote: str | None = None,
         quote_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        quote_entities: Optional[Sequence[MessageEntity]] = None,
-        quote_position: Optional[int] = None,
+        quote_entities: Sequence[MessageEntity] | None = None,
+        quote_position: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         self.message_id: int = message_id
-        self.chat_id: Optional[Union[int, str]] = chat_id
+        self.chat_id: int | str | None = chat_id
         self.allow_sending_without_reply: ODVInput[bool] = allow_sending_without_reply
-        self.quote: Optional[str] = quote
+        self.quote: str | None = quote
         self.quote_parse_mode: ODVInput[str] = quote_parse_mode
-        self.quote_entities: Optional[tuple[MessageEntity, ...]] = parse_sequence_arg(
-            quote_entities
-        )
-        self.quote_position: Optional[int] = quote_position
+        self.quote_entities: tuple[MessageEntity, ...] | None = parse_sequence_arg(quote_entities)
+        self.quote_position: int | None = quote_position
 
         self._id_attrs = (self.message_id,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReplyParameters":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ReplyParameters":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

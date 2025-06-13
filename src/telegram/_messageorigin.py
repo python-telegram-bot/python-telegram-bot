@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram MessageOigin."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._chat import Chat
@@ -81,7 +81,7 @@ class MessageOrigin(TelegramObject):
         type: str,  # pylint: disable=W0622
         date: dtm.datetime,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
@@ -95,7 +95,7 @@ class MessageOrigin(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageOrigin":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MessageOrigin":
         """Converts JSON data to the appropriate :class:`MessageOrigin` object, i.e. takes
         care of selecting the correct subclass.
         """
@@ -151,7 +151,7 @@ class MessageOriginUser(MessageOrigin):
         date: dtm.datetime,
         sender_user: User,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.USER, date=date, api_kwargs=api_kwargs)
 
@@ -185,7 +185,7 @@ class MessageOriginHiddenUser(MessageOrigin):
         date: dtm.datetime,
         sender_user_name: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.HIDDEN_USER, date=date, api_kwargs=api_kwargs)
 
@@ -225,15 +225,15 @@ class MessageOriginChat(MessageOrigin):
         self,
         date: dtm.datetime,
         sender_chat: Chat,
-        author_signature: Optional[str] = None,
+        author_signature: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.CHAT, date=date, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.sender_chat: Chat = sender_chat
-            self.author_signature: Optional[str] = author_signature
+            self.author_signature: str | None = author_signature
 
 
 class MessageOriginChannel(MessageOrigin):
@@ -270,13 +270,13 @@ class MessageOriginChannel(MessageOrigin):
         date: dtm.datetime,
         chat: Chat,
         message_id: int,
-        author_signature: Optional[str] = None,
+        author_signature: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=self.CHANNEL, date=date, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.chat: Chat = chat
             self.message_id: int = message_id
-            self.author_signature: Optional[str] = author_signature
+            self.author_signature: str | None = author_signature

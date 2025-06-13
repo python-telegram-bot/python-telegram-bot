@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Voice."""
-from typing import Optional
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._utils.types import JSONDict
@@ -58,10 +57,10 @@ class Voice(_BaseMedium):
         file_id: str,
         file_unique_id: str,
         duration: int,
-        mime_type: Optional[str] = None,
-        file_size: Optional[int] = None,
+        mime_type: str | None = None,
+        file_size: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -73,4 +72,4 @@ class Voice(_BaseMedium):
             # Required
             self.duration: int = duration
             # Optional
-            self.mime_type: Optional[str] = mime_type
+            self.mime_type: str | None = mime_type

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Any, NoReturn, Optional, final
+from typing import TYPE_CHECKING, Any, NoReturn, final
 
 from telegram._utils.datetime import UTC
 from telegram._utils.warnings import warn
@@ -126,21 +126,21 @@ class Defaults:
 
     def __init__(
         self,
-        parse_mode: Optional[str] = None,
-        disable_notification: Optional[bool] = None,
+        parse_mode: str | None = None,
+        disable_notification: bool | None = None,
         tzinfo: dtm.tzinfo = UTC,
         block: bool = True,
-        allow_sending_without_reply: Optional[bool] = None,
-        protect_content: Optional[bool] = None,
-        link_preview_options: Optional["LinkPreviewOptions"] = None,
-        do_quote: Optional[bool] = None,
+        allow_sending_without_reply: bool | None = None,
+        protect_content: bool | None = None,
+        link_preview_options: "LinkPreviewOptions | None" = None,
+        do_quote: bool | None = None,
     ):
-        self._parse_mode: Optional[str] = parse_mode
-        self._disable_notification: Optional[bool] = disable_notification
-        self._allow_sending_without_reply: Optional[bool] = allow_sending_without_reply
+        self._parse_mode: str | None = parse_mode
+        self._disable_notification: bool | None = disable_notification
+        self._allow_sending_without_reply: bool | None = allow_sending_without_reply
         self._tzinfo: dtm.tzinfo = tzinfo
         self._block: bool = block
-        self._protect_content: Optional[bool] = protect_content
+        self._protect_content: bool | None = protect_content
 
         if "pytz" in str(self._tzinfo.__class__):
             # TODO: When dropping support, make sure to update _utils.datetime accordingly
@@ -212,7 +212,7 @@ class Defaults:
         return self._api_defaults
 
     @property
-    def parse_mode(self) -> Optional[str]:
+    def parse_mode(self) -> str | None:
         """:obj:`str`: Optional. Send Markdown or HTML, if you want Telegram apps to show
         bold, italic, fixed-width text or URLs in your bot's message.
         """
@@ -223,7 +223,7 @@ class Defaults:
         raise AttributeError("You can not assign a new value to parse_mode after initialization.")
 
     @property
-    def explanation_parse_mode(self) -> Optional[str]:
+    def explanation_parse_mode(self) -> str | None:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :meth:`telegram.Bot.send_poll`.
         """
@@ -236,7 +236,7 @@ class Defaults:
         )
 
     @property
-    def quote_parse_mode(self) -> Optional[str]:
+    def quote_parse_mode(self) -> str | None:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :meth:`telegram.ReplyParameters`.
         """
@@ -249,7 +249,7 @@ class Defaults:
         )
 
     @property
-    def text_parse_mode(self) -> Optional[str]:
+    def text_parse_mode(self) -> str | None:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :class:`telegram.InputPollOption` and
         :meth:`telegram.Bot.send_gift`.
@@ -265,7 +265,7 @@ class Defaults:
         )
 
     @property
-    def question_parse_mode(self) -> Optional[str]:
+    def question_parse_mode(self) -> str | None:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :meth:`telegram.Bot.send_poll`.
 
@@ -280,7 +280,7 @@ class Defaults:
         )
 
     @property
-    def disable_notification(self) -> Optional[bool]:
+    def disable_notification(self) -> bool | None:
         """:obj:`bool`: Optional. Sends the message silently. Users will
         receive a notification with no sound.
         """
@@ -293,7 +293,7 @@ class Defaults:
         )
 
     @property
-    def allow_sending_without_reply(self) -> Optional[bool]:
+    def allow_sending_without_reply(self) -> bool | None:
         """:obj:`bool`: Optional. Pass :obj:`True`, if the message
         should be sent even if the specified replied-to message is not found.
         """
@@ -329,7 +329,7 @@ class Defaults:
         raise AttributeError("You can not assign a new value to block after initialization.")
 
     @property
-    def protect_content(self) -> Optional[bool]:
+    def protect_content(self) -> bool | None:
         """:obj:`bool`: Optional. Protects the contents of the sent message from forwarding and
         saving.
 
@@ -344,7 +344,7 @@ class Defaults:
         )
 
     @property
-    def link_preview_options(self) -> Optional["LinkPreviewOptions"]:
+    def link_preview_options(self) -> "LinkPreviewOptions | None":
         """:class:`telegram.LinkPreviewOptions`: Optional. Link preview generation options for all
         outgoing messages.
 
@@ -353,7 +353,7 @@ class Defaults:
         return self._link_preview_options
 
     @property
-    def do_quote(self) -> Optional[bool]:
+    def do_quote(self) -> bool | None:
         """:obj:`bool`: Optional. |reply_quote|
 
         .. versionadded:: 20.8

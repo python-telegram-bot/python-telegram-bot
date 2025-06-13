@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputContactMessageContent."""
-from typing import Optional
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._utils.types import JSONDict
@@ -51,10 +50,10 @@ class InputContactMessageContent(InputMessageContent):
         self,
         phone_number: str,
         first_name: str,
-        last_name: Optional[str] = None,
-        vcard: Optional[str] = None,
+        last_name: str | None = None,
+        vcard: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -62,7 +61,7 @@ class InputContactMessageContent(InputMessageContent):
             self.phone_number: str = phone_number
             self.first_name: str = first_name
             # Optionals
-            self.last_name: Optional[str] = last_name
-            self.vcard: Optional[str] = vcard
+            self.last_name: str | None = last_name
+            self.vcard: str | None = vcard
 
             self._id_attrs = (self.phone_number,)

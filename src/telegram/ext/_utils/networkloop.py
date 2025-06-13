@@ -32,8 +32,7 @@ Warning:
 """
 import asyncio
 import contextlib
-from collections.abc import Coroutine
-from typing import Callable, Optional
+from collections.abc import Callable, Coroutine
 
 from telegram._utils.logging import get_logger
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
@@ -44,11 +43,11 @@ _LOGGER = get_logger(__name__)
 async def network_retry_loop(
     *,
     action_cb: Callable[..., Coroutine],
-    on_err_cb: Optional[Callable[[TelegramError], None]] = None,
+    on_err_cb: Callable[[TelegramError], None] | None = None,
     description: str,
     interval: float,
-    stop_event: Optional[asyncio.Event] = None,
-    is_running: Optional[Callable[[], bool]] = None,
+    stop_event: asyncio.Event | None = None,
+    is_running: Callable[[], bool] | None = None,
     max_retries: int,
 ) -> None:
     """Perform a loop calling `action_cb`, retrying after network errors.

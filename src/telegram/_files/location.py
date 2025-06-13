@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Location."""
 
-from typing import Final, Optional
+from typing import Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -72,12 +72,12 @@ class Location(TelegramObject):
         self,
         longitude: float,
         latitude: float,
-        horizontal_accuracy: Optional[float] = None,
-        live_period: Optional[int] = None,
-        heading: Optional[int] = None,
-        proximity_alert_radius: Optional[int] = None,
+        horizontal_accuracy: float | None = None,
+        live_period: int | None = None,
+        heading: int | None = None,
+        proximity_alert_radius: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -85,10 +85,10 @@ class Location(TelegramObject):
         self.latitude: float = latitude
 
         # Optionals
-        self.horizontal_accuracy: Optional[float] = horizontal_accuracy
-        self.live_period: Optional[int] = live_period
-        self.heading: Optional[int] = heading
-        self.proximity_alert_radius: Optional[int] = (
+        self.horizontal_accuracy: float | None = horizontal_accuracy
+        self.live_period: int | None = live_period
+        self.heading: int | None = heading
+        self.proximity_alert_radius: int | None = (
             int(proximity_alert_radius) if proximity_alert_radius else None
         )
 
