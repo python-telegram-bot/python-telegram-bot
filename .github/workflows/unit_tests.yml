@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14.0-beta.2']
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: False
     steps:
@@ -62,8 +62,6 @@ jobs:
 
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
-          # need to manually install pytz here, because it's no longer in the optional reqs
-          pip install .[all] pytz
           # `-n auto --dist worksteal` uses pytest-xdist to run tests on multiple CPU
           # workers. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness.

@@ -36,9 +36,11 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "httpx >=0.27,<0.29",
+    "httpcore >=1.0.9; python_version >= '3.14'"  # httpx needs an update so 3.14 support works
 ]
 
 [project.urls]
@@ -111,6 +113,8 @@ tests = [
     # For testing with timezones. Might not be needed on all systems, but to ensure that unit tests
     # run correctly on all systems, we include it here.
     "tzdata",
+    # We've deprecated support pytz, but we still need it for testing that it works with the library.
+    "pytz",
 ]
 docs = [
     "chango~=0.4.0; python_version >= '3.12'",
@@ -123,6 +127,7 @@ docs = [
     "sphinx-inline-tabs==2023.4.21",
     # Temporary. See #4387
     "sphinx-build-compatibility @ git+https://github.com/readthedocs/sphinx-build-compatibility.git@58aabc5f207c6c2421f23d3578adc0b14af57047",
+    "pydantic @ git+https://github.com/pydantic/pydantic; python_version >= '3.14'"  # Temporary for 3.14 support, we're waiting for a new pydantic version
 ]
 all = ["pre-commit", { include-group = "tests" }, { include-group = "docs" }]
 
