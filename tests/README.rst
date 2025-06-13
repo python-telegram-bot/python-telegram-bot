@@ -42,7 +42,7 @@ such that tests marked with ``@pytest.mark.xdist_group("name")`` are run on the 
 
 .. code-block:: bash
 
-    $ pytest -n auto --dist=loadgroup
+    $ pytest -n auto --dist=worksteal
 
 This will result in a significant speedup, but may cause some tests to fail. If you want to run
 the failed tests in isolation, you can use the ``--lf`` flag:
