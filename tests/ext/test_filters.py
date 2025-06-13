@@ -713,7 +713,7 @@ class TestFilters:
         assert not filters.Document.AUDIO.check_update(update)
 
         update.message.document.mime_type = (
-            "audio/x-wav" if platform.python_version_tuple() < ("3", "14") else "audio/vnd.wave"
+            "audio/x-wav" if int(platform.python_version_tuple()[1]) < 14 else "audio/vnd.wave"
         )
         assert filters.Document.WAV.check_update(update)
         assert filters.Document.AUDIO.check_update(update)
