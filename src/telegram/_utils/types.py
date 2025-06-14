@@ -61,14 +61,10 @@ JSONDict: TypeAlias = dict[str, Any]
 DVValueType = TypeVar("DVValueType")  # pylint: disable=invalid-name
 DVType: TypeAlias = DVValueType | DefaultValue[DVValueType]
 """Generic type for a variable which can be either `type` or `DefaultValue[type]`."""
-ODVInput: TypeAlias = (
-    "DefaultValue[DVValueType]" | DVValueType | "DefaultValue[None]" | None  # noqa: TC010
-)
+ODVInput: TypeAlias = DefaultValue[DVValueType] | DVValueType | DefaultValue[None] | None
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
 as ``Union[DefaultValue[type], type, DefaultValue[None], None]``."""
-DVInput: TypeAlias = (
-    "DefaultValue[DVValueType]" | DVValueType | "DefaultValue[None]"  # noqa: TC010
-)
+DVInput: TypeAlias = DefaultValue[DVValueType] | DVValueType | DefaultValue[None]
 """Generic type for bot method parameters which can have defaults. ``DVInput[type]`` is the same
 as ``Union[DefaultValue[type], type, DefaultValue[None]]``."""
 
