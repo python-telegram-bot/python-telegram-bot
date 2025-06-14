@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
 from collections.abc import Sequence
-from typing import Final, TypeAlias
+from typing import TYPE_CHECKING, Final, TypeAlias
 
 from telegram import constants
 from telegram._files.animation import Animation
@@ -33,8 +33,11 @@ from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
-from telegram._utils.types import FileInput, JSONDict, ODVInput
+from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InputMediaType
+
+if TYPE_CHECKING:
+    from telegram._utils.types import FileInput
 
 MediaType: TypeAlias = Animation | Audio | Document | PhotoSize | Video
 
@@ -175,7 +178,7 @@ class InputPaidMediaPhoto(InputPaidMedia):
 
     def __init__(
         self,
-        media: FileInput | PhotoSize,
+        media: "FileInput | PhotoSize",
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -250,7 +253,7 @@ class InputPaidMediaVideo(InputPaidMedia):
 
     def __init__(
         self,
-        media: FileInput | Video,
+        media: "FileInput | Video",
         thumbnail: "FileInput | None" = None,
         width: int | None = None,
         height: int | None = None,
@@ -372,7 +375,7 @@ class InputMediaAnimation(InputMedia):
 
     def __init__(
         self,
-        media: FileInput | Animation,
+        media: "FileInput | Animation",
         caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         width: int | None = None,
@@ -475,7 +478,7 @@ class InputMediaPhoto(InputMedia):
 
     def __init__(
         self,
-        media: FileInput | PhotoSize,
+        media: "FileInput | PhotoSize",
         caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] | None = None,
@@ -614,7 +617,7 @@ class InputMediaVideo(InputMedia):
 
     def __init__(
         self,
-        media: FileInput | Video,
+        media: "FileInput | Video",
         caption: str | None = None,
         width: int | None = None,
         height: int | None = None,
@@ -733,7 +736,7 @@ class InputMediaAudio(InputMedia):
 
     def __init__(
         self,
-        media: FileInput | Audio,
+        media: "FileInput | Audio",
         caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         duration: int | None = None,
@@ -832,7 +835,7 @@ class InputMediaDocument(InputMedia):
 
     def __init__(
         self,
-        media: FileInput | Document,
+        media: "FileInput | Document",
         caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_content_type_detection: bool | None = None,
