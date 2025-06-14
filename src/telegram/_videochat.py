@@ -19,7 +19,7 @@
 """This module contains objects related to Telegram video chats."""
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -43,7 +43,7 @@ class VideoChatStarted(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -76,7 +76,7 @@ class VideoChatEnded(TelegramObject):
         self,
         duration: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.duration: int = duration
@@ -116,7 +116,7 @@ class VideoChatParticipantsInvited(TelegramObject):
         self,
         users: Sequence[User],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.users: tuple[User, ...] = parse_sequence_arg(users)
@@ -125,9 +125,7 @@ class VideoChatParticipantsInvited(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: JSONDict, bot: Optional["Bot"] = None
-    ) -> "VideoChatParticipantsInvited":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "VideoChatParticipantsInvited":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -165,7 +163,7 @@ class VideoChatScheduled(TelegramObject):
         self,
         start_date: dtm.datetime,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.start_date: dtm.datetime = start_date
@@ -175,7 +173,7 @@ class VideoChatScheduled(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "VideoChatScheduled":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "VideoChatScheduled":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

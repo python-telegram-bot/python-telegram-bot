@@ -20,7 +20,6 @@
 deletion.
 """
 
-from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -50,7 +49,7 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         self,
         message_auto_delete_time: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.message_auto_delete_time: int = message_auto_delete_time

@@ -25,11 +25,10 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from collections.abc import Coroutine, MutableMapping
-from typing import TYPE_CHECKING, Any, Callable, TypeVar, Union
+from collections.abc import Callable, Coroutine, MutableMapping
+from typing import TYPE_CHECKING, Any, TypeVar
 
 if TYPE_CHECKING:
-    from typing import Optional
 
     from telegram import Bot
     from telegram.ext import BaseRateLimiter, CallbackContext, JobQueue
@@ -53,9 +52,9 @@ JobCallback = Callable[[CCT], Coroutine[Any, Any, Any]]
     .. versionadded:: 20.0
 """
 
-ConversationKey = tuple[Union[int, str], ...]
+ConversationKey = tuple[int | str, ...]
 ConversationDict = MutableMapping[ConversationKey, object]
-"""dict[tuple[:obj:`int` | :obj:`str`, ...], Optional[:obj:`object`]]:
+"""dict[tuple[:obj:`int` | :obj:`str`, ...], :obj:`object` | None]:
     Dicts as maintained by the :class:`telegram.ext.ConversationHandler`.
 
     .. versionadded:: 13.6
@@ -89,12 +88,12 @@ BD = TypeVar("BD")
 
 .. versionadded:: 13.6
 """
-JQ = TypeVar("JQ", bound=Union[None, "JobQueue"])
+JQ = TypeVar("JQ", bound="None | JobQueue")
 """Type of the job queue.
 
 .. versionadded:: 20.0"""
 
-RL = TypeVar("RL", bound="Optional[BaseRateLimiter]")
+RL = TypeVar("RL", bound="BaseRateLimiter | None")
 """Type of the rate limiter.
 
 .. versionadded:: 20.0"""

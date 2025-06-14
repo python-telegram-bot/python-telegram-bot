@@ -18,7 +18,7 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that holds the parameters of a request to the Bot API."""
 import json
-from typing import Any, Optional, Union, final
+from typing import Any, final
 from urllib.parse import urlencode
 
 from telegram._utils.strings import TextEncoding
@@ -45,19 +45,19 @@ class RequestData:
 
     __slots__ = ("_parameters", "contains_files")
 
-    def __init__(self, parameters: Optional[list[RequestParameter]] = None):
+    def __init__(self, parameters: list[RequestParameter] | None = None):
         self._parameters: list[RequestParameter] = parameters or []
         self.contains_files: bool = any(param.input_files for param in self._parameters)
 
     @property
-    def parameters(self) -> dict[str, Union[str, int, list[Any], dict[Any, Any]]]:
+    def parameters(self) -> dict[str, str | int | list[Any] | dict[Any, Any]]:
         """Gives the parameters as mapping of parameter name to the parameter value, which can be
         a single object of type :obj:`int`, :obj:`float`, :obj:`str` or :obj:`bool` or any
         (possibly nested) composition of lists, tuples and dictionaries, where each entry, key
         and value is of one of the mentioned types.
 
         Returns:
-            dict[:obj:`str`, Union[:obj:`str`, :obj:`int`, list[any], dict[any, any]]]
+            dict[:obj:`str`, :obj:`str` | :obj:`int` | list[any] | dict[any, any]]
         """
         return {
             param.name: param.value  # type: ignore[misc]
@@ -84,7 +84,7 @@ class RequestData:
             if param.json_value is not None
         }
 
-    def url_encoded_parameters(self, encode_kwargs: Optional[dict[str, Any]] = None) -> str:
+    def url_encoded_parameters(self, encode_kwargs: dict[str, Any] | None = None) -> str:
         """Encodes the parameters with :func:`urllib.parse.urlencode`.
 
         Args:
@@ -98,7 +98,7 @@ class RequestData:
             return urlencode(self.json_parameters, **encode_kwargs)
         return urlencode(self.json_parameters)
 
-    def parametrized_url(self, url: str, encode_kwargs: Optional[dict[str, Any]] = None) -> str:
+    def parametrized_url(self, url: str, encode_kwargs: dict[str, Any] | None = None) -> str:
         """Shortcut for attaching the return value of :meth:`url_encoded_parameters` to the
         :paramref:`url`.
 

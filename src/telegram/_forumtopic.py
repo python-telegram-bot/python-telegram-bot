@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram forum topics."""
-from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -55,15 +54,15 @@ class ForumTopic(TelegramObject):
         message_thread_id: int,
         name: str,
         icon_color: int,
-        icon_custom_emoji_id: Optional[str] = None,
+        icon_custom_emoji_id: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.message_thread_id: int = message_thread_id
         self.name: str = name
         self.icon_color: int = icon_color
-        self.icon_custom_emoji_id: Optional[str] = icon_custom_emoji_id
+        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
 
         self._id_attrs = (self.message_thread_id, self.name, self.icon_color)
 
@@ -99,14 +98,14 @@ class ForumTopicCreated(TelegramObject):
         self,
         name: str,
         icon_color: int,
-        icon_custom_emoji_id: Optional[str] = None,
+        icon_custom_emoji_id: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
         self.icon_color: int = icon_color
-        self.icon_custom_emoji_id: Optional[str] = icon_custom_emoji_id
+        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
 
         self._id_attrs = (self.name, self.icon_color)
 
@@ -123,7 +122,7 @@ class ForumTopicClosed(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -139,7 +138,7 @@ class ForumTopicReopened(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -169,14 +168,14 @@ class ForumTopicEdited(TelegramObject):
 
     def __init__(
         self,
-        name: Optional[str] = None,
-        icon_custom_emoji_id: Optional[str] = None,
+        name: str | None = None,
+        icon_custom_emoji_id: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.name: Optional[str] = name
-        self.icon_custom_emoji_id: Optional[str] = icon_custom_emoji_id
+        self.name: str | None = name
+        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
 
         self._id_attrs = (self.name, self.icon_custom_emoji_id)
 
@@ -193,7 +192,7 @@ class GeneralForumTopicHidden(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -209,7 +208,7 @@ class GeneralForumTopicUnhidden(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()

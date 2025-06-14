@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents an invite link for a chat."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -140,14 +140,14 @@ class ChatInviteLink(TelegramObject):
         creates_join_request: bool,
         is_primary: bool,
         is_revoked: bool,
-        expire_date: Optional[dtm.datetime] = None,
-        member_limit: Optional[int] = None,
-        name: Optional[str] = None,
-        pending_join_request_count: Optional[int] = None,
-        subscription_period: Optional[int] = None,
-        subscription_price: Optional[int] = None,
+        expire_date: dtm.datetime | None = None,
+        member_limit: int | None = None,
+        name: str | None = None,
+        pending_join_request_count: int | None = None,
+        subscription_period: int | None = None,
+        subscription_price: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -158,14 +158,14 @@ class ChatInviteLink(TelegramObject):
         self.is_revoked: bool = is_revoked
 
         # Optionals
-        self.expire_date: Optional[dtm.datetime] = expire_date
-        self.member_limit: Optional[int] = member_limit
-        self.name: Optional[str] = name
-        self.pending_join_request_count: Optional[int] = (
+        self.expire_date: dtm.datetime | None = expire_date
+        self.member_limit: int | None = member_limit
+        self.name: str | None = name
+        self.pending_join_request_count: int | None = (
             int(pending_join_request_count) if pending_join_request_count is not None else None
         )
-        self.subscription_period: Optional[int] = subscription_period
-        self.subscription_price: Optional[int] = subscription_price
+        self.subscription_period: int | None = subscription_period
+        self.subscription_price: int | None = subscription_price
 
         self._id_attrs = (
             self.invite_link,
@@ -178,7 +178,7 @@ class ChatInviteLink(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatInviteLink":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatInviteLink":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

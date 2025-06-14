@@ -19,7 +19,7 @@
 """This module contains the classes that represent Telegram ChatBoosts."""
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._chat import Chat
@@ -58,7 +58,7 @@ class ChatBoostAdded(TelegramObject):
         self,
         boost_count: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.boost_count: int = boost_count
@@ -100,7 +100,7 @@ class ChatBoostSource(TelegramObject):
     GIVEAWAY: Final[str] = constants.ChatBoostSources.GIVEAWAY
     """:const:`telegram.constants.ChatBoostSources.GIVEAWAY`"""
 
-    def __init__(self, source: str, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, source: str, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required by all subclasses:
@@ -110,7 +110,7 @@ class ChatBoostSource(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBoostSource":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatBoostSource":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -147,7 +147,7 @@ class ChatBoostSourcePremium(ChatBoostSource):
 
     __slots__ = ("user",)
 
-    def __init__(self, user: User, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, user: User, *, api_kwargs: JSONDict | None = None):
         super().__init__(source=self.PREMIUM, api_kwargs=api_kwargs)
 
         with self._unfrozen():
@@ -173,7 +173,7 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
 
     __slots__ = ("user",)
 
-    def __init__(self, user: User, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, user: User, *, api_kwargs: JSONDict | None = None):
         super().__init__(source=self.GIFT_CODE, api_kwargs=api_kwargs)
 
         with self._unfrozen():
@@ -220,19 +220,19 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
     def __init__(
         self,
         giveaway_message_id: int,
-        user: Optional[User] = None,
-        is_unclaimed: Optional[bool] = None,
-        prize_star_count: Optional[int] = None,
+        user: User | None = None,
+        is_unclaimed: bool | None = None,
+        prize_star_count: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(source=self.GIVEAWAY, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.giveaway_message_id: int = giveaway_message_id
-            self.user: Optional[User] = user
-            self.prize_star_count: Optional[int] = prize_star_count
-            self.is_unclaimed: Optional[bool] = is_unclaimed
+            self.user: User | None = user
+            self.prize_star_count: int | None = prize_star_count
+            self.is_unclaimed: bool | None = is_unclaimed
 
 
 class ChatBoost(TelegramObject):
@@ -272,7 +272,7 @@ class ChatBoost(TelegramObject):
         expiration_date: dtm.datetime,
         source: ChatBoostSource,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -285,7 +285,7 @@ class ChatBoost(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBoost":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatBoost":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -321,7 +321,7 @@ class ChatBoostUpdated(TelegramObject):
         chat: Chat,
         boost: ChatBoost,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -332,7 +332,7 @@ class ChatBoostUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBoostUpdated":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatBoostUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -373,7 +373,7 @@ class ChatBoostRemoved(TelegramObject):
         remove_date: dtm.datetime,
         source: ChatBoostSource,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -386,7 +386,7 @@ class ChatBoostRemoved(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatBoostRemoved":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatBoostRemoved":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -420,7 +420,7 @@ class UserChatBoosts(TelegramObject):
         self,
         boosts: Sequence[ChatBoost],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -430,7 +430,7 @@ class UserChatBoosts(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UserChatBoosts":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UserChatBoosts":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

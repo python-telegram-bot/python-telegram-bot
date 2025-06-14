@@ -18,7 +18,6 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains the PaidMediaPurchased class."""
 
-from typing import Optional
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -66,8 +65,8 @@ class PaidMediaPurchasedHandler(BaseHandler[Update, CCT, RT]):
     def __init__(
         self: "PaidMediaPurchasedHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
-        user_id: Optional[SCT[int]] = None,
-        username: Optional[SCT[str]] = None,
+        user_id: SCT[int] | None = None,
+        username: SCT[str] | None = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)

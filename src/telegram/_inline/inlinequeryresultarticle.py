@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultArticle."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -105,14 +105,14 @@ class InlineQueryResultArticle(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         title: str,
         input_message_content: "InputMessageContent",
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        url: Optional[str] = None,
-        description: Optional[str] = None,
-        thumbnail_url: Optional[str] = None,
-        thumbnail_width: Optional[int] = None,
-        thumbnail_height: Optional[int] = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        url: str | None = None,
+        description: str | None = None,
+        thumbnail_url: str | None = None,
+        thumbnail_width: int | None = None,
+        thumbnail_height: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.ARTICLE, id, api_kwargs=api_kwargs)
@@ -121,9 +121,9 @@ class InlineQueryResultArticle(InlineQueryResult):
             self.input_message_content: InputMessageContent = input_message_content
 
             # Optional
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.url: Optional[str] = url
-            self.description: Optional[str] = description
-            self.thumbnail_url: Optional[str] = thumbnail_url
-            self.thumbnail_width: Optional[int] = thumbnail_width
-            self.thumbnail_height: Optional[int] = thumbnail_height
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.url: str | None = url
+            self.description: str | None = description
+            self.thumbnail_url: str | None = thumbnail_url
+            self.thumbnail_width: int | None = thumbnail_width
+            self.thumbnail_height: int | None = thumbnail_height

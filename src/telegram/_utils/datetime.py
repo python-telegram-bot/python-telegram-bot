@@ -30,7 +30,7 @@ Warning:
 import contextlib
 import datetime as dtm
 import time
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -58,9 +58,9 @@ def localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
 
 
 def to_float_timestamp(
-    time_object: Union[float, dtm.timedelta, dtm.datetime, dtm.time],
-    reference_timestamp: Optional[float] = None,
-    tzinfo: Optional[dtm.tzinfo] = None,
+    time_object: float | dtm.timedelta | dtm.datetime | dtm.time,
+    reference_timestamp: float | None = None,
+    tzinfo: dtm.tzinfo | None = None,
 ) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
@@ -122,7 +122,7 @@ def to_float_timestamp(
 
     if isinstance(time_object, dtm.timedelta):
         return reference_timestamp + time_object.total_seconds()
-    if isinstance(time_object, (int, float)):
+    if isinstance(time_object, int | float):
         return reference_timestamp + time_object
 
     if tzinfo is None:
@@ -160,10 +160,10 @@ def to_float_timestamp(
 
 
 def to_timestamp(
-    dt_obj: Union[float, dtm.timedelta, dtm.datetime, dtm.time, None],
-    reference_timestamp: Optional[float] = None,
-    tzinfo: Optional[dtm.tzinfo] = None,
-) -> Optional[int]:
+    dt_obj: float | dtm.timedelta | dtm.datetime | dtm.time | None,
+    reference_timestamp: float | None = None,
+    tzinfo: dtm.tzinfo | None = None,
+) -> int | None:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
     down to the nearest integer).
@@ -178,9 +178,9 @@ def to_timestamp(
 
 
 def from_timestamp(
-    unixtime: Optional[int],
-    tzinfo: Optional[dtm.tzinfo] = None,
-) -> Optional[dtm.datetime]:
+    unixtime: int | None,
+    tzinfo: dtm.tzinfo | None = None,
+) -> dtm.datetime | None:
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
     :obj:`None` s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
@@ -201,7 +201,7 @@ def from_timestamp(
     return dtm.datetime.fromtimestamp(unixtime, tz=UTC if tzinfo is None else tzinfo)
 
 
-def extract_tzinfo_from_defaults(bot: Optional["Bot"]) -> Union[dtm.tzinfo, None]:
+def extract_tzinfo_from_defaults(bot: "Bot | None") -> dtm.tzinfo | None:
     """
     Extracts the timezone info from the default values of the bot.
     If the bot has no default values, :obj:`None` is returned.

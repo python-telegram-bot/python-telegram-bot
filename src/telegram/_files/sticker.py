@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -153,16 +153,16 @@ class Sticker(_BaseThumbedMedium):
         is_animated: bool,
         is_video: bool,
         type: str,  # pylint: disable=redefined-builtin
-        emoji: Optional[str] = None,
-        file_size: Optional[int] = None,
-        set_name: Optional[str] = None,
-        mask_position: Optional["MaskPosition"] = None,
-        premium_animation: Optional["File"] = None,
-        custom_emoji_id: Optional[str] = None,
-        thumbnail: Optional[PhotoSize] = None,
-        needs_repainting: Optional[bool] = None,
+        emoji: str | None = None,
+        file_size: int | None = None,
+        set_name: str | None = None,
+        mask_position: "MaskPosition | None" = None,
+        premium_animation: "File | None" = None,
+        custom_emoji_id: str | None = None,
+        thumbnail: PhotoSize | None = None,
+        needs_repainting: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -179,12 +179,12 @@ class Sticker(_BaseThumbedMedium):
             self.is_video: bool = is_video
             self.type: str = enum.get_member(constants.StickerType, type, type)
             # Optional
-            self.emoji: Optional[str] = emoji
-            self.set_name: Optional[str] = set_name
-            self.mask_position: Optional[MaskPosition] = mask_position
-            self.premium_animation: Optional[File] = premium_animation
-            self.custom_emoji_id: Optional[str] = custom_emoji_id
-            self.needs_repainting: Optional[bool] = needs_repainting
+            self.emoji: str | None = emoji
+            self.set_name: str | None = set_name
+            self.mask_position: MaskPosition | None = mask_position
+            self.premium_animation: File | None = premium_animation
+            self.custom_emoji_id: str | None = custom_emoji_id
+            self.needs_repainting: bool | None = needs_repainting
 
     REGULAR: Final[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""
@@ -194,7 +194,7 @@ class Sticker(_BaseThumbedMedium):
     """:const:`telegram.constants.StickerType.CUSTOM_EMOJI`"""
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Sticker":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Sticker":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -287,9 +287,9 @@ class StickerSet(TelegramObject):
         title: str,
         stickers: Sequence[Sticker],
         sticker_type: str,
-        thumbnail: Optional[PhotoSize] = None,
+        thumbnail: PhotoSize | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
@@ -297,13 +297,13 @@ class StickerSet(TelegramObject):
         self.stickers: tuple[Sticker, ...] = parse_sequence_arg(stickers)
         self.sticker_type: str = sticker_type
         # Optional
-        self.thumbnail: Optional[PhotoSize] = thumbnail
+        self.thumbnail: PhotoSize | None = thumbnail
         self._id_attrs = (self.name,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "StickerSet":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "StickerSet":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -369,7 +369,7 @@ class MaskPosition(TelegramObject):
         y_shift: float,
         scale: float,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.point: str = point

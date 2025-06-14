@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram VideoNote."""
 
-from typing import Optional
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -72,10 +71,10 @@ class VideoNote(_BaseThumbedMedium):
         file_unique_id: str,
         length: int,
         duration: int,
-        file_size: Optional[int] = None,
-        thumbnail: Optional[PhotoSize] = None,
+        file_size: int | None = None,
+        thumbnail: PhotoSize | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,

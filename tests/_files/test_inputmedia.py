@@ -19,7 +19,6 @@
 import asyncio
 import copy
 from collections.abc import Sequence
-from typing import Optional
 
 import pytest
 
@@ -727,7 +726,7 @@ class TestSendMediaGroupWithoutRequest:
         self, offline_bot, chat_id, video_file, photo_file, monkeypatch
     ):
         async def make_assertion(
-            method: str, url: str, request_data: Optional[RequestData] = None, *args, **kwargs
+            method: str, url: str, request_data: RequestData | None = None, *args, **kwargs
         ):
             files = request_data.multipart_data
             video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
@@ -916,7 +915,8 @@ class TestSendMediaGroupWithRequest:
             # make sure that the media_group was not modified
             assert media_group == copied_media_group
             assert all(
-                a.parse_mode == b.parse_mode for a, b in zip(media_group, copied_media_group)
+                a.parse_mode == b.parse_mode
+                for a, b in zip(media_group, copied_media_group, strict=False)
             )
 
             assert isinstance(messages, tuple)
