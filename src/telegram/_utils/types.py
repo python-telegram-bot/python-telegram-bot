@@ -27,7 +27,7 @@ Warning:
 import datetime as dtm
 from collections.abc import Callable, Collection
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar
+from typing import IO, TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar, Union
 
 from telegram._utils.defaultvalue import DefaultValue
 
@@ -40,13 +40,18 @@ if TYPE_CHECKING:
         ReplyKeyboardRemove,
     )
 
-FileLike: TypeAlias = "IO[bytes] | InputFile"
+# We guarantee that InputFile will be defined at runtime, so we can use a string here and ignore
+# ruff.
+# See https://github.com/python-telegram-bot/python-telegram-bot/pull/4827#issuecomment-2973060875
+# on why we're doing this workaround.
+# TODO: Use `type` syntax when we drop support for Python 3.11.
+FileLike: TypeAlias = IO[bytes] | "InputFile"  # noqa: TC010
 """Either a bytes-stream (e.g. open file handler) or a :class:`telegram.InputFile`."""
 
 FilePathInput: TypeAlias = str | Path
 """A filepath either as string or as :obj:`pathlib.Path` object."""
 
-FileInput: TypeAlias = "FilePathInput | FileLike | bytes | str"
+FileInput: TypeAlias = FilePathInput | FileLike | bytes | str
 """Valid input for passing files to Telegram. Either a file id as string, a file like object,
 a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes`."""
 
@@ -56,10 +61,14 @@ JSONDict: TypeAlias = dict[str, Any]
 DVValueType = TypeVar("DVValueType")  # pylint: disable=invalid-name
 DVType: TypeAlias = DVValueType | DefaultValue[DVValueType]
 """Generic type for a variable which can be either `type` or `DefaultValue[type]`."""
-ODVInput: TypeAlias = DefaultValue[DVValueType] | DVValueType | DefaultValue[None] | None
+ODVInput: TypeAlias = (
+    "DefaultValue[DVValueType]" | DVValueType | "DefaultValue[None]" | None  # noqa: TC010
+)
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
-as ``Union[DefaultValue[type | None, type, DefaultValue[None]]``."""
-DVInput: TypeAlias = DefaultValue[DVValueType] | DVValueType | DefaultValue[None]
+as ``Union[DefaultValue[type], type, DefaultValue[None], None]``."""
+DVInput: TypeAlias = (
+    "DefaultValue[DVValueType]" | DVValueType | "DefaultValue[None]"  # noqa: TC010
+)
 """Generic type for bot method parameters which can have defaults. ``DVInput[type]`` is the same
 as ``Union[DefaultValue[type], type, DefaultValue[None]]``."""
 
@@ -67,9 +76,10 @@ RT = TypeVar("RT")
 SCT: TypeAlias = RT | Collection[RT]  # pylint: disable=invalid-name
 """Single instance or collection of instances."""
 
-ReplyMarkup: TypeAlias = (
-    "InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply"
-)
+# See comment above on why we're stuck using a Union here.
+ReplyMarkup: TypeAlias = Union[
+    "InlineKeyboardMarkup", "ReplyKeyboardMarkup", "ReplyKeyboardRemove", "ForceReply"
+]
 """Type alias for reply markup objects.
 
 .. versionadded:: 20.0
