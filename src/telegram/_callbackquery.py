@@ -22,13 +22,12 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final
 
 from telegram import constants
-from telegram._files.location import Location
 from telegram._message import MaybeInaccessibleMessage, Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, ReplyMarkup, TimePeriod
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import (
@@ -41,6 +40,8 @@ if TYPE_CHECKING:
         MessageId,
         ReplyParameters,
     )
+    from telegram._files.location import Location
+    from telegram._utils.types import ReplyMarkup
 
 
 class CallbackQuery(TelegramObject):
@@ -218,7 +219,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Shortcut for either::
 
             await update.callback_query.message.edit_text(*args, **kwargs)
@@ -289,7 +290,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Shortcut for either::
 
             await update.callback_query.message.edit_caption(*args, **kwargs)
@@ -354,7 +355,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Shortcut for either::
 
             await update.callback_query.message.edit_reply_markup(*args, **kwargs)
@@ -413,7 +414,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Shortcut for either::
 
             await update.callback_query.message.edit_media(*args, **kwargs)
@@ -473,13 +474,13 @@ class CallbackQuery(TelegramObject):
         proximity_alert_radius: int | None = None,
         live_period: TimePeriod | None = None,
         *,
-        location: Location | None = None,
+        location: "Location | None" = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Shortcut for either::
 
             await update.callback_query.message.edit_live_location(*args, **kwargs)
@@ -551,7 +552,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Shortcut for either::
 
             await update.callback_query.message.stop_live_location(*args, **kwargs)
@@ -612,7 +613,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Shortcut for either::
 
            await update.callback_query.message.set_game_score(*args, **kwargs)
@@ -825,7 +826,7 @@ class CallbackQuery(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         reply_parameters: "ReplyParameters | None" = None,

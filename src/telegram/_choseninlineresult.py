@@ -73,7 +73,7 @@ class ChosenInlineResult(TelegramObject):
         result_id: str,
         from_user: User,
         query: str,
-        location: Location | None = None,
+        location: "Location | None" = None,
         inline_message_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,

@@ -102,7 +102,6 @@ from telegram._utils.types import (
     FileInput,
     JSONDict,
     ODVInput,
-    ReplyMarkup,
     TimePeriod,
 )
 from telegram._utils.warnings import warn
@@ -133,6 +132,7 @@ if TYPE_CHECKING:
         ShippingOption,
         StoryArea,
     )
+    from telegram._utils.types import ReplyMarkup
 
 BT = TypeVar("BT", bound="Bot")
 
@@ -739,7 +739,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         endpoint: str,
         data: JSONDict,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         caption: str | None = None,
@@ -988,7 +988,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         entities: Sequence["MessageEntity"] | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         message_thread_id: int | None = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: "ReplyParameters | None" = None,
@@ -1351,10 +1351,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     async def send_photo(
         self,
         chat_id: int | str,
-        photo: "FileInput| PhotoSize",
+        photo: "FileInput | PhotoSize",
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1503,18 +1503,18 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     async def send_audio(
         self,
         chat_id: int | str,
-        audio: "FileInput| Audio",
+        audio: "FileInput | Audio",
         duration: TimePeriod | None = None,
         performer: str | None = None,
         title: str | None = None,
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
@@ -1672,13 +1672,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         document: "FileInput | Document",
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_content_type_detection: bool | None = None,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
@@ -1826,7 +1826,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         chat_id: int | str,
         sticker: "FileInput | Sticker",
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         emoji: str | None = None,
@@ -1951,7 +1951,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         duration: TimePeriod | None = None,
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         width: int | None = None,
         height: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1960,13 +1960,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         has_spoiler: bool | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         show_caption_above_media: bool | None = None,
-        cover: FileInput | None = None,
+        cover: "FileInput | None" = None,
         start_timestamp: int | None = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2145,10 +2145,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         duration: TimePeriod | None = None,
         length: int | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
@@ -2300,12 +2300,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         has_spoiler: bool | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
@@ -2472,7 +2472,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         duration: TimePeriod | None = None,
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2805,7 +2805,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         latitude: float | None = None,
         longitude: float | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         live_period: TimePeriod | None = None,
         horizontal_accuracy: float | None = None,
         heading: int | None = None,
@@ -2819,7 +2819,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
-        location: Location | None = None,
+        location: "Location | None" = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2969,13 +2969,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         live_period: TimePeriod | None = None,
         business_connection_id: str | None = None,
         *,
-        location: Location | None = None,
+        location: "Location | None" = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`telegram.Location.live_period`
         expires or editing is explicitly disabled by a call to :meth:`stop_message_live_location`.
@@ -3082,7 +3082,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before :paramref:`~telegram.Location.live_period` expires.
 
@@ -3130,7 +3130,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         address: str | None = None,
         foursquare_id: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         foursquare_type: str | None = None,
         google_place_id: str | None = None,
         google_place_type: str | None = None,
@@ -3143,7 +3143,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
-        venue: Venue | None = None,
+        venue: "Venue | None" = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3289,7 +3289,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         first_name: str | None = None,
         last_name: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         vcard: str | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
@@ -3300,7 +3300,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
-        contact: Contact | None = None,
+        contact: "Contact | None" = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3839,7 +3839,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> UserProfilePhotos:
+    ) -> "UserProfilePhotos":
         """Use this method to get a list of profile pictures for a user.
 
         Args:
@@ -4221,7 +4221,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """
         Use this method to edit text and game messages.
 
@@ -4327,7 +4327,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """
         Use this method to edit captions of messages.
 
@@ -4404,7 +4404,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """
         Use this method to edit animation, audio, document, photo, or video messages, or to add
         media to text messages. If a message
@@ -4473,7 +4473,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """
         Use this method to edit only the reply markup of messages sent by the bot or via the bot
         (for inline bots).
@@ -4634,7 +4634,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     async def set_webhook(
         self,
         url: str,
-        certificate: FileInput | None = None,
+        certificate: "FileInput | None" = None,
         max_connections: int | None = None,
         allowed_updates: Sequence[str] | None = None,
         ip_address: str | None = None,
@@ -5084,7 +5084,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> Message | bool:
+    ) -> "Message | bool":
         """
         Use this method to set the score of the specified user in a game message.
 
@@ -6962,7 +6962,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         name: str,
         user_id: int,
         format: str,  # pylint: disable=redefined-builtin
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7317,7 +7317,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         explanation: str | None = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: TimePeriod | None = None,
@@ -7556,7 +7556,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: int | str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         emoji: str | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
@@ -7990,7 +7990,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         reply_parameters: "ReplyParameters | None" = None,
@@ -10580,7 +10580,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         reply_parameters: "ReplyParameters | None" = None,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         business_connection_id: str | None = None,
         payload: str | None = None,
         allow_paid_broadcast: bool | None = None,
@@ -10826,7 +10826,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
     async def send_gift(
         self,
-        gift_id: str | Gift,
+        gift_id: "str | Gift",
         text: str | None = None,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Sequence["MessageEntity"] | None = None,

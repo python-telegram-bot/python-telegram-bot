@@ -50,7 +50,7 @@ def load_file(obj: _T) -> tuple[None, _T]: ...
 
 
 def load_file(
-    obj: FileInput | None,
+    obj: "FileInput | None",
 ) -> tuple[str | None, "bytes | InputFile | str | Path | None"]:
     """If the input is a file handle, read the data and name and return it. Otherwise, return
     the input unchanged.

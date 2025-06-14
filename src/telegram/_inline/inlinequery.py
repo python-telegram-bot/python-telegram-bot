@@ -112,7 +112,7 @@ class InlineQuery(TelegramObject):
         from_user: User,
         query: str,
         offset: str,
-        location: Location | None = None,
+        location: "Location | None" = None,
         chat_type: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,

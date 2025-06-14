@@ -460,7 +460,7 @@ class BusinessLocation(TelegramObject):
     def __init__(
         self,
         address: str,
-        location: Location | None = None,
+        location: "Location | None" = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):

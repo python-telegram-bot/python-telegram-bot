@@ -29,6 +29,8 @@ from collections.abc import Callable, Collection
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar
 
+from telegram._utils.defaultvalue import DefaultValue
+
 if TYPE_CHECKING:
     from telegram import (
         ForceReply,
@@ -37,7 +39,6 @@ if TYPE_CHECKING:
         ReplyKeyboardMarkup,
         ReplyKeyboardRemove,
     )
-    from telegram._utils.defaultvalue import DefaultValue
 
 FileLike: TypeAlias = "IO[bytes] | InputFile"
 """Either a bytes-stream (e.g. open file handler) or a :class:`telegram.InputFile`."""
@@ -45,7 +46,7 @@ FileLike: TypeAlias = "IO[bytes] | InputFile"
 FilePathInput: TypeAlias = str | Path
 """A filepath either as string or as :obj:`pathlib.Path` object."""
 
-FileInput: TypeAlias = FilePathInput | FileLike | bytes | str
+FileInput: TypeAlias = "FilePathInput | FileLike | bytes | str"
 """Valid input for passing files to Telegram. Either a file id as string, a file like object,
 a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes`."""
 
@@ -53,12 +54,12 @@ JSONDict: TypeAlias = dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
 
 DVValueType = TypeVar("DVValueType")  # pylint: disable=invalid-name
-DVType: TypeAlias = "DVValueType | DefaultValue[DVValueType]"
+DVType: TypeAlias = DVValueType | DefaultValue[DVValueType]
 """Generic type for a variable which can be either `type` or `DefaultValue[type]`."""
-ODVInput: TypeAlias = "DefaultValue[DVValueType] | DVValueType | DefaultValue[None] | None"
+ODVInput: TypeAlias = DefaultValue[DVValueType] | DVValueType | DefaultValue[None] | None
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
 as ``Union[DefaultValue[type | None, type, DefaultValue[None]]``."""
-DVInput: TypeAlias = "DefaultValue[DVValueType] | DVValueType | DefaultValue[None]"
+DVInput: TypeAlias = DefaultValue[DVValueType] | DVValueType | DefaultValue[None]
 """Generic type for bot method parameters which can have defaults. ``DVInput[type]`` is the same
 as ``Union[DefaultValue[type], type, DefaultValue[None]]``."""
 

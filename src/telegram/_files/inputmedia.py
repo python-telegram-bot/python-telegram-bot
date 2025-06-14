@@ -101,7 +101,7 @@ class InputMedia(TelegramObject):
         self._freeze()
 
     @staticmethod
-    def _parse_thumbnail_input(thumbnail: FileInput | None) -> str | InputFile | None:
+    def _parse_thumbnail_input(thumbnail: "FileInput | None") -> str | InputFile | None:
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
         return (
@@ -251,12 +251,12 @@ class InputPaidMediaVideo(InputPaidMedia):
     def __init__(
         self,
         media: FileInput | Video,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         width: int | None = None,
         height: int | None = None,
         duration: int | None = None,
         supports_streaming: bool | None = None,
-        cover: FileInput | None = None,
+        cover: "FileInput | None" = None,
         start_timestamp: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
@@ -381,7 +381,7 @@ class InputMediaAnimation(InputMedia):
         caption_entities: Sequence[MessageEntity] | None = None,
         filename: str | None = None,
         has_spoiler: bool | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         show_caption_above_media: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
@@ -624,9 +624,9 @@ class InputMediaVideo(InputMedia):
         caption_entities: Sequence[MessageEntity] | None = None,
         filename: str | None = None,
         has_spoiler: bool | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         show_caption_above_media: bool | None = None,
-        cover: FileInput | None = None,
+        cover: "FileInput | None" = None,
         start_timestamp: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
@@ -741,7 +741,7 @@ class InputMediaAudio(InputMedia):
         title: str | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
         filename: str | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -838,7 +838,7 @@ class InputMediaDocument(InputMedia):
         disable_content_type_detection: bool | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
         filename: str | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):

@@ -22,22 +22,14 @@ import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-from telegram._files.inputmedia import (
-    InputMediaAudio,
-    InputMediaDocument,
-    InputMediaPhoto,
-    InputMediaVideo,
-)
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
     CorrectOptionID,
-    FileInput,
     JSONDict,
     ODVInput,
-    ReplyMarkup,
     TimePeriod,
 )
 from telegram.helpers import mention_html as helpers_mention_html
@@ -51,6 +43,10 @@ if TYPE_CHECKING:
         Document,
         Gift,
         InlineKeyboardMarkup,
+        InputMediaAudio,
+        InputMediaDocument,
+        InputMediaPhoto,
+        InputMediaVideo,
         InputPollOption,
         LabeledPrice,
         LinkPreviewOptions,
@@ -68,6 +64,7 @@ if TYPE_CHECKING:
         VideoNote,
         Voice,
     )
+    from telegram._utils.types import FileInput, ReplyMarkup
 
 
 class User(TelegramObject):
@@ -241,7 +238,7 @@ class User(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
-    ) -> "UserProfilePhotos | None":
+    ) -> "UserProfilePhotos":
         """Shortcut for::
 
              await bot.get_user_profile_photos(update.effective_user.id, *args, **kwargs)
@@ -432,7 +429,7 @@ class User(TelegramObject):
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
@@ -557,7 +554,7 @@ class User(TelegramObject):
         photo: "FileInput | PhotoSize",
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -619,7 +616,9 @@ class User(TelegramObject):
 
     async def send_media_group(
         self,
-        media: Sequence[InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo],
+        media: Sequence[
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+        ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
@@ -683,12 +682,12 @@ class User(TelegramObject):
         title: str | None = None,
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
@@ -790,7 +789,7 @@ class User(TelegramObject):
         first_name: str | None = None,
         last_name: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         vcard: str | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
@@ -848,7 +847,7 @@ class User(TelegramObject):
     async def send_dice(
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         emoji: str | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
@@ -903,13 +902,13 @@ class User(TelegramObject):
         document: "FileInput | Document",
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_content_type_detection: bool | None = None,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
@@ -1122,7 +1121,7 @@ class User(TelegramObject):
         latitude: float | None = None,
         longitude: float | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         live_period: TimePeriod | None = None,
         horizontal_accuracy: float | None = None,
         heading: int | None = None,
@@ -1191,12 +1190,12 @@ class User(TelegramObject):
         caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         has_spoiler: bool | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
@@ -1259,7 +1258,7 @@ class User(TelegramObject):
         self,
         sticker: "FileInput | Sticker",
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         emoji: str | None = None,
@@ -1316,7 +1315,7 @@ class User(TelegramObject):
         duration: TimePeriod | None = None,
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         width: int | None = None,
         height: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1325,13 +1324,13 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         has_spoiler: bool | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         show_caption_above_media: bool | None = None,
-        cover: FileInput | None = None,
+        cover: "FileInput | None" = None,
         start_timestamp: int | None = None,
         *,
         reply_to_message_id: int | None = None,
@@ -1397,7 +1396,7 @@ class User(TelegramObject):
         address: str | None = None,
         foursquare_id: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         foursquare_type: str | None = None,
         google_place_id: str | None = None,
         google_place_type: str | None = None,
@@ -1464,10 +1463,10 @@ class User(TelegramObject):
         duration: TimePeriod | None = None,
         length: int | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
-        thumbnail: FileInput | None = None,
+        thumbnail: "FileInput | None" = None,
         reply_parameters: "ReplyParameters | None" = None,
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
@@ -1525,7 +1524,7 @@ class User(TelegramObject):
         duration: TimePeriod | None = None,
         caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1585,14 +1584,14 @@ class User(TelegramObject):
     async def send_poll(
         self,
         question: str,
-        options: "Sequence[str | InputPollOption]",
+        options: Sequence["str | InputPollOption"],
         is_anonymous: bool | None = None,
         type: str | None = None,
         allows_multiple_answers: bool | None = None,
         correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         explanation: str | None = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: TimePeriod | None = None,
@@ -1749,7 +1748,7 @@ class User(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         reply_parameters: "ReplyParameters | None" = None,
@@ -1810,7 +1809,7 @@ class User(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup | None = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         reply_parameters: "ReplyParameters | None" = None,
