@@ -152,6 +152,28 @@ class TestInlineQueryHandler:
             update.inline_query.query = "not_a_match"
             assert not handler.check_update(update)
 
+    @pytest.mark.parametrize(
+        ("query", "expected_result"),
+        [
+            pytest.param("", True, id="empty string"),
+            pytest.param("not empty", False, id="non_empty_string"),
+        ],
+    )
+    async def test_empty_inline_query_pattern(self, app, query, expected_result):
+        handler = InlineQueryHandler(self.callback, pattern=r"^$")
+        app.add_handler(handler)
+
+        update = Update(
+            update_id=0,
+            inline_query=InlineQuery(
+                id="id", from_user=User(1, "test", False), query=query, offset=""
+            ),
+        )
+
+        async with app:
+            await app.process_update(update)
+        assert self.test_flag == expected_result
+
     @pytest.mark.parametrize("chat_types", [[Chat.SENDER], [Chat.SENDER, Chat.SUPERGROUP], []])
     @pytest.mark.parametrize(
         ("chat_type", "result"), [(Chat.SENDER, True), (Chat.CHANNEL, False), (None, False)]
