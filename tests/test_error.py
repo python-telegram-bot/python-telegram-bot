@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
 import pickle
 from collections import defaultdict
 
@@ -35,6 +36,7 @@ from telegram.error import (
     TimedOut,
 )
 from telegram.ext import InvalidCallbackData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -92,9 +94,28 @@ class TestErrors:
             raise ChatMigrated(1234)
         assert e.value.new_chat_id == 1234
 
-    def test_retry_after(self):
-        with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12 seconds"):
-            raise RetryAfter(12)
+    @pytest.mark.parametrize("retry_after", [12, dtm.timedelta(seconds=12)])
+    def test_retry_after(self, PTB_TIMEDELTA, retry_after):
+        if PTB_TIMEDELTA:
+            with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 0:00:12"):
+                raise (exception := RetryAfter(retry_after))
+            assert type(exception.retry_after) is dtm.timedelta
+        else:
+            with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12 seconds"):
+                raise (exception := RetryAfter(retry_after))
+            assert type(exception.retry_after) is int
+
+    def test_retry_after_int_deprecated(self, PTB_TIMEDELTA, recwarn):
+        retry_after = RetryAfter(12).retry_after
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+            assert type(retry_after) is dtm.timedelta
+        else:
+            assert len(recwarn) == 1
+            assert "`retry_after` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
+            assert type(retry_after) is int
 
     def test_conflict(self):
         with pytest.raises(Conflict, match="Something something."):
@@ -111,6 +132,7 @@ class TestErrors:
             (TimedOut(), ["message"]),
             (ChatMigrated(1234), ["message", "new_chat_id"]),
             (RetryAfter(12), ["message", "retry_after"]),
+            (RetryAfter(dtm.timedelta(seconds=12)), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
             (PassportDecryptionError("test message"), ["message"]),
             (InvalidCallbackData("test data"), ["callback_data"]),
@@ -136,7 +158,7 @@ class TestErrors:
             (BadRequest("test message")),
             (TimedOut()),
             (ChatMigrated(1234)),
-            (RetryAfter(12)),
+            (RetryAfter(dtm.timedelta(seconds=12))),
             (Conflict("test message")),
             (PassportDecryptionError("test message")),
             (InvalidCallbackData("test data")),
@@ -181,15 +203,19 @@ class TestErrors:
 
         make_assertion(TelegramError)
 
-    def test_string_representations(self):
+    def test_string_representations(self, PTB_TIMEDELTA):
         """We just randomly test a few of the subclasses - should suffice"""
         e = TelegramError("This is a message")
         assert repr(e) == "TelegramError('This is a message')"
         assert str(e) == "This is a message"
 
-        e = RetryAfter(42)
-        assert repr(e) == "RetryAfter('Flood control exceeded. Retry in 42 seconds')"
-        assert str(e) == "Flood control exceeded. Retry in 42 seconds"
+        e = RetryAfter(dtm.timedelta(seconds=42))
+        if PTB_TIMEDELTA:
+            assert repr(e) == "RetryAfter('Flood control exceeded. Retry in 0:00:42')"
+            assert str(e) == "Flood control exceeded. Retry in 0:00:42"
+        else:
+            assert repr(e) == "RetryAfter('Flood control exceeded. Retry in 42 seconds')"
+            assert str(e) == "Flood control exceeded. Retry in 42 seconds"
 
         e = BadRequest("This is a message")
         assert repr(e) == "BadRequest('This is a message')"

@@ -22,6 +22,7 @@ import pytest
 from telegram import Chat, InputPollOption, MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -295,7 +296,7 @@ class PollTestBase:
         b"\\u200d\\U0001f467\\U0001f431http://google.com"
     ).decode("unicode-escape")
     explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
-    open_period = 42
+    open_period = dtm.timedelta(seconds=42)
     close_date = dtm.datetime.now(dtm.timezone.utc)
     question_entities = [
         MessageEntity(MessageEntity.BOLD, 0, 4),
@@ -316,7 +317,7 @@ class TestPollWithoutRequest(PollTestBase):
             "allows_multiple_answers": self.allows_multiple_answers,
             "explanation": self.explanation,
             "explanation_entities": [self.explanation_entities[0].to_dict()],
-            "open_period": self.open_period,
+            "open_period": int(self.open_period.total_seconds()),
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
         }
@@ -337,7 +338,7 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll.allows_multiple_answers == self.allows_multiple_answers
         assert poll.explanation == self.explanation
         assert poll.explanation_entities == tuple(self.explanation_entities)
-        assert poll.open_period == self.open_period
+        assert poll._open_period == self.open_period
         assert abs(poll.close_date - self.close_date) < dtm.timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
         assert poll.question_entities == tuple(self.question_entities)
@@ -354,7 +355,7 @@ class TestPollWithoutRequest(PollTestBase):
             "allows_multiple_answers": self.allows_multiple_answers,
             "explanation": self.explanation,
             "explanation_entities": [self.explanation_entities[0].to_dict()],
-            "open_period": self.open_period,
+            "open_period": int(self.open_period.total_seconds()),
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
         }
@@ -387,9 +388,27 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll_dict["allows_multiple_answers"] == poll.allows_multiple_answers
         assert poll_dict["explanation"] == poll.explanation
         assert poll_dict["explanation_entities"] == [poll.explanation_entities[0].to_dict()]
-        assert poll_dict["open_period"] == poll.open_period
+        assert poll_dict["open_period"] == int(self.open_period.total_seconds())
         assert poll_dict["close_date"] == to_timestamp(poll.close_date)
         assert poll_dict["question_entities"] == [e.to_dict() for e in poll.question_entities]
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, poll):
+        if PTB_TIMEDELTA:
+            assert poll.open_period == self.open_period
+            assert isinstance(poll.open_period, dtm.timedelta)
+        else:
+            assert poll.open_period == int(self.open_period.total_seconds())
+            assert isinstance(poll.open_period, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, poll):
+        poll.open_period
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`open_period` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)

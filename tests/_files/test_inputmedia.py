@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import copy
+import datetime as dtm
 from collections.abc import Sequence
 from typing import Optional
 
@@ -40,6 +41,7 @@ from telegram import (
 from telegram.constants import InputMediaType, ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
@@ -147,7 +149,7 @@ class InputMediaVideoTestBase:
     caption = "My Caption"
     width = 3
     height = 4
-    duration = 5
+    duration = dtm.timedelta(seconds=5)
     start_timestamp = 3
     parse_mode = "HTML"
     supports_streaming = True
@@ -169,7 +171,7 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video.caption == self.caption
         assert input_media_video.width == self.width
         assert input_media_video.height == self.height
-        assert input_media_video.duration == self.duration
+        assert input_media_video._duration == self.duration
         assert input_media_video.parse_mode == self.parse_mode
         assert input_media_video.caption_entities == tuple(self.caption_entities)
         assert input_media_video.supports_streaming == self.supports_streaming
@@ -190,7 +192,8 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video_dict["caption"] == input_media_video.caption
         assert input_media_video_dict["width"] == input_media_video.width
         assert input_media_video_dict["height"] == input_media_video.height
-        assert input_media_video_dict["duration"] == input_media_video.duration
+        assert input_media_video_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(input_media_video_dict["duration"], int)
         assert input_media_video_dict["parse_mode"] == input_media_video.parse_mode
         assert input_media_video_dict["caption_entities"] == [
             ce.to_dict() for ce in input_media_video.caption_entities
@@ -204,7 +207,27 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video_dict["cover"] == input_media_video.cover
         assert input_media_video_dict["start_timestamp"] == input_media_video.start_timestamp
 
-    def test_with_video(self, video):
+    def test_time_period_properties(self, PTB_TIMEDELTA, input_media_video):
+        duration = input_media_video.duration
+
+        if PTB_TIMEDELTA:
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
+        else:
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, input_media_video):
+        input_media_video.duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
+
+    def test_with_video(self, video, PTB_TIMEDELTA):
         # fixture found in test_video
         input_media_video = InputMediaVideo(video, caption="test 3")
         assert input_media_video.type == self.type_
@@ -324,7 +347,7 @@ class InputMediaAnimationTestBase:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     width = 30
     height = 30
-    duration = 1
+    duration = dtm.timedelta(seconds=1)
     has_spoiler = True
     show_caption_above_media = True
 
@@ -345,6 +368,7 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
         assert isinstance(input_media_animation.thumbnail, InputFile)
         assert input_media_animation.has_spoiler == self.has_spoiler
         assert input_media_animation.show_caption_above_media == self.show_caption_above_media
+        assert input_media_animation._duration == self.duration
 
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(self.media)
@@ -361,12 +385,33 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
         ]
         assert input_media_animation_dict["width"] == input_media_animation.width
         assert input_media_animation_dict["height"] == input_media_animation.height
-        assert input_media_animation_dict["duration"] == input_media_animation.duration
+        assert input_media_animation_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(input_media_animation_dict["duration"], int)
         assert input_media_animation_dict["has_spoiler"] == input_media_animation.has_spoiler
         assert (
             input_media_animation_dict["show_caption_above_media"]
             == input_media_animation.show_caption_above_media
         )
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, input_media_animation):
+        duration = input_media_animation.duration
+
+        if PTB_TIMEDELTA:
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
+        else:
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, input_media_animation):
+        input_media_animation.duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_with_animation(self, animation):
         # fixture found in test_animation
@@ -394,7 +439,7 @@ class InputMediaAudioTestBase:
     type_ = "audio"
     media = "NOTAREALFILEID"
     caption = "My Caption"
-    duration = 3
+    duration = dtm.timedelta(seconds=3)
     performer = "performer"
     title = "title"
     parse_mode = "HTML"
@@ -412,7 +457,7 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
         assert input_media_audio.type == self.type_
         assert input_media_audio.media == self.media
         assert input_media_audio.caption == self.caption
-        assert input_media_audio.duration == self.duration
+        assert input_media_audio._duration == self.duration
         assert input_media_audio.performer == self.performer
         assert input_media_audio.title == self.title
         assert input_media_audio.parse_mode == self.parse_mode
@@ -428,13 +473,35 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
         assert input_media_audio_dict["type"] == input_media_audio.type
         assert input_media_audio_dict["media"] == input_media_audio.media
         assert input_media_audio_dict["caption"] == input_media_audio.caption
-        assert input_media_audio_dict["duration"] == input_media_audio.duration
+        assert isinstance(input_media_audio_dict["duration"], int)
+        assert input_media_audio_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(input_media_audio_dict["duration"], int)
         assert input_media_audio_dict["performer"] == input_media_audio.performer
         assert input_media_audio_dict["title"] == input_media_audio.title
         assert input_media_audio_dict["parse_mode"] == input_media_audio.parse_mode
         assert input_media_audio_dict["caption_entities"] == [
             ce.to_dict() for ce in input_media_audio.caption_entities
         ]
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, input_media_audio):
+        duration = input_media_audio.duration
+
+        if PTB_TIMEDELTA:
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
+        else:
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, input_media_audio):
+        input_media_audio.duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_with_audio(self, audio):
         # fixture found in test_audio
@@ -574,7 +641,7 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_paid_media_video.media == self.media
         assert input_paid_media_video.width == self.width
         assert input_paid_media_video.height == self.height
-        assert input_paid_media_video.duration == self.duration
+        assert input_paid_media_video._duration == self.duration
         assert input_paid_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_paid_media_video.thumbnail, InputFile)
         assert isinstance(input_paid_media_video.cover, InputFile)
@@ -586,7 +653,8 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_paid_media_video_dict["media"] == input_paid_media_video.media
         assert input_paid_media_video_dict["width"] == input_paid_media_video.width
         assert input_paid_media_video_dict["height"] == input_paid_media_video.height
-        assert input_paid_media_video_dict["duration"] == input_paid_media_video.duration
+        assert input_paid_media_video_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(input_paid_media_video_dict["duration"], int)
         assert (
             input_paid_media_video_dict["supports_streaming"]
             == input_paid_media_video.supports_streaming
@@ -597,6 +665,26 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
             input_paid_media_video_dict["start_timestamp"]
             == input_paid_media_video.start_timestamp
         )
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, input_paid_media_video):
+        duration = input_paid_media_video.duration
+
+        if PTB_TIMEDELTA:
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
+        else:
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, input_paid_media_video):
+        input_paid_media_video.duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_with_video(self, video):
         # fixture found in test_video
