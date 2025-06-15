@@ -1,0 +1,5 @@
+other = "Improve Informativeness of Network Errors Raised by ``BaseRequest.post/retrieve``"
+
+[[pull_requests]]
+uid = "4822"
+author_uid = "Bibo-Joshi"
