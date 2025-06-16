@@ -59,9 +59,9 @@ jobs:
           pytest -v --cov -k "${TO_TEST}" --junit-xml=.test_report_no_optionals_junit.xml
           opt_dep_status=$?
           
-          pip install .[all]
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
+          pip install .[all]
           # `-n auto --dist worksteal` uses pytest-xdist to run tests on multiple CPU
           # workers. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness.
