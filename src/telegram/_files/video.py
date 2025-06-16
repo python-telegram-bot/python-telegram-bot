@@ -138,7 +138,7 @@ class Video(_BaseThumbedMedium):
             # Required
             self.width: int = width
             self.height: int = height
-            self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
+            self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
             self.mime_type: Optional[str] = mime_type
             self.file_name: Optional[str] = file_name

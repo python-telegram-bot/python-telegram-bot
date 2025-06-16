@@ -231,7 +231,7 @@ class RetryAfter(TelegramError):
     __slots__ = ("_retry_after",)
 
     def __init__(self, retry_after: TimePeriod):
-        self._retry_after: dtm.timedelta = to_timedelta(retry_after)  # type: ignore[assignment]
+        self._retry_after: dtm.timedelta = to_timedelta(retry_after)
 
         if isinstance(self.retry_after, int):
             super().__init__(f"Flood control exceeded. Retry in {self.retry_after} seconds")

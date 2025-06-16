@@ -107,7 +107,7 @@ class Audio(_BaseThumbedMedium):
         )
         with self._unfrozen():
             # Required
-            self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
+            self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
             self.performer: Optional[str] = performer
             self.title: Optional[str] = title

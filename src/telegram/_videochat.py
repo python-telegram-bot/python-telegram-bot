@@ -94,7 +94,7 @@ class VideoChatEnded(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
+        self._duration: dtm.timedelta = to_timedelta(duration)
         self._id_attrs = (self._duration,)
 
         self._freeze()

@@ -98,7 +98,7 @@ class VideoNote(_BaseThumbedMedium):
         with self._unfrozen():
             # Required
             self.length: int = length
-            self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
+            self._duration: dtm.timedelta = to_timedelta(duration)
 
     @property
     def duration(self) -> Union[int, dtm.timedelta]:

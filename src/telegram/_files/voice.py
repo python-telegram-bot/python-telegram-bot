@@ -82,7 +82,7 @@ class Voice(_BaseMedium):
         )
         with self._unfrozen():
             # Required
-            self._duration: dtm.timedelta = to_timedelta(duration)  # type: ignore[assignment]
+            self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
             self.mime_type: Optional[str] = mime_type
 

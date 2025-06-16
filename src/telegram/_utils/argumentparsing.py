@@ -25,7 +25,7 @@ Warning:
 """
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union
+from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union, overload
 
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._telegramobject import TelegramObject
@@ -49,6 +49,18 @@ def parse_sequence_arg(arg: Optional[Sequence[T]]) -> tuple[T, ...]:
         :obj:`Tuple`: The sequence converted to a tuple or an empty tuple.
     """
     return tuple(arg) if arg else ()
+
+
+@overload
+def to_timedelta(arg: None) -> None: ...
+
+
+@overload
+def to_timedelta(
+    arg: Union[  # noqa: PYI041 (be more explicit about `int` and `float` arguments)
+        int, float, dtm.timedelta
+    ],
+) -> dtm.timedelta: ...
 
 
 def to_timedelta(arg: Optional[Union[int, float, dtm.timedelta]]) -> Optional[dtm.timedelta]:

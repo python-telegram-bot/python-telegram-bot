@@ -502,9 +502,8 @@ class TelegramObject:
     def _is_deprecated_attr(self, attr: str) -> bool:
         """Checks whether `attr` is in the list of deprecated time period attributes."""
         return (
-            (class_name := self.__class__.__name__) in TelegramObject._TIME_PERIOD_DEPRECATIONS
-            and attr in TelegramObject._TIME_PERIOD_DEPRECATIONS[class_name]
-        )
+            class_name := self.__class__.__name__
+        ) in _TIME_PERIOD_DEPRECATIONS and attr in _TIME_PERIOD_DEPRECATIONS[class_name]
 
     def _get_attrs_names(self, include_private: bool) -> Iterator[str]:
         """
@@ -643,13 +642,13 @@ class TelegramObject:
                 out[key] = to_timestamp(value)
             elif isinstance(value, dtm.timedelta):
                 # Converting to int here is neccassry in some cases where Bot API returns
-                # 'BadRquest' when expecting integers (e.g. Video.duration)
-                # not updating `out` directly to avoid changing the dict size during iteration
+                # 'BadRquest' when expecting integers (e.g. InputMediaVideo.duration)
+                # Not updating `out` directly to avoid changing the dict size during iteration
                 timedelta_dict[key.removeprefix("_")] = (
                     int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds
                 )
                 # This will sometimes add non-deprecated timedelta attributes to pop_keys.
-                # we'll restore them shortly.
+                # We'll restore them shortly.
                 pop_keys.add(key)
 
         for key in pop_keys:
@@ -691,29 +690,30 @@ class TelegramObject:
         """
         self._bot = bot
 
-    # We use str keys to avoid importing which causes circular dependencies
-    _TIME_PERIOD_DEPRECATIONS: ClassVar = {
-        "ChatFullInfo": ("_message_auto_delete_time", "_slow_mode_delay"),
-        "Animation": ("_duration",),
-        "Audio": ("_duration",),
-        "Video": ("_duration", "_start_timestamp"),
-        "VideoNote": ("_duration",),
-        "Voice": ("_duration",),
-        "PaidMediaPreview": ("_duration",),
-        "VideoChatEnded": ("_duration",),
-        "InputMediaVideo": ("_duration",),
-        "InputMediaAnimation": ("_duration",),
-        "InputMediaAudio": ("_duration",),
-        "InputPaidMediaVideo": ("_duration",),
-        "InlineQueryResultGif": ("_gif_duration",),
-        "InlineQueryResultMpeg4Gif": ("_mpeg4_duration",),
-        "InlineQueryResultVideo": ("_video_duration",),
-        "InlineQueryResultAudio": ("_audio_duration",),
-        "InlineQueryResultVoice": ("_voice_duration",),
-        "InlineQueryResultLocation": ("_live_period",),
-        "Poll": ("_open_period",),
-        "Location": ("_live_period",),
-        "MessageAutoDeleteTimerChanged": ("_message_auto_delete_time",),
-        "ChatInviteLink": ("_subscription_period",),
-        "InputLocationMessageContent": ("_live_period",),
-    }
+
+# We use str keys to avoid importing which causes circular dependencies
+_TIME_PERIOD_DEPRECATIONS: dict[str, tuple[str, ...]] = {
+    "ChatFullInfo": ("_message_auto_delete_time", "_slow_mode_delay"),
+    "Animation": ("_duration",),
+    "Audio": ("_duration",),
+    "Video": ("_duration", "_start_timestamp"),
+    "VideoNote": ("_duration",),
+    "Voice": ("_duration",),
+    "PaidMediaPreview": ("_duration",),
+    "VideoChatEnded": ("_duration",),
+    "InputMediaVideo": ("_duration",),
+    "InputMediaAnimation": ("_duration",),
+    "InputMediaAudio": ("_duration",),
+    "InputPaidMediaVideo": ("_duration",),
+    "InlineQueryResultGif": ("_gif_duration",),
+    "InlineQueryResultMpeg4Gif": ("_mpeg4_duration",),
+    "InlineQueryResultVideo": ("_video_duration",),
+    "InlineQueryResultAudio": ("_audio_duration",),
+    "InlineQueryResultVoice": ("_voice_duration",),
+    "InlineQueryResultLocation": ("_live_period",),
+    "Poll": ("_open_period",),
+    "Location": ("_live_period",),
+    "MessageAutoDeleteTimerChanged": ("_message_auto_delete_time",),
+    "ChatInviteLink": ("_subscription_period",),
+    "InputLocationMessageContent": ("_live_period",),
+}
