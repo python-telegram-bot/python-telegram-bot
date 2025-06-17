@@ -3,7 +3,7 @@ Correctly parse parameter ``allow_sending_without_reply`` in ``Message.reply_*``
 
 .. hint::
 
-   Using ``dict`` valued input for ``do_quote`` along with passing ``allow_sending_without_reply_to`` is not supported and will raise an error.
+   Using ``dict`` valued input for ``do_quote`` along with passing ``allow_sending_without_reply`` is not supported and will raise an error.
 """
 
 [[pull_requests]]
