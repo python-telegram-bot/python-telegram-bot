@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -140,19 +140,19 @@ class InlineQueryResultGif(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         gif_url: str,
         thumbnail_url: str,
-        gif_width: Optional[int] = None,
-        gif_height: Optional[int] = None,
-        title: Optional[str] = None,
-        caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
-        gif_duration: Optional[int] = None,
+        gif_width: int | None = None,
+        gif_height: int | None = None,
+        title: str | None = None,
+        caption: str | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
+        gif_duration: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        thumbnail_mime_type: Optional[str] = None,
-        show_caption_above_media: Optional[bool] = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        thumbnail_mime_type: str | None = None,
+        show_caption_above_media: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
@@ -161,14 +161,14 @@ class InlineQueryResultGif(InlineQueryResult):
             self.thumbnail_url: str = thumbnail_url
 
             # Optionals
-            self.gif_width: Optional[int] = gif_width
-            self.gif_height: Optional[int] = gif_height
-            self.gif_duration: Optional[int] = gif_duration
-            self.title: Optional[str] = title
-            self.caption: Optional[str] = caption
+            self.gif_width: int | None = gif_width
+            self.gif_height: int | None = gif_height
+            self.gif_duration: int | None = gif_duration
+            self.title: str | None = title
+            self.caption: str | None = caption
             self.parse_mode: ODVInput[str] = parse_mode
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_mime_type: Optional[str] = thumbnail_mime_type
-            self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
+            self.thumbnail_mime_type: str | None = thumbnail_mime_type
+            self.show_caption_above_media: bool | None = show_caption_above_media

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
 from collections.abc import Collection
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -138,15 +138,15 @@ class HTTPXRequest(BaseRequest):
     def __init__(
         self,
         connection_pool_size: int = 1,
-        read_timeout: Optional[float] = 5.0,
-        write_timeout: Optional[float] = 5.0,
-        connect_timeout: Optional[float] = 5.0,
-        pool_timeout: Optional[float] = 1.0,
+        read_timeout: float | None = 5.0,
+        write_timeout: float | None = 5.0,
+        connect_timeout: float | None = 5.0,
+        pool_timeout: float | None = 1.0,
         http_version: HTTPVersion = "1.1",
-        socket_options: Optional[Collection[SocketOpt]] = None,
-        proxy: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
-        media_write_timeout: Optional[float] = 20.0,
-        httpx_kwargs: Optional[dict[str, Any]] = None,
+        socket_options: Collection[SocketOpt] | None = None,
+        proxy: str | httpx.Proxy | httpx.URL | None = None,
+        media_write_timeout: float | None = 20.0,
+        httpx_kwargs: dict[str, Any] | None = None,
     ):
         self._http_version = http_version
         self._media_write_timeout = media_write_timeout
@@ -208,7 +208,7 @@ class HTTPXRequest(BaseRequest):
         return self._http_version
 
     @property
-    def read_timeout(self) -> Optional[float]:
+    def read_timeout(self) -> float | None:
         """See :attr:`BaseRequest.read_timeout`.
 
         Returns:
@@ -237,7 +237,7 @@ class HTTPXRequest(BaseRequest):
         self,
         url: str,
         method: str,
-        request_data: Optional[RequestData] = None,
+        request_data: RequestData | None = None,
         read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,

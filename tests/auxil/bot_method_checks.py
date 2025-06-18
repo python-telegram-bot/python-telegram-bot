@@ -22,9 +22,9 @@ import functools
 import inspect
 import re
 import zoneinfo
-from collections.abc import Collection, Iterable
+from collections.abc import Callable, Collection, Iterable
 from types import GenericAlias
-from typing import Any, Callable, ForwardRef, Optional, Union
+from typing import Any, ForwardRef
 
 import pytest
 
@@ -60,7 +60,7 @@ def check_shortcut_signature(
     bot_method: Callable,
     shortcut_kwargs: list[str],
     additional_kwargs: list[str],
-    annotation_overrides: Optional[dict[str, tuple[Any, Any]]] = None,
+    annotation_overrides: dict[str, tuple[Any, Any]] | None = None,
 ) -> bool:
     """
     Checks that the signature of a shortcut matches the signature of the underlying bot method.
@@ -80,7 +80,7 @@ def check_shortcut_signature(
     """
     annotation_overrides = annotation_overrides or {}
 
-    def resolve_class(class_name: str) -> Optional[type]:
+    def resolve_class(class_name: str) -> type | None:
         """Attempts to resolve a PTB class (telegram module only) from a ForwardRef.
 
         E.g. resolves <class 'telegram._files.sticker.StickerSet'> from "StickerSet".
@@ -139,6 +139,7 @@ def check_shortcut_signature(
                 for shortcut_arg, bot_arg in zip(
                     shortcut_sig.parameters[kwarg].annotation.__args__,
                     bot_sig.parameters[kwarg].annotation.__args__,
+                    strict=False,
                 ):
                     shortcut_arg_to_check = shortcut_arg  # for ruff
                     match = FORWARD_REF_PATTERN.search(str(shortcut_arg))
@@ -195,8 +196,8 @@ async def check_shortcut_call(
     shortcut_method: Callable,
     bot: ExtBot,
     bot_method_name: str,
-    skip_params: Optional[Iterable[str]] = None,
-    shortcut_kwargs: Optional[Iterable[str]] = None,
+    skip_params: Iterable[str] | None = None,
+    shortcut_kwargs: Iterable[str] | None = None,
 ) -> bool:
     """
     Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::
@@ -395,13 +396,13 @@ def make_assertion_for_link_preview_options(
             )
 
 
-def _check_forward_ref(obj: object) -> Union[str, object]:
+def _check_forward_ref(obj: object) -> str | object:
     if isinstance(obj, ForwardRef):
         return obj.__forward_arg__
     return obj
 
 
-def guess_return_type_name(method: Callable[[...], Any]) -> tuple[Union[str, object], bool]:
+def guess_return_type_name(method: Callable[[...], Any]) -> tuple[str | object, bool]:
     # Using typing.get_type_hints(method) would be the nicer as it also resolves ForwardRefs
     # and string annotations. But it also wants to resolve the parameter annotations, which
     # need additional namespaces and that's not worth the struggle for now …

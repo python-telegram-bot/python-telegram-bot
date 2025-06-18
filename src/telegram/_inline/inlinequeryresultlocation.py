@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -138,17 +138,17 @@ class InlineQueryResultLocation(InlineQueryResult):
         latitude: float,
         longitude: float,
         title: str,
-        live_period: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
-        horizontal_accuracy: Optional[float] = None,
-        heading: Optional[int] = None,
-        proximity_alert_radius: Optional[int] = None,
-        thumbnail_url: Optional[str] = None,
-        thumbnail_width: Optional[int] = None,
-        thumbnail_height: Optional[int] = None,
+        live_period: int | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
+        horizontal_accuracy: float | None = None,
+        heading: int | None = None,
+        proximity_alert_radius: int | None = None,
+        thumbnail_url: str | None = None,
+        thumbnail_width: int | None = None,
+        thumbnail_height: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(constants.InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
@@ -158,15 +158,15 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.title: str = title
 
             # Optionals
-            self.live_period: Optional[int] = live_period
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_url: Optional[str] = thumbnail_url
-            self.thumbnail_width: Optional[int] = thumbnail_width
-            self.thumbnail_height: Optional[int] = thumbnail_height
-            self.horizontal_accuracy: Optional[float] = horizontal_accuracy
-            self.heading: Optional[int] = heading
-            self.proximity_alert_radius: Optional[int] = (
+            self.live_period: int | None = live_period
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
+            self.thumbnail_url: str | None = thumbnail_url
+            self.thumbnail_width: int | None = thumbnail_width
+            self.thumbnail_height: int | None = thumbnail_height
+            self.horizontal_accuracy: float | None = horizontal_accuracy
+            self.heading: int | None = heading
+            self.proximity_alert_radius: int | None = (
                 int(proximity_alert_radius) if proximity_alert_radius else None
             )
 

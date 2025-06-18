@@ -32,7 +32,6 @@ from pathlib import Path
 from queue import Queue
 from random import randrange
 from threading import Thread
-from typing import Optional
 
 import pytest
 
@@ -95,7 +94,7 @@ class TestApplication:
     async def callback_increase_count(self, update, context):
         self.count += 1
 
-    def callback_set_count(self, count, sleep: Optional[float] = None):
+    def callback_set_count(self, count, sleep: float | None = None):
         async def callback(update, context):
             if sleep:
                 await asyncio.sleep(sleep)

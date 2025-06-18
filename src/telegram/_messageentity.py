@@ -21,7 +21,7 @@
 import copy
 import itertools
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -115,12 +115,12 @@ class MessageEntity(TelegramObject):
         type: str,  # pylint: disable=redefined-builtin
         offset: int,
         length: int,
-        url: Optional[str] = None,
-        user: Optional[User] = None,
-        language: Optional[str] = None,
-        custom_emoji_id: Optional[str] = None,
+        url: str | None = None,
+        user: User | None = None,
+        language: str | None = None,
+        custom_emoji_id: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -128,17 +128,17 @@ class MessageEntity(TelegramObject):
         self.offset: int = offset
         self.length: int = length
         # Optionals
-        self.url: Optional[str] = url
-        self.user: Optional[User] = user
-        self.language: Optional[str] = language
-        self.custom_emoji_id: Optional[str] = custom_emoji_id
+        self.url: str | None = url
+        self.user: User | None = user
+        self.language: str | None = language
+        self.custom_emoji_id: str | None = custom_emoji_id
 
         self._id_attrs = (self.type, self.offset, self.length)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageEntity":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MessageEntity":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -220,7 +220,7 @@ class MessageEntity(TelegramObject):
         return out
 
     @staticmethod
-    def shift_entities(by: Union[str, int], entities: _SEM) -> _SEM:
+    def shift_entities(by: str | int, entities: _SEM) -> _SEM:
         """Utility functionality for shifting the offset of entities by a given amount.
 
         Examples:
@@ -285,7 +285,7 @@ class MessageEntity(TelegramObject):
     @classmethod
     def concatenate(
         cls,
-        *args: Union[tuple[str, _SEM], tuple[str, _SEM, bool]],
+        *args: tuple[str, _SEM] | tuple[str, _SEM, bool],
     ) -> tuple[str, _SEM]:
         """Utility functionality for concatenating two text along with their formatting entities.
 

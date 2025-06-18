@@ -23,6 +23,7 @@ notable
 """
 import asyncio
 import datetime as dtm
+import itertools
 import json
 import platform
 import time
@@ -233,7 +234,7 @@ class TestAIORateLimiter:
         times = TestAIORateLimiter.call_times
         if len(times) <= 1:
             return
-        delays = [j - i for i, j in zip(times[:-1], times[1:])]
+        delays = [j - i for i, j in itertools.pairwise(times)]
         assert delays == pytest.approx([1.1 for _ in range(max_retries)], rel=0.05)
 
     async def test_delay_all_pending_on_retry(self, bot):

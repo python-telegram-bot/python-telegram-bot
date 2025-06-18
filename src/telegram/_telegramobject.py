@@ -26,7 +26,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, ClassVar, Optional, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast
 
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
@@ -84,16 +84,16 @@ class TelegramObject:
     # Used to check if __INIT_PARAMS has been set for the current class. Unfortunately, we can't
     # just check if `__INIT_PARAMS is None`, since subclasses use the parent class' __INIT_PARAMS
     # unless it's overridden
-    __INIT_PARAMS_CHECK: Optional[type["TelegramObject"]] = None
+    __INIT_PARAMS_CHECK: type["TelegramObject"] | None = None
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         # Setting _frozen to `False` here means that classes without arguments still need to
         # implement __init__. However, with `True` would mean increased usage of
         # `with self._unfrozen()` in the `__init__` of subclasses and we have fewer empty
         # classes than classes with arguments.
         self._frozen: bool = False
         self._id_attrs: tuple[object, ...] = ()
-        self._bot: Optional[Bot] = None
+        self._bot: Bot | None = None
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
         self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
 
@@ -248,7 +248,7 @@ class TelegramObject:
                 f"`{item}`."
             ) from exc
 
-    def __getstate__(self) -> dict[str, Union[str, object]]:
+    def __getstate__(self) -> dict[str, str | object]:
         """
         Overrides :meth:`object.__getstate__` to customize the pickling process of objects of this
         type.
@@ -388,8 +388,8 @@ class TelegramObject:
     def _de_json(
         cls: type[Tele_co],
         data: JSONDict,
-        bot: Optional["Bot"],
-        api_kwargs: Optional[JSONDict] = None,
+        bot: "Bot | None",
+        api_kwargs: JSONDict | None = None,
     ) -> Tele_co:
         # try-except is significantly faster in case we already have a correct argument set
         try:
@@ -414,7 +414,7 @@ class TelegramObject:
         return obj
 
     @classmethod
-    def de_json(cls: type[Tele_co], data: JSONDict, bot: Optional["Bot"] = None) -> Tele_co:
+    def de_json(cls: type[Tele_co], data: JSONDict, bot: "Bot | None" = None) -> Tele_co:
         """Converts JSON data to a Telegram object.
 
         Args:
@@ -433,7 +433,7 @@ class TelegramObject:
 
     @classmethod
     def de_list(
-        cls: type[Tele_co], data: list[JSONDict], bot: Optional["Bot"] = None
+        cls: type[Tele_co], data: list[JSONDict], bot: "Bot | None" = None
     ) -> tuple[Tele_co, ...]:
         """Converts a list of JSON objects to a tuple of Telegram objects.
 
@@ -529,7 +529,7 @@ class TelegramObject:
         recursive: bool = False,
         remove_bot: bool = False,
         convert_default_value: bool = True,
-    ) -> dict[str, Union[str, object]]:
+    ) -> dict[str, str | object]:
         """This method is used for obtaining the attributes of the object.
 
         Args:
@@ -604,7 +604,7 @@ class TelegramObject:
         # `to_dict`
         pop_keys: set[str] = set()
         for key, value in out.items():
-            if isinstance(value, (tuple, list)):
+            if isinstance(value, tuple | list):
                 if not value:
                     # not popping directly to avoid changing the dict size during iteration
                     pop_keys.add(key)
@@ -615,7 +615,7 @@ class TelegramObject:
                     if hasattr(item, "to_dict"):
                         val.append(item.to_dict(recursive=recursive))
                     # This branch is useful for e.g. tuple[tuple[PhotoSize|KeyboardButton]]
-                    elif isinstance(item, (tuple, list)):
+                    elif isinstance(item, tuple | list):
                         val.append(
                             [
                                 i.to_dict(recursive=recursive) if hasattr(i, "to_dict") else i
@@ -654,7 +654,7 @@ class TelegramObject:
             )
         return self._bot
 
-    def set_bot(self, bot: Optional["Bot"]) -> None:
+    def set_bot(self, bot: "Bot | None") -> None:
         """Sets the :class:`telegram.Bot` instance associated with this object.
 
         .. seealso:: :meth:`get_bot`

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Video."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -102,14 +102,14 @@ class Video(_BaseThumbedMedium):
         width: int,
         height: int,
         duration: int,
-        mime_type: Optional[str] = None,
-        file_size: Optional[int] = None,
-        file_name: Optional[str] = None,
-        thumbnail: Optional[PhotoSize] = None,
-        cover: Optional[Sequence[PhotoSize]] = None,
-        start_timestamp: Optional[int] = None,
+        mime_type: str | None = None,
+        file_size: int | None = None,
+        file_name: str | None = None,
+        thumbnail: PhotoSize | None = None,
+        cover: Sequence[PhotoSize] | None = None,
+        start_timestamp: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -124,13 +124,13 @@ class Video(_BaseThumbedMedium):
             self.height: int = height
             self.duration: int = duration
             # Optional
-            self.mime_type: Optional[str] = mime_type
-            self.file_name: Optional[str] = file_name
-            self.cover: Optional[Sequence[PhotoSize]] = parse_sequence_arg(cover)
-            self.start_timestamp: Optional[int] = start_timestamp
+            self.mime_type: str | None = mime_type
+            self.file_name: str | None = file_name
+            self.cover: Sequence[PhotoSize] | None = parse_sequence_arg(cover)
+            self.start_timestamp: int | None = start_timestamp
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Video":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Video":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
