@@ -19,6 +19,7 @@ import collections.abc
 import contextlib
 import inspect
 import re
+import types
 import typing
 from collections import defaultdict
 from collections.abc import Iterator
@@ -323,6 +324,8 @@ class AdmonitionInserter:
 
         for cls, method_names in self.METHOD_NAMES_FOR_BOT_APP_APPBUILDER.items():
             for method_name in method_names:
+                if method_name == "get_file":
+                    pass
                 method_link = self._generate_link_to_method(method_name, cls)
 
                 arg = getattr(cls, method_name)
@@ -508,7 +511,9 @@ class AdmonitionInserter:
         def recurse_type(type_, is_recursed_from_ptb_class: bool):
             next_is_recursed_from_ptb_class = is_recursed_from_ptb_class or _is_ptb_class(type_)
 
-            if hasattr(type_, "__origin__"):  # For generic types like Union, List, etc.
+            if hasattr(type_, "__origin__") or isinstance(
+                type_, types.UnionType
+            ):  # For generic types like Union, List, etc.
                 # Make sure it's not a telegram.ext generic type (e.g. ContextTypes[...])
                 org = typing.get_origin(type_)
                 if "telegram.ext" in str(org):
