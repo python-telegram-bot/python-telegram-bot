@@ -1,0 +1,5 @@
+bugfixes = "Allow for pattern matching empty inline queries"
+[[pull_requests]]
+uid = "4817"
+author_uid = "locobott"
+closes_threads = []
