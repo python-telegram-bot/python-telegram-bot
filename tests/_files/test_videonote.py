@@ -27,6 +27,7 @@ from telegram import Bot, InputFile, PhotoSize, ReplyParameters, VideoNote, Voic
 from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -51,7 +52,7 @@ async def video_note(bot, chat_id):
 
 class VideoNoteTestBase:
     length = 240
-    duration = 3
+    duration = dtm.timedelta(seconds=3)
     file_size = 132084
     thumb_width = 240
     thumb_height = 240
@@ -81,17 +82,12 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         assert video_note.thumbnail.file_id
         assert video_note.thumbnail.file_unique_id
 
-    def test_expected_values(self, video_note):
-        assert video_note.length == self.length
-        assert video_note.duration == self.duration
-        assert video_note.file_size == self.file_size
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.videonote_file_id,
             "file_unique_id": self.videonote_file_unique_id,
             "length": self.length,
-            "duration": self.duration,
+            "duration": int(self.duration.total_seconds()),
             "file_size": self.file_size,
         }
         json_video_note = VideoNote.de_json(json_dict, offline_bot)
@@ -100,7 +96,7 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         assert json_video_note.file_id == self.videonote_file_id
         assert json_video_note.file_unique_id == self.videonote_file_unique_id
         assert json_video_note.length == self.length
-        assert json_video_note.duration == self.duration
+        assert json_video_note._duration == self.duration
         assert json_video_note.file_size == self.file_size
 
     def test_to_dict(self, video_note):
@@ -110,8 +106,27 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         assert video_note_dict["file_id"] == video_note.file_id
         assert video_note_dict["file_unique_id"] == video_note.file_unique_id
         assert video_note_dict["length"] == video_note.length
-        assert video_note_dict["duration"] == video_note.duration
+        assert video_note_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(video_note_dict["duration"], int)
         assert video_note_dict["file_size"] == video_note.file_size
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, video_note):
+        if PTB_TIMEDELTA:
+            assert video_note.duration == self.duration
+            assert isinstance(video_note.duration, dtm.timedelta)
+        else:
+            assert video_note.duration == int(self.duration.total_seconds())
+            assert isinstance(video_note.duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, video_note):
+        video_note.duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self, video_note):
         a = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)
