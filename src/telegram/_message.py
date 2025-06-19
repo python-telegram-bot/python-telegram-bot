@@ -1541,11 +1541,17 @@ class Message(MaybeInaccessibleMessage):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def _do_quote(self, do_quote: Optional[bool]) -> Optional[ReplyParameters]:
+    def _do_quote(
+        self, do_quote: Optional[bool], allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE
+    ) -> Optional[ReplyParameters]:
         """Modify kwargs for replying with or without quoting."""
+        # `Defaults` handling for allow_sending_without_reply is not necessary, as
+        # `ReplyParameters` have special defaults handling in (ExtBot)._insert_defaults
         if do_quote is not None:
             if do_quote:
-                return ReplyParameters(self.message_id)
+                return ReplyParameters(
+                    self.message_id, allow_sending_without_reply=allow_sending_without_reply
+                )
 
         else:
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
@@ -1555,7 +1561,9 @@ class Message(MaybeInaccessibleMessage):
             else:
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
-                return ReplyParameters(self.message_id)
+                return ReplyParameters(
+                    self.message_id, allow_sending_without_reply=allow_sending_without_reply
+                )
 
         return None
 
@@ -1729,7 +1737,13 @@ class Message(MaybeInaccessibleMessage):
         do_quote: Optional[Union[bool, _ReplyKwargs]],
         reply_to_message_id: Optional[int],
         reply_parameters: Optional["ReplyParameters"],
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
     ) -> tuple[Union[str, int], ReplyParameters]:
+        if allow_sending_without_reply is not DEFAULT_NONE and reply_parameters is not None:
+            raise ValueError(
+                "`allow_sending_without_reply` and `reply_parameters` are mutually exclusive."
+            )
+
         if reply_to_message_id is not None and reply_parameters is not None:
             raise ValueError(
                 "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
@@ -1741,12 +1755,21 @@ class Message(MaybeInaccessibleMessage):
         if reply_parameters is not None:
             effective_reply_parameters = reply_parameters
         elif reply_to_message_id is not None:
-            effective_reply_parameters = ReplyParameters(message_id=reply_to_message_id)
+            effective_reply_parameters = ReplyParameters(
+                message_id=reply_to_message_id,
+                allow_sending_without_reply=allow_sending_without_reply,
+            )
         elif isinstance(do_quote, dict):
+            if allow_sending_without_reply is not DEFAULT_NONE:
+                raise ValueError(
+                    "`allow_sending_without_reply` and `dict`-value input for `do_quote` are "
+                    "mutually exclusive."
+                )
+
             effective_reply_parameters = do_quote["reply_parameters"]
             chat_id = do_quote["chat_id"]
         else:
-            effective_reply_parameters = self._do_quote(do_quote)
+            effective_reply_parameters = self._do_quote(do_quote, allow_sending_without_reply)
 
         return chat_id, effective_reply_parameters
 
@@ -1823,7 +1846,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
@@ -1835,7 +1858,6 @@ class Message(MaybeInaccessibleMessage):
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
-            allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -1907,7 +1929,7 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
@@ -1919,7 +1941,6 @@ class Message(MaybeInaccessibleMessage):
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
-            allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -1987,7 +2008,7 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
@@ -1999,7 +2020,6 @@ class Message(MaybeInaccessibleMessage):
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
-            allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -2067,7 +2087,7 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
@@ -2079,7 +2099,6 @@ class Message(MaybeInaccessibleMessage):
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
-            allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -2148,7 +2167,7 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.error.TelegramError`
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_media_group(
@@ -2161,7 +2180,6 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             caption=caption,
@@ -2227,7 +2245,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_photo(
@@ -2238,7 +2256,6 @@ class Message(MaybeInaccessibleMessage):
             reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
@@ -2312,7 +2329,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_audio(
@@ -2326,7 +2343,6 @@ class Message(MaybeInaccessibleMessage):
             reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
@@ -2397,7 +2413,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_document(
@@ -2415,7 +2431,6 @@ class Message(MaybeInaccessibleMessage):
             parse_mode=parse_mode,
             api_kwargs=api_kwargs,
             disable_content_type_detection=disable_content_type_detection,
-            allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -2484,7 +2499,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_animation(
@@ -2503,7 +2518,6 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
@@ -2566,7 +2580,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_sticker(
@@ -2580,7 +2594,6 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             emoji=emoji,
@@ -2651,7 +2664,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_video(
@@ -2671,7 +2684,6 @@ class Message(MaybeInaccessibleMessage):
             parse_mode=parse_mode,
             supports_streaming=supports_streaming,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
@@ -2739,7 +2751,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_video_note(
@@ -2755,7 +2767,6 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -2819,7 +2830,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_voice(
@@ -2836,7 +2847,6 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
@@ -2901,7 +2911,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_location(
@@ -2921,7 +2931,6 @@ class Message(MaybeInaccessibleMessage):
             horizontal_accuracy=horizontal_accuracy,
             heading=heading,
             proximity_alert_radius=proximity_alert_radius,
-            allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
@@ -2986,7 +2995,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_venue(
@@ -3008,7 +3017,6 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             google_place_id=google_place_id,
             google_place_type=google_place_type,
-            allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
@@ -3069,7 +3077,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_contact(
@@ -3087,7 +3095,6 @@ class Message(MaybeInaccessibleMessage):
             contact=contact,
             vcard=vcard,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
@@ -3157,7 +3164,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_poll(
@@ -3181,7 +3188,6 @@ class Message(MaybeInaccessibleMessage):
             open_period=open_period,
             close_date=close_date,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             explanation_entities=explanation_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -3241,7 +3247,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_dice(
@@ -3255,7 +3261,6 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             emoji=emoji,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
@@ -3358,7 +3363,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_game(
@@ -3372,7 +3377,6 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
@@ -3460,7 +3464,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_invoice(
@@ -3492,7 +3496,6 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
             max_tip_amount=max_tip_amount,
             suggested_tip_amounts=suggested_tip_amounts,
             protect_content=protect_content,
@@ -3670,7 +3673,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().copy_message(
@@ -3683,7 +3686,6 @@ class Message(MaybeInaccessibleMessage):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
-            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -3742,7 +3744,7 @@ class Message(MaybeInaccessibleMessage):
 
         """
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
-            do_quote, reply_to_message_id, reply_parameters
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
         return await self.get_bot().send_paid_media(
             chat_id=chat_id,
@@ -3755,7 +3757,6 @@ class Message(MaybeInaccessibleMessage):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
-            allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
