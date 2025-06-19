@@ -6,4 +6,4 @@ Animation
 .. autoclass:: telegram.Animation
     :members:
     :show-inheritance:
-    :inherited-members: TelegramObject
+    :inherited-members: TelegramObject, object
