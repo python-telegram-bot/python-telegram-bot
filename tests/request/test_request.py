@@ -316,10 +316,14 @@ class TestRequestWithoutRequest:
             (-1, NetworkError),
         ],
     )
+    @pytest.mark.parametrize("description", ["Test Message", None])
     async def test_special_errors(
-        self, monkeypatch, httpx_request: HTTPXRequest, code, exception_class
+        self, monkeypatch, httpx_request: HTTPXRequest, code, exception_class, description
     ):
-        server_response = b'{"ok": "False", "description": "Test Message"}'
+        server_response_json = {"ok": False}
+        if description:
+            server_response_json["description"] = description
+        server_response = json.dumps(server_response_json).encode(TextEncoding.UTF_8)
 
         monkeypatch.setattr(
             httpx_request,
@@ -327,7 +331,25 @@ class TestRequestWithoutRequest:
             mocker_factory(response=server_response, return_code=code),
         )
 
-        with pytest.raises(exception_class, match="Test Message"):
+        if not description and code not in list(HTTPStatus):
+            match = f"Unknown HTTPError.*{code}"
+        else:
+            match = description or str(code.value)
+
+        with pytest.raises(exception_class, match=match):
+            await httpx_request.post("", None, None)
+
+    async def test_error_parsing_payload(self, monkeypatch, httpx_request: HTTPXRequest):
+        """Test that we raise an error if the payload is not a valid JSON."""
+        server_response = b"invalid_json"
+
+        monkeypatch.setattr(
+            httpx_request,
+            "do_request",
+            mocker_factory(response=server_response, return_code=HTTPStatus.BAD_GATEWAY),
+        )
+
+        with pytest.raises(TelegramError, match=r"502.*\. Parsing.*b'invalid_json' failed"):
             await httpx_request.post("", None, None)
 
     @pytest.mark.parametrize(
