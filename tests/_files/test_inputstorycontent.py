@@ -107,7 +107,7 @@ class InputStoryContentVideoTestBase:
     is_animation = False
 
 
-class TestInputMediaVideoWithoutRequest(InputStoryContentVideoTestBase):
+class TestInputStoryContentVideoWithoutRequest(InputStoryContentVideoTestBase):
     def test_slot_behaviour(self, input_story_content_video):
         inst = input_story_content_video
         for attr in inst.__slots__:
@@ -130,6 +130,25 @@ class TestInputMediaVideoWithoutRequest(InputStoryContentVideoTestBase):
         assert json_dict["duration"] == self.duration.total_seconds()
         assert json_dict["cover_frame_timestamp"] == self.cover_frame_timestamp.total_seconds()
         assert json_dict["is_animation"] is self.is_animation
+
+    @pytest.mark.parametrize(
+        ("argument", "expected"),
+        [(4, 4), (4.0, 4), (dtm.timedelta(seconds=4), 4), (4.5, 4.5)],
+    )
+    def test_to_dict_float_time_period(self, argument, expected):
+        # We test that whole number conversion works properly. Only tested here but
+        # relevant for some other classes too (e.g InputProfilePhotoAnimated.main_frame_timestamp)
+        inst = InputStoryContentVideo(
+            video=self.video.read_bytes(),
+            duration=argument,
+            cover_frame_timestamp=argument,
+        )
+        json_dict = inst.to_dict()
+
+        assert json_dict["duration"] == expected
+        assert type(json_dict["duration"]) is type(expected)
+        assert json_dict["cover_frame_timestamp"] == expected
+        assert type(json_dict["cover_frame_timestamp"]) is type(expected)
 
     def test_with_video_file(self, video_file):
         inst = InputStoryContentVideo(video=video_file)

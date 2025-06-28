@@ -642,7 +642,9 @@ class TelegramObject:
                 out[key] = to_timestamp(value)
             elif isinstance(value, dtm.timedelta):
                 # Converting to int here is neccassry in some cases where Bot API returns
-                # 'BadRquest' when expecting integers (e.g. InputMediaVideo.duration)
+                # 'BadRquest' when expecting integers (e.g. InputMediaVideo.duration).
+                # Other times, floats are accepted but the Bot API handles ints just as well
+                # (e.g. InputStoryContentVideo.duration).
                 # Not updating `out` directly to avoid changing the dict size during iteration
                 timedelta_dict[key.removeprefix("_")] = (
                     int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds
