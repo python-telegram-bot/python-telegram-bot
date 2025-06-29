@@ -1,0 +1,20 @@
+documentation = """Documentation Improvements. Among other things
+
+* mention alternative package managers in README and contribution guide
+* remove ``furo-sphinx-search``
+"""
+
+[[pull_requests]]
+uid = "4810"
+author_uid = "Bibo-Joshi"
+closes_threads = []
+
+[[pull_requests]]
+uid = "4824"
+author_uid = "Aweryc"
+closes_threads = ["4823"]
+
+[[pull_requests]]
+uid = "4826"
+author_uid = "harshil21"
+closes_threads = []
