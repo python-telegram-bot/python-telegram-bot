@@ -16,9 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import InputLocationMessageContent, Location
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -37,7 +40,7 @@ def input_location_message_content():
 class InputLocationMessageContentTestBase:
     latitude = -23.691288
     longitude = -46.788279
-    live_period = 80
+    live_period = dtm.timedelta(seconds=80)
     horizontal_accuracy = 50.5
     heading = 90
     proximity_alert_radius = 999
@@ -53,7 +56,7 @@ class TestInputLocationMessageContentWithoutRequest(InputLocationMessageContentT
     def test_expected_values(self, input_location_message_content):
         assert input_location_message_content.longitude == self.longitude
         assert input_location_message_content.latitude == self.latitude
-        assert input_location_message_content.live_period == self.live_period
+        assert input_location_message_content._live_period == self.live_period
         assert input_location_message_content.horizontal_accuracy == self.horizontal_accuracy
         assert input_location_message_content.heading == self.heading
         assert input_location_message_content.proximity_alert_radius == self.proximity_alert_radius
@@ -70,10 +73,10 @@ class TestInputLocationMessageContentWithoutRequest(InputLocationMessageContentT
             input_location_message_content_dict["longitude"]
             == input_location_message_content.longitude
         )
-        assert (
-            input_location_message_content_dict["live_period"]
-            == input_location_message_content.live_period
+        assert input_location_message_content_dict["live_period"] == int(
+            self.live_period.total_seconds()
         )
+        assert isinstance(input_location_message_content_dict["live_period"], int)
         assert (
             input_location_message_content_dict["horizontal_accuracy"]
             == input_location_message_content.horizontal_accuracy
@@ -86,6 +89,28 @@ class TestInputLocationMessageContentWithoutRequest(InputLocationMessageContentT
             input_location_message_content_dict["proximity_alert_radius"]
             == input_location_message_content.proximity_alert_radius
         )
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, input_location_message_content):
+        live_period = input_location_message_content.live_period
+
+        if PTB_TIMEDELTA:
+            assert live_period == self.live_period
+            assert isinstance(live_period, dtm.timedelta)
+        else:
+            assert live_period == int(self.live_period.total_seconds())
+            assert isinstance(live_period, int)
+
+    def test_time_period_int_deprecated(
+        self, recwarn, PTB_TIMEDELTA, input_location_message_content
+    ):
+        input_location_message_content.live_period
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`live_period` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = InputLocationMessageContent(123, 456, 70)

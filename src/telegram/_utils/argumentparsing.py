@@ -23,8 +23,9 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Protocol, TypeVar
+from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union, overload
 
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._telegramobject import TelegramObject
@@ -48,6 +49,34 @@ def parse_sequence_arg(arg: Optional[Sequence[T]]) -> tuple[T, ...]:
         :obj:`Tuple`: The sequence converted to a tuple or an empty tuple.
     """
     return tuple(arg) if arg else ()
+
+
+@overload
+def to_timedelta(arg: None) -> None: ...
+
+
+@overload
+def to_timedelta(
+    arg: Union[  # noqa: PYI041 (be more explicit about `int` and `float` arguments)
+        int, float, dtm.timedelta
+    ],
+) -> dtm.timedelta: ...
+
+
+def to_timedelta(arg: Optional[Union[int, float, dtm.timedelta]]) -> Optional[dtm.timedelta]:
+    """Parses an optional time period in seconds into a timedelta
+
+    Args:
+        arg (:obj:`int` | :class:`datetime.timedelta`, optional): The time period to parse.
+
+    Returns:
+        :obj:`timedelta`: The time period converted to a timedelta object or :obj:`None`.
+    """
+    if arg is None:
+        return None
+    if isinstance(arg, (int, float)):
+        return dtm.timedelta(seconds=arg)
+    return arg
 
 
 def parse_lpo_and_dwpp(

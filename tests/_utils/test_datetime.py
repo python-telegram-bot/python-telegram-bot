@@ -192,3 +192,20 @@ class TestDatetime:
         assert tg_dtm.extract_tzinfo_from_defaults(tz_bot) == tz_bot.defaults.tzinfo
         assert tg_dtm.extract_tzinfo_from_defaults(bot) is None
         assert tg_dtm.extract_tzinfo_from_defaults(raw_bot) is None
+
+    @pytest.mark.parametrize(
+        ("arg", "timedelta_result", "number_result"),
+        [
+            (None, None, None),
+            (dtm.timedelta(seconds=10), dtm.timedelta(seconds=10), 10),
+            (dtm.timedelta(seconds=10.5), dtm.timedelta(seconds=10.5), 10.5),
+        ],
+    )
+    def test_get_timedelta_value(self, PTB_TIMEDELTA, arg, timedelta_result, number_result):
+        result = tg_dtm.get_timedelta_value(arg, attribute="")
+
+        if PTB_TIMEDELTA:
+            assert result == timedelta_result
+        else:
+            assert result == number_result
+            assert type(result) is type(number_result)

@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import (
@@ -26,6 +28,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -55,7 +58,7 @@ class InlineQueryResultMpeg4GifTestBase:
     mpeg4_url = "mpeg4 url"
     mpeg4_width = 10
     mpeg4_height = 15
-    mpeg4_duration = 1
+    mpeg4_duration = dtm.timedelta(seconds=1)
     thumbnail_url = "thumb url"
     thumbnail_mime_type = "image/jpeg"
     title = "title"
@@ -80,7 +83,7 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(InlineQueryResultMpeg4GifTestB
         assert inline_query_result_mpeg4_gif.mpeg4_url == self.mpeg4_url
         assert inline_query_result_mpeg4_gif.mpeg4_width == self.mpeg4_width
         assert inline_query_result_mpeg4_gif.mpeg4_height == self.mpeg4_height
-        assert inline_query_result_mpeg4_gif.mpeg4_duration == self.mpeg4_duration
+        assert inline_query_result_mpeg4_gif._mpeg4_duration == self.mpeg4_duration
         assert inline_query_result_mpeg4_gif.thumbnail_url == self.thumbnail_url
         assert inline_query_result_mpeg4_gif.thumbnail_mime_type == self.thumbnail_mime_type
         assert inline_query_result_mpeg4_gif.title == self.title
@@ -118,10 +121,10 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(InlineQueryResultMpeg4GifTestB
             inline_query_result_mpeg4_gif_dict["mpeg4_height"]
             == inline_query_result_mpeg4_gif.mpeg4_height
         )
-        assert (
-            inline_query_result_mpeg4_gif_dict["mpeg4_duration"]
-            == inline_query_result_mpeg4_gif.mpeg4_duration
+        assert inline_query_result_mpeg4_gif_dict["mpeg4_duration"] == int(
+            self.mpeg4_duration.total_seconds()
         )
+        assert isinstance(inline_query_result_mpeg4_gif_dict["mpeg4_duration"], int)
         assert (
             inline_query_result_mpeg4_gif_dict["thumbnail_url"]
             == inline_query_result_mpeg4_gif.thumbnail_url
@@ -153,6 +156,30 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(InlineQueryResultMpeg4GifTestB
             inline_query_result_mpeg4_gif_dict["show_caption_above_media"]
             == inline_query_result_mpeg4_gif.show_caption_above_media
         )
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, inline_query_result_mpeg4_gif):
+        mpeg4_duration = inline_query_result_mpeg4_gif.mpeg4_duration
+
+        if PTB_TIMEDELTA:
+            assert mpeg4_duration == self.mpeg4_duration
+            assert isinstance(mpeg4_duration, dtm.timedelta)
+        else:
+            assert mpeg4_duration == int(self.mpeg4_duration.total_seconds())
+            assert isinstance(mpeg4_duration, int)
+
+    def test_time_period_int_deprecated(
+        self, recwarn, PTB_TIMEDELTA, inline_query_result_mpeg4_gif
+    ):
+        inline_query_result_mpeg4_gif.mpeg4_duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`mpeg4_duration` will be of type `datetime.timedelta`" in str(
+                recwarn[0].message
+            )
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumbnail_url)
