@@ -1,0 +1,11 @@
+bugfixes = "Allow for pattern matching empty inline queries"
+other = "Bump Version to v22.2"
+[[pull_requests]]
+uid = "4817"
+author_uid = "locobott"
+closes_threads = []
+
+[[pull_requests]]
+uid = "4834"
+author_uid = "Bibo-Joshi"
+closes_threads = []
