@@ -120,7 +120,7 @@ class PaidMediaPreview(PaidMedia):
 
     .. versionadded:: 21.4
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: v22.2
        As part of the migration to representing time periods using ``datetime.timedelta``,
        equality comparison now considers integer durations and equivalent timedeltas as equal.
 
@@ -131,7 +131,7 @@ class PaidMediaPreview(PaidMedia):
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the media in
             seconds as defined by the sender.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
 
     Attributes:
@@ -141,7 +141,7 @@ class PaidMediaPreview(PaidMedia):
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Duration of the media in
             seconds as defined by the sender.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
     """
 

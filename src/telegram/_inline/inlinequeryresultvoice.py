@@ -61,7 +61,7 @@ class InlineQueryResultVoice(InlineQueryResult):
         voice_duration (:obj:`int` | :class:`datetime.timedelta`, optional): Recording duration
             in seconds.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
@@ -88,7 +88,7 @@ class InlineQueryResultVoice(InlineQueryResult):
         voice_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Recording duration
             in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.

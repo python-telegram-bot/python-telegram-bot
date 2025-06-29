@@ -219,7 +219,7 @@ class InputPaidMediaVideo(InputPaidMedia):
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Video duration in seconds.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
@@ -240,7 +240,7 @@ class InputPaidMediaVideo(InputPaidMedia):
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
             suitable for streaming.
@@ -337,7 +337,7 @@ class InputMediaAnimation(InputMedia):
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Animation duration
             in seconds.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the animation needs to be covered
             with a spoiler animation.
@@ -369,7 +369,7 @@ class InputMediaAnimation(InputMedia):
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Animation duration
             in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the animation is covered with a
             spoiler animation.
@@ -571,7 +571,7 @@ class InputMediaVideo(InputMedia):
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Video duration in seconds.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
@@ -611,7 +611,7 @@ class InputMediaVideo(InputMedia):
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
             suitable for streaming.
@@ -740,7 +740,7 @@ class InputMediaAudio(InputMedia):
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the audio
             in seconds as defined by the sender.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         performer (:obj:`str`, optional): Performer of the audio as defined by the sender or by
             audio tags.
@@ -766,7 +766,7 @@ class InputMediaAudio(InputMedia):
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Duration of the audio
             in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
             audio tags.

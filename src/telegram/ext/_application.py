@@ -785,7 +785,7 @@ class Application(
                 :paramref:`telegram.Bot.get_updates.timeout`.
                 Default is :obj:`timedelta(seconds=10)<datetime.timedelta>`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: v22.2
                     |time-period-input|
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase
                 (calling :meth:`initialize` and the boostrapping of

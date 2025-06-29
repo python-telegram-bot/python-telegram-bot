@@ -43,7 +43,7 @@ class Location(TelegramObject):
             message sending date, during which the location can be updated, in seconds. For active
             live locations only.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         heading (:obj:`int`, optional): The direction in which user is moving, in degrees;
             :tg-const:`telegram.Location.MIN_HEADING`-:tg-const:`telegram.Location.MAX_HEADING`.
@@ -60,7 +60,7 @@ class Location(TelegramObject):
             message sending date, during which the location can be updated, in seconds. For active
             live locations only.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         heading (:obj:`int`): Optional. The direction in which user is moving, in degrees;
             :tg-const:`telegram.Location.MIN_HEADING`-:tg-const:`telegram.Location.MAX_HEADING`.

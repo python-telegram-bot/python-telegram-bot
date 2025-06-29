@@ -324,7 +324,7 @@ class TransactionPartnerUser(TransactionPartner):
 
             .. versionadded:: 21.8
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 Accepts :obj:`int` objects as well as :class:`datetime.timedelta`.
         paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
             media bought by the user. for

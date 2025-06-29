@@ -41,7 +41,7 @@ class Voice(_BaseMedium):
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in
             seconds as defined by the sender.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         mime_type (:obj:`str`, optional): MIME type of the file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
@@ -55,7 +55,7 @@ class Voice(_BaseMedium):
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in seconds as
             defined by the sender.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.

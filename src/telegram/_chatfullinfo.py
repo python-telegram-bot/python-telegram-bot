@@ -178,7 +178,7 @@ class ChatFullInfo(_ChatBase):
         slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`, optional): For supergroups,
             the minimum allowed delay between consecutive messages sent by each unprivileged user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         unrestrict_boost_count (:obj:`int`, optional): For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
@@ -190,7 +190,7 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 13.4
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
@@ -349,7 +349,7 @@ class ChatFullInfo(_ChatBase):
         slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`): Optional. For supergroups,
             the minimum allowed delay between consecutive messages sent by each unprivileged user.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         unrestrict_boost_count (:obj:`int`): Optional. For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
@@ -361,7 +361,7 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 13.4
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat

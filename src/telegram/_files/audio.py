@@ -45,7 +45,7 @@ class Audio(_BaseThumbedMedium):
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in
             seconds as defined by the sender.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         performer (:obj:`str`, optional): Performer of the audio as defined by the sender or by
             audio tags.
@@ -66,7 +66,7 @@ class Audio(_BaseThumbedMedium):
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in seconds as
             defined by the sender.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
             audio tags.

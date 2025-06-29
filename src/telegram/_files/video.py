@@ -51,7 +51,7 @@ class Video(_BaseThumbedMedium):
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video
             in seconds as defined by the sender.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         file_name (:obj:`str`, optional): Original filename as defined by the sender.
         mime_type (:obj:`str`, optional): MIME type of a file as defined by the sender.
@@ -67,7 +67,7 @@ class Video(_BaseThumbedMedium):
             from which the video will play in the message
             .. versionadded:: 21.11
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
 
     Attributes:
@@ -81,7 +81,7 @@ class Video(_BaseThumbedMedium):
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in seconds
             as defined by the sender.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         file_name (:obj:`str`): Optional. Original filename as defined by the sender.
         mime_type (:obj:`str`): Optional. MIME type of a file as defined by the sender.
@@ -97,7 +97,7 @@ class Video(_BaseThumbedMedium):
             from which the video will play in the message
             .. versionadded:: 21.11
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
     """
 

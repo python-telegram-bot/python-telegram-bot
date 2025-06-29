@@ -231,7 +231,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 :paramref:`telegram.Bot.get_updates.timeout`. Defaults to
                 ``timedelta(seconds=10)``.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: v22.2
                     |time-period-input|
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of
                 will retry on failures on the Telegram server.

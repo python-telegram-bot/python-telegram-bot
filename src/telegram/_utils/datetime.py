@@ -260,7 +260,7 @@ def get_timedelta_value(
         return value
     warn(
         PTBDeprecationWarning(
-            "NEXT.VERSION",
+            "v22.2",
             f"In a future major version attribute `{attribute}` will be of type"
             " `datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true`"
             " or ``PTB_TIMEDELTA=1`` as an environment variable.",

@@ -66,7 +66,7 @@ class VideoChatEnded(TelegramObject):
     .. versionchanged:: 20.0
         This class was renamed from ``VoiceChatEnded`` in accordance to Bot API 6.0.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: v22.2
        As part of the migration to representing time periods using ``datetime.timedelta``,
        equality comparison now considers integer durations and equivalent timedeltas as equal.
 
@@ -74,13 +74,13 @@ class VideoChatEnded(TelegramObject):
         duration (:obj:`int` | :class:`datetime.timedelta`): Voice chat duration
             in seconds.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
 
     Attributes:
         duration (:obj:`int` | :class:`datetime.timedelta`): Voice chat duration in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
 
     """

@@ -4558,7 +4558,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 long polling. Defaults to ``0``, i.e. usual short polling. Should be positive,
                 short polling should be used for testing purposes only.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: v22.2
                     |time-period-input|
             allowed_updates (Sequence[:obj:`str`]), optional): A sequence the types of
                 updates you want your bot to receive. For example, specify ["message",

@@ -355,7 +355,7 @@ class Poll(TelegramObject):
         open_period (:obj:`int` | :class:`datetime.timedelta`, optional): Amount of time in seconds
             the poll will be active after creation.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
@@ -399,7 +399,7 @@ class Poll(TelegramObject):
         open_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Amount of time in seconds
             the poll will be active after creation.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
             automatically closed.

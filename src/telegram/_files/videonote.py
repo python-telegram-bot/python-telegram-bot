@@ -48,7 +48,7 @@ class VideoNote(_BaseThumbedMedium):
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in
             seconds as defined by the sender.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         file_size (:obj:`int`, optional): File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`, optional): Video thumbnail.
@@ -66,7 +66,7 @@ class VideoNote(_BaseThumbedMedium):
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in seconds as
             defined by the sender.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         file_size (:obj:`int`): Optional. File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
