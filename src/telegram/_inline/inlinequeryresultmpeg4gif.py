@@ -56,7 +56,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_duration (:obj:`int` | :class:`datetime.timedelta`, optional): Video duration
             in seconds.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         thumbnail_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4)
             thumbnail for the result.
@@ -100,7 +100,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration
             in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         thumbnail_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail
             for the result.

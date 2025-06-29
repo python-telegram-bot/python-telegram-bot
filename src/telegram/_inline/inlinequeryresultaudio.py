@@ -52,7 +52,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         audio_duration (:obj:`int` | :class:`datetime.timedelta`, optional): Audio duration
             in seconds.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         caption (:obj:`str`, optional): Caption,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
@@ -78,7 +78,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         audio_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Audio duration
             in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         caption (:obj:`str`): Optional. Caption,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities

@@ -41,14 +41,14 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`): New auto-delete time
             for messages in the chat.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
 
     Attributes:
         message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`): New auto-delete time
             for messages in the chat.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
 
     """

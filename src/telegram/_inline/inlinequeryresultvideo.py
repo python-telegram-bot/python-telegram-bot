@@ -78,7 +78,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         video_duration (:obj:`int` | :class:`datetime.timedelta`, optional): Video duration
             in seconds.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         description (:obj:`str`, optional): Short description of the result.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
@@ -119,7 +119,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         video_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration
             in seconds.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         description (:obj:`str`): Optional. Short description of the result.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached

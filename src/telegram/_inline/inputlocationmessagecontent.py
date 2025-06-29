@@ -49,7 +49,7 @@ class InputLocationMessageContent(InputMessageContent):
             :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
             locations that can be edited indefinitely.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         heading (:obj:`int`, optional): For live locations, a direction in which the user is
             moving, in degrees. Must be between
@@ -72,7 +72,7 @@ class InputLocationMessageContent(InputMessageContent):
             :tg-const:`telegram.InputLocationMessageContent.MIN_LIVE_PERIOD` and
             :tg-const:`telegram.InputLocationMessageContent.MAX_LIVE_PERIOD`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         heading (:obj:`int`): Optional. For live locations, a direction in which the user is
             moving, in degrees. Must be between

@@ -79,7 +79,7 @@ class ChatInviteLink(TelegramObject):
 
             .. versionadded:: 21.5
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         subscription_price (:obj:`int`, optional): The amount of Telegram Stars a user must pay
             initially and after each subsequent subscription period to be a member of the chat
@@ -119,7 +119,7 @@ class ChatInviteLink(TelegramObject):
 
             .. versionadded:: 21.5
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         subscription_price (:obj:`int`): Optional. The amount of Telegram Stars a user must pay
             initially and after each subsequent subscription period to be a member of the chat

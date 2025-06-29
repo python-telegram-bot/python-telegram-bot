@@ -56,7 +56,7 @@ class InlineQueryResultLocation(InlineQueryResult):
             :tg-const:`telegram.InlineQueryResultLocation.MIN_LIVE_PERIOD` and
             :tg-const:`telegram.InlineQueryResultLocation.MAX_LIVE_PERIOD`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
         heading (:obj:`int`, optional): For live locations, a direction in which the user is
             moving, in degrees. Must be between
@@ -99,7 +99,7 @@ class InlineQueryResultLocation(InlineQueryResult):
             :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
             locations that can be edited indefinitely.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
         heading (:obj:`int`): Optional. For live locations, a direction in which the user is
             moving, in degrees. Must be between

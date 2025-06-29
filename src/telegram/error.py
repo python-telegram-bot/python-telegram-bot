@@ -216,14 +216,14 @@ class RetryAfter(TelegramError):
         retry_after (:obj:`int` | :class:`datetime.timedelta`): Time in seconds, after which the
             bot can retry the request.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: v22.2
                 |time-period-input|
 
     Attributes:
         retry_after (:obj:`int` | :class:`datetime.timedelta`): Time in seconds, after which the
             bot can retry the request.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: v22.2
                 |time-period-int-deprecated|
 
     """
@@ -247,7 +247,7 @@ class RetryAfter(TelegramError):
 
     def __reduce__(self) -> tuple[type, tuple[float]]:  # type: ignore[override]
         # Until support for `int` time periods is lifted, leave pickle behaviour the same
-        # tag: deprecated: NEXT.VERSION
+        # tag: deprecated: v22.2
         return self.__class__, (int(self._retry_after.total_seconds()),)
 
 
