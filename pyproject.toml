@@ -121,7 +121,6 @@ docs = [
     "chango~=0.4.0; python_version >= '3.12'",
     "sphinx==8.2.3; python_version >= '3.11'",
     "furo==2024.8.6",
-    "furo-sphinx-search @ git+https://github.com/harshil21/furo-sphinx-search@v0.2.0.1",
     "sphinx-paramlinks==0.6.0",
     "sphinxcontrib-mermaid==1.0.0",
     "sphinx-copybutton==0.5.2",
