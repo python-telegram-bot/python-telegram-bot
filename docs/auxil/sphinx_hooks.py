@@ -55,7 +55,7 @@ PRIVATE_BASE_CLASSES = {
 }
 
 
-FILE_ROOT = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
+FILE_ROOT = Path(inspect.getsourcefile(telegram)).parent.parent.parent.resolve()
 
 
 def autodoc_skip_member(app, what, name, obj, skip, options):
