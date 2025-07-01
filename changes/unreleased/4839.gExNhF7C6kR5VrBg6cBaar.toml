@@ -1,4 +1,7 @@
-documentation = "Documentation improvements."
+documentation = """Documentation improvements.
+
+* Fix [source] linking.
+"""
 [[pull_requests]]
 uid = "4839"
 author_uid = "aelkheir"
