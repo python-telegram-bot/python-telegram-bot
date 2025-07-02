@@ -46,7 +46,7 @@ class BusinessTestBase:
     can_change_gift_settings = True
     can_convert_gifts_to_stars = True
     can_delete_all_messages = True
-    can_delete_sent_messages = True
+    can_delete_outgoing_messages = True
     can_edit_bio = True
     can_edit_name = True
     can_edit_profile_photo = True
@@ -80,7 +80,7 @@ def business_bot_rights():
         can_change_gift_settings=BusinessTestBase.can_change_gift_settings,
         can_convert_gifts_to_stars=BusinessTestBase.can_convert_gifts_to_stars,
         can_delete_all_messages=BusinessTestBase.can_delete_all_messages,
-        can_delete_sent_messages=BusinessTestBase.can_delete_sent_messages,
+        can_delete_outgoing_messages=BusinessTestBase.can_delete_outgoing_messages,
         can_edit_bio=BusinessTestBase.can_edit_bio,
         can_edit_name=BusinessTestBase.can_edit_name,
         can_edit_profile_photo=BusinessTestBase.can_edit_profile_photo,
@@ -162,7 +162,7 @@ class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
         assert isinstance(rights_dict, dict)
         assert rights_dict["can_reply"] is self.can_reply
         assert rights_dict["can_read_messages"] is self.can_read_messages
-        assert rights_dict["can_delete_sent_messages"] is self.can_delete_sent_messages
+        assert rights_dict["can_delete_outgoing_messages"] is self.can_delete_outgoing_messages
         assert rights_dict["can_delete_all_messages"] is self.can_delete_all_messages
         assert rights_dict["can_edit_name"] is self.can_edit_name
         assert rights_dict["can_edit_bio"] is self.can_edit_bio
@@ -179,7 +179,7 @@ class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
         json_dict = {
             "can_reply": self.can_reply,
             "can_read_messages": self.can_read_messages,
-            "can_delete_sent_messages": self.can_delete_sent_messages,
+            "can_delete_outgoing_messages": self.can_delete_outgoing_messages,
             "can_delete_all_messages": self.can_delete_all_messages,
             "can_edit_name": self.can_edit_name,
             "can_edit_bio": self.can_edit_bio,
@@ -196,7 +196,7 @@ class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
         rights = BusinessBotRights.de_json(json_dict, None)
         assert rights.can_reply is self.can_reply
         assert rights.can_read_messages is self.can_read_messages
-        assert rights.can_delete_sent_messages is self.can_delete_sent_messages
+        assert rights.can_delete_outgoing_messages is self.can_delete_outgoing_messages
         assert rights.can_delete_all_messages is self.can_delete_all_messages
         assert rights.can_edit_name is self.can_edit_name
         assert rights.can_edit_bio is self.can_edit_bio

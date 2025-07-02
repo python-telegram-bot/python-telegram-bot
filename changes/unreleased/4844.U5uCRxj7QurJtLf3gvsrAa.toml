@@ -1,0 +1,6 @@
+breaking = "Renamed argument and attribute ``BusinessBotRights.can_delete_sent_messages`` to ``BusinessBotRights.can_delete_outgoing_messages``. This is due to a change in the Bot API docs that was not announced in the changelog, but was introduced between Bot API 9.0 and 9.1. "
+
+[[pull_requests]]
+uid = "4844"
+author_uid = "Bibo-Joshi"
+closes_threads = []

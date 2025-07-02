@@ -49,13 +49,17 @@ class BusinessBotRights(TelegramObject):
     Two objects of this class are considered equal, if all their attributes are equal.
 
     .. versionadded:: 22.1
+    .. versionchanged:: NEXT.VERSION::
+       Renamed argument and attribute ``can_delete_sent_messages`` to
+       ``can_delete_outgoing_messages``. This is due to a change in the Bot API docs that was not
+       announced in the changelog, but was introduced between Bot API 9.0 and 9.1.
 
     Args:
         can_reply (:obj:`bool`, optional): True, if the bot can send and edit messages in the
             private chats that had incoming messages in the last 24 hours.
         can_read_messages (:obj:`bool`, optional): True, if the bot can mark incoming private
             messages as read.
-        can_delete_sent_messages (:obj:`bool`, optional): True, if the bot can delete messages
+        can_delete_outgoing_messages (:obj:`bool`, optional): True, if the bot can delete messages
             sent by the bot.
         can_delete_all_messages (:obj:`bool`, optional): True, if the bot can delete all private
             messages in managed chats.
@@ -86,7 +90,7 @@ class BusinessBotRights(TelegramObject):
             private chats that had incoming messages in the last 24 hours.
         can_read_messages (:obj:`bool`): Optional. True, if the bot can mark incoming private
             messages as read.
-        can_delete_sent_messages (:obj:`bool`): Optional. True, if the bot can delete messages
+        can_delete_outgoing_messages (:obj:`bool`): Optional. True, if the bot can delete messages
             sent by the bot.
         can_delete_all_messages (:obj:`bool`): Optional. True, if the bot can delete all private
             messages in managed chats.
@@ -117,7 +121,7 @@ class BusinessBotRights(TelegramObject):
         "can_change_gift_settings",
         "can_convert_gifts_to_stars",
         "can_delete_all_messages",
-        "can_delete_sent_messages",
+        "can_delete_outgoing_messages",
         "can_edit_bio",
         "can_edit_name",
         "can_edit_profile_photo",
@@ -134,7 +138,7 @@ class BusinessBotRights(TelegramObject):
         self,
         can_reply: Optional[bool] = None,
         can_read_messages: Optional[bool] = None,
-        can_delete_sent_messages: Optional[bool] = None,
+        can_delete_outgoing_messages: Optional[bool] = None,
         can_delete_all_messages: Optional[bool] = None,
         can_edit_name: Optional[bool] = None,
         can_edit_bio: Optional[bool] = None,
@@ -152,7 +156,7 @@ class BusinessBotRights(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.can_reply: Optional[bool] = can_reply
         self.can_read_messages: Optional[bool] = can_read_messages
-        self.can_delete_sent_messages: Optional[bool] = can_delete_sent_messages
+        self.can_delete_outgoing_messages: Optional[bool] = can_delete_outgoing_messages
         self.can_delete_all_messages: Optional[bool] = can_delete_all_messages
         self.can_edit_name: Optional[bool] = can_edit_name
         self.can_edit_bio: Optional[bool] = can_edit_bio
@@ -168,7 +172,7 @@ class BusinessBotRights(TelegramObject):
         self._id_attrs = (
             self.can_reply,
             self.can_read_messages,
-            self.can_delete_sent_messages,
+            self.can_delete_outgoing_messages,
             self.can_delete_all_messages,
             self.can_edit_name,
             self.can_edit_bio,
