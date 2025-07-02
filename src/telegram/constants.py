@@ -185,6 +185,7 @@ SUPPORTED_WEBHOOK_PORTS: Final[list[int]] = [443, 80, 88, 8443]
 
 #: :obj:`datetime.datetime`, value of unix 0.
 #: This date literal is used in :class:`telegram.InaccessibleMessage`
+#  and :class:`telegram.ChecklistTask`.
 #:
 #: .. versionadded:: 20.8
 ZERO_DATE: Final[dtm.datetime] = dtm.datetime(1970, 1, 1, tzinfo=UTC)
