@@ -1,5 +1,6 @@
 from bot.handlers.index import index
-from bot.handlers.notadoi import notadoi  # importă handlerul explicit
+from bot.handlers.review import review
+from bot.handlers.notadoi import notadoi
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from dotenv import load_dotenv
 import os
@@ -14,8 +15,9 @@ def main():
     # Comenzi clasice (ex: /start, /notadoi)
     for k, v in index().items():
         dp.add_handler(CommandHandler(k, v))
-    # Handler pentru textul exact de la buton
-    dp.add_handler(MessageHandler(Filters.text("Nota Doi"), notadoi))
+    # Handler pentru textul de la butoane din meniu
+    dp.add_handler(MessageHandler(Filters.regex(r"^Nota Doi$"), notadoi))
+    dp.add_handler(MessageHandler(Filters.regex(r"^Scrie Recenzie$"), review))
     updater.start_polling()
     updater.idle()
 

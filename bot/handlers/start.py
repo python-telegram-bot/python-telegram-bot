@@ -2,7 +2,7 @@ from telegram import ReplyKeyboardMarkup
 
 def start(update, context):
     keyboard = [
-        ["Meniu", "Contact"],
+        ["Scrie Recenzie", "Contact"],
         ["Nota Doi"]
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)

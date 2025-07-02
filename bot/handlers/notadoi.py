@@ -1,7 +1,7 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 
-def notadoi (update: Update, context: CallbackContext):
+def notadoi(update, context):
     keyboard = [
         [InlineKeyboardButton("Blog", url="https://www.notadoi.com/blog")],
         [InlineKeyboardButton("Newsletter", url="https://www.notadoi.com/newsletters/anti-scrisori-cu-intrebari-interzise-2")],
