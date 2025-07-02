@@ -1,0 +1,356 @@
+#!/usr/bin/env python
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2022
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
+#
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""A library that provides a Python interface to the Telegram Bot API"""
+
+from .base import TelegramObject
+from .botcommand import BotCommand
+from .webappdata import WebAppData
+from .webappinfo import WebAppInfo
+from .sentwebappmessage import SentWebAppMessage
+from .menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
+from .loginurl import LoginUrl
+from .games.callbackgame import CallbackGame
+from .user import User
+from .files.chatphoto import ChatPhoto
+from .chat import Chat
+from .chatadministratorrights import ChatAdministratorRights
+from .chatlocation import ChatLocation
+from .chatinvitelink import ChatInviteLink
+from .chatjoinrequest import ChatJoinRequest
+from .chatmember import (
+    ChatMember,
+    ChatMemberOwner,
+    ChatMemberAdministrator,
+    ChatMemberMember,
+    ChatMemberRestricted,
+    ChatMemberLeft,
+    ChatMemberBanned,
+)
+from .chatmemberupdated import ChatMemberUpdated
+from .chatpermissions import ChatPermissions
+from .files.photosize import PhotoSize
+from .files.audio import Audio
+from .files.voice import Voice
+from .files.document import Document
+from .files.animation import Animation
+from .files.sticker import Sticker, StickerSet, MaskPosition
+from .files.video import Video
+from .files.contact import Contact
+from .files.location import Location
+from .files.venue import Venue
+from .files.videonote import VideoNote
+from .chataction import ChatAction
+from .dice import Dice
+from .userprofilephotos import UserProfilePhotos
+from .keyboardbuttonpolltype import KeyboardButtonPollType
+from .keyboardbutton import KeyboardButton
+from .replymarkup import ReplyMarkup
+from .replykeyboardmarkup import ReplyKeyboardMarkup
+from .replykeyboardremove import ReplyKeyboardRemove
+from .forcereply import ForceReply
+from .forumtopic import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
+from .error import TelegramError
+from .files.inputfile import InputFile
+from .files.file import File
+from .parsemode import ParseMode
+from .messageentity import MessageEntity
+from .messageid import MessageId
+from .games.game import Game
+from .poll import Poll, PollOption, PollAnswer
+from .voicechat import (
+    VoiceChatStarted,
+    VoiceChatEnded,
+    VoiceChatParticipantsInvited,
+    VoiceChatScheduled,
+)
+from .videochat import (
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
+)
+from .proximityalerttriggered import ProximityAlertTriggered
+from .payment.shippingaddress import ShippingAddress
+from .payment.orderinfo import OrderInfo
+from .payment.successfulpayment import SuccessfulPayment
+from .payment.invoice import Invoice
+from .passport.credentials import EncryptedCredentials
+from .passport.passportfile import PassportFile
+from .passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
+from .passport.encryptedpassportelement import EncryptedPassportElement
+from .passport.passportdata import PassportData
+from .inline.inlinekeyboardbutton import InlineKeyboardButton
+from .inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from .messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
+from .message import Message
+from .callbackquery import CallbackQuery
+from .choseninlineresult import ChosenInlineResult
+from .inline.inputmessagecontent import InputMessageContent
+from .inline.inlinequery import InlineQuery
+from .inline.inlinequeryresult import InlineQueryResult
+from .inline.inlinequeryresultarticle import InlineQueryResultArticle
+from .inline.inlinequeryresultaudio import InlineQueryResultAudio
+from .inline.inlinequeryresultcachedaudio import InlineQueryResultCachedAudio
+from .inline.inlinequeryresultcacheddocument import InlineQueryResultCachedDocument
+from .inline.inlinequeryresultcachedgif import InlineQueryResultCachedGif
+from .inline.inlinequeryresultcachedmpeg4gif import InlineQueryResultCachedMpeg4Gif
+from .inline.inlinequeryresultcachedphoto import InlineQueryResultCachedPhoto
+from .inline.inlinequeryresultcachedsticker import InlineQueryResultCachedSticker
+from .inline.inlinequeryresultcachedvideo import InlineQueryResultCachedVideo
+from .inline.inlinequeryresultcachedvoice import InlineQueryResultCachedVoice
+from .inline.inlinequeryresultcontact import InlineQueryResultContact
+from .inline.inlinequeryresultdocument import InlineQueryResultDocument
+from .inline.inlinequeryresultgif import InlineQueryResultGif
+from .inline.inlinequeryresultlocation import InlineQueryResultLocation
+from .inline.inlinequeryresultmpeg4gif import InlineQueryResultMpeg4Gif
+from .inline.inlinequeryresultphoto import InlineQueryResultPhoto
+from .inline.inlinequeryresultvenue import InlineQueryResultVenue
+from .inline.inlinequeryresultvideo import InlineQueryResultVideo
+from .inline.inlinequeryresultvoice import InlineQueryResultVoice
+from .inline.inlinequeryresultgame import InlineQueryResultGame
+from .inline.inputtextmessagecontent import InputTextMessageContent
+from .inline.inputlocationmessagecontent import InputLocationMessageContent
+from .inline.inputvenuemessagecontent import InputVenueMessageContent
+from .payment.labeledprice import LabeledPrice
+from .inline.inputinvoicemessagecontent import InputInvoiceMessageContent
+from .inline.inputcontactmessagecontent import InputContactMessageContent
+from .payment.shippingoption import ShippingOption
+from .payment.precheckoutquery import PreCheckoutQuery
+from .payment.shippingquery import ShippingQuery
+from .webhookinfo import WebhookInfo
+from .games.gamehighscore import GameHighScore
+from .update import Update
+from .files.inputmedia import (
+    InputMedia,
+    InputMediaVideo,
+    InputMediaPhoto,
+    InputMediaAnimation,
+    InputMediaAudio,
+    InputMediaDocument,
+)
+from .constants import (
+    MAX_MESSAGE_LENGTH,
+    MAX_CAPTION_LENGTH,
+    SUPPORTED_WEBHOOK_PORTS,
+    MAX_FILESIZE_DOWNLOAD,
+    MAX_FILESIZE_UPLOAD,
+    MAX_MESSAGES_PER_SECOND_PER_CHAT,
+    MAX_MESSAGES_PER_SECOND,
+    MAX_MESSAGES_PER_MINUTE_PER_GROUP,
+)
+from .passport.passportelementerrors import (
+    PassportElementError,
+    PassportElementErrorDataField,
+    PassportElementErrorFile,
+    PassportElementErrorFiles,
+    PassportElementErrorFrontSide,
+    PassportElementErrorReverseSide,
+    PassportElementErrorSelfie,
+    PassportElementErrorTranslationFile,
+    PassportElementErrorTranslationFiles,
+    PassportElementErrorUnspecified,
+)
+from .passport.credentials import (
+    Credentials,
+    DataCredentials,
+    SecureData,
+    SecureValue,
+    FileCredentials,
+    TelegramDecryptionError,
+)
+from .botcommandscope import (
+    BotCommandScope,
+    BotCommandScopeDefault,
+    BotCommandScopeAllPrivateChats,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllChatAdministrators,
+    BotCommandScopeChat,
+    BotCommandScopeChatAdministrators,
+    BotCommandScopeChatMember,
+)
+from .bot import Bot
+from .version import __version__, bot_api_version  # noqa: F401
+
+__author__ = 'devs@python-telegram-bot.org'
+
+__all__ = (  # Keep this alphabetically ordered
+    'Animation',
+    'Audio',
+    'Bot',
+    'BotCommand',
+    'BotCommandScope',
+    'BotCommandScopeAllChatAdministrators',
+    'BotCommandScopeAllGroupChats',
+    'BotCommandScopeAllPrivateChats',
+    'BotCommandScopeChat',
+    'BotCommandScopeChatAdministrators',
+    'BotCommandScopeChatMember',
+    'BotCommandScopeDefault',
+    'CallbackGame',
+    'CallbackQuery',
+    'Chat',
+    'ChatAdministratorRights',
+    'ChatAction',
+    'ChatInviteLink',
+    'ChatJoinRequest',
+    'ChatLocation',
+    'ChatMember',
+    'ChatMemberOwner',
+    'ChatMemberAdministrator',
+    'ChatMemberMember',
+    'ChatMemberRestricted',
+    'ChatMemberLeft',
+    'ChatMemberBanned',
+    'ChatMemberUpdated',
+    'ChatPermissions',
+    'ChatPhoto',
+    'ChosenInlineResult',
+    'Contact',
+    'Credentials',
+    'DataCredentials',
+    'Dice',
+    'Document',
+    'EncryptedCredentials',
+    'EncryptedPassportElement',
+    'File',
+    'FileCredentials',
+    'ForceReply',
+    'ForumTopic',
+    'ForumTopicClosed',
+    'ForumTopicCreated',
+    'ForumTopicReopened',
+    'Game',
+    'GameHighScore',
+    'IdDocumentData',
+    'InlineKeyboardButton',
+    'InlineKeyboardMarkup',
+    'InlineQuery',
+    'InlineQueryResult',
+    'InlineQueryResultArticle',
+    'InlineQueryResultAudio',
+    'InlineQueryResultCachedAudio',
+    'InlineQueryResultCachedDocument',
+    'InlineQueryResultCachedGif',
+    'InlineQueryResultCachedMpeg4Gif',
+    'InlineQueryResultCachedPhoto',
+    'InlineQueryResultCachedSticker',
+    'InlineQueryResultCachedVideo',
+    'InlineQueryResultCachedVoice',
+    'InlineQueryResultContact',
+    'InlineQueryResultDocument',
+    'InlineQueryResultGame',
+    'InlineQueryResultGif',
+    'InlineQueryResultLocation',
+    'InlineQueryResultMpeg4Gif',
+    'InlineQueryResultPhoto',
+    'InlineQueryResultVenue',
+    'InlineQueryResultVideo',
+    'InlineQueryResultVoice',
+    'InputContactMessageContent',
+    'InputFile',
+    'InputInvoiceMessageContent',
+    'InputLocationMessageContent',
+    'InputMedia',
+    'InputMediaAnimation',
+    'InputMediaAudio',
+    'InputMediaDocument',
+    'InputMediaPhoto',
+    'InputMediaVideo',
+    'InputMessageContent',
+    'InputTextMessageContent',
+    'InputVenueMessageContent',
+    'Invoice',
+    'KeyboardButton',
+    'KeyboardButtonPollType',
+    'LabeledPrice',
+    'Location',
+    'LoginUrl',
+    'MAX_CAPTION_LENGTH',
+    'MAX_FILESIZE_DOWNLOAD',
+    'MAX_FILESIZE_UPLOAD',
+    'MAX_MESSAGES_PER_MINUTE_PER_GROUP',
+    'MAX_MESSAGES_PER_SECOND',
+    'MAX_MESSAGES_PER_SECOND_PER_CHAT',
+    'MAX_MESSAGE_LENGTH',
+    'MaskPosition',
+    'MenuButton',
+    'MenuButtonCommands',
+    'MenuButtonDefault',
+    'MenuButtonWebApp',
+    'Message',
+    'MessageAutoDeleteTimerChanged',
+    'MessageEntity',
+    'MessageId',
+    'OrderInfo',
+    'ParseMode',
+    'PassportData',
+    'PassportElementError',
+    'PassportElementErrorDataField',
+    'PassportElementErrorFile',
+    'PassportElementErrorFiles',
+    'PassportElementErrorFrontSide',
+    'PassportElementErrorReverseSide',
+    'PassportElementErrorSelfie',
+    'PassportElementErrorTranslationFile',
+    'PassportElementErrorTranslationFiles',
+    'PassportElementErrorUnspecified',
+    'PassportFile',
+    'PersonalDetails',
+    'PhotoSize',
+    'Poll',
+    'PollAnswer',
+    'PollOption',
+    'PreCheckoutQuery',
+    'ProximityAlertTriggered',
+    'ReplyKeyboardMarkup',
+    'ReplyKeyboardRemove',
+    'ReplyMarkup',
+    'ResidentialAddress',
+    'SUPPORTED_WEBHOOK_PORTS',
+    'SecureData',
+    'SecureValue',
+    'SentWebAppMessage',
+    'ShippingAddress',
+    'ShippingOption',
+    'ShippingQuery',
+    'Sticker',
+    'StickerSet',
+    'SuccessfulPayment',
+    'TelegramDecryptionError',
+    'TelegramError',
+    'TelegramObject',
+    'Update',
+    'User',
+    'UserProfilePhotos',
+    'Venue',
+    'Video',
+    'VideoChatEnded',
+    'VideoChatParticipantsInvited',
+    'VideoChatScheduled',
+    'VideoChatStarted',
+    'VideoNote',
+    'Voice',
+    'VoiceChatStarted',
+    'VoiceChatEnded',
+    'VoiceChatScheduled',
+    'VoiceChatParticipantsInvited',
+    'WebAppData',
+    'WebAppInfo',
+    'WebhookInfo',
+)

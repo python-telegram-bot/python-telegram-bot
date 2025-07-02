@@ -1,0 +1,6 @@
+configuration.yaml
+test*.py
+Pipfile
+Pipfile.lock
+ideas.txt
+.DS_Store

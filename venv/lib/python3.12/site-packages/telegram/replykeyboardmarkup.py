@@ -1,0 +1,291 @@
+#!/usr/bin/env python
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2022
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
+#
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
+
+from typing import Any, List, Union, Sequence
+
+from telegram import KeyboardButton, ReplyMarkup
+from telegram.utils.types import JSONDict
+
+
+class ReplyKeyboardMarkup(ReplyMarkup):
+    """This object represents a custom keyboard with reply options.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their the size of :attr:`keyboard` and all the buttons are equal.
+
+    Example:
+        A user requests to change the bot's language, bot replies to the request with a keyboard
+        to select the new language. Other users in the group don't see the keyboard.
+
+    Args:
+        keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
+                each represented by an Array of :class:`telegram.KeyboardButton` objects.
+        resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard vertically
+            for optimal fit (e.g., make the keyboard smaller if there are just two rows of
+            buttons). Defaults to :obj:`False`, in which case the custom keyboard is always of the
+            same height as the app's standard keyboard.
+        one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as soon as
+            it's been used. The keyboard will still be available, but clients will automatically
+            display the usual letter-keyboard in the chat - the user can press a special button in
+            the input field to see the custom keyboard again. Defaults to :obj:`False`.
+        selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard to
+            specific users only. Targets:
+
+            1) Users that are @mentioned in the :attr:`~telegram.Message.text` of the
+               :class:`telegram.Message` object.
+            2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+               original message.
+
+            Defaults to :obj:`False`.
+
+        input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
+            field when the keyboard is active; 1-64 characters.
+
+            .. versionadded:: 13.7
+
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
+        resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
+        one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
+            it's been used.
+        selective (:obj:`bool`): Optional. Show the keyboard to specific users only.
+        input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
+            field when the reply is active.
+
+            .. versionadded:: 13.7
+
+    """
+
+    __slots__ = (
+        'selective',
+        'keyboard',
+        'resize_keyboard',
+        'one_time_keyboard',
+        'input_field_placeholder',
+        '_id_attrs',
+    )
+
+    def __init__(
+        self,
+        keyboard: Sequence[Sequence[Union[str, KeyboardButton]]],
+        resize_keyboard: bool = False,
+        one_time_keyboard: bool = False,
+        selective: bool = False,
+        input_field_placeholder: str = None,
+        **_kwargs: Any,
+    ):
+        # Required
+        self.keyboard = []
+        for row in keyboard:
+            button_row = []
+            for button in row:
+                if isinstance(button, KeyboardButton):
+                    button_row.append(button)  # telegram.KeyboardButton
+                else:
+                    button_row.append(KeyboardButton(button))  # str
+            self.keyboard.append(button_row)
+
+        # Optionals
+        self.resize_keyboard = bool(resize_keyboard)
+        self.one_time_keyboard = bool(one_time_keyboard)
+        self.selective = bool(selective)
+        self.input_field_placeholder = input_field_placeholder
+
+        self._id_attrs = (self.keyboard,)
+
+    def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        data = super().to_dict()
+
+        data['keyboard'] = []
+        for row in self.keyboard:
+            data['keyboard'].append([button.to_dict() for button in row])
+        return data
+
+    @classmethod
+    def from_button(
+        cls,
+        button: Union[KeyboardButton, str],
+        resize_keyboard: bool = False,
+        one_time_keyboard: bool = False,
+        selective: bool = False,
+        input_field_placeholder: str = None,
+        **kwargs: object,
+    ) -> 'ReplyKeyboardMarkup':
+        """Shortcut for::
+
+            ReplyKeyboardMarkup([[button]], **kwargs)
+
+        Return a ReplyKeyboardMarkup from a single KeyboardButton.
+
+        Args:
+            button (:class:`telegram.KeyboardButton` | :obj:`str`): The button to use in
+                the markup.
+            resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
+                vertically for optimal fit (e.g., make the keyboard smaller if there are just two
+                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
+                always of the same height as the app's standard keyboard.
+            one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
+                soon as it's been used. The keyboard will still be available, but clients will
+                automatically display the usual letter-keyboard in the chat - the user can press
+                a special button in the input field to see the custom keyboard again.
+                Defaults to :obj:`False`.
+            selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
+                to specific users only. Targets:
+
+                1) Users that are @mentioned in the text of the Message object.
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+                   original message.
+
+                Defaults to :obj:`False`.
+
+            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
+                field when the reply is active.
+
+                .. versionadded:: 13.7
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+        """
+        return cls(
+            [[button]],
+            resize_keyboard=resize_keyboard,
+            one_time_keyboard=one_time_keyboard,
+            selective=selective,
+            input_field_placeholder=input_field_placeholder,
+            **kwargs,
+        )
+
+    @classmethod
+    def from_row(
+        cls,
+        button_row: List[Union[str, KeyboardButton]],
+        resize_keyboard: bool = False,
+        one_time_keyboard: bool = False,
+        selective: bool = False,
+        input_field_placeholder: str = None,
+        **kwargs: object,
+    ) -> 'ReplyKeyboardMarkup':
+        """Shortcut for::
+
+            ReplyKeyboardMarkup([button_row], **kwargs)
+
+        Return a ReplyKeyboardMarkup from a single row of KeyboardButtons.
+
+        Args:
+            button_row (List[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to use in
+                the markup.
+            resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
+                vertically for optimal fit (e.g., make the keyboard smaller if there are just two
+                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
+                always of the same height as the app's standard keyboard.
+            one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
+                soon as it's been used. The keyboard will still be available, but clients will
+                automatically display the usual letter-keyboard in the chat - the user can press
+                a special button in the input field to see the custom keyboard again.
+                Defaults to :obj:`False`.
+            selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
+                to specific users only. Targets:
+
+                1) Users that are @mentioned in the text of the Message object.
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+                   original message.
+
+                Defaults to :obj:`False`.
+
+            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
+                field when the reply is active.
+
+                .. versionadded:: 13.7
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        """
+        return cls(
+            [button_row],
+            resize_keyboard=resize_keyboard,
+            one_time_keyboard=one_time_keyboard,
+            selective=selective,
+            input_field_placeholder=input_field_placeholder,
+            **kwargs,
+        )
+
+    @classmethod
+    def from_column(
+        cls,
+        button_column: List[Union[str, KeyboardButton]],
+        resize_keyboard: bool = False,
+        one_time_keyboard: bool = False,
+        selective: bool = False,
+        input_field_placeholder: str = None,
+        **kwargs: object,
+    ) -> 'ReplyKeyboardMarkup':
+        """Shortcut for::
+
+            ReplyKeyboardMarkup([[button] for button in button_column], **kwargs)
+
+        Return a ReplyKeyboardMarkup from a single column of KeyboardButtons.
+
+        Args:
+            button_column (List[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to use
+                in the markup.
+            resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
+                vertically for optimal fit (e.g., make the keyboard smaller if there are just two
+                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
+                always of the same height as the app's standard keyboard.
+            one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
+                soon as it's been used. The keyboard will still be available, but clients will
+                automatically display the usual letter-keyboard in the chat - the user can press
+                a special button in the input field to see the custom keyboard again.
+                Defaults to :obj:`False`.
+            selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
+                to specific users only. Targets:
+
+                1) Users that are @mentioned in the text of the Message object.
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+                   original message.
+
+                Defaults to :obj:`False`.
+
+            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
+                field when the reply is active.
+
+                .. versionadded:: 13.7
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        """
+        button_grid = [[button] for button in button_column]
+        return cls(
+            button_grid,
+            resize_keyboard=resize_keyboard,
+            one_time_keyboard=one_time_keyboard,
+            selective=selective,
+            input_field_placeholder=input_field_placeholder,
+            **kwargs,
+        )
+
+    def __hash__(self) -> int:
+        return hash(
+            (
+                tuple(tuple(button for button in row) for row in self.keyboard),
+                self.resize_keyboard,
+                self.one_time_keyboard,
+                self.selective,
+            )
+        )

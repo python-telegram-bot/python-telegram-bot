@@ -1,5 +1,0 @@
-internal = "Bump actions/setup-python from 5.4.0 to 5.5.0"
-[[pull_requests]]
-uid = "4742"
-author_uid = "dependabot"
-closes_threads = []

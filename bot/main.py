@@ -1,27 +1,23 @@
-from bot.handlers.basic import register_basic_handlers
-from bot.handlers.subscribe import register_abonare_handler
-from bot.config import TOKEN, WEBHOOK_URL
-from telegram.ext import ApplicationBuilder
+from bot.handlers.index import index
+from bot.handlers.notadoi import notadoi  # importă handlerul explicit
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from dotenv import load_dotenv
 import os
 
-app = ApplicationBuilder().token(TOKEN).build()
+# Încarcă variabilele din .env (inclusiv TOKEN-ul)
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
 
-register_basic_handlers(app)
-register_abonare_handler(app)
-
-async def run_webhook():
-    print("🚀 Pornit în mod WEBHOOK")
-    await app.initialize()
-    await app.start()
-    await app.updater.start_webhook(
-        listen="0.0.0.0",
-        port=int(os.environ.get("PORT", 8000)),
-        url_path="/webhook",
-        webhook_url=WEBHOOK_URL,
-    )
-    import asyncio
-    await asyncio.Event().wait()
+def main():
+    updater = Updater(TOKEN)
+    dp = updater.dispatcher
+    # Comenzi clasice (ex: /start, /notadoi)
+    for k, v in index().items():
+        dp.add_handler(CommandHandler(k, v))
+    # Handler pentru textul exact de la buton
+    dp.add_handler(MessageHandler(Filters.text("Nota Doi"), notadoi))
+    updater.start_polling()
+    updater.idle()
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(run_webhook())
+    main()

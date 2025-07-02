@@ -1,0 +1,20 @@
+mode: dev
+prod:
+  - botname: My Production Bot
+    username: my_production_bot
+    token: 
+      1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
+    about:
+      "this is some short text about my bot"
+    description:
+      "This is a description of what my bot can do which customer will use"
+
+dev:
+  - botname: Development Bot
+    username: my_development_bot
+    token: 
+      1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
+    about:
+      "this is some short text about development bot  "
+    description:
+      "This is a description of what my development bot can do with testing"

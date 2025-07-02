@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  python_telegram_bot:
+    container_name: "python-telegram-bot"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      - pipenv
+      - run
+      - python
+      - main.py
+    restart: "no"
