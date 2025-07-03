@@ -1,0 +1,16 @@
+highlights = "Full Support for Bot API 9.1"
+
+breaking = "Optional Section Content"
+security = "Optional Section Content"
+deprecations = "Optional Section Content"
+features = "Optional Section Content"
+bugfixes = "Optional Section Content"
+dependencies = "Optional Section Content"
+other = "Optional Section Content"
+documentation = "Optional Section Content"
+internal = "Optional Section Content"
+
+[[pull_requests]]
+uid = "4847"
+author_uid = "Bibo-Joshi"
+closes_threads = ["4845"]
