@@ -21,9 +21,10 @@ import datetime as dtm
 import pytest
 
 from telegram import ChecklistTask, Dice, MessageEntity, User
-from telegram._checklists import Checklist
+from telegram._checklists import Checklist, ChecklistTasksDone
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ZERO_DATE
+from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
 
@@ -81,6 +82,7 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
         assert clt.text_entities == tuple(self.text_entities)
         assert clt.completed_by_user == self.completed_by_user
         assert clt.completion_date == self.completion_date
+        assert clt.api_kwargs == {}
 
     def test_de_json_required_fields(self, offline_bot):
         json_dict = {
@@ -94,6 +96,7 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
         assert clt.text_entities == ()
         assert clt.completed_by_user is None
         assert clt.completion_date is None
+        assert clt.api_kwargs == {}
 
     def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
@@ -228,6 +231,7 @@ class TestChecklistWithoutRequest(ChecklistTestBase):
         assert cl.tasks == tuple(self.tasks)
         assert cl.others_can_add_tasks is self.others_can_add_tasks
         assert cl.others_can_mark_tasks_as_done is self.others_can_mark_tasks_as_done
+        assert cl.api_kwargs == {}
 
     def test_de_json_required_fields(self, offline_bot):
         json_dict = {
@@ -275,3 +279,77 @@ class TestChecklistWithoutRequest(ChecklistTestBase):
 
         assert cl1 != cl4
         assert hash(cl1) != hash(cl4)
+
+
+class ChecklistTasksDoneTestBase:
+    checklist_message = make_message("Checklist message")
+    marked_as_done_task_ids = [1, 2, 3]
+    marked_as_not_done_task_ids = [4, 5]
+
+
+@pytest.fixture(scope="module")
+def checklist_tasks_done():
+    return ChecklistTasksDone(
+        checklist_message=ChecklistTasksDoneTestBase.checklist_message,
+        marked_as_done_task_ids=ChecklistTasksDoneTestBase.marked_as_done_task_ids,
+        marked_as_not_done_task_ids=ChecklistTasksDoneTestBase.marked_as_not_done_task_ids,
+    )
+
+
+class TestChecklistTasksDoneWithoutRequest(ChecklistTasksDoneTestBase):
+    def test_slot_behaviour(self, checklist_tasks_done):
+        for attr in checklist_tasks_done.__slots__:
+            assert getattr(checklist_tasks_done, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(checklist_tasks_done)) == len(
+            set(mro_slots(checklist_tasks_done))
+        ), "duplicate slot"
+
+    def test_to_dict(self, checklist_tasks_done):
+        cltd_dict = checklist_tasks_done.to_dict()
+        assert isinstance(cltd_dict, dict)
+        assert cltd_dict["checklist_message"] == self.checklist_message.to_dict()
+        assert cltd_dict["marked_as_done_task_ids"] == self.marked_as_done_task_ids
+        assert cltd_dict["marked_as_not_done_task_ids"] == self.marked_as_not_done_task_ids
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "checklist_message": self.checklist_message.to_dict(),
+            "marked_as_done_task_ids": self.marked_as_done_task_ids,
+            "marked_as_not_done_task_ids": self.marked_as_not_done_task_ids,
+        }
+        cltd = ChecklistTasksDone.de_json(json_dict, offline_bot)
+        assert isinstance(cltd, ChecklistTasksDone)
+        assert cltd.checklist_message == self.checklist_message
+        assert cltd.marked_as_done_task_ids == tuple(self.marked_as_done_task_ids)
+        assert cltd.marked_as_not_done_task_ids == tuple(self.marked_as_not_done_task_ids)
+        assert cltd.api_kwargs == {}
+
+    def test_de_json_required_fields(self, offline_bot):
+        cltd = ChecklistTasksDone.de_json({}, offline_bot)
+        assert isinstance(cltd, ChecklistTasksDone)
+        assert cltd.checklist_message is None
+        assert cltd.marked_as_done_task_ids == ()
+        assert cltd.marked_as_not_done_task_ids == ()
+        assert cltd.api_kwargs == {}
+
+    def test_equality(self, checklist_tasks_done):
+        cltd1 = checklist_tasks_done
+        cltd2 = ChecklistTasksDone(
+            checklist_message=None,
+            marked_as_done_task_ids=[1, 2, 3],
+            marked_as_not_done_task_ids=[4, 5],
+        )
+        cltd3 = ChecklistTasksDone(
+            checklist_message=make_message("Checklist message"),
+            marked_as_done_task_ids=[1, 2, 3],
+        )
+        cltd4 = make_message("Not a checklist tasks done")
+
+        assert cltd1 == cltd2
+        assert hash(cltd1) == hash(cltd2)
+
+        assert cltd1 != cltd3
+        assert hash(cltd1) != hash(cltd3)
+
+        assert cltd1 != cltd4
+        assert hash(cltd1) != hash(cltd4)

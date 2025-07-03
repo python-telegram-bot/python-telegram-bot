@@ -21,6 +21,7 @@ import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
+from telegram._message import Message
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -264,3 +265,69 @@ class Checklist(TelegramObject):
             the text that belongs to them, calculated based on UTF-16 codepoints.
         """
         return parse_message_entities(self.title, self.title_entities, types)
+
+
+class ChecklistTasksDone(TelegramObject):
+    """
+    Describes a service message about checklist tasks marked as done or not done.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their :attr:`marked_as_done_task_ids` and
+    :attr:`marked_as_not_done_task_ids` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        checklist_message (:class:`telegram.Message`, optional): Message containing the checklist
+            whose tasks were marked as done or not done. Note that the ~:class:`telegram.Message`
+            object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
+            field even if it itself is a reply.
+        marked_as_done_task_ids (Sequence[:obj:`int`], optional): Identifiers of the tasks that
+            were marked as done
+        marked_as_not_done_task_ids (Sequence[:obj:`int`], optional): Identifiers of the tasks that
+            were marked as not done
+
+    Attributes:
+        checklist_message (:class:`telegram.Message`): Optional. Message containing the checklist
+            whose tasks were marked as done or not done. Note that the ~:class:`telegram.Message`
+            object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
+            field even if it itself is a reply.
+        marked_as_done_task_ids (Tuple[:obj:`int`]): Identifiers of the tasks that were marked
+            as done
+        marked_as_not_done_task_ids (Tuple[:obj:`int`]): Identifiers of the tasks that were
+            marked as not done
+    """
+
+    __slots__ = (
+        "checklist_message",
+        "marked_as_done_task_ids",
+        "marked_as_not_done_task_ids",
+    )
+
+    def __init__(
+        self,
+        checklist_message: Optional[Message] = None,
+        marked_as_done_task_ids: Optional[Sequence[int]] = None,
+        marked_as_not_done_task_ids: Optional[Sequence[int]] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.checklist_message: Optional[Message] = checklist_message
+        self.marked_as_done_task_ids: tuple[int, ...] = parse_sequence_arg(marked_as_done_task_ids)
+        self.marked_as_not_done_task_ids: tuple[int, ...] = parse_sequence_arg(
+            marked_as_not_done_task_ids
+        )
+
+        self._id_attrs = (self.marked_as_done_task_ids, self.marked_as_not_done_task_ids)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChecklistTasksDone":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["checklist_message"] = de_json_optional(data.get("checklist_message"), Message, bot)
+
+        return super().de_json(data=data, bot=bot)

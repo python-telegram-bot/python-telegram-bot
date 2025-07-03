@@ -33,6 +33,7 @@ Available Types
     telegram.chatbackground
     telegram.checklist
     telegram.checklisttask
+    telegram.checklisttasksdone
     telegram.copytextbutton
     telegram.backgroundtype
     telegram.backgroundtypefill
