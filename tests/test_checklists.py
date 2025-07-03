@@ -20,7 +20,8 @@ import datetime as dtm
 
 import pytest
 
-from telegram import ChecklistTask, MessageEntity, User
+from telegram import ChecklistTask, Dice, MessageEntity, User
+from telegram._checklists import Checklist
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ZERO_DATE
 from tests.auxil.slots import mro_slots
@@ -154,9 +155,123 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
             id=self.id + 1,
             text=self.text,
         )
+        clt4 = Dice(value=1, emoji="🎲")
 
         assert clt1 == clt2
         assert hash(clt1) == hash(clt2)
 
         assert clt1 != clt3
         assert hash(clt1) != hash(clt3)
+
+        assert clt1 != clt4
+        assert hash(clt1) != hash(clt4)
+
+
+class ChecklistTestBase:
+    title = "Checklist Title"
+    title_entities = [
+        MessageEntity(type="bold", offset=0, length=9),
+        MessageEntity(type="italic", offset=10, length=5),
+    ]
+    tasks = [
+        ChecklistTask(
+            id=1,
+            text="Task 1",
+        ),
+        ChecklistTask(
+            id=2,
+            text="Task 2",
+        ),
+    ]
+    others_can_add_tasks = True
+    others_can_mark_tasks_as_done = False
+
+
+@pytest.fixture(scope="module")
+def checklist():
+    return Checklist(
+        title=ChecklistTestBase.title,
+        title_entities=ChecklistTestBase.title_entities,
+        tasks=ChecklistTestBase.tasks,
+        others_can_add_tasks=ChecklistTestBase.others_can_add_tasks,
+        others_can_mark_tasks_as_done=ChecklistTestBase.others_can_mark_tasks_as_done,
+    )
+
+
+class TestChecklistWithoutRequest(ChecklistTestBase):
+    def test_slot_behaviour(self, checklist):
+        for attr in checklist.__slots__:
+            assert getattr(checklist, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(checklist)) == len(set(mro_slots(checklist))), "duplicate slot"
+
+    def test_to_dict(self, checklist):
+        cl_dict = checklist.to_dict()
+        assert isinstance(cl_dict, dict)
+        assert cl_dict["title"] == self.title
+        assert cl_dict["title_entities"] == [entity.to_dict() for entity in self.title_entities]
+        assert cl_dict["tasks"] == [task.to_dict() for task in self.tasks]
+        assert cl_dict["others_can_add_tasks"] is self.others_can_add_tasks
+        assert cl_dict["others_can_mark_tasks_as_done"] is self.others_can_mark_tasks_as_done
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "title": self.title,
+            "title_entities": [entity.to_dict() for entity in self.title_entities],
+            "tasks": [task.to_dict() for task in self.tasks],
+            "others_can_add_tasks": self.others_can_add_tasks,
+            "others_can_mark_tasks_as_done": self.others_can_mark_tasks_as_done,
+        }
+        cl = Checklist.de_json(json_dict, offline_bot)
+        assert isinstance(cl, Checklist)
+        assert cl.title == self.title
+        assert cl.title_entities == tuple(self.title_entities)
+        assert cl.tasks == tuple(self.tasks)
+        assert cl.others_can_add_tasks is self.others_can_add_tasks
+        assert cl.others_can_mark_tasks_as_done is self.others_can_mark_tasks_as_done
+
+    def test_de_json_required_fields(self, offline_bot):
+        json_dict = {
+            "title": self.title,
+            "tasks": [task.to_dict() for task in self.tasks],
+        }
+        cl = Checklist.de_json(json_dict, offline_bot)
+        assert isinstance(cl, Checklist)
+        assert cl.title == self.title
+        assert cl.title_entities == ()
+        assert cl.tasks == tuple(self.tasks)
+        assert not cl.others_can_add_tasks
+        assert not cl.others_can_mark_tasks_as_done
+
+    def test_parse_entity(self, checklist):
+        assert checklist.parse_entity(checklist.title_entities[0]) == "Checklist"
+        assert checklist.parse_entity(checklist.title_entities[1]) == "Title"
+
+    def test_parse_entities(self, checklist):
+        assert checklist.parse_entities(MessageEntity.BOLD) == {
+            checklist.title_entities[0]: "Checklist"
+        }
+        assert checklist.parse_entities() == {
+            checklist.title_entities[0]: "Checklist",
+            checklist.title_entities[1]: "Title",
+        }
+
+    def test_equality(self, checklist, checklist_task):
+        cl1 = checklist
+        cl2 = Checklist(
+            title=self.title + " other",
+            tasks=[ChecklistTask(id=1, text="something"), ChecklistTask(id=2, text="something")],
+        )
+        cl3 = Checklist(
+            title=self.title + " other",
+            tasks=[ChecklistTask(id=42, text="Task 2")],
+        )
+        cl4 = checklist_task
+
+        assert cl1 == cl2
+        assert hash(cl1) == hash(cl2)
+
+        assert cl1 != cl3
+        assert hash(cl1) != hash(cl3)
+
+        assert cl1 != cl4
+        assert hash(cl1) != hash(cl4)

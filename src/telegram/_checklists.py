@@ -154,3 +154,113 @@ class ChecklistTask(TelegramObject):
             the text that belongs to them, calculated based on UTF-16 codepoints.
         """
         return parse_message_entities(self.text, self.text_entities, types)
+
+
+class Checklist(TelegramObject):
+    """
+    Describes a checklist.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if all their :attr:`tasks` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        title (:obj:`str`): Title of the checklist.
+        title_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
+            entities that appear in the checklist title.
+        tasks (Sequence[:class:`telegram.ChecklistTask`]): List of tasks in the checklist.
+        others_can_add_tasks (:obj:`bool`, optional): :obj:`True` if users other than the creator
+            of the list can add tasks to the list
+        others_can_mark_tasks_as_done (:obj:`bool`, optional): :obj:`True` if users other than the
+            creator of the list can mark tasks as done or not done
+
+    Attributes:
+        title (:obj:`str`): Title of the checklist.
+        title_entities (Tuple[:class:`telegram.MessageEntity`]): Special
+            entities that appear in the checklist title.
+        tasks (Tuple[:class:`telegram.ChecklistTask`]): List of tasks in the checklist.
+        others_can_add_tasks (:obj:`bool`): :obj:`True` if users other than the creator
+            of the list can add tasks to the list
+        others_can_mark_tasks_as_done (:obj:`bool`): :obj:`True` if users other than the
+            creator of the list can mark tasks as done or not done
+    """
+
+    __slots__ = (
+        "others_can_add_tasks",
+        "others_can_mark_tasks_as_done",
+        "tasks",
+        "title",
+        "title_entities",
+    )
+
+    def __init__(
+        self,
+        title: str,
+        tasks: Sequence[ChecklistTask],
+        title_entities: Optional[Sequence[MessageEntity]] = None,
+        others_can_add_tasks: Optional[bool] = None,
+        others_can_mark_tasks_as_done: Optional[bool] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.title: str = title
+        self.title_entities: tuple[MessageEntity, ...] = parse_sequence_arg(title_entities)
+        self.tasks: tuple[ChecklistTask, ...] = parse_sequence_arg(tasks)
+        self.others_can_add_tasks: Optional[bool] = others_can_add_tasks
+        self.others_can_mark_tasks_as_done: Optional[bool] = others_can_mark_tasks_as_done
+
+        self._id_attrs = (self.tasks,)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Checklist":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["title_entities"] = de_list_optional(data.get("title_entities"), MessageEntity, bot)
+        data["tasks"] = de_list_optional(data.get("tasks"), ChecklistTask, bot)
+
+        return super().de_json(data=data, bot=bot)
+
+    def parse_entity(self, entity: MessageEntity) -> str:
+        """Returns the text in :attr:`text`
+        from a given :class:`telegram.MessageEntity` of :attr:`title_entities`.
+
+        Note:
+            This method is present because Telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
+            (That is, you can't just slice ``Message.text`` with the offset and length.)
+
+        Args:
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
+                be an entity that belongs to :attr:`title_entities`.
+
+        Returns:
+            :obj:`str`: The text of the given entity.
+        """
+        return parse_message_entity(self.title, entity)
+
+    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
+        """
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
+        It contains entities from this polls question filtered by their ``type`` attribute as
+        the key, and the text that each entity belongs to as the value of the :obj:`dict`.
+
+        Note:
+            This method should always be used instead of the :attr:`title_entities`
+            attribute, since it calculates the correct substring from the message text based on
+            UTF-16 codepoints. See :attr:`parse_entity` for more info.
+
+        Args:
+            types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+                    ``type`` attribute of an entity is contained in this list, it will be returned.
+                    Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
+
+        Returns:
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            the text that belongs to them, calculated based on UTF-16 codepoints.
+        """
+        return parse_message_entities(self.title, self.title_entities, types)

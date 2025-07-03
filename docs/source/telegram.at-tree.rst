@@ -31,6 +31,7 @@ Available Types
     telegram.chat
     telegram.chatadministratorrights
     telegram.chatbackground
+    telegram.checklist
     telegram.checklisttask
     telegram.copytextbutton
     telegram.backgroundtype
