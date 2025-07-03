@@ -160,7 +160,6 @@ PTB_EXTRA_PARAMS = {
     "StoryAreaType": {"type"},  # attributes common to all subclasses
     # backwards compatibility for api 9.0 changes
     # tags: deprecated v22.2, bot api 9.0
-    "BusinessConnection": {"can_reply"},
     "ChatFullInfo": {"can_send_gift"},
     "InputProfilePhoto": {"type"},  # attributes common to all subclasses
 }
@@ -212,7 +211,6 @@ IGNORED_PARAM_REQUIREMENTS = {
     # ---->
     # backwards compatibility for api 9.0 changes
     # tags: deprecated v22.2, bot api 9.0
-    "BusinessConnection": {"is_enabled"},
     "ChatFullInfo": {"accepted_gift_types"},
     "TransactionPartnerUser": {"transaction_type"},
 }
