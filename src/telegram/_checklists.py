@@ -331,3 +331,55 @@ class ChecklistTasksDone(TelegramObject):
         data["checklist_message"] = de_json_optional(data.get("checklist_message"), Message, bot)
 
         return super().de_json(data=data, bot=bot)
+
+
+class ChecklistTasksAdded(TelegramObject):
+    """
+    Describes a service message about checklist tasks added to a checklist.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their :attr:`tasks` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        checklist_message (:class:`telegram.Message`, optional): Message containing the checklist
+            to which tasks were added. Note that the ~:class:`telegram.Message`
+            object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
+            field even if it itself is a reply.
+        tasks (Sequence[:class:`telegram.ChecklistTask`]): List of tasks added to the checklist
+
+    Attributes:
+        checklist_message (:class:`telegram.Message`): Optional. Message containing the checklist
+            to which tasks were added. Note that the ~:class:`telegram.Message`
+            object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
+            field even if it itself is a reply.
+        tasks (Tuple[:class:`telegram.ChecklistTask`]): List of tasks added to the checklist
+    """
+
+    __slots__ = ("checklist_message", "tasks")
+
+    def __init__(
+        self,
+        tasks: Sequence[ChecklistTask],
+        checklist_message: Optional[Message] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.checklist_message: Optional[Message] = checklist_message
+        self.tasks: tuple[ChecklistTask, ...] = parse_sequence_arg(tasks)
+
+        self._id_attrs = (self.tasks,)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChecklistTasksAdded":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["checklist_message"] = de_json_optional(data.get("checklist_message"), Message, bot)
+        data["tasks"] = ChecklistTask.de_list(data.get("tasks", []), bot)
+
+        return super().de_json(data=data, bot=bot)

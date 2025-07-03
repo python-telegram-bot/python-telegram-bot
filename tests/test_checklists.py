@@ -21,7 +21,7 @@ import datetime as dtm
 import pytest
 
 from telegram import ChecklistTask, Dice, MessageEntity, User
-from telegram._checklists import Checklist, ChecklistTasksDone
+from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ZERO_DATE
 from tests.auxil.build_messages import make_message
@@ -353,3 +353,80 @@ class TestChecklistTasksDoneWithoutRequest(ChecklistTasksDoneTestBase):
 
         assert cltd1 != cltd4
         assert hash(cltd1) != hash(cltd4)
+
+
+class ChecklistTasksAddedTestBase:
+    checklist_message = make_message("Checklist message")
+    tasks = [
+        ChecklistTask(id=1, text="Task 1"),
+        ChecklistTask(id=2, text="Task 2"),
+        ChecklistTask(id=3, text="Task 3"),
+    ]
+
+
+@pytest.fixture(scope="module")
+def checklist_tasks_added():
+    return ChecklistTasksAdded(
+        checklist_message=ChecklistTasksAddedTestBase.checklist_message,
+        tasks=ChecklistTasksAddedTestBase.tasks,
+    )
+
+
+class TestChecklistTasksAddedWithoutRequest(ChecklistTasksAddedTestBase):
+    def test_slot_behaviour(self, checklist_tasks_added):
+        for attr in checklist_tasks_added.__slots__:
+            assert getattr(checklist_tasks_added, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(checklist_tasks_added)) == len(
+            set(mro_slots(checklist_tasks_added))
+        ), "duplicate slot"
+
+    def test_to_dict(self, checklist_tasks_added):
+        clta_dict = checklist_tasks_added.to_dict()
+        assert isinstance(clta_dict, dict)
+        assert clta_dict["checklist_message"] == self.checklist_message.to_dict()
+        assert clta_dict["tasks"] == [task.to_dict() for task in self.tasks]
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "checklist_message": self.checklist_message.to_dict(),
+            "tasks": [task.to_dict() for task in self.tasks],
+        }
+        clta = ChecklistTasksAdded.de_json(json_dict, offline_bot)
+        assert isinstance(clta, ChecklistTasksAdded)
+        assert clta.checklist_message == self.checklist_message
+        assert clta.tasks == tuple(self.tasks)
+        assert clta.api_kwargs == {}
+
+    def test_de_json_required_fields(self, offline_bot):
+        clta = ChecklistTasksAdded.de_json(
+            {"tasks": [task.to_dict() for task in self.tasks]}, offline_bot
+        )
+        assert isinstance(clta, ChecklistTasksAdded)
+        assert clta.checklist_message is None
+        assert clta.tasks == tuple(self.tasks)
+        assert clta.api_kwargs == {}
+
+    def test_equality(self, checklist_tasks_added):
+        clta1 = checklist_tasks_added
+        clta2 = ChecklistTasksAdded(
+            checklist_message=None,
+            tasks=[
+                ChecklistTask(id=1, text="Other Task 1"),
+                ChecklistTask(id=2, text="Other Task 2"),
+                ChecklistTask(id=3, text="Other Task 3"),
+            ],
+        )
+        clta3 = ChecklistTasksAdded(
+            checklist_message=make_message("Checklist message"),
+            tasks=[ChecklistTask(id=1, text="Task 1")],
+        )
+        clta4 = make_message("Not a checklist tasks added")
+
+        assert clta1 == clta2
+        assert hash(clta1) == hash(clta2)
+
+        assert clta1 != clta3
+        assert hash(clta1) != hash(clta3)
+
+        assert clta1 != clta4
+        assert hash(clta1) != hash(clta4)
