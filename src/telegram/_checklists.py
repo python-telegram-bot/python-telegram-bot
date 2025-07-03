@@ -80,18 +80,18 @@ class ChecklistTask(TelegramObject):
         self,
         id: int,  # pylint: disable=redefined-builtin
         text: str,
-        text_entities: Optional[Sequence["MessageEntity"]] = None,
-        completed_by_user: Optional["User"] = None,
+        text_entities: Optional[Sequence[MessageEntity]] = None,
+        completed_by_user: Optional[User] = None,
         completion_date: Optional[dtm.datetime] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id = id
-        self.text = text
-        self.text_entities = parse_sequence_arg(text_entities)
-        self.completed_by_user = completed_by_user
-        self.completion_date = completion_date
+        self.id: int = id
+        self.text: str = text
+        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
+        self.completed_by_user: Optional[User] = completed_by_user
+        self.completion_date: Optional[dtm.datetime] = completion_date
 
         self._id_attrs = (self.id,)
 
