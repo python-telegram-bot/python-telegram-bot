@@ -119,7 +119,7 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
         [
             (None, None),
             (0, ZERO_DATE),
-            (1735689600, dtm.datetime(2025, 1, 1, tzinfo=dtm.UTC)),
+            (1735689600, dtm.datetime(2025, 1, 1, tzinfo=UTC)),
         ],
     )
     def test_de_json_completion_date(self, offline_bot, completion_date, expected):
