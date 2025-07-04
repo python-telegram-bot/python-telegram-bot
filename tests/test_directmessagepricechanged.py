@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from telegram import DirectMessagePriceChanged
+from telegram import DirectMessagePriceChanged, User
 from tests.auxil.slots import mro_slots
 
 if TYPE_CHECKING:
@@ -79,3 +79,7 @@ class TestDirectMessagePriceChangedWithoutRequest(DirectMessagePriceChangedTestB
         )
         assert dmpc1 != dmpc3
         assert hash(dmpc1) != hash(dmpc3)
+
+        not_a_dmpc = User(id=1, first_name="wrong", is_bot=False)
+        assert dmpc1 != not_a_dmpc
+        assert hash(dmpc1) != hash(not_a_dmpc)
