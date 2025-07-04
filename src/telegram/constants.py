@@ -2064,6 +2064,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
     DICE = "dice"
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
+    DIRECT_MESSAGE_PRICE_CHANGED = "direct_message_price_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.direct_message_price_changed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
     EFFECT_ID = "effect_id"
