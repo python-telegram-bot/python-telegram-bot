@@ -158,9 +158,6 @@ PTB_EXTRA_PARAMS = {
     "InputPaidMedia": {"type", "media"},  # attributes common to all subclasses
     "InputStoryContent": {"type"},  # attributes common to all subclasses
     "StoryAreaType": {"type"},  # attributes common to all subclasses
-    # backwards compatibility for api 9.0 changes
-    # tags: deprecated v22.2, bot api 9.0
-    "ChatFullInfo": {"can_send_gift"},
     "InputProfilePhoto": {"type"},  # attributes common to all subclasses
 }
 
@@ -211,7 +208,6 @@ IGNORED_PARAM_REQUIREMENTS = {
     # ---->
     # backwards compatibility for api 9.0 changes
     # tags: deprecated v22.2, bot api 9.0
-    "ChatFullInfo": {"accepted_gift_types"},
     "TransactionPartnerUser": {"transaction_type"},
 }
 
