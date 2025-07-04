@@ -206,9 +206,6 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
-    # backwards compatibility for api 9.0 changes
-    # tags: deprecated v22.2, bot api 9.0
-    "TransactionPartnerUser": {"transaction_type"},
 }
 
 
