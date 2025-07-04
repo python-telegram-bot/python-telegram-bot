@@ -33,7 +33,8 @@ class DirectMessagePriceChanged(TelegramObject):
     .. versionadded:: NEXT.VERSION
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`are_direct_messages_enabled` are equal.
+    considered equal, if their :attr:`are_direct_messages_enabled`, and
+    :attr:`direct_message_star_count` are equal.
 
     Args:
         are_direct_messages_enabled (:obj:`bool`):
@@ -67,6 +68,6 @@ class DirectMessagePriceChanged(TelegramObject):
         self.are_direct_messages_enabled: bool = are_direct_messages_enabled
         self.direct_message_star_count: Optional[int] = direct_message_star_count
 
-        self._id_attrs = (self.are_direct_messages_enabled,)
+        self._id_attrs = (self.are_direct_messages_enabled, self.direct_message_star_count)
 
         self._freeze()

@@ -33,6 +33,7 @@ from telegram import (
     ChatShared,
     Contact,
     Dice,
+    DirectMessagePriceChanged,
     Document,
     ExternalReplyInfo,
     Game,
@@ -76,7 +77,6 @@ from telegram import (
     Voice,
     WebAppData,
 )
-from telegram._directmessagepricechanged import DirectMessagePriceChanged
 from telegram._gifts import Gift, GiftInfo
 from telegram._uniquegift import (
     UniqueGift,
