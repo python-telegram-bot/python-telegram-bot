@@ -49,11 +49,6 @@ if TEST_WITH_OPT_DEPS:
     import pytz
 
 
-# Don't collect `test_official.py` on Python 3.10- since it uses newer features like X | Y syntax.
-# Docs: https://docs.pytest.org/en/7.1.x/example/pythoncollection.html#customizing-test-collection
-collect_ignore = []
-
-
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
 def pytest_runtestloop(session: pytest.Session):
     session.add_marker(
