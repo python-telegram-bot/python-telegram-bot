@@ -425,7 +425,6 @@ class TransactionPartnerUser(TransactionPartner):
         gift: Optional[Gift] = None,
         affiliate: Optional[AffiliateInfo] = None,
         premium_subscription_duration: Optional[int] = None,
-        # temporarily optional to account for changed signature
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:

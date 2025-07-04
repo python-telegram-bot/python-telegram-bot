@@ -187,6 +187,10 @@ class BusinessConnection(TelegramObject):
     considered equal if their :attr:`id`, :attr:`user`, :attr:`user_chat_id`, :attr:`date`,
     :attr:`rights`, and :attr:`is_enabled` are equal.
 
+    .. versionadded:: 21.1
+    .. versionchanged:: 22.1
+        Equality comparison now considers :attr:`rights` instead of ``can_reply``.
+
     .. versionremoved:: NEXT.VERSION
        Removed argument and attribute ``can_reply`` deprecated  by API 9.0.
 
