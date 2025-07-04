@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that represents a Telegram InputInvoiceMessageContent."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._payment.labeledprice import LabeledPrice
@@ -203,23 +203,23 @@ class InputInvoiceMessageContent(InputMessageContent):
         payload: str,
         currency: str,
         prices: Sequence[LabeledPrice],
-        provider_token: Optional[str] = None,
-        max_tip_amount: Optional[int] = None,
-        suggested_tip_amounts: Optional[Sequence[int]] = None,
-        provider_data: Optional[str] = None,
-        photo_url: Optional[str] = None,
-        photo_size: Optional[int] = None,
-        photo_width: Optional[int] = None,
-        photo_height: Optional[int] = None,
-        need_name: Optional[bool] = None,
-        need_phone_number: Optional[bool] = None,
-        need_email: Optional[bool] = None,
-        need_shipping_address: Optional[bool] = None,
-        send_phone_number_to_provider: Optional[bool] = None,
-        send_email_to_provider: Optional[bool] = None,
-        is_flexible: Optional[bool] = None,
+        provider_token: str | None = None,
+        max_tip_amount: int | None = None,
+        suggested_tip_amounts: Sequence[int] | None = None,
+        provider_data: str | None = None,
+        photo_url: str | None = None,
+        photo_size: int | None = None,
+        photo_width: int | None = None,
+        photo_height: int | None = None,
+        need_name: bool | None = None,
+        need_phone_number: bool | None = None,
+        need_email: bool | None = None,
+        need_shipping_address: bool | None = None,
+        send_phone_number_to_provider: bool | None = None,
+        send_email_to_provider: bool | None = None,
+        is_flexible: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -230,21 +230,21 @@ class InputInvoiceMessageContent(InputMessageContent):
             self.currency: str = currency
             self.prices: tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
             # Optionals
-            self.provider_token: Optional[str] = provider_token
-            self.max_tip_amount: Optional[int] = max_tip_amount
+            self.provider_token: str | None = provider_token
+            self.max_tip_amount: int | None = max_tip_amount
             self.suggested_tip_amounts: tuple[int, ...] = parse_sequence_arg(suggested_tip_amounts)
-            self.provider_data: Optional[str] = provider_data
-            self.photo_url: Optional[str] = photo_url
-            self.photo_size: Optional[int] = photo_size
-            self.photo_width: Optional[int] = photo_width
-            self.photo_height: Optional[int] = photo_height
-            self.need_name: Optional[bool] = need_name
-            self.need_phone_number: Optional[bool] = need_phone_number
-            self.need_email: Optional[bool] = need_email
-            self.need_shipping_address: Optional[bool] = need_shipping_address
-            self.send_phone_number_to_provider: Optional[bool] = send_phone_number_to_provider
-            self.send_email_to_provider: Optional[bool] = send_email_to_provider
-            self.is_flexible: Optional[bool] = is_flexible
+            self.provider_data: str | None = provider_data
+            self.photo_url: str | None = photo_url
+            self.photo_size: int | None = photo_size
+            self.photo_width: int | None = photo_width
+            self.photo_height: int | None = photo_height
+            self.need_name: bool | None = need_name
+            self.need_phone_number: bool | None = need_phone_number
+            self.need_email: bool | None = need_email
+            self.need_shipping_address: bool | None = need_shipping_address
+            self.send_phone_number_to_provider: bool | None = send_phone_number_to_provider
+            self.send_email_to_provider: bool | None = send_email_to_provider
+            self.is_flexible: bool | None = is_flexible
 
             self._id_attrs = (
                 self.title,
@@ -255,7 +255,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             )
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InputInvoiceMessageContent":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InputInvoiceMessageContent":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

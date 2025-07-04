@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Poll."""
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._chat import Chat
@@ -86,9 +86,9 @@ class InputPollOption(TelegramObject):
         self,
         text: str,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        text_entities: Optional[Sequence[MessageEntity]] = None,
+        text_entities: Sequence[MessageEntity] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
@@ -100,7 +100,7 @@ class InputPollOption(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InputPollOption":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InputPollOption":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -147,9 +147,9 @@ class PollOption(TelegramObject):
         self,
         text: str,
         voter_count: int,
-        text_entities: Optional[Sequence[MessageEntity]] = None,
+        text_entities: Sequence[MessageEntity] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
@@ -161,7 +161,7 @@ class PollOption(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PollOption":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollOption":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -189,7 +189,7 @@ class PollOption(TelegramObject):
         """
         return parse_message_entity(self.text, entity)
 
-    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
+    def parse_entities(self, types: list[str] | None = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this polls question filtered by their ``type`` attribute as
@@ -284,16 +284,16 @@ class PollAnswer(TelegramObject):
         self,
         poll_id: str,
         option_ids: Sequence[int],
-        user: Optional[User] = None,
-        voter_chat: Optional[Chat] = None,
+        user: User | None = None,
+        voter_chat: Chat | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id: str = poll_id
-        self.voter_chat: Optional[Chat] = voter_chat
+        self.voter_chat: Chat | None = voter_chat
         self.option_ids: tuple[int, ...] = parse_sequence_arg(option_ids)
-        self.user: Optional[User] = user
+        self.user: User | None = user
 
         self._id_attrs = (
             self.poll_id,
@@ -305,7 +305,7 @@ class PollAnswer(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PollAnswer":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollAnswer":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -442,14 +442,14 @@ class Poll(TelegramObject):
         is_anonymous: bool,
         type: str,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool,
-        correct_option_id: Optional[int] = None,
-        explanation: Optional[str] = None,
-        explanation_entities: Optional[Sequence[MessageEntity]] = None,
-        open_period: Optional[TimePeriod] = None,
-        close_date: Optional[dtm.datetime] = None,
-        question_entities: Optional[Sequence[MessageEntity]] = None,
+        correct_option_id: int | None = None,
+        explanation: str | None = None,
+        explanation_entities: Sequence[MessageEntity] | None = None,
+        open_period: TimePeriod | None = None,
+        close_date: dtm.datetime | None = None,
+        question_entities: Sequence[MessageEntity] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
@@ -460,13 +460,13 @@ class Poll(TelegramObject):
         self.is_anonymous: bool = is_anonymous
         self.type: str = enum.get_member(constants.PollType, type, type)
         self.allows_multiple_answers: bool = allows_multiple_answers
-        self.correct_option_id: Optional[int] = correct_option_id
-        self.explanation: Optional[str] = explanation
+        self.correct_option_id: int | None = correct_option_id
+        self.explanation: str | None = explanation
         self.explanation_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
             explanation_entities
         )
-        self._open_period: Optional[dtm.timedelta] = to_timedelta(open_period)
-        self.close_date: Optional[dtm.datetime] = close_date
+        self._open_period: dtm.timedelta | None = to_timedelta(open_period)
+        self.close_date: dtm.datetime | None = close_date
         self.question_entities: tuple[MessageEntity, ...] = parse_sequence_arg(question_entities)
 
         self._id_attrs = (self.id,)
@@ -474,11 +474,11 @@ class Poll(TelegramObject):
         self._freeze()
 
     @property
-    def open_period(self) -> Optional[Union[int, dtm.timedelta]]:
+    def open_period(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._open_period, attribute="open_period")
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Poll":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Poll":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -522,7 +522,7 @@ class Poll(TelegramObject):
         return parse_message_entity(self.explanation, entity)
 
     def parse_explanation_entities(
-        self, types: Optional[list[str]] = None
+        self, types: list[str] | None = None
     ) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
@@ -572,9 +572,7 @@ class Poll(TelegramObject):
         """
         return parse_message_entity(self.question, entity)
 
-    def parse_question_entities(
-        self, types: Optional[list[str]] = None
-    ) -> dict[MessageEntity, str]:
+    def parse_question_entities(self, types: list[str] | None = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this polls question filtered by their ``type`` attribute as

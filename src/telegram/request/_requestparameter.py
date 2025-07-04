@@ -21,7 +21,7 @@ import datetime as dtm
 import json
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Optional, final
+from typing import final
 
 from telegram._files._inputstorycontent import InputStoryContent
 from telegram._files.inputfile import InputFile
@@ -64,10 +64,10 @@ class RequestParameter:
 
     name: str
     value: object
-    input_files: Optional[list[InputFile]]
+    input_files: list[InputFile] | None
 
     @property
-    def json_value(self) -> Optional[str]:
+    def json_value(self) -> str | None:
         """The JSON dumped :attr:`value` or :obj:`None` if :attr:`value` is :obj:`None`.
         The latter can currently only happen if :attr:`input_files` has exactly one element that
         must not be uploaded via an attach:// URI.
@@ -79,7 +79,7 @@ class RequestParameter:
         return json.dumps(self.value)
 
     @property
-    def multipart_data(self) -> Optional[UploadFileDict]:
+    def multipart_data(self) -> UploadFileDict | None:
         """A dict with the file data to upload, if any.
 
         .. versionchanged:: 21.5
@@ -132,7 +132,7 @@ class RequestParameter:
                 return value.attach_uri, [value]
             return None, [value]
 
-        if isinstance(value, (InputMedia, InputPaidMedia)) and isinstance(value.media, InputFile):
+        if isinstance(value, InputMedia | InputPaidMedia) and isinstance(value.media, InputFile):
             # We call to_dict and change the returned dict instead of overriding
             # value.media in case the same value is reused for another request
             data = value.to_dict()
@@ -192,7 +192,7 @@ class RequestParameter:
         """Builds an instance of this class for a given key-value pair that represents the raw
         input as passed along from a method of :class:`telegram.Bot`.
         """
-        if not isinstance(value, (str, bytes)) and isinstance(value, Sequence):
+        if not isinstance(value, str | bytes) and isinstance(value, Sequence):
             param_values = []
             input_files = []
             for obj in value:

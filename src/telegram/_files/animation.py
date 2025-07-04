@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Animation."""
 import datetime as dtm
-from typing import Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -89,12 +88,12 @@ class Animation(_BaseThumbedMedium):
         width: int,
         height: int,
         duration: TimePeriod,
-        file_name: Optional[str] = None,
-        mime_type: Optional[str] = None,
-        file_size: Optional[int] = None,
-        thumbnail: Optional[PhotoSize] = None,
+        file_name: str | None = None,
+        mime_type: str | None = None,
+        file_size: int | None = None,
+        thumbnail: PhotoSize | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -109,11 +108,11 @@ class Animation(_BaseThumbedMedium):
             self.height: int = height
             self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
-            self.mime_type: Optional[str] = mime_type
-            self.file_name: Optional[str] = file_name
+            self.mime_type: str | None = mime_type
+            self.file_name: str | None = file_name
 
     @property
-    def duration(self) -> Union[int, dtm.timedelta]:
+    def duration(self) -> int | dtm.timedelta:
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )

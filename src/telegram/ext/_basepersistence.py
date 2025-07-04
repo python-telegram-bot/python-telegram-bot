@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 from abc import ABC, abstractmethod
-from typing import Generic, NamedTuple, NoReturn, Optional
+from typing import Generic, NamedTuple, NoReturn
 
 from telegram._bot import Bot
 from telegram.ext._extbot import ExtBot
@@ -145,7 +145,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     def __init__(
         self,
-        store_data: Optional[PersistenceInput] = None,
+        store_data: PersistenceInput | None = None,
         update_interval: float = 60,
     ):
         self.store_data: PersistenceInput = store_data or PersistenceInput()
@@ -238,7 +238,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    async def get_callback_data(self) -> Optional[CDCData]:
+    async def get_callback_data(self) -> CDCData | None:
         """Will be called by :class:`telegram.ext.Application` upon creation with a
         persistence object. If callback data was stored, it should be returned.
 
@@ -270,7 +270,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     @abstractmethod
     async def update_conversation(
-        self, name: str, key: ConversationKey, new_state: Optional[object]
+        self, name: str, key: ConversationKey, new_state: object | None
     ) -> None:
         """Will be called when a :class:`telegram.ext.ConversationHandler` changes states.
         This allows the storage of the new state in the persistence.

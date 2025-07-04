@@ -27,14 +27,13 @@ Warning:
 """
 from pathlib import Path
 from types import FrameType
-from typing import Optional
 
 from telegram._utils.logging import get_logger
 
 _LOGGER = get_logger(__name__)
 
 
-def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
+def was_called_by(frame: FrameType | None, caller: Path) -> bool:
     """Checks if the passed frame was called by the specified file.
 
     Example:

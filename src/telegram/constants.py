@@ -125,7 +125,7 @@ __all__ = [
 import datetime as dtm
 import sys
 from enum import Enum
-from typing import Final, NamedTuple, Optional
+from typing import Final, NamedTuple
 
 from telegram._utils.datetime import UTC
 from telegram._utils.enum import FloatEnum, IntEnum, StringEnum
@@ -157,7 +157,7 @@ class _AccentColor(NamedTuple):
     """
 
     identifier: int
-    name: Optional[str] = None
+    name: str | None = None
     light_colors: tuple[int, ...] = ()
     dark_colors: tuple[int, ...] = ()
 

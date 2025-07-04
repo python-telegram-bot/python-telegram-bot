@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars transaction partners."""
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._chat import Chat
@@ -95,7 +95,7 @@ class TransactionPartner(TelegramObject):
     USER: Final[str] = constants.TransactionPartnerType.USER
     """:const:`telegram.constants.TransactionPartnerType.USER`"""
 
-    def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, type: str, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.TransactionPartnerType, type, type)
 
@@ -103,7 +103,7 @@ class TransactionPartner(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TransactionPartner":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TransactionPartner":
         """Converts JSON data to the appropriate :class:`TransactionPartner` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -162,14 +162,14 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
     def __init__(
         self,
         commission_per_mille: int,
-        sponsor_user: Optional["User"] = None,
+        sponsor_user: "User | None" = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=TransactionPartner.AFFILIATE_PROGRAM, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.sponsor_user: Optional[User] = sponsor_user
+            self.sponsor_user: User | None = sponsor_user
             self.commission_per_mille: int = commission_per_mille
             self._id_attrs = (
                 self.type,
@@ -178,7 +178,7 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
 
     @classmethod
     def de_json(
-        cls, data: JSONDict, bot: Optional["Bot"] = None
+        cls, data: JSONDict, bot: "Bot | None" = None
     ) -> "TransactionPartnerAffiliateProgram":
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
@@ -216,15 +216,15 @@ class TransactionPartnerChat(TransactionPartner):
     def __init__(
         self,
         chat: Chat,
-        gift: Optional[Gift] = None,
+        gift: Gift | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=TransactionPartner.CHAT, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.chat: Chat = chat
-            self.gift: Optional[Gift] = gift
+            self.gift: Gift | None = gift
 
             self._id_attrs = (
                 self.type,
@@ -232,7 +232,7 @@ class TransactionPartnerChat(TransactionPartner):
             )
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TransactionPartnerChat":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TransactionPartnerChat":
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
@@ -262,17 +262,17 @@ class TransactionPartnerFragment(TransactionPartner):
 
     def __init__(
         self,
-        withdrawal_state: Optional["RevenueWithdrawalState"] = None,
+        withdrawal_state: "RevenueWithdrawalState | None" = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=TransactionPartner.FRAGMENT, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.withdrawal_state: Optional[RevenueWithdrawalState] = withdrawal_state
+            self.withdrawal_state: RevenueWithdrawalState | None = withdrawal_state
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TransactionPartnerFragment":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TransactionPartnerFragment":
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
@@ -417,17 +417,17 @@ class TransactionPartnerUser(TransactionPartner):
     def __init__(
         self,
         user: "User",
-        invoice_payload: Optional[str] = None,
-        paid_media: Optional[Sequence[PaidMedia]] = None,
-        paid_media_payload: Optional[str] = None,
-        subscription_period: Optional[TimePeriod] = None,
-        gift: Optional[Gift] = None,
-        affiliate: Optional[AffiliateInfo] = None,
-        premium_subscription_duration: Optional[int] = None,
+        invoice_payload: str | None = None,
+        paid_media: Sequence[PaidMedia] | None = None,
+        paid_media_payload: str | None = None,
+        subscription_period: TimePeriod | None = None,
+        gift: Gift | None = None,
+        affiliate: AffiliateInfo | None = None,
+        premium_subscription_duration: int | None = None,
         # temporarily optional to account for changed signature
-        transaction_type: Optional[str] = None,
+        transaction_type: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
 
@@ -437,13 +437,13 @@ class TransactionPartnerUser(TransactionPartner):
 
         with self._unfrozen():
             self.user: User = user
-            self.affiliate: Optional[AffiliateInfo] = affiliate
-            self.invoice_payload: Optional[str] = invoice_payload
-            self.paid_media: Optional[tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
-            self.paid_media_payload: Optional[str] = paid_media_payload
-            self.subscription_period: Optional[dtm.timedelta] = to_timedelta(subscription_period)
-            self.gift: Optional[Gift] = gift
-            self.premium_subscription_duration: Optional[int] = premium_subscription_duration
+            self.affiliate: AffiliateInfo | None = affiliate
+            self.invoice_payload: str | None = invoice_payload
+            self.paid_media: tuple[PaidMedia, ...] | None = parse_sequence_arg(paid_media)
+            self.paid_media_payload: str | None = paid_media_payload
+            self.subscription_period: dtm.timedelta | None = to_timedelta(subscription_period)
+            self.gift: Gift | None = gift
+            self.premium_subscription_duration: int | None = premium_subscription_duration
             self.transaction_type: str = transaction_type
 
             self._id_attrs = (
@@ -453,7 +453,7 @@ class TransactionPartnerUser(TransactionPartner):
             )
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "TransactionPartnerUser":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TransactionPartnerUser":
         """See :meth:`telegram.TransactionPartner.de_json`."""
         data = cls._parse_data(data)
 
@@ -477,7 +477,7 @@ class TransactionPartnerOther(TransactionPartner):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(type=TransactionPartner.OTHER, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -494,7 +494,7 @@ class TransactionPartnerTelegramAds(TransactionPartner):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(type=TransactionPartner.TELEGRAM_ADS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -521,7 +521,7 @@ class TransactionPartnerTelegramApi(TransactionPartner):
 
     __slots__ = ("request_count",)
 
-    def __init__(self, request_count: int, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, request_count: int, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(type=TransactionPartner.TELEGRAM_API, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.request_count: int = request_count

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects to request chats/users."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
@@ -106,26 +106,26 @@ class KeyboardButtonRequestUsers(TelegramObject):
     def __init__(
         self,
         request_id: int,
-        user_is_bot: Optional[bool] = None,
-        user_is_premium: Optional[bool] = None,
-        max_quantity: Optional[int] = None,
-        request_name: Optional[bool] = None,
-        request_username: Optional[bool] = None,
-        request_photo: Optional[bool] = None,
+        user_is_bot: bool | None = None,
+        user_is_premium: bool | None = None,
+        max_quantity: int | None = None,
+        request_name: bool | None = None,
+        request_username: bool | None = None,
+        request_photo: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.request_id: int = request_id
 
         # Optionals
-        self.user_is_bot: Optional[bool] = user_is_bot
-        self.user_is_premium: Optional[bool] = user_is_premium
-        self.max_quantity: Optional[int] = max_quantity
-        self.request_name: Optional[bool] = request_name
-        self.request_username: Optional[bool] = request_username
-        self.request_photo: Optional[bool] = request_photo
+        self.user_is_bot: bool | None = user_is_bot
+        self.user_is_premium: bool | None = user_is_premium
+        self.max_quantity: int | None = max_quantity
+        self.request_name: bool | None = request_name
+        self.request_username: bool | None = request_username
+        self.request_photo: bool | None = request_photo
 
         self._id_attrs = (self.request_id,)
 
@@ -223,17 +223,17 @@ class KeyboardButtonRequestChat(TelegramObject):
         self,
         request_id: int,
         chat_is_channel: bool,
-        chat_is_forum: Optional[bool] = None,
-        chat_has_username: Optional[bool] = None,
-        chat_is_created: Optional[bool] = None,
-        user_administrator_rights: Optional[ChatAdministratorRights] = None,
-        bot_administrator_rights: Optional[ChatAdministratorRights] = None,
-        bot_is_member: Optional[bool] = None,
-        request_title: Optional[bool] = None,
-        request_username: Optional[bool] = None,
-        request_photo: Optional[bool] = None,
+        chat_is_forum: bool | None = None,
+        chat_has_username: bool | None = None,
+        chat_is_created: bool | None = None,
+        user_administrator_rights: ChatAdministratorRights | None = None,
+        bot_administrator_rights: ChatAdministratorRights | None = None,
+        bot_is_member: bool | None = None,
+        request_title: bool | None = None,
+        request_username: bool | None = None,
+        request_photo: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # required
@@ -241,24 +241,22 @@ class KeyboardButtonRequestChat(TelegramObject):
         self.chat_is_channel: bool = chat_is_channel
 
         # optional
-        self.chat_is_forum: Optional[bool] = chat_is_forum
-        self.chat_has_username: Optional[bool] = chat_has_username
-        self.chat_is_created: Optional[bool] = chat_is_created
-        self.user_administrator_rights: Optional[ChatAdministratorRights] = (
-            user_administrator_rights
-        )
-        self.bot_administrator_rights: Optional[ChatAdministratorRights] = bot_administrator_rights
-        self.bot_is_member: Optional[bool] = bot_is_member
-        self.request_title: Optional[bool] = request_title
-        self.request_username: Optional[bool] = request_username
-        self.request_photo: Optional[bool] = request_photo
+        self.chat_is_forum: bool | None = chat_is_forum
+        self.chat_has_username: bool | None = chat_has_username
+        self.chat_is_created: bool | None = chat_is_created
+        self.user_administrator_rights: ChatAdministratorRights | None = user_administrator_rights
+        self.bot_administrator_rights: ChatAdministratorRights | None = bot_administrator_rights
+        self.bot_is_member: bool | None = bot_is_member
+        self.request_title: bool | None = request_title
+        self.request_username: bool | None = request_username
+        self.request_photo: bool | None = request_photo
 
         self._id_attrs = (self.request_id,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "KeyboardButtonRequestChat":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "KeyboardButtonRequestChat":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

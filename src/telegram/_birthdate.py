@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Birthday."""
 import datetime as dtm
-from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -51,9 +50,9 @@ class Birthdate(TelegramObject):
         self,
         day: int,
         month: int,
-        year: Optional[int] = None,
+        year: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -61,7 +60,7 @@ class Birthdate(TelegramObject):
         self.day: int = day
         self.month: int = month
         # Optional
-        self.year: Optional[int] = year
+        self.year: int | None = year
 
         self._id_attrs = (
             self.day,
@@ -70,7 +69,7 @@ class Birthdate(TelegramObject):
 
         self._freeze()
 
-    def to_date(self, year: Optional[int] = None) -> dtm.date:
+    def to_date(self, year: int | None = None) -> dtm.date:
         """Return the birthdate as a date object.
 
         .. versionchanged:: 21.2

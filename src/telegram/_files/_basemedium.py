@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects"""
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -56,9 +56,9 @@ class _BaseMedium(TelegramObject):
         self,
         file_id: str,
         file_unique_id: str,
-        file_size: Optional[int] = None,
+        file_size: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -66,7 +66,7 @@ class _BaseMedium(TelegramObject):
         self.file_id: str = str(file_id)
         self.file_unique_id: str = str(file_unique_id)
         # Optionals
-        self.file_size: Optional[int] = file_size
+        self.file_size: int | None = file_size
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -77,7 +77,7 @@ class _BaseMedium(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "File":
         """Convenience wrapper over :meth:`telegram.Bot.get_file`
 

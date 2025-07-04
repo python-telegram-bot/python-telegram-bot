@@ -19,8 +19,6 @@
 """This module contains the LinkPreviewOptions class."""
 
 
-from typing import Optional
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
@@ -81,7 +79,7 @@ class LinkPreviewOptions(TelegramObject):
         prefer_large_media: ODVInput[bool] = DEFAULT_NONE,
         show_above_text: ODVInput[bool] = DEFAULT_NONE,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 

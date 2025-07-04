@@ -21,9 +21,8 @@ library.
 """
 import asyncio
 import contextlib
-import sys
-from collections.abc import AsyncIterator, Coroutine
-from typing import Any, Callable, Optional, Union
+from collections.abc import Callable, Coroutine
+from typing import Any
 
 try:
     from aiolimiter import AsyncLimiter
@@ -41,13 +40,7 @@ from telegram.ext._baseratelimiter import BaseRateLimiter
 # Useful for something like:
 #    async with group_limiter if group else null_context():
 # so we don't have to differentiate between "I'm using a context manager" and "I'm not"
-if sys.version_info >= (3, 10):
-    null_context = contextlib.nullcontext  # pylint: disable=invalid-name
-else:
-
-    @contextlib.asynccontextmanager
-    async def null_context() -> AsyncIterator[None]:
-        yield None
+null_context = contextlib.nullcontext  # pylint: disable=invalid-name
 
 
 _LOGGER = get_logger(__name__, class_name="AIORateLimiter")
@@ -157,7 +150,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
                 '"python-telegram-bot[rate-limiter]"`.'
             )
         if overall_max_rate and overall_time_period:
-            self._base_limiter: Optional[AsyncLimiter] = AsyncLimiter(
+            self._base_limiter: AsyncLimiter | None = AsyncLimiter(
                 max_rate=overall_max_rate, time_period=overall_time_period
             )
         else:
@@ -170,7 +163,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
             self._group_max_rate = 0
             self._group_time_period = 0
 
-        self._group_limiters: dict[Union[str, int], AsyncLimiter] = {}
+        self._group_limiters: dict[str | int, AsyncLimiter] = {}
         self._apb_limiter: AsyncLimiter = AsyncLimiter(
             max_rate=constants.FloodLimit.PAID_MESSAGES_PER_SECOND, time_period=1
         )
@@ -184,7 +177,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
     async def shutdown(self) -> None:
         """Does nothing."""
 
-    def _get_group_limiter(self, group_id: Union[str, int, bool]) -> "AsyncLimiter":
+    def _get_group_limiter(self, group_id: str | int | bool) -> "AsyncLimiter":
         # Remove limiters that haven't been used for so long that all their capacity is unused
         # We only do that if we have a lot of limiters lying around to avoid looping on every call
         # This is a minimal effort approach - a full-fledged cache could use a TTL approach
@@ -207,13 +200,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
     async def _run_request(
         self,
         chat: bool,
-        group: Union[str, int, bool],
+        group: str | int | bool,
         allow_paid_broadcast: bool,
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, list[JSONDict]]]],
+        callback: Callable[..., Coroutine[Any, Any, bool | JSONDict | list[JSONDict]]],
         args: Any,
         kwargs: dict[str, Any],
-    ) -> Union[bool, JSONDict, list[JSONDict]]:
-        async def inner() -> Union[bool, JSONDict, list[JSONDict]]:
+    ) -> bool | JSONDict | list[JSONDict]:
+        async def inner() -> bool | JSONDict | list[JSONDict]:
             # In case a retry_after was hit, we wait with processing the request
             await self._retry_after_event.wait()
             return await callback(*args, **kwargs)
@@ -235,13 +228,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
     # mypy doesn't understand that the last run of the for loop raises an exception
     async def process_request(
         self,
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, list[JSONDict]]]],
+        callback: Callable[..., Coroutine[Any, Any, bool | JSONDict | list[JSONDict]]],
         args: Any,
         kwargs: dict[str, Any],
         endpoint: str,  # noqa: ARG002
         data: dict[str, Any],
-        rate_limit_args: Optional[int],
-    ) -> Union[bool, JSONDict, list[JSONDict]]:
+        rate_limit_args: int | None,
+    ) -> bool | JSONDict | list[JSONDict]:
         """
         Processes a request by applying rate limiting.
 
@@ -255,7 +248,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         """
         max_retries = rate_limit_args or self._max_retries
 
-        group: Union[int, str, bool] = False
+        group: int | str | bool = False
         chat: bool = False
         chat_id = data.get("chat_id")
         allow_paid_broadcast = data.get("allow_paid_broadcast", False)
