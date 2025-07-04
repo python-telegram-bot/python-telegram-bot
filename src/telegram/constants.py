@@ -3211,6 +3211,11 @@ class UniqueGiftInfoOrigin(StringEnum):
     """:obj:`str` gift upgraded"""
     TRANSFER = "transfer"
     """:obj:`str` gift transfered"""
+    RESALE = "resale"
+    """:obj:`str` gift bought from other users
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class UpdateType(StringEnum):
