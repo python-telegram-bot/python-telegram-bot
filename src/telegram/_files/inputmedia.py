@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
+import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final, TypeAlias
 
@@ -30,10 +31,11 @@ from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 from telegram.constants import InputMediaType
 
 if TYPE_CHECKING:
@@ -218,7 +220,10 @@ class InputPaidMediaVideo(InputPaidMedia):
             .. versionchanged:: 21.11
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
-        duration (:obj:`int`, optional): Video duration in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`, optional): Video duration in seconds.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
 
@@ -236,14 +241,17 @@ class InputPaidMediaVideo(InputPaidMedia):
             .. versionchanged:: 21.11
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
-        duration (:obj:`int`): Optional. Video duration in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration in seconds.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
             suitable for streaming.
     """
 
     __slots__ = (
+        "_duration",
         "cover",
-        "duration",
         "height",
         "start_timestamp",
         "supports_streaming",
@@ -257,7 +265,7 @@ class InputPaidMediaVideo(InputPaidMedia):
         thumbnail: "FileInput | None" = None,
         width: int | None = None,
         height: int | None = None,
-        duration: int | None = None,
+        duration: TimePeriod | None = None,
         supports_streaming: bool | None = None,
         cover: "FileInput | None" = None,
         start_timestamp: int | None = None,
@@ -267,7 +275,7 @@ class InputPaidMediaVideo(InputPaidMedia):
         if isinstance(media, Video):
             width = width if width is not None else media.width
             height = height if height is not None else media.height
-            duration = duration if duration is not None else media.duration
+            duration = duration if duration is not None else media._duration
             media = media.file_id
         else:
             # We use local_mode=True because we don't have access to the actual setting and want
@@ -279,12 +287,16 @@ class InputPaidMediaVideo(InputPaidMedia):
             self.thumbnail: str | InputFile | None = InputMedia._parse_thumbnail_input(thumbnail)
             self.width: int | None = width
             self.height: int | None = height
-            self.duration: int | None = duration
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
             self.supports_streaming: bool | None = supports_streaming
             self.cover: InputFile | str | None = (
                 parse_file_input(cover, attach=True, local_mode=True) if cover else None
             )
             self.start_timestamp: int | None = start_timestamp
+
+    @property
+    def duration(self) -> int | dtm.timedelta | None:
+        return get_timedelta_value(self._duration, attribute="duration")
 
 
 class InputMediaAnimation(InputMedia):
@@ -323,7 +335,11 @@ class InputMediaAnimation(InputMedia):
 
         width (:obj:`int`, optional): Animation width.
         height (:obj:`int`, optional): Animation height.
-        duration (:obj:`int`, optional): Animation duration in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`, optional): Animation duration
+            in seconds.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the animation needs to be covered
             with a spoiler animation.
 
@@ -351,7 +367,11 @@ class InputMediaAnimation(InputMedia):
                 * |alwaystuple|
         width (:obj:`int`): Optional. Animation width.
         height (:obj:`int`): Optional. Animation height.
-        duration (:obj:`int`): Optional. Animation duration in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Animation duration
+            in seconds.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the animation is covered with a
             spoiler animation.
 
@@ -365,7 +385,7 @@ class InputMediaAnimation(InputMedia):
     """
 
     __slots__ = (
-        "duration",
+        "_duration",
         "has_spoiler",
         "height",
         "show_caption_above_media",
@@ -380,7 +400,7 @@ class InputMediaAnimation(InputMedia):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         width: int | None = None,
         height: int | None = None,
-        duration: int | None = None,
+        duration: TimePeriod | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
         filename: str | None = None,
         has_spoiler: bool | None = None,
@@ -392,7 +412,7 @@ class InputMediaAnimation(InputMedia):
         if isinstance(media, Animation):
             width = media.width if width is None else width
             height = media.height if height is None else height
-            duration = media.duration if duration is None else duration
+            duration = duration if duration is not None else media._duration
             media = media.file_id
         else:
             # We use local_mode=True because we don't have access to the actual setting and want
@@ -411,9 +431,13 @@ class InputMediaAnimation(InputMedia):
             self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
             self.width: int | None = width
             self.height: int | None = height
-            self.duration: int | None = duration
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
             self.has_spoiler: bool | None = has_spoiler
             self.show_caption_above_media: bool | None = show_caption_above_media
+
+    @property
+    def duration(self) -> int | dtm.timedelta | None:
+        return get_timedelta_value(self._duration, attribute="duration")
 
 
 class InputMediaPhoto(InputMedia):
@@ -544,7 +568,10 @@ class InputMediaVideo(InputMedia):
 
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
-        duration (:obj:`int`, optional): Video duration in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`, optional): Video duration in seconds.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the video needs to be covered
@@ -581,7 +608,10 @@ class InputMediaVideo(InputMedia):
                 * |alwaystuple|
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
-        duration (:obj:`int`): Optional. Video duration in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration in seconds.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
             suitable for streaming.
         has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the video is covered with a
@@ -604,8 +634,8 @@ class InputMediaVideo(InputMedia):
     """
 
     __slots__ = (
+        "_duration",
         "cover",
-        "duration",
         "has_spoiler",
         "height",
         "show_caption_above_media",
@@ -621,7 +651,7 @@ class InputMediaVideo(InputMedia):
         caption: str | None = None,
         width: int | None = None,
         height: int | None = None,
-        duration: int | None = None,
+        duration: TimePeriod | None = None,
         supports_streaming: bool | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] | None = None,
@@ -637,7 +667,7 @@ class InputMediaVideo(InputMedia):
         if isinstance(media, Video):
             width = width if width is not None else media.width
             height = height if height is not None else media.height
-            duration = duration if duration is not None else media.duration
+            duration = duration if duration is not None else media._duration
             media = media.file_id
         else:
             # We use local_mode=True because we don't have access to the actual setting and want
@@ -655,7 +685,7 @@ class InputMediaVideo(InputMedia):
         with self._unfrozen():
             self.width: int | None = width
             self.height: int | None = height
-            self.duration: int | None = duration
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
             self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
             self.supports_streaming: bool | None = supports_streaming
             self.has_spoiler: bool | None = has_spoiler
@@ -664,6 +694,10 @@ class InputMediaVideo(InputMedia):
                 parse_file_input(cover, attach=True, local_mode=True) if cover else None
             )
             self.start_timestamp: int | None = start_timestamp
+
+    @property
+    def duration(self) -> int | dtm.timedelta | None:
+        return get_timedelta_value(self._duration, attribute="duration")
 
 
 class InputMediaAudio(InputMedia):
@@ -700,7 +734,11 @@ class InputMediaAudio(InputMedia):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        duration (:obj:`int`, optional): Duration of the audio in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the audio
+            in seconds as defined by the sender.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         performer (:obj:`str`, optional): Performer of the audio as defined by the sender or by
             audio tags.
         title (:obj:`str`, optional): Title of the audio as defined by the sender or by audio tags.
@@ -722,7 +760,11 @@ class InputMediaAudio(InputMedia):
 
                 * |tupleclassattrs|
                 * |alwaystuple|
-        duration (:obj:`int`): Optional. Duration of the audio in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Duration of the audio
+            in seconds.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
             audio tags.
         title (:obj:`str`): Optional. Title of the audio as defined by the sender or by audio tags.
@@ -732,14 +774,14 @@ class InputMediaAudio(InputMedia):
 
     """
 
-    __slots__ = ("duration", "performer", "thumbnail", "title")
+    __slots__ = ("_duration", "performer", "thumbnail", "title")
 
     def __init__(
         self,
         media: "FileInput | Audio",
         caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        duration: int | None = None,
+        duration: TimePeriod | None = None,
         performer: str | None = None,
         title: str | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
@@ -749,7 +791,7 @@ class InputMediaAudio(InputMedia):
         api_kwargs: JSONDict | None = None,
     ):
         if isinstance(media, Audio):
-            duration = media.duration if duration is None else duration
+            duration = duration if duration is not None else media._duration
             performer = media.performer if performer is None else performer
             title = media.title if title is None else title
             media = media.file_id
@@ -768,9 +810,13 @@ class InputMediaAudio(InputMedia):
         )
         with self._unfrozen():
             self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
-            self.duration: int | None = duration
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
             self.title: str | None = title
             self.performer: str | None = performer
+
+    @property
+    def duration(self) -> int | dtm.timedelta | None:
+        return get_timedelta_value(self._duration, attribute="duration")
 
 
 class InputMediaDocument(InputMedia):

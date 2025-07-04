@@ -67,7 +67,7 @@ all = [
 ]
 callback-data = [
     # Cachetools doesn't have a strict stability policy. Let's be cautious for now.
-    "cachetools>=5.3.3,<6.1.0",
+    "cachetools>=5.3.3,<6.2.0",
 ]
 ext = [
     "python-telegram-bot[callback-data,job-queue,rate-limiter,webhooks]",
@@ -92,7 +92,7 @@ socks = [
 ]
 webhooks = [
     # tornado is rather stable, but let's not allow the next major release without prior testing
-    "tornado~=6.4",
+    "tornado~=6.5",
 ]
 
 [dependency-groups]
@@ -100,7 +100,7 @@ tests = [
     # required for building the wheels for releases
     "build",
     # For the test suite
-    "pytest==8.3.5",
+    "pytest==8.4.0",
     # needed because pytest doesn't come with native support for coroutines as tests
     "pytest-asyncio==0.21.2",
     # xdist runs tests in parallel
@@ -121,14 +121,19 @@ docs = [
     "chango~=0.4.0; python_version >= '3.12'",
     "sphinx==8.2.3; python_version >= '3.11'",
     "furo==2024.8.6",
-    "furo-sphinx-search @ git+https://github.com/harshil21/furo-sphinx-search@v0.2.0.1",
     "sphinx-paramlinks==0.6.0",
     "sphinxcontrib-mermaid==1.0.0",
     "sphinx-copybutton==0.5.2",
     "sphinx-inline-tabs==2023.4.21",
     # Temporary. See #4387
     "sphinx-build-compatibility @ git+https://github.com/readthedocs/sphinx-build-compatibility.git@58aabc5f207c6c2421f23d3578adc0b14af57047",
-    "pydantic @ git+https://github.com/pydantic/pydantic ; python_version >= '3.14'"  # Temporary for 3.14 support, we're waiting for a new pydantic version
+    # For python 3.14 support, we need a version of pydantic-core >= 2.35.0, since it upgrades the
+    # rust toolchain, required for building the project. But there isn't a version of pydantic
+    # which allows that pydantic-core version yet, so we use the latest commit on the
+    # pydantic repository, which has the required version of pydantic-core.
+    # This should ideally be done in `chango`'s dependencies. We can remove this once a new pydantic
+    # version is released.
+    "pydantic @ git+https://github.com/pydantic/pydantic ; python_version >= '3.14'"
 ]
 all = ["pre-commit", { include-group = "tests" }, { include-group = "docs" }]
 

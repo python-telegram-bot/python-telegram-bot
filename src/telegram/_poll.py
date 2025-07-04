@@ -27,11 +27,20 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.argumentparsing import (
+    de_json_optional,
+    de_list_optional,
+    parse_sequence_arg,
+    to_timedelta,
+)
+from telegram._utils.datetime import (
+    extract_tzinfo_from_defaults,
+    from_timestamp,
+    get_timedelta_value,
+)
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.entities import parse_message_entities, parse_message_entity
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -343,8 +352,11 @@ class Poll(TelegramObject):
 
                * This attribute is now always a (possibly empty) list and never :obj:`None`.
                * |sequenceclassargs|
-        open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
-            after creation.
+        open_period (:obj:`int` | :class:`datetime.timedelta`, optional): Amount of time in seconds
+            the poll will be active after creation.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
 
@@ -384,8 +396,11 @@ class Poll(TelegramObject):
 
             .. versionchanged:: 20.0
                This attribute is now always a (possibly empty) list and never :obj:`None`.
-        open_period (:obj:`int`): Optional. Amount of time in seconds the poll will be active
-            after creation.
+        open_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Amount of time in seconds
+            the poll will be active after creation.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
             automatically closed.
 
@@ -401,6 +416,7 @@ class Poll(TelegramObject):
     """
 
     __slots__ = (
+        "_open_period",
         "allows_multiple_answers",
         "close_date",
         "correct_option_id",
@@ -409,7 +425,6 @@ class Poll(TelegramObject):
         "id",
         "is_anonymous",
         "is_closed",
-        "open_period",
         "options",
         "question",
         "question_entities",
@@ -430,7 +445,7 @@ class Poll(TelegramObject):
         correct_option_id: int | None = None,
         explanation: str | None = None,
         explanation_entities: Sequence[MessageEntity] | None = None,
-        open_period: int | None = None,
+        open_period: TimePeriod | None = None,
         close_date: dtm.datetime | None = None,
         question_entities: Sequence[MessageEntity] | None = None,
         *,
@@ -450,13 +465,17 @@ class Poll(TelegramObject):
         self.explanation_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
             explanation_entities
         )
-        self.open_period: int | None = open_period
+        self._open_period: dtm.timedelta | None = to_timedelta(open_period)
         self.close_date: dtm.datetime | None = close_date
         self.question_entities: tuple[MessageEntity, ...] = parse_sequence_arg(question_entities)
 
         self._id_attrs = (self.id,)
 
         self._freeze()
+
+    @property
+    def open_period(self) -> int | dtm.timedelta | None:
+        return get_timedelta_value(self._open_period, attribute="open_period")
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Poll":

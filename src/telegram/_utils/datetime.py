@@ -29,8 +29,12 @@ Warning:
 """
 import contextlib
 import datetime as dtm
+import os
 import time
 from typing import TYPE_CHECKING
+
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -224,3 +228,45 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     if dt_obj.tzinfo is None:
         dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
     return dt_obj.timestamp()
+
+
+def get_timedelta_value(value: dtm.timedelta | None, attribute: str) -> int | dtm.timedelta | None:
+    """
+    Convert a `datetime.timedelta` to seconds or return it as-is, based on environment config.
+
+    This utility is part of the migration process from integer-based time representations
+    to using `datetime.timedelta`. The behavior is controlled by the `PTB_TIMEDELTA`
+    environment variable.
+
+    Note:
+        When `PTB_TIMEDELTA` is not enabled, the function will issue a deprecation warning.
+
+    Args:
+        value (:obj:`datetime.timedelta`): The timedelta value to process.
+        attribute (:obj:`str`): The name of the attribute at the caller scope, used for
+            warning messages.
+
+    Returns:
+        - :obj:`None` if :paramref:`value` is None.
+        - :obj:`datetime.timedelta` if `PTB_TIMEDELTA=true` or ``PTB_TIMEDELTA=1``.
+        - :obj:`int` if the total seconds is a whole number.
+        - float: otherwise.
+    """
+    if value is None:
+        return None
+    if os.getenv("PTB_TIMEDELTA", "false").lower().strip() in ["true", "1"]:
+        return value
+    warn(
+        PTBDeprecationWarning(
+            "v22.2",
+            f"In a future major version attribute `{attribute}` will be of type"
+            " `datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true`"
+            " or ``PTB_TIMEDELTA=1`` as an environment variable.",
+        ),
+        stacklevel=2,
+    )
+    return (
+        int(seconds)
+        if (seconds := value.total_seconds()).is_integer()
+        else seconds  # type: ignore[return-value]
+    )

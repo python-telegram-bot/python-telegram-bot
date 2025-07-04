@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14.0-beta.2']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14.0-beta.3']
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: False
     steps:
@@ -59,9 +59,15 @@ jobs:
           pytest -v --cov -k "${TO_TEST}" --junit-xml=.test_report_no_optionals_junit.xml
           opt_dep_status=$?
           
+<<<<<<< HEAD
           pip install .[all]
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
+=======
+          # Test the rest
+          export TEST_WITH_OPT_DEPS='true'
+          pip install .[all]
+>>>>>>> master
           # `-n auto --dist worksteal` uses pytest-xdist to run tests on multiple CPU
           # workers. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness.

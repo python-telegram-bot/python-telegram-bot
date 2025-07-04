@@ -80,6 +80,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Kirill Vasin <https://github.com/vasinkd>`_
 - `Kjwon15 <https://github.com/kjwon15>`_
 - `Li-aung Yip <https://github.com/LiaungYip>`_
+- `locobott <https://github.com/locobott>`_
 - `Loo Zheng Yuan <https://github.com/loozhengyuan>`_
 - `LRezende <https://github.com/lrezende>`_
 - `Luca Bellanti <https://github.com/Trifase>`_
@@ -109,6 +110,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_
 - `Pawan <https://github.com/pawanrai9999>`_
+- `Philipp Isachenko <https://github.com/Aweryc>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Piraty <https://github.com/piraty>`_
 - `Poolitzer <https://github.com/Poolitzer>`_

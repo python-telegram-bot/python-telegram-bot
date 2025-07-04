@@ -499,6 +499,12 @@ class TelegramObject:
             elif getattr(self, key, True) is None:
                 setattr(self, key, api_kwargs.pop(key))
 
+    def _is_deprecated_attr(self, attr: str) -> bool:
+        """Checks whether `attr` is in the list of deprecated time period attributes."""
+        return (
+            class_name := self.__class__.__name__
+        ) in _TIME_PERIOD_DEPRECATIONS and attr in _TIME_PERIOD_DEPRECATIONS[class_name]
+
     def _get_attrs_names(self, include_private: bool) -> Iterator[str]:
         """
         Returns the names of the attributes of this object. This is used to determine which
@@ -521,7 +527,12 @@ class TelegramObject:
 
         if include_private:
             return all_attrs
-        return (attr for attr in all_attrs if not attr.startswith("_"))
+        return (
+            attr
+            for attr in all_attrs
+            # Include deprecated private attributes, which are exposed via properties
+            if not attr.startswith("_") or self._is_deprecated_attr(attr)
+        )
 
     def _get_attrs(
         self,
@@ -603,6 +614,7 @@ class TelegramObject:
         # datetimes to timestamps. This mostly eliminates the need for subclasses to override
         # `to_dict`
         pop_keys: set[str] = set()
+        timedelta_dict: dict = {}
         for key, value in out.items():
             if isinstance(value, tuple | list):
                 if not value:
@@ -629,10 +641,24 @@ class TelegramObject:
             elif isinstance(value, dtm.datetime):
                 out[key] = to_timestamp(value)
             elif isinstance(value, dtm.timedelta):
-                out[key] = value.total_seconds()
+                # Converting to int here is neccassry in some cases where Bot API returns
+                # 'BadRquest' when expecting integers (e.g. InputMediaVideo.duration).
+                # Other times, floats are accepted but the Bot API handles ints just as well
+                # (e.g. InputStoryContentVideo.duration).
+                # Not updating `out` directly to avoid changing the dict size during iteration
+                timedelta_dict[key.removeprefix("_")] = (
+                    int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds
+                )
+                # This will sometimes add non-deprecated timedelta attributes to pop_keys.
+                # We'll restore them shortly.
+                pop_keys.add(key)
 
         for key in pop_keys:
             out.pop(key)
+
+        # `out.update` must to be called *after* we pop deprecated time period attributes
+        # this ensures that we restore attributes that were already using datetime.timdelta
+        out.update(timedelta_dict)
 
         # Effectively "unpack" api_kwargs into `out`:
         out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]
@@ -665,3 +691,31 @@ class TelegramObject:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
         """
         self._bot = bot
+
+
+# We use str keys to avoid importing which causes circular dependencies
+_TIME_PERIOD_DEPRECATIONS: dict[str, tuple[str, ...]] = {
+    "ChatFullInfo": ("_message_auto_delete_time", "_slow_mode_delay"),
+    "Animation": ("_duration",),
+    "Audio": ("_duration",),
+    "Video": ("_duration", "_start_timestamp"),
+    "VideoNote": ("_duration",),
+    "Voice": ("_duration",),
+    "PaidMediaPreview": ("_duration",),
+    "VideoChatEnded": ("_duration",),
+    "InputMediaVideo": ("_duration",),
+    "InputMediaAnimation": ("_duration",),
+    "InputMediaAudio": ("_duration",),
+    "InputPaidMediaVideo": ("_duration",),
+    "InlineQueryResultGif": ("_gif_duration",),
+    "InlineQueryResultMpeg4Gif": ("_mpeg4_duration",),
+    "InlineQueryResultVideo": ("_video_duration",),
+    "InlineQueryResultAudio": ("_audio_duration",),
+    "InlineQueryResultVoice": ("_voice_duration",),
+    "InlineQueryResultLocation": ("_live_period",),
+    "Poll": ("_open_period",),
+    "Location": ("_live_period",),
+    "MessageAutoDeleteTimerChanged": ("_message_auto_delete_time",),
+    "ChatInviteLink": ("_subscription_period",),
+    "InputLocationMessageContent": ("_live_period",),
+}

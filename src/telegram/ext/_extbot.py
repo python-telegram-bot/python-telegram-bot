@@ -652,7 +652,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         offset: int | None = None,
         limit: int | None = None,
-        timeout: int | None = None,
+        timeout: TimePeriod | None = None,
         allowed_updates: Sequence[str] | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

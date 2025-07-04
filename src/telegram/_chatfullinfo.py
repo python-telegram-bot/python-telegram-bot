@@ -29,9 +29,18 @@ from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._gifts import AcceptedGiftTypes
 from telegram._reaction import ReactionType
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import (
+    de_json_optional,
+    de_list_optional,
+    parse_sequence_arg,
+    to_timedelta,
+)
+from telegram._utils.datetime import (
+    extract_tzinfo_from_defaults,
+    from_timestamp,
+    get_timedelta_value,
+)
+from telegram._utils.types import JSONDict, TimePeriod
 from telegram._utils.warnings import warn
 from telegram._utils.warnings_transition import (
     build_deprecation_warning_message,
@@ -166,17 +175,23 @@ class ChatFullInfo(_ChatBase):
             (by sending date).
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups.
-        slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user.
+        slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`, optional): For supergroups,
+            the minimum allowed delay between consecutive messages sent by each unprivileged user.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         unrestrict_boost_count (:obj:`int`, optional): For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions.
 
             .. versionadded:: 21.0
-        message_auto_delete_time (:obj:`int`, optional): The time after which all messages sent to
-            the chat will be automatically deleted; in seconds.
+        message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`, optional): The time
+            after which all messages sent to the chat will be automatically deleted; in seconds.
 
             .. versionadded:: 13.4
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators.
@@ -331,17 +346,23 @@ class ChatFullInfo(_ChatBase):
             (by sending date).
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups.
-        slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user.
+        slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`): Optional. For supergroups,
+            the minimum allowed delay between consecutive messages sent by each unprivileged user.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         unrestrict_boost_count (:obj:`int`): Optional. For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions.
 
             .. versionadded:: 21.0
-        message_auto_delete_time (:obj:`int`): Optional. The time after which all messages sent to
-            the chat will be automatically deleted; in seconds.
+        message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`): Optional. The time
+            after which all messages sent to the chat will be automatically deleted; in seconds.
 
             .. versionadded:: 13.4
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators.
@@ -383,6 +404,8 @@ class ChatFullInfo(_ChatBase):
 
     __slots__ = (
         "_can_send_gift",
+        "_message_auto_delete_time",
+        "_slow_mode_delay",
         "accent_color_id",
         "accepted_gift_types",
         "active_usernames",
@@ -411,14 +434,12 @@ class ChatFullInfo(_ChatBase):
         "linked_chat_id",
         "location",
         "max_reaction_count",
-        "message_auto_delete_time",
         "permissions",
         "personal_chat",
         "photo",
         "pinned_message",
         "profile_accent_color_id",
         "profile_background_custom_emoji_id",
-        "slow_mode_delay",
         "sticker_set_name",
         "unrestrict_boost_count",
     )
@@ -456,9 +477,9 @@ class ChatFullInfo(_ChatBase):
         invite_link: str | None = None,
         pinned_message: "Message | None" = None,
         permissions: ChatPermissions | None = None,
-        slow_mode_delay: int | None = None,
+        slow_mode_delay: TimePeriod | None = None,
         unrestrict_boost_count: int | None = None,
-        message_auto_delete_time: int | None = None,
+        message_auto_delete_time: TimePeriod | None = None,
         has_aggressive_anti_spam_enabled: bool | None = None,
         has_hidden_members: bool | None = None,
         has_protected_content: bool | None = None,
@@ -513,9 +534,9 @@ class ChatFullInfo(_ChatBase):
             self.invite_link: str | None = invite_link
             self.pinned_message: Message | None = pinned_message
             self.permissions: ChatPermissions | None = permissions
-            self.slow_mode_delay: int | None = slow_mode_delay
-            self.message_auto_delete_time: int | None = (
-                int(message_auto_delete_time) if message_auto_delete_time is not None else None
+            self._slow_mode_delay: dtm.timedelta | None = to_timedelta(slow_mode_delay)
+            self._message_auto_delete_time: dtm.timedelta | None = to_timedelta(
+                message_auto_delete_time
             )
             self.has_protected_content: bool | None = has_protected_content
             self.has_visible_history: bool | None = has_visible_history
@@ -571,6 +592,16 @@ class ChatFullInfo(_ChatBase):
             stacklevel=2,
         )
         return self._can_send_gift
+
+    @property
+    def slow_mode_delay(self) -> int | dtm.timedelta | None:
+        return get_timedelta_value(self._slow_mode_delay, attribute="slow_mode_delay")
+
+    @property
+    def message_auto_delete_time(self) -> int | dtm.timedelta | None:
+        return get_timedelta_value(
+            self._message_auto_delete_time, attribute="message_auto_delete_time"
+        )
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatFullInfo":
