@@ -446,6 +446,30 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
         assert unique_gift_info.last_resale_star_count == self.last_resale_star_count
         assert unique_gift_info.next_transfer_date == self.next_transfer_date
 
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
+        json_dict = {
+            "gift": self.gift.to_dict(),
+            "origin": self.origin,
+            "owned_gift_id": self.owned_gift_id,
+            "transfer_star_count": self.transfer_star_count,
+            "last_resale_star_count": self.last_resale_star_count,
+            "next_transfer_date": to_timestamp(self.next_transfer_date),
+        }
+
+        unique_gift_info_raw = UniqueGiftInfo.de_json(json_dict, raw_bot)
+        unique_gift_info_offline = UniqueGiftInfo.de_json(json_dict, offline_bot)
+        unique_gift_info_tz = UniqueGiftInfo.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        unique_gift_info_tz_offset = unique_gift_info_tz.next_transfer_date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            unique_gift_info_tz.next_transfer_date.replace(tzinfo=None)
+        )
+
+        assert unique_gift_info_raw.next_transfer_date.tzinfo == UTC
+        assert unique_gift_info_offline.next_transfer_date.tzinfo == UTC
+        assert unique_gift_info_tz_offset == tz_bot_offset
+
     def test_to_dict(self, unique_gift_info):
         json_dict = unique_gift_info.to_dict()
         assert json_dict["gift"] == self.gift.to_dict()
