@@ -46,6 +46,7 @@ __all__ = (
     "AUDIO",
     "BOOST_ADDED",
     "CAPTION",
+    "CHECKLIST",
     "COMMAND",
     "CONTACT",
     "EFFECT_ID",
@@ -918,6 +919,20 @@ class ChatType:  # A convenience namespace for Chat types.
 
     SUPERGROUP = _SuperGroup(name="filters.ChatType.SUPERGROUP")
     """Updates from supergroup."""
+
+
+class _Checklist(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.checklist)
+
+
+CHECKLIST = _Checklist(name="filters.CHECKLIST")
+"""Messages that contain :attr:`telegram.Message.checklist`.
+
+.. versionadded:: NEXT.VERSION
+"""
 
 
 class Command(MessageFilter):

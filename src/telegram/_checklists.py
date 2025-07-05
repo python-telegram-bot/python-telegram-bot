@@ -21,7 +21,6 @@ import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
-from telegram._message import Message
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -32,7 +31,7 @@ from telegram._utils.types import JSONDict
 from telegram.constants import ZERO_DATE
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram import Bot, Message
 
 
 class ChecklistTask(TelegramObject):
@@ -306,7 +305,7 @@ class ChecklistTasksDone(TelegramObject):
 
     def __init__(
         self,
-        checklist_message: Optional[Message] = None,
+        checklist_message: Optional["Message"] = None,
         marked_as_done_task_ids: Optional[Sequence[int]] = None,
         marked_as_not_done_task_ids: Optional[Sequence[int]] = None,
         *,
@@ -327,6 +326,9 @@ class ChecklistTasksDone(TelegramObject):
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChecklistTasksDone":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
+
+        # needs to be imported here to avoid circular import issues
+        from telegram import Message  # pylint: disable=import-outside-toplevel
 
         data["checklist_message"] = de_json_optional(data.get("checklist_message"), Message, bot)
 
@@ -362,7 +364,7 @@ class ChecklistTasksAdded(TelegramObject):
     def __init__(
         self,
         tasks: Sequence[ChecklistTask],
-        checklist_message: Optional[Message] = None,
+        checklist_message: Optional["Message"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -378,6 +380,9 @@ class ChecklistTasksAdded(TelegramObject):
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChecklistTasksAdded":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
+
+        # needs to be imported here to avoid circular import issues
+        from telegram import Message  # pylint: disable=import-outside-toplevel
 
         data["checklist_message"] = de_json_optional(data.get("checklist_message"), Message, bot)
         data["tasks"] = ChecklistTask.de_list(data.get("tasks", []), bot)

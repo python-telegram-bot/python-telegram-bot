@@ -2797,3 +2797,10 @@ class TestFilters:
         update.message.sender_boost_count = "test"
         assert filters.SENDER_BOOST_COUNT.check_update(update)
         assert str(filters.SENDER_BOOST_COUNT) == "filters.SENDER_BOOST_COUNT"
+
+    def test_filters_checklist(self, update):
+        assert not filters.CHECKLIST.check_update(update)
+
+        update.message.checklist = "test"
+        assert filters.CHECKLIST.check_update(update)
+        assert str(filters.CHECKLIST) == "filters.CHECKLIST"

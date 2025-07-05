@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING, Optional, TypedDict, Union
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
 from telegram._chatboost import ChatBoostAdded
+from telegram._checklists import Checklist
 from telegram._dice import Dice
 from telegram._directmessagepricechanged import DirectMessagePriceChanged
 from telegram._files.animation import Animation
@@ -525,6 +526,9 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
+        checklist (:class:`telegram.Checklist`, optional): Message is a checklist
+
+            .. versionadded:: NEXT.VERSION
         users_shared (:class:`telegram.UsersShared`, optional): Service message: users were shared
             with the bot
 
@@ -874,6 +878,9 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
+        checklist (:class:`telegram.Checklist`): Optional. Message is a checklist
+
+            .. versionadded:: NEXT.VERSION
         users_shared (:class:`telegram.UsersShared`): Optional. Service message: users were shared
             with the bot
 
@@ -994,6 +1001,7 @@ class Message(MaybeInaccessibleMessage):
         "channel_chat_created",
         "chat_background_set",
         "chat_shared",
+        "checklist",
         "connected_website",
         "contact",
         "delete_chat_photo",
@@ -1165,6 +1173,7 @@ class Message(MaybeInaccessibleMessage):
         paid_message_price_changed: Optional[PaidMessagePriceChanged] = None,
         paid_star_count: Optional[int] = None,
         direct_message_price_changed: Optional[DirectMessagePriceChanged] = None,
+        checklist: Optional[Checklist] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1246,6 +1255,7 @@ class Message(MaybeInaccessibleMessage):
             )
             self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
             self.has_media_spoiler: Optional[bool] = has_media_spoiler
+            self.checklist: Optional[Checklist] = checklist
             self.users_shared: Optional[UsersShared] = users_shared
             self.chat_shared: Optional[ChatShared] = chat_shared
             self.story: Optional[Story] = story
@@ -1456,6 +1466,7 @@ class Message(MaybeInaccessibleMessage):
         data["direct_message_price_changed"] = de_json_optional(
             data.get("direct_message_price_changed"), DirectMessagePriceChanged, bot
         )
+        data["checklist"] = de_json_optional(data.get("checklist"), Checklist, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

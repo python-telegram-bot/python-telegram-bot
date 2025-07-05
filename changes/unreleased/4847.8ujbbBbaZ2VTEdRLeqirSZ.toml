@@ -4,6 +4,7 @@ features = """
 New filters based on Bot API 9.1:
 
 * ``filters.StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED`` for ``Message.direct_message_price_changed``
+* ``filters.CHECKLIST`` for ``Message.checklist``
 """
 
 pull_requests = [
