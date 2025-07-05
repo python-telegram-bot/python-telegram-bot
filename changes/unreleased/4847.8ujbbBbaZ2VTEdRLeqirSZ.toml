@@ -4,6 +4,8 @@ features = """
 New filters based on Bot API 9.1:
 
 * ``filters.StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED`` for ``Message.direct_message_price_changed``
+* ``filters.StatusUpdate.CHECKLIST_TASKS_ADDED`` for ``Message.checklist_tasks_added``
+* ``filters.StatusUpdate.CHECKLIST_TASKS_DONE`` for ``Message.checklist_tasks_done``
 * ``filters.CHECKLIST`` for ``Message.checklist``
 """
 
