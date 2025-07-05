@@ -20,8 +20,15 @@ import datetime as dtm
 
 import pytest
 
-from telegram import ChecklistTask, Dice, MessageEntity, User
-from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
+from telegram import (
+    Checklist,
+    ChecklistTask,
+    ChecklistTasksAdded,
+    ChecklistTasksDone,
+    Dice,
+    MessageEntity,
+    User,
+)
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ZERO_DATE
 from tests.auxil.build_messages import make_message
