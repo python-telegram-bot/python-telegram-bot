@@ -1947,6 +1947,7 @@ class StatusUpdate:
                 or StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
                 or StatusUpdate.WEB_APP_DATA.check_update(update)
                 or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
+                or StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1996,6 +1997,20 @@ class StatusUpdate:
 
     CONNECTED_WEBSITE = _ConnectedWebsite(name="filters.StatusUpdate.CONNECTED_WEBSITE")
     """Messages that contain :attr:`telegram.Message.connected_website`."""
+
+    class _DirectMessagePriceChanged(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.direct_message_price_changed)
+
+    DIRECT_MESSAGE_PRICE_CHANGED = _DirectMessagePriceChanged(
+        name="filters.StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED"
+    )
+    """Messages that contain :attr:`telegram.Message.direct_message_price_changed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
     class _DeleteChatPhoto(MessageFilter):
         __slots__ = ()

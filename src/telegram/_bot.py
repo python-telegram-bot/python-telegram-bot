@@ -11072,6 +11072,36 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def get_my_star_balance(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> StarAmount:
+        """A method to get the current Telegram Stars balance of the bot. Requires no parameters.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.StarAmount`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        return StarAmount.de_json(
+            await self._post(
+                "getMyStarBalance",
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -11386,3 +11416,5 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`remove_chat_verification`"""
     removeUserVerification = remove_user_verification
     """Alias for :meth:`remove_user_verification`"""
+    getMyStarBalance = get_my_star_balance
+    """Alias for :meth:`get_my_star_balance`"""

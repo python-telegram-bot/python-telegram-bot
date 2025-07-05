@@ -416,6 +416,7 @@ class TransactionPartnerUser(TransactionPartner):
 
     def __init__(
         self,
+        transaction_type: str,
         user: "User",
         invoice_payload: Optional[str] = None,
         paid_media: Optional[Sequence[PaidMedia]] = None,
@@ -424,16 +425,10 @@ class TransactionPartnerUser(TransactionPartner):
         gift: Optional[Gift] = None,
         affiliate: Optional[AffiliateInfo] = None,
         premium_subscription_duration: Optional[int] = None,
-        # temporarily optional to account for changed signature
-        transaction_type: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
-
-        # tags: deprecated 22.1, bot api 9.0
-        if transaction_type is None:
-            raise TypeError("`transaction_type` is a required argument since Bot API 9.0")
 
         with self._unfrozen():
             self.user: User = user

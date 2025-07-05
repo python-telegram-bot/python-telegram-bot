@@ -33,6 +33,7 @@ from telegram import (
     ChatShared,
     Contact,
     Dice,
+    DirectMessagePriceChanged,
     Document,
     ExternalReplyInfo,
     Game,
@@ -331,6 +332,7 @@ def message(bot):
         {"refunded_payment": RefundedPayment("EUR", 243, "payload", "charge_id", "provider_id")},
         {"paid_star_count": 291},
         {"paid_message_price_changed": PaidMessagePriceChanged(291)},
+        {"direct_message_price_changed": DirectMessagePriceChanged(True, 100)},
     ],
     ids=[
         "reply",
@@ -408,6 +410,7 @@ def message(bot):
         "refunded_payment",
         "paid_star_count",
         "paid_message_price_changed",
+        "direct_message_price_changed",
     ],
 )
 def message_params(bot, request):

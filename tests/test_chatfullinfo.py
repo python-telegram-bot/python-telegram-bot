@@ -145,7 +145,6 @@ class ChatFullInfoTestBase:
     first_name = "first_name"
     last_name = "last_name"
     can_send_paid_media = True
-    can_send_gift = True
     accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
 
 
@@ -166,7 +165,6 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "max_reaction_count": self.max_reaction_count,
             "username": self.username,
             "accepted_gift_types": self.accepted_gift_types.to_dict(),
-            "can_send_gift": self.can_send_gift,
             "sticker_set_name": self.sticker_set_name,
             "can_set_sticker_set": self.can_set_sticker_set,
             "permissions": self.permissions.to_dict(),
@@ -333,35 +331,6 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["accepted_gift_types"] == cfi.accepted_gift_types.to_dict()
 
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
-
-    def test_accepted_gift_types_is_required_argument(self):
-        with pytest.raises(TypeError, match="`accepted_gift_type` is a required argument"):
-            ChatFullInfo(
-                id=123,
-                type=Chat.PRIVATE,
-                accent_color_id=1,
-                max_reaction_count=2,
-                can_send_gift=True,
-            )
-
-    def test_can_send_gift_deprecation_warning(self):
-        with pytest.warns(
-            PTBDeprecationWarning,
-            match="'can_send_gift' was replaced by 'accepted_gift_types' in Bot API 9.0",
-        ):
-            chat_full_info = ChatFullInfo(
-                id=123,
-                type=Chat.PRIVATE,
-                accent_color_id=1,
-                max_reaction_count=2,
-                accepted_gift_types=self.accepted_gift_types,
-                can_send_gift=self.can_send_gift,
-            )
-        with pytest.warns(
-            PTBDeprecationWarning,
-            match="Bot API 9.0 renamed the attribute 'can_send_gift' to 'accepted_gift_types'",
-        ):
-            chat_full_info.can_send_gift
 
     def test_time_period_properties(self, PTB_TIMEDELTA, chat_full_info):
         cfi = chat_full_info

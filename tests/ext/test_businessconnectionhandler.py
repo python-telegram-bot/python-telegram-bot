@@ -23,6 +23,7 @@ import pytest
 
 from telegram import (
     Bot,
+    BusinessBotRights,
     BusinessConnection,
     CallbackQuery,
     Chat,
@@ -81,8 +82,8 @@ def business_connection(bot):
         user_chat_id=1,
         user=User(1, "name", username="user_a", is_bot=False),
         date=dtm.datetime.now(tz=UTC),
-        can_reply=True,
         is_enabled=True,
+        rights=BusinessBotRights(can_reply=True),
     )
     bc.set_bot(bot)
     return bc

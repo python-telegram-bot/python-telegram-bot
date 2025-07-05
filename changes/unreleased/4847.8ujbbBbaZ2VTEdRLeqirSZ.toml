@@ -1,16 +1,14 @@
 highlights = "Full Support for Bot API 9.1"
 
-breaking = "Optional Section Content"
-security = "Optional Section Content"
-deprecations = "Optional Section Content"
-features = "Optional Section Content"
-bugfixes = "Optional Section Content"
-dependencies = "Optional Section Content"
-other = "Optional Section Content"
-documentation = "Optional Section Content"
-internal = "Optional Section Content"
+features = """
+New filters based on Bot API 9.1:
+
+* ``filters.StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED`` for ``Message.direct_message_price_changed``
+"""
 
 pull_requests = [
   { uid = "4847", author_uid = "Bibo-Joshi", closes_threads = ["4845"] },
-  { uid = "4848", author_uid = "Bibo-Joshi", closes_threads = [] }
+  { uid = "4848", author_uid = "Bibo-Joshi" },
+  { uid = "4849", author_uid = "harshil21" },
+  { uid = "4851", author_uid = "harshil21" },
 ]

@@ -92,6 +92,7 @@ __all__ = (
     "Credentials",
     "DataCredentials",
     "Dice",
+    "DirectMessagePriceChanged",
     "Document",
     "EncryptedCredentials",
     "EncryptedPassportElement",
@@ -389,6 +390,7 @@ from ._checklists import Checklist, ChecklistTask, ChecklistTasksAdded, Checklis
 from ._choseninlineresult import ChosenInlineResult
 from ._copytextbutton import CopyTextButton
 from ._dice import Dice
+from ._directmessagepricechanged import DirectMessagePriceChanged
 from ._files._inputstorycontent import (
     InputStoryContent,
     InputStoryContentPhoto,
