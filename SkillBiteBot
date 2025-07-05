@@ -1,0 +1,181 @@
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, Filters, ContextTypes
+import json
+import os
+from datetime import datetime, timedelta
+import random
+
+# Token de BotFather (reemplazá con el tuyo)
+TOKEN = "123456:ABC-DEF1234ghIjkLoM"  # ¡Obtené tu token de @BotFather!
+
+# Archivo para guardar datos
+DATA_FILE = "skill_bite.json"
+
+# Banco de preguntas (idioma: inglés para empezar)
+QUESTIONS = [
+    {
+        "question": "¿Cómo se dice 'hola' en inglés?",
+        "options": ["1. Hello", "2. Goodbye", "3. Please", "4. Thank you"],
+        "correct": 1
+    },
+    {
+        "question": "¿Cuál es el pasado de 'go'?",
+        "options": ["1. Goes", "2. Went", "3. Going", "4. Gone"],
+        "correct": 2
+    },
+    {
+        "question": "¿Cómo se dice 'gracias' en inglés?",
+        "options": ["1. Sorry", "2. Please", "3. Thank you", "4. Hello"],
+        "correct": 3
+    }
+]
+
+# Respuestas motivacionales
+RESPONSES = [
+    "¡Sos una máquina del conocimiento! 🧠 +5 puntos.",
+    "¡Crack, seguí así! 🔥 +5 puntos por aprender.",
+    "¡Pura épica mental! 😎 +5 puntos.",
+    "¡Leyenda del saber! 📚 +5 puntos, ¿listo para más?"
+]
+
+# Medallas
+MEDALS = [
+    "🥉 Aprendiz de Inglés: 10 puntos",
+    "🥈 Maestro de Vocabulario: 30 puntos",
+    "🥇 Gurú del Conocimiento: 50 puntos"
+]
+
+# Cargar/guardar datos
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    return {"users": {}}
+
+def save_data(data):
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f)
+
+# Comando /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = str(update.message.from_user.id)
+    data = load_data()
+    if user_id not in data["users"]:
+        data["users"][user_id] = {"points": 0, "premium": False, "medals": [], "last_question": None}
+        save_data(data)
+    question = random.choice(QUESTIONS)
+    data["users"][user_id]["last_question"] = question
+    save_data(data)
+    options_text = "\n".join(question["options"])
+    await update.message.reply_text(
+        "¡Bienvenido a @SkillBiteBot! 🧠 Aprendé en bocados y ganá puntos.\n"
+        f"Pregunta: {question['question']}\n{options_text}\n"
+        "Respondé con /answer 1, /answer 2, etc.\n"
+        "Comandos:\n/points - Ver tus puntos\n/premium - Desbloqueá más\n/daily - Nueva pregunta"
+    )
+
+# Comando /daily (nueva pregunta)
+async def daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = str(update.message.from_user.id)
+    data = load_data()
+    question = random.choice(QUESTIONS)
+    data["users"][user_id]["last_question"] = question
+    save_data(data)
+    options_text = "\n".join(question["options"])
+    await update.message.reply_text(
+        f"¡Pregunta del día! 📚\n{question['question']}\n{options_text}\n"
+        "Respondé con /answer 1, /answer 2, etc."
+    )
+    # Programar recordatorio (simulado, 10 segundos después)
+    context.job_queue.run_once(
+        send_reminder,
+        when=10,
+        data={"chat_id": update.message.chat_id}
+    )
+
+# Comando /answer
+async def answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = str(update.message.from_user.id)
+    data = load_data()
+    if user_id not in data["users"] or not data["users"][user_id]["last_question"]:
+        await update.message.reply_text("¡Primero pedí una pregunta con /daily! 📚")
+        return
+    try:
+        user_answer = int(context.args[0])
+        question = data["users"][user_id]["last_question"]
+        if user_answer == question["correct"]:
+            data["users"][user_id]["points"] += 5
+            # Dar medallas según puntos
+            if data["users"][user_id]["points"] >= 50 and "Gurú del Conocimiento" not in data["users"][user_id]["medals"]:
+                data["users"][user_id]["medals"].append("🥇 Gurú del Conocimiento")
+            elif data["users"][user_id]["points"] >= 30 and "Maestro de Vocabulario" not in data["users"][user_id]["medals"]:
+                data["users"][user_id]["medals"].append("🥈 Maestro de Vocabulario")
+            elif data["users"][user_id]["points"] >= 10 and "Aprendiz de Inglés" not in data["users"][user_id]["medals"]:
+                data["users"][user_id]["medals"].append("🥉 Aprendiz de Inglés")
+            save_data(data)
+            affiliate_link = "https://amazon.com/language-books?tag=tuafiliado123"  # Reemplazá con tu enlace real
+            await update.message.reply_text(
+                f"¡Correcto! 🎉 {random.choice(RESPONSES)}\n"
+                f"Querés aprender más? Mirá estos libros: {affiliate_link}\n"
+                "Pedí otra pregunta con /daily."
+            )
+        else:
+            await update.message.reply_text("¡Uy, no! 😅 Intentá otra con /daily.")
+    except (IndexError, ValueError):
+        await update.message.reply_text("Usá /answer 1, /answer 2, etc. Ejemplo: /answer 1")
+
+# Comando /points
+async def points(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = str(update.message.from_user.id)
+    data = load_data()
+    user_points = data["users"][user_id]["points"]
+    medals = "\n".join(data["users"][user_id]["medals"]) or "¡Sin medallas aún, a ganarlas!"
+    await update.message.reply_text(f"🧠 Puntos de conocimiento: {user_points}\nMedallas:\n{medals}")
+
+# Comando /premium
+async def premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = str(update.message.from_user.id)
+    data = load_data()
+    if data["users"][user_id]["premium"]:
+        await update.message.reply_text("¡Ya sos premium, genio! 🚀 Usá /daily o /leaderboard para más.")
+    else:
+        affiliate_link = "https://amazon.com/language-books?tag=tuafiliado123"  # Reemplazá con tu enlace real
+        await update.message.reply_text(
+            "¡Volvete premium por $2/mes! 🚀 Con premium tenés:\n"
+            "- Preguntas personalizadas\n"
+            "- Tabla de clasificación\n"
+            "- Canal exclusivo con mini-cursos\n"
+            f"Pagá en: t.me/InviteMember (simulado) o mirá estos libros: {affiliate_link}"
+        )
+
+# Programar recordatorio
+async def send_reminder(context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        context.job.context["chat_id"],
+        "¡No te pierdas la pregunta de hoy! 📚 Usá /daily para aprender y ganar puntos. @SkillBiteBot"
+    )
+
+# Manejar mensajes
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = str(update.message.from_user.id)
+    data = load_data()
+    if user_id not in data["users"]:
+        data["users"][user_id] = {"points": 0, "premium": False, "medals": [], "last_question": None}
+        save_data(data)
+    await update.message.reply_text(
+        f"¡Vamos, genio! 🧠 Pedí una pregunta con /daily o chequeá tus puntos con /points."
+    )
+
+def main():
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("daily", daily))
+    app.add_handler(CommandHandler("answer", answer))
+    app.add_handler(CommandHandler("points", points))
+    app.add_handler(CommandHandler("premium", premium))
+    app.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+    print("Bot iniciado...")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
