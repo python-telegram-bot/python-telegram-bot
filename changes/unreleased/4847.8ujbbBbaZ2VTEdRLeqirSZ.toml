@@ -10,7 +10,8 @@ other = "Optional Section Content"
 documentation = "Optional Section Content"
 internal = "Optional Section Content"
 
-[[pull_requests]]
-uid = "4847"
-author_uid = "Bibo-Joshi"
-closes_threads = ["4845"]
+pull_requests = [
+  { uid = "4847", author_uid = "Bibo-Joshi", closes_threads = ["4845"] },
+  { uid = "4849", author_uid = "harshil21" },
+  { uid = "4851", author_uid = "harshil21" },
+]
