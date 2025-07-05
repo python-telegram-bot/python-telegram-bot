@@ -322,19 +322,15 @@ class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
         assert json_dict["subscription_period"] == self.subscription_period.total_seconds()
         assert json_dict["premium_subscription_duration"] == self.premium_subscription_duration
 
-    def test_transaction_type_is_required_argument(self):
-        with pytest.raises(TypeError, match="`transaction_type` is a required argument"):
-            TransactionPartnerUser(user=self.user)
-
     def test_equality(self, transaction_partner_user):
         a = transaction_partner_user
         b = TransactionPartnerUser(
-            user=self.user,
             transaction_type=self.transaction_type,
+            user=self.user,
         )
         c = TransactionPartnerUser(
-            user=User(id=1, is_bot=False, first_name="user", last_name="user"),
             transaction_type=self.transaction_type,
+            user=User(id=1, is_bot=False, first_name="user", last_name="user"),
         )
         d = User(id=1, is_bot=False, first_name="user", last_name="user")
 
