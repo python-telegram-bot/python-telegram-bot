@@ -50,8 +50,9 @@ class ChecklistTask(TelegramObject):
             entities that appear in the task text.
         completed_by_user (:class:`telegram.User`, optional): User that completed the task; omitted
             if the task wasn't completed
-        completion_date (:class:`datetime.datetime`, optional): Point in time (Unix timestamp) when
-            the task was completed; 0 in Univ time if the task wasn't completed
+        completion_date (:class:`datetime.datetime`, optional): Point in time when
+            the task was completed; :attr:`~telegram.constants.ZERO_DATE` if the task wasn't
+            completed
 
             |datetime_localization|
 
@@ -62,8 +63,9 @@ class ChecklistTask(TelegramObject):
             entities that appear in the task text.
         completed_by_user (:class:`telegram.User`): Optional. User that completed the task; omitted
             if the task wasn't completed
-        completion_date (:class:`datetime.datetime`): Optional. Point in time (Unix timestamp) when
-            the task was completed; 0 in Univ time if the task wasn't completed
+        completion_date (:class:`datetime.datetime`): Optional. Point in time when
+            the task was completed; :attr:`~telegram.constants.ZERO_DATE` if the task wasn't
+            completed
 
             |datetime_localization|
     """
@@ -122,7 +124,7 @@ class ChecklistTask(TelegramObject):
         Note:
             This method is present because Telegram calculates the offset and length in
             UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
-            (That is, you can't just slice ``Message.text`` with the offset and length.)
+            (That is, you can't just slice ``ChecklistTask.text`` with the offset and length.)
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
@@ -136,7 +138,7 @@ class ChecklistTask(TelegramObject):
     def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
-        It contains entities from this polls question filtered by their ``type`` attribute as
+        It contains entities from this checklist task filtered by their ``type`` attribute as
         the key, and the text that each entity belongs to as the value of the :obj:`dict`.
 
         Note:
