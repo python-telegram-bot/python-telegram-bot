@@ -32,7 +32,8 @@ if TYPE_CHECKING:
 @pytest.fixture
 def direct_message_price_changed():
     return DirectMessagePriceChanged(
-        are_direct_messages_enabled=True, direct_message_star_count=100
+        are_direct_messages_enabled=DirectMessagePriceChangedTestBase.are_direct_messages_enabled,
+        direct_message_star_count=DirectMessagePriceChangedTestBase.direct_message_star_count,
     )
 
 
