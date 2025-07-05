@@ -1116,7 +1116,12 @@ class TestFilters:
         assert filters.StatusUpdate.PAID_MESSAGE_PRICE_CHANGED.check_update(update)
         update.message.paid_message_price_changed = None
 
-    def test_filters_forwarded(self, update, message_origin_user):
+        update.message.direct_message_price_changed = "direct_message_price_changed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED.check_update(update)
+        update.message.direct_message_price_changed = None
+
+    def test_filters_forwarded(self, update):
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = MessageOriginHiddenUser(dtm.datetime.utcnow(), 1)
         assert filters.FORWARDED.check_update(update)

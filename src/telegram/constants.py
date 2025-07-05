@@ -2064,6 +2064,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
     DICE = "dice"
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
+    DIRECT_MESSAGE_PRICE_CHANGED = "direct_message_price_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.direct_message_price_changed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
     EFFECT_ID = "effect_id"
@@ -3153,10 +3158,13 @@ class PollLimit(IntEnum):
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MAX_OPTION_NUMBER = 10
+    MAX_OPTION_NUMBER = 12
     """:obj:`int`: Maximum number of strings passed in a :obj:`list`
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
+
+    .. versionchanged:: NEXT.VERSION
+        This value was changed from ``10`` to ``12`` in accordance to Bot API 9.1.
     """
     MAX_EXPLANATION_LENGTH = 200
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the

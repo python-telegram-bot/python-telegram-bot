@@ -79,6 +79,7 @@ from telegram import (
     User,
     WebAppInfo,
 )
+from telegram._payment.stars.staramount import StarAmount
 from telegram._utils.datetime import UTC, from_timestamp, localize, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import to_camel_case
@@ -2574,6 +2575,17 @@ class TestBotWithoutRequest:
 
         await offline_bot.remove_chat_verification(1234)
 
+    async def test_get_my_star_balance(self, offline_bot, monkeypatch):
+        sa = StarAmount(1000).to_json()
+
+        async def do_request(url, request_data: RequestData, *args, **kwargs):
+            assert not request_data.parameters
+            return 200, f'{{"ok": true, "result": {sa}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", do_request)
+        obj = await offline_bot.get_my_star_balance()
+        assert isinstance(obj, StarAmount)
+
 
 class TestBotWithRequest:
     """
@@ -4540,3 +4552,8 @@ class TestBotWithRequest:
         assert edited_link.name == "sub_name_2"
         assert sub_link.subscription_period == 2592000
         assert sub_link.subscription_price == 13
+
+    async def test_get_my_star_balance(self, bot):
+        balance = await bot.get_my_star_balance()
+        assert isinstance(balance, StarAmount)
+        assert balance.amount == 0
