@@ -55,6 +55,8 @@ PRIVATE_BASE_CLASSES = {
 }
 
 
+# Resolves to the parent directory of `telegram/`, depending on installation setup,
+# could either be `<absolute_path>/src` or `<absolute_path>/site-packages`
 FILE_ROOT = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
 
 
@@ -161,7 +163,7 @@ def autodoc_process_docstring(
     with contextlib.suppress(Exception):
         source_lines, start_line = inspect.getsourcelines(obj)
         end_line = start_line + len(source_lines)
-        file = Path(inspect.getsourcefile(obj)).relative_to(FILE_ROOT)
+        file = Path("src") / Path(inspect.getsourcefile(obj)).relative_to(FILE_ROOT)
         LINE_NUMBERS[name] = (file, start_line, end_line)
 
     # Since we don't document the `__init__`, we call this manually to have it available for
