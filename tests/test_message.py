@@ -31,6 +31,10 @@ from telegram import (
     ChatBackground,
     ChatBoostAdded,
     ChatShared,
+    Checklist,
+    ChecklistTask,
+    ChecklistTasksAdded,
+    ChecklistTasksDone,
     Contact,
     Dice,
     DirectMessagePriceChanged,
@@ -333,6 +337,23 @@ def message(bot):
         {"paid_star_count": 291},
         {"paid_message_price_changed": PaidMessagePriceChanged(291)},
         {"direct_message_price_changed": DirectMessagePriceChanged(True, 100)},
+        {
+            "checklist": Checklist(
+                "checklist_id",
+                tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
+            )
+        },
+        {
+            "checklist_tasks_done": ChecklistTasksDone(
+                marked_as_done_task_ids=[1, 2, 3],
+                marked_as_not_done_task_ids=[4, 5],
+            )
+        },
+        {
+            "checklist_tasks_added": ChecklistTasksAdded(
+                tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
+            )
+        },
     ],
     ids=[
         "reply",
@@ -411,6 +432,9 @@ def message(bot):
         "paid_star_count",
         "paid_message_price_changed",
         "direct_message_price_changed",
+        "checklist",
+        "checklist_tasks_done",
+        "checklist_tasks_added",
     ],
 )
 def message_params(bot, request):

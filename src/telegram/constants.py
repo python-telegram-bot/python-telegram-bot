@@ -2059,6 +2059,21 @@ class MessageType(StringEnum):
 
     .. versionadded:: 21.2
     """
+    CHECKLIST = "checklist"
+    """:obj:`str`: Messages with :attr:`telegram.Message.checklist`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CHECKLIST_TASKS_ADDED = "checklist_tasks_added"
+    """:obj:`str`: Messages with :attr:`telegram.Message.checklist_tasks_added`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CHECKLIST_TASKS_DONE = "checklist_tasks_done"
+    """:obj:`str`: Messages with :attr:`telegram.Message.checklist_tasks_done`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     CONNECTED_WEBSITE = "connected_website"
     """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
     CONTACT = "contact"
