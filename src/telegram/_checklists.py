@@ -177,12 +177,12 @@ class Checklist(TelegramObject):
 
     Attributes:
         title (:obj:`str`): Title of the checklist.
-        title_entities (Tuple[:class:`telegram.MessageEntity`]): Special
+        title_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special
             entities that appear in the checklist title.
         tasks (Tuple[:class:`telegram.ChecklistTask`]): List of tasks in the checklist.
-        others_can_add_tasks (:obj:`bool`): :obj:`True` if users other than the creator
+        others_can_add_tasks (:obj:`bool`): Optional. :obj:`True` if users other than the creator
             of the list can add tasks to the list
-        others_can_mark_tasks_as_done (:obj:`bool`): :obj:`True` if users other than the
+        others_can_mark_tasks_as_done (:obj:`bool`): Optional. :obj:`True` if users other than the
             creator of the list can mark tasks as done or not done
     """
 
@@ -226,13 +226,13 @@ class Checklist(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     def parse_entity(self, entity: MessageEntity) -> str:
-        """Returns the text in :attr:`text`
+        """Returns the text in :attr:`title`
         from a given :class:`telegram.MessageEntity` of :attr:`title_entities`.
 
         Note:
             This method is present because Telegram calculates the offset and length in
             UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
-            (That is, you can't just slice ``Message.text`` with the offset and length.)
+            (That is, you can't just slice :attr:`title` with the offset and length.)
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
@@ -246,7 +246,7 @@ class Checklist(TelegramObject):
     def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
-        It contains entities from this polls question filtered by their ``type`` attribute as
+        It contains entities from this checklist's title filtered by their ``type`` attribute as
         the key, and the text that each entity belongs to as the value of the :obj:`dict`.
 
         Note:
@@ -291,10 +291,10 @@ class ChecklistTasksDone(TelegramObject):
             whose tasks were marked as done or not done. Note that the ~:class:`telegram.Message`
             object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
             field even if it itself is a reply.
-        marked_as_done_task_ids (Tuple[:obj:`int`]): Identifiers of the tasks that were marked
-            as done
-        marked_as_not_done_task_ids (Tuple[:obj:`int`]): Identifiers of the tasks that were
-            marked as not done
+        marked_as_done_task_ids (Tuple[:obj:`int`]): Optional. Identifiers of the tasks that were
+            marked as done
+        marked_as_not_done_task_ids (Tuple[:obj:`int`]): Optional. Identifiers of the tasks that
+            were marked as not done
     """
 
     __slots__ = (
@@ -337,7 +337,7 @@ class ChecklistTasksDone(TelegramObject):
 
 class ChecklistTasksAdded(TelegramObject):
     """
-    Describes a service message about checklist tasks added to a checklist.
+    Describes a service message about tasks added to a checklist.
 
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their :attr:`tasks` are equal.
