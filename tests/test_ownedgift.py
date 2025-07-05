@@ -18,7 +18,6 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 
 import datetime as dtm
-from collections.abc import Sequence
 from copy import deepcopy
 
 import pytest
@@ -96,6 +95,7 @@ class OwnedGiftTestBase:
     prepaid_upgrade_star_count = 200
     can_be_transferred = True
     transfer_star_count = 300
+    next_transfer_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
 class TestOwnedGiftWithoutRequest(OwnedGiftTestBase):
@@ -139,6 +139,7 @@ class TestOwnedGiftWithoutRequest(OwnedGiftTestBase):
             "prepaid_upgrade_star_count": self.prepaid_upgrade_star_count,
             "can_be_transferred": self.can_be_transferred,
             "transfer_star_count": self.transfer_star_count,
+            "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
         og = OwnedGift.de_json(json_dict, offline_bot)
 
@@ -292,6 +293,7 @@ def owned_gift_unique():
         is_saved=TestOwnedGiftUniqueWithoutRequest.is_saved,
         can_be_transferred=TestOwnedGiftUniqueWithoutRequest.can_be_transferred,
         transfer_star_count=TestOwnedGiftUniqueWithoutRequest.transfer_star_count,
+        next_transfer_date=TestOwnedGiftUniqueWithoutRequest.next_transfer_date,
     )
 
 
@@ -313,6 +315,7 @@ class TestOwnedGiftUniqueWithoutRequest(OwnedGiftTestBase):
             "is_saved": self.is_saved,
             "can_be_transferred": self.can_be_transferred,
             "transfer_star_count": self.transfer_star_count,
+            "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
         ogu = OwnedGiftUnique.de_json(json_dict, offline_bot)
         assert ogu.gift == self.unique_gift
@@ -322,6 +325,7 @@ class TestOwnedGiftUniqueWithoutRequest(OwnedGiftTestBase):
         assert ogu.is_saved == self.is_saved
         assert ogu.can_be_transferred == self.can_be_transferred
         assert ogu.transfer_star_count == self.transfer_star_count
+        assert ogu.next_transfer_date == self.next_transfer_date
         assert ogu.api_kwargs == {}
 
     def test_to_dict(self, owned_gift_unique):
@@ -335,6 +339,7 @@ class TestOwnedGiftUniqueWithoutRequest(OwnedGiftTestBase):
         assert json_dict["is_saved"] == self.is_saved
         assert json_dict["can_be_transferred"] == self.can_be_transferred
         assert json_dict["transfer_star_count"] == self.transfer_star_count
+        assert json_dict["next_transfer_date"] == to_timestamp(self.next_transfer_date)
 
     def test_equality(self, owned_gift_unique):
         a = owned_gift_unique
@@ -365,7 +370,7 @@ def owned_gifts(request):
 class OwnedGiftsTestBase:
     total_count = 2
     next_offset = "next_offset_str"
-    gifts: Sequence[OwnedGifts] = [
+    gifts: list[OwnedGift] = [
         OwnedGiftRegular(
             gift=Gift(
                 id="id1",

@@ -82,12 +82,14 @@ __all__ = (
     "ChatPermissions",
     "ChatPhoto",
     "ChatShared",
+    "ChecklistTask",
     "ChosenInlineResult",
     "Contact",
     "CopyTextButton",
     "Credentials",
     "DataCredentials",
     "Dice",
+    "DirectMessagePriceChanged",
     "Document",
     "EncryptedCredentials",
     "EncryptedPassportElement",
@@ -381,9 +383,11 @@ from ._chatmember import (
 )
 from ._chatmemberupdated import ChatMemberUpdated
 from ._chatpermissions import ChatPermissions
+from ._checklists import ChecklistTask
 from ._choseninlineresult import ChosenInlineResult
 from ._copytextbutton import CopyTextButton
 from ._dice import Dice
+from ._directmessagepricechanged import DirectMessagePriceChanged
 from ._files._inputstorycontent import (
     InputStoryContent,
     InputStoryContentPhoto,

@@ -29,6 +29,7 @@ from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
 from telegram._chatboost import ChatBoostAdded
 from telegram._dice import Dice
+from telegram._directmessagepricechanged import DirectMessagePriceChanged
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
@@ -609,6 +610,11 @@ class Message(MaybeInaccessibleMessage):
             message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
+        direct_message_price_changed (:class:`telegram.DirectMessagePriceChanged`, optional):
+            Service message: the price for paid messages in the corresponding direct messages chat
+            of a channel has changed.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -954,6 +960,11 @@ class Message(MaybeInaccessibleMessage):
             message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
+        direct_message_price_changed (:class:`telegram.DirectMessagePriceChanged`):
+            Optional. Service message: the price for paid messages in the corresponding direct
+            messages chat of a channel has changed.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -987,6 +998,7 @@ class Message(MaybeInaccessibleMessage):
         "contact",
         "delete_chat_photo",
         "dice",
+        "direct_message_price_changed",
         "document",
         "edit_date",
         "effect_id",
@@ -1152,6 +1164,7 @@ class Message(MaybeInaccessibleMessage):
         unique_gift: Optional[UniqueGiftInfo] = None,
         paid_message_price_changed: Optional[PaidMessagePriceChanged] = None,
         paid_star_count: Optional[int] = None,
+        direct_message_price_changed: Optional[DirectMessagePriceChanged] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1261,6 +1274,9 @@ class Message(MaybeInaccessibleMessage):
                 paid_message_price_changed
             )
             self.paid_star_count: Optional[int] = paid_star_count
+            self.direct_message_price_changed: Optional[DirectMessagePriceChanged] = (
+                direct_message_price_changed
+            )
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1437,6 +1453,9 @@ class Message(MaybeInaccessibleMessage):
         data["reply_to_story"] = de_json_optional(data.get("reply_to_story"), Story, bot)
         data["boost_added"] = de_json_optional(data.get("boost_added"), ChatBoostAdded, bot)
         data["sender_business_bot"] = de_json_optional(data.get("sender_business_bot"), User, bot)
+        data["direct_message_price_changed"] = de_json_optional(
+            data.get("direct_message_price_changed"), DirectMessagePriceChanged, bot
+        )
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

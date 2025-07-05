@@ -390,6 +390,8 @@
       - Used to generate an HTTP link for an invoice
     * - :meth:`~telegram.Bot.edit_user_star_subscription`
       - Used for editing a user's star subscription
+    * - :meth:`~telegram.Bot.get_my_star_balance`
+      - Used for obtaining the bot's Telegram Stars balance
     * - :meth:`~telegram.Bot.get_star_transactions`
       - Used for obtaining the bot's Telegram Stars transactions
     * - :meth:`~telegram.Bot.refund_star_payment`
