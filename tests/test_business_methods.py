@@ -21,6 +21,7 @@ import datetime as dtm
 import pytest
 
 from telegram import (
+    BusinessBotRights,
     BusinessConnection,
     Chat,
     InputProfilePhotoStatic,
@@ -51,10 +52,15 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
         user = User(1, "first", False)
         user_chat_id = 1
         date = dtm.datetime.utcnow()
-        can_reply = True
+        rights = BusinessBotRights(can_reply=True)
         is_enabled = True
         bc = BusinessConnection(
-            self.bci, user, user_chat_id, date, can_reply, is_enabled
+            self.bci,
+            user,
+            user_chat_id,
+            date,
+            is_enabled,
+            rights=rights,
         ).to_json()
 
         async def do_request(*args, **kwargs):

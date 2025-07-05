@@ -27,6 +27,10 @@ those classes.
 .. versionchanged:: 20.0
 
     * Most of the constants in this module are grouped into enums.
+
+.. versionremoved:: NEXT.VERSION
+    Removed deprecated class ``StarTransactions``. Please instead use
+    :attr:`telegram.constants.Nanostar.VALUE`.
 """
 # TODO: Remove this when https://github.com/PyCQA/pylint/issues/6887 is resolved.
 # pylint: disable=invalid-enum-extension,invalid-slots
@@ -103,7 +107,6 @@ __all__ = [
     "ReactionType",
     "ReplyLimit",
     "RevenueWithdrawalStateType",
-    "StarTransactions",
     "StarTransactionsLimit",
     "StickerFormat",
     "StickerLimit",
@@ -2737,36 +2740,18 @@ class RevenueWithdrawalStateType(StringEnum):
     """:obj:`str`: A withdrawal failed and the transaction was refunded."""
 
 
-# tags: deprecated 22.1, bot api 9.0
-class StarTransactions(FloatEnum):
-    """This enum contains constants for :class:`telegram.StarTransaction`.
-    The enum members of this enumeration are instances of :class:`float` and can be treated as
-    such.
-
-    .. versionadded:: 21.9
-
-    .. deprecated:: 22.1
-        This class will be removed as its only member :attr:`NANOSTAR_VALUE` will be replaced
-        by :attr:`telegram.constants.Nanostar.VALUE`.
-    """
-
-    __slots__ = ()
-
-    NANOSTAR_VALUE = Nanostar.VALUE
-    """:obj:`float`: The value of one nanostar as used in
-    :attr:`telegram.StarTransaction.nanostar_amount`.
-
-    .. deprecated:: 22.1
-        This member will be replaced by :attr:`telegram.constants.Nanostar.VALUE`.
-    """
-
-
 class StarTransactionsLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.Bot.get_star_transactions` and
     :class:`telegram.StarTransaction`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 21.4
+
+    .. versionremoved:: NEXT.VERSION
+        Removed deprecated attributes ``StarTransactionsLimit.NANOSTAR_MIN_AMOUNT``
+        and ``StarTransactionsLimit.NANOSTAR_MAX_AMOUNT``. Please instead use
+        :attr:`telegram.constants.NanostarLimit.MIN_AMOUNT`
+        and :attr:`telegram.constants.NanostarLimit.MAX_AMOUNT`.
     """
 
     __slots__ = ()
@@ -2779,28 +2764,6 @@ class StarTransactionsLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.get_star_transactions.limit` parameter of
     :meth:`telegram.Bot.get_star_transactions`."""
-    # tags: deprecated 22.1, bot api 9.0
-    NANOSTAR_MIN_AMOUNT = NanostarLimit.MIN_AMOUNT
-    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.AffiliateInfo.nanostar_amount`
-    parameter of :class:`telegram.AffiliateInfo`.
-
-    .. versionadded:: 21.9
-
-    .. deprecated:: 22.1
-        This member will be replaced by :attr:`telegram.constants.NanostarLimit.MIN_AMOUNT`.
-    """
-    # tags: deprecated 22.1, bot api 9.0
-    NANOSTAR_MAX_AMOUNT = NanostarLimit.MAX_AMOUNT
-    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.StarTransaction.nanostar_amount`
-    parameter of :class:`telegram.StarTransaction` and
-    :paramref:`~telegram.AffiliateInfo.nanostar_amount` parameter of
-    :class:`telegram.AffiliateInfo`.
-
-    .. versionadded:: 21.9
-
-    .. deprecated:: 22.1
-        This member will be replaced by :attr:`telegram.constants.NanostarLimit.MAX_AMOUNT`.
-    """
 
 
 class StickerFormat(StringEnum):

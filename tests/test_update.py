@@ -23,6 +23,7 @@ from copy import deepcopy
 import pytest
 
 from telegram import (
+    BusinessBotRights,
     BusinessConnection,
     BusinessMessagesDeleted,
     CallbackQuery,
@@ -129,7 +130,7 @@ business_connection = BusinessConnection(
     1,
     from_timestamp(int(time.time())),
     True,
-    True,
+    rights=BusinessBotRights(can_reply=True),
 )
 
 deleted_business_messages = BusinessMessagesDeleted(
