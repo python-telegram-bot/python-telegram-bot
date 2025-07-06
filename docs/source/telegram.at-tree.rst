@@ -87,6 +87,8 @@ Available Types
     telegram.inaccessiblemessage
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
+    telegram.inputchecklist
+    telegram.inputchecklisttask
     telegram.inputfile
     telegram.inputmedia
     telegram.inputmediaanimation

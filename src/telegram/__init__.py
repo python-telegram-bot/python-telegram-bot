@@ -140,6 +140,8 @@ __all__ = (
     "InlineQueryResultVideo",
     "InlineQueryResultVoice",
     "InlineQueryResultsButton",
+    "InputChecklist",
+    "InputChecklistTask",
     "InputContactMessageContent",
     "InputFile",
     "InputInvoiceMessageContent",
@@ -304,6 +306,7 @@ __all__ = (
     "warnings",
 )
 
+from telegram._inputchecklist import InputChecklist, InputChecklistTask
 from telegram._payment.stars.staramount import StarAmount
 from telegram._payment.stars.startransactions import StarTransaction, StarTransactions
 from telegram._payment.stars.transactionpartner import (
