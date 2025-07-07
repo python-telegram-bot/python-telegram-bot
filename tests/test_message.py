@@ -37,10 +37,14 @@ from telegram import (
     Document,
     ExternalReplyInfo,
     Game,
+    Gift,
+    GiftInfo,
     Giveaway,
     GiveawayCompleted,
     GiveawayCreated,
     GiveawayWinners,
+    InputChecklist,
+    InputChecklistTask,
     InputPaidMediaPhoto,
     Invoice,
     LinkPreviewOptions,
@@ -64,6 +68,12 @@ from telegram import (
     Story,
     SuccessfulPayment,
     TextQuote,
+    UniqueGift,
+    UniqueGiftBackdrop,
+    UniqueGiftBackdropColors,
+    UniqueGiftInfo,
+    UniqueGiftModel,
+    UniqueGiftSymbol,
     Update,
     User,
     UsersShared,
@@ -76,15 +86,6 @@ from telegram import (
     VideoNote,
     Voice,
     WebAppData,
-)
-from telegram._gifts import Gift, GiftInfo
-from telegram._uniquegift import (
-    UniqueGift,
-    UniqueGiftBackdrop,
-    UniqueGiftBackdropColors,
-    UniqueGiftInfo,
-    UniqueGiftModel,
-    UniqueGiftSymbol,
 )
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -2197,6 +2198,42 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         await self.check_thread_id_parsing(
             message, message.reply_dice, "send_dice", [], monkeypatch
+        )
+
+    async def test_reply_checklist(self, monkeypatch, message):
+        checklist = InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")])
+
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["business_connection_id"] == message.business_connection_id
+                and kwargs["checklist"] == checklist
+                and kwargs["disable_notification"] is True
+            )
+
+        assert check_shortcut_signature(
+            Message.reply_checklist,
+            Bot.send_checklist,
+            ["chat_id", "business_connection_id", "reply_to_message_id"],
+            ["do_quote", "reply_to_message_id"],
+        )
+        assert await check_shortcut_call(
+            message.reply_checklist,
+            message.get_bot(),
+            "send_checklist",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["chat_id", "business_connection_id"],
+        )
+        assert await check_defaults_handling(message.reply_checklist, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "send_checklist", make_assertion)
+        assert await message.reply_checklist(checklist, disable_notification=True)
+        await self.check_quote_parsing(
+            message,
+            message.reply_checklist,
+            "send_checklist",
+            [checklist, True],
+            monkeypatch,
         )
 
     async def test_reply_action(self, monkeypatch, message: Message):

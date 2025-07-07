@@ -78,6 +78,7 @@ from telegram._games.gamehighscore import GameHighScore
 from telegram._gifts import AcceptedGiftTypes, Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._inline.preparedinlinemessage import PreparedInlineMessage
+from telegram._inputchecklist import InputChecklist
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -7555,6 +7556,86 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return Poll.de_json(result, self)
 
+    async def send_checklist(
+        self,
+        business_connection_id: str,
+        chat_id: Union[int, str],
+        checklist: InputChecklist,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_effect_id: Optional[str] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Message:
+        """
+        Use this method to send a checklist on behalf of a connected business account.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`):
+                |business_id_str|.
+            chat_id (:obj:`int` | :obj:`str`):
+                Unique identifier for the target chat.
+            checklist (:class:`telegram.InputChecklist`):
+                The checklist to send.
+            disable_notification (:obj:`bool`, optional):
+                |disable_notification|
+            protect_content (:obj:`bool`, optional):
+                |protect_content|
+            message_effect_id (:obj:`str`, optional):
+                |message_effect_id|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional):
+                |reply_parameters|
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional):
+                An object for an inline keyboard
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "checklist": checklist,
+        }
+
+        return await self._send_message(
+            "sendChecklist",
+            data,
+            disable_notification=disable_notification,
+            reply_markup=reply_markup,
+            protect_content=protect_content,
+            reply_parameters=reply_parameters,
+            message_effect_id=message_effect_id,
+            business_connection_id=business_connection_id,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_to_message_id=reply_to_message_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_dice(
         self,
         chat_id: Union[int, str],
@@ -11274,6 +11355,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`send_poll`"""
     stopPoll = stop_poll
     """Alias for :meth:`stop_poll`"""
+    sendChecklist = send_checklist
+    """Alias for :meth:`send_checklist`"""
     sendDice = send_dice
     """Alias for :meth:`send_dice`"""
     getMyCommands = get_my_commands
