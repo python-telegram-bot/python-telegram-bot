@@ -3936,6 +3936,53 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
         )
 
+    async def edit_checklist(
+        self,
+        checklist: InputChecklist,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.edit_message_checklist(
+                 business_connection_id=message.business_connection_id,
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_message_checklist`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, the edited Message is returned.
+
+        """
+        return await self.get_bot().edit_message_checklist(
+            business_connection_id=self.business_connection_id,
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            checklist=checklist,
+            reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def edit_media(
         self,
         media: "InputMedia",

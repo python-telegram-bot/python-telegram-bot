@@ -2678,6 +2678,34 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def edit_message_checklist(
+        self,
+        business_connection_id: str,
+        chat_id: Union[int, str],
+        message_id: int,
+        checklist: InputChecklist,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Message:
+        return await super().edit_message_checklist(
+            business_connection_id=business_connection_id,
+            chat_id=chat_id,
+            message_id=message_id,
+            checklist=checklist,
+            reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def send_dice(
         self,
         chat_id: Union[int, str],
@@ -5197,6 +5225,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     sendPoll = send_poll
     stopPoll = stop_poll
     sendChecklist = send_checklist
+    editMessageChecklist = edit_message_checklist
     sendDice = send_dice
     getMyCommands = get_my_commands
     setMyCommands = set_my_commands

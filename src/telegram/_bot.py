@@ -7636,6 +7636,62 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
+    async def edit_message_checklist(
+        self,
+        business_connection_id: str,
+        chat_id: Union[int, str],
+        message_id: int,
+        checklist: InputChecklist,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Message:
+        """
+        Use this method to edit a checklist on behalf of a connected business account.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`):
+                |business_id_str|
+            chat_id (:obj:`int` | :obj:`str`):
+                Unique identifier for the target chat.
+            message_id (:obj:`int`):
+                Unique identifier for the target message.
+            checklist (:class:`telegram.InputChecklist`):
+                The new checklist.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional):
+                An object for the new inline keyboard for the message.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "checklist": checklist,
+        }
+
+        return await self._send_message(
+            "editMessageChecklist",
+            data,
+            reply_markup=reply_markup,
+            business_connection_id=business_connection_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_dice(
         self,
         chat_id: Union[int, str],
@@ -11357,6 +11413,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`stop_poll`"""
     sendChecklist = send_checklist
     """Alias for :meth:`send_checklist`"""
+    editMessageChecklist = edit_message_checklist
+    """Alias for :meth:`edit_message_checklist`"""
     sendDice = send_dice
     """Alias for :meth:`send_dice`"""
     getMyCommands = get_my_commands

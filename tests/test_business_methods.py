@@ -757,3 +757,35 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
                 allow_sending_without_reply=True,
                 reply_parameters=True,
             )
+
+    async def test_edit_message_checklist_all_args(self, offline_bot, monkeypatch):
+        chat_id = 123
+        message_id = 45
+        checklist = InputChecklist(
+            title="My Checklist",
+            tasks=[InputChecklistTask(1, "Task 1"), InputChecklistTask(2, "Task 2")],
+        )
+        reply_markup = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+        json_message = Message(1, dtm.datetime.now(), Chat(1, ""), text="test").to_json()
+
+        async def make_assertions(*args, **kwargs):
+            params = kwargs.get("request_data").parameters
+            assert params.get("business_connection_id") == self.bci
+            assert params.get("chat_id") == chat_id
+            assert params.get("message_id") == message_id
+            assert params.get("checklist") == checklist.to_dict()
+            assert params.get("reply_markup") == reply_markup.to_dict()
+
+            return 200, f'{{"ok": true, "result": {json_message}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", make_assertions)
+        obj = await offline_bot.edit_message_checklist(
+            business_connection_id=self.bci,
+            chat_id=chat_id,
+            message_id=message_id,
+            checklist=checklist,
+            reply_markup=reply_markup,
+        )
+        assert isinstance(obj, Message)

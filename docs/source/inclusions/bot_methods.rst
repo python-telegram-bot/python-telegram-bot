@@ -451,6 +451,8 @@
       - Used for transfering Stars from the business account balance to the bot's balance.
     * - :meth:`~telegram.Bot.send_checklist`
       - Used for sending a checklist on behalf of the business account.
+    * - :meth:`~telegram.Bot.edit_message_checklist`
+      - Used for editing a checklist on behalf of the business account.
 
 
 .. raw:: html
