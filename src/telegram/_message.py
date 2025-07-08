@@ -3277,7 +3277,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_effect_id: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3313,7 +3313,7 @@ class Message(MaybeInaccessibleMessage):
         )
         return await self.get_bot().send_checklist(
             business_connection_id=self.business_connection_id,
-            chat_id=chat_id,
+            chat_id=chat_id,  # type: ignore[arg-type]
             checklist=checklist,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,

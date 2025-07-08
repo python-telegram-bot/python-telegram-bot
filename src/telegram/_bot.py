@@ -7559,13 +7559,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def send_checklist(
         self,
         business_connection_id: str,
-        chat_id: Union[int, str],
+        chat_id: int,
         checklist: InputChecklist,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_effect_id: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -7583,7 +7583,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             business_connection_id (:obj:`str`):
                 |business_id_str|
-            chat_id (:obj:`int` | :obj:`str`):
+            chat_id (:obj:`int`):
                 Unique identifier for the target chat.
             checklist (:class:`telegram.InputChecklist`):
                 The checklist to send.
@@ -7639,7 +7639,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def edit_message_checklist(
         self,
         business_connection_id: str,
-        chat_id: Union[int, str],
+        chat_id: int,
         message_id: int,
         checklist: InputChecklist,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
@@ -7658,7 +7658,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             business_connection_id (:obj:`str`):
                 |business_id_str|
-            chat_id (:obj:`int` | :obj:`str`):
+            chat_id (:obj:`int`):
                 Unique identifier for the target chat.
             message_id (:obj:`int`):
                 Unique identifier for the target message.

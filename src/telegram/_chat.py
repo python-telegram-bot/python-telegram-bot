@@ -1477,7 +1477,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: str,
         checklist: "InputChecklist",
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
