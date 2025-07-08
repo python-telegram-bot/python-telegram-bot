@@ -77,6 +77,7 @@ __all__ = [
     "InlineQueryResultLimit",
     "InlineQueryResultType",
     "InlineQueryResultsButtonLimit",
+    "InputChecklistLimit",
     "InputMediaType",
     "InputPaidMediaType",
     "InputProfilePhotoType",
@@ -1409,6 +1410,47 @@ class InlineKeyboardMarkupLimit(IntEnum):
 
     Note:
         This value is undocumented and might be changed by Telegram.
+    """
+
+
+class InputChecklistLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.InputChecklist`/
+    :class:`telegram.InputChecklistTask`. The enum
+    members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_TITLE_LENGTH = 1
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as
+    :paramref:`~telegram.InputChecklist.title` parameter of :class:`telegram.InputChecklist`
+    """
+
+    MAX_TITLE_LENGTH = 255
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as
+    :paramref:`~telegram.InputChecklist.title` parameter of :class:`telegram.InputChecklist`
+    """
+
+    MIN_TEXT_LENGTH = 1
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as
+    :paramref:`~telegram.InputChecklistTask.text` parameter of :class:`telegram.InputChecklistTask`
+    """
+
+    MAX_TEXT_LENGTH = 100
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as
+    :paramref:`~telegram.InputChecklistTask.text` parameter of :class:`telegram.InputChecklistTask`
+    """
+
+    MIN_TASK_NUMBER = 1
+    """:obj:`int`: Minimum number of tasks passed as :paramref:`~telegram.InputChecklist.tasks`
+    parameter of :class:`telegram.InputChecklist`
+    """
+
+    MAX_TASK_NUMBER = 30
+    """:obj:`int`: Maximum number of tasks passed as :paramref:`~telegram.InputChecklistTask.tasks`
+    parameter of :class:`telegram.InputChecklistTask`
     """
 
 

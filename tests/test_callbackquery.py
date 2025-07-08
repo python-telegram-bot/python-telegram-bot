@@ -21,7 +21,17 @@ import datetime as dtm
 
 import pytest
 
-from telegram import Audio, Bot, CallbackQuery, Chat, InaccessibleMessage, Message, User
+from telegram import (
+    Audio,
+    Bot,
+    CallbackQuery,
+    Chat,
+    InaccessibleMessage,
+    InputChecklist,
+    InputChecklistTask,
+    Message,
+    User,
+)
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -229,6 +239,43 @@ class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
         monkeypatch.setattr(callback_query.get_bot(), "edit_message_caption", make_assertion)
         assert await callback_query.edit_message_caption(caption="new caption")
         assert await callback_query.edit_message_caption("new caption")
+
+    async def test_edit_message_checklist(self, monkeypatch, callback_query):
+        checklist = InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")])
+
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.edit_message_checklist(checklist)
+            return
+
+        if callback_query.inline_message_id:
+            pytest.skip("Can't edit inline messages")
+
+        async def make_assertion(*_, **kwargs):
+            chat_id = kwargs["chat_id"] == callback_query.message.chat_id
+            message_id = kwargs["message_id"] == callback_query.message.message_id
+            caption = kwargs["checklist"] == checklist
+            return chat_id and message_id and caption
+
+        assert check_shortcut_signature(
+            CallbackQuery.edit_message_checklist,
+            Bot.edit_message_checklist,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            callback_query.edit_message_checklist,
+            callback_query.get_bot(),
+            "edit_message_checklist",
+            shortcut_kwargs=["chat_id", "message_id", "business_connection_id"],
+        )
+        assert await check_defaults_handling(
+            callback_query.edit_message_checklist, callback_query.get_bot()
+        )
+
+        monkeypatch.setattr(callback_query.get_bot(), "edit_message_checklist", make_assertion)
+        assert await callback_query.edit_message_checklist(checklist=checklist)
+        assert await callback_query.edit_message_checklist(checklist)
 
     async def test_edit_message_reply_markup(self, monkeypatch, callback_query):
         if isinstance(callback_query.message, InaccessibleMessage):

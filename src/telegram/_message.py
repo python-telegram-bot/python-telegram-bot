@@ -53,6 +53,7 @@ from telegram._forumtopic import (
 from telegram._games.game import Game
 from telegram._gifts import GiftInfo
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inputchecklist import InputChecklist
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
@@ -3308,6 +3309,63 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
         )
 
+    async def reply_checklist(
+        self,
+        checklist: InputChecklist,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_effect_id: Optional[str] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        *,
+        reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_checklist(
+                 business_connection_id=self.business_connection_id,
+                 chat_id=update.effective_message.chat_id,
+                 *args,
+                 **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_checklist`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Keyword Args:
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
+        )
+        return await self.get_bot().send_checklist(
+            business_connection_id=self.business_connection_id,
+            chat_id=chat_id,  # type: ignore[arg-type]
+            checklist=checklist,
+            disable_notification=disable_notification,
+            reply_parameters=effective_reply_parameters,
+            reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            protect_content=protect_content,
+            message_effect_id=message_effect_id,
+        )
+
     async def reply_chat_action(
         self,
         action: str,
@@ -3915,6 +3973,53 @@ class Message(MaybeInaccessibleMessage):
             inline_message_id=None,
             show_caption_above_media=show_caption_above_media,
             business_connection_id=self.business_connection_id,
+        )
+
+    async def edit_checklist(
+        self,
+        checklist: InputChecklist,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.edit_message_checklist(
+                 business_connection_id=message.business_connection_id,
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_message_checklist`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, the edited Message is returned.
+
+        """
+        return await self.get_bot().edit_message_checklist(
+            business_connection_id=self.business_connection_id,
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            checklist=checklist,
+            reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def edit_media(
