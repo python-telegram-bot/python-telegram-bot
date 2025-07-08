@@ -737,7 +737,7 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
 
         await default_bot.send_checklist(**kwargs)
 
-    async def test_send_checklist_mutually_exclusive_reply_parameters(self, offline_bot, chat_id):
+    async def test_send_checklist_mutually_exclusive_reply_parameters(self, offline_bot):
         """Test that reply_to_message_id and allow_sending_without_reply are mutually exclusive
         with reply_parameters."""
         with pytest.raises(ValueError, match="`reply_to_message_id` and"):
