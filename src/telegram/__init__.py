@@ -82,7 +82,10 @@ __all__ = (
     "ChatPermissions",
     "ChatPhoto",
     "ChatShared",
+    "Checklist",
     "ChecklistTask",
+    "ChecklistTasksAdded",
+    "ChecklistTasksDone",
     "ChosenInlineResult",
     "Contact",
     "CopyTextButton",
@@ -383,7 +386,7 @@ from ._chatmember import (
 )
 from ._chatmemberupdated import ChatMemberUpdated
 from ._chatpermissions import ChatPermissions
-from ._checklists import ChecklistTask
+from ._checklists import Checklist, ChecklistTask, ChecklistTasksAdded, ChecklistTasksDone
 from ._choseninlineresult import ChosenInlineResult
 from ._copytextbutton import CopyTextButton
 from ._dice import Dice

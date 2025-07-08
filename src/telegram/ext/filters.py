@@ -46,6 +46,7 @@ __all__ = (
     "AUDIO",
     "BOOST_ADDED",
     "CAPTION",
+    "CHECKLIST",
     "COMMAND",
     "CONTACT",
     "EFFECT_ID",
@@ -918,6 +919,20 @@ class ChatType:  # A convenience namespace for Chat types.
 
     SUPERGROUP = _SuperGroup(name="filters.ChatType.SUPERGROUP")
     """Updates from supergroup."""
+
+
+class _Checklist(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.checklist)
+
+
+CHECKLIST = _Checklist(name="filters.CHECKLIST")
+"""Messages that contain :attr:`telegram.Message.checklist`.
+
+.. versionadded:: NEXT.VERSION
+"""
 
 
 class Command(MessageFilter):
@@ -1918,7 +1933,10 @@ class StatusUpdate:
                 StatusUpdate.CHAT_BACKGROUND_SET.check_update(update)
                 or StatusUpdate.CHAT_CREATED.check_update(update)
                 or StatusUpdate.CHAT_SHARED.check_update(update)
+                or StatusUpdate.CHECKLIST_TASKS_ADDED.check_update(update)
+                or StatusUpdate.CHECKLIST_TASKS_DONE.check_update(update)
                 or StatusUpdate.CONNECTED_WEBSITE.check_update(update)
+                or StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED.check_update(update)
                 or StatusUpdate.DELETE_CHAT_PHOTO.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
@@ -1947,7 +1965,6 @@ class StatusUpdate:
                 or StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
                 or StatusUpdate.WEB_APP_DATA.check_update(update)
                 or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
-                or StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1987,6 +2004,30 @@ class StatusUpdate:
     """Messages that contain :attr:`telegram.Message.chat_shared`.
 
     .. versionadded:: 20.1
+    """
+
+    class _ChecklistTasksAdded(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.checklist_tasks_added)
+
+    CHECKLIST_TASKS_ADDED = _ChecklistTasksAdded(name="filters.StatusUpdate.CHECKLIST_TASKS_ADDED")
+    """Messages that contain :attr:`telegram.Message.checklist_tasks_added`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _ChecklistTasksDone(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.checklist_tasks_done)
+
+    CHECKLIST_TASKS_DONE = _ChecklistTasksDone(name="filters.StatusUpdate.CHECKLIST_TASKS_DONE")
+    """Messages that contain :attr:`telegram.Message.checklist_tasks_done`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
     class _ConnectedWebsite(MessageFilter):
