@@ -145,6 +145,8 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
+            # Use case-insensitive regex to accept gender input regardless of letter casing,
+            # e.g., "boy", "BOY", "Girl", etc., will all be matched
             GENDER: [MessageHandler(filters.Regex("(?i)^(Boy|Girl|Other)$"), gender)],
             PHOTO: [MessageHandler(filters.PHOTO, photo), CommandHandler("skip", skip_photo)],
             LOCATION: [
