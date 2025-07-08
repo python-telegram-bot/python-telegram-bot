@@ -7582,7 +7582,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             business_connection_id (:obj:`str`):
-                |business_id_str|.
+                |business_id_str|
             chat_id (:obj:`int` | :obj:`str`):
                 Unique identifier for the target chat.
             checklist (:class:`telegram.InputChecklist`):
