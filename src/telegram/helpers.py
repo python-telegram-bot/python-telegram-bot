@@ -125,7 +125,10 @@ def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
 
     """
     # Importing on file-level yields cyclic Import Errors
-    from telegram import Message, Update  # pylint: disable=import-outside-toplevel
+    from telegram import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
+        Message,
+        Update,
+    )
 
     if isinstance(entity, Message):
         message = entity
