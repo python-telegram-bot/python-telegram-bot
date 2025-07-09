@@ -31,6 +31,10 @@ Available Types
     telegram.chat
     telegram.chatadministratorrights
     telegram.chatbackground
+    telegram.checklist
+    telegram.checklisttask
+    telegram.checklisttasksadded
+    telegram.checklisttasksdone
     telegram.copytextbutton
     telegram.backgroundtype
     telegram.backgroundtypefill
@@ -66,6 +70,7 @@ Available Types
     telegram.chatshared
     telegram.contact
     telegram.dice
+    telegram.directmessagepricechanged
     telegram.document
     telegram.externalreplyinfo
     telegram.file

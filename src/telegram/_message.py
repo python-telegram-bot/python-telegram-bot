@@ -28,7 +28,9 @@ from typing import TYPE_CHECKING, Optional, TypedDict, Union
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
 from telegram._chatboost import ChatBoostAdded
+from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
 from telegram._dice import Dice
+from telegram._directmessagepricechanged import DirectMessagePriceChanged
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
@@ -524,6 +526,9 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
+        checklist (:class:`telegram.Checklist`, optional): Message is a checklist
+
+            .. versionadded:: NEXT.VERSION
         users_shared (:class:`telegram.UsersShared`, optional): Service message: users were shared
             with the bot
 
@@ -601,6 +606,14 @@ class Message(MaybeInaccessibleMessage):
             background set.
 
             .. versionadded:: 21.2
+        checklist_tasks_done (:class:`telegram.ChecklistTasksDone`, optional): Service message:
+            some tasks in a checklist were marked as done or not done
+
+            .. versionadded:: NEXT.VERSION
+        checklist_tasks_added (:class:`telegram.ChecklistTasksAdded`, optional): Service message:
+            tasks were added to a checklist
+
+            .. versionadded:: NEXT.VERSION
         paid_media (:class:`telegram.PaidMediaInfo`, optional): Message contains paid media;
             information about the paid media.
 
@@ -609,6 +622,11 @@ class Message(MaybeInaccessibleMessage):
             message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
+        direct_message_price_changed (:class:`telegram.DirectMessagePriceChanged`, optional):
+            Service message: the price for paid messages in the corresponding direct messages chat
+            of a channel has changed.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -868,6 +886,9 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
+        checklist (:class:`telegram.Checklist`): Optional. Message is a checklist
+
+            .. versionadded:: NEXT.VERSION
         users_shared (:class:`telegram.UsersShared`): Optional. Service message: users were shared
             with the bot
 
@@ -946,6 +967,14 @@ class Message(MaybeInaccessibleMessage):
             background set
 
             .. versionadded:: 21.2
+        checklist_tasks_done (:class:`telegram.ChecklistTasksDone`): Optional. Service message:
+            some tasks in a checklist were marked as done or not done
+
+            .. versionadded:: NEXT.VERSION
+        checklist_tasks_added (:class:`telegram.ChecklistTasksAdded`): Optional. Service message:
+            tasks were added to a checklist
+
+            .. versionadded:: NEXT.VERSION
         paid_media (:class:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
             information about the paid media.
 
@@ -954,6 +983,11 @@ class Message(MaybeInaccessibleMessage):
             message about a refunded payment, information about the payment.
 
             .. versionadded:: 21.4
+        direct_message_price_changed (:class:`telegram.DirectMessagePriceChanged`):
+            Optional. Service message: the price for paid messages in the corresponding direct
+            messages chat of a channel has changed.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -983,10 +1017,14 @@ class Message(MaybeInaccessibleMessage):
         "channel_chat_created",
         "chat_background_set",
         "chat_shared",
+        "checklist",
+        "checklist_tasks_added",
+        "checklist_tasks_done",
         "connected_website",
         "contact",
         "delete_chat_photo",
         "dice",
+        "direct_message_price_changed",
         "document",
         "edit_date",
         "effect_id",
@@ -1152,6 +1190,10 @@ class Message(MaybeInaccessibleMessage):
         unique_gift: Optional[UniqueGiftInfo] = None,
         paid_message_price_changed: Optional[PaidMessagePriceChanged] = None,
         paid_star_count: Optional[int] = None,
+        direct_message_price_changed: Optional[DirectMessagePriceChanged] = None,
+        checklist: Optional[Checklist] = None,
+        checklist_tasks_done: Optional[ChecklistTasksDone] = None,
+        checklist_tasks_added: Optional[ChecklistTasksAdded] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1233,6 +1275,7 @@ class Message(MaybeInaccessibleMessage):
             )
             self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
             self.has_media_spoiler: Optional[bool] = has_media_spoiler
+            self.checklist: Optional[Checklist] = checklist
             self.users_shared: Optional[UsersShared] = users_shared
             self.chat_shared: Optional[ChatShared] = chat_shared
             self.story: Optional[Story] = story
@@ -1251,6 +1294,8 @@ class Message(MaybeInaccessibleMessage):
             self.sender_business_bot: Optional[User] = sender_business_bot
             self.is_from_offline: Optional[bool] = is_from_offline
             self.chat_background_set: Optional[ChatBackground] = chat_background_set
+            self.checklist_tasks_done: Optional[ChecklistTasksDone] = checklist_tasks_done
+            self.checklist_tasks_added: Optional[ChecklistTasksAdded] = checklist_tasks_added
             self.effect_id: Optional[str] = effect_id
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
             self.paid_media: Optional[PaidMediaInfo] = paid_media
@@ -1261,6 +1306,9 @@ class Message(MaybeInaccessibleMessage):
                 paid_message_price_changed
             )
             self.paid_star_count: Optional[int] = paid_star_count
+            self.direct_message_price_changed: Optional[DirectMessagePriceChanged] = (
+                direct_message_price_changed
+            )
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1437,6 +1485,16 @@ class Message(MaybeInaccessibleMessage):
         data["reply_to_story"] = de_json_optional(data.get("reply_to_story"), Story, bot)
         data["boost_added"] = de_json_optional(data.get("boost_added"), ChatBoostAdded, bot)
         data["sender_business_bot"] = de_json_optional(data.get("sender_business_bot"), User, bot)
+        data["direct_message_price_changed"] = de_json_optional(
+            data.get("direct_message_price_changed"), DirectMessagePriceChanged, bot
+        )
+        data["checklist"] = de_json_optional(data.get("checklist"), Checklist, bot)
+        data["checklist_tasks_done"] = de_json_optional(
+            data.get("checklist_tasks_done"), ChecklistTasksDone, bot
+        )
+        data["checklist_tasks_added"] = de_json_optional(
+            data.get("checklist_tasks_added"), ChecklistTasksAdded, bot
+        )
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
