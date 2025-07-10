@@ -1,0 +1,5 @@
+other= "Make Gender Input Case-Insensitive in ``conversationbot.py``"
+[[pull_requests]]
+uid = "4855"
+author_uid = "fengxiaohu"
+closes_threads = ["4846"]
