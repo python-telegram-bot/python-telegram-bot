@@ -1,0 +1,41 @@
+import logging
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+import yt_dlp
+import os
+
+TOKEN = "7586320924:AAE8DOP4afaQzuEmrT6QEfFz9Vw2ujg3uOw"
+
+logging.basicConfig(level=logging.INFO)
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Send me a video URL (YouTube, Instagram, etc.), and I’ll try to download it!")
+
+async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    url = update.message.text
+    chat_id = update.effective_chat.id
+    output_file = "downloaded_video.mp4"
+
+    ydl_opts = {
+        'outtmpl': output_file,
+        'format': 'best[ext=mp4]/best',
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+
+        with open(output_file, 'rb') as video:
+            await context.bot.send_video(chat_id=chat_id, video=video)
+
+        os.remove(output_file)
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {str(e)}")
+
+if __name__ == "__main__":
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
+
+    app.run_polling()
