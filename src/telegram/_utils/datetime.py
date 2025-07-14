@@ -30,7 +30,10 @@ Warning:
 import contextlib
 import datetime as dtm
 import time
+import zoneinfo
 from typing import TYPE_CHECKING, Optional, Union
+
+from telegram.error import TelegramError
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -224,3 +227,25 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     if dt_obj.tzinfo is None:
         dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
     return dt_obj.timestamp()
+
+
+def verify_timezone(
+    tz: Optional[Union[dtm.tzinfo, zoneinfo.ZoneInfo]],
+) -> Optional[Union[zoneinfo.ZoneInfo, dtm.tzinfo]]:
+    """
+    Verifies that the given timezone is a valid timezone.
+    """
+
+    if tz is None:
+        return None
+    if isinstance(tz, (dtm.tzinfo, zoneinfo.ZoneInfo)):
+        return tz
+
+    try:
+        return zoneinfo.ZoneInfo(tz)
+    except zoneinfo.ZoneInfoNotFoundError as err:
+        raise TelegramError(
+            f"No time zone found with key {tz}. "
+            f"Make sure to use a valid time zone name and "
+            f"correct install tzdata (https://pypi.org/project/tzdata/)"
+        ) from err

@@ -23,6 +23,8 @@ import zoneinfo
 import pytest
 
 from telegram._utils import datetime as tg_dtm
+from telegram._utils.datetime import verify_timezone
+from telegram.error import TelegramError
 from telegram.ext import Defaults
 
 # sample time specification values categorised into absolute / delta / time-of-day
@@ -168,7 +170,7 @@ class TestDatetime:
             assert tg_dtm.to_timestamp(i) == int(tg_dtm.to_float_timestamp(i)), f"Failed for {i}"
 
     def test_to_timestamp_none(self):
-        # this 'convenience' behaviour has been left left for backwards compatibility
+        # this 'convenience' behaviour has been left for backwards compatibility
         assert tg_dtm.to_timestamp(None) is None
 
     def test_from_timestamp_none(self):
@@ -192,3 +194,53 @@ class TestDatetime:
         assert tg_dtm.extract_tzinfo_from_defaults(tz_bot) == tz_bot.defaults.tzinfo
         assert tg_dtm.extract_tzinfo_from_defaults(bot) is None
         assert tg_dtm.extract_tzinfo_from_defaults(raw_bot) is None
+
+    def test_with_zoneinfo_object(self):
+        """Test with a valid zoneinfo.ZoneInfo object."""
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        result = verify_timezone(tz)
+        assert result == tz
+
+    def test_with_datetime_tzinfo(self):
+        """Test with a datetime.tzinfo object."""
+
+        class CustomTZ(dtm.tzinfo):
+            def utcoffset(self, dt):
+                return dtm.timedelta(hours=2)
+
+            def dst(self, dt):
+                return dtm.timedelta(0)
+
+        tz = CustomTZ()
+        result = verify_timezone(tz)
+        assert result == tz
+
+    def test_with_valid_timezone_string(self):
+        """Test with a valid timezone string."""
+        tz = "Asia/Tokyo"
+        result = verify_timezone(tz)
+        assert isinstance(result, zoneinfo.ZoneInfo)
+        assert str(result) == "Asia/Tokyo"
+
+    def test_with_none(self):
+        """Test with None input."""
+        assert verify_timezone(None) is None
+
+    def test_with_invalid_timezone_string(self):
+        """Test with an invalid timezone string."""
+        with pytest.raises(TelegramError, match="No time zone found"):
+            verify_timezone("Invalid/Timezone")
+
+    def test_with_empty_string(self):
+        """Test with empty string input."""
+        with pytest.raises(TelegramError, match="No time zone found"):
+            verify_timezone("")
+
+    def test_with_non_timezone_object(self):
+        """Test with an object that isn't a timezone."""
+        with pytest.raises(TelegramError, match="No time zone found"):
+            verify_timezone(123)  # integer
+        with pytest.raises(TelegramError, match="No time zone found"):
+            verify_timezone({"key": "value"})  # dict
+        with pytest.raises(TelegramError, match="No time zone found"):
+            verify_timezone([])  # empty list

@@ -38,7 +38,12 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
+    "black>=25.1.0",
     "httpx >=0.27,<0.29",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "pytz>=2025.2",
+    "ruff==0.11.9",
 ]
 
 [project.urls]
