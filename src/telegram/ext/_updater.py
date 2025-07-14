@@ -20,6 +20,7 @@
 
 import asyncio
 import contextlib
+import datetime as dtm
 import ssl
 from collections.abc import Coroutine, Sequence
 from pathlib import Path
@@ -29,7 +30,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union
 from telegram._utils.defaultvalue import DEFAULT_80, DEFAULT_IP, DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
-from telegram._utils.types import DVType
+from telegram._utils.types import DVType, TimePeriod
 from telegram.error import TelegramError
 from telegram.ext._utils.networkloop import network_retry_loop
 
@@ -206,7 +207,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
     async def start_polling(
         self,
         poll_interval: float = 0.0,
-        timeout: int = 10,
+        timeout: TimePeriod = dtm.timedelta(seconds=10),
         bootstrap_retries: int = 0,
         allowed_updates: Optional[Sequence[str]] = None,
         drop_pending_updates: Optional[bool] = None,
@@ -226,8 +227,12 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
-            timeout (:obj:`int`, optional): Passed to
-                :paramref:`telegram.Bot.get_updates.timeout`. Defaults to ``10`` seconds.
+            timeout (:obj:`int` | :class:`datetime.timedelta`, optional): Passed to
+                :paramref:`telegram.Bot.get_updates.timeout`. Defaults to
+                ``timedelta(seconds=10)``.
+
+                .. versionchanged:: v22.2
+                    |time-period-input|
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of
                 will retry on failures on the Telegram server.
 
@@ -309,7 +314,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
     async def _start_polling(
         self,
         poll_interval: float,
-        timeout: int,
+        timeout: TimePeriod,
         bootstrap_retries: int,
         drop_pending_updates: Optional[bool],
         allowed_updates: Optional[Sequence[str]],
@@ -394,7 +399,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 await self.bot.get_updates(
                     offset=self._last_update_id,
                     # We don't want to do long polling here!
-                    timeout=0,
+                    timeout=dtm.timedelta(seconds=0),
                     allowed_updates=allowed_updates,
                 )
             except TelegramError:

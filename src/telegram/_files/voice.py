@@ -17,10 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Voice."""
-from typing import Optional
+import datetime as dtm
+from typing import Optional, Union
 
 from telegram._files._basemedium import _BaseMedium
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
 
 
 class Voice(_BaseMedium):
@@ -35,7 +38,11 @@ class Voice(_BaseMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in
+            seconds as defined by the sender.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         mime_type (:obj:`str`, optional): MIME type of the file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
 
@@ -45,19 +52,23 @@ class Voice(_BaseMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in seconds as
+            defined by the sender.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.
 
     """
 
-    __slots__ = ("duration", "mime_type")
+    __slots__ = ("_duration", "mime_type")
 
     def __init__(
         self,
         file_id: str,
         file_unique_id: str,
-        duration: int,
+        duration: TimePeriod,
         mime_type: Optional[str] = None,
         file_size: Optional[int] = None,
         *,
@@ -71,6 +82,12 @@ class Voice(_BaseMedium):
         )
         with self._unfrozen():
             # Required
-            self.duration: int = duration
+            self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
             self.mime_type: Optional[str] = mime_type
+
+    @property
+    def duration(self) -> Union[int, dtm.timedelta]:
+        return get_timedelta_value(  # type: ignore[return-value]
+            self._duration, attribute="duration"
+        )

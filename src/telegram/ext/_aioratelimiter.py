@@ -288,7 +288,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
                     )
                     raise
 
-                sleep = exc.retry_after + 0.1
+                sleep = exc._retry_after.total_seconds() + 0.1  # pylint: disable=protected-access
                 _LOGGER.info("Rate limit hit. Retrying after %f seconds", sleep)
                 # Make sure we don't allow other requests to be processed
                 self._retry_after_event.clear()

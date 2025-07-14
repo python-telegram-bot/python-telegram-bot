@@ -18,8 +18,9 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent paid media in Telegram."""
 
+import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._files.photosize import PhotoSize
@@ -27,8 +28,14 @@ from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import (
+    de_json_optional,
+    de_list_optional,
+    parse_sequence_arg,
+    to_timedelta,
+)
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -98,6 +105,9 @@ class PaidMedia(TelegramObject):
         if cls is PaidMedia and data.get("type") in _class_mapping:
             return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
+        if "duration" in data:
+            data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
+
         return super().de_json(data=data, bot=bot)
 
 
@@ -110,26 +120,38 @@ class PaidMediaPreview(PaidMedia):
 
     .. versionadded:: 21.4
 
+    .. versionchanged:: v22.2
+       As part of the migration to representing time periods using ``datetime.timedelta``,
+       equality comparison now considers integer durations and equivalent timedeltas as equal.
+
     Args:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PREVIEW`.
         width (:obj:`int`, optional): Media width as defined by the sender.
         height (:obj:`int`, optional): Media height as defined by the sender.
-        duration (:obj:`int`, optional): Duration of the media in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the media in
+            seconds as defined by the sender.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
 
     Attributes:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PREVIEW`.
         width (:obj:`int`): Optional. Media width as defined by the sender.
         height (:obj:`int`): Optional. Media height as defined by the sender.
-        duration (:obj:`int`): Optional. Duration of the media in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Duration of the media in
+            seconds as defined by the sender.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
     """
 
-    __slots__ = ("duration", "height", "width")
+    __slots__ = ("_duration", "height", "width")
 
     def __init__(
         self,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        duration: Optional[int] = None,
+        duration: Optional[TimePeriod] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -138,9 +160,13 @@ class PaidMediaPreview(PaidMedia):
         with self._unfrozen():
             self.width: Optional[int] = width
             self.height: Optional[int] = height
-            self.duration: Optional[int] = duration
+            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
 
-            self._id_attrs = (self.type, self.width, self.height, self.duration)
+            self._id_attrs = (self.type, self.width, self.height, self._duration)
+
+    @property
+    def duration(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(self._duration, attribute="duration")
 
 
 class PaidMediaPhoto(PaidMedia):

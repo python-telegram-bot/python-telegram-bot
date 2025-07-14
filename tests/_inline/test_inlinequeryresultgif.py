@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import (
@@ -26,6 +28,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -55,7 +58,7 @@ class InlineQueryResultGifTestBase:
     gif_url = "gif url"
     gif_width = 10
     gif_height = 15
-    gif_duration = 1
+    gif_duration = dtm.timedelta(seconds=1)
     thumbnail_url = "thumb url"
     thumbnail_mime_type = "image/jpeg"
     title = "title"
@@ -84,7 +87,7 @@ class TestInlineQueryResultGifWithoutRequest(InlineQueryResultGifTestBase):
         assert inline_query_result_gif.gif_url == self.gif_url
         assert inline_query_result_gif.gif_width == self.gif_width
         assert inline_query_result_gif.gif_height == self.gif_height
-        assert inline_query_result_gif.gif_duration == self.gif_duration
+        assert inline_query_result_gif._gif_duration == self.gif_duration
         assert inline_query_result_gif.thumbnail_url == self.thumbnail_url
         assert inline_query_result_gif.thumbnail_mime_type == self.thumbnail_mime_type
         assert inline_query_result_gif.title == self.title
@@ -107,7 +110,10 @@ class TestInlineQueryResultGifWithoutRequest(InlineQueryResultGifTestBase):
         assert inline_query_result_gif_dict["gif_url"] == inline_query_result_gif.gif_url
         assert inline_query_result_gif_dict["gif_width"] == inline_query_result_gif.gif_width
         assert inline_query_result_gif_dict["gif_height"] == inline_query_result_gif.gif_height
-        assert inline_query_result_gif_dict["gif_duration"] == inline_query_result_gif.gif_duration
+        assert inline_query_result_gif_dict["gif_duration"] == int(
+            self.gif_duration.total_seconds()
+        )
+        assert isinstance(inline_query_result_gif_dict["gif_duration"], int)
         assert (
             inline_query_result_gif_dict["thumbnail_url"] == inline_query_result_gif.thumbnail_url
         )
@@ -133,6 +139,26 @@ class TestInlineQueryResultGifWithoutRequest(InlineQueryResultGifTestBase):
             inline_query_result_gif_dict["show_caption_above_media"]
             == inline_query_result_gif.show_caption_above_media
         )
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, inline_query_result_gif):
+        gif_duration = inline_query_result_gif.gif_duration
+
+        if PTB_TIMEDELTA:
+            assert gif_duration == self.gif_duration
+            assert isinstance(gif_duration, dtm.timedelta)
+        else:
+            assert gif_duration == int(self.gif_duration.total_seconds())
+            assert isinstance(gif_duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, inline_query_result_gif):
+        inline_query_result_gif.gif_duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`gif_duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = InlineQueryResultGif(self.id_, self.gif_url, self.thumbnail_url)

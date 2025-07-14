@@ -17,15 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
+import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -50,7 +52,11 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_url (:obj:`str`): A valid URL for the GIF file.
         gif_width (:obj:`int`, optional): Width of the GIF.
         gif_height (:obj:`int`, optional): Height of the GIF.
-        gif_duration (:obj:`int`, optional): Duration of the GIF in seconds.
+        gif_duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the GIF
+            in seconds.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         thumbnail_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4)
             thumbnail for the result.
 
@@ -89,7 +95,11 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_url (:obj:`str`): A valid URL for the GIF file.
         gif_width (:obj:`int`): Optional. Width of the GIF.
         gif_height (:obj:`int`): Optional. Height of the GIF.
-        gif_duration (:obj:`int`): Optional. Duration of the GIF in seconds.
+        gif_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Duration of the GIF
+            in seconds.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         thumbnail_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail
             for the result.
 
@@ -120,9 +130,9 @@ class InlineQueryResultGif(InlineQueryResult):
     """
 
     __slots__ = (
+        "_gif_duration",
         "caption",
         "caption_entities",
-        "gif_duration",
         "gif_height",
         "gif_url",
         "gif_width",
@@ -146,7 +156,7 @@ class InlineQueryResultGif(InlineQueryResult):
         caption: Optional[str] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         input_message_content: Optional["InputMessageContent"] = None,
-        gif_duration: Optional[int] = None,
+        gif_duration: Optional[TimePeriod] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
         thumbnail_mime_type: Optional[str] = None,
@@ -163,7 +173,7 @@ class InlineQueryResultGif(InlineQueryResult):
             # Optionals
             self.gif_width: Optional[int] = gif_width
             self.gif_height: Optional[int] = gif_height
-            self.gif_duration: Optional[int] = gif_duration
+            self._gif_duration: Optional[dtm.timedelta] = to_timedelta(gif_duration)
             self.title: Optional[str] = title
             self.caption: Optional[str] = caption
             self.parse_mode: ODVInput[str] = parse_mode
@@ -172,3 +182,7 @@ class InlineQueryResultGif(InlineQueryResult):
             self.input_message_content: Optional[InputMessageContent] = input_message_content
             self.thumbnail_mime_type: Optional[str] = thumbnail_mime_type
             self.show_caption_above_media: Optional[bool] = show_caption_above_media
+
+    @property
+    def gif_duration(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(self._gif_duration, attribute="gif_duration")

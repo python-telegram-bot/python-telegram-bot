@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
 import inspect
+import platform
 import re
 
 import pytest
@@ -711,7 +712,9 @@ class TestFilters:
         assert not filters.Document.WAV.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "audio/x-wav"
+        update.message.document.mime_type = (
+            "audio/x-wav" if int(platform.python_version_tuple()[1]) < 14 else "audio/vnd.wave"
+        )
         assert filters.Document.WAV.check_update(update)
         assert filters.Document.AUDIO.check_update(update)
         assert not filters.Document.XML.check_update(update)

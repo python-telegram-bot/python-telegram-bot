@@ -17,15 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVoice."""
+import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -56,7 +58,11 @@ class InlineQueryResultVoice(InlineQueryResult):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        voice_duration (:obj:`int`, optional): Recording duration in seconds.
+        voice_duration (:obj:`int` | :class:`datetime.timedelta`, optional): Recording duration
+            in seconds.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -79,7 +85,11 @@ class InlineQueryResultVoice(InlineQueryResult):
 
                 * |tupleclassattrs|
                 * |alwaystuple|
-        voice_duration (:obj:`int`): Optional. Recording duration in seconds.
+        voice_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Recording duration
+            in seconds.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -88,13 +98,13 @@ class InlineQueryResultVoice(InlineQueryResult):
     """
 
     __slots__ = (
+        "_voice_duration",
         "caption",
         "caption_entities",
         "input_message_content",
         "parse_mode",
         "reply_markup",
         "title",
-        "voice_duration",
         "voice_url",
     )
 
@@ -103,7 +113,7 @@ class InlineQueryResultVoice(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         voice_url: str,
         title: str,
-        voice_duration: Optional[int] = None,
+        voice_duration: Optional[TimePeriod] = None,
         caption: Optional[str] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         input_message_content: Optional["InputMessageContent"] = None,
@@ -119,9 +129,13 @@ class InlineQueryResultVoice(InlineQueryResult):
             self.title: str = title
 
             # Optional
-            self.voice_duration: Optional[int] = voice_duration
+            self._voice_duration: Optional[dtm.timedelta] = to_timedelta(voice_duration)
             self.caption: Optional[str] = caption
             self.parse_mode: ODVInput[str] = parse_mode
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
+
+    @property
+    def voice_duration(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(self._voice_duration, attribute="voice_duration")

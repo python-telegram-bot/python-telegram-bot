@@ -24,7 +24,7 @@ def env_var_2_bool(env_var: object) -> bool:
         return env_var
     if not isinstance(env_var, str):
         return False
-    return env_var.lower().strip() == "true"
+    return env_var.lower().strip() in ["true", "1"]
 
 
 GITHUB_ACTIONS: bool = env_var_2_bool(os.getenv("GITHUB_ACTIONS", "false"))

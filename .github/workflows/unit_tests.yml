@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14.0-beta.3']
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: False
     steps:
@@ -36,7 +36,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -U pytest-cov
           python -W ignore -m pip install . --group tests
 
       - name: Test with pytest
@@ -59,11 +58,10 @@ jobs:
           TO_TEST="test_no_passport.py or test_datetime.py or test_defaults.py or test_jobqueue.py or test_applicationbuilder.py or test_ratelimiter.py or test_updater.py or test_callbackdatacache.py or test_request.py"
           pytest -v --cov -k "${TO_TEST}" --junit-xml=.test_report_no_optionals_junit.xml
           opt_dep_status=$?
-
+          
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
-          # need to manually install pytz here, because it's no longer in the optional reqs
-          pip install .[all] pytz
+          pip install .[all]
           # `-n auto --dist worksteal` uses pytest-xdist to run tests on multiple CPU
           # workers. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness.

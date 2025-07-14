@@ -317,45 +317,61 @@ class BaseRequest(
 
         if HTTPStatus.OK <= code <= 299:
             # 200-299 range are HTTP success statuses
+            # starting with Py 3.12 we can use `HTTPStatus.is_success`
             return payload
 
-        response_data = self.parse_json_payload(payload)
+        try:
+            message = f"{HTTPStatus(code).phrase} ({code})"
+        except ValueError:
+            message = f"Unknown HTTPError ({code})"
 
-        description = response_data.get("description")
-        message = description if description else "Unknown HTTPError"
+        parsing_exception: Optional[TelegramError] = None
 
-        # In some special cases, we can raise more informative exceptions:
-        # see https://core.telegram.org/bots/api#responseparameters and
-        # https://core.telegram.org/bots/api#making-requests
-        # TGs response also has the fields 'ok' and 'error_code'.
-        # However, we rather rely on the HTTP status code for now.
-        parameters = response_data.get("parameters")
-        if parameters:
-            migrate_to_chat_id = parameters.get("migrate_to_chat_id")
-            if migrate_to_chat_id:
-                raise ChatMigrated(migrate_to_chat_id)
-            retry_after = parameters.get("retry_after")
-            if retry_after:
-                raise RetryAfter(retry_after)
+        try:
+            response_data = self.parse_json_payload(payload)
+        except TelegramError as exc:
+            message += f". Parsing the server response {payload!r} failed"
+            parsing_exception = exc
+        else:
+            message = response_data.get("description") or message
 
-            message += f"\nThe server response contained unknown parameters: {parameters}"
+            # In some special cases, we can raise more informative exceptions:
+            # see https://core.telegram.org/bots/api#responseparameters and
+            # https://core.telegram.org/bots/api#making-requests
+            # TGs response also has the fields 'ok' and 'error_code'.
+            # However, we rather rely on the HTTP status code for now.
+            parameters = response_data.get("parameters")
+            if parameters:
+                migrate_to_chat_id = parameters.get("migrate_to_chat_id")
+                if migrate_to_chat_id:
+                    raise ChatMigrated(migrate_to_chat_id)
+                retry_after = parameters.get("retry_after")
+                if retry_after:
+                    raise RetryAfter(retry_after)
+
+                message += f". The server response contained unknown parameters: {parameters}"
 
         if code == HTTPStatus.FORBIDDEN:  # 403
-            raise Forbidden(message)
-        if code in (HTTPStatus.NOT_FOUND, HTTPStatus.UNAUTHORIZED):  # 404 and 401
+            exception: TelegramError = Forbidden(message)
+        elif code in (HTTPStatus.NOT_FOUND, HTTPStatus.UNAUTHORIZED):  # 404 and 401
             # TG returns 404 Not found for
             #   1) malformed tokens
             #   2) correct tokens but non-existing method, e.g. api.tg.org/botTOKEN/unkonwnMethod
             # 2) is relevant only for Bot.do_api_request, where we have special handing for it.
             # TG returns 401 Unauthorized for correctly formatted tokens that are not valid
-            raise InvalidToken(message)
-        if code == HTTPStatus.BAD_REQUEST:  # 400
-            raise BadRequest(message)
-        if code == HTTPStatus.CONFLICT:  # 409
-            raise Conflict(message)
-        if code == HTTPStatus.BAD_GATEWAY:  # 502
-            raise NetworkError(description or "Bad Gateway")
-        raise NetworkError(f"{message} ({code})")
+            exception = InvalidToken(message)
+        elif code == HTTPStatus.BAD_REQUEST:  # 400
+            exception = BadRequest(message)
+        elif code == HTTPStatus.CONFLICT:  # 409
+            exception = Conflict(message)
+        elif code == HTTPStatus.BAD_GATEWAY:  # 502
+            exception = NetworkError(message)
+        else:
+            exception = NetworkError(message)
+
+        if parsing_exception:
+            raise exception from parsing_exception
+        raise exception
 
     @staticmethod
     def parse_json_payload(payload: bytes) -> JSONDict:
