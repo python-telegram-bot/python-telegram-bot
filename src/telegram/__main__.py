@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
-# ruff: noqa: T201, D100, S603, S607
+# ruff: noqa: T201, D100, S607
 import subprocess
 import sys
 from typing import Optional
@@ -28,7 +28,7 @@ from .constants import BOT_API_VERSION
 
 def _git_revision() -> Optional[str]:
     try:
-        output = subprocess.check_output(
+        output = subprocess.check_output(  # noqa: S603
             ["git", "describe", "--long", "--tags"], stderr=subprocess.STDOUT
         )
     except (subprocess.SubprocessError, OSError):
