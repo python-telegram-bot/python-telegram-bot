@@ -295,4 +295,3 @@ def get_timedelta_value(
         if (seconds := value.total_seconds()).is_integer()
         else seconds  # type: ignore[return-value]
     )
-  
