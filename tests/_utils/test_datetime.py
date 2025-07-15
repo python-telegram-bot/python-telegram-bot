@@ -263,4 +263,3 @@ class TestDatetime:
         else:
             assert result == number_result
             assert type(result) is type(number_result)
-            
