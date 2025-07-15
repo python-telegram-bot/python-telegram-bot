@@ -1,0 +1,90 @@
+from telegram import Update, ReplyKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
+
+# States
+AGE, WEIGHT, HEIGHT, ACTIVITY = range(4)
+
+user_data = {}
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("👋 Welcome to FitBot! Let's create your diet and workout plan.\nPlease enter your age (in years):")
+    return AGE
+
+async def get_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_data['age'] = int(update.message.text)
+    await update.message.reply_text("Great! Now enter your weight (in kg):")
+    return WEIGHT
+
+async def get_weight(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_data['weight'] = float(update.message.text)
+    await update.message.reply_text("Now enter your height (in cm):")
+    return HEIGHT
+
+async def get_height(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_data['height'] = float(update.message.text)
+
+    reply_keyboard = [['Sedentary', 'Lightly active'],
+                      ['Moderately active', 'Very active']]
+    await update.message.reply_text(
+        "Choose your activity level:",
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+    )
+    return ACTIVITY
+
+async def get_activity(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_data['activity'] = update.message.text
+
+    # Calculate BMR using Mifflin-St Jeor Formula
+    age = user_data['age']
+    weight = user_data['weight']
+    height = user_data['height']
+    activity_level = user_data['activity']
+
+    bmr = 10 * weight + 6.25 * height - 5 * age + 5  # Assuming male
+    activity_factors = {
+        "Sedentary": 1.2,
+        "Lightly active": 1.375,
+        "Moderately active": 1.55,
+        "Very active": 1.725
+    }
+
+    tdee = bmr * activity_factors.get(activity_level, 1.2)
+    diet_plan = f"🍽️ *Your Daily Calorie Needs*: {int(tdee)} kcal\n"
+    diet_plan += f"🥗 Recommended Diet: \n- Protein: {int(0.8 * weight)}g\n- Carbs: {int(2.5 * weight)}g\n- Fats: {int(0.9 * weight)}g\n\n"
+
+    workout_plan = "💪 Suggested Workout Plan:\n"
+    if activity_level == "Sedentary":
+        workout_plan += "- 30 min walking\n- 15 min stretching\n"
+    elif activity_level == "Lightly active":
+        workout_plan += "- 20 min bodyweight workout\n- 10 min cardio\n"
+    elif activity_level == "Moderately active":
+        workout_plan += "- Strength training (3x/week)\n- Cardio (3x/week)\n"
+    elif activity_level == "Very active":
+        workout_plan += "- Strength + HIIT (5x/week)\n- 1 rest day\n"
+
+    await update.message.reply_text(diet_plan + "\n" + workout_plan, parse_mode='Markdown')
+
+    user_data.clear()
+    return ConversationHandler.END
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Cancelled. Type /start to try again.")
+    return ConversationHandler.END
+
+app = ApplicationBuilder().token("YOUR_BOT_TOKEN_HERE").build()
+
+conv_handler = ConversationHandler(
+    entry_points=[CommandHandler('start', start)],
+    states={
+        AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_age)],
+        WEIGHT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_weight)],
+        HEIGHT: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_height)],
+        ACTIVITY: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_activity)],
+    },
+    fallbacks=[CommandHandler('cancel', cancel)],
+)
+
+app.add_handler(conv_handler)
+
+print("🤖 Bot is running...")
+app.run_polling()
