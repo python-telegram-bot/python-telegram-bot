@@ -34,7 +34,6 @@ import time
 import zoneinfo
 from typing import TYPE_CHECKING, Optional, Union
 
-from telegram.error import TelegramError
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
 
