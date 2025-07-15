@@ -134,7 +134,7 @@ def parse_file_input(  # pylint: disable=too-many-return-statements
         :attr:`file_input`, in case it's no valid file input.
     """
     # Importing on file-level yields cyclic Import Errors
-    from telegram import InputFile  # pylint: disable=import-outside-toplevel
+    from telegram import InputFile  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
 
     if isinstance(file_input, str) and file_input.startswith("file://"):
         if not local_mode:
