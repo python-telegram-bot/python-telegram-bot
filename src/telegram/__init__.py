@@ -82,12 +82,17 @@ __all__ = (
     "ChatPermissions",
     "ChatPhoto",
     "ChatShared",
+    "Checklist",
+    "ChecklistTask",
+    "ChecklistTasksAdded",
+    "ChecklistTasksDone",
     "ChosenInlineResult",
     "Contact",
     "CopyTextButton",
     "Credentials",
     "DataCredentials",
     "Dice",
+    "DirectMessagePriceChanged",
     "Document",
     "EncryptedCredentials",
     "EncryptedPassportElement",
@@ -138,6 +143,8 @@ __all__ = (
     "InlineQueryResultVideo",
     "InlineQueryResultVoice",
     "InlineQueryResultsButton",
+    "InputChecklist",
+    "InputChecklistTask",
     "InputContactMessageContent",
     "InputFile",
     "InputInvoiceMessageContent",
@@ -302,6 +309,7 @@ __all__ = (
     "warnings",
 )
 
+from telegram._inputchecklist import InputChecklist, InputChecklistTask
 from telegram._payment.stars.staramount import StarAmount
 from telegram._payment.stars.startransactions import StarTransaction, StarTransactions
 from telegram._payment.stars.transactionpartner import (
@@ -381,9 +389,11 @@ from ._chatmember import (
 )
 from ._chatmemberupdated import ChatMemberUpdated
 from ._chatpermissions import ChatPermissions
+from ._checklists import Checklist, ChecklistTask, ChecklistTasksAdded, ChecklistTasksDone
 from ._choseninlineresult import ChosenInlineResult
 from ._copytextbutton import CopyTextButton
 from ._dice import Dice
+from ._directmessagepricechanged import DirectMessagePriceChanged
 from ._files._inputstorycontent import (
     InputStoryContent,
     InputStoryContentPhoto,

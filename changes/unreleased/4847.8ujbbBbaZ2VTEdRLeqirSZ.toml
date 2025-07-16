@@ -1,0 +1,18 @@
+highlights = "Full Support for Bot API 9.1"
+
+features = """
+New filters based on Bot API 9.1:
+
+* ``filters.StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED`` for ``Message.direct_message_price_changed``
+* ``filters.StatusUpdate.CHECKLIST_TASKS_ADDED`` for ``Message.checklist_tasks_added``
+* ``filters.StatusUpdate.CHECKLIST_TASKS_DONE`` for ``Message.checklist_tasks_done``
+* ``filters.CHECKLIST`` for ``Message.checklist``
+"""
+
+pull_requests = [
+  { uid = "4847", author_uid = "Bibo-Joshi", closes_threads = ["4845"] },
+  { uid = "4848", author_uid = "Bibo-Joshi" },
+  { uid = "4849", author_uid = "harshil21" },
+  { uid = "4851", author_uid = "harshil21" },
+  { uid = "4857", author_uid = "aelkheir" },
+]

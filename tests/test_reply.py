@@ -24,6 +24,8 @@ import pytest
 from telegram import (
     BotCommand,
     Chat,
+    Checklist,
+    ChecklistTask,
     ExternalReplyInfo,
     Giveaway,
     LinkPreviewOptions,
@@ -47,6 +49,7 @@ def external_reply_info():
         link_preview_options=ExternalReplyInfoTestBase.link_preview_options,
         giveaway=ExternalReplyInfoTestBase.giveaway,
         paid_media=ExternalReplyInfoTestBase.paid_media,
+        checklist=ExternalReplyInfoTestBase.checklist,
     )
 
 
@@ -63,6 +66,13 @@ class ExternalReplyInfoTestBase:
         1,
     )
     paid_media = PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])
+    checklist = Checklist(
+        title="Checklist Title",
+        tasks=[
+            ChecklistTask(text="Item 1", id=1),
+            ChecklistTask(text="Item 2", id=2),
+        ],
+    )
 
 
 class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
@@ -81,6 +91,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
             "link_preview_options": self.link_preview_options.to_dict(),
             "giveaway": self.giveaway.to_dict(),
             "paid_media": self.paid_media.to_dict(),
+            "checklist": self.checklist.to_dict(),
         }
 
         external_reply_info = ExternalReplyInfo.de_json(json_dict, offline_bot)
@@ -92,6 +103,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert external_reply_info.link_preview_options == self.link_preview_options
         assert external_reply_info.giveaway == self.giveaway
         assert external_reply_info.paid_media == self.paid_media
+        assert external_reply_info.checklist == self.checklist
 
     def test_to_dict(self, external_reply_info):
         ext_reply_info_dict = external_reply_info.to_dict()
@@ -103,6 +115,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert ext_reply_info_dict["link_preview_options"] == self.link_preview_options.to_dict()
         assert ext_reply_info_dict["giveaway"] == self.giveaway.to_dict()
         assert ext_reply_info_dict["paid_media"] == self.paid_media.to_dict()
+        assert ext_reply_info_dict["checklist"] == self.checklist.to_dict()
 
     def test_equality(self, external_reply_info):
         a = external_reply_info
