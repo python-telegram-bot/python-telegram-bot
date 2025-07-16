@@ -1,0 +1,15 @@
+mkdir my-telegram-bot
+cd my-telegram-bot
+touch bot.py  # در اندروید: notepad bot.py
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+
+TOKEN = "7928829738:AAEya5YlvC29DACQwBpKkn-hdLQ33shjWek"
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("سلام! من ربات گروهی شما هستم 🎉")
+
+app = ApplicationBuilder().token(TOKEN).build()
+app.add_handler(CommandHandler("start", start))
+app.run_polling()
+python bot.py
