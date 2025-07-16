@@ -10,4 +10,5 @@ pull_requests = [
   { uid = "4847", author_uid = "Bibo-Joshi", closes_threads = ["4845"] },
   { uid = "4849", author_uid = "harshil21" },
   { uid = "4851", author_uid = "harshil21" },
+  { uid = "4857", author_uid = "aelkheir" },
 ]
