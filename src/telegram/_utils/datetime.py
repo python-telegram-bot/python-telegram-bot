@@ -244,7 +244,7 @@ def verify_timezone(
     try:
         return zoneinfo.ZoneInfo(tz)
     except zoneinfo.ZoneInfoNotFoundError as err:
-        raise TelegramError(
+        raise zoneinfo.ZoneInfoNotFoundError(
             f"No time zone found with key {tz}. "
             f"Make sure to use a valid time zone name and "
             f"correct install tzdata (https://pypi.org/project/tzdata/)"
