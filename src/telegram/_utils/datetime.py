@@ -33,8 +33,6 @@ import time
 import zoneinfo
 from typing import TYPE_CHECKING, Optional, Union
 
-from telegram.error import TelegramError
-
 if TYPE_CHECKING:
     from telegram import Bot
 
