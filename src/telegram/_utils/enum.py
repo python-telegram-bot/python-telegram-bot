@@ -60,7 +60,7 @@ class StringEnum(str, _enum.Enum):
 
 
 # Apply the __repr__ modification and __str__ fix to IntEnum
-class IntEnum(_enum.IntEnum):
+class IntEnum(_enum.IntEnum):  # pylint: disable=invalid-slots
     """Helper class for int enums where ``str(member)`` prints the value, but ``repr(member)``
     gives ``EnumName.MEMBER_NAME``.
     """
