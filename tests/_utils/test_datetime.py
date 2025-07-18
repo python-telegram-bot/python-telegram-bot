@@ -228,7 +228,7 @@ class TestDatetime:
 
     def test_with_invalid_timezone_string(self):
         """Test with an invalid timezone string."""
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone("Invalid/Timezone")
 
     def test_with_empty_string(self):
@@ -238,9 +238,9 @@ class TestDatetime:
 
     def test_with_non_timezone_object(self):
         """Test with an object that isn't a timezone."""
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone(123)  # integer
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone({"key": "value"})  # dict
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone([])  # empty list
