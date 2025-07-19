@@ -20,6 +20,7 @@
 import asyncio
 import functools
 import logging
+from copy import copy
 from pathlib import Path
 from warnings import filterwarnings
 
@@ -307,8 +308,6 @@ class TestConversationHandler:
         )
 
     def test_repr_with_truncation(self):
-        from copy import copy
-
         states = copy(self.drinking_states)
         # there are exactly 3 drinking states. adding one more to make sure it's truncated
         states["extra_to_be_truncated"] = [CommandHandler("foo", self.start)]

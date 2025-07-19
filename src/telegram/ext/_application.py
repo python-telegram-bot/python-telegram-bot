@@ -20,6 +20,7 @@
 
 import asyncio
 import contextlib
+import datetime as dtm
 import inspect
 import itertools
 import platform
@@ -42,7 +43,7 @@ from telegram._utils.defaultvalue import (
 )
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
-from telegram._utils.types import SCT, DVType, ODVInput
+from telegram._utils.types import SCT, DVType, ODVInput, TimePeriod
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
@@ -454,7 +455,9 @@ class Application(
         .. versionadded:: 20.0
         """
         # Unfortunately this needs to be here due to cyclical imports
-        from telegram.ext import ApplicationBuilder  # pylint: disable=import-outside-toplevel
+        from telegram.ext import (  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
+            ApplicationBuilder,
+        )
 
         return ApplicationBuilder()
 
@@ -497,7 +500,7 @@ class Application(
 
         # Unfortunately due to circular imports this has to be here
         # pylint: disable=import-outside-toplevel
-        from telegram.ext._handlers.conversationhandler import ConversationHandler
+        from telegram.ext._handlers.conversationhandler import ConversationHandler  # noqa: PLC0415
 
         # Initialize the persistent conversation handlers with the stored states
         for handler in itertools.chain.from_iterable(self.handlers.values()):
@@ -739,7 +742,7 @@ class Application(
     def run_polling(
         self,
         poll_interval: float = 0.0,
-        timeout: int = 10,
+        timeout: TimePeriod = dtm.timedelta(seconds=10),
         bootstrap_retries: int = 0,
         allowed_updates: Optional[Sequence[str]] = None,
         drop_pending_updates: Optional[bool] = None,
@@ -780,8 +783,12 @@ class Application(
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
-            timeout (:obj:`int`, optional): Passed to
-                :paramref:`telegram.Bot.get_updates.timeout`. Default is ``10`` seconds.
+            timeout (:obj:`int` | :class:`datetime.timedelta`, optional): Passed to
+                :paramref:`telegram.Bot.get_updates.timeout`.
+                Default is :obj:`timedelta(seconds=10)<datetime.timedelta>`.
+
+                .. versionchanged:: v22.2
+                    |time-period-input|
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase
                 (calling :meth:`initialize` and the boostrapping of
                 :meth:`telegram.ext.Updater.start_polling`)
@@ -1364,7 +1371,7 @@ class Application(
         """
         # Unfortunately due to circular imports this has to be here
         # pylint: disable=import-outside-toplevel
-        from telegram.ext._handlers.conversationhandler import ConversationHandler
+        from telegram.ext._handlers.conversationhandler import ConversationHandler  # noqa: PLC0415
 
         if not isinstance(handler, BaseHandler):
             raise TypeError(f"handler is not an instance of {BaseHandler.__name__}")
@@ -1730,7 +1737,7 @@ class Application(
 
         # Unfortunately due to circular imports this has to be here
         # pylint: disable=import-outside-toplevel
-        from telegram.ext._handlers.conversationhandler import PendingState
+        from telegram.ext._handlers.conversationhandler import PendingState  # noqa: PLC0415
 
         for name, (key, new_state) in itertools.chain.from_iterable(
             zip(itertools.repeat(name), states_dict.pop_accessed_write_items())

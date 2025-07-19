@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
-import datetime as dtm
 
 from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
@@ -54,12 +53,6 @@ class ParamTypeCheckingExceptions:
         },
         "replace_sticker_in_set": {
             "old_sticker$": Sticker,
-        },
-        # The underscore will match any method
-        r"\w+_[\w_]+": {
-            "duration": dtm.timedelta,
-            r"\w+_period": dtm.timedelta,
-            "cache_time": dtm.timedelta,
         },
     }
 
@@ -102,7 +95,6 @@ class ParamTypeCheckingExceptions:
         },
         "InputProfilePhotoAnimated": {
             "animation": str,  # actual: Union[str, FileInput]
-            "main_frame_timestamp": float,  # actual: Union[float, dtm.timedelta]
         },
         "InputSticker": {
             "sticker": str,  # actual: Union[str, FileInput]
@@ -110,8 +102,6 @@ class ParamTypeCheckingExceptions:
         "InputStoryContent.*": {
             "photo": str,  # actual: Union[str, FileInput]
             "video": str,  # actual: Union[str, FileInput]
-            "duration": float,  # actual: dtm.timedelta
-            "cover_frame_timestamp": float,  # actual: dtm.timedelta
         },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
@@ -168,10 +158,6 @@ PTB_EXTRA_PARAMS = {
     "InputPaidMedia": {"type", "media"},  # attributes common to all subclasses
     "InputStoryContent": {"type"},  # attributes common to all subclasses
     "StoryAreaType": {"type"},  # attributes common to all subclasses
-    # backwards compatibility for api 9.0 changes
-    # tags: deprecated NEXT.VERSION, bot api 9.0
-    "BusinessConnection": {"can_reply"},
-    "ChatFullInfo": {"can_send_gift"},
     "InputProfilePhoto": {"type"},  # attributes common to all subclasses
 }
 
@@ -220,11 +206,6 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
-    # backwards compatibility for api 9.0 changes
-    # tags: deprecated NEXT.VERSION, bot api 9.0
-    "BusinessConnection": {"is_enabled"},
-    "ChatFullInfo": {"accepted_gift_types"},
-    "TransactionPartnerUser": {"transaction_type"},
 }
 
 

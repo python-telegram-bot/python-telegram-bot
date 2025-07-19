@@ -17,11 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Audio."""
-from typing import Optional
+import datetime as dtm
+from typing import Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
 
 
 class Audio(_BaseThumbedMedium):
@@ -39,7 +42,11 @@ class Audio(_BaseThumbedMedium):
             or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in
+            seconds as defined by the sender.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         performer (:obj:`str`, optional): Performer of the audio as defined by the sender or by
             audio tags.
         title (:obj:`str`, optional): Title of the audio as defined by the sender or by audio tags.
@@ -56,7 +63,11 @@ class Audio(_BaseThumbedMedium):
             or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in seconds as
+            defined by the sender.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
             audio tags.
         title (:obj:`str`): Optional. Title of the audio as defined by the sender or by audio tags.
@@ -71,13 +82,13 @@ class Audio(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ("duration", "file_name", "mime_type", "performer", "title")
+    __slots__ = ("_duration", "file_name", "mime_type", "performer", "title")
 
     def __init__(
         self,
         file_id: str,
         file_unique_id: str,
-        duration: int,
+        duration: TimePeriod,
         performer: Optional[str] = None,
         title: Optional[str] = None,
         mime_type: Optional[str] = None,
@@ -96,9 +107,15 @@ class Audio(_BaseThumbedMedium):
         )
         with self._unfrozen():
             # Required
-            self.duration: int = duration
+            self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
             self.performer: Optional[str] = performer
             self.title: Optional[str] = title
             self.mime_type: Optional[str] = mime_type
             self.file_name: Optional[str] = file_name
+
+    @property
+    def duration(self) -> Union[int, dtm.timedelta]:
+        return get_timedelta_value(  # type: ignore[return-value]
+            self._duration, attribute="duration"
+        )

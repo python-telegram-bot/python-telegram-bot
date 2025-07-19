@@ -21,6 +21,7 @@ import datetime as dtm
 import pytest
 
 from telegram import (
+    BusinessBotRights,
     BusinessConnection,
     Chat,
     InputProfilePhotoStatic,
@@ -32,6 +33,7 @@ from telegram import (
     StoryAreaTypeUniqueGift,
     User,
 )
+from telegram._files._inputstorycontent import InputStoryContentVideo
 from telegram._files.sticker import Sticker
 from telegram._gifts import AcceptedGiftTypes, Gift
 from telegram._ownedgift import OwnedGiftRegular, OwnedGifts
@@ -50,10 +52,15 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
         user = User(1, "first", False)
         user_chat_id = 1
         date = dtm.datetime.utcnow()
-        can_reply = True
+        rights = BusinessBotRights(can_reply=True)
         is_enabled = True
         bc = BusinessConnection(
-            self.bci, user, user_chat_id, date, can_reply, is_enabled
+            self.bci,
+            user,
+            user_chat_id,
+            date,
+            is_enabled,
+            rights=rights,
         ).to_json()
 
         async def do_request(*args, **kwargs):
@@ -491,6 +498,39 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             kwargs["protect_content"] = passed_value
 
         await default_bot.post_story(**kwargs)
+
+    @pytest.mark.parametrize(
+        ("argument", "expected"),
+        [(4, 4), (4.0, 4), (dtm.timedelta(seconds=4), 4), (4.5, 4.5)],
+    )
+    async def test_post_story_float_time_period(
+        self, offline_bot, monkeypatch, argument, expected
+    ):
+        # We test that whole number conversion works properly. Only tested here but
+        # relevant for some other methods too (e.g bot.set_business_account_profile_photo)
+        async def make_assertion(url, request_data, *args, **kwargs):
+            data = request_data.parameters
+            content = data["content"]
+
+            assert content["duration"] == expected
+            assert type(content["duration"]) is type(expected)
+            assert content["cover_frame_timestamp"] == expected
+            assert type(content["cover_frame_timestamp"]) is type(expected)
+
+            return Story(chat=Chat(123, "private"), id=123).to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "content": InputStoryContentVideo(
+                video=data_file("telegram.mp4"),
+                duration=argument,
+                cover_frame_timestamp=argument,
+            ),
+            "active_period": dtm.timedelta(seconds=20),
+        }
+
+        assert await offline_bot.post_story(**kwargs)
 
     async def test_edit_story_all_args(self, offline_bot, monkeypatch):
         story_id = 1234

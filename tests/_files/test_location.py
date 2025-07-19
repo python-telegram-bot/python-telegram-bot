@@ -25,6 +25,7 @@ from telegram import Location, ReplyParameters
 from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
@@ -45,7 +46,7 @@ class LocationTestBase:
     latitude = -23.691288
     longitude = -46.788279
     horizontal_accuracy = 999
-    live_period = 60
+    live_period = dtm.timedelta(seconds=60)
     heading = 90
     proximity_alert_radius = 50
 
@@ -61,7 +62,7 @@ class TestLocationWithoutRequest(LocationTestBase):
             "latitude": self.latitude,
             "longitude": self.longitude,
             "horizontal_accuracy": self.horizontal_accuracy,
-            "live_period": self.live_period,
+            "live_period": int(self.live_period.total_seconds()),
             "heading": self.heading,
             "proximity_alert_radius": self.proximity_alert_radius,
         }
@@ -71,7 +72,7 @@ class TestLocationWithoutRequest(LocationTestBase):
         assert location.latitude == self.latitude
         assert location.longitude == self.longitude
         assert location.horizontal_accuracy == self.horizontal_accuracy
-        assert location.live_period == self.live_period
+        assert location._live_period == self.live_period
         assert location.heading == self.heading
         assert location.proximity_alert_radius == self.proximity_alert_radius
 
@@ -81,9 +82,28 @@ class TestLocationWithoutRequest(LocationTestBase):
         assert location_dict["latitude"] == location.latitude
         assert location_dict["longitude"] == location.longitude
         assert location_dict["horizontal_accuracy"] == location.horizontal_accuracy
-        assert location_dict["live_period"] == location.live_period
+        assert location_dict["live_period"] == int(self.live_period.total_seconds())
+        assert isinstance(location_dict["live_period"], int)
         assert location["heading"] == location.heading
         assert location["proximity_alert_radius"] == location.proximity_alert_radius
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, location):
+        if PTB_TIMEDELTA:
+            assert location.live_period == self.live_period
+            assert isinstance(location.live_period, dtm.timedelta)
+        else:
+            assert location.live_period == int(self.live_period.total_seconds())
+            assert isinstance(location.live_period, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, location):
+        location.live_period
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`live_period` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = Location(self.longitude, self.latitude)

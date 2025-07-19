@@ -18,12 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
-from typing import TYPE_CHECKING, Final, Optional
+import datetime as dtm
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
@@ -48,10 +51,13 @@ class InlineQueryResultLocation(InlineQueryResult):
         horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
             measured in meters; 0-
             :tg-const:`telegram.InlineQueryResultLocation.HORIZONTAL_ACCURACY`.
-        live_period (:obj:`int`, optional): Period in seconds for which the location will be
-            updated, should be between
+        live_period (:obj:`int` | :class:`datetime.timedelta`, optional): Period in seconds for
+            which the location will be updated, should be between
             :tg-const:`telegram.InlineQueryResultLocation.MIN_LIVE_PERIOD` and
             :tg-const:`telegram.InlineQueryResultLocation.MAX_LIVE_PERIOD`.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         heading (:obj:`int`, optional): For live locations, a direction in which the user is
             moving, in degrees. Must be between
             :tg-const:`telegram.InlineQueryResultLocation.MIN_HEADING` and
@@ -86,12 +92,15 @@ class InlineQueryResultLocation(InlineQueryResult):
         horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
             measured in meters; 0-
             :tg-const:`telegram.InlineQueryResultLocation.HORIZONTAL_ACCURACY`.
-        live_period (:obj:`int`): Optional. Period in seconds for which the location will be
-            updated, should be between
+        live_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Period in seconds for
+            which the location will be updated, should be between
             :tg-const:`telegram.InlineQueryResultLocation.MIN_LIVE_PERIOD` and
             :tg-const:`telegram.InlineQueryResultLocation.MAX_LIVE_PERIOD` or
             :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
             locations that can be edited indefinitely.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         heading (:obj:`int`): Optional. For live locations, a direction in which the user is
             moving, in degrees. Must be between
             :tg-const:`telegram.InlineQueryResultLocation.MIN_HEADING` and
@@ -118,11 +127,11 @@ class InlineQueryResultLocation(InlineQueryResult):
     """
 
     __slots__ = (
+        "_live_period",
         "heading",
         "horizontal_accuracy",
         "input_message_content",
         "latitude",
-        "live_period",
         "longitude",
         "proximity_alert_radius",
         "reply_markup",
@@ -138,7 +147,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         latitude: float,
         longitude: float,
         title: str,
-        live_period: Optional[int] = None,
+        live_period: Optional[TimePeriod] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         input_message_content: Optional["InputMessageContent"] = None,
         horizontal_accuracy: Optional[float] = None,
@@ -158,7 +167,7 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.title: str = title
 
             # Optionals
-            self.live_period: Optional[int] = live_period
+            self._live_period: Optional[dtm.timedelta] = to_timedelta(live_period)
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
             self.thumbnail_url: Optional[str] = thumbnail_url
@@ -169,6 +178,10 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.proximity_alert_radius: Optional[int] = (
                 int(proximity_alert_radius) if proximity_alert_radius else None
             )
+
+    @property
+    def live_period(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(self._live_period, attribute="live_period")
 
     HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`

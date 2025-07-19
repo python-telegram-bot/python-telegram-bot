@@ -1,0 +1,11 @@
+breaking = """Remove Functionality Deprecated in API 9.0
+
+* Remove deprecated argument and attribute ``BusinessConnection.can_reply``.
+* Remove deprecated argument and attribute ``ChatFullInfo.can_send_gift``
+* Remove deprecated class ``constants.StarTransactions``. Please instead use :attr:`telegram.constants.Nanostar.VALUE`.
+* Remove deprecated attributes ``constants.StarTransactionsLimit.NANOSTAR_MIN_AMOUNT`` and ``constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT``. Please instead use :attr:`telegram.constants.NanostarLimit.MIN_AMOUNT` and :attr:`telegram.constants.NanostarLimit.MAX_AMOUNT`.
+"""
+[[pull_requests]]
+uid = "4852"
+author_uid = "aelkheir"
+closes_threads = []

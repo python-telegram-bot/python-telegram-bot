@@ -4519,7 +4519,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
-        timeout: Optional[int] = None,
+        timeout: Optional[TimePeriod] = None,
         allowed_updates: Optional[Sequence[str]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4554,9 +4554,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 between :tg-const:`telegram.constants.PollingLimit.MIN_LIMIT`-
                 :tg-const:`telegram.constants.PollingLimit.MAX_LIMIT` are accepted.
                 Defaults to ``100``.
-            timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to ``0``,
-                i.e. usual short polling. Should be positive, short polling should be used for
-                testing purposes only.
+            timeout (:obj:`int` | :class:`datetime.timedelta`, optional): Timeout in seconds for
+                long polling. Defaults to ``0``, i.e. usual short polling. Should be positive,
+                short polling should be used for testing purposes only.
+
+                .. versionchanged:: v22.2
+                    |time-period-input|
             allowed_updates (Sequence[:obj:`str`]), optional): A sequence the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
@@ -4591,6 +4594,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         else:
             arg_read_timeout = self._request[0].read_timeout or 0
 
+        read_timeout = (
+            (arg_read_timeout + timeout.total_seconds())
+            if isinstance(timeout, dtm.timedelta)
+            else (arg_read_timeout + timeout if timeout else arg_read_timeout)
+        )
+
         # Ideally we'd use an aggressive read timeout for the polling. However,
         # * Short polling should return within 2 seconds.
         # * Long polling poses a different problem: the connection might have been dropped while
@@ -4601,7 +4610,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             await self._post(
                 "getUpdates",
                 data,
-                read_timeout=arg_read_timeout + timeout if timeout else arg_read_timeout,
+                read_timeout=read_timeout,
                 write_timeout=write_timeout,
                 connect_timeout=connect_timeout,
                 pool_timeout=pool_timeout,

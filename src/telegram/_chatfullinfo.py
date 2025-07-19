@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram ChatFullInfo."""
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._birthdate import Birthdate
 from telegram._chat import Chat, _ChatBase
@@ -29,15 +29,18 @@ from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._gifts import AcceptedGiftTypes
 from telegram._reaction import ReactionType
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
-from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import (
-    build_deprecation_warning_message,
-    warn_about_deprecated_attr_in_property,
+from telegram._utils.argumentparsing import (
+    de_json_optional,
+    de_list_optional,
+    parse_sequence_arg,
+    to_timedelta,
 )
-from telegram.warnings import PTBDeprecationWarning
+from telegram._utils.datetime import (
+    extract_tzinfo_from_defaults,
+    from_timestamp,
+    get_timedelta_value,
+)
+from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import Bot, BusinessIntro, BusinessLocation, BusinessOpeningHours, Message
@@ -56,6 +59,9 @@ class ChatFullInfo(_ChatBase):
         Explicit support for all shortcut methods known from :class:`telegram.Chat` on this
         object. Previously those were only available because this class inherited from
         :class:`telegram.Chat`.
+
+    .. versionremoved:: NEXT.VERSION
+       Removed argument and attribute ``can_send_gift`` deprecated  by API 9.0.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat.
@@ -166,17 +172,23 @@ class ChatFullInfo(_ChatBase):
             (by sending date).
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups.
-        slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user.
+        slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`, optional): For supergroups,
+            the minimum allowed delay between consecutive messages sent by each unprivileged user.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         unrestrict_boost_count (:obj:`int`, optional): For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions.
 
             .. versionadded:: 21.0
-        message_auto_delete_time (:obj:`int`, optional): The time after which all messages sent to
-            the chat will be automatically deleted; in seconds.
+        message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`, optional): The time
+            after which all messages sent to the chat will be automatically deleted; in seconds.
 
             .. versionadded:: 13.4
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators.
@@ -211,13 +223,6 @@ class ChatFullInfo(_ChatBase):
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
             .. versionadded:: 21.4
-        can_send_gift (:obj:`bool`, optional): :obj:`True`, if gifts can be sent to the chat.
-
-            .. versionadded:: 21.11
-
-            .. deprecated:: 22.1
-               Bot API 9.0 introduced :paramref:`accepted_gift_types`, replacing this argument.
-               Hence, this argument will be removed in future versions.
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -331,17 +336,23 @@ class ChatFullInfo(_ChatBase):
             (by sending date).
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups.
-        slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user.
+        slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`): Optional. For supergroups,
+            the minimum allowed delay between consecutive messages sent by each unprivileged user.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         unrestrict_boost_count (:obj:`int`): Optional. For supergroups, the minimum number of
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions.
 
             .. versionadded:: 21.0
-        message_auto_delete_time (:obj:`int`): Optional. The time after which all messages sent to
-            the chat will be automatically deleted; in seconds.
+        message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`): Optional. The time
+            after which all messages sent to the chat will be automatically deleted; in seconds.
 
             .. versionadded:: 13.4
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators.
@@ -382,7 +393,8 @@ class ChatFullInfo(_ChatBase):
     """
 
     __slots__ = (
-        "_can_send_gift",
+        "_message_auto_delete_time",
+        "_slow_mode_delay",
         "accent_color_id",
         "accepted_gift_types",
         "active_usernames",
@@ -411,14 +423,12 @@ class ChatFullInfo(_ChatBase):
         "linked_chat_id",
         "location",
         "max_reaction_count",
-        "message_auto_delete_time",
         "permissions",
         "personal_chat",
         "photo",
         "pinned_message",
         "profile_accent_color_id",
         "profile_background_custom_emoji_id",
-        "slow_mode_delay",
         "sticker_set_name",
         "unrestrict_boost_count",
     )
@@ -429,6 +439,7 @@ class ChatFullInfo(_ChatBase):
         type: str,
         accent_color_id: int,
         max_reaction_count: int,
+        accepted_gift_types: AcceptedGiftTypes,
         title: Optional[str] = None,
         username: Optional[str] = None,
         first_name: Optional[str] = None,
@@ -456,9 +467,9 @@ class ChatFullInfo(_ChatBase):
         invite_link: Optional[str] = None,
         pinned_message: Optional["Message"] = None,
         permissions: Optional[ChatPermissions] = None,
-        slow_mode_delay: Optional[int] = None,
+        slow_mode_delay: Optional[TimePeriod] = None,
         unrestrict_boost_count: Optional[int] = None,
-        message_auto_delete_time: Optional[int] = None,
+        message_auto_delete_time: Optional[TimePeriod] = None,
         has_aggressive_anti_spam_enabled: Optional[bool] = None,
         has_hidden_members: Optional[bool] = None,
         has_protected_content: Optional[bool] = None,
@@ -469,10 +480,6 @@ class ChatFullInfo(_ChatBase):
         linked_chat_id: Optional[int] = None,
         location: Optional[ChatLocation] = None,
         can_send_paid_media: Optional[bool] = None,
-        # tags: deprecated 22.1; bot api 9.0
-        can_send_gift: Optional[bool] = None,
-        # temporarily optional to account for changed signature
-        accepted_gift_types: Optional[AcceptedGiftTypes] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -486,23 +493,6 @@ class ChatFullInfo(_ChatBase):
             is_forum=is_forum,
             api_kwargs=api_kwargs,
         )
-        if accepted_gift_types is None:
-            raise TypeError("`accepted_gift_type` is a required argument since Bot API 9.0")
-
-        if can_send_gift is not None:
-            warn(
-                PTBDeprecationWarning(
-                    "22.1",
-                    build_deprecation_warning_message(
-                        deprecated_name="can_send_gift",
-                        new_name="accepted_gift_types",
-                        object_type="parameter",
-                        bot_api_version="9.0",
-                    ),
-                ),
-                stacklevel=2,
-            )
-
         # Required and unique to this class-
         with self._unfrozen():
             self.max_reaction_count: int = max_reaction_count
@@ -513,9 +503,9 @@ class ChatFullInfo(_ChatBase):
             self.invite_link: Optional[str] = invite_link
             self.pinned_message: Optional[Message] = pinned_message
             self.permissions: Optional[ChatPermissions] = permissions
-            self.slow_mode_delay: Optional[int] = slow_mode_delay
-            self.message_auto_delete_time: Optional[int] = (
-                int(message_auto_delete_time) if message_auto_delete_time is not None else None
+            self._slow_mode_delay: Optional[dtm.timedelta] = to_timedelta(slow_mode_delay)
+            self._message_auto_delete_time: Optional[dtm.timedelta] = to_timedelta(
+                message_auto_delete_time
             )
             self.has_protected_content: Optional[bool] = has_protected_content
             self.has_visible_history: Optional[bool] = has_visible_history
@@ -554,27 +544,17 @@ class ChatFullInfo(_ChatBase):
             self.business_location: Optional[BusinessLocation] = business_location
             self.business_opening_hours: Optional[BusinessOpeningHours] = business_opening_hours
             self.can_send_paid_media: Optional[bool] = can_send_paid_media
-            self._can_send_gift: Optional[bool] = can_send_gift
             self.accepted_gift_types: AcceptedGiftTypes = accepted_gift_types
 
     @property
-    def can_send_gift(self) -> Optional[bool]:
-        """
-        :obj:`bool`: Optional. :obj:`True`, if gifts can be sent to the chat.
+    def slow_mode_delay(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(self._slow_mode_delay, attribute="slow_mode_delay")
 
-        .. deprecated:: 22.1
-            As Bot API 9.0 replaces this attribute with :attr:`accepted_gift_types`, this attribute
-            will be removed in future versions.
-
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="can_send_gift",
-            new_attr_name="accepted_gift_types",
-            bot_api_version="9.0",
-            ptb_version="22.1",
-            stacklevel=2,
+    @property
+    def message_auto_delete_time(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(
+            self._message_auto_delete_time, attribute="message_auto_delete_time"
         )
-        return self._can_send_gift
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatFullInfo":
@@ -593,7 +573,7 @@ class ChatFullInfo(_ChatBase):
             data.get("accepted_gift_types"), AcceptedGiftTypes, bot
         )
 
-        from telegram import (  # pylint: disable=import-outside-toplevel
+        from telegram import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
             BusinessIntro,
             BusinessLocation,
             BusinessOpeningHours,

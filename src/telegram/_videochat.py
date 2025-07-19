@@ -19,13 +19,17 @@
 """This module contains objects related to Telegram video chats."""
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.datetime import (
+    extract_tzinfo_from_defaults,
+    from_timestamp,
+    get_timedelta_value,
+)
+from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -62,27 +66,44 @@ class VideoChatEnded(TelegramObject):
     .. versionchanged:: 20.0
         This class was renamed from ``VoiceChatEnded`` in accordance to Bot API 6.0.
 
+    .. versionchanged:: v22.2
+       As part of the migration to representing time periods using ``datetime.timedelta``,
+       equality comparison now considers integer durations and equivalent timedeltas as equal.
+
     Args:
-        duration (:obj:`int`): Voice chat duration in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Voice chat duration
+            in seconds.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
 
     Attributes:
-        duration (:obj:`int`): Voice chat duration in seconds.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Voice chat duration in seconds.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
 
     """
 
-    __slots__ = ("duration",)
+    __slots__ = ("_duration",)
 
     def __init__(
         self,
-        duration: int,
+        duration: TimePeriod,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.duration: int = duration
-        self._id_attrs = (self.duration,)
+        self._duration: dtm.timedelta = to_timedelta(duration)
+        self._id_attrs = (self._duration,)
 
         self._freeze()
+
+    @property
+    def duration(self) -> Union[int, dtm.timedelta]:
+        return get_timedelta_value(  # type: ignore[return-value]
+            self._duration, attribute="duration"
+        )
 
 
 class VideoChatParticipantsInvited(TelegramObject):

@@ -18,11 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram VideoNote."""
 
-from typing import Optional
+import datetime as dtm
+from typing import Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
 
 
 class VideoNote(_BaseThumbedMedium):
@@ -42,7 +45,11 @@ class VideoNote(_BaseThumbedMedium):
             Can't be used to download or reuse the file.
         length (:obj:`int`): Video width and height (diameter of the video message) as defined
             by sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in
+            seconds as defined by the sender.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         file_size (:obj:`int`, optional): File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`, optional): Video thumbnail.
 
@@ -56,7 +63,11 @@ class VideoNote(_BaseThumbedMedium):
             Can't be used to download or reuse the file.
         length (:obj:`int`): Video width and height (diameter of the video message) as defined
             by sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in seconds as
+            defined by the sender.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         file_size (:obj:`int`): Optional. File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
 
@@ -64,14 +75,14 @@ class VideoNote(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ("duration", "length")
+    __slots__ = ("_duration", "length")
 
     def __init__(
         self,
         file_id: str,
         file_unique_id: str,
         length: int,
-        duration: int,
+        duration: TimePeriod,
         file_size: Optional[int] = None,
         thumbnail: Optional[PhotoSize] = None,
         *,
@@ -87,4 +98,10 @@ class VideoNote(_BaseThumbedMedium):
         with self._unfrozen():
             # Required
             self.length: int = length
-            self.duration: int = duration
+            self._duration: dtm.timedelta = to_timedelta(duration)
+
+    @property
+    def duration(self) -> Union[int, dtm.timedelta]:
+        return get_timedelta_value(  # type: ignore[return-value]
+            self._duration, attribute="duration"
+        )

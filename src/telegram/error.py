@@ -22,6 +22,13 @@
     Replaced ``Unauthorized`` by :class:`Forbidden`.
 """
 
+import datetime as dtm
+from typing import Optional, Union
+
+from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import TimePeriod
+
 __all__ = (
     "BadRequest",
     "ChatMigrated",
@@ -35,8 +42,6 @@ __all__ = (
     "TelegramError",
     "TimedOut",
 )
-
-from typing import Optional, Union
 
 
 class TelegramError(Exception):
@@ -208,21 +213,42 @@ class RetryAfter(TelegramError):
        :attr:`retry_after` is now an integer to comply with the Bot API.
 
     Args:
-        retry_after (:obj:`int`): Time in seconds, after which the bot can retry the request.
+        retry_after (:obj:`int` | :class:`datetime.timedelta`): Time in seconds, after which the
+            bot can retry the request.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
 
     Attributes:
-        retry_after (:obj:`int`): Time in seconds, after which the bot can retry the request.
+        retry_after (:obj:`int` | :class:`datetime.timedelta`): Time in seconds, after which the
+            bot can retry the request.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
 
     """
 
-    __slots__ = ("retry_after",)
+    __slots__ = ("_retry_after",)
 
-    def __init__(self, retry_after: int):
-        super().__init__(f"Flood control exceeded. Retry in {retry_after} seconds")
-        self.retry_after: int = retry_after
+    def __init__(self, retry_after: TimePeriod):
+        self._retry_after: dtm.timedelta = to_timedelta(retry_after)
+
+        if isinstance(self.retry_after, int):
+            super().__init__(f"Flood control exceeded. Retry in {self.retry_after} seconds")
+        else:
+            super().__init__(f"Flood control exceeded. Retry in {self.retry_after!s}")
+
+    @property
+    def retry_after(self) -> Union[int, dtm.timedelta]:  # noqa: D102
+        # Diableing D102 because docstring for `retry_after` is present at the class's level
+        return get_timedelta_value(  # type: ignore[return-value]
+            self._retry_after, attribute="retry_after"
+        )
 
     def __reduce__(self) -> tuple[type, tuple[float]]:  # type: ignore[override]
-        return self.__class__, (self.retry_after,)
+        # Until support for `int` time periods is lifted, leave pickle behaviour the same
+        # tag: deprecated: v22.2
+        return self.__class__, (int(self._retry_after.total_seconds()),)
 
 
 class Conflict(TelegramError):

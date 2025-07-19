@@ -17,13 +17,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Video."""
+import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg, to_timedelta
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -46,7 +48,11 @@ class Video(_BaseThumbedMedium):
             Can't be used to download or reuse the file.
         width (:obj:`int`): Video width as defined by the sender.
         height (:obj:`int`): Video height as defined by the sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video
+            in seconds as defined by the sender.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
         file_name (:obj:`str`, optional): Original filename as defined by the sender.
         mime_type (:obj:`str`, optional): MIME type of a file as defined by the sender.
         file_size (:obj:`int`, optional): File size in bytes.
@@ -57,9 +63,12 @@ class Video(_BaseThumbedMedium):
             the video in the message.
 
             .. versionadded:: 21.11
-        start_timestamp (:obj:`int`, optional): Timestamp in seconds from which the video
-            will play in the message
+        start_timestamp (:obj:`int` | :class:`datetime.timedelta`, optional): Timestamp in seconds
+            from which the video will play in the message
             .. versionadded:: 21.11
+
+            .. versionchanged:: v22.2
+                |time-period-input|
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -69,7 +78,11 @@ class Video(_BaseThumbedMedium):
             Can't be used to download or reuse the file.
         width (:obj:`int`): Video width as defined by the sender.
         height (:obj:`int`): Video height as defined by the sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by the sender.
+        duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in seconds
+            as defined by the sender.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
         file_name (:obj:`str`): Optional. Original filename as defined by the sender.
         mime_type (:obj:`str`): Optional. MIME type of a file as defined by the sender.
         file_size (:obj:`int`): Optional. File size in bytes.
@@ -80,18 +93,21 @@ class Video(_BaseThumbedMedium):
             the video in the message.
 
             .. versionadded:: 21.11
-        start_timestamp (:obj:`int`): Optional, Timestamp in seconds from which the video
-            will play in the message
+        start_timestamp (:obj:`int` | :class:`datetime.timedelta`): Optional. Timestamp in seconds
+            from which the video will play in the message
             .. versionadded:: 21.11
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
     """
 
     __slots__ = (
+        "_duration",
+        "_start_timestamp",
         "cover",
-        "duration",
         "file_name",
         "height",
         "mime_type",
-        "start_timestamp",
         "width",
     )
 
@@ -101,13 +117,13 @@ class Video(_BaseThumbedMedium):
         file_unique_id: str,
         width: int,
         height: int,
-        duration: int,
+        duration: TimePeriod,
         mime_type: Optional[str] = None,
         file_size: Optional[int] = None,
         file_name: Optional[str] = None,
         thumbnail: Optional[PhotoSize] = None,
         cover: Optional[Sequence[PhotoSize]] = None,
-        start_timestamp: Optional[int] = None,
+        start_timestamp: Optional[TimePeriod] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -122,12 +138,22 @@ class Video(_BaseThumbedMedium):
             # Required
             self.width: int = width
             self.height: int = height
-            self.duration: int = duration
+            self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
             self.mime_type: Optional[str] = mime_type
             self.file_name: Optional[str] = file_name
             self.cover: Optional[Sequence[PhotoSize]] = parse_sequence_arg(cover)
-            self.start_timestamp: Optional[int] = start_timestamp
+            self._start_timestamp: Optional[dtm.timedelta] = to_timedelta(start_timestamp)
+
+    @property
+    def duration(self) -> Union[int, dtm.timedelta]:
+        return get_timedelta_value(  # type: ignore[return-value]
+            self._duration, attribute="duration"
+        )
+
+    @property
+    def start_timestamp(self) -> Optional[Union[int, dtm.timedelta]]:
+        return get_timedelta_value(self._start_timestamp, attribute="start_timestamp")
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Video":

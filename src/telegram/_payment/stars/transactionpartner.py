@@ -18,7 +18,6 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars transaction partners."""
-import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final, Optional
 
@@ -29,13 +28,20 @@ from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import (
+    de_json_optional,
+    de_list_optional,
+    parse_sequence_arg,
+    to_timedelta,
+)
+from telegram._utils.types import JSONDict, TimePeriod
 
 from .affiliateinfo import AffiliateInfo
 from .revenuewithdrawalstate import RevenueWithdrawalState
 
 if TYPE_CHECKING:
+    import datetime as dtm
+
     from telegram import Bot
 
 
@@ -312,11 +318,14 @@ class TransactionPartnerUser(TransactionPartner):
         invoice_payload (:obj:`str`, optional): Bot-specified invoice payload. Can be available
             only for :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT`
             transactions.
-        subscription_period (:class:`datetime.timedelta`, optional): The duration of the paid
-            subscription. Can be available only for
+        subscription_period (:obj:`int` | :class:`datetime.timedelta`, optional): The duration of
+            the paid subscription. Can be available only for
             :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT` transactions.
 
             .. versionadded:: 21.8
+
+            .. versionchanged:: v22.2
+                Accepts :obj:`int` objects as well as :class:`datetime.timedelta`.
         paid_media (Sequence[:class:`telegram.PaidMedia`], optional): Information about the paid
             media bought by the user. for
             :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
@@ -407,24 +416,19 @@ class TransactionPartnerUser(TransactionPartner):
 
     def __init__(
         self,
+        transaction_type: str,
         user: "User",
         invoice_payload: Optional[str] = None,
         paid_media: Optional[Sequence[PaidMedia]] = None,
         paid_media_payload: Optional[str] = None,
-        subscription_period: Optional[dtm.timedelta] = None,
+        subscription_period: Optional[TimePeriod] = None,
         gift: Optional[Gift] = None,
         affiliate: Optional[AffiliateInfo] = None,
         premium_subscription_duration: Optional[int] = None,
-        # temporarily optional to account for changed signature
-        transaction_type: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
-
-        # tags: deprecated 22.1, bot api 9.0
-        if transaction_type is None:
-            raise TypeError("`transaction_type` is a required argument since Bot API 9.0")
 
         with self._unfrozen():
             self.user: User = user
@@ -432,7 +436,7 @@ class TransactionPartnerUser(TransactionPartner):
             self.invoice_payload: Optional[str] = invoice_payload
             self.paid_media: Optional[tuple[PaidMedia, ...]] = parse_sequence_arg(paid_media)
             self.paid_media_payload: Optional[str] = paid_media_payload
-            self.subscription_period: Optional[dtm.timedelta] = subscription_period
+            self.subscription_period: Optional[dtm.timedelta] = to_timedelta(subscription_period)
             self.gift: Optional[Gift] = gift
             self.premium_subscription_duration: Optional[int] = premium_subscription_duration
             self.transaction_type: str = transaction_type
@@ -451,11 +455,6 @@ class TransactionPartnerUser(TransactionPartner):
         data["user"] = de_json_optional(data.get("user"), User, bot)
         data["affiliate"] = de_json_optional(data.get("affiliate"), AffiliateInfo, bot)
         data["paid_media"] = de_list_optional(data.get("paid_media"), PaidMedia, bot)
-        data["subscription_period"] = (
-            dtm.timedelta(seconds=sp)
-            if (sp := data.get("subscription_period")) is not None
-            else None
-        )
         data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]

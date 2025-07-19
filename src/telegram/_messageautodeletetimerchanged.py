@@ -20,10 +20,13 @@
 deletion.
 """
 
-from typing import Optional
+import datetime as dtm
+from typing import Optional, Union
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.datetime import get_timedelta_value
+from telegram._utils.types import JSONDict, TimePeriod
 
 
 class MessageAutoDeleteTimerChanged(TelegramObject):
@@ -35,26 +38,38 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
     .. versionadded:: 13.4
 
     Args:
-        message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
-            chat.
+        message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`): New auto-delete time
+            for messages in the chat.
+
+            .. versionchanged:: v22.2
+                |time-period-input|
 
     Attributes:
-        message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
-            chat.
+        message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`): New auto-delete time
+            for messages in the chat.
+
+            .. deprecated:: v22.2
+                |time-period-int-deprecated|
 
     """
 
-    __slots__ = ("message_auto_delete_time",)
+    __slots__ = ("_message_auto_delete_time",)
 
     def __init__(
         self,
-        message_auto_delete_time: int,
+        message_auto_delete_time: TimePeriod,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.message_auto_delete_time: int = message_auto_delete_time
+        self._message_auto_delete_time: dtm.timedelta = to_timedelta(message_auto_delete_time)
 
         self._id_attrs = (self.message_auto_delete_time,)
 
         self._freeze()
+
+    @property
+    def message_auto_delete_time(self) -> Union[int, dtm.timedelta]:
+        return get_timedelta_value(  # type: ignore[return-value]
+            self._message_auto_delete_time, attribute="message_auto_delete_time"
+        )

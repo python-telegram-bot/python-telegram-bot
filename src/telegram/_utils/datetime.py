@@ -29,9 +29,11 @@ Warning:
 """
 import contextlib
 import datetime as dtm
+import os
 import time
 import zoneinfo
 from typing import TYPE_CHECKING, Optional, Union
+
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -251,3 +253,47 @@ def verify_timezone(
             f"Make sure to use a valid time zone name and "
             f"correct install tzdata (https://pypi.org/project/tzdata/)"
         ) from err
+
+        
+def get_timedelta_value(
+    value: Optional[dtm.timedelta], attribute: str
+) -> Optional[Union[int, dtm.timedelta]]:
+    """
+    Convert a `datetime.timedelta` to seconds or return it as-is, based on environment config.
+
+    This utility is part of the migration process from integer-based time representations
+    to using `datetime.timedelta`. The behavior is controlled by the `PTB_TIMEDELTA`
+    environment variable.
+
+    Note:
+        When `PTB_TIMEDELTA` is not enabled, the function will issue a deprecation warning.
+
+    Args:
+        value (:obj:`datetime.timedelta`): The timedelta value to process.
+        attribute (:obj:`str`): The name of the attribute at the caller scope, used for
+            warning messages.
+
+    Returns:
+        - :obj:`None` if :paramref:`value` is None.
+        - :obj:`datetime.timedelta` if `PTB_TIMEDELTA=true` or ``PTB_TIMEDELTA=1``.
+        - :obj:`int` if the total seconds is a whole number.
+        - float: otherwise.
+    """
+    if value is None:
+        return None
+    if os.getenv("PTB_TIMEDELTA", "false").lower().strip() in ["true", "1"]:
+        return value
+    warn(
+        PTBDeprecationWarning(
+            "v22.2",
+            f"In a future major version attribute `{attribute}` will be of type"
+            " `datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true`"
+            " or ``PTB_TIMEDELTA=1`` as an environment variable.",
+        ),
+        stacklevel=2,
+    )
+    return (
+        int(seconds)
+        if (seconds := value.total_seconds()).is_integer()
+        else seconds  # type: ignore[return-value]
+    )
