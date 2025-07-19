@@ -4169,6 +4169,16 @@ class Message(MaybeInaccessibleMessage):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
+        if self.business_connection_id:
+            return await self.get_bot().delete_business_messages(
+                business_connection_id=self.business_connection_id,
+                message_ids=[self.message_id],
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
         return await self.get_bot().delete_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
