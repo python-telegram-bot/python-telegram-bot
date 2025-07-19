@@ -612,7 +612,7 @@ class BusinessOpeningHours(TelegramObject):
                             day=date.day,
                             hour=int_open[1],
                             minute=int_open[2],
-                            tzinfo=verify_timezone(time_zone),
+                            tzinfo=verify_timezone(time_zone) if time_zone else None,
                         ),
                         dtm.datetime(
                             year=date.year,
@@ -620,7 +620,7 @@ class BusinessOpeningHours(TelegramObject):
                             day=date.day,
                             hour=int_close[1],
                             minute=int_close[2],
-                            tzinfo=verify_timezone(time_zone),
+                            tzinfo=verify_timezone(time_zone) if time_zone else None,
                         ),
                     )
                 )

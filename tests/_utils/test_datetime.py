@@ -24,7 +24,6 @@ import pytest
 
 from telegram._utils import datetime as tg_dtm
 from telegram._utils.datetime import verify_timezone
-from telegram.error import TelegramError
 from telegram.ext import Defaults
 
 # sample time specification values categorised into absolute / delta / time-of-day
@@ -225,25 +224,26 @@ class TestDatetime:
 
     def test_with_none(self):
         """Test with None input."""
-        assert verify_timezone(None) is None
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
+            verify_timezone(None)
 
     def test_with_invalid_timezone_string(self):
         """Test with an invalid timezone string."""
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone("Invalid/Timezone")
 
     def test_with_empty_string(self):
         """Test with empty string input."""
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone("")
 
     def test_with_non_timezone_object(self):
         """Test with an object that isn't a timezone."""
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone(123)  # integer
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone({"key": "value"})  # dict
-        with pytest.raises(TelegramError, match="No time zone found"):
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
             verify_timezone([])  # empty list
 
             

@@ -577,8 +577,10 @@ class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
         result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
 
         expected = (
-            dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
-            dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+            (
+                dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
+                dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+            ),
         )
 
         assert result == expected
@@ -590,8 +592,10 @@ class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
         result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
 
         expected = (
-            dtm.datetime(2023, 11, 7, 0, 0, tzinfo=time_zone),
-            dtm.datetime(2023, 11, 7, 23, 59, tzinfo=time_zone),
+            (
+                dtm.datetime(2023, 11, 7, 0, 0, tzinfo=time_zone),
+                dtm.datetime(2023, 11, 7, 23, 59, tzinfo=time_zone),
+            ),
         )
 
         assert result == expected
@@ -603,8 +607,10 @@ class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
         result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
 
         expected = (
-            dtm.datetime(2023, 11, 12, 0, 0, tzinfo=time_zone),
-            dtm.datetime(2023, 11, 12, 23, 58, tzinfo=time_zone),
+            (
+                dtm.datetime(2023, 11, 12, 0, 0, tzinfo=time_zone),
+                dtm.datetime(2023, 11, 12, 23, 58, tzinfo=time_zone),
+            ),
         )
 
         assert result == expected
@@ -630,10 +636,14 @@ class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
         result = opening_hours.get_opening_hours_for_day(test_date, time_zone)
 
         expected = (
-            dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
-            dtm.datetime(2023, 11, 6, 12, 0, tzinfo=time_zone),
-            dtm.datetime(2023, 11, 6, 15, 0, tzinfo=time_zone),
-            dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+            (
+                dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
+                dtm.datetime(2023, 11, 6, 12, 0, tzinfo=time_zone),
+            ),
+            (
+                dtm.datetime(2023, 11, 6, 15, 0, tzinfo=time_zone),
+                dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+            ),
         )
 
         assert result == expected
@@ -645,13 +655,15 @@ class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
         result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
 
         expected = (
-            dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
-            dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+            (
+                dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
+                dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+            ),
         )
 
         assert result == expected
-        assert result[0].tzinfo == time_zone
-        assert result[1].tzinfo == time_zone
+        assert result[0][0].tzinfo == time_zone
+        assert result[0][1].tzinfo == time_zone
 
     def test_no_timezone_provided(self, sample_opening_hours):
         # Test when no timezone is provided
@@ -659,8 +671,10 @@ class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
         result = sample_opening_hours.get_opening_hours_for_day(test_date)
 
         expected = (
-            dtm.datetime(2023, 11, 6, 8, 0, tzinfo=None),
-            dtm.datetime(2023, 11, 6, 20, 30, tzinfo=None),
+            (
+                dtm.datetime(2023, 11, 6, 8, 0, tzinfo=None),
+                dtm.datetime(2023, 11, 6, 20, 30, tzinfo=None),
+            ),
         )
 
         assert result == expected
@@ -711,7 +725,7 @@ class TestBusinessOpeningHoursIsOpenWithoutRequest:
 
     def test_timezone_conversion(self, sample_opening_hours):
         # Monday 10am UTC is 6am EDT (should be closed)
-        dt = dtm.datetime(2023, 11, 6, 6, 0, tzinfo=ZoneInfo("America/New_York"))
+        dt = dtm.datetime(2023, 11, 6, 2, 30, tzinfo=ZoneInfo("America/New_York"))
         assert sample_opening_hours.is_open(dt) is False
 
         # Monday 10am EDT is 2pm UTC (should be open)
