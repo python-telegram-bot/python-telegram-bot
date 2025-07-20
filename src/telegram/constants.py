@@ -77,6 +77,7 @@ __all__ = [
     "InlineQueryResultLimit",
     "InlineQueryResultType",
     "InlineQueryResultsButtonLimit",
+    "InputChecklistLimit",
     "InputMediaType",
     "InputPaidMediaType",
     "InputProfilePhotoType",
@@ -172,7 +173,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=0)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=1)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -188,6 +189,7 @@ SUPPORTED_WEBHOOK_PORTS: Final[list[int]] = [443, 80, 88, 8443]
 
 #: :obj:`datetime.datetime`, value of unix 0.
 #: This date literal is used in :class:`telegram.InaccessibleMessage`
+#  and :class:`telegram.ChecklistTask`.
 #:
 #: .. versionadded:: 20.8
 ZERO_DATE: Final[dtm.datetime] = dtm.datetime(1970, 1, 1, tzinfo=UTC)
@@ -1411,6 +1413,47 @@ class InlineKeyboardMarkupLimit(IntEnum):
     """
 
 
+class InputChecklistLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.InputChecklist`/
+    :class:`telegram.InputChecklistTask`. The enum
+    members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_TITLE_LENGTH = 1
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as
+    :paramref:`~telegram.InputChecklist.title` parameter of :class:`telegram.InputChecklist`
+    """
+
+    MAX_TITLE_LENGTH = 255
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as
+    :paramref:`~telegram.InputChecklist.title` parameter of :class:`telegram.InputChecklist`
+    """
+
+    MIN_TEXT_LENGTH = 1
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as
+    :paramref:`~telegram.InputChecklistTask.text` parameter of :class:`telegram.InputChecklistTask`
+    """
+
+    MAX_TEXT_LENGTH = 100
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as
+    :paramref:`~telegram.InputChecklistTask.text` parameter of :class:`telegram.InputChecklistTask`
+    """
+
+    MIN_TASK_NUMBER = 1
+    """:obj:`int`: Minimum number of tasks passed as :paramref:`~telegram.InputChecklist.tasks`
+    parameter of :class:`telegram.InputChecklist`
+    """
+
+    MAX_TASK_NUMBER = 30
+    """:obj:`int`: Maximum number of tasks passed as :paramref:`~telegram.InputChecklistTask.tasks`
+    parameter of :class:`telegram.InputChecklistTask`
+    """
+
+
 class InputMediaType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -2058,6 +2101,21 @@ class MessageType(StringEnum):
 
     .. versionadded:: 21.2
     """
+    CHECKLIST = "checklist"
+    """:obj:`str`: Messages with :attr:`telegram.Message.checklist`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CHECKLIST_TASKS_ADDED = "checklist_tasks_added"
+    """:obj:`str`: Messages with :attr:`telegram.Message.checklist_tasks_added`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CHECKLIST_TASKS_DONE = "checklist_tasks_done"
+    """:obj:`str`: Messages with :attr:`telegram.Message.checklist_tasks_done`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     CONNECTED_WEBSITE = "connected_website"
     """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
     CONTACT = "contact"
@@ -2066,6 +2124,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
     DICE = "dice"
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
+    DIRECT_MESSAGE_PRICE_CHANGED = "direct_message_price_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.direct_message_price_changed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
     EFFECT_ID = "effect_id"
@@ -3115,10 +3178,13 @@ class PollLimit(IntEnum):
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MAX_OPTION_NUMBER = 10
+    MAX_OPTION_NUMBER = 12
     """:obj:`int`: Maximum number of strings passed in a :obj:`list`
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
+
+    .. versionchanged:: NEXT.VERSION
+        This value was changed from ``10`` to ``12`` in accordance to Bot API 9.1.
     """
     MAX_EXPLANATION_LENGTH = 200
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
@@ -3173,6 +3239,11 @@ class UniqueGiftInfoOrigin(StringEnum):
     """:obj:`str` gift upgraded"""
     TRANSFER = "transfer"
     """:obj:`str` gift transfered"""
+    RESALE = "resale"
+    """:obj:`str` gift bought from other users
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class UpdateType(StringEnum):
