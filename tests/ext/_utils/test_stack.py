@@ -80,7 +80,7 @@ def caller_func():
         symlink_to(symlink_file, temp_file)
 
         sys.path.append(tmp_path.as_posix())
-        from caller_link import caller_func
+        from caller_link import caller_func  # noqa: PLC0415
 
         frame = caller_func()
         assert was_called_by(frame, temp_file)
@@ -111,7 +111,7 @@ def outer_func():
         symlink_to(symlink_file2, temp_file2)
 
         sys.path.append(tmp_path.as_posix())
-        from outer_link import outer_func
+        from outer_link import outer_func  # noqa: PLC0415
 
         frame = outer_func()
         assert was_called_by(frame, temp_file2)

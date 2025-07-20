@@ -93,7 +93,7 @@ def is_parameter_required_by_tg(field: str) -> bool:
 def wrap_with_none(tg_parameter: "TelegramParameter", mapped_type: Any, obj: object) -> type:
     """Adds `None` to type annotation if the parameter isn't required. Respects ignored params."""
     # have to import here to avoid circular imports
-    from tests.test_official.exceptions import ignored_param_requirements
+    from tests.test_official.exceptions import ignored_param_requirements  # noqa: PLC0415
 
     if tg_parameter.param_name in ignored_param_requirements(obj.__name__):
         return mapped_type | type(None)

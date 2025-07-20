@@ -65,7 +65,7 @@ class TestDatetime:
     @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
     def test_localize_pytz(self):
         dt = dtm.datetime(2023, 1, 1, 12, 0, 0)
-        import pytz
+        import pytz  # noqa: PLC0415
 
         tzinfo = pytz.timezone("Europe/Berlin")
         localized_dt = tg_dtm.localize(dt, tzinfo)
