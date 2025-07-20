@@ -1496,7 +1496,7 @@ class _ChatBase(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_checklist`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.3
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.

@@ -364,7 +364,7 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Message.edit_checklist`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.3
 
         Returns:
             :class:`telegram.Message`: On success, the edited Message is returned.

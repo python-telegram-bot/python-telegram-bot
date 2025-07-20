@@ -92,7 +92,7 @@ class ExternalReplyInfo(TelegramObject):
             a spoiler animation.
         checklist (:class:`telegram.Checklist`, optional): Message is a checklist
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value.
@@ -144,7 +144,7 @@ class ExternalReplyInfo(TelegramObject):
             a spoiler animation.
         checklist (:class:`telegram.Checklist`): Optional. Message is a checklist
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
             about the contact.
         dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.

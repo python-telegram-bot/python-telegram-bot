@@ -28,7 +28,7 @@ those classes.
 
     * Most of the constants in this module are grouped into enums.
 
-.. versionremoved:: NEXT.VERSION
+.. versionremoved:: 22.3
     Removed deprecated class ``StarTransactions``. Please instead use
     :attr:`telegram.constants.Nanostar.VALUE`.
 """
@@ -1418,7 +1418,7 @@ class InputChecklistLimit(IntEnum):
     :class:`telegram.InputChecklistTask`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
 
     __slots__ = ()
@@ -2104,17 +2104,17 @@ class MessageType(StringEnum):
     CHECKLIST = "checklist"
     """:obj:`str`: Messages with :attr:`telegram.Message.checklist`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
     CHECKLIST_TASKS_ADDED = "checklist_tasks_added"
     """:obj:`str`: Messages with :attr:`telegram.Message.checklist_tasks_added`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
     CHECKLIST_TASKS_DONE = "checklist_tasks_done"
     """:obj:`str`: Messages with :attr:`telegram.Message.checklist_tasks_done`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
     CONNECTED_WEBSITE = "connected_website"
     """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
@@ -2127,7 +2127,7 @@ class MessageType(StringEnum):
     DIRECT_MESSAGE_PRICE_CHANGED = "direct_message_price_changed"
     """:obj:`str`: Messages with :attr:`telegram.Message.direct_message_price_changed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
@@ -2810,7 +2810,7 @@ class StarTransactionsLimit(IntEnum):
 
     .. versionadded:: 21.4
 
-    .. versionremoved:: NEXT.VERSION
+    .. versionremoved:: 22.3
         Removed deprecated attributes ``StarTransactionsLimit.NANOSTAR_MIN_AMOUNT``
         and ``StarTransactionsLimit.NANOSTAR_MAX_AMOUNT``. Please instead use
         :attr:`telegram.constants.NanostarLimit.MIN_AMOUNT`
@@ -3183,7 +3183,7 @@ class PollLimit(IntEnum):
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.3
         This value was changed from ``10`` to ``12`` in accordance to Bot API 9.1.
     """
     MAX_EXPLANATION_LENGTH = 200
@@ -3242,7 +3242,7 @@ class UniqueGiftInfoOrigin(StringEnum):
     RESALE = "resale"
     """:obj:`str` gift bought from other users
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
 
 

@@ -41,7 +41,7 @@ class ChecklistTask(TelegramObject):
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if all their :attr:`id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
 
     Args:
         id (:obj:`int`): Unique identifier of the task.
@@ -165,7 +165,7 @@ class Checklist(TelegramObject):
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if all their :attr:`tasks` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
 
     Args:
         title (:obj:`str`): Title of the checklist.
@@ -276,7 +276,7 @@ class ChecklistTasksDone(TelegramObject):
     Two objects of this class are considered equal, if their :attr:`marked_as_done_task_ids` and
     :attr:`marked_as_not_done_task_ids` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
 
     Args:
         checklist_message (:class:`telegram.Message`, optional): Message containing the checklist
@@ -344,7 +344,7 @@ class ChecklistTasksAdded(TelegramObject):
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their :attr:`tasks` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
 
     Args:
         checklist_message (:class:`telegram.Message`, optional): Message containing the checklist

@@ -60,7 +60,7 @@ class ChatFullInfo(_ChatBase):
         object. Previously those were only available because this class inherited from
         :class:`telegram.Chat`.
 
-    .. versionremoved:: NEXT.VERSION
+    .. versionremoved:: 22.3
        Removed argument and attribute ``can_send_gift`` deprecated  by API 9.0.
 
     Args:

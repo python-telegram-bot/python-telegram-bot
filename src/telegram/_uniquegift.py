@@ -346,7 +346,7 @@ class UniqueGiftInfo(TelegramObject):
             upgraded from regular gifts, :attr:`TRANSFER` for gifts transferred from other users
             or channels, or :attr:`RESALE` for gifts bought from other users.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.3
                 The :attr:`RESALE` origin was added.
         owned_gift_id (:obj:`str`, optional) Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
@@ -355,12 +355,12 @@ class UniqueGiftInfo(TelegramObject):
         last_resale_star_count (:obj:`int`, optional): For gifts bought from other users, the price
             paid for the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         next_transfer_date (:obj:`datetime.datetime`, optional): Date when the gift can be
             transferred. If it's in the past, then the gift can be transferred now.
             |datetime_localization|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
 
     Attributes:
         gift (:class:`UniqueGift`): Information about the gift.
@@ -368,7 +368,7 @@ class UniqueGiftInfo(TelegramObject):
             upgraded from regular gifts, :attr:`TRANSFER` for gifts transferred from other users
             or channels, or :attr:`RESALE` for gifts bought from other users.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.3
                 The :attr:`RESALE` origin was added.
         owned_gift_id (:obj:`str`) Optional. Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
@@ -377,12 +377,12 @@ class UniqueGiftInfo(TelegramObject):
         last_resale_star_count (:obj:`int`): Optional. For gifts bought from other users, the price
             paid for the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         next_transfer_date (:obj:`datetime.datetime`): Optional. Date when the gift can be
             transferred. If it's in the past, then the gift can be transferred now.
             |datetime_localization|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
     """
 
     UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.UPGRADE
@@ -392,7 +392,7 @@ class UniqueGiftInfo(TelegramObject):
     RESALE: Final[str] = constants.UniqueGiftInfoOrigin.RESALE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.RESALE`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
 
     __slots__ = (

@@ -931,7 +931,7 @@ class _Checklist(MessageFilter):
 CHECKLIST = _Checklist(name="filters.CHECKLIST")
 """Messages that contain :attr:`telegram.Message.checklist`.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 22.3
 """
 
 
@@ -2015,7 +2015,7 @@ class StatusUpdate:
     CHECKLIST_TASKS_ADDED = _ChecklistTasksAdded(name="filters.StatusUpdate.CHECKLIST_TASKS_ADDED")
     """Messages that contain :attr:`telegram.Message.checklist_tasks_added`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
 
     class _ChecklistTasksDone(MessageFilter):
@@ -2027,7 +2027,7 @@ class StatusUpdate:
     CHECKLIST_TASKS_DONE = _ChecklistTasksDone(name="filters.StatusUpdate.CHECKLIST_TASKS_DONE")
     """Messages that contain :attr:`telegram.Message.checklist_tasks_done`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
 
     class _ConnectedWebsite(MessageFilter):
@@ -2050,7 +2050,7 @@ class StatusUpdate:
     )
     """Messages that contain :attr:`telegram.Message.direct_message_price_changed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
     """
 
     class _DeleteChatPhoto(MessageFilter):
