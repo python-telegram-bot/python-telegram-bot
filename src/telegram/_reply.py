@@ -21,6 +21,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._chat import Chat
+from telegram._checklists import Checklist
 from telegram._dice import Dice
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
@@ -89,6 +90,9 @@ class ExternalReplyInfo(TelegramObject):
             the file.
         has_media_spoiler (:obj:`bool`, optional): :obj:`True`, if the message media is covered by
             a spoiler animation.
+        checklist (:class:`telegram.Checklist`, optional): Message is a checklist
+
+            .. versionadded:: 22.3
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value.
@@ -138,6 +142,9 @@ class ExternalReplyInfo(TelegramObject):
             the file.
         has_media_spoiler (:obj:`bool`): Optional. :obj:`True`, if the message media is covered by
             a spoiler animation.
+        checklist (:class:`telegram.Checklist`): Optional. Message is a checklist
+
+            .. versionadded:: 22.3
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
             about the contact.
         dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.
@@ -164,6 +171,7 @@ class ExternalReplyInfo(TelegramObject):
         "animation",
         "audio",
         "chat",
+        "checklist",
         "contact",
         "dice",
         "document",
@@ -213,6 +221,7 @@ class ExternalReplyInfo(TelegramObject):
         poll: Optional[Poll] = None,
         venue: Optional[Venue] = None,
         paid_media: Optional[PaidMediaInfo] = None,
+        checklist: Optional[Checklist] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -232,6 +241,7 @@ class ExternalReplyInfo(TelegramObject):
         self.video_note: Optional[VideoNote] = video_note
         self.voice: Optional[Voice] = voice
         self.has_media_spoiler: Optional[bool] = has_media_spoiler
+        self.checklist: Optional[Checklist] = checklist
         self.contact: Optional[Contact] = contact
         self.dice: Optional[Dice] = dice
         self.game: Optional[Game] = game
@@ -278,6 +288,7 @@ class ExternalReplyInfo(TelegramObject):
         data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
         data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
         data["paid_media"] = de_json_optional(data.get("paid_media"), PaidMediaInfo, bot)
+        data["checklist"] = de_json_optional(data.get("checklist"), Checklist, bot)
 
         return super().de_json(data=data, bot=bot)
 

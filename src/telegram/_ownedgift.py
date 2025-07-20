@@ -347,13 +347,17 @@ class OwnedGiftUnique(OwnedGift):
             bot; for gifts received on behalf of business accounts only.
         sender_user (:class:`telegram.User`, optional): Sender of the gift if it is a known user.
         send_date (:obj:`datetime.datetime`): Date the gift was sent as :class:`datetime.datetime`.
-            |datetime_localization|.
+            |datetime_localization|
         is_saved (:obj:`bool`, optional): :obj:`True`, if the gift is displayed on the account's
             profile page; for gifts received on behalf of business accounts only.
         can_be_transferred (:obj:`bool`, optional): :obj:`True`, if the gift can be transferred to
             another owner; for gifts received on behalf of business accounts only.
         transfer_star_count (:obj:`int`, optional): Number of Telegram Stars that must be paid
             to transfer the gift; omitted if the bot cannot transfer the gift.
+        next_transfer_date (:obj:`datetime.datetime`, optional): Date when the gift can be
+            transferred. If it's in the past, then the gift can be transferred now.
+            |datetime_localization|
+            .. versionadded:: 22.3
 
     Attributes:
         type (:obj:`str`): Type of the owned gift, always :tg-const:`~telegram.OwnedGift.UNIQUE`.
@@ -362,19 +366,24 @@ class OwnedGiftUnique(OwnedGift):
             bot; for gifts received on behalf of business accounts only.
         sender_user (:class:`telegram.User`): Optional. Sender of the gift if it is a known user.
         send_date (:obj:`datetime.datetime`): Date the gift was sent as :class:`datetime.datetime`.
-            |datetime_localization|.
+            |datetime_localization|
         is_saved (:obj:`bool`): Optional. :obj:`True`, if the gift is displayed on the account's
             profile page; for gifts received on behalf of business accounts only.
         can_be_transferred (:obj:`bool`): Optional. :obj:`True`, if the gift can be transferred to
             another owner; for gifts received on behalf of business accounts only.
         transfer_star_count (:obj:`int`): Optional. Number of Telegram Stars that must be paid
             to transfer the gift; omitted if the bot cannot transfer the gift.
+        next_transfer_date (:obj:`datetime.datetime`): Optional. Date when the gift can be
+            transferred. If it's in the past, then the gift can be transferred now.
+            |datetime_localization|
+            .. versionadded:: 22.3
     """
 
     __slots__ = (
         "can_be_transferred",
         "gift",
         "is_saved",
+        "next_transfer_date",
         "owned_gift_id",
         "send_date",
         "sender_user",
@@ -390,6 +399,7 @@ class OwnedGiftUnique(OwnedGift):
         is_saved: Optional[bool] = None,
         can_be_transferred: Optional[bool] = None,
         transfer_star_count: Optional[int] = None,
+        next_transfer_date: Optional[dtm.datetime] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -403,6 +413,7 @@ class OwnedGiftUnique(OwnedGift):
             self.is_saved: Optional[bool] = is_saved
             self.can_be_transferred: Optional[bool] = can_be_transferred
             self.transfer_star_count: Optional[int] = transfer_star_count
+            self.next_transfer_date: Optional[dtm.datetime] = next_transfer_date
 
             self._id_attrs = (self.type, self.gift, self.send_date)
 
@@ -415,5 +426,8 @@ class OwnedGiftUnique(OwnedGift):
         data["send_date"] = from_timestamp(data.get("send_date"), tzinfo=loc_tzinfo)
         data["sender_user"] = de_json_optional(data.get("sender_user"), User, bot)
         data["gift"] = de_json_optional(data.get("gift"), UniqueGift, bot)
+        data["next_transfer_date"] = from_timestamp(
+            data.get("next_transfer_date"), tzinfo=loc_tzinfo
+        )
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]

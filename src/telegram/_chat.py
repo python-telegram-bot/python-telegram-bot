@@ -53,6 +53,7 @@ if TYPE_CHECKING:
         Document,
         Gift,
         InlineKeyboardMarkup,
+        InputChecklist,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
@@ -1469,6 +1470,54 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+        )
+
+    async def send_checklist(
+        self,
+        business_connection_id: str,
+        checklist: "InputChecklist",
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
+        *,
+        reply_to_message_id: Optional[int] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_checklist(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_checklist`.
+
+        .. versionadded:: 22.3
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return await self.get_bot().send_checklist(
+            chat_id=self.id,
+            business_connection_id=business_connection_id,
+            checklist=checklist,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_effect_id=message_effect_id,
+            reply_parameters=reply_parameters,
+            reply_markup=reply_markup,
+            reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def send_dice(
