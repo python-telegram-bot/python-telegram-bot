@@ -34,7 +34,7 @@ class InputChecklistTask(TelegramObject):
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal if their :attr:`id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
 
     Args:
         id (:obj:`int`):
@@ -104,7 +104,7 @@ class InputChecklist(TelegramObject):
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal if their :attr:`tasks` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
 
     Args:
         title (:obj:`str`):

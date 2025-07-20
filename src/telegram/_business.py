@@ -191,7 +191,7 @@ class BusinessConnection(TelegramObject):
     .. versionchanged:: 22.1
         Equality comparison now considers :attr:`rights` instead of ``can_reply``.
 
-    .. versionremoved:: NEXT.VERSION
+    .. versionremoved:: 22.3
        Removed argument and attribute ``can_reply`` deprecated  by API 9.0.
 
     Args:

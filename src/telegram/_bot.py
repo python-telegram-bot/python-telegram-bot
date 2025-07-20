@@ -7578,7 +7578,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to send a checklist on behalf of a connected business account.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.3
 
         Args:
             business_connection_id (:obj:`str`):
@@ -7653,7 +7653,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to edit a checklist on behalf of a connected business account.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.3
 
         Args:
             business_connection_id (:obj:`str`):
@@ -11220,7 +11220,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     ) -> StarAmount:
         """A method to get the current Telegram Stars balance of the bot. Requires no parameters.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.3
 
         Returns:
             :class:`telegram.StarAmount`

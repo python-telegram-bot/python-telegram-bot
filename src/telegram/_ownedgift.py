@@ -357,7 +357,7 @@ class OwnedGiftUnique(OwnedGift):
         next_transfer_date (:obj:`datetime.datetime`, optional): Date when the gift can be
             transferred. If it's in the past, then the gift can be transferred now.
             |datetime_localization|
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
 
     Attributes:
         type (:obj:`str`): Type of the owned gift, always :tg-const:`~telegram.OwnedGift.UNIQUE`.
@@ -376,7 +376,7 @@ class OwnedGiftUnique(OwnedGift):
         next_transfer_date (:obj:`datetime.datetime`): Optional. Date when the gift can be
             transferred. If it's in the past, then the gift can be transferred now.
             |datetime_localization|
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
     """
 
     __slots__ = (

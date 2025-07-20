@@ -30,7 +30,7 @@ class DirectMessagePriceChanged(TelegramObject):
     Describes a service message about a change in the price of direct messages sent to a channel
     chat.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.3
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`are_direct_messages_enabled`, and

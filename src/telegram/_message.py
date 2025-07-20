@@ -529,7 +529,7 @@ class Message(MaybeInaccessibleMessage):
             .. versionadded:: 20.0
         checklist (:class:`telegram.Checklist`, optional): Message is a checklist
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         users_shared (:class:`telegram.UsersShared`, optional): Service message: users were shared
             with the bot
 
@@ -610,11 +610,11 @@ class Message(MaybeInaccessibleMessage):
         checklist_tasks_done (:class:`telegram.ChecklistTasksDone`, optional): Service message:
             some tasks in a checklist were marked as done or not done
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         checklist_tasks_added (:class:`telegram.ChecklistTasksAdded`, optional): Service message:
             tasks were added to a checklist
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         paid_media (:class:`telegram.PaidMediaInfo`, optional): Message contains paid media;
             information about the paid media.
 
@@ -627,7 +627,7 @@ class Message(MaybeInaccessibleMessage):
             Service message: the price for paid messages in the corresponding direct messages chat
             of a channel has changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -889,7 +889,7 @@ class Message(MaybeInaccessibleMessage):
             .. versionadded:: 20.0
         checklist (:class:`telegram.Checklist`): Optional. Message is a checklist
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         users_shared (:class:`telegram.UsersShared`): Optional. Service message: users were shared
             with the bot
 
@@ -971,11 +971,11 @@ class Message(MaybeInaccessibleMessage):
         checklist_tasks_done (:class:`telegram.ChecklistTasksDone`): Optional. Service message:
             some tasks in a checklist were marked as done or not done
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         checklist_tasks_added (:class:`telegram.ChecklistTasksAdded`): Optional. Service message:
             tasks were added to a checklist
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
         paid_media (:class:`telegram.PaidMediaInfo`): Optional. Message contains paid media;
             information about the paid media.
 
@@ -988,7 +988,7 @@ class Message(MaybeInaccessibleMessage):
             Optional. Service message: the price for paid messages in the corresponding direct
             messages chat of a channel has changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.3
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -3338,7 +3338,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_checklist`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.3
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -3998,7 +3998,7 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_checklist`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.3
 
         Note:
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
