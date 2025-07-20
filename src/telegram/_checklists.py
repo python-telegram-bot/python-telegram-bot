@@ -330,7 +330,7 @@ class ChecklistTasksDone(TelegramObject):
         data = cls._parse_data(data)
 
         # needs to be imported here to avoid circular import issues
-        from telegram import Message  # pylint: disable=import-outside-toplevel
+        from telegram import Message  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
 
         data["checklist_message"] = de_json_optional(data.get("checklist_message"), Message, bot)
 
