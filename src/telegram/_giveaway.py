@@ -371,7 +371,9 @@ class GiveawayCompleted(TelegramObject):
         data = cls._parse_data(data)
 
         # Unfortunately, this needs to be here due to cyclic imports
-        from telegram._message import Message  # pylint: disable=import-outside-toplevel
+        from telegram._message import (  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
+            Message,
+        )
 
         data["giveaway_message"] = de_json_optional(data.get("giveaway_message"), Message, bot)
 

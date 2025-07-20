@@ -573,7 +573,7 @@ class ChatFullInfo(_ChatBase):
             data.get("accepted_gift_types"), AcceptedGiftTypes, bot
         )
 
-        from telegram import (  # pylint: disable=import-outside-toplevel
+        from telegram import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
             BusinessIntro,
             BusinessLocation,
             BusinessOpeningHours,

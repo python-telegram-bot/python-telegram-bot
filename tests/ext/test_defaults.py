@@ -42,7 +42,7 @@ class TestDefaults:
 
     @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
     def test_pytz_deprecation(self, recwarn):
-        import pytz
+        import pytz  # noqa: PLC0415
 
         with pytest.warns(PTBDeprecationWarning, match="pytz") as record:
             Defaults(tzinfo=pytz.timezone("Europe/Berlin"))

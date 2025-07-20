@@ -2763,7 +2763,7 @@ class User(_ChatUserBaseFilter):
 
     @user_ids.setter
     def user_ids(self, user_id: SCT[int]) -> None:
-        self.chat_ids = user_id  # type: ignore[assignment]
+        self.chat_ids = user_id
 
     def add_user_ids(self, user_id: SCT[int]) -> None:
         """
@@ -2901,7 +2901,7 @@ class ViaBot(_ChatUserBaseFilter):
 
     @bot_ids.setter
     def bot_ids(self, bot_id: SCT[int]) -> None:
-        self.chat_ids = bot_id  # type: ignore[assignment]
+        self.chat_ids = bot_id
 
     def add_bot_ids(self, bot_id: SCT[int]) -> None:
         """

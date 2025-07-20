@@ -1451,16 +1451,16 @@ class Message(MaybeInaccessibleMessage):
         )
 
         # Unfortunately, this needs to be here due to cyclic imports
-        from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
+        from telegram._giveaway import (  # pylint: disable=C0415  # noqa: PLC0415
             Giveaway,
             GiveawayCompleted,
             GiveawayCreated,
             GiveawayWinners,
         )
-        from telegram._messageorigin import (  # pylint: disable=import-outside-toplevel
+        from telegram._messageorigin import (  # pylint: disable=C0415  # noqa: PLC0415
             MessageOrigin,
         )
-        from telegram._reply import (  # pylint: disable=import-outside-toplevel
+        from telegram._reply import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
             ExternalReplyInfo,
             TextQuote,
         )
