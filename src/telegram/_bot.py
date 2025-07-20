@@ -3177,7 +3177,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
             google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
                 `supported types \
-                <https://developers.google.com/maps/documentation/places/web-service/supported_types>`_.)
+                <https://developers.google.com/maps/documentation/places/web-service/place-types>`_.)
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
