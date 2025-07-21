@@ -245,14 +245,20 @@ def verify_timezone(
 
     try:
         return zoneinfo.ZoneInfo(tz)
+    except (ValueError, TypeError) as e:
+        raise zoneinfo.ZoneInfoNotFoundError(
+            f"No time zone found with key {tz}. "
+            f"Make sure to use a valid time zone name and "
+            f"correct install tzdata (https://pypi.org/project/tzdata/)"
+        ) from e
     except zoneinfo.ZoneInfoNotFoundError as err:
-        raise TelegramError(
+        raise zoneinfo.ZoneInfoNotFoundError(
             f"No time zone found with key {tz}. "
             f"Make sure to use a valid time zone name and "
             f"correct install tzdata (https://pypi.org/project/tzdata/)"
         ) from err
 
-        
+
 def get_timedelta_value(
     value: Optional[dtm.timedelta], attribute: str
 ) -> Optional[Union[int, dtm.timedelta]]:
