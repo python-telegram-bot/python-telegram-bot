@@ -238,8 +238,6 @@ def verify_timezone(
     Verifies that the given timezone is a valid timezone.
     """
 
-    if tz is None:
-        return None
     if isinstance(tz, (dtm.tzinfo, zoneinfo.ZoneInfo)):
         return tz
 
