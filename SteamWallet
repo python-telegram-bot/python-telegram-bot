@@ -1,0 +1,46 @@
+import telegram
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+TOKEN = "Here is the token for bot Admin @SafeSteamPay_Bot:
+
+8395208886:AAEkdnINd5YzS6BlDhJFZ6TizeOyvwfK_JA"
+PAYMENT_PROVIDER_TOKEN = "YOOKASSA_OR_OTHER_PROVIDER_TOKEN"
+
+def start(update, context):
+    update.message.reply_text("Добро пожаловать! Используйте /topup для пополнения Steam.")
+
+def topup(update, context):
+    chat_id = update.message.chat_id
+    title = "Пополнение Steam"
+    description = "Пополните баланс Steam на 100 руб"
+    payload = "steam-topup-10usd"
+    currency = "руб"
+    price = 1000  # в центах/копейках
+    prices = [telegram.LabeledPrice("100 руб", price)]
+
+    context.bot.send_invoice(
+        chat_id, title, description, payload,
+        PAYMENT_PROVIDER_TOKEN, currency, prices
+    )
+
+def handle_precheckout(update, context):
+    query = update.pre_checkout_query
+    if query.invoice_payload != "steam-topup-100руб":
+        query.answer(ok=False, error_message="Ошибка платежа.")
+    else:
+        query.answer(ok=True)
+
+def handle_payment(update, context):
+    # Выдать Steam-код после оплаты
+    update.message.reply_text("Платеж успешен! Ваш код: XXXXX-XXXXX-XXXXX")
+
+updater = Updater(TOKEN, use_context=True)
+dp = updater.dispatcher
+
+dp.add_handler(CommandHandler("start", start))
+dp.add_handler(CommandHandler("topup", topup))
+dp.add_handler(MessageHandler(Filters.successful_payment, handle_payment))
+dp.add_handler(PreCheckoutQueryHandler(handle_precheckout))
+
+updater.start_polling()
+updater.idle()
