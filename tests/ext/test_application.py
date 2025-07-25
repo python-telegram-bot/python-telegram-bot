@@ -2729,7 +2729,10 @@ class TestApplication:
                 # Note: the existing test_run_polling_webhook_bootstrap_retries DOES set one
 
                 app = (
-                    ApplicationBuilder().bot(offline_bot).application_class(PytestApplication).build()
+                    ApplicationBuilder()
+                    .bot(offline_bot)
+                    .application_class(PytestApplication)
+                    .build()
                 )
 
                 # Mock the necessary methods to avoid network calls
@@ -2738,6 +2741,7 @@ class TestApplication:
 
                 # Mock initialize to exit quickly after testing event loop creation
                 original_initialize = app.initialize
+
                 async def quick_initialize(*args, **kwargs):
                     await original_initialize(*args, **kwargs)
                     # Exit quickly by raising an exception after successful initialization
@@ -2767,5 +2771,3 @@ class TestApplication:
         # If there was an unexpected exception, fail the test
         if exception_captured:
             pytest.fail(f"Unexpected exception in thread: {exception_captured}")
-
-        # If we reach here, the test passed - no RuntimeError about missing event loop occurred
