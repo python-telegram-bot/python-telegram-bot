@@ -1503,7 +1503,7 @@ class TestApplication:
         thread.start()
         with caplog.at_level(logging.DEBUG):
             app.run_polling(drop_pending_updates=True, close_loop=False)
-            thread.join()
+            thread.join(timeout=10)
 
         assert len(assertions) == 8
         for key, value in assertions.items():
@@ -1557,7 +1557,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == ["init", "post_init", "start_polling"], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
@@ -1602,7 +1602,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.shutdown",
             "shutdown",
@@ -1654,7 +1654,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.stop",
             "stop",
@@ -1703,7 +1703,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys())
         for name, param in updater_signature.parameters.items():
@@ -1718,7 +1718,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(close_loop=False, **expected)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys())
         assert self.received.pop("error_callback", None)
@@ -1777,7 +1777,7 @@ class TestApplication:
                 drop_pending_updates=True,
                 close_loop=False,
             )
-            thread.join()
+            thread.join(timeout=10)
 
         assert len(assertions) == 7
         for key, value in assertions.items():
@@ -1842,7 +1842,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == ["init", "post_init", "start_webhook"], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
@@ -1898,7 +1898,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.shutdown",
             "shutdown",
@@ -1961,7 +1961,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.stop",
             "stop",
@@ -2012,7 +2012,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_webhook(close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys()) - {"self"}
         for name, param in updater_signature.parameters.items():
@@ -2024,7 +2024,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_webhook(close_loop=False, **expected)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(expected.keys())
         assert self.received == expected
@@ -2356,8 +2356,7 @@ class TestApplication:
         thread.join(timeout=10)
         assert not thread.is_alive(), "Test took to long to run. Aborting"
 
-    @pytest.mark.flaky(3, 1)  # loop.call_later will error the test when a flood error is received
-    def test_signal_handlers(self, app, monkeypatch):
+    def test_signal_handlers(self, offline_bot, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
 
@@ -2365,19 +2364,30 @@ class TestApplication:
 
         def signal_handler_test(*args, **kwargs):
             # args[0] is the signal, [1] the callback
-            received_signals.append(args[0])
+            received_signals.append(args[1])
+
+        app = ApplicationBuilder().bot(offline_bot).application_class(PytestApplication).build()
+
+        # Mock the necessary methods to avoid network calls
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         loop = asyncio.get_event_loop()
 
-        monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test)
-        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(loop.__class__, "add_signal_handler", signal_handler_test)
 
-        def abort_app():
-            raise SystemExit
+        # Mock initialize to exit quickly after testing signal handler setup
+        original_initialize = app.initialize
 
-        loop.call_later(0.6, abort_app)
+        async def quick_initialize(*args, **kwargs):
+            await original_initialize(*args, **kwargs)
+            # Exit quickly by raising an exception after successful initialization
+            raise TelegramError("Test completed successfully")
 
-        app.run_polling(close_loop=False)
+        monkeypatch.setattr(app, "initialize", quick_initialize)
+
+        with pytest.raises(TelegramError, match="Test completed successfully"):
+            app.run_polling(close_loop=False)
 
         if platform.system() == "Windows":
             assert received_signals == []
@@ -2385,8 +2395,8 @@ class TestApplication:
             assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
 
         received_signals.clear()
-        loop.call_later(0.8, abort_app)
-        app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
+        with pytest.raises(TelegramError, match="Test completed successfully"):
+            app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
         if platform.system() == "Windows":
             assert received_signals == []
@@ -2537,7 +2547,7 @@ class TestApplication:
                 close_loop=False,
             )
 
-        thread.join()
+        thread.join(timeout=10)
 
         assert len(assertions) == 5
         for key, value in assertions.items():
