@@ -38,4 +38,4 @@ jobs:
         run: uv python install 3.13
 
       - name: Install the project
-        run: uv sync --locked --all-extras --all-groups
+        run: uv sync --all-extras --all-groups
