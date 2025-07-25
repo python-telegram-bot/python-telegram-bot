@@ -2711,3 +2711,61 @@ class TestApplication:
         # check that exactly those handlers were checked that were configured when
         # add_error_handler was called
         assert called_handlers == {"remove_handler"}
+
+    def test_run_polling_no_event_loop_python314(self, offline_bot, monkeypatch):
+        """Test that run_polling works when no event loop exists (Python 3.14+ scenario).
+
+        This simulates the Python 3.14+ behavior where get_event_loop() raises RuntimeError
+        when there's no current event loop in the main thread. The fix should create a new
+        event loop in this case.
+        """
+        # Track if our test ran and whether any exceptions occurred
+        exception_captured = None
+
+        def thread_target():
+            nonlocal exception_captured
+            try:
+                # Intentionally DON'T set an event loop to simulate Python 3.14 scenario
+                # Note: the existing test_run_polling_webhook_bootstrap_retries DOES set one
+
+                app = (
+                    ApplicationBuilder().bot(offline_bot).application_class(PytestApplication).build()
+                )
+
+                # Mock the necessary methods to avoid network calls
+                monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+                monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+
+                # Mock initialize to exit quickly after testing event loop creation
+                original_initialize = app.initialize
+                async def quick_initialize(*args, **kwargs):
+                    await original_initialize(*args, **kwargs)
+                    # Exit quickly by raising an exception after successful initialization
+                    raise TelegramError("Test completed successfully")
+
+                monkeypatch.setattr(app, "initialize", quick_initialize)
+
+                # This should work - the key is that it creates an event loop and doesn't
+                # raise RuntimeError about no current event loop (Python 3.14+ issue)
+                with pytest.raises(TelegramError, match="Test completed successfully"):
+                    app.run_polling(
+                        bootstrap_retries=0,
+                        close_loop=False,
+                        stop_signals=None,
+                        drop_pending_updates=True,
+                    )
+                # If we get here, the event loop was created successfully
+            except Exception as e:
+                exception_captured = e
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        thread.join(timeout=10)
+
+        assert not thread.is_alive(), "Test took too long to run"
+
+        # If there was an unexpected exception, fail the test
+        if exception_captured:
+            pytest.fail(f"Unexpected exception in thread: {exception_captured}")
+
+        # If we reach here, the test passed - no RuntimeError about missing event loop occurred

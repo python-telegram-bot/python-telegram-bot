@@ -97,4 +97,4 @@ pyvenv.cfg
 Scripts/
 
 # environment manager:
-.mise.toml
+.mise.tomluv.lock
