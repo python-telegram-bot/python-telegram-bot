@@ -1,0 +1,5 @@
+internal = "[WIP] No current event loop on Python 3.14"
+[[pull_requests]]
+uid = "4875"
+author_uid = "Copilot"
+closes_threads = ["4874"]
