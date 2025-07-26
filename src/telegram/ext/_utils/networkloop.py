@@ -50,14 +50,19 @@ async def network_retry_loop(
     stop_event: Optional[asyncio.Event] = None,
     is_running: Optional[Callable[[], bool]] = None,
     max_retries: int,
+    infinite_loop: bool,
 ) -> None:
     """Perform a loop calling `action_cb`, retrying after network errors.
 
-    Stop condition for loop:
+    Stop condition for loop in case of `infinite_loop` is True:
         * `is_running()` evaluates :obj:`False` or
-        * return value of `action_cb` evaluates :obj:`False`
         * or `stop_event` is set.
-        * or `max_retries` is reached.
+
+    Stop condition for loop in case of `infinite_loop` is False:
+        * a call to `action_cb` succeeds or
+        * `is_running()` evaluates :obj:`False` or
+        * or `stop_event` is set or
+        * `max_retries` is reached.
 
     Args:
         action_cb (:term:`coroutine function`): Network oriented callback function to call.
@@ -82,15 +87,29 @@ async def network_retry_loop(
 
             * < 0: Retry indefinitely.
             * 0: No retries.
-            * > 0: Number of retries.
+            * > 0: Number of retries
+
+            Must be negative if `infinite_loop` is set to True..
+        infinite_loop (:obj:`bool`): If :obj:`True`, the loop will run indefinitely until
+            `is_running()` evaluates to :obj:`False` or `stop_event` is set. Otherwise, the loop
+            will stop after a successful call to `action_cb`, or when `is_running()` evaluates to
+            :obj:`False`, or `stop_event` is set, or `max_retries` is reached.
 
     """
+    if infinite_loop and max_retries >= 0:
+        raise ValueError(
+            "max_retries must be negative if infinite_loop is True. "
+            "Use -1 for infinite retries."
+        )
+
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
     async def do_action() -> bool:
+        """Return value indicating whether the action was successful."""
         if not stop_event:
-            return await action_cb()
+            await action_cb()
+            return True
 
         action_cb_task = asyncio.create_task(action_cb())
         stop_task = asyncio.create_task(stop_event.wait())
@@ -105,15 +124,20 @@ async def network_retry_loop(
             _LOGGER.debug("%s Cancelled", log_prefix)
             return False
 
-        return action_cb_task.result()
+        # Calling `result()` on `action_cb_task` will raise an exception if the task failed.
+        # this is important to propagate the error to the caller.
+        action_cb_task.result()
+        return True
 
     _LOGGER.debug("%s Starting", log_prefix)
     cur_interval = interval
     retries = 0
     while effective_is_running():
         try:
-            if not await do_action():
-                break
+            await do_action()
+            if not infinite_loop:
+                _LOGGER.debug("%s Action succeeded. Stopping loop.", log_prefix)
+                return
         except RetryAfter as exc:
             slack_time = 0.5
             _LOGGER.info(
