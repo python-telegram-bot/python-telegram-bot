@@ -38,7 +38,7 @@ from telegram import (
     MessageEntity,
     ReplyParameters,
 )
-from telegram.constants import InputMediaType, ParseMode
+from telegram.constants import InputMediaType, InputPaidMediaType, ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
 from telegram.warnings import PTBDeprecationWarning
@@ -859,6 +859,39 @@ class TestSendMediaGroupWithoutRequest:
             chat_id, media_group, reply_parameters=ReplyParameters(**kwargs)
         )
 
+    async def test_send_paid_media(self, bot, channel_id, photo_file, video_file, monkeypatch):
+        # Actually making the request started returning BadRequest at some point with an unclear
+        # error message, so we just check that we pass the correct parameters to the request now
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["star_count"] == 20
+            assert len(request_data.multipart_data) == 2
+            assert request_data.parameters["caption"] == "bye onlyfans"
+            assert request_data.parameters["show_caption_above_media"] is True
+
+            media = request_data.parameters["media"]
+            mpd = request_data.multipart_data
+            assert media[0]["type"] == InputPaidMediaType.PHOTO
+            attach_photo = media[0]["media"].replace("attach://", "")
+            assert mpd.pop(attach_photo)[0] == "telegram.jpg"
+            assert media[1]["type"] == InputPaidMediaType.VIDEO
+            attach_video = media[1]["media"].replace("attach://", "")
+            assert mpd.pop(attach_video)[0] == "telegram.mp4"
+            assert mpd == {}
+
+            return make_message("dummy reply").to_dict()
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        await bot.send_paid_media(
+            chat_id=channel_id,
+            star_count=20,
+            media=[
+                InputPaidMediaPhoto(media=photo_file),
+                InputPaidMediaVideo(media=video_file),
+            ],
+            caption="bye onlyfans",
+            show_caption_above_media=True,
+        )
+
 
 class CustomSequence(Sequence):
     def __init__(self, items):
@@ -1239,20 +1272,3 @@ class TestSendMediaGroupWithRequest:
         assert message.caption_entities == ()
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode
-
-    async def test_send_paid_media(self, bot, channel_id, photo_file, video_file):
-        msg = await bot.send_paid_media(
-            chat_id=channel_id,
-            star_count=20,
-            media=[
-                InputPaidMediaPhoto(media=photo_file),
-                InputPaidMediaVideo(media=video_file),
-            ],
-            caption="bye onlyfans",
-            show_caption_above_media=True,
-        )
-
-        assert isinstance(msg, Message)
-        assert msg.caption == "bye onlyfans"
-        assert msg.show_caption_above_media
-        assert msg.paid_media.star_count == 20
