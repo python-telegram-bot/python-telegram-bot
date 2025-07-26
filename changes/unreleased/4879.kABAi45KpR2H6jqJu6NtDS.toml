@@ -1,4 +1,4 @@
-internal = "Address Failing Unit Test for ``send_paid_media`` by Skipping Request to Bot API"
+internal = "Address Failing Unit Test for ``send_paid_media``"
 
 [[pull_requests]]
 uid = "4879"
