@@ -26,7 +26,6 @@ from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.usernames import get_name, get_full_name, get_link
 from telegram._utils.types import (
     CorrectOptionID,
     FileInput,
@@ -35,6 +34,7 @@ from telegram._utils.types import (
     ReplyMarkup,
     TimePeriod,
 )
+from telegram._utils.usernames import get_full_name, get_link, get_name
 from telegram.helpers import mention_html as helpers_mention_html
 from telegram.helpers import mention_markdown as helpers_mention_markdown
 
@@ -208,21 +208,21 @@ class User(TelegramObject):
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
         prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
         """
-        return get_name(self, )
+        return get_name(self)
 
     @property
     def full_name(self) -> str:
         """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
         available) :attr:`last_name`.
         """
-        return get_full_name(self, )
+        return get_full_name(self)
 
     @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
         of the user.
         """
-        return get_link(self, )
+        return get_link(self)
 
     async def get_profile_photos(
         self,

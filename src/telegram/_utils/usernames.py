@@ -16,88 +16,93 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""Shared properties to extract username, first_name, last_name values if filled."""
-from __future__ import annotations
-from typing import Protocol, overload
+"""Helper utilities around Telegram Objects first_name, last_name and username.
+.. versionadded:: NEXT.VERSION
 
+Warning:
+    Contents of this module are intended to be used internally by the library and *not* by the
+    user. Changes to this module are not considered breaking changes and may not be documented in
+    the changelog.
+"""
+from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union, overload
 
-class UserLikeOptional(Protocol):
-    """
-    Note:
-        `User`, `Contact` (and maybe some other) objects always have first_name,
-         unlike the `Chat` and `Shared`, were they are optional.
-         The `last_name` is always optional.
-    """
-    last_name: str | None
-    username: str | None
+TeleUserLike = TypeVar("TeleUserLike", bound="UserLike")
+TeleUserLikeOptional = TypeVar("TeleUserLikeOptional", bound="UserLikeOptional")
 
+if TYPE_CHECKING:
+    from typing import type_check_only
 
-class UserLike(UserLikeOptional):
-    """
-    Note:
-        `User`, `Contact` (and maybe some other) objects always have first_name,
-         unlike the `Chat` and `Shared`, were they are optional.
-         The `last_name` is always optional.
-    """
-    first_name: str
+    @type_check_only
+    class UserLike(Protocol):
+        first_name: str
+        last_name: Optional[str]
+        username: Optional[str]
 
-
-class MiniUserLike(UserLikeOptional):
-    """
-    Note:
-        `User`, `Contact` (and maybe some other) objects always have first_name,
-         unlike the `Chat` and `Shared`, were they are optional.
-         The `last_name` is always optional.
-    """
-    first_name: str | None
+    @type_check_only
+    class UserLikeOptional(Protocol):
+        first_name: Optional[str]
+        last_name: Optional[str]
+        username: Optional[str]
 
 
 @overload
-def get_name(user: UserLike) -> str:
-    ...
+def get_name(userlike: TeleUserLike) -> str: ...
+@overload
+def get_name(userlike: TeleUserLikeOptional) -> Optional[str]: ...
+
+
+def get_name(userlike: Union[TeleUserLike, TeleUserLikeOptional]) -> Optional[str]:
+    """Returns ``username`` prefixed with "@". If  ``username`` is not available, calls
+    :func:`get_full_name` below`.
+    """
+    if userlike.username:
+        return f"@{userlike.username}"
+    return get_full_name(userlike=userlike)
 
 
 @overload
-def get_name(user: MiniUserLike) -> str | None:
-    ...
+def get_full_name(userlike: TeleUserLike) -> str: ...
+@overload
+def get_full_name(userlike: TeleUserLikeOptional) -> Optional[str]: ...
 
 
-def get_name(user: UserLike | MiniUserLike) -> str | None:
-    """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
-    prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
-    For the UserLike object str will always be returned as `first_name`always exists.
+def get_full_name(userlike: Union[TeleUserLike, TeleUserLikeOptional]) -> Optional[str]:
     """
-    if user.username:
-        return f"@{user.username}"
-    return get_full_name(user=user, )
+    If parameter ``first_name`` is not :obj:`None`, gives
+    ``first_name`` followed by (if available) `UserLike.last_name`. Otherwise,
+    :obj:`None` is returned.
+    """
+    if not userlike.first_name:
+        return None
+    if userlike.last_name:
+        return f"{userlike.first_name} {userlike.last_name}"
+    return userlike.first_name
+
+
+# We isolate these TypeVars to accomodiate telegram objects with ``username``
+# and no ``first_name`` or ``last_name`` (e.g ``ChatShared``)
+TeleLinkable = TypeVar("TeleLinkable", bound="Linkable")
+TeleLinkableOptional = TypeVar("TeleLinkableOptional", bound="LinkableOptional")
+
+if TYPE_CHECKING:
+
+    @type_check_only
+    class Linkable(Protocol):
+        username: str
+
+    @type_check_only
+    class LinkableOptional(Protocol):
+        username: Optional[str]
 
 
 @overload
-def get_full_name(user: UserLike) -> str:
-    ...
-
-
+def get_link(linkable: TeleLinkable) -> str: ...
 @overload
-def get_full_name(user: MiniUserLike) -> str | None:
-    ...
+def get_link(linkable: TeleLinkableOptional) -> Optional[str]: ...
 
 
-def get_full_name(user: UserLike | MiniUserLike) -> str | None:
-    """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
-    available) :attr:`last_name`, otherwise None.
-    For the UserLike object str will always be returned as `first_name`always exists.
-    """
-    if user.first_name and user.last_name:
-        return f"{user.first_name} {user.last_name}"
-    if user.first_name or user.last_name:
-        return f"{user.first_name or user.last_name}"
-    return None
-
-
-def get_link(user: UserLike | MiniUserLike) -> str | None:
-    """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
-    of the user.
-    """
-    if user.username:
-        return f"https://t.me/{user.username}"
+def get_link(linkable: Union[TeleLinkable, TeleLinkableOptional]) -> Optional[str]:
+    """If ``username`` is available, returns a t.me link of the user/chat."""
+    if linkable.username:
+        return f"https://t.me/{linkable.username}"
     return None
