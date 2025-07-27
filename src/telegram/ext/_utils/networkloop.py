@@ -54,15 +54,13 @@ async def network_retry_loop(
 ) -> None:
     """Perform a loop calling `action_cb`, retrying after network errors.
 
-    Stop condition for loop in case of `infinite_loop` is True:
-        * `is_running()` evaluates :obj:`False` or
+    Stop condition for loop in case of `infinite_loop` is :obj:`True`:
+        * `is_running()` evaluates :obj:`False`
         * or `stop_event` is set.
 
-    Stop condition for loop in case of `infinite_loop` is False:
-        * a call to `action_cb` succeeds or
-        * `is_running()` evaluates :obj:`False` or
-        * or `stop_event` is set or
-        * `max_retries` is reached.
+    Additional stop condition for loop in case of `infinite_loop` is :obj:`False`:
+        * a call to `action_cb` succeeds
+        * or `max_retries` is reached.
 
     Args:
         action_cb (:term:`coroutine function`): Network oriented callback function to call.
@@ -89,7 +87,7 @@ async def network_retry_loop(
             * 0: No retries.
             * > 0: Number of retries
 
-            Must be negative if `infinite_loop` is set to True..
+            Must be negative if `infinite_loop` is set to :obj:`True`.
         infinite_loop (:obj:`bool`): If :obj:`True`, the loop will run indefinitely until
             `is_running()` evaluates to :obj:`False` or `stop_event` is set. Otherwise, the loop
             will stop after a successful call to `action_cb`, or when `is_running()` evaluates to
