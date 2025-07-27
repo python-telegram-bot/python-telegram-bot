@@ -48,7 +48,7 @@ class HTTPXRequest(BaseRequest):
 
     Args:
         connection_pool_size (:obj:`int`, optional): Number of connections to keep in the
-            connection pool. Defaults to ``1``.
+            connection pool. Defaults to ``256``.
 
             .. versionchanged:: NEXT.VERSION
                 Set the default to ``256``.
