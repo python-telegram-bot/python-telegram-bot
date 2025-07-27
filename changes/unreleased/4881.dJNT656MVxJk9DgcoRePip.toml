@@ -1,4 +1,4 @@
-featrues = "Add convenience properties to `SharedUser` and `SharedUser`"
+featrues = "Add convenience properties to ``SharedUser`` and ``ChatShared``"
 internal = "Introduce utility module ``_utils.usernames`` refactoring convenience properties around Telegramn Objects' ``firstname``, ``lastname``, and ``username``"
 pull_requests = [
   { uid = "4881", author_uid = "aelkheir" },
