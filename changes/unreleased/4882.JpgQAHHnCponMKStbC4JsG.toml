@@ -1,0 +1,5 @@
+other = "Httpx timeout improvements"
+[[pull_requests]]
+uid = "4882"
+author_uid = "Poolitzer"
+closes_threads = []
