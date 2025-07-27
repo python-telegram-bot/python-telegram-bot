@@ -49,6 +49,10 @@ class HTTPXRequest(BaseRequest):
     Args:
         connection_pool_size (:obj:`int`, optional): Number of connections to keep in the
             connection pool. Defaults to ``1``.
+
+            .. versionchanged:: NEXT.VERSION
+                Stopped applying to :paramref:`~httpx.Limits.max_keepalive_connections`.
+                Now only applys to :paramref:`~httpx.Limits.max_connections`.
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server.
             This value is used unless a different value is passed to :meth:`do_request`.
@@ -158,7 +162,6 @@ class HTTPXRequest(BaseRequest):
         )
         limits = httpx.Limits(
             max_connections=connection_pool_size,
-            max_keepalive_connections=connection_pool_size,
         )
 
         if http_version not in ("1.1", "2", "2.0"):
