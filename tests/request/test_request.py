@@ -438,7 +438,7 @@ class TestHTTPXRequestWithoutRequest:
         request = HTTPXRequest()
         assert request._client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
         assert request._client.proxy is None
-        assert request._client.limits == httpx.Limits(max_connections=1)
+        assert request._client.limits == httpx.Limits(max_connections=256)
         assert request._client.http1 is True
         assert not request._client.http2
 

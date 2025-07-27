@@ -159,7 +159,7 @@ class TestApplicationBuilder:
         assert not get_updates_client.http2
 
         client = app.bot.request._client
-        assert client.limits == httpx.Limits(max_connections=256, max_keepalive_connections=256)
+        assert client.limits == httpx.Limits(max_connections=256)
         assert client.proxy is None
         assert client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
         assert client.http1 is True
@@ -414,7 +414,7 @@ class TestApplicationBuilder:
         client = app.bot._request[0]._client
 
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
-        assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
+        assert client.limits == httpx.Limits(max_connections=1)
         assert client.proxy == "get_updates_proxy"
         assert client.http1 is True
         assert client.http2 is False
