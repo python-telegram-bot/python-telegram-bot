@@ -61,7 +61,7 @@ for this one, too!
 :any:`examples.nestedconversationbot`
 -------------------------------------
 
-A even more complex example of a bot that uses the nested
+An even more complex example of a bot that uses the nested
 ``ConversationHandler``\ s. While it’s certainly not that complex that
 you couldn’t built it without nested ``ConversationHanldler``\ s, it
 gives a good impression on how to work with them. Of course, there is a

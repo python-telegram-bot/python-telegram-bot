@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""The integration of persistence into the application is tested in test_basepersistence.
-"""
+"""The integration of persistence into the application is tested in test_basepersistence."""
 import asyncio
 import functools
 import inspect
@@ -59,7 +58,7 @@ from telegram.ext import (
 from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.asyncio_helpers import call_after
 from tests.auxil.build_messages import make_message_update
-from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.files import SOURCE_ROOT_PATH
 from tests.auxil.monkeypatch import empty_get_updates, return_true
 from tests.auxil.networking import send_webhook_message
 from tests.auxil.pytest_classes import PytestApplication, PytestUpdater, make_bot
@@ -1007,7 +1006,7 @@ class TestApplication:
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
         assert (
-            Path(recwarn[0].filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_application.py"
+            Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py"
         ), "incorrect stacklevel!"
 
     async def test_non_blocking_no_error_handler(self, app, caplog):
@@ -1080,7 +1079,7 @@ class TestApplication:
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
         assert (
-            Path(recwarn[0].filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_application.py"
+            Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py"
         ), "incorrect stacklevel!"
 
     @pytest.mark.parametrize(("block", "expected_output"), [(False, 0), (True, 5)])
@@ -1515,49 +1514,6 @@ class TestApplication:
             if "received stop signal" in record.getMessage() and record.levelno == logging.DEBUG:
                 found_log = True
         assert found_log
-
-    @pytest.mark.parametrize(
-        "timeout_name",
-        ["read_timeout", "connect_timeout", "write_timeout", "pool_timeout", "poll_interval"],
-    )
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Can't send signals without stopping whole process on windows",
-    )
-    def test_run_polling_timeout_deprecation_warnings(
-        self, timeout_name, monkeypatch, recwarn, app
-    ):
-        def thread_target():
-            waited = 0
-            while not app.running:
-                time.sleep(0.05)
-                waited += 0.05
-                if waited > 5:
-                    pytest.fail("App apparently won't start")
-
-            time.sleep(0.05)
-
-            os.kill(os.getpid(), signal.SIGINT)
-
-        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
-
-        thread = Thread(target=thread_target)
-        thread.start()
-
-        kwargs = {timeout_name: 42}
-        app.run_polling(drop_pending_updates=True, close_loop=False, **kwargs)
-        thread.join()
-
-        if timeout_name == "poll_interval":
-            assert len(recwarn) == 0
-            return
-
-        assert len(recwarn) == 1
-        assert "Setting timeouts via `Application.run_polling` is deprecated." in str(
-            recwarn[0].message
-        )
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
@@ -2627,6 +2583,70 @@ class TestApplication:
             assert received_updates == {2}
             assert len(caplog.records) == 0
 
+    @pytest.mark.parametrize("change_type", ["remove", "add"])
+    async def test_process_update_handler_change_groups_during_iteration(self, app, change_type):
+        run_groups = set()
+
+        async def dummy_callback(_, __, g: int):
+            run_groups.add(g)
+
+        for group in range(10, 20):
+            handler = TypeHandler(int, functools.partial(dummy_callback, g=group))
+            app.add_handler(handler, group=group)
+
+        async def wait_callback(_, context):
+            # Trigger a change of the app.handlers dict during the iteration
+            if change_type == "remove":
+                context.application.remove_handler(handler, group)
+            else:
+                context.application.add_handler(
+                    TypeHandler(int, functools.partial(dummy_callback, g=42)), group=42
+                )
+
+        app.add_handler(TypeHandler(int, wait_callback))
+
+        async with app:
+            await app.process_update(1)
+
+        # check that exactly those handlers were called that were configured when
+        # process_update was called
+        assert run_groups == set(range(10, 20))
+
+    async def test_process_update_handler_change_group_during_iteration(self, app):
+        async def dummy_callback(_, __):
+            pass
+
+        checked_handlers = set()
+
+        class TrackHandler(TypeHandler):
+            def __init__(self, name: str, *args, **kwargs):
+                self.name = name
+                super().__init__(*args, **kwargs)
+
+            def check_update(self, update: object) -> bool:
+                checked_handlers.add(self.name)
+                return super().check_update(update)
+
+        remove_handler = TrackHandler("remove", int, dummy_callback)
+        add_handler = TrackHandler("add", int, dummy_callback)
+
+        class TriggerHandler(TypeHandler):
+            def check_update(self, update: object) -> bool:
+                # Trigger a change of the app.handlers *in the same group* during the iteration
+                app.remove_handler(remove_handler)
+                app.add_handler(add_handler)
+                # return False to ensure that additional handlers in the same group are checked
+                return False
+
+        app.add_handler(TriggerHandler(str, dummy_callback))
+        app.add_handler(remove_handler)
+        async with app:
+            await app.process_update("string update")
+
+        # check that exactly those handlers were checked that were configured when
+        # process_update was called
+        assert checked_handlers == {"remove"}
+
     async def test_process_error_exception_in_building_context(self, monkeypatch, caplog, app):
         # Makes sure that exceptions in building the context don't stop the application
         exception = ValueError("TestException")
@@ -2666,3 +2686,28 @@ class TestApplication:
 
             assert received_errors == {2}
             assert len(caplog.records) == 0
+
+    @pytest.mark.parametrize("change_type", ["remove", "add"])
+    async def test_process_error_change_during_iteration(self, app, change_type):
+        called_handlers = set()
+
+        async def dummy_process_error(name: str, *_, **__):
+            called_handlers.add(name)
+
+        add_error_handler = functools.partial(dummy_process_error, "add_handler")
+        remove_error_handler = functools.partial(dummy_process_error, "remove_handler")
+
+        async def trigger_change(*_, **__):
+            if change_type == "remove":
+                app.remove_error_handler(remove_error_handler)
+            else:
+                app.add_error_handler(add_error_handler)
+
+        app.add_error_handler(trigger_change)
+        app.add_error_handler(remove_error_handler)
+        async with app:
+            await app.process_error(update=None, error=None)
+
+        # check that exactly those handlers were checked that were configured when
+        # add_error_handler was called
+        assert called_handlers == {"remove_handler"}

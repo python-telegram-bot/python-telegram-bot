@@ -6,6 +6,12 @@ PTB uses `pytest`_ for testing. To run the tests, you need to
 have pytest installed along with a few other dependencies. You can find the list of dependencies
 in the ``pyproject.toml`` file in the root of the repository.
 
+Since PTB uses a src-based layout, make sure you have installed the package in development mode before running the tests:
+
+.. code-block:: bash
+
+   $ pip install -e .
+
 Running tests
 =============
 
@@ -36,7 +42,7 @@ such that tests marked with ``@pytest.mark.xdist_group("name")`` are run on the 
 
 .. code-block:: bash
 
-    $ pytest -n auto --dist=loadgroup
+    $ pytest -n auto --dist=worksteal
 
 This will result in a significant speedup, but may cause some tests to fail. If you want to run
 the failed tests in isolation, you can use the ``--lf`` flag:

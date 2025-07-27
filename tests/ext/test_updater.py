@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import logging
 import platform
 from collections import defaultdict
@@ -27,7 +28,6 @@ from random import randrange
 import pytest
 
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from tests.auxil.build_messages import make_message, make_message_update
@@ -295,11 +295,7 @@ class TestUpdater:
         tracking_flag = False
         received_kwargs = {}
         expected_kwargs = {
-            "timeout": 0,
-            "read_timeout": "read_timeout",
-            "connect_timeout": "connect_timeout",
-            "write_timeout": "write_timeout",
-            "pool_timeout": "pool_timeout",
+            "timeout": dtm.timedelta(seconds=0),
             "allowed_updates": "allowed_updates",
         }
 
@@ -421,11 +417,7 @@ class TestUpdater:
         on_stop_flag = False
 
         expected = {
-            "timeout": 10,
-            "read_timeout": DEFAULT_NONE,
-            "write_timeout": DEFAULT_NONE,
-            "connect_timeout": DEFAULT_NONE,
-            "pool_timeout": DEFAULT_NONE,
+            "timeout": dtm.timedelta(seconds=10),
             "allowed_updates": None,
             "api_kwargs": None,
         }
@@ -465,22 +457,14 @@ class TestUpdater:
             on_stop_flag = False
 
             expected = {
-                "timeout": 42,
-                "read_timeout": 43,
-                "write_timeout": 44,
-                "connect_timeout": 45,
-                "pool_timeout": 46,
+                "timeout": dtm.timedelta(seconds=42),
                 "allowed_updates": ["message"],
                 "api_kwargs": None,
             }
 
             await update_queue.put(Update(update_id=2))
             await updater.start_polling(
-                timeout=42,
-                read_timeout=43,
-                write_timeout=44,
-                connect_timeout=45,
-                pool_timeout=46,
+                timeout=dtm.timedelta(seconds=42),
                 allowed_updates=["message"],
             )
             await update_queue.join()

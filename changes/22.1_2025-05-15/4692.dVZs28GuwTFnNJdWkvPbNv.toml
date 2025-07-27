@@ -1,0 +1,5 @@
+breaking = "Drop backward compatibility for ``user_id`` in ``send_gift`` by updating the order of parameters. Please adapt your code accordingly or use keyword arguments."
+[[pull_requests]]
+uid = "4692"
+author_uid = "Bibo-Joshi"
+closes_threads = []

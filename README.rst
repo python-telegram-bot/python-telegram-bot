@@ -11,7 +11,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-8.3-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-9.1-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API version
 
@@ -19,7 +19,7 @@
    :target: https://pypistats.org/packages/python-telegram-bot
    :alt: PyPi Package Monthly Download
 
-.. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=stable
+.. image:: https://app.readthedocs.org/projects/python-telegram-bot/badge/?version=stable
    :target: https://docs.python-telegram-bot.org/en/stable/
    :alt: Documentation Status
 
@@ -81,7 +81,7 @@ After installing_ the library, be sure to check out the section on `working with
 Telegram API support
 ~~~~~~~~~~~~~~~~~~~~
 
-All types and methods of the Telegram Bot API **8.3** are natively supported by this library.
+All types and methods of the Telegram Bot API **9.1** are natively supported by this library.
 In addition, Bot API functionality not yet natively included can still be used as described `in our wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Bot-API-Forward-Compatibility>`_.
 
 Notable Features
@@ -114,6 +114,8 @@ You can also install ``python-telegram-bot`` from source, though this is usually
     $ pip install build
     $ python -m build
 
+You can also use your favored package manager (such as ``uv``, ``hatch``, ``poetry``, etc.) instead of ``pip``.
+
 Verifying Releases
 ~~~~~~~~~~~~~~~~~~
 
@@ -139,7 +141,7 @@ As these features are *optional*, the corresponding 3rd party dependencies are n
 Instead, they are listed as optional dependencies.
 This allows to avoid unnecessary dependency conflicts for users who don't need the optional features.
 
-The only required dependency is `httpx ~= 0.27 <https://www.python-httpx.org>`_ for
+The only required dependency is `httpx >=0.27,<0.29 <https://www.python-httpx.org>`_ for
 ``telegram.request.HTTPXRequest``, the default networking backend.
 
 ``python-telegram-bot`` is most useful when used along with additional libraries.
@@ -157,7 +159,7 @@ PTB can be installed with optional dependencies:
 * ``pip install "python-telegram-bot[http2]"`` installs `httpx[http2] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to use HTTP/2.
 * ``pip install "python-telegram-bot[rate-limiter]"`` installs `aiolimiter~=1.1,<1.3 <https://aiolimiter.readthedocs.io/en/stable/>`_. Use this, if you want to use ``telegram.ext.AIORateLimiter``.
 * ``pip install "python-telegram-bot[webhooks]"`` installs the `tornado~=6.4 <https://www.tornadoweb.org/en/stable/>`_ library. Use this, if you want to use ``telegram.ext.Updater.start_webhook``/``telegram.ext.Application.run_webhook``.
-* ``pip install "python-telegram-bot[callback-data]"`` installs the `cachetools>=5.3.3,<5.6.0 <https://cachetools.readthedocs.io/en/latest/>`_ library. Use this, if you want to use `arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_.
+* ``pip install "python-telegram-bot[callback-data]"`` installs the `cachetools>=5.3.3,<6.2.0 <https://cachetools.readthedocs.io/en/latest/>`_ library. Use this, if you want to use `arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_.
 * ``pip install "python-telegram-bot[job-queue]"`` installs the `APScheduler>=3.10.4,<3.12.0 <https://apscheduler.readthedocs.io/en/3.x/>`_ library. Use this, if you want to use the ``telegram.ext.JobQueue``.
 
 To install multiple optional dependencies, separate them by commas, e.g. ``pip install "python-telegram-bot[socks,webhooks]"``.

@@ -69,7 +69,7 @@ async def list_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     # Get the data from the callback_data.
     # If you're using a type checker like MyPy, you'll have to use typing.cast
     # to make the checker get the expected type of the callback_data
-    number, number_list = cast(tuple[int, list[int]], query.data)
+    number, number_list = cast("tuple[int, list[int]]", query.data)
     # append the number to the list
     number_list.append(number)
 

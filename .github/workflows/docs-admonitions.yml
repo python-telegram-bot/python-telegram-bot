@@ -2,7 +2,7 @@ name: Test Admonitions Generation
 on:
   pull_request:
     paths:
-      - telegram/**
+      - src/telegram/**
       - docs/**
       - .github/workflows/docs-admonitions.yml
   push:
@@ -28,14 +28,14 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: '**/requirements*.txt'
+          cache-dependency-path: 'pyproject.toml'
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -r requirements-dev-all.txt
+          python -W ignore -m pip install .[all] --group all
       - name: Test autogeneration of admonitions
         run: pytest -v --tb=short tests/docs/admonition_inserter.py

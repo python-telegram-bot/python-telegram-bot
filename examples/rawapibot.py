@@ -7,6 +7,7 @@ This program is dedicated to the public domain under the CC0 license.
 """
 import asyncio
 import contextlib
+import datetime as dtm
 import logging
 from typing import NoReturn
 
@@ -47,7 +48,9 @@ async def main() -> NoReturn:
 async def echo(bot: Bot, update_id: int) -> int:
     """Echo the message the user sent."""
     # Request updates after the last update_id
-    updates = await bot.get_updates(offset=update_id, timeout=10, allowed_updates=Update.ALL_TYPES)
+    updates = await bot.get_updates(
+        offset=update_id, timeout=dtm.timedelta(seconds=10), allowed_updates=Update.ALL_TYPES
+    )
     for update in updates:
         next_update_id = update.update_id + 1
 

@@ -2,11 +2,10 @@ name: Unit Tests
 on:
   pull_request:
     paths:
-      - telegram/**
+      - src/telegram/**
       - tests/**
       - .github/workflows/unit_tests.yml
       - pyproject.toml
-      - requirements-unit-tests.txt
   push:
     branches:
       - master
@@ -22,7 +21,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14.0-beta.3']
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: False
     steps:
@@ -30,18 +29,14 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: '**/requirements*.txt'
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -U pytest-cov
-          python -W ignore -m pip install .
-          python -W ignore -m pip install -r requirements-unit-tests.txt
-          python -W ignore -m pip install pytest-xdist
+          python -W ignore -m pip install . --group tests
 
       - name: Test with pytest
         # We run 4 different suites here
@@ -63,11 +58,10 @@ jobs:
           TO_TEST="test_no_passport.py or test_datetime.py or test_defaults.py or test_jobqueue.py or test_applicationbuilder.py or test_ratelimiter.py or test_updater.py or test_callbackdatacache.py or test_request.py"
           pytest -v --cov -k "${TO_TEST}" --junit-xml=.test_report_no_optionals_junit.xml
           opt_dep_status=$?
-
+          
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
-          # need to manually install pytz here, because it's no longer in the optional reqs
-          pip install .[all] pytz
+          pip install .[all]
           # `-n auto --dist worksteal` uses pytest-xdist to run tests on multiple CPU
           # workers. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness.
@@ -92,14 +86,14 @@ jobs:
             .test_report_optionals_junit.xml
 
       - name: Submit coverage
-        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303  # v5.1.2
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24  # v5.4.3
         with:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload test results to Codecov
-        uses: codecov/test-results-action@4e79e65778be1cecd5df25e14af1eafb6df80ea9 # v1.0.2
+        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
         if: ${{ !cancelled() }}
         with:
           files: .test_report_no_optionals_junit.xml,.test_report_optionals_junit.xml

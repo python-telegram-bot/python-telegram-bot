@@ -34,8 +34,10 @@ from telegram import (
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
 )
+from telegram._gifts import AcceptedGiftTypes
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ReactionEmoji
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -46,12 +48,14 @@ def chat_full_info(bot):
         type=ChatFullInfoTestBase.type_,
         accent_color_id=ChatFullInfoTestBase.accent_color_id,
         max_reaction_count=ChatFullInfoTestBase.max_reaction_count,
+        accepted_gift_types=ChatFullInfoTestBase.accepted_gift_types,
         title=ChatFullInfoTestBase.title,
         username=ChatFullInfoTestBase.username,
         sticker_set_name=ChatFullInfoTestBase.sticker_set_name,
         can_set_sticker_set=ChatFullInfoTestBase.can_set_sticker_set,
         permissions=ChatFullInfoTestBase.permissions,
         slow_mode_delay=ChatFullInfoTestBase.slow_mode_delay,
+        message_auto_delete_time=ChatFullInfoTestBase.message_auto_delete_time,
         bio=ChatFullInfoTestBase.bio,
         linked_chat_id=ChatFullInfoTestBase.linked_chat_id,
         location=ChatFullInfoTestBase.location,
@@ -103,7 +107,8 @@ class ChatFullInfoTestBase:
         can_change_info=False,
         can_invite_users=True,
     )
-    slow_mode_delay = 30
+    slow_mode_delay = dtm.timedelta(seconds=30)
+    message_auto_delete_time = dtm.timedelta(60)
     bio = "I'm a Barbie Girl in a Barbie World"
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), "Barbie World")
@@ -140,6 +145,7 @@ class ChatFullInfoTestBase:
     first_name = "first_name"
     last_name = "last_name"
     can_send_paid_media = True
+    accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
 
 
 class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
@@ -158,10 +164,12 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "accent_color_id": self.accent_color_id,
             "max_reaction_count": self.max_reaction_count,
             "username": self.username,
+            "accepted_gift_types": self.accepted_gift_types.to_dict(),
             "sticker_set_name": self.sticker_set_name,
             "can_set_sticker_set": self.can_set_sticker_set,
             "permissions": self.permissions.to_dict(),
-            "slow_mode_delay": self.slow_mode_delay,
+            "slow_mode_delay": self.slow_mode_delay.total_seconds(),
+            "message_auto_delete_time": self.message_auto_delete_time.total_seconds(),
             "bio": self.bio,
             "business_intro": self.business_intro.to_dict(),
             "business_location": self.business_location.to_dict(),
@@ -194,15 +202,19 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "last_name": self.last_name,
             "can_send_paid_media": self.can_send_paid_media,
         }
+
         cfi = ChatFullInfo.de_json(json_dict, offline_bot)
+        assert cfi.api_kwargs == {}
         assert cfi.id == self.id_
         assert cfi.title == self.title
         assert cfi.type == self.type_
         assert cfi.username == self.username
+        assert cfi.accepted_gift_types == self.accepted_gift_types
         assert cfi.sticker_set_name == self.sticker_set_name
         assert cfi.can_set_sticker_set == self.can_set_sticker_set
         assert cfi.permissions == self.permissions
-        assert cfi.slow_mode_delay == self.slow_mode_delay
+        assert cfi._slow_mode_delay == self.slow_mode_delay
+        assert cfi._message_auto_delete_time == self.message_auto_delete_time
         assert cfi.bio == self.bio
         assert cfi.business_intro == self.business_intro
         assert cfi.business_location == self.business_location
@@ -245,6 +257,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "type": self.type_,
             "accent_color_id": self.accent_color_id,
             "max_reaction_count": self.max_reaction_count,
+            "accepted_gift_types": self.accepted_gift_types.to_dict(),
             "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
         }
         cfi_bot = ChatFullInfo.de_json(json_dict, offline_bot)
@@ -271,7 +284,10 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["type"] == cfi.type
         assert cfi_dict["username"] == cfi.username
         assert cfi_dict["permissions"] == cfi.permissions.to_dict()
-        assert cfi_dict["slow_mode_delay"] == cfi.slow_mode_delay
+        assert cfi_dict["slow_mode_delay"] == int(self.slow_mode_delay.total_seconds())
+        assert cfi_dict["message_auto_delete_time"] == int(
+            self.message_auto_delete_time.total_seconds()
+        )
         assert cfi_dict["bio"] == cfi.bio
         assert cfi_dict["business_intro"] == cfi.business_intro.to_dict()
         assert cfi_dict["business_location"] == cfi.business_location.to_dict()
@@ -312,8 +328,38 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["first_name"] == cfi.first_name
         assert cfi_dict["last_name"] == cfi.last_name
         assert cfi_dict["can_send_paid_media"] == cfi.can_send_paid_media
+        assert cfi_dict["accepted_gift_types"] == cfi.accepted_gift_types.to_dict()
 
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, chat_full_info):
+        cfi = chat_full_info
+        if PTB_TIMEDELTA:
+            assert cfi.slow_mode_delay == self.slow_mode_delay
+            assert isinstance(cfi.slow_mode_delay, dtm.timedelta)
+
+            assert cfi.message_auto_delete_time == self.message_auto_delete_time
+            assert isinstance(cfi.message_auto_delete_time, dtm.timedelta)
+        else:
+            assert cfi.slow_mode_delay == int(self.slow_mode_delay.total_seconds())
+            assert isinstance(cfi.slow_mode_delay, int)
+
+            assert cfi.message_auto_delete_time == int(
+                self.message_auto_delete_time.total_seconds()
+            )
+            assert isinstance(cfi.message_auto_delete_time, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, chat_full_info):
+        chat_full_info.slow_mode_delay
+        chat_full_info.message_auto_delete_time
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 2
+            for i, attr in enumerate(["slow_mode_delay", "message_auto_delete_time"]):
+                assert f"`{attr}` will be of type `datetime.timedelta`" in str(recwarn[i].message)
+                assert recwarn[i].category is PTBDeprecationWarning
 
     def test_always_tuples_attributes(self):
         cfi = ChatFullInfo(
@@ -321,6 +367,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             type=Chat.PRIVATE,
             accent_color_id=1,
             max_reaction_count=2,
+            accepted_gift_types=self.accepted_gift_types,
         )
         assert isinstance(cfi.active_usernames, tuple)
         assert cfi.active_usernames == ()

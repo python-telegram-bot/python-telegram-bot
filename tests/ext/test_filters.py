@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
 import inspect
+import platform
 import re
 
 import pytest
@@ -711,7 +712,9 @@ class TestFilters:
         assert not filters.Document.WAV.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "audio/x-wav"
+        update.message.document.mime_type = (
+            "audio/x-wav" if int(platform.python_version_tuple()[1]) < 14 else "audio/vnd.wave"
+        )
         assert filters.Document.WAV.check_update(update)
         assert filters.Document.AUDIO.check_update(update)
         assert not filters.Document.XML.check_update(update)
@@ -1068,11 +1071,6 @@ class TestFilters:
         assert filters.StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
         update.message.write_access_allowed = None
 
-        update.message.api_kwargs = {"user_shared": "user_shared"}
-        assert filters.StatusUpdate.ALL.check_update(update)
-        assert filters.StatusUpdate.USER_SHARED.check_update(update)
-        update.message.api_kwargs = {}
-
         update.message.users_shared = "users_shared"
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.USERS_SHARED.check_update(update)
@@ -1103,7 +1101,37 @@ class TestFilters:
         assert filters.StatusUpdate.REFUNDED_PAYMENT.check_update(update)
         update.message.refunded_payment = None
 
-    def test_filters_forwarded(self, update, message_origin_user):
+        update.message.gift = "gift"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIFT.check_update(update)
+        update.message.gift = None
+
+        update.message.unique_gift = "unique_gift"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.UNIQUE_GIFT.check_update(update)
+        update.message.unique_gift = None
+
+        update.message.paid_message_price_changed = "paid_message_price_changed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.PAID_MESSAGE_PRICE_CHANGED.check_update(update)
+        update.message.paid_message_price_changed = None
+
+        update.message.direct_message_price_changed = "direct_message_price_changed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED.check_update(update)
+        update.message.direct_message_price_changed = None
+
+        update.message.checklist_tasks_added = "checklist_tasks_added"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.CHECKLIST_TASKS_ADDED.check_update(update)
+        update.message.checklist_tasks_added = None
+
+        update.message.checklist_tasks_done = "checklist_tasks_done"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.CHECKLIST_TASKS_DONE.check_update(update)
+        update.message.checklist_tasks_done = None
+
+    def test_filters_forwarded(self, update):
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = MessageOriginHiddenUser(dtm.datetime.utcnow(), 1)
         assert filters.FORWARDED.check_update(update)
@@ -1334,15 +1362,12 @@ class TestFilters:
 
     def test_filters_chat_id(self, update):
         assert not filters.Chat(chat_id=1).check_update(update)
-        assert filters.CHAT.check_update(update)
         update.message.chat.id = 1
         assert filters.Chat(chat_id=1).check_update(update)
-        assert filters.CHAT.check_update(update)
         update.message.chat.id = 2
         assert filters.Chat(chat_id=[1, 2]).check_update(update)
         assert not filters.Chat(chat_id=[3, 4]).check_update(update)
         update.message.chat = None
-        assert not filters.CHAT.check_update(update)
         assert not filters.Chat(chat_id=[3, 4]).check_update(update)
 
     def test_filters_chat_username(self, update):
@@ -2782,3 +2807,10 @@ class TestFilters:
         update.message.sender_boost_count = "test"
         assert filters.SENDER_BOOST_COUNT.check_update(update)
         assert str(filters.SENDER_BOOST_COUNT) == "filters.SENDER_BOOST_COUNT"
+
+    def test_filters_checklist(self, update):
+        assert not filters.CHECKLIST.check_update(update)
+
+        update.message.checklist = "test"
+        assert filters.CHECKLIST.check_update(update)
+        assert str(filters.CHECKLIST) == "filters.CHECKLIST"

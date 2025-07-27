@@ -731,15 +731,7 @@ class TestUserWithoutRequest(UserTestBase):
                 and kwargs["text_entities"] == "text_entities"
             )
 
-        # TODO discuss if better way exists
-        # tags: deprecated 21.11
-        with pytest.raises(
-            Exception,
-            match="Default for argument gift_id does not match the default of the Bot method.",
-        ):
-            assert check_shortcut_signature(
-                user.send_gift, Bot.send_gift, ["user_id", "chat_id"], []
-            )
+        assert check_shortcut_signature(user.send_gift, Bot.send_gift, ["user_id", "chat_id"], [])
         assert await check_shortcut_call(
             user.send_gift, user.get_bot(), "send_gift", ["chat_id", "user_id"]
         )
@@ -748,6 +740,36 @@ class TestUserWithoutRequest(UserTestBase):
         monkeypatch.setattr(user.get_bot(), "send_gift", make_assertion)
         assert await user.send_gift(
             gift_id="gift_id",
+            text="text",
+            text_parse_mode="text_parse_mode",
+            text_entities="text_entities",
+        )
+
+    async def test_instance_method_gift_premium_subscription(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["month_count"] == 3
+                and kwargs["star_count"] == 1000
+                and kwargs["text"] == "text"
+                and kwargs["text_parse_mode"] == "text_parse_mode"
+                and kwargs["text_entities"] == "text_entities"
+            )
+
+        assert check_shortcut_signature(
+            user.gift_premium_subscription, Bot.gift_premium_subscription, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.gift_premium_subscription,
+            user.get_bot(),
+            "gift_premium_subscription",
+        )
+        assert await check_defaults_handling(user.gift_premium_subscription, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "gift_premium_subscription", make_assertion)
+        assert await user.gift_premium_subscription(
+            month_count=3,
+            star_count=1000,
             text="text",
             text_parse_mode="text_parse_mode",
             text_entities="text_entities",

@@ -2,7 +2,7 @@ name: Bot API Tests
 on:
   pull_request:
     paths:
-      - telegram/**
+      - src/telegram/**
       - tests/**
   push:
     branches:
@@ -27,14 +27,13 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install .[all]
-          python -W ignore -m pip install -r requirements-unit-tests.txt
+          python -W ignore -m pip install .[all] --group tests
       - name: Compare to official api
         run: |
           pytest -v tests/test_official/test_official.py --junit-xml=.test_report_official.xml

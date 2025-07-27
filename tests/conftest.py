@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import logging
+import os
 import sys
 import zoneinfo
 from pathlib import Path
@@ -40,7 +41,12 @@ from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE, make_message
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
-from tests.auxil.envvars import GITHUB_ACTIONS, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import (
+    GITHUB_ACTIONS,
+    RUN_TEST_OFFICIAL,
+    TEST_WITH_OPT_DEPS,
+    env_var_2_bool,
+)
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestBot, make_bot
@@ -127,6 +133,18 @@ if GITHUB_ACTIONS and JOB_INDEX == 0:
                 f"Test function {request.function} in test class {name} should not have a `bot` "
                 f"fixture. Use `offline_bot` instead."
             )
+
+
+@pytest.fixture(scope="module", params=["true", "1", "false", "gibberish", None])
+def PTB_TIMEDELTA(request):
+    # Here we manually use monkeypatch to give this fixture module scope
+    monkeypatch = pytest.MonkeyPatch()
+    if request.param is not None:
+        monkeypatch.setenv("PTB_TIMEDELTA", request.param)
+    else:
+        monkeypatch.delenv("PTB_TIMEDELTA", raising=False)
+    yield env_var_2_bool(os.getenv("PTB_TIMEDELTA"))
+    monkeypatch.undo()
 
 
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be

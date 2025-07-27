@@ -30,7 +30,7 @@ from .envvars import GITHUB_ACTIONS
 # These bots are only able to talk in our test chats, so they are quite useless for other
 # purposes than testing.
 FALLBACKS = (
-    "W3sidG9rZW4iOiAiNTc5Njk0NzE0OkFBRnBLOHc2emtrVXJENHhTZVl3RjNNTzhlLTRHcm1jeTdjIiwgInBheW1lbnRfc"
+    "W3sidG9rZW4iOiAiNTc5Njk0NzE0OkFBRmdqXzhmNFVlV1hrb3VVUnpUZThhRUY0UGNFQkRxdlY0IiwgInBheW1lbnRfc"
     "HJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TmpRME5qWmxOekk1WWpKaSIsICJjaGF0X2lkIjogIjY3NTY2Nj"
     "IyNCIsICJzdXBlcl9ncm91cF9pZCI6ICItMTAwMTMxMDkxMTEzNSIsICJmb3J1bV9ncm91cF9pZCI6ICItMTAwMTgzODA"
     "wNDU3NyIsICJjaGFubmVsX2lkIjogIkBweXRob250ZWxlZ3JhbWJvdHRlc3RzIiwgIm5hbWUiOiAiUFRCIHRlc3RzIGZh"

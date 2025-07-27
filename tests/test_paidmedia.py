@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 
+import datetime as dtm
 from copy import deepcopy
 
 import pytest
@@ -34,6 +35,7 @@ from telegram import (
     Video,
 )
 from telegram.constants import PaidMediaType
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -46,13 +48,13 @@ class PaidMediaTestBase:
     type = PaidMediaType.PHOTO
     width = 640
     height = 480
-    duration = 60
+    duration = dtm.timedelta(60)
     video = Video(
         file_id="video_file_id",
         width=640,
         height=480,
         file_unique_id="file_unique_id",
-        duration=60,
+        duration=dtm.timedelta(seconds=60),
     )
     photo = (
         PhotoSize(
@@ -96,14 +98,17 @@ class TestPaidMediaWithoutRequest(PaidMediaTestBase):
             "photo": [p.to_dict() for p in self.photo],
             "width": self.width,
             "height": self.height,
-            "duration": self.duration,
+            "duration": int(self.duration.total_seconds()),
         }
         pm = PaidMedia.de_json(json_dict, offline_bot)
 
+        # TODO: Should be removed when the timedelta migartion is complete
+        extra_slots = {"duration"} if subclass is PaidMediaPreview else set()
+
         assert type(pm) is subclass
-        assert set(pm.api_kwargs.keys()) == set(json_dict.keys()) - set(subclass.__slots__) - {
-            "type"
-        }
+        assert set(pm.api_kwargs.keys()) == set(json_dict.keys()) - (
+            set(subclass.__slots__) | extra_slots
+        ) - {"type"}
         assert pm.type == pm_type
 
     def test_to_dict(self, paid_media):
@@ -243,21 +248,23 @@ class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase):
         json_dict = {
             "width": self.width,
             "height": self.height,
-            "duration": self.duration,
+            "duration": int(self.duration.total_seconds()),
         }
         pmp = PaidMediaPreview.de_json(json_dict, offline_bot)
         assert pmp.width == self.width
         assert pmp.height == self.height
-        assert pmp.duration == self.duration
+        assert pmp._duration == self.duration
         assert pmp.api_kwargs == {}
 
     def test_to_dict(self, paid_media_preview):
-        assert paid_media_preview.to_dict() == {
-            "type": paid_media_preview.type,
-            "width": self.width,
-            "height": self.height,
-            "duration": self.duration,
-        }
+        paid_media_preview_dict = paid_media_preview.to_dict()
+
+        assert isinstance(paid_media_preview_dict, dict)
+        assert paid_media_preview_dict["type"] == paid_media_preview.type
+        assert paid_media_preview_dict["width"] == paid_media_preview.width
+        assert paid_media_preview_dict["height"] == paid_media_preview.height
+        assert paid_media_preview_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(paid_media_preview_dict["duration"], int)
 
     def test_equality(self, paid_media_preview):
         a = paid_media_preview
@@ -265,6 +272,11 @@ class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase):
             width=self.width,
             height=self.height,
             duration=self.duration,
+        )
+        x = PaidMediaPreview(
+            width=self.width,
+            height=self.height,
+            duration=int(self.duration.total_seconds()),
         )
         c = PaidMediaPreview(
             width=100,
@@ -274,13 +286,35 @@ class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase):
         d = Dice(5, "test")
 
         assert a == b
+        assert b == x
         assert hash(a) == hash(b)
+        assert hash(b) == hash(x)
 
         assert a != c
         assert hash(a) != hash(c)
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, paid_media_preview):
+        duration = paid_media_preview.duration
+
+        if PTB_TIMEDELTA:
+            assert duration == self.duration
+            assert isinstance(duration, dtm.timedelta)
+        else:
+            assert duration == int(self.duration.total_seconds())
+            assert isinstance(duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, paid_media_preview):
+        paid_media_preview.duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
 
 # ===========================================================================================

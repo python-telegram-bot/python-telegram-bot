@@ -19,6 +19,7 @@
 """Here we run tests directly with HTTPXRequest because that's easier than providing dummy
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
+import datetime as dtm
 import json
 import logging
 from collections import defaultdict
@@ -45,10 +46,9 @@ from telegram.error import (
     TelegramError,
     TimedOut,
 )
-from telegram.request import BaseRequest, RequestData
+from telegram.request import RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
@@ -245,7 +245,7 @@ class TestRequestWithoutRequest:
 
         assert exc_info.value.new_chat_id == 123
 
-    async def test_retry_after(self, monkeypatch, httpx_request: HTTPXRequest):
+    async def test_retry_after(self, monkeypatch, httpx_request: HTTPXRequest, PTB_TIMEDELTA):
         server_response = b'{"ok": "False", "parameters": {"retry_after": 42}}'
 
         monkeypatch.setattr(
@@ -254,10 +254,12 @@ class TestRequestWithoutRequest:
             mocker_factory(response=server_response, return_code=HTTPStatus.BAD_REQUEST),
         )
 
-        with pytest.raises(RetryAfter, match="Retry in 42") as exc_info:
+        with pytest.raises(
+            RetryAfter, match="Retry in " + "0:00:42" if PTB_TIMEDELTA else "42"
+        ) as exc_info:
             await httpx_request.post(None, None, None)
 
-        assert exc_info.value.retry_after == 42
+        assert exc_info.value.retry_after == (dtm.timdelta(seconds=42) if PTB_TIMEDELTA else 42)
 
     async def test_unknown_request_params(self, monkeypatch, httpx_request: HTTPXRequest):
         server_response = b'{"ok": "False", "parameters": {"unknown": "42"}}'
@@ -317,10 +319,14 @@ class TestRequestWithoutRequest:
             (-1, NetworkError),
         ],
     )
+    @pytest.mark.parametrize("description", ["Test Message", None])
     async def test_special_errors(
-        self, monkeypatch, httpx_request: HTTPXRequest, code, exception_class
+        self, monkeypatch, httpx_request: HTTPXRequest, code, exception_class, description
     ):
-        server_response = b'{"ok": "False", "description": "Test Message"}'
+        server_response_json = {"ok": False}
+        if description:
+            server_response_json["description"] = description
+        server_response = json.dumps(server_response_json).encode(TextEncoding.UTF_8)
 
         monkeypatch.setattr(
             httpx_request,
@@ -328,7 +334,25 @@ class TestRequestWithoutRequest:
             mocker_factory(response=server_response, return_code=code),
         )
 
-        with pytest.raises(exception_class, match="Test Message"):
+        if not description and code not in list(HTTPStatus):
+            match = f"Unknown HTTPError.*{code}"
+        else:
+            match = description or str(code.value)
+
+        with pytest.raises(exception_class, match=match):
+            await httpx_request.post("", None, None)
+
+    async def test_error_parsing_payload(self, monkeypatch, httpx_request: HTTPXRequest):
+        """Test that we raise an error if the payload is not a valid JSON."""
+        server_response = b"invalid_json"
+
+        monkeypatch.setattr(
+            httpx_request,
+            "do_request",
+            mocker_factory(response=server_response, return_code=HTTPStatus.BAD_GATEWAY),
+        )
+
+        with pytest.raises(TelegramError, match=r"502.*\. Parsing.*b'invalid_json' failed"):
             await httpx_request.post("", None, None)
 
     @pytest.mark.parametrize(
@@ -390,76 +414,6 @@ class TestRequestWithoutRequest:
         )
         assert self.test_flag == (1, 2, 3, 4)
 
-    def test_read_timeout_not_implemented(self):
-        class SimpleRequest(BaseRequest):
-            async def do_request(self, *args, **kwargs):
-                raise httpx.ReadTimeout("read timeout")
-
-            async def initialize(self) -> None:
-                pass
-
-            async def shutdown(self) -> None:
-                pass
-
-        with pytest.raises(NotImplementedError):
-            SimpleRequest().read_timeout
-
-    @pytest.mark.parametrize("media", [True, False])
-    async def test_timeout_propagation_write_timeout(
-        self, monkeypatch, media, input_media_photo, recwarn  # noqa: F811
-    ):
-        class CustomRequest(BaseRequest):
-            async def initialize(self_) -> None:
-                pass
-
-            async def shutdown(self_) -> None:
-                pass
-
-            async def do_request(self_, *args, **kwargs) -> tuple[int, bytes]:
-                self.test_flag = (
-                    kwargs.get("read_timeout"),
-                    kwargs.get("connect_timeout"),
-                    kwargs.get("write_timeout"),
-                    kwargs.get("pool_timeout"),
-                )
-                return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
-
-        custom_request = CustomRequest()
-        data = {"string": "string", "int": 1, "float": 1.0}
-        if media:
-            data["media"] = input_media_photo
-        request_data = RequestData(
-            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
-        )
-
-        # First make sure that custom timeouts are always respected
-        await custom_request.post(
-            "url", request_data, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
-        )
-        assert self.test_flag == (1, 2, 3, 4)
-
-        # Now also ensure that the default timeout for media requests is 20 seconds
-        await custom_request.post("url", request_data)
-        assert self.test_flag == (
-            DEFAULT_NONE,
-            DEFAULT_NONE,
-            20 if media else DEFAULT_NONE,
-            DEFAULT_NONE,
-        )
-
-        print("warnings")
-        for entry in recwarn:
-            print(entry.message)
-        if media:
-            assert len(recwarn) == 1
-            assert "will default to `BaseRequest.DEFAULT_NONE` instead of 20" in str(
-                recwarn[0].message
-            )
-            assert recwarn[0].category is PTBDeprecationWarning
-            assert recwarn[0].filename == __file__
-        else:
-            assert len(recwarn) == 0
-
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestHTTPXRequestWithoutRequest:
@@ -469,9 +423,7 @@ class TestHTTPXRequestWithoutRequest:
     def _reset(self):
         self.test_flag = None
 
-    # We parametrize this to make sure that the legacy `proxy_url` argument is still supported
-    @pytest.mark.parametrize("proxy_argument", ["proxy", "proxy_url"])
-    def test_init(self, monkeypatch, proxy_argument):
+    def test_init(self, monkeypatch):
         @dataclass
         class Client:
             timeout: object
@@ -492,31 +444,19 @@ class TestHTTPXRequestWithoutRequest:
         assert request._client.http1 is True
         assert not request._client.http2
 
-        kwargs = {
-            "connection_pool_size": 42,
-            proxy_argument: "proxy",
-            "connect_timeout": 43,
-            "read_timeout": 44,
-            "write_timeout": 45,
-            "pool_timeout": 46,
-        }
-        request = HTTPXRequest(**kwargs)
+        request = HTTPXRequest(
+            connection_pool_size=42,
+            proxy="proxy",
+            connect_timeout=43,
+            read_timeout=44,
+            write_timeout=45,
+            pool_timeout=46,
+        )
         assert request._client.proxy == "proxy"
         assert request._client.limits == httpx.Limits(
             max_connections=42, max_keepalive_connections=42
         )
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
-
-    def test_proxy_mutually_exclusive(self):
-        with pytest.raises(ValueError, match="mutually exclusive"):
-            HTTPXRequest(proxy="proxy", proxy_url="proxy_url")
-
-    def test_proxy_url_deprecation_warning(self, recwarn):
-        HTTPXRequest(proxy_url="http://127.0.0.1:3128")
-        assert len(recwarn) == 1
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert "`proxy_url` is deprecated" in str(recwarn[0].message)
-        assert recwarn[0].filename == __file__, "incorrect stacklevel"
 
     async def test_multiple_inits_and_shutdowns(self, monkeypatch):
         self.test_flag = defaultdict(int)
@@ -728,7 +668,7 @@ class TestHTTPXRequestWithoutRequest:
 
     @pytest.mark.parametrize("media", [True, False])
     async def test_do_request_write_timeout(
-        self, monkeypatch, media, httpx_request, input_media_photo, recwarn  # noqa: F811
+        self, monkeypatch, media, httpx_request, input_media_photo  # noqa: F811
     ):
         async def request(_, **kwargs):
             self.test_flag = kwargs.get("timeout")
@@ -752,10 +692,6 @@ class TestHTTPXRequestWithoutRequest:
         # Now also ensure that the default timeout for media requests is 20 seconds
         await httpx_request.post("url", request_data)
         assert self.test_flag == httpx.Timeout(read=5, connect=5, write=20 if media else 5, pool=1)
-
-        # Just for double-checking, since warnings are issued for implementations of BaseRequest
-        # other than HTTPXRequest
-        assert len(recwarn) == 0
 
     @pytest.mark.parametrize("init", [True, False])
     async def test_setting_media_write_timeout(

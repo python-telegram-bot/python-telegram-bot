@@ -17,9 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
-import datetime as dtm
 
-from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
+from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -47,20 +46,13 @@ class ParamTypeCheckingExceptions:
             "animation": Animation,
             "voice": Voice,
             "sticker": Sticker,
-            # TODO: Deprecated and will be corrected (and readded) in next major bot API release:
-            # "gift_id": Gift,
+            "gift_id": Gift,
         },
         "(delete|set)_sticker.*": {
             "sticker$": Sticker,
         },
         "replace_sticker_in_set": {
             "old_sticker$": Sticker,
-        },
-        # The underscore will match any method
-        r"\w+_[\w_]+": {
-            "duration": dtm.timedelta,
-            r"\w+_period": dtm.timedelta,
-            "cache_time": dtm.timedelta,
         },
     }
 
@@ -73,8 +65,6 @@ class ParamTypeCheckingExceptions:
         ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
         ("reaction", False): "ReactionType",  # + str
         ("options", False): "InputPollOption",  # + str
-        # TODO: Deprecated and will be corrected (and removed) in next bot api release
-        ("file_hashes", True): "list[str]",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
@@ -100,12 +90,22 @@ class ParamTypeCheckingExceptions:
             "thumbnail": str,  # actual: Union[str, FileInput]
             "cover": str,  # actual: Union[str, FileInput]
         },
+        "InputProfilePhotoStatic": {
+            "photo": str,  # actual: Union[str, FileInput]
+        },
+        "InputProfilePhotoAnimated": {
+            "animation": str,  # actual: Union[str, FileInput]
+        },
+        "InputSticker": {
+            "sticker": str,  # actual: Union[str, FileInput]
+        },
+        "InputStoryContent.*": {
+            "photo": str,  # actual: Union[str, FileInput]
+            "video": str,  # actual: Union[str, FileInput]
+        },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },
-        # TODO: Deprecated and will be corrected (and removed) in next major PTB
-        #  version:
-        "send_gift": {"gift_id": str},  # actual: Non optional
     }
 
     # param names ignored in the param type checking in classes for the `tg.Defaults` case.
@@ -116,11 +116,6 @@ class ParamTypeCheckingExceptions:
 
     # These classes' params are all ODVInput, so we ignore them in the defaults type checking.
     IGNORED_DEFAULTS_CLASSES = {"LinkPreviewOptions"}
-
-    # TODO: Remove this in v22 when it becomes a datetime (also remove from arg_type_checker.py)
-    DATETIME_EXCEPTIONS = {
-        "file_date",
-    }
 
 
 # Arguments *added* to the official API
@@ -155,11 +150,15 @@ PTB_EXTRA_PARAMS = {
     "ReactionType": {"type"},  # attributes common to all subclasses
     "BackgroundType": {"type"},  # attributes common to all subclasses
     "BackgroundFill": {"type"},  # attributes common to all subclasses
+    "OwnedGift": {"type"},  # attributes common to all subclasses
     "InputTextMessageContent": {"disable_web_page_preview"},  # convenience arg, here for bw compat
     "RevenueWithdrawalState": {"type"},  # attributes common to all subclasses
     "TransactionPartner": {"type"},  # attributes common to all subclasses
     "PaidMedia": {"type"},  # attributes common to all subclasses
     "InputPaidMedia": {"type", "media"},  # attributes common to all subclasses
+    "InputStoryContent": {"type"},  # attributes common to all subclasses
+    "StoryAreaType": {"type"},  # attributes common to all subclasses
+    "InputProfilePhoto": {"type"},  # attributes common to all subclasses
 }
 
 
@@ -188,6 +187,10 @@ PTB_IGNORED_PARAMS = {
     r"TransactionPartner\w+": {"type"},
     r"PaidMedia\w+": {"type"},
     r"InputPaidMedia\w+": {"type"},
+    r"InputProfilePhoto\w+": {"type"},
+    r"OwnedGift\w+": {"type"},
+    r"InputStoryContent\w+": {"type"},
+    r"StoryAreaType\w+": {"type"},
 }
 
 
@@ -203,8 +206,6 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
-    # here for backwards compatibility. Todo: remove on next bot api release
-    "send_gift": {"gift_id"},
 }
 
 

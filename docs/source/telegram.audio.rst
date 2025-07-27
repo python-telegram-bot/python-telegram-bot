@@ -6,4 +6,4 @@ Audio
 .. autoclass:: telegram.Audio
     :members:
     :show-inheritance:
-    :inherited-members: TelegramObject
+    :inherited-members: TelegramObject, object

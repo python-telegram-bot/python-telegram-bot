@@ -15,12 +15,12 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-import collections.abc
 import contextlib
 import inspect
 import re
 import typing
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from sphinx.application import Sphinx
 
@@ -32,10 +32,14 @@ from docs.auxil.kwargs_insertion import (
     find_insert_pos_for_kwargs,
     get_updates_read_timeout_addition,
     keyword_args,
-    media_write_timeout_deprecation,
-    media_write_timeout_deprecation_methods,
+    media_write_timeout_change,
+    media_write_timeout_change_methods,
 )
 from docs.auxil.link_code import LINE_NUMBERS
+
+if TYPE_CHECKING:
+    import collections.abc
+
 
 ADMONITION_INSERTER = AdmonitionInserter()
 
@@ -51,6 +55,8 @@ PRIVATE_BASE_CLASSES = {
 }
 
 
+# Resolves to the parent directory of `telegram/`, depending on installation setup,
+# could either be `<absolute_path>/src` or `<absolute_path>/site-packages`
 FILE_ROOT = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
 
 
@@ -116,9 +122,9 @@ def autodoc_process_docstring(
 
             if (
                 "post.write_timeout`. Defaults to" in to_insert
-                and method_name in media_write_timeout_deprecation_methods
+                and method_name in media_write_timeout_change_methods
             ):
-                effective_insert: list[str] = media_write_timeout_deprecation
+                effective_insert: list[str] = media_write_timeout_change
             elif get_updates and to_insert.lstrip().startswith("read_timeout"):
                 effective_insert = [to_insert, *get_updates_read_timeout_addition]
             else:
@@ -128,7 +134,7 @@ def autodoc_process_docstring(
             insert_idx += len(effective_insert)
 
         ADMONITION_INSERTER.insert_admonitions(
-            obj=typing.cast(collections.abc.Callable, obj),
+            obj=typing.cast("collections.abc.Callable", obj),
             docstring_lines=lines,
         )
 
@@ -136,7 +142,7 @@ def autodoc_process_docstring(
     # (where applicable)
     if what == "class":
         ADMONITION_INSERTER.insert_admonitions(
-            obj=typing.cast(type, obj),  # since "what" == class, we know it's not just object
+            obj=typing.cast("type", obj),  # since "what" == class, we know it's not just object
             docstring_lines=lines,
         )
 
@@ -157,7 +163,7 @@ def autodoc_process_docstring(
     with contextlib.suppress(Exception):
         source_lines, start_line = inspect.getsourcelines(obj)
         end_line = start_line + len(source_lines)
-        file = Path(inspect.getsourcefile(obj)).relative_to(FILE_ROOT)
+        file = Path("src") / Path(inspect.getsourcefile(obj)).relative_to(FILE_ROOT)
         LINE_NUMBERS[name] = (file, start_line, end_line)
 
     # Since we don't document the `__init__`, we call this manually to have it available for

@@ -38,7 +38,6 @@ from telegram import (
     BotDescription,
     BotName,
     BotShortDescription,
-    BusinessConnection,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -80,6 +79,7 @@ from telegram import (
     User,
     WebAppInfo,
 )
+from telegram._payment.stars.staramount import StarAmount
 from telegram._utils.datetime import UTC, from_timestamp, localize, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import to_camel_case
@@ -95,7 +95,7 @@ from telegram.error import BadRequest, EndPointNotFound, InvalidToken
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTIONS
@@ -402,6 +402,21 @@ class TestBotWithoutRequest:
 
         assert self.test_flag == "stop"
 
+    async def test_shutdown_at_error_in_request_in_init(self, monkeypatch, offline_bot):
+        async def get_me_error():
+            raise httpx.HTTPError("BadRequest wrong token sry :(")
+
+        async def shutdown(*args):
+            self.test_flag = "stop"
+
+        monkeypatch.setattr(offline_bot, "get_me", get_me_error)
+        monkeypatch.setattr(offline_bot, "shutdown", shutdown)
+
+        async with offline_bot:
+            pass
+
+        assert self.test_flag == "stop"
+
     async def test_equality(self):
         async with (
             make_bot(token=FALLBACKS[0]["token"]) as a,
@@ -528,7 +543,7 @@ class TestBotWithoutRequest:
         if bot_method_name.replace("_", "").lower() != "getupdates" and bot_class is ExtBot:
             assert rate_arg in param_names, f"{bot_method} is missing the parameter `{rate_arg}`"
 
-    @bot_methods(ext_bot=False)
+    @bot_methods()
     async def test_defaults_handling(
         self,
         bot_class,
@@ -681,7 +696,7 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize(
         "default_bot",
-        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        [{"parse_mode": "Markdown", "link_preview_options": LinkPreviewOptions(is_disabled=True)}],
         indirect=True,
     )
     @pytest.mark.parametrize(
@@ -976,7 +991,7 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize(
         "default_bot",
-        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        [{"parse_mode": "Markdown", "link_preview_options": LinkPreviewOptions(is_disabled=True)}],
         indirect=True,
     )
     async def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
@@ -2257,6 +2272,10 @@ class TestBotWithoutRequest:
                 )
                 return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
 
+            @property
+            def read_timeout(self):
+                return 1
+
         custom_request = CustomRequest()
 
         offline_bot = Bot(offline_bot.token, request=custom_request)
@@ -2271,7 +2290,7 @@ class TestBotWithoutRequest:
         assert test_flag == (
             DEFAULT_NONE,
             DEFAULT_NONE,
-            20,
+            DEFAULT_NONE,
             DEFAULT_NONE,
         )
 
@@ -2354,26 +2373,6 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_message(2, "text", allow_paid_broadcast=42)
 
-    async def test_get_business_connection(self, offline_bot, monkeypatch):
-        bci = "42"
-        user = User(1, "first", False)
-        user_chat_id = 1
-        date = dtm.datetime.utcnow()
-        can_reply = True
-        is_enabled = True
-        bc = BusinessConnection(bci, user, user_chat_id, date, can_reply, is_enabled).to_json()
-
-        async def do_request(*args, **kwargs):
-            data = kwargs.get("request_data")
-            obj = data.parameters.get("business_connection_id")
-            if obj == bci:
-                return 200, f'{{"ok": true, "result": {bc}}}'.encode()
-            return 400, b'{"ok": false, "result": []}'
-
-        monkeypatch.setattr(offline_bot.request, "do_request", do_request)
-        obj = await offline_bot.get_business_connection(business_connection_id=bci)
-        assert isinstance(obj, BusinessConnection)
-
     async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
         async def make_assertion(*args, **_):
             kwargs = args[1]
@@ -2386,6 +2385,61 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.send_chat_action(chat_id, "action", 1, 3)
+
+    async def test_gift_premium_subscription_all_args(self, bot, monkeypatch):
+        # can't make actual request so we just test that the correct data is passed
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs.get("user_id") == 12
+                and kwargs.get("month_count") == 3
+                and kwargs.get("star_count") == 1000
+                and kwargs.get("text") == "test text"
+                and kwargs.get("text_parse_mode") == "Markdown"
+                and kwargs.get("text_entities")
+                == [
+                    MessageEntity(MessageEntity.BOLD, 0, 3),
+                    MessageEntity(MessageEntity.ITALIC, 5, 11),
+                ]
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        assert await bot.gift_premium_subscription(
+            user_id=12,
+            month_count=3,
+            star_count=1000,
+            text="test text",
+            text_parse_mode="Markdown",
+            text_entities=[
+                MessageEntity(MessageEntity.BOLD, 0, 3),
+                MessageEntity(MessageEntity.ITALIC, 5, 11),
+            ],
+        )
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, "Markdown"), ("HTML", "HTML"), (None, None)],
+    )
+    async def test_gift_premium_subscription_default_parse_mode(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        # can't make actual request so we just test that the correct data is passed
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("text_parse_mode") == expected_value
+            return True
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "user_id": 123,
+            "month_count": 3,
+            "star_count": 1000,
+            "text": "text",
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["text_parse_mode"] = passed_value
+
+        assert await default_bot.gift_premium_subscription(**kwargs)
 
     async def test_refund_star_payment(self, offline_bot, monkeypatch):
         # can't make actual request so we just test that the correct data is passed
@@ -2520,6 +2574,17 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
         await offline_bot.remove_chat_verification(1234)
+
+    async def test_get_my_star_balance(self, offline_bot, monkeypatch):
+        sa = StarAmount(1000).to_json()
+
+        async def do_request(url, request_data: RequestData, *args, **kwargs):
+            assert not request_data.parameters
+            return 200, f'{{"ok": true, "result": {sa}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", do_request)
+        obj = await offline_bot.get_my_star_balance()
+        assert isinstance(obj, StarAmount)
 
 
 class TestBotWithRequest:
@@ -3213,43 +3278,14 @@ class TestBotWithRequest:
         pass
 
     # TODO: Actually send updates to the test bot so this can be tested properly
-    async def test_get_updates(self, bot):
+    @pytest.mark.parametrize("timeout", [1, dtm.timedelta(seconds=1)])
+    async def test_get_updates(self, bot, timeout):
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-        updates = await bot.get_updates(timeout=1)
+        updates = await bot.get_updates(timeout=timeout)
 
         assert isinstance(updates, tuple)
         if updates:
             assert isinstance(updates[0], Update)
-
-    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
-    async def test_get_updates_read_timeout_deprecation_warning(
-        self, bot, recwarn, monkeypatch, bot_class
-    ):
-        # Using the normal HTTPXRequest should not issue any warnings
-        await bot.get_updates()
-        assert len(recwarn) == 0
-
-        # Now let's test deprecation warning when using get_updates for other BaseRequest
-        # subclasses (we just monkeypatch the existing HTTPXRequest for this)
-        read_timeout = None
-
-        async def catch_timeouts(*args, **kwargs):
-            nonlocal read_timeout
-            read_timeout = kwargs.get("read_timeout")
-            return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
-
-        monkeypatch.setattr(HTTPXRequest, "read_timeout", BaseRequest.read_timeout)
-        monkeypatch.setattr(HTTPXRequest, "do_request", catch_timeouts)
-
-        bot = bot_class(get_updates_request=HTTPXRequest(), token=bot.token)
-        await bot.get_updates()
-
-        assert len(recwarn) == 1
-        assert "does not override the property `read_timeout`" in str(recwarn[0].message)
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
-
-        assert read_timeout == 2
 
     @pytest.mark.parametrize(
         ("read_timeout", "timeout", "expected"),
@@ -3257,9 +3293,12 @@ class TestBotWithRequest:
             (None, None, 0),
             (1, None, 1),
             (None, 1, 1),
+            (None, dtm.timedelta(seconds=1), 1),
             (DEFAULT_NONE, None, 10),
             (DEFAULT_NONE, 1, 11),
+            (DEFAULT_NONE, dtm.timedelta(seconds=1), 11),
             (1, 2, 3),
+            (1, dtm.timedelta(seconds=2), 3),
         ],
     )
     async def test_get_updates_read_timeout_value_passing(
@@ -4211,7 +4250,7 @@ class TestBotWithRequest:
                 ]
             )
             await poll_message.stop_poll(reply_markup=reply_markup)
-            helper_message = await poll_message.reply_text("temp", quote=True)
+            helper_message = await poll_message.reply_text("temp", do_quote=True)
             message = helper_message.reply_to_message
             inline_keyboard = message.reply_markup.inline_keyboard
 
@@ -4513,3 +4552,8 @@ class TestBotWithRequest:
         assert edited_link.name == "sub_name_2"
         assert sub_link.subscription_period == 2592000
         assert sub_link.subscription_price == 13
+
+    async def test_get_my_star_balance(self, bot):
+        balance = await bot.get_my_star_balance()
+        assert isinstance(balance, StarAmount)
+        assert balance.amount == 0

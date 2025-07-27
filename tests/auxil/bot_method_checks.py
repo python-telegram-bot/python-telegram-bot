@@ -35,6 +35,7 @@ from telegram import (
     InlineQueryResultArticle,
     InlineQueryResultCachedPhoto,
     InputMediaPhoto,
+    InputPaidMediaPhoto,
     InputTextMessageContent,
     LinkPreviewOptions,
     ReplyParameters,
@@ -69,7 +70,7 @@ def check_shortcut_signature(
         bot_method: The bot method, e.g. :meth:`telegram.Bot.send_message`
         shortcut_kwargs: The kwargs passed by the shortcut directly, e.g. ``chat_id``
         additional_kwargs: Additional kwargs of the shortcut that the bot method doesn't have, e.g.
-            ``quote``.
+            ``do_quote``.
         annotation_overrides: A dictionary of exceptions for the annotation comparison. The key is
             the name of the argument, the value is a tuple of the expected annotation and
             the default value. E.g. ``{'parse_mode': (str, 'None')}``.
@@ -227,21 +228,18 @@ async def check_shortcut_call(
 
     shortcut_signature = inspect.signature(shortcut_method)
     # auto_pagination: Special casing for InlineQuery.answer
-    # quote: Don't test deprecated "quote" parameter of Message.reply_*
     kwargs = {
-        name: name
-        for name in shortcut_signature.parameters
-        if name not in ["auto_pagination", "quote"]
+        name: name for name in shortcut_signature.parameters if name not in ["auto_pagination"]
     }
     if "reply_parameters" in kwargs:
         kwargs["reply_parameters"] = ReplyParameters(message_id=1)
 
     # We tested this for a long time, but Bot API 7.0 deprecated it in favor of
-    # reply_parameters. In the transition phase, both exist in a mutually exclusive
-    # way. Testing both cases would require a lot of additional code, so we just
-    # ignore this parameter here until it is removed.
-    kwargs.pop("reply_to_message_id", None)
-    expected_args.discard("reply_to_message_id")
+    # reply_parameters. Testing both cases would require a lot of additional code, so we just
+    # ignore these parameters here.
+    for arg in ["reply_to_message_id", "allow_sending_without_reply"]:
+        kwargs.pop(arg, None)
+        expected_args.discard(arg)
 
     async def make_assertion(**kw):
         # name == value makes sure that
@@ -253,7 +251,7 @@ async def check_shortcut_call(
             if name in ignored_args
             or (value == name or (name == "reply_parameters" and value.message_id == 1))
         }
-        if not received_kwargs == expected_args:
+        if received_kwargs != expected_args:
             raise Exception(
                 f"{orig_bot_method.__name__} did not receive correct value for the parameters "
                 f"{expected_args - received_kwargs}"
@@ -285,8 +283,13 @@ def build_kwargs(
             elif name in ["prices", "commands", "errors"]:
                 kws[name] = []
             elif name == "media":
-                media = InputMediaPhoto("media", parse_mode=manually_passed_value)
-                if "list" in str(param.annotation).lower():
+                if "star_count" in signature.parameters:
+                    media = InputPaidMediaPhoto("media")
+                else:
+                    media = InputMediaPhoto("media", parse_mode=manually_passed_value)
+
+                param_annotation = str(param.annotation).lower()
+                if "sequence" in param_annotation or "list" in param_annotation:
                     kws[name] = [media]
                 else:
                     kws[name] = media
@@ -351,9 +354,6 @@ def build_kwargs(
                 allow_sending_without_reply=manually_passed_value,
                 quote_parse_mode=manually_passed_value,
             )
-        # TODO remove when gift_id isnt marked as optional anymore, tags: deprecated 21.11
-        elif name == "gift_id":
-            kws[name] = "GIFT-ID"
 
     return kws
 
@@ -510,7 +510,8 @@ async def make_assertion(
             )
 
     media = data.pop("media", None)
-    if media:
+    paid_media = media and data.pop("star_count", None)
+    if media and not paid_media:
         if isinstance(media, dict) and isinstance(media.get("type", None), InputMediaType):
             check_input_media(media)
         else:
@@ -617,10 +618,8 @@ async def check_defaults_handling(
         kwargs_need_default.remove("parse_mode")
 
     defaults_no_custom_defaults = Defaults()
-    kwargs = {kwarg: "custom_default" for kwarg in inspect.signature(Defaults).parameters}
+    kwargs = dict.fromkeys(inspect.signature(Defaults).parameters, "custom_default")
     kwargs["tzinfo"] = zoneinfo.ZoneInfo("America/New_York")
-    kwargs.pop("disable_web_page_preview")  # mutually exclusive with link_preview_options
-    kwargs.pop("quote")  # mutually exclusive with do_quote
     kwargs["link_preview_options"] = LinkPreviewOptions(
         url="custom_default", show_above_text="custom_default"
     )

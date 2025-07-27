@@ -20,7 +20,15 @@
 
 import pytest
 
-from telegram import Bot, Chat, ChatPermissions, ReactionTypeEmoji, User
+from telegram import (
+    Bot,
+    Chat,
+    ChatPermissions,
+    InputChecklist,
+    InputChecklistTask,
+    ReactionTypeEmoji,
+    User,
+)
 from telegram.constants import ChatAction, ChatType, ReactionEmoji
 from telegram.helpers import escape_markdown
 from tests.auxil.bot_method_checks import (
@@ -578,6 +586,23 @@ class TestChatWithoutRequest(ChatTestBase):
 
         monkeypatch.setattr(chat.get_bot(), "send_dice", make_assertion)
         assert await chat.send_dice(emoji="test_dice")
+
+    async def test_instance_method_send_checklist(self, monkeypatch, chat):
+        checklist = InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")])
+
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["business_connection_id"] == "123"
+                and kwargs["checklist"] == checklist
+            )
+
+        assert check_shortcut_signature(Chat.send_checklist, Bot.send_checklist, ["chat_id"], [])
+        assert await check_shortcut_call(chat.send_checklist, chat.get_bot(), "send_checklist")
+        assert await check_defaults_handling(chat.send_checklist, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_checklist", make_assertion)
+        assert await chat.send_checklist("123", checklist)
 
     async def test_instance_method_send_game(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
@@ -1330,15 +1355,7 @@ class TestChatWithoutRequest(ChatTestBase):
                 and kwargs["text_entities"] == "text_entities"
             )
 
-        # TODO discuss if better way exists
-        # tags: deprecated 21.11
-        with pytest.raises(
-            Exception,
-            match="Default for argument gift_id does not match the default of the Bot method.",
-        ):
-            assert check_shortcut_signature(
-                Chat.send_gift, Bot.send_gift, ["user_id", "chat_id"], []
-            )
+        assert check_shortcut_signature(Chat.send_gift, Bot.send_gift, ["user_id", "chat_id"], [])
         assert await check_shortcut_call(
             chat.send_gift, chat.get_bot(), "send_gift", ["user_id", "chat_id"]
         )
@@ -1359,6 +1376,28 @@ class TestChatWithoutRequest(ChatTestBase):
             text="text",
             text_parse_mode="text_parse_mode",
             text_entities="text_entities",
+        )
+
+    @pytest.mark.parametrize("star_count", [100, None])
+    async def test_instance_method_transfer_gift(self, monkeypatch, chat, star_count):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["new_owner_chat_id"] == chat.id
+                and kwargs["owned_gift_id"] == "owned_gift_id"
+                and kwargs["star_count"] == star_count
+            )
+
+        assert check_shortcut_signature(
+            Chat.transfer_gift, Bot.transfer_gift, ["new_owner_chat_id"], []
+        )
+        assert await check_shortcut_call(chat.transfer_gift, chat.get_bot(), "transfer_gift")
+        assert await check_defaults_handling(chat.transfer_gift, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "transfer_gift", make_assertion)
+        assert await chat.transfer_gift(
+            owned_gift_id="owned_gift_id",
+            star_count=star_count,
+            business_connection_id="business_connection_id",
         )
 
     async def test_instance_method_verify_chat(self, monkeypatch, chat):
@@ -1391,6 +1430,27 @@ class TestChatWithoutRequest(ChatTestBase):
 
         monkeypatch.setattr(chat.get_bot(), "remove_chat_verification", make_assertion)
         assert await chat.remove_verification()
+
+    async def test_instance_method_read_business_message(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["business_connection_id"] == "business_connection_id"
+                and kwargs["message_id"] == "message_id"
+            )
+
+        assert check_shortcut_signature(
+            Chat.read_business_message, Bot.read_business_message, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.read_business_message, chat.get_bot(), "read_business_message"
+        )
+        assert await check_defaults_handling(chat.read_business_message, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "read_business_message", make_assertion)
+        assert await chat.read_business_message(
+            message_id="message_id", business_connection_id="business_connection_id"
+        )
 
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")

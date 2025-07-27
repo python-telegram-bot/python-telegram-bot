@@ -1,0 +1,5 @@
+internal = "Bump pytest from 8.3.4 to 8.3.5"
+[[pull_requests]]
+uid = "4709"
+author_uid = "dependabot"
+closes_threads = []

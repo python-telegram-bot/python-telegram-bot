@@ -5,4 +5,4 @@ Chat
 .. autoclass:: telegram.Chat
     :members:
     :show-inheritance:
-    :inherited-members: TelegramObject
+    :inherited-members: TelegramObject, object

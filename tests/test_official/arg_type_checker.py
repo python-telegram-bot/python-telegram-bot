@@ -68,7 +68,7 @@ DATETIME_REGEX = re.compile(
     """,
     re.VERBOSE,
 )
-TIMEDELTA_REGEX = re.compile(r"\w+_period$")  # Parameter names ending with "_period"
+TIMEDELTA_REGEX = re.compile(r"((in|number of) seconds)|(\w+_period$)")
 
 log = logging.debug
 
@@ -190,21 +190,15 @@ def check_param_type(
         or "Unix time" in tg_parameter.param_description
     ):
         log("Checking that `%s` is a datetime!\n", ptb_param.name)
-        if ptb_param.name in PTCE.DATETIME_EXCEPTIONS:
-            return True, mapped_type
         # If it's a class, we only accept datetime as the parameter
         mapped_type = dtm.datetime if is_class else mapped_type | dtm.datetime
 
     # 4) HANDLING TIMEDELTA:
-    elif re.search(TIMEDELTA_REGEX, ptb_param.name) and obj.__name__ in (
-        "TransactionPartnerUser",
-        "create_invoice_link",
+    elif re.search(TIMEDELTA_REGEX, tg_parameter.param_description) or re.search(
+        TIMEDELTA_REGEX, ptb_param.name
     ):
-        # Currently we only support timedelta for `subscription_period` in `TransactionPartnerUser`
-        # and `create_invoice_link`.
-        # See https://github.com/python-telegram-bot/python-telegram-bot/issues/4575
         log("Checking that `%s` is a timedelta!\n", ptb_param.name)
-        mapped_type = dtm.timedelta if is_class else mapped_type | dtm.timedelta
+        mapped_type = mapped_type | dtm.timedelta
 
     # 5) COMPLEX TYPES:
     # Some types are too complicated, so we replace our annotation with a simpler type:
