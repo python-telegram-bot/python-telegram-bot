@@ -438,9 +438,7 @@ class TestHTTPXRequestWithoutRequest:
         request = HTTPXRequest()
         assert request._client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
         assert request._client.proxy is None
-        assert request._client.limits == httpx.Limits(
-            max_connections=1, max_keepalive_connections=1
-        )
+        assert request._client.limits == httpx.Limits(max_connections=1)
         assert request._client.http1 is True
         assert not request._client.http2
 
@@ -453,9 +451,7 @@ class TestHTTPXRequestWithoutRequest:
             pool_timeout=46,
         )
         assert request._client.proxy == "proxy"
-        assert request._client.limits == httpx.Limits(
-            max_connections=42, max_keepalive_connections=42
-        )
+        assert request._client.limits == httpx.Limits(max_connections=42)
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
 
     async def test_multiple_inits_and_shutdowns(self, monkeypatch):
