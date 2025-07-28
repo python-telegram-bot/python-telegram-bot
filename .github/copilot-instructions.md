@@ -1,5 +1,6 @@
 This is a python project which is a wrapper for the Telegram Bot API. Please read the contributing
-guidelines mentioned in .github/CONTRIBUTING.rst to know how to contribute to this project.
+guidelines mentioned in .github/CONTRIBUTING.rst to know how to contribute to this project. The 
+README.rst file lists the features and usage of the project.
 
 ### Development Environment:
 
@@ -22,6 +23,16 @@ The repository follows a standard structure for Python projects. Here are some k
 - `tests/`: This directory contains test cases for the project.
 - `pyproject.toml`: This file contains the project metadata and dependencies.
 - `.github/`: This directory contains GitHub-specific files, including workflows and issue templates.
+
+
+### Things to keep in mind while coding:
+
+- Ensure that your code is properly and fully typed. All your code should be compatible from
+  Python 3.9 to 3.14. Don't use the `typing_extensions` module.
+- Read the stability guide mentioned at docs/source/stability_policy.rst to understand if your changes
+  are breaking or incompatible.
+- Try to make sure your code is asyncio-friendly and thread-safe.
+- Run `uv run pre-commit` to run pre-commit hooks before committing your changes.
 
 ### Pull Requests:
 

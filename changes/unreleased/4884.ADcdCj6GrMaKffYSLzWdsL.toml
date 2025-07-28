@@ -1,4 +1,4 @@
-other = "Add copilot instructions and setup steps"
+internal = "Add Copilot Instructions and Setup Steps"
 [[pull_requests]]
 uid = "4884"
 author_uid = "harshil21"
