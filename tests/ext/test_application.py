@@ -2764,8 +2764,8 @@ class TestApplication:
                 with pytest.raises(TelegramError, match="Test completed successfully"):
                     app.run_polling(
                         bootstrap_retries=0,
-                        close_loop=False,
-                        stop_signals=None,
+                        close_loop=True,
+                        stop_signals=None,  # Can't use signals in threads
                         drop_pending_updates=True,
                     )
                 # If we get here, the event loop was created successfully
