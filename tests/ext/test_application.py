@@ -2722,6 +2722,10 @@ class TestApplication:
         # add_error_handler was called
         assert called_handlers == {"remove_handler"}
 
+    @pytest.mark.skipif(
+        sys.version_info < (3, 14),
+        reason="Only relevant for Python 3.14+ where get_event_loop() raises RuntimeError",
+    )
     def test_run_polling_no_event_loop_python314(self, offline_bot, monkeypatch):
         """Test that run_polling works when no event loop exists (Python 3.14+ scenario).
 
@@ -2780,4 +2784,4 @@ class TestApplication:
 
         # If there was an unexpected exception, fail the test
         if exception_captured:
-            pytest.fail(f"Unexpected exception in thread: {exception_captured}")
+            raise exception_captured

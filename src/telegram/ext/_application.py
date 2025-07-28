@@ -1029,7 +1029,7 @@ class Application(
         # This handles the Python 3.14+ behavior where get_event_loop() raises RuntimeError
         # when there's no current event loop in the main thread.
         try:
-            loop = asyncio.get_running_loop()
+            loop = asyncio.get_event_loop()
         except RuntimeError:
             # No running event loop, create and set a new one
             loop = asyncio.new_event_loop()
