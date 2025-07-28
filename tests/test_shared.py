@@ -117,6 +117,12 @@ class TestChatSharedWithoutRequest(ChatSharedTestBase):
         assert chat_shared.request_id == self.request_id
         assert chat_shared.chat_id == self.chat_id
 
+    def test_link(self):
+        chat_shared = ChatShared(1, 123, username="username")
+        assert chat_shared.link == f"https://t.me/{chat_shared.username}"
+        chat_shared = ChatShared(1, 123)
+        assert chat_shared.link is None
+
     def test_equality(self, users_shared):
         a = ChatShared(self.request_id, self.chat_id)
         b = ChatShared(self.request_id, self.chat_id)
@@ -206,6 +212,32 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
         assert shared_user.last_name == self.last_name
         assert shared_user.username == self.username
         assert shared_user.photo == self.photo
+
+    def test_name(self):
+        shared_user = SharedUser(123, "first_name", "last_name", "username")
+        assert shared_user.name == f"@{shared_user.username}"
+        shared_user = SharedUser(123, "first_name", "last_name")
+        assert shared_user.name == f"{shared_user.first_name} {shared_user.last_name}"
+        shared_user = SharedUser(123, "first_name")
+        assert shared_user.name == f"{shared_user.first_name}"
+        shared_user = SharedUser(123, "first_name", username="username")
+        assert shared_user.name == f"@{shared_user.username}"
+        shared_user = SharedUser(123)
+        assert shared_user.name is None
+
+    def test_full_name(self):
+        shared_user = SharedUser(123, "first_name", "last_name")
+        assert shared_user.full_name == f"{shared_user.first_name} {shared_user.last_name}"
+        shared_user = SharedUser(123, "first_name")
+        assert shared_user.full_name == f"{shared_user.first_name}"
+        shared_user = SharedUser(123)
+        assert shared_user.full_name is None
+
+    def test_link(self):
+        shared_user = SharedUser(123, username="username")
+        assert shared_user.link == f"https://t.me/{shared_user.username}"
+        shared_user = SharedUser(123, "first_name", "last_name")
+        assert shared_user.link is None
 
     def test_equality(self, chat_shared):
         a = SharedUser(
