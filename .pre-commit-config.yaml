@@ -12,12 +12,6 @@ repos:
     # Run the linter:
     -   id: ruff
         name: ruff
-        # additional_dependencies:
-        #   - httpx~=0.27
-        #   - tornado~=6.4
-        #   - APScheduler~=3.10.4
-        #   - cachetools>=5.3.3,<5.5.0
-        #   - aiolimiter~=1.1,<1.3
     # Run the formatter:
     -   id: ruff-format
 -   repo: https://github.com/PyCQA/pylint
