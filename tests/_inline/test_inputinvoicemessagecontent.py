@@ -204,7 +204,6 @@ class TestInputInvoiceMessageContentWithoutRequest(InputInvoiceMessageContentTes
         )
 
     def test_de_json(self, offline_bot):
-
         json_dict = {
             "title": self.title,
             "description": self.description,

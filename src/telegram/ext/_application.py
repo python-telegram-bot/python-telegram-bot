@@ -455,7 +455,7 @@ class Application(
         .. versionadded:: 20.0
         """
         # Unfortunately this needs to be here due to cyclical imports
-        from telegram.ext import (  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
+        from telegram.ext import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
             ApplicationBuilder,
         )
 
@@ -1302,8 +1302,7 @@ class Application(
                             coroutine,
                             update=update,
                             name=(
-                                f"Application:{self.bot.id}:process_update_non_blocking"
-                                f":{handler}"
+                                f"Application:{self.bot.id}:process_update_non_blocking:{handler}"
                             ),
                         )
                     else:

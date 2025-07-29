@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Contact."""
+
 from typing import Optional
 
 from telegram._telegramobject import TelegramObject

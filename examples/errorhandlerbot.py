@@ -3,6 +3,7 @@
 # This program is dedicated to the public domain under the CC0 license.
 
 """This is a very simple example on how one could implement a custom error handler."""
+
 import html
 import json
 import logging

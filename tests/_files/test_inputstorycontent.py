@@ -61,7 +61,6 @@ class InputStoryContentPhotoTestBase:
 
 
 class TestInputStoryContentPhotoWithoutRequest(InputStoryContentPhotoTestBase):
-
     def test_slot_behaviour(self, input_story_content_photo):
         inst = input_story_content_photo
         for attr in inst.__slots__:

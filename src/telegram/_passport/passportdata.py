@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
+
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 

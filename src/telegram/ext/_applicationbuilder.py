@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Builder classes for the telegram.ext module."""
+
 from asyncio import Queue
 from collections.abc import Collection, Coroutine
 from pathlib import Path

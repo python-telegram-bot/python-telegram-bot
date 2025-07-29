@@ -596,9 +596,9 @@ class TestBotWithoutRequest:
         signature = inspect.signature(method)
         ext_signature = inspect.signature(getattr(ExtBot, name))
 
-        assert (
-            ext_signature.return_annotation == signature.return_annotation
-        ), f"Wrong return annotation for method {name}"
+        assert ext_signature.return_annotation == signature.return_annotation, (
+            f"Wrong return annotation for method {name}"
+        )
         assert (
             set(signature.parameters)
             == set(ext_signature.parameters) - global_extra_args - extra_args_per_method[name]
@@ -606,15 +606,15 @@ class TestBotWithoutRequest:
         for param_name, param in signature.parameters.items():
             if param_name in different_hints_per_method[name]:
                 continue
-            assert (
-                param.annotation == ext_signature.parameters[param_name].annotation
-            ), f"Wrong annotation for parameter {param_name} of method {name}"
-            assert (
-                param.default == ext_signature.parameters[param_name].default
-            ), f"Wrong default value for parameter {param_name} of method {name}"
-            assert (
-                param.kind == ext_signature.parameters[param_name].kind
-            ), f"Wrong parameter kind for parameter {param_name} of method {name}"
+            assert param.annotation == ext_signature.parameters[param_name].annotation, (
+                f"Wrong annotation for parameter {param_name} of method {name}"
+            )
+            assert param.default == ext_signature.parameters[param_name].default, (
+                f"Wrong default value for parameter {param_name} of method {name}"
+            )
+            assert param.kind == ext_signature.parameters[param_name].kind, (
+                f"Wrong parameter kind for parameter {param_name} of method {name}"
+            )
 
     async def test_unknown_kwargs(self, offline_bot, monkeypatch):
         async def post(url, request_data: RequestData, *args, **kwargs):

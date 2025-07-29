@@ -221,9 +221,9 @@ class TestReactionCountWithoutRequest:
     def test_slot_behaviour(self, reaction_count):
         for attr in reaction_count.__slots__:
             assert getattr(reaction_count, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(reaction_count)) == len(
-            set(mro_slots(reaction_count))
-        ), "duplicate slot"
+        assert len(mro_slots(reaction_count)) == len(set(mro_slots(reaction_count))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {

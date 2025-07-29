@@ -25,6 +25,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 from collections import UserDict
 from collections.abc import Mapping
 from typing import Final, Generic, Optional, TypeVar, Union

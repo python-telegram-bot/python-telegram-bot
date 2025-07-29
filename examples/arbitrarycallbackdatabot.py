@@ -11,6 +11,7 @@ Note:
 To use arbitrary callback data, you must install PTB via
 `pip install "python-telegram-bot[callback-data]"`
 """
+
 import logging
 from typing import cast
 
