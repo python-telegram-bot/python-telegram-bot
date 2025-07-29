@@ -1,0 +1,5 @@
+other = "Configure Renovate"
+[[pull_requests]]
+uid = "4887"
+author_uid = "renovate[bot]"
+closes_threads = []
