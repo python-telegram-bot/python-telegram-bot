@@ -31,15 +31,24 @@ from telegram import (
     ChatBackground,
     ChatBoostAdded,
     ChatShared,
+    Checklist,
+    ChecklistTask,
+    ChecklistTasksAdded,
+    ChecklistTasksDone,
     Contact,
     Dice,
+    DirectMessagePriceChanged,
     Document,
     ExternalReplyInfo,
     Game,
+    Gift,
+    GiftInfo,
     Giveaway,
     GiveawayCompleted,
     GiveawayCreated,
     GiveawayWinners,
+    InputChecklist,
+    InputChecklistTask,
     InputPaidMediaPhoto,
     Invoice,
     LinkPreviewOptions,
@@ -63,6 +72,12 @@ from telegram import (
     Story,
     SuccessfulPayment,
     TextQuote,
+    UniqueGift,
+    UniqueGiftBackdrop,
+    UniqueGiftBackdropColors,
+    UniqueGiftInfo,
+    UniqueGiftModel,
+    UniqueGiftSymbol,
     Update,
     User,
     UsersShared,
@@ -75,15 +90,6 @@ from telegram import (
     VideoNote,
     Voice,
     WebAppData,
-)
-from telegram._gifts import Gift, GiftInfo
-from telegram._uniquegift import (
-    UniqueGift,
-    UniqueGiftBackdrop,
-    UniqueGiftBackdropColors,
-    UniqueGiftInfo,
-    UniqueGiftModel,
-    UniqueGiftSymbol,
 )
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -331,6 +337,24 @@ def message(bot):
         {"refunded_payment": RefundedPayment("EUR", 243, "payload", "charge_id", "provider_id")},
         {"paid_star_count": 291},
         {"paid_message_price_changed": PaidMessagePriceChanged(291)},
+        {"direct_message_price_changed": DirectMessagePriceChanged(True, 100)},
+        {
+            "checklist": Checklist(
+                "checklist_id",
+                tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
+            )
+        },
+        {
+            "checklist_tasks_done": ChecklistTasksDone(
+                marked_as_done_task_ids=[1, 2, 3],
+                marked_as_not_done_task_ids=[4, 5],
+            )
+        },
+        {
+            "checklist_tasks_added": ChecklistTasksAdded(
+                tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
+            )
+        },
     ],
     ids=[
         "reply",
@@ -408,6 +432,10 @@ def message(bot):
         "refunded_payment",
         "paid_star_count",
         "paid_message_price_changed",
+        "direct_message_price_changed",
+        "checklist",
+        "checklist_tasks_done",
+        "checklist_tasks_added",
     ],
 )
 def message_params(bot, request):
@@ -2196,6 +2224,42 @@ class TestMessageWithoutRequest(MessageTestBase):
             message, message.reply_dice, "send_dice", [], monkeypatch
         )
 
+    async def test_reply_checklist(self, monkeypatch, message):
+        checklist = InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")])
+
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["business_connection_id"] == message.business_connection_id
+                and kwargs["checklist"] == checklist
+                and kwargs["disable_notification"] is True
+            )
+
+        assert check_shortcut_signature(
+            Message.reply_checklist,
+            Bot.send_checklist,
+            ["chat_id", "business_connection_id", "reply_to_message_id"],
+            ["do_quote", "reply_to_message_id"],
+        )
+        assert await check_shortcut_call(
+            message.reply_checklist,
+            message.get_bot(),
+            "send_checklist",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["chat_id", "business_connection_id"],
+        )
+        assert await check_defaults_handling(message.reply_checklist, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "send_checklist", make_assertion)
+        assert await message.reply_checklist(checklist, disable_notification=True)
+        await self.check_quote_parsing(
+            message,
+            message.reply_checklist,
+            "send_checklist",
+            [checklist, True],
+            monkeypatch,
+        )
+
     async def test_reply_action(self, monkeypatch, message: Message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -2530,6 +2594,34 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         monkeypatch.setattr(message.get_bot(), "edit_message_caption", make_assertion)
         assert await message.edit_caption(caption="new caption")
+
+    async def test_edit_checklist(self, monkeypatch, message):
+        checklist = InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")])
+
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["business_connection_id"] == message.business_connection_id
+                and kwargs["chat_id"] == message.chat_id
+                and kwargs["message_id"] == message.message_id
+                and kwargs["checklist"] == checklist
+            )
+
+        assert check_shortcut_signature(
+            Message.edit_checklist,
+            Bot.edit_message_checklist,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.edit_checklist,
+            message.get_bot(),
+            "edit_message_checklist",
+            shortcut_kwargs=["chat_id", "message_id", "business_connection_id"],
+        )
+        assert await check_defaults_handling(message.edit_checklist, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "edit_message_checklist", make_assertion)
+        assert await message.edit_checklist(checklist=checklist)
 
     async def test_edit_media(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
