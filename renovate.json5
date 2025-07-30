@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [ // See what config:recommended does: https://docs.renovatebot.com/presets-config/#configrecommended
+    "config:recommended",
+    // Dependency Dashboards are Issues Renovate creates which list all pending updates. We disable it
+    // because we don't need it, we can see the pending updates in the PRs. This is also noisy.
+    // https://docs.renovatebot.com/configuration-options/#dependencydashboard
+    // ":disableDependencyDashboard"
+  ],
+
+  // Add pull request labels:
+  "labels": ["dependencies"],
+
+  // Bump even patch versions:
+  "bumpVersion": "patch",
+
+  // Update the lock files:
+  "lockFileMaintenance": {
+    "enabled": true,
+    "recreateWhen": "always",
+    "rebaseStalePrs": true,
+    "branchTopic": "lock-file-maintenance",
+    "commitMessageAction": "Lock file maintenance",
+    "commitMessageTopic": null,
+    "commitMessageExtra": null,
+    "schedule": [
+      "twice a week"
+    ],
+    "groupName": "Bump versions in lock files",
+    "prBodyDefinitions": {
+      "Change": "All locks refreshed"
+    }
+  },
+
+  // Bump the versions even in other files:
+  "bumpVersions": [
+    {
+      "name": "Update dependency versions in README.rst",
+      "filePatterns": ["README.rst"],
+      "matchStrings": [
+        "cryptography>=(?<version>\\d+\\.\\d+\\.\\d+)",
+        "aiolimiter~=(?<version>\\d+\\.\\d+\\.\\d+)",
+        "tornado~=(?<version>\\d+\\.\\d+)",
+        "cachetools>=(?<version>\\d+\\.\\d+\\.\\d+)",        // Lower bound only
+        "APScheduler>=(?<version>\\d+\\.\\d+\\.\\d+)"        // Lower bound only
+      ],
+      "bumpType": "minor"
+    }
+  ],
+
+  // Renovate may change the schema or syntax, this option will make it so that Renovate creates a 
+  // new PR to help us migrate to the new schema or syntax:
+  "configMigration": true,
+
+  // Temporarily disabled:
+  "ignoreDeps": ["pytest-asyncio"],
+
+  // schedule to allow PR's from Renovate:
+  "schedule": ["* * * * 0,6"]  // Every weekend
+
+}
