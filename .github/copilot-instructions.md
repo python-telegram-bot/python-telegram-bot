@@ -32,7 +32,8 @@ The repository follows a standard structure for Python projects. Here are some k
 - Read the stability guide mentioned at docs/source/stability_policy.rst to understand if your changes
   are breaking or incompatible.
 - Try to make sure your code is asyncio-friendly and thread-safe.
-- Run `uv run pre-commit` to run pre-commit hooks before committing your changes.
+- Run `uv run pre-commit` to run pre-commit hooks before committing your changes, but after `git add`ing them.
+- Make sure you always test your changes. Either update or write new tests in the `tests/` directory.
 
 ### Pull Requests:
 
