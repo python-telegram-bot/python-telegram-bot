@@ -87,10 +87,7 @@ async def network_retry_loop(
             * > 0: Number of retries.
 
     """
-    try:
-        infinite_loop = max_retries < 0
-    except TypeError as exc:
-        raise TypeError(f"max_retries: {max_retries!r}, {type(max_retries)}") from exc
+    infinite_loop = max_retries < 0
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
