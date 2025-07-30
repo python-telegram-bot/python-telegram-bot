@@ -382,7 +382,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 interval=poll_interval,
                 stop_event=self.__polling_task_stop_event,
                 max_retries=-1,
-                infinite_loop=True,
             ),
             name="Updater:start_polling:polling_task",
         )
@@ -711,7 +710,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 interval=bootstrap_interval,
                 stop_event=None,
                 max_retries=max_retries,
-                infinite_loop=False,
             )
 
         # Restore/set webhook settings, if needed. Again, we don't know ahead if a webhook is set,
@@ -724,7 +722,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 interval=bootstrap_interval,
                 stop_event=None,
                 max_retries=max_retries,
-                infinite_loop=False,
             )
 
     async def stop(self) -> None:

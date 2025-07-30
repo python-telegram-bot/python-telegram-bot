@@ -1016,7 +1016,6 @@ class Application(
             description="Bootstrap Initialize Application",
             max_retries=max_retries,
             interval=1,
-            infinite_loop=False,
         )
 
     def __run(

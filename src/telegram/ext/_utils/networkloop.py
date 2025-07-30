@@ -50,15 +50,14 @@ async def network_retry_loop(
     stop_event: Optional[asyncio.Event] = None,
     is_running: Optional[Callable[[], bool]] = None,
     max_retries: int,
-    infinite_loop: bool,
 ) -> None:
     """Perform a loop calling `action_cb`, retrying after network errors.
 
-    Stop condition for loop in case of `infinite_loop` is :obj:`True`:
+    Stop condition for loop in case of ``max_retries < 0``:
         * `is_running()` evaluates :obj:`False`
         * or `stop_event` is set.
 
-    Additional stop condition for loop in case of `infinite_loop` is :obj:`False`:
+    Additional stop condition for loop in case of `max_retries >= 0``:
         * a call to `action_cb` succeeds
         * or `max_retries` is reached.
 
@@ -87,19 +86,8 @@ async def network_retry_loop(
             * 0: No retries.
             * > 0: Number of retries
 
-            Must be negative if `infinite_loop` is set to :obj:`True`.
-        infinite_loop (:obj:`bool`): If :obj:`True`, the loop will run indefinitely until
-            `is_running()` evaluates to :obj:`False` or `stop_event` is set. Otherwise, the loop
-            will stop after a successful call to `action_cb`, or when `is_running()` evaluates to
-            :obj:`False`, or `stop_event` is set, or `max_retries` is reached.
-
     """
-    if infinite_loop and max_retries >= 0:
-        raise ValueError(
-            "max_retries must be negative if infinite_loop is True. "
-            "Use -1 for infinite retries."
-        )
-
+    infinite_loop = max_retries < 0
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
