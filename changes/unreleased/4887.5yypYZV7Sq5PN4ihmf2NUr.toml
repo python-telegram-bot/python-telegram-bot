@@ -1,4 +1,4 @@
-other = "Configure Renovate"
+internal = "Use Renovate to Keep Dependencies Up-To-Date"
 [[pull_requests]]
 uid = "4887"
 author_uid = "renovate[bot]"

@@ -1,5 +1,10 @@
 ci:
     autofix_prs: false
+    # We use Renovate to update this file now, but we can't disable automatic pre-commit updates
+    # when using the `pre-commit` GitHub Action, so we set the schedule to quarterly to avoid 
+    # frequent updates.
+    autoupdate_schedule: quarterly
+    autoupdate_commit_msg: 'Bump `pre-commit` Hooks to Latest Versions'
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
