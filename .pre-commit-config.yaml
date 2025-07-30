@@ -10,7 +10,7 @@ repos:
     rev: 'v0.12.7'
     hooks:
     # Run the linter:
-    -   id: ruff
+    -   id: ruff-check
         name: ruff
     # Run the formatter:
     -   id: ruff-format
