@@ -84,10 +84,13 @@ async def network_retry_loop(
 
             * < 0: Retry indefinitely.
             * 0: No retries.
-            * > 0: Number of retries
+            * > 0: Number of retries.
 
     """
-    infinite_loop = max_retries < 0
+    try:
+        infinite_loop = max_retries < 0
+    except TypeError as exc:
+        raise TypeError(f"max_retries: {max_retries!r}, {type(max_retries)}") from exc
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
@@ -123,7 +126,7 @@ async def network_retry_loop(
             await do_action()
             if not infinite_loop:
                 _LOGGER.debug("%s Action succeeded. Stopping loop.", log_prefix)
-                return
+                break
         except RetryAfter as exc:
             slack_time = 0.5
             _LOGGER.info(
