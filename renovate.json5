@@ -23,9 +23,7 @@
     "commitMessageAction": "Lock file maintenance",
     "commitMessageTopic": null,
     "commitMessageExtra": null,
-    "schedule": [
-      "twice a week"
-    ],
+    "schedule": ["* * * * 1,4"],  // Run sometime on Monday and Thursday
     "groupName": "Bump versions in lock files",
     "prBodyDefinitions": {
       "Change": "All locks refreshed"
