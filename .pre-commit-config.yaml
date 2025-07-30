@@ -1,9 +1,5 @@
-# Make sure that the additional_dependencies here match pyproject.toml
-
 ci:
     autofix_prs: false
-    autoupdate_schedule: quarterly
-    autoupdate_commit_msg: 'Bump `pre-commit` Hooks to Latest Versions'
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
@@ -11,6 +7,7 @@ repos:
     hooks:
     -   id: ruff
         name: ruff
+        language: python
         additional_dependencies:
           - httpx~=0.27
           - tornado~=6.4
@@ -33,6 +30,7 @@ repos:
     hooks:
     -   id: pylint
         files: ^(?!(tests|docs)).*\.py$
+        language: python
         additional_dependencies:
           - httpx~=0.27
           - tornado~=6.4
@@ -46,6 +44,7 @@ repos:
     -   id: mypy
         name: mypy-ptb
         files: ^(?!(tests|examples|docs)).*\.py$
+        language: python
         additional_dependencies:
           - types-pytz
           - types-cryptography
@@ -59,6 +58,7 @@ repos:
     - id: mypy
       name: mypy-examples
       files: ^examples/.*\.py$
+      language: python
       args:
         - --no-strict-optional
         - --follow-imports=silent

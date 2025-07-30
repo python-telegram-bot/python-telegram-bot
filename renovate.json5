@@ -46,6 +46,11 @@
     }
   ],
 
+  // Opt-in to updating the pre-commit-config.yaml file too:
+  "pre-commit": {
+    "enabled": true
+  },
+
   // Renovate may change the schema or syntax, this option will make it so that Renovate creates a 
   // new PR to help us migrate to the new schema or syntax:
   "configMigration": true,
