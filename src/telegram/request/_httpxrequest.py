@@ -49,7 +49,13 @@ class HTTPXRequest(BaseRequest):
 
     Args:
         connection_pool_size (:obj:`int`, optional): Number of connections to keep in the
-            connection pool. Defaults to ``1``.
+            connection pool. Defaults to ``256``.
+
+            .. versionchanged:: NEXT.VERSION
+                Set the default to ``256``.
+                Stopped applying to ``httpx.Limits.max_keepalive_connections``. Now only applies to
+                ``httpx.Limits.max_connections``. See `Resource Limits
+                <https://www.python-httpx.org/advanced/resource-limits/>`_
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server.
             This value is used unless a different value is passed to :meth:`do_request`.
@@ -138,7 +144,7 @@ class HTTPXRequest(BaseRequest):
 
     def __init__(
         self,
-        connection_pool_size: int = 1,
+        connection_pool_size: int = 256,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
@@ -159,7 +165,6 @@ class HTTPXRequest(BaseRequest):
         )
         limits = httpx.Limits(
             max_connections=connection_pool_size,
-            max_keepalive_connections=connection_pool_size,
         )
 
         if http_version not in ("1.1", "2", "2.0"):
