@@ -8,6 +8,7 @@ The static website for this website is hosted by the PTB team for your convenien
 Currently only showcases starting the WebApp via a KeyboardButton, as all other methods would
 require a bot token.
 """
+
 import json
 import logging
 

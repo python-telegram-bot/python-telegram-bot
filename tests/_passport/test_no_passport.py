@@ -26,6 +26,7 @@ Because imports in pytest are intricate, we just run
 
 with the TEST_WITH_OPT_DEPS environment variable set to False in addition to the regular test suite
 """
+
 import pytest
 
 import telegram

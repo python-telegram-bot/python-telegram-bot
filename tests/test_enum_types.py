@@ -25,8 +25,7 @@ telegram_root = Path(__file__).parent.parent / "telegram"
 telegram_ext_root = telegram_root / "ext"
 exclude_dirs = {
     # We touch passport stuff only if strictly necessary.
-    telegram_root
-    / "_passport",
+    telegram_root / "_passport",
 }
 
 exclude_patterns = {

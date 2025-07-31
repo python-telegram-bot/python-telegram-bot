@@ -23,6 +23,7 @@ inside warnings.py.
 
 .. versionadded:: 20.2
 """
+
 from typing import Any, Callable, Union
 
 from telegram._utils.warnings import warn

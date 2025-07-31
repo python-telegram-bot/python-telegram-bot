@@ -19,6 +19,7 @@
 to link to the correct files & lines on github. Can be simplified once
 https://github.com/sphinx-doc/sphinx/issues/1556 is closed
 """
+
 import subprocess
 from pathlib import Path
 

@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Provide a bot to tests"""
+
 import base64
 import json
 import os
@@ -49,9 +50,7 @@ if GITHUB_ACTIONS and BOTS is not None and JOB_INDEX is not None:
     BOTS = json.loads(base64.b64decode(BOTS).decode(TextEncoding.UTF_8))
     JOB_INDEX = int(JOB_INDEX)
 
-FALLBACKS = json.loads(
-    base64.b64decode(FALLBACKS).decode(TextEncoding.UTF_8)
-)  # type: list[dict[str, str]]
+FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode(TextEncoding.UTF_8))  # type: list[dict[str, str]]
 
 
 class BotInfoProvider:

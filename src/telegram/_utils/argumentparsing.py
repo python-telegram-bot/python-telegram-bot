@@ -23,6 +23,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union, overload

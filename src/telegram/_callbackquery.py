@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
+
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final, Optional, Union
 

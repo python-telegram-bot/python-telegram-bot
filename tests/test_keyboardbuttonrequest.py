@@ -44,9 +44,9 @@ class TestKeyboardButtonRequestUsersWithoutRequest(KeyboardButtonRequestUsersTes
     def test_slot_behaviour(self, request_users):
         for attr in request_users.__slots__:
             assert getattr(request_users, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(request_users)) == len(
-            set(mro_slots(request_users))
-        ), "duplicate slot"
+        assert len(mro_slots(request_users)) == len(set(mro_slots(request_users))), (
+            "duplicate slot"
+        )
 
     def test_to_dict(self, request_users):
         request_users_dict = request_users.to_dict()

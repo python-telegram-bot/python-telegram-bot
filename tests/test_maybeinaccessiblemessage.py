@@ -44,9 +44,9 @@ class MaybeInaccessibleMessageTestBase:
 class TestMaybeInaccessibleMessageWithoutRequest(MaybeInaccessibleMessageTestBase):
     def test_slot_behaviour(self, maybe_inaccessible_message):
         for attr in maybe_inaccessible_message.__slots__:
-            assert (
-                getattr(maybe_inaccessible_message, attr, "err") != "err"
-            ), f"got extra slot '{attr}'"
+            assert getattr(maybe_inaccessible_message, attr, "err") != "err", (
+                f"got extra slot '{attr}'"
+            )
         assert len(mro_slots(maybe_inaccessible_message)) == len(
             set(mro_slots(maybe_inaccessible_message))
         ), "duplicate slot"
