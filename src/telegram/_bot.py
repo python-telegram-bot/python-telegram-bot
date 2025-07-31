@@ -339,7 +339,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self._initialized: bool = False
 
         self._request: tuple[BaseRequest, BaseRequest] = (
-            HTTPXRequest() if get_updates_request is None else get_updates_request,
+            (
+                HTTPXRequest(connection_pool_size=1)
+                if get_updates_request is None
+                else get_updates_request
+            ),
             HTTPXRequest() if request is None else request,
         )
 
