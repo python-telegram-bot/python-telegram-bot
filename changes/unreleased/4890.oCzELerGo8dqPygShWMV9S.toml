@@ -1,0 +1,5 @@
+documentation = "Add `uv.lock`"
+[[pull_requests]]
+uid = "4890"
+author_uid = "harshil21"
+closes_threads = ["4796"]
