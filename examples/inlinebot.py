@@ -14,6 +14,7 @@ Basic inline bot example. Applies different text transformations.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
+
 import logging
 from html import escape
 from uuid import uuid4

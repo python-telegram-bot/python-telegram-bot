@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BaseProcessor class."""
+
 from abc import ABC, abstractmethod
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an objects that are related to Telegram giveaways."""
+
 import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
@@ -371,7 +372,7 @@ class GiveawayCompleted(TelegramObject):
         data = cls._parse_data(data)
 
         # Unfortunately, this needs to be here due to cyclic imports
-        from telegram._message import (  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
+        from telegram._message import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
             Message,
         )
 

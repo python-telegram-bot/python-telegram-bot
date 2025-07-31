@@ -6,6 +6,7 @@
 Basic example for a bot that uses inline keyboards. For an in-depth explanation, check out
  https://github.com/python-telegram-bot/python-telegram-bot/wiki/InlineKeyboard-Example.
 """
+
 import logging
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update

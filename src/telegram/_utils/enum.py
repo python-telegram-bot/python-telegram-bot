@@ -23,6 +23,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 import enum as _enum
 import sys
 from typing import TypeVar, Union

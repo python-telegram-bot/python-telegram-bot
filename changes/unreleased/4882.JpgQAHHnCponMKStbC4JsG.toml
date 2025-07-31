@@ -1,0 +1,10 @@
+other = """
+Set the default connection pool size for ``HTTPXRequest`` to 256 to allow more concurrent requests by default. Drop the ``httpx`` parameter ``max_keepalive_connections``. This way, the ``httpx`` default of 20 is used, leading to a smaller number of idle connections in large connection pools.
+
+.. hint::
+   If you manually build the ``HTTPXRequest`` objects, please be aware that these changes also applies to you. Kindly double check your settings. To specify custom limits, you can set them via the parameter ``httpx_kwargs`` of ``HTTPXRequest``. See also  `the httpx documentation <https://www.python-httpx.org/advanced/resource-limits/>`__ for more details on these settings."
+"""
+[[pull_requests]]
+uid = "4882"
+author_uid = "Poolitzer"
+closes_threads = []

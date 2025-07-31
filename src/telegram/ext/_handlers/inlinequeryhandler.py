@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the InlineQueryHandler class."""
+
 import re
 from re import Match, Pattern
 from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, cast

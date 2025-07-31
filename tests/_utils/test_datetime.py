@@ -118,9 +118,9 @@ class TestDatetime:
         reference_t = 0
         for i in DELTA_TIME_SPECS:
             delta = i.total_seconds() if hasattr(i, "total_seconds") else i
-            assert (
-                tg_dtm.to_float_timestamp(i, reference_t) == reference_t + delta
-            ), f"failed for {i}"
+            assert tg_dtm.to_float_timestamp(i, reference_t) == reference_t + delta, (
+                f"failed for {i}"
+            )
 
     def test_to_float_timestamp_time_of_day(self):
         """Conversion from time-of-day specification to timestamp"""

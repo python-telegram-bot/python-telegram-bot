@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes for Telegram Stars affiliates."""
+
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
