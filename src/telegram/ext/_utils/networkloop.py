@@ -92,11 +92,10 @@ async def network_retry_loop(
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
-    async def do_action() -> bool:
-        """Return value indicating whether the action was successful."""
+    async def do_action() -> None:
         if not stop_event:
             await action_cb()
-            return True
+            return
 
         action_cb_task = asyncio.create_task(action_cb())
         stop_task = asyncio.create_task(stop_event.wait())
@@ -109,12 +108,10 @@ async def network_retry_loop(
 
         if stop_task in done:
             _LOGGER.debug("%s Cancelled", log_prefix)
-            return False
 
         # Calling `result()` on `action_cb_task` will raise an exception if the task failed.
         # this is important to propagate the error to the caller.
         action_cb_task.result()
-        return True
 
     _LOGGER.debug("%s Starting", log_prefix)
     cur_interval = interval
