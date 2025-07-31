@@ -52,7 +52,7 @@ class HTTPXRequest(BaseRequest):
 
             .. versionchanged:: NEXT.VERSION
                 Set the default to ``256``.
-                Stopped applying to ``httpx.Limits.max_keepalive_connections``. Now only applys to
+                Stopped applying to ``httpx.Limits.max_keepalive_connections``. Now only applies to
                 ``httpx.Limits.max_connections``. See `Resource Limits
                 <https://www.python-httpx.org/advanced/resource-limits/>`_
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
