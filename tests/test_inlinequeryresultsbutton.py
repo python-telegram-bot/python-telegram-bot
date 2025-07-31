@@ -52,7 +52,6 @@ class TestInlineQueryResultsButtonWithoutRequest(InlineQueryResultsButtonTestBas
         assert inline_query_results_button_dict["web_app"] == self.web_app.to_dict()
 
     def test_de_json(self, offline_bot):
-
         json_dict = {
             "text": self.text,
             "start_parameter": self.start_parameter,

@@ -181,9 +181,9 @@ class TestGiveawayCreatedWithoutRequest:
     def test_slot_behaviour(self, giveaway_created):
         for attr in giveaway_created.__slots__:
             assert getattr(giveaway_created, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(giveaway_created)) == len(
-            set(mro_slots(giveaway_created))
-        ), "duplicate slot"
+        assert len(mro_slots(giveaway_created)) == len(set(mro_slots(giveaway_created))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, bot):
         json_dict = {
@@ -238,9 +238,9 @@ class TestGiveawayWinnersWithoutRequest:
     def test_slot_behaviour(self, giveaway_winners):
         for attr in giveaway_winners.__slots__:
             assert getattr(giveaway_winners, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(giveaway_winners)) == len(
-            set(mro_slots(giveaway_winners))
-        ), "duplicate slot"
+        assert len(mro_slots(giveaway_winners)) == len(set(mro_slots(giveaway_winners))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -385,9 +385,9 @@ class TestGiveawayCompletedWithoutRequest:
     def test_slot_behaviour(self, giveaway_completed):
         for attr in giveaway_completed.__slots__:
             assert getattr(giveaway_completed, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(giveaway_completed)) == len(
-            set(mro_slots(giveaway_completed))
-        ), "duplicate slot"
+        assert len(mro_slots(giveaway_completed)) == len(set(mro_slots(giveaway_completed))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {

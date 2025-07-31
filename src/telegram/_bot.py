@@ -3620,8 +3620,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 next_offset_int = current_offset_int + 1
                 next_offset = str(next_offset_int)
                 effective_results = results[
-                    current_offset_int
-                    * InlineQueryLimit.RESULTS : next_offset_int
+                    current_offset_int * InlineQueryLimit.RESULTS : next_offset_int
                     * InlineQueryLimit.RESULTS
                 ]
             else:

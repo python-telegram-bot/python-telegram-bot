@@ -158,9 +158,9 @@ class TestFilters:
             )
         }
         actual = set(filters.__all__)
-        assert (
-            actual == expected
-        ), f"Members {expected - actual} were not listed in constants.__all__"
+        assert actual == expected, (
+            f"Members {expected - actual} were not listed in constants.__all__"
+        )
 
     def test_filters_all(self, update):
         assert filters.ALL.check_update(update)

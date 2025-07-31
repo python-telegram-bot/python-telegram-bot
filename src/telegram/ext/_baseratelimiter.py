@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that allows to rate limit requests to the Bot API."""
+
 from abc import ABC, abstractmethod
 from collections.abc import Coroutine
 from typing import Any, Callable, Generic, Optional, Union
