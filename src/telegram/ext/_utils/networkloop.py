@@ -108,6 +108,7 @@ async def network_retry_loop(
 
         if stop_task in done:
             _LOGGER.debug("%s Cancelled", log_prefix)
+            return
 
         # Calling `result()` on `action_cb_task` will raise an exception if the task failed.
         # this is important to propagate the error to the caller.
