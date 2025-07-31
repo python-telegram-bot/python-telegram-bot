@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Application."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar, Union
 

@@ -68,9 +68,9 @@ class TestKeyboardData:
         keyboard_data = _KeyboardData("uuid")
         for attr in keyboard_data.__slots__:
             assert getattr(keyboard_data, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(keyboard_data)) == len(
-            set(mro_slots(keyboard_data))
-        ), "duplicate slot"
+        assert len(mro_slots(keyboard_data)) == len(set(mro_slots(keyboard_data))), (
+            "duplicate slot"
+        )
 
 
 @pytest.mark.skipif(
@@ -86,9 +86,9 @@ class TestCallbackDataCache:
                 else attr
             )
             assert getattr(callback_data_cache, at, "err") != "err", f"got extra slot '{at}'"
-        assert len(mro_slots(callback_data_cache)) == len(
-            set(mro_slots(callback_data_cache))
-        ), "duplicate slot"
+        assert len(mro_slots(callback_data_cache)) == len(set(mro_slots(callback_data_cache))), (
+            "duplicate slot"
+        )
 
     @pytest.mark.parametrize("maxsize", [1, 5, 2048])
     def test_init_maxsize(self, maxsize, bot):

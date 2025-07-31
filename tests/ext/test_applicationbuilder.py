@@ -346,11 +346,7 @@ class TestApplicationBuilder:
             PRIVATE_KEY
         ).defaults(defaults).arbitrary_callback_data(42).request(request).get_updates_request(
             get_updates_request
-        ).rate_limiter(
-            rate_limiter
-        ).local_mode(
-            True
-        )
+        ).rate_limiter(rate_limiter).local_mode(True)
         built_bot = builder.build().bot
 
         # In the following we access some private attributes of bot and request. this is not
@@ -407,11 +403,7 @@ class TestApplicationBuilder:
             2
         ).get_updates_pool_timeout(3).get_updates_read_timeout(4).get_updates_write_timeout(
             5
-        ).get_updates_http_version(
-            "1.1"
-        ).get_updates_proxy(
-            "get_updates_proxy"
-        )
+        ).get_updates_http_version("1.1").get_updates_proxy("get_updates_proxy")
         app = builder.build()
         client = app.bot._request[0]._client
 

@@ -18,6 +18,7 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars transaction partners."""
+
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final, Optional
 

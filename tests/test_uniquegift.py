@@ -154,9 +154,9 @@ class TestUniqueGiftModelWithoutRequest(UniqueGiftModelTestBase):
     def test_slot_behaviour(self, unique_gift_model):
         for attr in unique_gift_model.__slots__:
             assert getattr(unique_gift_model, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_model)) == len(
-            set(mro_slots(unique_gift_model))
-        ), "duplicate slot"
+        assert len(mro_slots(unique_gift_model)) == len(set(mro_slots(unique_gift_model))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -211,9 +211,9 @@ class TestUniqueGiftSymbolWithoutRequest(UniqueGiftSymbolTestBase):
     def test_slot_behaviour(self, unique_gift_symbol):
         for attr in unique_gift_symbol.__slots__:
             assert getattr(unique_gift_symbol, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_symbol)) == len(
-            set(mro_slots(unique_gift_symbol))
-        ), "duplicate slot"
+        assert len(mro_slots(unique_gift_symbol)) == len(set(mro_slots(unique_gift_symbol))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -268,9 +268,9 @@ class TestUniqueGiftBackdropWithoutRequest(UniqueGiftBackdropTestBase):
     def test_slot_behaviour(self, unique_gift_backdrop):
         for attr in unique_gift_backdrop.__slots__:
             assert getattr(unique_gift_backdrop, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_backdrop)) == len(
-            set(mro_slots(unique_gift_backdrop))
-        ), "duplicate slot"
+        assert len(mro_slots(unique_gift_backdrop)) == len(set(mro_slots(unique_gift_backdrop))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -326,9 +326,9 @@ class UniqueGiftBackdropColorsTestBase:
 class TestUniqueGiftBackdropColorsWithoutRequest(UniqueGiftBackdropColorsTestBase):
     def test_slot_behaviour(self, unique_gift_backdrop_colors):
         for attr in unique_gift_backdrop_colors.__slots__:
-            assert (
-                getattr(unique_gift_backdrop_colors, attr, "err") != "err"
-            ), f"got extra slot '{attr}'"
+            assert getattr(unique_gift_backdrop_colors, attr, "err") != "err", (
+                f"got extra slot '{attr}'"
+            )
         assert len(mro_slots(unique_gift_backdrop_colors)) == len(
             set(mro_slots(unique_gift_backdrop_colors))
         ), "duplicate slot"
@@ -424,9 +424,9 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
     def test_slot_behaviour(self, unique_gift_info):
         for attr in unique_gift_info.__slots__:
             assert getattr(unique_gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_info)) == len(
-            set(mro_slots(unique_gift_info))
-        ), "duplicate slot"
+        assert len(mro_slots(unique_gift_info)) == len(set(mro_slots(unique_gift_info))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {

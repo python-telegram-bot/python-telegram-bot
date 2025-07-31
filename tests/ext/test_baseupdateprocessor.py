@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Here we run tests directly with SimpleUpdateProcessor because that's easier than providing dummy
 implementations for SimpleUpdateProcessor and we want to test SimpleUpdateProcessor anyway."""
+
 import asyncio
 
 import pytest

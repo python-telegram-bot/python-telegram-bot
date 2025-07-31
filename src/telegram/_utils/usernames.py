@@ -24,6 +24,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union, overload
 
 TeleUserLike = TypeVar("TeleUserLike", bound="UserLike")

@@ -27,6 +27,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 import contextlib
 import datetime as dtm
 import os
@@ -268,7 +269,5 @@ def get_timedelta_value(
         stacklevel=2,
     )
     return (
-        int(seconds)
-        if (seconds := value.total_seconds()).is_integer()
-        else seconds  # type: ignore[return-value]
+        int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
     )

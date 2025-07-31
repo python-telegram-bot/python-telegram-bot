@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Module to provide fixtures most of which are used in test_inputmedia.py."""
+
 import pytest
 
 from telegram.error import BadRequest

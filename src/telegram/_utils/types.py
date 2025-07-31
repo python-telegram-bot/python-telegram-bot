@@ -23,6 +23,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 import datetime as dtm
 from collections.abc import Collection
 from pathlib import Path

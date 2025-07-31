@@ -61,9 +61,9 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
     def test_slot_behaviour(self, checklist_task):
         for attr in checklist_task.__slots__:
             assert getattr(checklist_task, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(checklist_task)) == len(
-            set(mro_slots(checklist_task))
-        ), "duplicate slot"
+        assert len(mro_slots(checklist_task)) == len(set(mro_slots(checklist_task))), (
+            "duplicate slot"
+        )
 
     def test_to_dict(self, checklist_task):
         clt_dict = checklist_task.to_dict()
@@ -307,9 +307,9 @@ class TestChecklistTasksDoneWithoutRequest(ChecklistTasksDoneTestBase):
     def test_slot_behaviour(self, checklist_tasks_done):
         for attr in checklist_tasks_done.__slots__:
             assert getattr(checklist_tasks_done, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(checklist_tasks_done)) == len(
-            set(mro_slots(checklist_tasks_done))
-        ), "duplicate slot"
+        assert len(mro_slots(checklist_tasks_done)) == len(set(mro_slots(checklist_tasks_done))), (
+            "duplicate slot"
+        )
 
     def test_to_dict(self, checklist_tasks_done):
         cltd_dict = checklist_tasks_done.to_dict()
