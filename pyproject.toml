@@ -104,7 +104,7 @@ tests = [
     # needed because pytest doesn't come with native support for coroutines as tests
     "pytest-asyncio==0.21.2",
     # xdist runs tests in parallel
-    "pytest-xdist==3.6.1",
+    "pytest-xdist==3.8.0",
     # Used for flaky tests (flaky decorator)
     "flaky>=3.8.1",
     # used in test_official for parsing tg docs
