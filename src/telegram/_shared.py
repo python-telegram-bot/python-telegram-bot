@@ -19,7 +19,7 @@
 """This module contains two objects used for request chats/users service messages."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
@@ -75,7 +75,7 @@ class UsersShared(TelegramObject):
         request_id: int,
         users: Sequence["SharedUser"],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.request_id: int = request_id
@@ -86,7 +86,7 @@ class UsersShared(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UsersShared":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UsersShared":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -154,25 +154,25 @@ class ChatShared(TelegramObject):
         self,
         request_id: int,
         chat_id: int,
-        title: Optional[str] = None,
-        username: Optional[str] = None,
-        photo: Optional[Sequence[PhotoSize]] = None,
+        title: str | None = None,
+        username: str | None = None,
+        photo: Sequence[PhotoSize] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.request_id: int = request_id
         self.chat_id: int = chat_id
-        self.title: Optional[str] = title
-        self.username: Optional[str] = username
-        self.photo: Optional[tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
+        self.title: str | None = title
+        self.username: str | None = username
+        self.photo: tuple[PhotoSize, ...] | None = parse_sequence_arg(photo)
 
         self._id_attrs = (self.request_id, self.chat_id)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatShared":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatShared":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -180,7 +180,7 @@ class ChatShared(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     @property
-    def link(self) -> Optional[str]:
+    def link(self) -> str | None:
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
         of the chat.
 
@@ -237,26 +237,26 @@ class SharedUser(TelegramObject):
     def __init__(
         self,
         user_id: int,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        username: Optional[str] = None,
-        photo: Optional[Sequence[PhotoSize]] = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        username: str | None = None,
+        photo: Sequence[PhotoSize] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.user_id: int = user_id
-        self.first_name: Optional[str] = first_name
-        self.last_name: Optional[str] = last_name
-        self.username: Optional[str] = username
-        self.photo: Optional[tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
+        self.first_name: str | None = first_name
+        self.last_name: str | None = last_name
+        self.username: str | None = username
+        self.photo: tuple[PhotoSize, ...] | None = parse_sequence_arg(photo)
 
         self._id_attrs = (self.user_id,)
 
         self._freeze()
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
         prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
 
@@ -265,7 +265,7 @@ class SharedUser(TelegramObject):
         return get_name(self)
 
     @property
-    def full_name(self) -> Optional[str]:
+    def full_name(self) -> str | None:
         """:obj:`str`: Convenience property. If :attr:`first_name` is not :obj:`None`, gives
         :attr:`first_name` followed by (if available) :attr:`last_name`.
 
@@ -274,7 +274,7 @@ class SharedUser(TelegramObject):
         return get_full_name(self)
 
     @property
-    def link(self) -> Optional[str]:
+    def link(self) -> str | None:
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
         of the user.
 
@@ -283,7 +283,7 @@ class SharedUser(TelegramObject):
         return get_link(self)
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SharedUser":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "SharedUser":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

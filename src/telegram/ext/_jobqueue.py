@@ -22,7 +22,7 @@ import asyncio
 import datetime as dtm
 import re
 import weakref
-from typing import TYPE_CHECKING, Any, Generic, Optional, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Generic, cast, overload
 
 try:
     from apscheduler.executors.asyncio import AsyncIOExecutor
@@ -108,7 +108,7 @@ class JobQueue(Generic[CCT]):
                 '"python-telegram-bot[job-queue]"`.'
             )
 
-        self._application: Optional[weakref.ReferenceType[Application]] = None
+        self._application: weakref.ReferenceType[Application] | None = None
         self._executor = AsyncIOExecutor()
         self.scheduler: "AsyncIOScheduler" = AsyncIOScheduler(  # noqa: UP037
             **self.scheduler_configuration
@@ -181,18 +181,18 @@ class JobQueue(Generic[CCT]):
     @overload
     def _parse_time_input(
         self,
-        time: Union[float, dtm.timedelta, dtm.datetime, dtm.time],
+        time: float | dtm.timedelta | dtm.datetime | dtm.time,
         shift_day: bool = False,
     ) -> dtm.datetime: ...
 
     def _parse_time_input(
         self,
-        time: Union[float, dtm.timedelta, dtm.datetime, dtm.time, None],
+        time: float | dtm.timedelta | dtm.datetime | dtm.time | None,
         shift_day: bool = False,
-    ) -> Optional[dtm.datetime]:
+    ) -> dtm.datetime | None:
         if time is None:
             return None
-        if isinstance(time, (int, float)):
+        if isinstance(time, int | float):
             return self._tz_now() + dtm.timedelta(seconds=time)
         if isinstance(time, dtm.timedelta):
             return self._tz_now() + time
@@ -248,12 +248,12 @@ class JobQueue(Generic[CCT]):
     def run_once(
         self,
         callback: JobCallback[CCT],
-        when: Union[float, dtm.timedelta, dtm.datetime, dtm.time],
-        data: Optional[object] = None,
-        name: Optional[str] = None,
-        chat_id: Optional[int] = None,
-        user_id: Optional[int] = None,
-        job_kwargs: Optional[JSONDict] = None,
+        when: float | dtm.timedelta | dtm.datetime | dtm.time,
+        data: object | None = None,
+        name: str | None = None,
+        chat_id: int | None = None,
+        user_id: int | None = None,
+        job_kwargs: JSONDict | None = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
@@ -332,14 +332,14 @@ class JobQueue(Generic[CCT]):
     def run_repeating(
         self,
         callback: JobCallback[CCT],
-        interval: Union[float, dtm.timedelta],
-        first: Optional[Union[float, dtm.timedelta, dtm.datetime, dtm.time]] = None,
-        last: Optional[Union[float, dtm.timedelta, dtm.datetime, dtm.time]] = None,
-        data: Optional[object] = None,
-        name: Optional[str] = None,
-        chat_id: Optional[int] = None,
-        user_id: Optional[int] = None,
-        job_kwargs: Optional[JSONDict] = None,
+        interval: float | dtm.timedelta,
+        first: float | dtm.timedelta | dtm.datetime | dtm.time | None = None,
+        last: float | dtm.timedelta | dtm.datetime | dtm.time | None = None,
+        data: object | None = None,
+        name: str | None = None,
+        chat_id: int | None = None,
+        user_id: int | None = None,
+        job_kwargs: JSONDict | None = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
         queue.
@@ -461,11 +461,11 @@ class JobQueue(Generic[CCT]):
         callback: JobCallback[CCT],
         when: dtm.time,
         day: int,
-        data: Optional[object] = None,
-        name: Optional[str] = None,
-        chat_id: Optional[int] = None,
-        user_id: Optional[int] = None,
-        job_kwargs: Optional[JSONDict] = None,
+        data: object | None = None,
+        name: str | None = None,
+        chat_id: int | None = None,
+        user_id: int | None = None,
+        job_kwargs: JSONDict | None = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
@@ -539,11 +539,11 @@ class JobQueue(Generic[CCT]):
         callback: JobCallback[CCT],
         time: dtm.time,
         days: tuple[int, ...] = _ALL_DAYS,
-        data: Optional[object] = None,
-        name: Optional[str] = None,
-        chat_id: Optional[int] = None,
-        user_id: Optional[int] = None,
-        job_kwargs: Optional[JSONDict] = None,
+        data: object | None = None,
+        name: str | None = None,
+        chat_id: int | None = None,
+        user_id: int | None = None,
+        job_kwargs: JSONDict | None = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a daily basis and adds it to the queue.
 
@@ -622,10 +622,10 @@ class JobQueue(Generic[CCT]):
         self,
         callback: JobCallback[CCT],
         job_kwargs: JSONDict,
-        data: Optional[object] = None,
-        name: Optional[str] = None,
-        chat_id: Optional[int] = None,
-        user_id: Optional[int] = None,
+        data: object | None = None,
+        name: str | None = None,
+        chat_id: int | None = None,
+        user_id: int | None = None,
     ) -> "Job[CCT]":
         """Creates a new custom defined :class:`Job`.
 
@@ -699,7 +699,7 @@ class JobQueue(Generic[CCT]):
             # so give it a tiny bit of time to actually shut down.
             await asyncio.sleep(0.01)
 
-    def jobs(self, pattern: Union[str, re.Pattern[str], None] = None) -> tuple["Job[CCT]", ...]:
+    def jobs(self, pattern: str | re.Pattern[str] | None = None) -> tuple["Job[CCT]", ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`.
 
         Args:
@@ -819,10 +819,10 @@ class Job(Generic[CCT]):
     def __init__(
         self,
         callback: JobCallback[CCT],
-        data: Optional[object] = None,
-        name: Optional[str] = None,
-        chat_id: Optional[int] = None,
-        user_id: Optional[int] = None,
+        data: object | None = None,
+        name: str | None = None,
+        chat_id: int | None = None,
+        user_id: int | None = None,
     ):
         if not APS_AVAILABLE:
             raise RuntimeError(
@@ -831,10 +831,10 @@ class Job(Generic[CCT]):
             )
 
         self.callback: JobCallback[CCT] = callback
-        self.data: Optional[object] = data
-        self.name: Optional[str] = name or callback.__name__
-        self.chat_id: Optional[int] = chat_id
-        self.user_id: Optional[int] = user_id
+        self.data: object | None = data
+        self.name: str | None = name or callback.__name__
+        self.chat_id: int | None = chat_id
+        self.user_id: int | None = user_id
 
         self._removed = False
         self._enabled = False
@@ -931,7 +931,7 @@ class Job(Generic[CCT]):
         self._enabled = status
 
     @property
-    def next_t(self) -> Optional[dtm.datetime]:
+    def next_t(self) -> dtm.datetime | None:
         """
         :class:`datetime.datetime`: Datetime for the next job execution.
         Datetime is localized according to :attr:`datetime.datetime.tzinfo`.

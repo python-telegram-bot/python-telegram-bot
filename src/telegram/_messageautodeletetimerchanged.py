@@ -21,7 +21,6 @@ deletion.
 """
 
 import datetime as dtm
-from typing import Optional, Union
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import to_timedelta
@@ -59,7 +58,7 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         self,
         message_auto_delete_time: TimePeriod,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self._message_auto_delete_time: dtm.timedelta = to_timedelta(message_auto_delete_time)
@@ -69,7 +68,7 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         self._freeze()
 
     @property
-    def message_auto_delete_time(self) -> Union[int, dtm.timedelta]:
+    def message_auto_delete_time(self) -> int | dtm.timedelta:
         return get_timedelta_value(  # type: ignore[return-value]
             self._message_auto_delete_time, attribute="message_auto_delete_time"
         )

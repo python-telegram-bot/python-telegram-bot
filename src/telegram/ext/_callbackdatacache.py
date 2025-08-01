@@ -21,7 +21,7 @@
 import datetime as dtm
 import time
 from collections.abc import MutableMapping
-from typing import TYPE_CHECKING, Any, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
 try:
@@ -65,14 +65,14 @@ class InvalidCallbackData(TelegramError):
 
     __slots__ = ("callback_data",)
 
-    def __init__(self, callback_data: Optional[str] = None) -> None:
+    def __init__(self, callback_data: str | None = None) -> None:
         super().__init__(
             "The object belonging to this callback_data was deleted or the callback_data was "
             "manipulated."
         )
-        self.callback_data: Optional[str] = callback_data
+        self.callback_data: str | None = callback_data
 
-    def __reduce__(self) -> tuple[type, tuple[Optional[str]]]:  # type: ignore[override]
+    def __reduce__(self) -> tuple[type, tuple[str | None]]:  # type: ignore[override]
         """Defines how to serialize the exception for pickle. See
         :py:meth:`object.__reduce__` for more info.
 
@@ -88,8 +88,8 @@ class _KeyboardData:
     def __init__(
         self,
         keyboard_uuid: str,
-        access_time: Optional[float] = None,
-        button_data: Optional[dict[str, object]] = None,
+        access_time: float | None = None,
+        button_data: dict[str, object] | None = None,
     ):
         self.keyboard_uuid = keyboard_uuid
         self.button_data = button_data or {}
@@ -158,7 +158,7 @@ class CallbackDataCache:
         self,
         bot: "ExtBot[Any]",
         maxsize: int = 1024,
-        persistent_data: Optional[CDCData] = None,
+        persistent_data: CDCData | None = None,
     ):
         if not CACHE_TOOLS_AVAILABLE:
             raise RuntimeError(
@@ -271,7 +271,7 @@ class CallbackDataCache:
 
     def __get_keyboard_uuid_and_button_data(
         self, callback_data: str
-    ) -> Union[tuple[str, object], tuple[None, InvalidCallbackData]]:
+    ) -> tuple[str, object] | tuple[None, InvalidCallbackData]:
         keyboard, button = self.extract_uuids(callback_data)
         try:
             # we get the values before calling update() in case KeyErrors are raised
@@ -324,7 +324,7 @@ class CallbackDataCache:
         """
         self.__process_message(message)
 
-    def __process_message(self, message: Message) -> Optional[str]:
+    def __process_message(self, message: Message) -> str | None:
         """As documented in process_message, but returns the uuid of the attached keyboard, if any,
         which is relevant for process_callback_query.
 
@@ -334,7 +334,7 @@ class CallbackDataCache:
             return None
 
         if message.via_bot:
-            sender: Optional[User] = message.via_bot
+            sender: User | None = message.via_bot
         elif message.from_user:
             sender = message.from_user
         else:
@@ -432,9 +432,7 @@ class CallbackDataCache:
         with contextlib.suppress(KeyError):
             self._keyboard_data.pop(keyboard_uuid)
 
-    def clear_callback_data(
-        self, time_cutoff: Optional[Union[float, dtm.datetime]] = None
-    ) -> None:
+    def clear_callback_data(self, time_cutoff: float | dtm.datetime | None = None) -> None:
         """Clears the stored callback data.
 
         Args:
@@ -450,7 +448,7 @@ class CallbackDataCache:
         self.__clear(self._callback_queries)
 
     def __clear(
-        self, mapping: MutableMapping, time_cutoff: Optional[Union[float, dtm.datetime]] = None
+        self, mapping: MutableMapping, time_cutoff: float | dtm.datetime | None = None
     ) -> None:
         if not time_cutoff:
             mapping.clear()

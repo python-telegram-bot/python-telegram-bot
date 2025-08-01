@@ -19,7 +19,7 @@
 """This module contains an objects that represents a InputProfilePhoto and subclasses."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -59,7 +59,7 @@ class InputProfilePhoto(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.InputProfilePhotoType, type, type)
@@ -88,15 +88,13 @@ class InputProfilePhotoStatic(InputProfilePhoto):
         self,
         photo: FileInput,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=constants.InputProfilePhotoType.STATIC, api_kwargs=api_kwargs)
         with self._unfrozen():
             # We use local_mode=True because we don't have access to the actual setting and want
             # things to work in local mode.
-            self.photo: Union[str, InputFile] = parse_file_input(
-                photo, attach=True, local_mode=True
-            )
+            self.photo: str | InputFile = parse_file_input(photo, attach=True, local_mode=True)
 
 
 class InputProfilePhotoAnimated(InputProfilePhoto):
@@ -123,16 +121,16 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
     def __init__(
         self,
         animation: FileInput,
-        main_frame_timestamp: Union[float, dtm.timedelta, None] = None,
+        main_frame_timestamp: float | dtm.timedelta | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=constants.InputProfilePhotoType.ANIMATED, api_kwargs=api_kwargs)
         with self._unfrozen():
             # We use local_mode=True because we don't have access to the actual setting and want
             # things to work in local mode.
-            self.animation: Union[str, InputFile] = parse_file_input(
+            self.animation: str | InputFile = parse_file_input(
                 animation, attach=True, local_mode=True
             )
 
-            self.main_frame_timestamp: Optional[dtm.timedelta] = to_timedelta(main_frame_timestamp)
+            self.main_frame_timestamp: dtm.timedelta | None = to_timedelta(main_frame_timestamp)
