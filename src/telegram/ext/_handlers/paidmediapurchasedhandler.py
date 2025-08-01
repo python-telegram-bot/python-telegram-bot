@@ -18,7 +18,6 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains the PaidMediaPurchased class."""
 
-
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import SCT, DVType

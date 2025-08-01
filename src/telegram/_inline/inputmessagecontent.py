@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputMessageContent."""
 
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 

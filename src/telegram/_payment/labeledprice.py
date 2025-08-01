@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LabeledPrice."""
 
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 

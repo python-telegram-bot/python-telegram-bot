@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PhotoSize."""
 
-
 from telegram._files._basemedium import _BaseMedium
 from telegram._utils.types import JSONDict
 
