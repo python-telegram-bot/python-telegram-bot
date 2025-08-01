@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains classes related to unique gifs."""
+
+import datetime as dtm
 from typing import TYPE_CHECKING, Final
 
 from telegram import constants
@@ -25,6 +27,7 @@ from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import de_json_optional
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -340,31 +343,63 @@ class UniqueGiftInfo(TelegramObject):
 
     Args:
         gift (:class:`UniqueGift`): Information about the gift.
-        origin (:obj:`str`): Origin of the gift. Currently, either :attr:`UPGRADE`
-            or :attr:`TRANSFER`.
+        origin (:obj:`str`): Origin of the gift. Currently, either :attr:`UPGRADE` for gifts
+            upgraded from regular gifts, :attr:`TRANSFER` for gifts transferred from other users
+            or channels, or :attr:`RESALE` for gifts bought from other users.
+
+            .. versionchanged:: 22.3
+                The :attr:`RESALE` origin was added.
         owned_gift_id (:obj:`str`, optional) Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
         transfer_star_count (:obj:`int`, optional): Number of Telegram Stars that must be paid
             to transfer the gift; omitted if the bot cannot transfer the gift.
+        last_resale_star_count (:obj:`int`, optional): For gifts bought from other users, the price
+            paid for the gift.
+
+            .. versionadded:: 22.3
+        next_transfer_date (:obj:`datetime.datetime`, optional): Date when the gift can be
+            transferred. If it's in the past, then the gift can be transferred now.
+            |datetime_localization|
+
+            .. versionadded:: 22.3
 
     Attributes:
         gift (:class:`UniqueGift`): Information about the gift.
-        origin (:obj:`str`): Origin of the gift. Currently, either :attr:`UPGRADE`
-            or :attr:`TRANSFER`.
+        origin (:obj:`str`): Origin of the gift. Currently, either :attr:`UPGRADE` for gifts
+            upgraded from regular gifts, :attr:`TRANSFER` for gifts transferred from other users
+            or channels, or :attr:`RESALE` for gifts bought from other users.
+
+            .. versionchanged:: 22.3
+                The :attr:`RESALE` origin was added.
         owned_gift_id (:obj:`str`) Optional. Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
         transfer_star_count (:obj:`int`): Optional. Number of Telegram Stars that must be paid
             to transfer the gift; omitted if the bot cannot transfer the gift.
+        last_resale_star_count (:obj:`int`): Optional. For gifts bought from other users, the price
+            paid for the gift.
 
+            .. versionadded:: 22.3
+        next_transfer_date (:obj:`datetime.datetime`): Optional. Date when the gift can be
+            transferred. If it's in the past, then the gift can be transferred now.
+            |datetime_localization|
+
+            .. versionadded:: 22.3
     """
 
     UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.UPGRADE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.UPGRADE`"""
     TRANSFER: Final[str] = constants.UniqueGiftInfoOrigin.TRANSFER
     """:const:`telegram.constants.UniqueGiftInfoOrigin.TRANSFER`"""
+    RESALE: Final[str] = constants.UniqueGiftInfoOrigin.RESALE
+    """:const:`telegram.constants.UniqueGiftInfoOrigin.RESALE`
+
+    .. versionadded:: 22.3
+    """
 
     __slots__ = (
         "gift",
+        "last_resale_star_count",
+        "next_transfer_date",
         "origin",
         "owned_gift_id",
         "transfer_star_count",
@@ -376,6 +411,8 @@ class UniqueGiftInfo(TelegramObject):
         origin: str,
         owned_gift_id: str | None = None,
         transfer_star_count: int | None = None,
+        last_resale_star_count: int | None = None,
+        next_transfer_date: dtm.datetime | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -386,6 +423,8 @@ class UniqueGiftInfo(TelegramObject):
         # Optional
         self.owned_gift_id: str | None = owned_gift_id
         self.transfer_star_count: int | None = transfer_star_count
+        self.last_resale_star_count: int | None = last_resale_star_count
+        self.next_transfer_date: dtm.datetime | None = next_transfer_date
 
         self._id_attrs = (self.gift, self.origin)
 
@@ -396,6 +435,10 @@ class UniqueGiftInfo(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["gift"] = de_json_optional(data.get("gift"), UniqueGift, bot)
+        data["next_transfer_date"] = from_timestamp(
+            data.get("next_transfer_date"), tzinfo=loc_tzinfo
+        )
 
         return super().de_json(data=data, bot=bot)

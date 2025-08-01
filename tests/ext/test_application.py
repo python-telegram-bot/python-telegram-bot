@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """The integration of persistence into the application is tested in test_basepersistence."""
+
 import asyncio
 import functools
 import inspect
@@ -1004,9 +1005,9 @@ class TestApplication:
             str(recwarn[0].message)
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
-        assert (
-            Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py"
-        ), "incorrect stacklevel!"
+        assert Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py", (
+            "incorrect stacklevel!"
+        )
 
     async def test_non_blocking_no_error_handler(self, app, caplog):
         app.add_handler(TypeHandler(object, self.callback_raise_error("Test error"), block=False))
@@ -1077,9 +1078,9 @@ class TestApplication:
             str(recwarn[0].message)
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
-        assert (
-            Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py"
-        ), "incorrect stacklevel!"
+        assert Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py", (
+            "incorrect stacklevel!"
+        )
 
     @pytest.mark.parametrize(("block", "expected_output"), [(False, 0), (True, 5)])
     async def test_default_block_error_handler(self, bot_info, block, expected_output):

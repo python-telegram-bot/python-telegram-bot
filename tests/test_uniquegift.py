@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import datetime as dtm
+
 import pytest
 
 from telegram import (
@@ -29,6 +31,8 @@ from telegram import (
     UniqueGiftModel,
     UniqueGiftSymbol,
 )
+from telegram._utils.datetime import UTC, to_timestamp
+from telegram.constants import UniqueGiftInfoOrigin
 from tests.auxil.slots import mro_slots
 
 
@@ -150,9 +154,9 @@ class TestUniqueGiftModelWithoutRequest(UniqueGiftModelTestBase):
     def test_slot_behaviour(self, unique_gift_model):
         for attr in unique_gift_model.__slots__:
             assert getattr(unique_gift_model, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_model)) == len(
-            set(mro_slots(unique_gift_model))
-        ), "duplicate slot"
+        assert len(mro_slots(unique_gift_model)) == len(set(mro_slots(unique_gift_model))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -207,9 +211,9 @@ class TestUniqueGiftSymbolWithoutRequest(UniqueGiftSymbolTestBase):
     def test_slot_behaviour(self, unique_gift_symbol):
         for attr in unique_gift_symbol.__slots__:
             assert getattr(unique_gift_symbol, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_symbol)) == len(
-            set(mro_slots(unique_gift_symbol))
-        ), "duplicate slot"
+        assert len(mro_slots(unique_gift_symbol)) == len(set(mro_slots(unique_gift_symbol))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -264,9 +268,9 @@ class TestUniqueGiftBackdropWithoutRequest(UniqueGiftBackdropTestBase):
     def test_slot_behaviour(self, unique_gift_backdrop):
         for attr in unique_gift_backdrop.__slots__:
             assert getattr(unique_gift_backdrop, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_backdrop)) == len(
-            set(mro_slots(unique_gift_backdrop))
-        ), "duplicate slot"
+        assert len(mro_slots(unique_gift_backdrop)) == len(set(mro_slots(unique_gift_backdrop))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -322,9 +326,9 @@ class UniqueGiftBackdropColorsTestBase:
 class TestUniqueGiftBackdropColorsWithoutRequest(UniqueGiftBackdropColorsTestBase):
     def test_slot_behaviour(self, unique_gift_backdrop_colors):
         for attr in unique_gift_backdrop_colors.__slots__:
-            assert (
-                getattr(unique_gift_backdrop_colors, attr, "err") != "err"
-            ), f"got extra slot '{attr}'"
+            assert getattr(unique_gift_backdrop_colors, attr, "err") != "err", (
+                f"got extra slot '{attr}'"
+            )
         assert len(mro_slots(unique_gift_backdrop_colors)) == len(
             set(mro_slots(unique_gift_backdrop_colors))
         ), "duplicate slot"
@@ -383,6 +387,8 @@ def unique_gift_info():
         origin=UniqueGiftInfoTestBase.origin,
         owned_gift_id=UniqueGiftInfoTestBase.owned_gift_id,
         transfer_star_count=UniqueGiftInfoTestBase.transfer_star_count,
+        last_resale_star_count=UniqueGiftInfoTestBase.last_resale_star_count,
+        next_transfer_date=UniqueGiftInfoTestBase.next_transfer_date,
     )
 
 
@@ -410,15 +416,17 @@ class UniqueGiftInfoTestBase:
     origin = UniqueGiftInfo.UPGRADE
     owned_gift_id = "some_id"
     transfer_star_count = 10
+    last_resale_star_count = 5
+    next_transfer_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
 class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
     def test_slot_behaviour(self, unique_gift_info):
         for attr in unique_gift_info.__slots__:
             assert getattr(unique_gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_info)) == len(
-            set(mro_slots(unique_gift_info))
-        ), "duplicate slot"
+        assert len(mro_slots(unique_gift_info)) == len(set(mro_slots(unique_gift_info))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -426,6 +434,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
             "origin": self.origin,
             "owned_gift_id": self.owned_gift_id,
             "transfer_star_count": self.transfer_star_count,
+            "last_resale_star_count": self.last_resale_star_count,
+            "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
         unique_gift_info = UniqueGiftInfo.de_json(json_dict, offline_bot)
         assert unique_gift_info.api_kwargs == {}
@@ -433,6 +443,32 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
         assert unique_gift_info.origin == self.origin
         assert unique_gift_info.owned_gift_id == self.owned_gift_id
         assert unique_gift_info.transfer_star_count == self.transfer_star_count
+        assert unique_gift_info.last_resale_star_count == self.last_resale_star_count
+        assert unique_gift_info.next_transfer_date == self.next_transfer_date
+
+    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
+        json_dict = {
+            "gift": self.gift.to_dict(),
+            "origin": self.origin,
+            "owned_gift_id": self.owned_gift_id,
+            "transfer_star_count": self.transfer_star_count,
+            "last_resale_star_count": self.last_resale_star_count,
+            "next_transfer_date": to_timestamp(self.next_transfer_date),
+        }
+
+        unique_gift_info_raw = UniqueGiftInfo.de_json(json_dict, raw_bot)
+        unique_gift_info_offline = UniqueGiftInfo.de_json(json_dict, offline_bot)
+        unique_gift_info_tz = UniqueGiftInfo.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        unique_gift_info_tz_offset = unique_gift_info_tz.next_transfer_date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            unique_gift_info_tz.next_transfer_date.replace(tzinfo=None)
+        )
+
+        assert unique_gift_info_raw.next_transfer_date.tzinfo == UTC
+        assert unique_gift_info_offline.next_transfer_date.tzinfo == UTC
+        assert unique_gift_info_tz_offset == tz_bot_offset
 
     def test_to_dict(self, unique_gift_info):
         json_dict = unique_gift_info.to_dict()
@@ -440,6 +476,12 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
         assert json_dict["origin"] == self.origin
         assert json_dict["owned_gift_id"] == self.owned_gift_id
         assert json_dict["transfer_star_count"] == self.transfer_star_count
+        assert json_dict["last_resale_star_count"] == self.last_resale_star_count
+        assert json_dict["next_transfer_date"] == to_timestamp(self.next_transfer_date)
+
+    def test_enum_type_conversion(self, unique_gift_info):
+        assert type(unique_gift_info.origin) is UniqueGiftInfoOrigin
+        assert unique_gift_info.origin == UniqueGiftInfoOrigin.UPGRADE
 
     def test_equality(self, unique_gift_info):
         a = unique_gift_info

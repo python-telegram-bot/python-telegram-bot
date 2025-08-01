@@ -23,6 +23,7 @@ inside warnings.py.
 
 .. versionadded:: 20.2
 """
+
 from collections.abc import Callable
 from typing import Any
 

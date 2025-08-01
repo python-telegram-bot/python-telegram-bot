@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that describes a single parameter of a request to the Bot API."""
+
 import datetime as dtm
 import json
 from collections.abc import Sequence

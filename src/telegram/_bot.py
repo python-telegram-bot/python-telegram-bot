@@ -75,6 +75,7 @@ from telegram._games.gamehighscore import GameHighScore
 from telegram._gifts import AcceptedGiftTypes, Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._inline.preparedinlinemessage import PreparedInlineMessage
+from telegram._inputchecklist import InputChecklist
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -335,7 +336,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self._initialized: bool = False
 
         self._request: tuple[BaseRequest, BaseRequest] = (
-            HTTPXRequest() if get_updates_request is None else get_updates_request,
+            (
+                HTTPXRequest(connection_pool_size=1)
+                if get_updates_request is None
+                else get_updates_request
+            ),
             HTTPXRequest() if request is None else request,
         )
 
@@ -3173,7 +3178,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
             google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
                 `supported types \
-                <https://developers.google.com/maps/documentation/places/web-service/supported_types>`_.)
+                <https://developers.google.com/maps/documentation/places/web-service/place-types>`_.)
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -3576,9 +3581,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
     def _effective_inline_results(
         self,
-        results: Sequence["InlineQueryResult"] | (
-            Callable[[int], Sequence["InlineQueryResult"] | None]
-        ),
+        results: Sequence["InlineQueryResult"]
+        | (Callable[[int], Sequence["InlineQueryResult"] | None]),
         next_offset: str | None = None,
         current_offset: str | None = None,
     ) -> tuple[Sequence["InlineQueryResult"], str | None]:
@@ -3616,8 +3620,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 next_offset_int = current_offset_int + 1
                 next_offset = str(next_offset_int)
                 effective_results = results[
-                    current_offset_int
-                    * InlineQueryLimit.RESULTS : next_offset_int
+                    current_offset_int * InlineQueryLimit.RESULTS : next_offset_int
                     * InlineQueryLimit.RESULTS
                 ]
             else:
@@ -3671,9 +3674,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     async def answer_inline_query(
         self,
         inline_query_id: str,
-        results: Sequence["InlineQueryResult"] | (
-            Callable[[int], Sequence["InlineQueryResult"] | None]
-        ),
+        results: Sequence["InlineQueryResult"]
+        | (Callable[[int], Sequence["InlineQueryResult"] | None]),
         cache_time: TimePeriod | None = None,
         is_personal: bool | None = None,
         next_offset: str | None = None,
@@ -7561,6 +7563,142 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return Poll.de_json(result, self)
 
+    async def send_checklist(
+        self,
+        business_connection_id: str,
+        chat_id: int,
+        checklist: InputChecklist,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_effect_id: str | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: int | None = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> Message:
+        """
+        Use this method to send a checklist on behalf of a connected business account.
+
+        .. versionadded:: 22.3
+
+        Args:
+            business_connection_id (:obj:`str`):
+                |business_id_str|
+            chat_id (:obj:`int`):
+                Unique identifier for the target chat.
+            checklist (:class:`telegram.InputChecklist`):
+                The checklist to send.
+            disable_notification (:obj:`bool`, optional):
+                |disable_notification|
+            protect_content (:obj:`bool`, optional):
+                |protect_content|
+            message_effect_id (:obj:`str`, optional):
+                |message_effect_id|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional):
+                |reply_parameters|
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional):
+                An object for an inline keyboard
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "checklist": checklist,
+        }
+
+        return await self._send_message(
+            "sendChecklist",
+            data,
+            disable_notification=disable_notification,
+            reply_markup=reply_markup,
+            protect_content=protect_content,
+            reply_parameters=reply_parameters,
+            message_effect_id=message_effect_id,
+            business_connection_id=business_connection_id,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_to_message_id=reply_to_message_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def edit_message_checklist(
+        self,
+        business_connection_id: str,
+        chat_id: int,
+        message_id: int,
+        checklist: InputChecklist,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> Message:
+        """
+        Use this method to edit a checklist on behalf of a connected business account.
+
+        .. versionadded:: 22.3
+
+        Args:
+            business_connection_id (:obj:`str`):
+                |business_id_str|
+            chat_id (:obj:`int`):
+                Unique identifier for the target chat.
+            message_id (:obj:`int`):
+                Unique identifier for the target message.
+            checklist (:class:`telegram.InputChecklist`):
+                The new checklist.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional):
+                An object for the new inline keyboard for the message.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "checklist": checklist,
+        }
+
+        return await self._send_message(
+            "editMessageChecklist",
+            data,
+            reply_markup=reply_markup,
+            business_connection_id=business_connection_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_dice(
         self,
         chat_id: int | str,
@@ -11076,6 +11214,36 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def get_my_star_balance(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> StarAmount:
+        """A method to get the current Telegram Stars balance of the bot. Requires no parameters.
+
+        .. versionadded:: 22.3
+
+        Returns:
+            :class:`telegram.StarAmount`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        return StarAmount.de_json(
+            await self._post(
+                "getMyStarBalance",
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -11248,6 +11416,10 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`send_poll`"""
     stopPoll = stop_poll
     """Alias for :meth:`stop_poll`"""
+    sendChecklist = send_checklist
+    """Alias for :meth:`send_checklist`"""
+    editMessageChecklist = edit_message_checklist
+    """Alias for :meth:`edit_message_checklist`"""
     sendDice = send_dice
     """Alias for :meth:`send_dice`"""
     getMyCommands = get_my_commands
@@ -11390,3 +11562,5 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`remove_chat_verification`"""
     removeUserVerification = remove_user_verification
     """Alias for :meth:`remove_user_verification`"""
+    getMyStarBalance = get_my_star_balance
+    """Alias for :meth:`get_my_star_balance`"""

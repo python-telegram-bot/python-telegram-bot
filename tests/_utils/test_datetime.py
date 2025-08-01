@@ -65,7 +65,7 @@ class TestDatetime:
     @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
     def test_localize_pytz(self):
         dt = dtm.datetime(2023, 1, 1, 12, 0, 0)
-        import pytz
+        import pytz  # noqa: PLC0415
 
         tzinfo = pytz.timezone("Europe/Berlin")
         localized_dt = tg_dtm.localize(dt, tzinfo)
@@ -118,9 +118,9 @@ class TestDatetime:
         reference_t = 0
         for i in DELTA_TIME_SPECS:
             delta = i.total_seconds() if hasattr(i, "total_seconds") else i
-            assert (
-                tg_dtm.to_float_timestamp(i, reference_t) == reference_t + delta
-            ), f"failed for {i}"
+            assert tg_dtm.to_float_timestamp(i, reference_t) == reference_t + delta, (
+                f"failed for {i}"
+            )
 
     def test_to_float_timestamp_time_of_day(self):
         """Conversion from time-of-day specification to timestamp"""

@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
+
 import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
@@ -32,6 +33,7 @@ from telegram._utils.types import (
     ODVInput,
     TimePeriod,
 )
+from telegram._utils.usernames import get_full_name, get_link, get_name
 from telegram.helpers import mention_html as helpers_mention_html
 from telegram.helpers import mention_markdown as helpers_mention_markdown
 
@@ -206,27 +208,21 @@ class User(TelegramObject):
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
         prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
         """
-        if self.username:
-            return f"@{self.username}"
-        return self.full_name
+        return get_name(self)
 
     @property
     def full_name(self) -> str:
         """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
         available) :attr:`last_name`.
         """
-        if self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        return self.first_name
+        return get_full_name(self)
 
     @property
     def link(self) -> str | None:
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
         of the user.
         """
-        if self.username:
-            return f"https://t.me/{self.username}"
-        return None
+        return get_link(self)
 
     async def get_profile_photos(
         self,

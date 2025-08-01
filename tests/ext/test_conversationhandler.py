@@ -17,9 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Persistence of conversations is tested in test_basepersistence.py"""
+
 import asyncio
 import functools
 import logging
+from copy import copy
 from pathlib import Path
 from warnings import filterwarnings
 
@@ -307,8 +309,6 @@ class TestConversationHandler:
         )
 
     def test_repr_with_truncation(self):
-        from copy import copy
-
         states = copy(self.drinking_states)
         # there are exactly 3 drinking states. adding one more to make sure it's truncated
         states["extra_to_be_truncated"] = [CommandHandler("foo", self.start)]
@@ -1423,9 +1423,9 @@ class TestConversationHandler:
             assert len(recwarn) == 1
             assert str(recwarn[0].message).startswith("ApplicationHandlerStop in TIMEOUT")
             assert recwarn[0].category is PTBUserWarning
-            assert (
-                Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_jobqueue.py"
-            ), "wrong stacklevel!"
+            assert Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_jobqueue.py", (
+                "wrong stacklevel!"
+            )
 
             await app.stop()
 

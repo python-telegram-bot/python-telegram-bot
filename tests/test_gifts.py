@@ -433,9 +433,9 @@ class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
     def test_slot_behaviour(self, accepted_gift_types):
         for attr in accepted_gift_types.__slots__:
             assert getattr(accepted_gift_types, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(accepted_gift_types)) == len(
-            set(mro_slots(accepted_gift_types))
-        ), "duplicate slot"
+        assert len(mro_slots(accepted_gift_types)) == len(set(mro_slots(accepted_gift_types))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {

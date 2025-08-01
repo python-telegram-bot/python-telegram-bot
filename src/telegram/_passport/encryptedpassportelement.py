@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# flake8: noqa: E501
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2025
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
@@ -17,6 +16,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
+
 from base64 import b64decode
 from collections.abc import Sequence
 from typing import TYPE_CHECKING

@@ -156,15 +156,6 @@ packages = ["src/telegram"]
 sys_path = "changes"
 chango_instance = { name= "chango_instance", module = "config" }
 
-# BLACK:
-[tool.black]
-line-length = 99
-
-# ISORT:
-[tool.isort]  # black config
-profile = "black"
-line_length = 99
-
 # RUFF:
 [tool.ruff]
 line-length = 99

@@ -1240,9 +1240,9 @@ class TestSendMediaGroupWithRequest:
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode
 
-    async def test_send_paid_media(self, bot, channel_id, photo_file, video_file):
+    async def test_send_paid_media(self, bot, chat_id, photo_file, video_file):
         msg = await bot.send_paid_media(
-            chat_id=channel_id,
+            chat_id=chat_id,
             star_count=20,
             media=[
                 InputPaidMediaPhoto(media=photo_file),

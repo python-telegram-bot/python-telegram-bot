@@ -374,7 +374,6 @@ class TestUpdater:
         assert log_found
 
     async def test_polling_mark_updates_as_read_failure(self, monkeypatch, updater, caplog):
-
         monkeypatch.setattr(updater.bot, "get_updates", empty_get_updates)
 
         async with updater:
@@ -399,7 +398,6 @@ class TestUpdater:
         assert log_found
 
     async def test_start_polling_already_running(self, updater, monkeypatch):
-
         monkeypatch.setattr(updater.bot, "get_updates", empty_get_updates)
 
         async with updater:
@@ -956,7 +954,6 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, "set_webhook", return_true)
 
         try:
-
             ip = "127.0.0.1"
             port = randrange(1024, 49152)  # Select random port
 
@@ -998,7 +995,6 @@ class TestUpdater:
             updater.bot.callback_data_cache.clear_callback_queries()
 
     async def test_webhook_invalid_ssl(self, monkeypatch, updater):
-
         ip = "127.0.0.1"
         port = randrange(1024, 49152)  # Select random port
         async with updater:
@@ -1070,7 +1066,6 @@ class TestUpdater:
                     )
 
     async def test_webhook_invalid_posts(self, updater, monkeypatch):
-
         ip = "127.0.0.1"
         port = randrange(1024, 49152)
 

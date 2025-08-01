@@ -62,9 +62,9 @@ class TestConstantsWithoutRequest:
             )
         }
         actual = set(constants.__all__)
-        assert (
-            actual == expected
-        ), f"Members {expected - actual} were not listed in constants.__all__"
+        assert actual == expected, (
+            f"Members {expected - actual} were not listed in constants.__all__"
+        )
 
     def test_message_attachment_type(self):
         assert all(
@@ -226,9 +226,9 @@ class TestConstantsWithoutRequest:
 
     @pytest.mark.parametrize("member", constants.MessageType)
     def test_message_type_completeness_reverse(self, member):
-        assert self.is_type_attribute(
-            member.value
-        ), f"Additional member {member} in MessageType that should not be a message type"
+        assert self.is_type_attribute(member.value), (
+            f"Additional member {member} in MessageType that should not be a message type"
+        )
 
     @pytest.mark.parametrize("member", constants.MessageAttachmentType)
     def test_message_attachment_type_completeness(self, member):

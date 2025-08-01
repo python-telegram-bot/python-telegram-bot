@@ -21,6 +21,7 @@ import datetime as dtm
 import pytest
 
 from telegram import (
+    BusinessBotRights,
     BusinessConnection,
     Chat,
     InputProfilePhotoStatic,
@@ -35,7 +36,12 @@ from telegram import (
 from telegram._files._inputstorycontent import InputStoryContentVideo
 from telegram._files.sticker import Sticker
 from telegram._gifts import AcceptedGiftTypes, Gift
+from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inputchecklist import InputChecklist, InputChecklistTask
+from telegram._message import Message
 from telegram._ownedgift import OwnedGiftRegular, OwnedGifts
+from telegram._reply import ReplyParameters
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.constants import InputProfilePhotoType, InputStoryContentType
@@ -51,10 +57,15 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
         user = User(1, "first", False)
         user_chat_id = 1
         date = dtm.datetime.utcnow()
-        can_reply = True
+        rights = BusinessBotRights(can_reply=True)
         is_enabled = True
         bc = BusinessConnection(
-            self.bci, user, user_chat_id, date, can_reply, is_enabled
+            self.bci,
+            user,
+            user_chat_id,
+            date,
+            is_enabled,
+            rights=rights,
         ).to_json()
 
         async def do_request(*args, **kwargs):
@@ -632,3 +643,149 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.delete_story(business_connection_id=self.bci, story_id=story_id)
+
+    async def test_send_checklist_all_args(self, offline_bot, monkeypatch):
+        chat_id = 123
+        checklist = InputChecklist(
+            title="My Checklist",
+            tasks=[InputChecklistTask(1, "Task 1"), InputChecklistTask(2, "Task 2")],
+        )
+        disable_notification = True
+        protect_content = False
+        message_effect_id = 42
+        reply_parameters = ReplyParameters(23, chat_id, allow_sending_without_reply=True)
+        reply_markup = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+        json_message = Message(1, dtm.datetime.now(), Chat(1, ""), text="test").to_json()
+
+        async def make_assertions(*args, **kwargs):
+            params = kwargs.get("request_data").parameters
+            assert params.get("business_connection_id") == self.bci
+            assert params.get("chat_id") == chat_id
+            assert params.get("checklist") == checklist.to_dict()
+            assert params.get("disable_notification") is disable_notification
+            assert params.get("protect_content") is protect_content
+            assert params.get("message_effect_id") == message_effect_id
+            assert params.get("reply_parameters") == reply_parameters.to_dict()
+            assert params.get("reply_markup") == reply_markup.to_dict()
+
+            return 200, f'{{"ok": true, "result": {json_message}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", make_assertions)
+        obj = await offline_bot.send_checklist(
+            business_connection_id=self.bci,
+            chat_id=chat_id,
+            checklist=checklist,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_effect_id=message_effect_id,
+            reply_parameters=reply_parameters,
+            reply_markup=reply_markup,
+        )
+        assert isinstance(obj, Message)
+
+    @pytest.mark.parametrize("default_bot", [{"disable_notification": True}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, True), (False, False), (None, None)],
+    )
+    async def test_send_checklist_default_disable_notification(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("disable_notification") is expected_value
+            return Message(1, dtm.datetime.now(), Chat(1, ""), text="test").to_dict()
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "chat_id": 123,
+            "checklist": InputChecklist(
+                title="My Checklist",
+                tasks=[InputChecklistTask(1, "Task 1")],
+            ),
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["disable_notification"] = passed_value
+
+        await default_bot.send_checklist(**kwargs)
+
+    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, True), (False, False), (None, None)],
+    )
+    async def test_send_checklist_default_protect_content(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("protect_content") is expected_value
+            return Message(1, dtm.datetime.now(), Chat(1, ""), text="test").to_dict()
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "chat_id": 123,
+            "checklist": InputChecklist(
+                title="My Checklist",
+                tasks=[InputChecklistTask(1, "Task 1")],
+            ),
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["protect_content"] = passed_value
+
+        await default_bot.send_checklist(**kwargs)
+
+    async def test_send_checklist_mutually_exclusive_reply_parameters(self, offline_bot):
+        """Test that reply_to_message_id and allow_sending_without_reply are mutually exclusive
+        with reply_parameters."""
+        with pytest.raises(ValueError, match="`reply_to_message_id` and"):
+            await offline_bot.send_checklist(
+                self.bci,
+                123,
+                InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")]),
+                reply_to_message_id=1,
+                reply_parameters=True,
+            )
+
+        with pytest.raises(ValueError, match="`allow_sending_without_reply` and"):
+            await offline_bot.send_checklist(
+                self.bci,
+                123,
+                InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")]),
+                allow_sending_without_reply=True,
+                reply_parameters=True,
+            )
+
+    async def test_edit_message_checklist_all_args(self, offline_bot, monkeypatch):
+        chat_id = 123
+        message_id = 45
+        checklist = InputChecklist(
+            title="My Checklist",
+            tasks=[InputChecklistTask(1, "Task 1"), InputChecklistTask(2, "Task 2")],
+        )
+        reply_markup = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+        json_message = Message(1, dtm.datetime.now(), Chat(1, ""), text="test").to_json()
+
+        async def make_assertions(*args, **kwargs):
+            params = kwargs.get("request_data").parameters
+            assert params.get("business_connection_id") == self.bci
+            assert params.get("chat_id") == chat_id
+            assert params.get("message_id") == message_id
+            assert params.get("checklist") == checklist.to_dict()
+            assert params.get("reply_markup") == reply_markup.to_dict()
+
+            return 200, f'{{"ok": true, "result": {json_message}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", make_assertions)
+        obj = await offline_bot.edit_message_checklist(
+            business_connection_id=self.bci,
+            chat_id=chat_id,
+            message_id=message_id,
+            checklist=checklist,
+            reply_markup=reply_markup,
+        )
+        assert isinstance(obj, Message)

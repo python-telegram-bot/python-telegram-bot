@@ -18,6 +18,7 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars transaction partners."""
+
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final
 
@@ -416,6 +417,7 @@ class TransactionPartnerUser(TransactionPartner):
 
     def __init__(
         self,
+        transaction_type: str,
         user: "User",
         invoice_payload: str | None = None,
         paid_media: Sequence[PaidMedia] | None = None,
@@ -424,16 +426,10 @@ class TransactionPartnerUser(TransactionPartner):
         gift: Gift | None = None,
         affiliate: AffiliateInfo | None = None,
         premium_subscription_duration: int | None = None,
-        # temporarily optional to account for changed signature
-        transaction_type: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
-
-        # tags: deprecated 22.1, bot api 9.0
-        if transaction_type is None:
-            raise TypeError("`transaction_type` is a required argument since Bot API 9.0")
 
         with self._unfrozen():
             self.user: User = user

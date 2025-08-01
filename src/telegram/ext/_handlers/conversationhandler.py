@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ConversationHandler."""
+
 import asyncio
 import datetime as dtm
 from dataclasses import dataclass
@@ -298,7 +299,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         # these imports need to be here because of circular import error otherwise
-        from telegram.ext import (  # pylint: disable=import-outside-toplevel
+        from telegram.ext import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
             PollAnswerHandler,
             PollHandler,
             PreCheckoutQueryHandler,

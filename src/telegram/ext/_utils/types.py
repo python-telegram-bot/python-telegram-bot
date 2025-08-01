@@ -25,11 +25,11 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 from collections.abc import Callable, Coroutine, MutableMapping
 from typing import TYPE_CHECKING, Any, TypeVar
 
 if TYPE_CHECKING:
-
     from telegram import Bot
     from telegram.ext import BaseRateLimiter, CallbackContext, JobQueue
 

@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatFullInfo."""
+
 import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
@@ -41,12 +42,6 @@ from telegram._utils.datetime import (
     get_timedelta_value,
 )
 from telegram._utils.types import JSONDict, TimePeriod
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import (
-    build_deprecation_warning_message,
-    warn_about_deprecated_attr_in_property,
-)
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot, BusinessIntro, BusinessLocation, BusinessOpeningHours, Message
@@ -65,6 +60,9 @@ class ChatFullInfo(_ChatBase):
         Explicit support for all shortcut methods known from :class:`telegram.Chat` on this
         object. Previously those were only available because this class inherited from
         :class:`telegram.Chat`.
+
+    .. versionremoved:: 22.3
+       Removed argument and attribute ``can_send_gift`` deprecated  by API 9.0.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat.
@@ -226,13 +224,6 @@ class ChatFullInfo(_ChatBase):
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
             .. versionadded:: 21.4
-        can_send_gift (:obj:`bool`, optional): :obj:`True`, if gifts can be sent to the chat.
-
-            .. versionadded:: 21.11
-
-            .. deprecated:: 22.1
-               Bot API 9.0 introduced :paramref:`accepted_gift_types`, replacing this argument.
-               Hence, this argument will be removed in future versions.
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -403,7 +394,6 @@ class ChatFullInfo(_ChatBase):
     """
 
     __slots__ = (
-        "_can_send_gift",
         "_message_auto_delete_time",
         "_slow_mode_delay",
         "accent_color_id",
@@ -450,6 +440,7 @@ class ChatFullInfo(_ChatBase):
         type: str,
         accent_color_id: int,
         max_reaction_count: int,
+        accepted_gift_types: AcceptedGiftTypes,
         title: str | None = None,
         username: str | None = None,
         first_name: str | None = None,
@@ -490,10 +481,6 @@ class ChatFullInfo(_ChatBase):
         linked_chat_id: int | None = None,
         location: ChatLocation | None = None,
         can_send_paid_media: bool | None = None,
-        # tags: deprecated 22.1; bot api 9.0
-        can_send_gift: bool | None = None,
-        # temporarily optional to account for changed signature
-        accepted_gift_types: AcceptedGiftTypes | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -507,23 +494,6 @@ class ChatFullInfo(_ChatBase):
             is_forum=is_forum,
             api_kwargs=api_kwargs,
         )
-        if accepted_gift_types is None:
-            raise TypeError("`accepted_gift_type` is a required argument since Bot API 9.0")
-
-        if can_send_gift is not None:
-            warn(
-                PTBDeprecationWarning(
-                    "22.1",
-                    build_deprecation_warning_message(
-                        deprecated_name="can_send_gift",
-                        new_name="accepted_gift_types",
-                        object_type="parameter",
-                        bot_api_version="9.0",
-                    ),
-                ),
-                stacklevel=2,
-            )
-
         # Required and unique to this class-
         with self._unfrozen():
             self.max_reaction_count: int = max_reaction_count
@@ -571,27 +541,7 @@ class ChatFullInfo(_ChatBase):
             self.business_location: BusinessLocation | None = business_location
             self.business_opening_hours: BusinessOpeningHours | None = business_opening_hours
             self.can_send_paid_media: bool | None = can_send_paid_media
-            self._can_send_gift: bool | None = can_send_gift
             self.accepted_gift_types: AcceptedGiftTypes = accepted_gift_types
-
-    @property
-    def can_send_gift(self) -> bool | None:
-        """
-        :obj:`bool`: Optional. :obj:`True`, if gifts can be sent to the chat.
-
-        .. deprecated:: 22.1
-            As Bot API 9.0 replaces this attribute with :attr:`accepted_gift_types`, this attribute
-            will be removed in future versions.
-
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="can_send_gift",
-            new_attr_name="accepted_gift_types",
-            bot_api_version="9.0",
-            ptb_version="22.1",
-            stacklevel=2,
-        )
-        return self._can_send_gift
 
     @property
     def slow_mode_delay(self) -> int | dtm.timedelta | None:
@@ -620,7 +570,7 @@ class ChatFullInfo(_ChatBase):
             data.get("accepted_gift_types"), AcceptedGiftTypes, bot
         )
 
-        from telegram import (  # pylint: disable=import-outside-toplevel
+        from telegram import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
             BusinessIntro,
             BusinessLocation,
             BusinessOpeningHours,

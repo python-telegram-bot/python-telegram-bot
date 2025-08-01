@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Here we run tests directly with HTTPXRequest because that's easier than providing dummy
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
+
 import asyncio
 import datetime as dtm
 import json
@@ -438,9 +439,7 @@ class TestHTTPXRequestWithoutRequest:
         request = HTTPXRequest()
         assert request._client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
         assert request._client.proxy is None
-        assert request._client.limits == httpx.Limits(
-            max_connections=1, max_keepalive_connections=1
-        )
+        assert request._client.limits == httpx.Limits(max_connections=256)
         assert request._client.http1 is True
         assert not request._client.http2
 
@@ -453,9 +452,7 @@ class TestHTTPXRequestWithoutRequest:
             pool_timeout=46,
         )
         assert request._client.proxy == "proxy"
-        assert request._client.limits == httpx.Limits(
-            max_connections=42, max_keepalive_connections=42
-        )
+        assert request._client.limits == httpx.Limits(max_connections=42)
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
 
     async def test_multiple_inits_and_shutdowns(self, monkeypatch):
@@ -591,7 +588,10 @@ class TestHTTPXRequestWithoutRequest:
         assert code == HTTPStatus.OK
 
     async def test_do_request_params_with_data(
-        self, monkeypatch, httpx_request, mixed_rqs  # noqa: F811
+        self,
+        monkeypatch,
+        httpx_request,
+        mixed_rqs,  # noqa: F811
     ):
         async def make_assertion(self, **kwargs):
             method_assertion = kwargs.get("method") == "method"
@@ -668,7 +668,11 @@ class TestHTTPXRequestWithoutRequest:
 
     @pytest.mark.parametrize("media", [True, False])
     async def test_do_request_write_timeout(
-        self, monkeypatch, media, httpx_request, input_media_photo  # noqa: F811
+        self,
+        monkeypatch,
+        media,
+        httpx_request,
+        input_media_photo,  # noqa: F811
     ):
         async def request(_, **kwargs):
             self.test_flag = kwargs.get("timeout")
@@ -695,7 +699,11 @@ class TestHTTPXRequestWithoutRequest:
 
     @pytest.mark.parametrize("init", [True, False])
     async def test_setting_media_write_timeout(
-        self, monkeypatch, init, input_media_photo, recwarn  # noqa: F811
+        self,
+        monkeypatch,
+        init,
+        input_media_photo,  # noqa: F811
+        recwarn,
     ):
         httpx_request = HTTPXRequest(media_write_timeout=42) if init else HTTPXRequest()
 

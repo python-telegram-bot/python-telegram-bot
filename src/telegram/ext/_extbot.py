@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
+
 import datetime as dtm
 from collections.abc import Callable, Sequence
 from copy import copy
@@ -57,6 +58,7 @@ from telegram import (
     Gifts,
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
+    InputChecklist,
     InputMedia,
     InputPaidMedia,
     InputPollOption,
@@ -2643,6 +2645,72 @@ class ExtBot(Bot, Generic[RLARGS]):
             allow_paid_broadcast=allow_paid_broadcast,
         )
 
+    async def send_checklist(
+        self,
+        business_connection_id: str,
+        chat_id: int,
+        checklist: InputChecklist,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_effect_id: str | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
+        *,
+        reply_to_message_id: int | None = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> Message:
+        return await super().send_checklist(
+            business_connection_id=business_connection_id,
+            chat_id=chat_id,
+            checklist=checklist,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_effect_id=message_effect_id,
+            reply_parameters=reply_parameters,
+            reply_markup=reply_markup,
+            reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def edit_message_checklist(
+        self,
+        business_connection_id: str,
+        chat_id: int,
+        message_id: int,
+        checklist: InputChecklist,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> Message:
+        return await super().edit_message_checklist(
+            business_connection_id=business_connection_id,
+            chat_id=chat_id,
+            message_id=message_id,
+            checklist=checklist,
+            reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def send_dice(
         self,
         chat_id: int | str,
@@ -5061,6 +5129,24 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_my_star_balance(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> StarAmount:
+        return await super().get_my_star_balance(
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -5143,6 +5229,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     setPassportDataErrors = set_passport_data_errors
     sendPoll = send_poll
     stopPoll = stop_poll
+    sendChecklist = send_checklist
+    editMessageChecklist = edit_message_checklist
     sendDice = send_dice
     getMyCommands = get_my_commands
     setMyCommands = set_my_commands
@@ -5214,3 +5302,4 @@ class ExtBot(Bot, Generic[RLARGS]):
     verifyUser = verify_user
     removeChatVerification = remove_chat_verification
     removeUserVerification = remove_user_verification
+    getMyStarBalance = get_my_star_balance
