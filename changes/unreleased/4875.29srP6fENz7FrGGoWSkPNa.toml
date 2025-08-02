@@ -1,4 +1,4 @@
-bugfixes = "Fix no running event loop error on Python 3.14"
+bugfixes = "Adapt logic on getting the event loop in ``Application.run_pooling/webhook`` to Python 3.14"
 [[pull_requests]]
 uid = "4875"
 author_uid = "Copilot"
