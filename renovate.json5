@@ -47,6 +47,15 @@
     }
   ],
 
+  // Group package updates together, so e.g. Ruff is updated in both pyproject.toml and pre-commit-config.yaml
+  // in one PR:
+  "packageRules": [
+    {
+      "matchPackageNames": ["*"],
+      "groupName": "Upgrade {{packageName}} to {{newVersion}}"
+    }
+  ],
+
   // Opt-in to updating the pre-commit-config.yaml file too:
   "pre-commit": {
     "enabled": true
