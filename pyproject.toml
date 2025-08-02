@@ -135,7 +135,13 @@ docs = [
     # version is released.
     "pydantic @ git+https://github.com/pydantic/pydantic ; python_version >= '3.14'"
 ]
-all = ["pre-commit", { include-group = "tests" }, { include-group = "docs" }]
+linting = [
+    "pre-commit",
+    "ruff==0.12.7",
+    "mypy==1.16.1",
+    "pylint==3.3.7"
+]
+all = [{ include-group = "tests" }, { include-group = "docs" }, { include-group = "linting"}]
 
 # HATCH
 [tool.hatch.version]
