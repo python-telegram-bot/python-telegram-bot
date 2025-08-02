@@ -9,7 +9,7 @@
     // ":disableDependencyDashboard"
 
     // Update the digest of the github action workflows to the latest version:
-    "helpers:pinGithubActionDigests"
+    "helpers:pinGitHubActionDigests"
   ],
 
   // Add pull request labels:
