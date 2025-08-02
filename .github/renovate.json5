@@ -7,6 +7,9 @@
     // https://docs.renovatebot.com/configuration-options/#dependencydashboard
     // Enabled for now to see how it works and if it's useful, we can disable it later if needed.
     // ":disableDependencyDashboard"
+
+    // Update the digest of the github action workflows to the latest version:
+    "helpers:pinGithubActionDigests"
   ],
 
   // Add pull request labels:
@@ -14,6 +17,9 @@
 
   // Bump even patch versions:
   "bumpVersion": "patch",
+
+  // Always bump the versions. See docs: https://docs.renovatebot.com/configuration-options/#rangestrategy
+  "rangeStrategy": "bump",
 
   // Update the lock files:
   "lockFileMaintenance": {
@@ -47,11 +53,12 @@
     }
   ],
 
-  // Group package updates together, so e.g. Ruff is updated in both pyproject.toml and pre-commit-config.yaml
-  // in one PR:
+  // Group package updates together:
   "packageRules": [
+    // Linting dependencies in sync with the pre-commit-config hooks:
     {
-      "matchPackageNames": ["*"],
+      "matchDepTypes": ["mypy", "ruff", "pylint"],
+      "matchManagers": ["pre-commit", "pep621"],
       "groupName": "Upgrade {{packageName}} to {{newVersion}}"
     }
   ],
