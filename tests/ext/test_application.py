@@ -1716,6 +1716,7 @@ class TestApplication:
         expected = {
             name: name for name in updater_signature.parameters if name != "error_callback"
         }
+        expected["bootstrap_retries"] = 42
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(close_loop=False, **expected)
@@ -2022,6 +2023,7 @@ class TestApplication:
             assert self.received[name] == param.default
 
         expected = {name: name for name in updater_signature.parameters if name != "self"}
+        expected["bootstrap_retries"] = 42
         thread = Thread(target=thread_target)
         thread.start()
         app.run_webhook(close_loop=False, **expected)

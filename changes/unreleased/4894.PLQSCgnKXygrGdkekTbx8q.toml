@@ -1,0 +1,5 @@
+documentation = "Bump ``furo`` from 2024.8.6 to 2025.7.19"
+[[pull_requests]]
+uid = "4894"
+author_uid = "dependabot"
+closes_threads = []

@@ -100,7 +100,7 @@ tests = [
     # required for building the wheels for releases
     "build",
     # For the test suite
-    "pytest==8.4.0",
+    "pytest==8.4.1",
     # needed because pytest doesn't come with native support for coroutines as tests
     "pytest-asyncio==0.21.2",
     # xdist runs tests in parallel
@@ -120,7 +120,7 @@ tests = [
 docs = [
     "chango~=0.4.0; python_version >= '3.12'",
     "sphinx==8.2.3; python_version >= '3.11'",
-    "furo==2024.8.6",
+    "furo==2025.7.19",
     "sphinx-paramlinks==0.6.0",
     "sphinxcontrib-mermaid==1.0.0",
     "sphinx-copybutton==0.5.2",
