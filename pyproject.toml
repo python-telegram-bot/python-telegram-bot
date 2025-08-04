@@ -52,14 +52,12 @@ dependencies = [
 "Support" = "https://t.me/pythontelegrambotgroup"
 
 [project.optional-dependencies]
-# Make sure to install those as additional_dependencies in the
-# pre-commit hooks for pylint & mypy
-# Also update the readme accordingly
+# Make sure to install those as additional_dependencies in the pre-commit hooks
 #
 # When dependencies release new versions and tests succeed, we should try to expand the allowed
 # versions and only increase the lower bound if necessary
 #
-# When adding new groups, make sure to update `ext` and `all` accordingly
+# When adding new extras, make sure to update `ext` and `all` accordingly
 
 # Optional dependencies for production
 all = [

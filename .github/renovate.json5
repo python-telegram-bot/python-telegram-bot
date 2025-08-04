@@ -18,8 +18,8 @@
   // Bump even patch versions:
   "bumpVersion": "patch",
 
-  // Always bump the versions. See docs: https://docs.renovatebot.com/configuration-options/#rangestrategy
-  "rangeStrategy": "bump",
+  // Let Renovate decide how to update. See docs: https://docs.renovatebot.com/configuration-options/#rangestrategy
+  "rangeStrategy": "auto",
 
   // Update the lock files:
   "lockFileMaintenance": {
@@ -60,6 +60,12 @@
       "matchDepTypes": ["mypy", "ruff", "pylint"],
       "matchManagers": ["pre-commit", "pep621"],
       "groupName": "Upgrade {{packageName}} to {{newVersion}}"
+    },
+    // Replace the versions in the dependency-groups:
+    {
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["dependency-groups"],
+      "matchUpdateTypes": ["replacement"]  // Replace the current version with new one
     }
   ],
 
