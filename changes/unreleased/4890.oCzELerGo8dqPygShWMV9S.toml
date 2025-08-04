@@ -1,4 +1,4 @@
-documentation = "Add `uv.lock`"
+internal = "Add a ``uv.lock`` lockfile for reproducible environments when installing ``python-telegram-bot`` with ``uv``."
 [[pull_requests]]
 uid = "4890"
 author_uid = "harshil21"
