@@ -1025,10 +1025,15 @@ class Application(
         bootstrap_retries: int,
         close_loop: bool = True,
     ) -> None:
-        # Calling get_event_loop() should still be okay even in py3.10+ as long as there is a
-        # running event loop, or we are in the main thread, which are the intended use cases.
-        # See the docs of get_event_loop() and get_running_loop() for more info
-        loop = asyncio.get_event_loop()
+        # Try to get the running event loop first, and if there isn't one, create a new one.
+        # This handles the Python 3.14+ behavior where get_event_loop() raises RuntimeError
+        # when there's no current event loop in the main thread.
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            # No running event loop, create and set a new one
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
 
         if stop_signals is DEFAULT_NONE and platform.system() != "Windows":
             stop_signals = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)

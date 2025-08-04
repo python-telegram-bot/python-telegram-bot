@@ -335,7 +335,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
 
         _LOGGER.debug("Bootstrap done")
 
-        async def polling_action_cb() -> bool:
+        async def polling_action_cb() -> None:
             try:
                 updates = await self.bot.get_updates(
                     offset=self._last_update_id,
@@ -352,7 +352,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                     "Received data was *not* processed!",
                     exc_info=exc,
                 )
-                return True
+                return
 
             if updates:
                 if not self.running:
@@ -365,7 +365,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                         await self.update_queue.put(update)
                     self._last_update_id = updates[-1].update_id + 1  # Add one to 'confirm' it
 
-            return True  # Keep fetching updates & don't quit. Polls with poll_interval.
+            return
 
         def default_error_callback(exc: TelegramError) -> None:
             _LOGGER.exception("Exception happened while polling for updates.", exc_info=exc)
@@ -678,14 +678,13 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         :paramref:`max_retries`.
         """
 
-        async def bootstrap_del_webhook() -> bool:
+        async def bootstrap_del_webhook() -> None:
             _LOGGER.debug("Deleting webhook")
             if drop_pending_updates:
                 _LOGGER.debug("Dropping pending updates from Telegram server")
             await self.bot.delete_webhook(drop_pending_updates=drop_pending_updates)
-            return False
 
-        async def bootstrap_set_webhook() -> bool:
+        async def bootstrap_set_webhook() -> None:
             _LOGGER.debug("Setting webhook")
             if drop_pending_updates:
                 _LOGGER.debug("Dropping pending updates from Telegram server")
@@ -698,7 +697,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 max_connections=max_connections,
                 secret_token=secret_token,
             )
-            return False
 
         # Dropping pending updates from TG can be efficiently done with the drop_pending_updates
         # parameter of delete/start_webhook, even in the case of polling. Also, we want to make
