@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LabeledPrice."""
 
-from typing import Optional
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -55,7 +53,7 @@ class LabeledPrice(TelegramObject):
 
     __slots__ = ("amount", "label")
 
-    def __init__(self, label: str, amount: int, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, label: str, amount: int, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
         self.label: str = label
         self.amount: int = amount

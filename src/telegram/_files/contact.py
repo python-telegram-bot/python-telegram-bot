@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Contact."""
 
-from typing import Optional
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -52,20 +50,20 @@ class Contact(TelegramObject):
         self,
         phone_number: str,
         first_name: str,
-        last_name: Optional[str] = None,
-        user_id: Optional[int] = None,
-        vcard: Optional[str] = None,
+        last_name: str | None = None,
+        user_id: int | None = None,
+        vcard: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.phone_number: str = str(phone_number)
         self.first_name: str = first_name
         # Optionals
-        self.last_name: Optional[str] = last_name
-        self.user_id: Optional[int] = user_id
-        self.vcard: Optional[str] = vcard
+        self.last_name: str | None = last_name
+        self.user_id: int | None = user_id
+        self.vcard: str | None = vcard
 
         self._id_attrs = (self.phone_number,)
 

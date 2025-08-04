@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ChatJoinRequest."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
@@ -110,10 +110,10 @@ class ChatJoinRequest(TelegramObject):
         from_user: User,
         date: dtm.datetime,
         user_chat_id: int,
-        bio: Optional[str] = None,
-        invite_link: Optional[ChatInviteLink] = None,
+        bio: str | None = None,
+        invite_link: ChatInviteLink | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -123,15 +123,15 @@ class ChatJoinRequest(TelegramObject):
         self.user_chat_id: int = user_chat_id
 
         # Optionals
-        self.bio: Optional[str] = bio
-        self.invite_link: Optional[ChatInviteLink] = invite_link
+        self.bio: str | None = bio
+        self.invite_link: ChatInviteLink | None = invite_link
 
         self._id_attrs = (self.chat, self.from_user, self.date)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatJoinRequest":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatJoinRequest":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -152,7 +152,7 @@ class ChatJoinRequest(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -184,7 +184,7 @@ class ChatJoinRequest(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 

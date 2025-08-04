@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardRemove."""
 
-from typing import Optional
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -64,11 +62,11 @@ class ReplyKeyboardRemove(TelegramObject):
 
     __slots__ = ("remove_keyboard", "selective")
 
-    def __init__(self, selective: Optional[bool] = None, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, selective: bool | None = None, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.remove_keyboard: bool = True
         # Optionals
-        self.selective: Optional[bool] = selective
+        self.selective: bool | None = selective
 
         self._freeze()

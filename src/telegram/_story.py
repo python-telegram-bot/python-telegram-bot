@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object related to a Telegram Story."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
@@ -60,7 +60,7 @@ class Story(TelegramObject):
         chat: Chat,
         id: int,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.chat: Chat = chat
@@ -71,7 +71,7 @@ class Story(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Story":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Story":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

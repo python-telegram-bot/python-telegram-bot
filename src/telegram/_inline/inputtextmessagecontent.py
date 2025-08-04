@@ -19,7 +19,7 @@
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
@@ -96,11 +96,11 @@ class InputTextMessageContent(InputMessageContent):
         self,
         message_text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        entities: Optional[Sequence[MessageEntity]] = None,
+        entities: Sequence[MessageEntity] | None = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
-        disable_web_page_preview: Optional[bool] = None,
-        api_kwargs: Optional[JSONDict] = None,
+        disable_web_page_preview: bool | None = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
