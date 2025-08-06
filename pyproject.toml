@@ -146,7 +146,7 @@ path = "src/telegram/_version.py"
 # See also https://github.com/pypa/hatch/issues/1230 for discussion
 # the source distribution will include most of the files in the root directory
 [tool.hatch.build.targets.sdist]
-exclude = [".venv*", "venv*", ".github"]
+exclude = [".venv*", "venv*", ".github", "uv.lock"]
 # the wheel will only include the src/telegram package
 [tool.hatch.build.targets.wheel]
 packages = ["src/telegram"]
