@@ -25,6 +25,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 from collections.abc import Coroutine, MutableMapping
 from typing import TYPE_CHECKING, Any, Callable, TypeVar, Union
 

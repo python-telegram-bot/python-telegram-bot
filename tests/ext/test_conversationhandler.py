@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Persistence of conversations is tested in test_basepersistence.py"""
+
 import asyncio
 import functools
 import logging
@@ -1422,9 +1423,9 @@ class TestConversationHandler:
             assert len(recwarn) == 1
             assert str(recwarn[0].message).startswith("ApplicationHandlerStop in TIMEOUT")
             assert recwarn[0].category is PTBUserWarning
-            assert (
-                Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_jobqueue.py"
-            ), "wrong stacklevel!"
+            assert Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_jobqueue.py", (
+                "wrong stacklevel!"
+            )
 
             await app.stop()
 

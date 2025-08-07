@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 """This module contains a class that represents a Telegram SwitchInlineQueryChosenChat."""
+
 from typing import Optional
 
 from telegram._telegramobject import TelegramObject

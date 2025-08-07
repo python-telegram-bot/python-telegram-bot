@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains classes related to gifs sent by bots."""
+
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 

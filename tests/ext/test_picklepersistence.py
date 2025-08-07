@@ -898,9 +898,9 @@ class TestPicklePersistence:
         assert len(recwarn) == 1
         assert recwarn[-1].category is PTBUserWarning
         assert str(recwarn[-1].message).startswith("Unknown bot instance found.")
-        assert (
-            Path(recwarn[-1].filename) == SOURCE_ROOT_PATH / "ext" / "_picklepersistence.py"
-        ), "wrong stacklevel!"
+        assert Path(recwarn[-1].filename) == SOURCE_ROOT_PATH / "ext" / "_picklepersistence.py", (
+            "wrong stacklevel!"
+        )
         pp = PicklePersistence("pickletest", single_file=False, on_flush=False)
         pp.set_bot(bot)
         assert (await pp.get_chat_data())[12345]["unknown_bot_in_user"]._bot is None

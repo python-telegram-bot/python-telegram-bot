@@ -1,0 +1,5 @@
+internal = "Bump ``github/codeql-action`` from 3.29.2 to 3.29.5"
+[[pull_requests]]
+uid = "4896"
+author_uid = "dependabot"
+closes_threads = []
