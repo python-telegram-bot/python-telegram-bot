@@ -1,0 +1,87 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [ // See what config:recommended does: https://docs.renovatebot.com/presets-config/#configrecommended
+    "config:recommended",
+    // Dependency Dashboards are Issues Renovate creates which list all pending updates. We disable it
+    // because we don't need it, we can see the pending updates in the PRs. This is also noisy.
+    // https://docs.renovatebot.com/configuration-options/#dependencydashboard
+    // Enabled for now to see how it works and if it's useful, we can disable it later if needed.
+    // ":disableDependencyDashboard"
+
+    // Update the digest of the github action workflows to the latest version:
+    "helpers:pinGitHubActionDigests"
+  ],
+
+  // Add pull request labels:
+  "labels": ["dependencies"],
+
+  // Bump even patch versions:
+  "bumpVersion": "patch",
+
+  // Let Renovate decide how to update. See docs: https://docs.renovatebot.com/configuration-options/#rangestrategy
+  "rangeStrategy": "auto",
+
+  // Update the lock files:
+  "lockFileMaintenance": {
+    "enabled": true,
+    "recreateWhen": "always",
+    "rebaseStalePrs": true,
+    "branchTopic": "lock-file-maintenance",
+    "commitMessageAction": "Lock file maintenance",
+    "commitMessageTopic": null,
+    "commitMessageExtra": null,
+    "schedule": ["* * * * 1,4"],  // Run sometime on Monday and Thursday
+    "groupName": "Bump versions in lock files",
+    "prBodyDefinitions": {
+      "Change": "All locks refreshed"
+    }
+  },
+
+  // Bump the versions even in other files:
+  "bumpVersions": [
+    {
+      "name": "Update dependency versions in README.rst",
+      "filePatterns": ["README.rst"],
+      "matchStrings": [
+        "cryptography>=(?<version>\\d+\\.\\d+\\.\\d+)",
+        "aiolimiter~=(?<version>\\d+\\.\\d+\\.\\d+)",
+        "tornado~=(?<version>\\d+\\.\\d+)",
+        "cachetools>=(?<version>\\d+\\.\\d+\\.\\d+)",        // Lower bound only
+        "APScheduler>=(?<version>\\d+\\.\\d+\\.\\d+)"        // Lower bound only
+      ],
+      "bumpType": "minor"
+    }
+  ],
+
+  // Group package updates together:
+  "packageRules": [
+    // Linting dependencies in sync with the pre-commit-config hooks:
+    {
+      "matchDepTypes": ["mypy", "ruff", "pylint"],
+      "matchManagers": ["pre-commit", "pep621"],
+      "groupName": "Upgrade {{packageName}} to {{newVersion}}"
+    },
+    // Replace the versions in the dependency-groups:
+    {
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["dependency-groups"],
+      "matchUpdateTypes": ["replacement"]  // Replace the current version with new one
+    }
+  ],
+
+  // Opt-in to updating the pre-commit-config.yaml file too:
+  "pre-commit": {
+    "enabled": true
+  },
+
+  // Renovate may change the schema or syntax, this option will make it so that Renovate creates a 
+  // new PR to help us migrate to the new schema or syntax:
+  "configMigration": true,
+
+  // Temporarily disabled:
+  "ignoreDeps": ["pytest-asyncio"],
+
+  // schedule to allow PR's from Renovate:
+  "schedule": ["* * * * 0,6"]  // Every weekend
+
+}
