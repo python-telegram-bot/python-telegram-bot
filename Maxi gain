@@ -1,0 +1,46 @@
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+
+# Token de ton bot
+TOKEN = "8255388464:AAFlZ1tThfkxGj6RlL1qB8CWz14aNDRxizE"
+
+# Commande /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("📥 Recharges", callback_data='recharges')],
+        [InlineKeyboardButton("💸 Retrait", callback_data='retrait')],
+        [InlineKeyboardButton("👥 Invité", callback_data='invite')],
+        [InlineKeyboardButton("📂 Dossiers financiers", callback_data='dossiers')],
+        [InlineKeyboardButton("✅ Tâches", callback_data='taches')],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("Bienvenue dans le mini-app !", reply_markup=reply_markup)
+
+# Réponse aux clics de bouton
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == "recharges":
+        await query.edit_message_text("💰 Pour recharger, envoie tes fonds à :\n\nUSDT BEP20 : 0x080667fBC9175EDedF3dA6656CE9ff2A67C1D785")
+    elif query.data == "retrait":
+        await query.edit_message_text("💸 Retrait : entre ton adresse wallet pour recevoir tes gains.")
+    elif query.data == "invite":
+        await query.edit_message_text("👥 Invite tes amis et gagne des bonus !")
+    elif query.data == "dossiers":
+        await query.edit_message_text("📂 Historique financier : bientôt disponible.")
+    elif query.data == "taches":
+        await query.edit_message_text("✅ Tâches disponibles : complète-les pour gagner.")
+
+# Lancement du bot
+def main():
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button))
+
+    print("Bot démarré...")
+    app.run_polling()
+
+if __name__ == '__main__':
+    main()
