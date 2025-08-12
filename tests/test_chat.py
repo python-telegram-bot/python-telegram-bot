@@ -49,6 +49,7 @@ def chat(bot):
         is_forum=True,
         first_name=ChatTestBase.first_name,
         last_name=ChatTestBase.last_name,
+        is_direct_messages=ChatTestBase.is_direct_messages,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -63,6 +64,7 @@ class ChatTestBase:
     is_forum = True
     first_name = "first"
     last_name = "last"
+    is_direct_messages = True
 
 
 class TestChatWithoutRequest(ChatTestBase):
@@ -80,6 +82,7 @@ class TestChatWithoutRequest(ChatTestBase):
             "is_forum": self.is_forum,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "is_direct_messages": self.is_direct_messages,
         }
         chat = Chat.de_json(json_dict, offline_bot)
 
@@ -102,6 +105,7 @@ class TestChatWithoutRequest(ChatTestBase):
         assert chat_dict["is_forum"] == chat.is_forum
         assert chat_dict["first_name"] == chat.first_name
         assert chat_dict["last_name"] == chat.last_name
+        assert chat_dict["is_direct_messages"] == chat.is_direct_messages
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")

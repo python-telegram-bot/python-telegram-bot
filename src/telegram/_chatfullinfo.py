@@ -224,6 +224,10 @@ class ChatFullInfo(_ChatBase):
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
             .. versionadded:: 21.4
+        is_direct_messages (:obj:`bool`, optional): :obj:`True`, if the chat is the direct messages
+            chat of a channel.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -388,6 +392,10 @@ class ChatFullInfo(_ChatBase):
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
             .. versionadded:: 21.4
+        is_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the chat is the direct messages
+            chat of a channel.
+
+            .. versionadded:: NEXT.VERSION
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
@@ -481,6 +489,7 @@ class ChatFullInfo(_ChatBase):
         linked_chat_id: Optional[int] = None,
         location: Optional[ChatLocation] = None,
         can_send_paid_media: Optional[bool] = None,
+        is_direct_messages: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -492,6 +501,7 @@ class ChatFullInfo(_ChatBase):
             first_name=first_name,
             last_name=last_name,
             is_forum=is_forum,
+            is_direct_messages=is_direct_messages,
             api_kwargs=api_kwargs,
         )
         # Required and unique to this class-

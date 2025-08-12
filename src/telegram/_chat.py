@@ -85,7 +85,16 @@ class _ChatBase(TelegramObject):
     .. versionadded:: 21.3
     """
 
-    __slots__ = ("first_name", "id", "is_forum", "last_name", "title", "type", "username")
+    __slots__ = (
+        "first_name",
+        "id",
+        "is_direct_messages",
+        "is_forum",
+        "last_name",
+        "title",
+        "type",
+        "username",
+    )
 
     def __init__(
         self,
@@ -96,6 +105,7 @@ class _ChatBase(TelegramObject):
         first_name: Optional[str] = None,
         last_name: Optional[str] = None,
         is_forum: Optional[bool] = None,
+        is_direct_messages: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -109,6 +119,7 @@ class _ChatBase(TelegramObject):
         self.first_name: Optional[str] = first_name
         self.last_name: Optional[str] = last_name
         self.is_forum: Optional[bool] = is_forum
+        self.is_direct_messages: Optional[bool] = is_direct_messages
 
         self._id_attrs = (self.id,)
 
@@ -3719,6 +3730,10 @@ class Chat(_ChatBase):
             (has topics_ enabled).
 
             .. versionadded:: 20.0
+        is_direct_messages (:obj:`bool`, optional): :obj:`True`, if the chat is the direct messages
+            chat of a channel.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -3733,6 +3748,10 @@ class Chat(_ChatBase):
             (has topics_ enabled).
 
             .. versionadded:: 20.0
+        is_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the chat is the direct messages
+            chat of a channel.
+
+            .. versionadded:: NEXT.VERSION
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """

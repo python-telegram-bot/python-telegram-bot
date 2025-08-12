@@ -87,6 +87,7 @@ def chat_full_info(bot):
         first_name=ChatFullInfoTestBase.first_name,
         last_name=ChatFullInfoTestBase.last_name,
         can_send_paid_media=ChatFullInfoTestBase.can_send_paid_media,
+        is_direct_messages=ChatFullInfoTestBase.is_direct_messages,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -146,6 +147,7 @@ class ChatFullInfoTestBase:
     last_name = "last_name"
     can_send_paid_media = True
     accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
+    is_direct_messages = True
 
 
 class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
@@ -201,6 +203,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "can_send_paid_media": self.can_send_paid_media,
+            "is_direct_messages": self.is_direct_messages,
         }
 
         cfi = ChatFullInfo.de_json(json_dict, offline_bot)
@@ -250,6 +253,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi.last_name == self.last_name
         assert cfi.max_reaction_count == self.max_reaction_count
         assert cfi.can_send_paid_media == self.can_send_paid_media
+        assert cfi.is_direct_messages == self.is_direct_messages
 
     def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
@@ -331,6 +335,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["accepted_gift_types"] == cfi.accepted_gift_types.to_dict()
 
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
+        assert cfi_dict["is_direct_messages"] == cfi.is_direct_messages
 
     def test_time_period_properties(self, PTB_TIMEDELTA, chat_full_info):
         cfi = chat_full_info
