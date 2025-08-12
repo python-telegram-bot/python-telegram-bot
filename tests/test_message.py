@@ -91,6 +91,7 @@ from telegram import (
     Voice,
     WebAppData,
 )
+from telegram._directmessagestopic import DirectMessagesTopic
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -355,6 +356,12 @@ def message(bot):
                 tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
             )
         },
+        {
+            "direct_messages_topic": DirectMessagesTopic(
+                topic_id=1234,
+                user=User(id=5678, first_name="TestUser", is_bot=False),
+            )
+        },
     ],
     ids=[
         "reply",
@@ -436,6 +443,7 @@ def message(bot):
         "checklist",
         "checklist_tasks_done",
         "checklist_tasks_added",
+        "direct_messages_topic",
     ],
 )
 def message_params(bot, request):

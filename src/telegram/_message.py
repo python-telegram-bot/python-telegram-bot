@@ -31,6 +31,7 @@ from telegram._chatboost import ChatBoostAdded
 from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
 from telegram._dice import Dice
 from telegram._directmessagepricechanged import DirectMessagePriceChanged
+from telegram._directmessagestopic import DirectMessagesTopic
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
@@ -628,6 +629,10 @@ class Message(MaybeInaccessibleMessage):
             of a channel has changed.
 
             .. versionadded:: 22.3
+        direct_messages_topic (:class:`telegram.DirectMessagesTopic`, optional): Information about
+            the direct messages chat topic that contains the message.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -989,6 +994,10 @@ class Message(MaybeInaccessibleMessage):
             messages chat of a channel has changed.
 
             .. versionadded:: 22.3
+        direct_messages_topic (:class:`telegram.DirectMessagesTopic`): Optional. Information about
+            the direct messages chat topic that contains the message.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1026,6 +1035,7 @@ class Message(MaybeInaccessibleMessage):
         "delete_chat_photo",
         "dice",
         "direct_message_price_changed",
+        "direct_messages_topic",
         "document",
         "edit_date",
         "effect_id",
@@ -1195,6 +1205,7 @@ class Message(MaybeInaccessibleMessage):
         checklist: Optional[Checklist] = None,
         checklist_tasks_done: Optional[ChecklistTasksDone] = None,
         checklist_tasks_added: Optional[ChecklistTasksAdded] = None,
+        direct_messages_topic: Optional[DirectMessagesTopic] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1310,6 +1321,7 @@ class Message(MaybeInaccessibleMessage):
             self.direct_message_price_changed: Optional[DirectMessagePriceChanged] = (
                 direct_message_price_changed
             )
+            self.direct_messages_topic: Optional[DirectMessagesTopic] = direct_messages_topic
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1495,6 +1507,9 @@ class Message(MaybeInaccessibleMessage):
         )
         data["checklist_tasks_added"] = de_json_optional(
             data.get("checklist_tasks_added"), ChecklistTasksAdded, bot
+        )
+        data["direct_messages_topic"] = de_json_optional(
+            data.get("direct_messages_topic"), DirectMessagesTopic, bot
         )
 
         api_kwargs = {}
