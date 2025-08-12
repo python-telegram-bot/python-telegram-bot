@@ -228,6 +228,10 @@ class ChatFullInfo(_ChatBase):
             chat of a channel.
 
             .. versionadded:: NEXT.VERSION
+        parent_chat (:obj:`telegram.Chat`, optional): Information about the corresponding channel
+            chat; for direct messages chats only.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -396,6 +400,10 @@ class ChatFullInfo(_ChatBase):
             chat of a channel.
 
             .. versionadded:: NEXT.VERSION
+        parent_chat (:obj:`telegram.Chat`): Optional. Information about the corresponding channel
+            chat; for direct messages chats only.
+
+            .. versionadded:: NEXT.VERSION
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
@@ -432,6 +440,7 @@ class ChatFullInfo(_ChatBase):
         "linked_chat_id",
         "location",
         "max_reaction_count",
+        "parent_chat",
         "permissions",
         "personal_chat",
         "photo",
@@ -490,6 +499,7 @@ class ChatFullInfo(_ChatBase):
         location: Optional[ChatLocation] = None,
         can_send_paid_media: Optional[bool] = None,
         is_direct_messages: Optional[bool] = None,
+        parent_chat: Optional[Chat] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -556,6 +566,7 @@ class ChatFullInfo(_ChatBase):
             self.business_opening_hours: Optional[BusinessOpeningHours] = business_opening_hours
             self.can_send_paid_media: Optional[bool] = can_send_paid_media
             self.accepted_gift_types: AcceptedGiftTypes = accepted_gift_types
+            self.parent_chat: Optional[Chat] = parent_chat
 
     @property
     def slow_mode_delay(self) -> Optional[Union[int, dtm.timedelta]]:
@@ -606,5 +617,6 @@ class ChatFullInfo(_ChatBase):
         data["business_opening_hours"] = de_json_optional(
             data.get("business_opening_hours"), BusinessOpeningHours, bot
         )
+        data["parent_chat"] = de_json_optional(data.get("parent_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)
