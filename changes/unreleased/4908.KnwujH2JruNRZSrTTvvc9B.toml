@@ -1,0 +1,5 @@
+other = "[WIP] `ResourceWarning: unclosed file` when passing `pathlib.Path` to `send_photo`/`send_document`"
+[[pull_requests]]
+uid = "4908"
+author_uid = "Copilot"
+closes_threads = ["4907"]
