@@ -1389,8 +1389,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         message.text = "AA"
         with pytest.raises(
             ValueError,
-            match="You requested the 5-th occurrence of 'A', "
-            "but this text appears only 2 times.",
+            match="You requested the 5-th occurrence of 'A', but this text appears only 2 times.",
         ):
             message.compute_quote_position_and_entities("A", 5)
 

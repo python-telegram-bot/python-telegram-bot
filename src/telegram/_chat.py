@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
+
 import datetime as dtm
 from collections.abc import Sequence
 from html import escape
@@ -39,6 +40,7 @@ from telegram._utils.types import (
     ReplyMarkup,
     TimePeriod,
 )
+from telegram._utils.usernames import get_full_name, get_link
 from telegram.helpers import escape_markdown
 from telegram.helpers import mention_html as helpers_mention_html
 from telegram.helpers import mention_markdown as helpers_mention_markdown
@@ -152,20 +154,14 @@ class _ChatBase(TelegramObject):
 
         .. versionadded:: 13.2
         """
-        if not self.first_name:
-            return None
-        if self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        return self.first_name
+        return get_full_name(self)
 
     @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat has a :attr:`~Chat.username`, returns a
         t.me link of the chat.
         """
-        if self.username:
-            return f"https://t.me/{self.username}"
-        return None
+        return get_link(self)
 
     def mention_markdown(self, name: Optional[str] = None) -> str:
         """

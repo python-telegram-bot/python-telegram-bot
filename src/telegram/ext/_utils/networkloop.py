@@ -30,6 +30,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 import asyncio
 import contextlib
 from collections.abc import Coroutine
@@ -53,10 +54,12 @@ async def network_retry_loop(
 ) -> None:
     """Perform a loop calling `action_cb`, retrying after network errors.
 
-    Stop condition for loop:
-        * `is_running()` evaluates :obj:`False` or
-        * return value of `action_cb` evaluates :obj:`False`
+    Stop condition for loop in case of ``max_retries < 0``:
+        * `is_running()` evaluates :obj:`False`
         * or `stop_event` is set.
+
+    Additional stop condition for loop in case of `max_retries >= 0``:
+        * a call to `action_cb` succeeds
         * or `max_retries` is reached.
 
     Args:
@@ -85,12 +88,14 @@ async def network_retry_loop(
             * > 0: Number of retries.
 
     """
+    infinite_loop = max_retries < 0
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
-    async def do_action() -> bool:
+    async def do_action() -> None:
         if not stop_event:
-            return await action_cb()
+            await action_cb()
+            return
 
         action_cb_task = asyncio.create_task(action_cb())
         stop_task = asyncio.create_task(stop_event.wait())
@@ -103,16 +108,20 @@ async def network_retry_loop(
 
         if stop_task in done:
             _LOGGER.debug("%s Cancelled", log_prefix)
-            return False
+            return
 
-        return action_cb_task.result()
+        # Calling `result()` on `action_cb_task` will raise an exception if the task failed.
+        # this is important to propagate the error to the caller.
+        action_cb_task.result()
 
     _LOGGER.debug("%s Starting", log_prefix)
     cur_interval = interval
     retries = 0
     while effective_is_running():
         try:
-            if not await do_action():
+            await do_action()
+            if not infinite_loop:
+                _LOGGER.debug("%s Action succeeded. Stopping loop.", log_prefix)
                 break
         except RetryAfter as exc:
             slack_time = 0.5

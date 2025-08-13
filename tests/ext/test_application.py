@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """The integration of persistence into the application is tested in test_basepersistence."""
+
 import asyncio
 import functools
 import inspect
@@ -1005,9 +1006,9 @@ class TestApplication:
             str(recwarn[0].message)
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
-        assert (
-            Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py"
-        ), "incorrect stacklevel!"
+        assert Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py", (
+            "incorrect stacklevel!"
+        )
 
     async def test_non_blocking_no_error_handler(self, app, caplog):
         app.add_handler(TypeHandler(object, self.callback_raise_error("Test error"), block=False))
@@ -1078,9 +1079,9 @@ class TestApplication:
             str(recwarn[0].message)
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
-        assert (
-            Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py"
-        ), "incorrect stacklevel!"
+        assert Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py", (
+            "incorrect stacklevel!"
+        )
 
     @pytest.mark.parametrize(("block", "expected_output"), [(False, 0), (True, 5)])
     async def test_default_block_error_handler(self, bot_info, block, expected_output):
@@ -1503,7 +1504,7 @@ class TestApplication:
         thread.start()
         with caplog.at_level(logging.DEBUG):
             app.run_polling(drop_pending_updates=True, close_loop=False)
-            thread.join()
+            thread.join(timeout=10)
 
         assert len(assertions) == 8
         for key, value in assertions.items():
@@ -1557,7 +1558,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == ["init", "post_init", "start_polling"], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
@@ -1602,7 +1603,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.shutdown",
             "shutdown",
@@ -1654,7 +1655,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.stop",
             "stop",
@@ -1703,7 +1704,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys())
         for name, param in updater_signature.parameters.items():
@@ -1715,10 +1716,11 @@ class TestApplication:
         expected = {
             name: name for name in updater_signature.parameters if name != "error_callback"
         }
+        expected["bootstrap_retries"] = 42
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(close_loop=False, **expected)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys())
         assert self.received.pop("error_callback", None)
@@ -1777,7 +1779,7 @@ class TestApplication:
                 drop_pending_updates=True,
                 close_loop=False,
             )
-            thread.join()
+            thread.join(timeout=10)
 
         assert len(assertions) == 7
         for key, value in assertions.items():
@@ -1842,7 +1844,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == ["init", "post_init", "start_webhook"], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
@@ -1898,7 +1900,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.shutdown",
             "shutdown",
@@ -1961,7 +1963,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.stop",
             "stop",
@@ -2012,7 +2014,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_webhook(close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys()) - {"self"}
         for name, param in updater_signature.parameters.items():
@@ -2021,10 +2023,11 @@ class TestApplication:
             assert self.received[name] == param.default
 
         expected = {name: name for name in updater_signature.parameters if name != "self"}
+        expected["bootstrap_retries"] = 42
         thread = Thread(target=thread_target)
         thread.start()
         app.run_webhook(close_loop=False, **expected)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(expected.keys())
         assert self.received == expected
@@ -2356,8 +2359,7 @@ class TestApplication:
         thread.join(timeout=10)
         assert not thread.is_alive(), "Test took to long to run. Aborting"
 
-    @pytest.mark.flaky(3, 1)  # loop.call_later will error the test when a flood error is received
-    def test_signal_handlers(self, app, monkeypatch):
+    def test_signal_handlers(self, offline_bot, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
 
@@ -2365,19 +2367,30 @@ class TestApplication:
 
         def signal_handler_test(*args, **kwargs):
             # args[0] is the signal, [1] the callback
-            received_signals.append(args[0])
+            received_signals.append(args[1])
+
+        app = ApplicationBuilder().bot(offline_bot).application_class(PytestApplication).build()
+
+        # Mock the necessary methods to avoid network calls
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         loop = asyncio.get_event_loop()
 
-        monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test)
-        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(loop.__class__, "add_signal_handler", signal_handler_test)
 
-        def abort_app():
-            raise SystemExit
+        # Mock initialize to exit quickly after testing signal handler setup
+        original_initialize = app.initialize
 
-        loop.call_later(0.6, abort_app)
+        async def quick_initialize(*args, **kwargs):
+            await original_initialize(*args, **kwargs)
+            # Exit quickly by raising an exception after successful initialization
+            raise TelegramError("Test completed successfully")
 
-        app.run_polling(close_loop=False)
+        monkeypatch.setattr(app, "initialize", quick_initialize)
+
+        with pytest.raises(TelegramError, match="Test completed successfully"):
+            app.run_polling(close_loop=False)
 
         if platform.system() == "Windows":
             assert received_signals == []
@@ -2385,8 +2398,8 @@ class TestApplication:
             assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
 
         received_signals.clear()
-        loop.call_later(0.8, abort_app)
-        app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
+        with pytest.raises(TelegramError, match="Test completed successfully"):
+            app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
         if platform.system() == "Windows":
             assert received_signals == []
@@ -2537,7 +2550,7 @@ class TestApplication:
                 close_loop=False,
             )
 
-        thread.join()
+        thread.join(timeout=10)
 
         assert len(assertions) == 5
         for key, value in assertions.items():
@@ -2711,3 +2724,67 @@ class TestApplication:
         # check that exactly those handlers were checked that were configured when
         # add_error_handler was called
         assert called_handlers == {"remove_handler"}
+
+    @pytest.mark.skipif(
+        sys.version_info < (3, 14),
+        reason="Only relevant for Python 3.14+ where get_event_loop() raises RuntimeError",
+    )
+    def test_run_polling_no_event_loop_python314(self, offline_bot, monkeypatch):
+        """Test that run_polling works when no event loop exists (Python 3.14+ scenario).
+
+        This simulates the Python 3.14+ behavior where get_event_loop() raises RuntimeError
+        when there's no current event loop in the main thread. The fix should create a new
+        event loop in this case.
+        """
+        # Track if our test ran and whether any exceptions occurred
+        exception_captured = None
+
+        def thread_target():
+            nonlocal exception_captured
+            try:
+                # Intentionally DON'T set an event loop to simulate Python 3.14 scenario
+                # Note: the existing test_run_polling_webhook_bootstrap_retries DOES set one
+
+                app = (
+                    ApplicationBuilder()
+                    .bot(offline_bot)
+                    .application_class(PytestApplication)
+                    .build()
+                )
+
+                # Mock the necessary methods to avoid network calls
+                monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+                monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+
+                # Mock initialize to exit quickly after testing event loop creation
+                original_initialize = app.initialize
+
+                async def quick_initialize(*args, **kwargs):
+                    await original_initialize(*args, **kwargs)
+                    # Exit quickly by raising an exception after successful initialization
+                    raise TelegramError("Test completed successfully")
+
+                monkeypatch.setattr(app, "initialize", quick_initialize)
+
+                # This should work - the key is that it creates an event loop and doesn't
+                # raise RuntimeError about no current event loop (Python 3.14+ issue)
+                with pytest.raises(TelegramError, match="Test completed successfully"):
+                    app.run_polling(
+                        bootstrap_retries=0,
+                        close_loop=True,
+                        stop_signals=None,  # Can't use signals in threads
+                        drop_pending_updates=True,
+                    )
+                # If we get here, the event loop was created successfully
+            except Exception as e:
+                exception_captured = e
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        thread.join(timeout=10)
+
+        assert not thread.is_alive(), "Test took too long to run"
+
+        # If there was an unexpected exception, fail the test
+        if exception_captured:
+            raise exception_captured

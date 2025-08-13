@@ -150,9 +150,7 @@ class TestApplicationBuilder:
         assert app.bot.local_mode is False
 
         get_updates_client = app.bot._request[0]._client
-        assert get_updates_client.limits == httpx.Limits(
-            max_connections=1, max_keepalive_connections=1
-        )
+        assert get_updates_client.limits == httpx.Limits(max_connections=1)
         assert get_updates_client.proxy is None
         assert get_updates_client.timeout == httpx.Timeout(
             connect=5.0, read=5.0, write=5.0, pool=1.0
@@ -161,7 +159,7 @@ class TestApplicationBuilder:
         assert not get_updates_client.http2
 
         client = app.bot.request._client
-        assert client.limits == httpx.Limits(max_connections=256, max_keepalive_connections=256)
+        assert client.limits == httpx.Limits(max_connections=256)
         assert client.proxy is None
         assert client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
         assert client.http1 is True
@@ -346,11 +344,7 @@ class TestApplicationBuilder:
             PRIVATE_KEY
         ).defaults(defaults).arbitrary_callback_data(42).request(request).get_updates_request(
             get_updates_request
-        ).rate_limiter(
-            rate_limiter
-        ).local_mode(
-            True
-        )
+        ).rate_limiter(rate_limiter).local_mode(True)
         built_bot = builder.build().bot
 
         # In the following we access some private attributes of bot and request. this is not
@@ -395,7 +389,7 @@ class TestApplicationBuilder:
         client = app.bot.request._client
 
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
-        assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
+        assert client.limits == httpx.Limits(max_connections=1)
         assert client.proxy == "proxy"
         assert client.http1 is True
         assert client.http2 is False
@@ -407,16 +401,12 @@ class TestApplicationBuilder:
             2
         ).get_updates_pool_timeout(3).get_updates_read_timeout(4).get_updates_write_timeout(
             5
-        ).get_updates_http_version(
-            "1.1"
-        ).get_updates_proxy(
-            "get_updates_proxy"
-        )
+        ).get_updates_http_version("1.1").get_updates_proxy("get_updates_proxy")
         app = builder.build()
         client = app.bot._request[0]._client
 
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
-        assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
+        assert client.limits == httpx.Limits(max_connections=1)
         assert client.proxy == "get_updates_proxy"
         assert client.http1 is True
         assert client.http2 is False

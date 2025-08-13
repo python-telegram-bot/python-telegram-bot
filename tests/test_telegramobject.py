@@ -146,9 +146,9 @@ class TestTelegramObject:
         if cls is TelegramObject:
             # TelegramObject doesn't have a super class
             return
-        assert "api_kwargs=api_kwargs" in inspect.getsource(
-            cls.__init__
-        ), f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
+        assert "api_kwargs=api_kwargs" in inspect.getsource(cls.__init__), (
+            f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
+        )
 
     def test_de_json_arbitrary_exceptions(self, bot):
         class SubClass(TelegramObject):

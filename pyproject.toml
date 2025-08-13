@@ -100,11 +100,11 @@ tests = [
     # required for building the wheels for releases
     "build",
     # For the test suite
-    "pytest==8.4.0",
+    "pytest==8.4.1",
     # needed because pytest doesn't come with native support for coroutines as tests
     "pytest-asyncio==0.21.2",
     # xdist runs tests in parallel
-    "pytest-xdist==3.6.1",
+    "pytest-xdist==3.8.0",
     # Used for flaky tests (flaky decorator)
     "flaky>=3.8.1",
     # used in test_official for parsing tg docs
@@ -120,7 +120,7 @@ tests = [
 docs = [
     "chango~=0.4.0; python_version >= '3.12'",
     "sphinx==8.2.3; python_version >= '3.11'",
-    "furo==2024.8.6",
+    "furo==2025.7.19",
     "sphinx-paramlinks==0.6.0",
     "sphinxcontrib-mermaid==1.0.0",
     "sphinx-copybutton==0.5.2",
@@ -146,7 +146,7 @@ path = "src/telegram/_version.py"
 # See also https://github.com/pypa/hatch/issues/1230 for discussion
 # the source distribution will include most of the files in the root directory
 [tool.hatch.build.targets.sdist]
-exclude = [".venv*", "venv*", ".github"]
+exclude = [".venv*", "venv*", ".github", "uv.lock"]
 # the wheel will only include the src/telegram package
 [tool.hatch.build.targets.wheel]
 packages = ["src/telegram"]
@@ -155,15 +155,6 @@ packages = ["src/telegram"]
 [tool.chango]
 sys_path = "changes"
 chango_instance = { name= "chango_instance", module = "config" }
-
-# BLACK:
-[tool.black]
-line-length = 99
-
-# ISORT:
-[tool.isort]  # black config
-profile = "black"
-line_length = 99
 
 # RUFF:
 [tool.ruff]

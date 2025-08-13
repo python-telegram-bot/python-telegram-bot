@@ -25,6 +25,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+
 from typing import Optional
 
 from telegram._utils.types import SCT

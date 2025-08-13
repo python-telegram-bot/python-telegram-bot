@@ -60,7 +60,6 @@ class TestForumTopicWithoutRequest:
         assert forum_topic_object.icon_custom_emoji_id == emoji_id
 
     def test_de_json(self, offline_bot, emoji_id, forum_group_id):
-
         json_dict = {
             "message_thread_id": forum_group_id,
             "name": TEST_TOPIC_NAME,
@@ -297,16 +296,15 @@ class TestForumTopicCreatedWithoutRequest:
     def test_slot_behaviour(self, topic_created):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(topic_created)) == len(
-            set(mro_slots(topic_created))
-        ), "duplicate slot"
+        assert len(mro_slots(topic_created)) == len(set(mro_slots(topic_created))), (
+            "duplicate slot"
+        )
 
     def test_expected_values(self, topic_created):
         assert topic_created.icon_color == TEST_TOPIC_ICON_COLOR
         assert topic_created.name == TEST_TOPIC_NAME
 
     def test_de_json(self, offline_bot):
-
         json_dict = {"icon_color": TEST_TOPIC_ICON_COLOR, "name": TEST_TOPIC_NAME}
         action = ForumTopicCreated.de_json(json_dict, offline_bot)
         assert action.api_kwargs == {}

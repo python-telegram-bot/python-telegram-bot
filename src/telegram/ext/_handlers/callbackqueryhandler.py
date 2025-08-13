@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackQueryHandler class."""
+
 import asyncio
 import re
 from re import Match, Pattern
