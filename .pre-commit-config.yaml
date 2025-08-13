@@ -13,11 +13,9 @@ repos:
     # Run the linter:
     -   id: ruff-check
         name: ruff check
-        language: python
     # Run the formatter:
     -   id: ruff-format
         name: ruff format
-        language: python
 -   repo: https://github.com/PyCQA/pylint
     rev: v3.3.7
     hooks:
