@@ -871,6 +871,7 @@ class CallbackQuery(TelegramObject):
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
         video_start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -920,6 +921,7 @@ class CallbackQuery(TelegramObject):
             reply_parameters=reply_parameters,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     MAX_ANSWER_TEXT_LENGTH: Final[int] = (
