@@ -2381,8 +2381,6 @@ class TestBotWithoutRequest:
             return request_data.parameters.get("direct_messages_topic_id") == 42
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-
-        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_message(2, "text", direct_messages_topic_id=42)
 
     async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
