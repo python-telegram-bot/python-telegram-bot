@@ -19,6 +19,7 @@
 import contextlib
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -156,3 +157,20 @@ class TestFiles:
             proc.kill()
             # This exception may be thrown if the process has finished before we had the chance
             # to kill it.
+
+    @pytest.mark.filterwarnings("error::ResourceWarning")
+    def test_parse_file_input_path_no_resource_warning(self):
+        """Test that parsing a Path input doesn't generate ResourceWarning."""
+        # Create a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_file:
+            tmp_file.write(b"test content for resource warning test")
+            tmp_path = Path(tmp_file.name)
+
+        try:
+            # This should not raise a ResourceWarning
+            result = telegram._utils.files.parse_file_input(tmp_path)
+            assert isinstance(result, InputFile)
+            assert result.filename.endswith(".png")
+        finally:
+            # Clean up
+            tmp_path.unlink()
