@@ -1,4 +1,4 @@
-other = "Add `filters.FORUM`"
+features = "Add `filters.FORUM` to filter messages from forum topic chats"
 [[pull_requests]]
 uid = "4906"
 author_uid = "harshil21"
