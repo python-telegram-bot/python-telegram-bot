@@ -5,6 +5,7 @@ ci:
     # frequent updates.
     autoupdate_schedule: quarterly
     autoupdate_commit_msg: 'Bump `pre-commit` Hooks to Latest Versions'
+    skip: [renovate-config-validator]  # This is too big in size to run on pre-commit.ci, so we skip it
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
@@ -58,3 +59,10 @@ repos:
         - APScheduler~=3.10.4
         - cachetools>=5.3.3,<5.5.0
         - . # this basically does `pip install -e .`
+
+# Validates your Renovate configuration:
+-   repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 41.66.2
+    hooks:
+      - id: renovate-config-validator
+        args: [--strict]  # Fail when we use something deprecated and need to migrate
