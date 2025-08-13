@@ -3,7 +3,8 @@
   "extends": [ // See what config:best-practices does: https://docs.renovatebot.com/presets-config/#configbest-practices
     "config:best-practices",
     // Opt-in to updating the pre-commit-config.yaml file too:
-    ":enablePreCommit"
+    ":enablePreCommit",
+    ":prConcurrentLimitNone"  // No limits on the number of open PRs.
   ],
 
   // Add pull request labels:
@@ -60,11 +61,6 @@
       "description": "Group chango updates together",
       "matchPackageNames": ["chango", "Bibo-Joshi/chango"],
       "groupName": "Chango"
-    },
-    {
-      "description": "Group uv updates together",
-      "matchPackageNames": ["astral-sh/uv", "astral-sh/setup-uv"],
-      "groupName": "uv"
     }
   ],
 
