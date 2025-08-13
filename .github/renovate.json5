@@ -44,19 +44,32 @@
     {
       "description": "Group Ruff updates together",
       "matchPackageNames": ["ruff", "astral-sh/ruff-pre-commit"],
-      "groupName": "Ruff updates"
+      "groupName": "Ruff"
     },
     {
       "description": "Group mypy updates together",
       "matchPackageNames": ["mypy", "pre-commit/mirrors-mypy"],
-      "groupName": "Mypy updates"
+      "groupName": "Mypy"
     },
     {
       "description": "Group pylint updates together",
       "matchPackageNames": ["pylint", "PyCQA/pylint"],
-      "groupName": "Pylint updates"
+      "groupName": "Pylint"
+    },
+    {
+      "description": "Group chango updates together",
+      "matchPackageNames": ["chango", "Bibo-Joshi/chango"],
+      "groupName": "Chango"
+    },
+    {
+      "description": "Group uv updates together",
+      "matchPackageNames": ["astral-sh/uv", "astral-sh/setup-uv"],
+      "groupName": "uv"
     }
   ],
+
+  // Increase the number of PR's Renovate can create in a hour. Default is 2.
+  "prHourlyLimit": 5,
 
   // Temporarily disabled:
   "ignoreDeps": ["pytest-asyncio"],
