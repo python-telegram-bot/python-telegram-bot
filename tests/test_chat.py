@@ -93,6 +93,7 @@ class TestChatWithoutRequest(ChatTestBase):
         assert chat.is_forum == self.is_forum
         assert chat.first_name == self.first_name
         assert chat.last_name == self.last_name
+        assert chat.is_direct_messages == self.is_direct_messages
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()

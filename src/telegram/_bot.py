@@ -1274,7 +1274,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+            direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
+                topic to which the message will be forwarded; required if the message is
+                forwarded to a direct messages chat.
+
                 .. versionadded:: NEXT.VERSION
 
 
@@ -1340,7 +1343,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
-            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+            direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
+                topic to which the messages will be forwarded; required if the messages are
+                forwarded to a direct messages chat.
+
                 .. versionadded:: NEXT.VERSION
 
         Returns:
@@ -2746,7 +2752,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
                 .. versionadded:: 21.7
-            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+            direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
+                topic to which the messages will be sent; required if the messages are sent to a
+                direct messages chat.
+
                 .. versionadded:: NEXT.VERSION
 
 
@@ -8385,7 +8394,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
             remove_caption (:obj:`bool`, optional): Pass :obj:`True` to copy the messages without
                 their captions.
-            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+            direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
+                topic to which the message will be sent; required if the message is sent to a
+                direct messages chat.
+
                 .. versionadded:: NEXT.VERSION
 
 

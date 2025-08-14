@@ -70,8 +70,8 @@ Available Types
     telegram.chatshared
     telegram.contact
     telegram.dice
-    telegram.directmessagestopic
     telegram.directmessagepricechanged
+    telegram.directmessagestopic
     telegram.document
     telegram.externalreplyinfo
     telegram.file
