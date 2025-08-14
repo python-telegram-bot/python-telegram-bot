@@ -1,5 +1,5 @@
-other = "[WIP] `ResourceWarning: unclosed file` when passing `pathlib.Path` to `send_photo`/`send_document`"
+bugfixes = "Fix ``ResourceWarning`` when passing ``pathlib.Path`` objects to methods which accept file input"
 [[pull_requests]]
 uid = "4908"
-author_uid = "Copilot"
+author_uid = "harshil21"
 closes_threads = ["4907"]
