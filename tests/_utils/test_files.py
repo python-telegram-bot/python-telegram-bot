@@ -158,11 +158,9 @@ class TestFiles:
             # to kill it.
 
     @pytest.mark.filterwarnings("error::ResourceWarning")
-    def test_parse_file_input_path_no_resource_warning(self, tmp_path):
+    def test_parse_file_input_path_no_resource_warning(self):
         """Test that parsing a Path input doesn't generate ResourceWarning."""
-        # Create a temporary file using pytest's tmp_path fixture
-        test_file = tmp_path / "test_file.png"
-        test_file.write_bytes(b"test content for resource warning test")
+        test_file = data_file(filename="telegram.png")
 
         # This should not raise a ResourceWarning
         result = telegram._utils.files.parse_file_input(test_file)
