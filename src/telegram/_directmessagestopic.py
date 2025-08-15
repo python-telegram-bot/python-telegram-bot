@@ -41,13 +41,16 @@ class DirectMessagesTopic(TelegramObject):
     Args:
         topic_id (:obj:`int`): Unique identifier of the topic.
         user (:class:`telegram.User`, optional): Information about the user that created the topic.
-            Currently, it is always present.
 
+            .. hint::
+                According to Telegram, this field is always present as of Bot API 9.2.
 
     Attributes:
         topic_id (:obj:`int`): Unique identifier of the topic.
         user (:class:`telegram.User`): Optional. Information about the user that created the topic.
-            Currently, it is always present.
+
+            .. hint::
+                According to Telegram, this field is always present as of Bot API 9.2.
 
     """
 

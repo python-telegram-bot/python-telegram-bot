@@ -57,6 +57,7 @@ class TestDirectMessagesTopicWithoutRequest(DirectMessagesTopicTestBase):
         dmt = DirectMessagesTopic.de_json(json_dict, offline_bot)
         assert dmt.topic_id == self.topic_id
         assert dmt.user == self.user
+        assert dmt.api_kwargs == {}
 
     def test_to_dict(self, direct_messages_topic):
         dmt = direct_messages_topic

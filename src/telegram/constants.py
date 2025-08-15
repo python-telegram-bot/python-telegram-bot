@@ -2129,11 +2129,6 @@ class MessageType(StringEnum):
 
     .. versionadded:: 22.3
     """
-    DIRECT_MESSAGES_TOPIC = "direct_messages_topic"
-    """:obj:`str`: Messages with :attr:`telegram.Message.direct_messages_topic`.
-
-    .. versionadded:: NEXT.VERSION
-    """
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
     EFFECT_ID = "effect_id"
