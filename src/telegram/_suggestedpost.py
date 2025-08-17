@@ -124,7 +124,7 @@ class SuggestedPostParameters(TelegramObject):
 
     def __init__(
         self,
-        price: Optional[SuggestedPostPrice],
+        price: Optional[SuggestedPostPrice] = None,
         send_date: Optional[dtm.datetime] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
