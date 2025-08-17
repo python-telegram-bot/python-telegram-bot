@@ -628,6 +628,10 @@ class Message(MaybeInaccessibleMessage):
             of a channel has changed.
 
             .. versionadded:: 22.3
+        is_paid_post (:obj:`bool`, optional): :obj:`True`, if the message is a paid post. Note that
+            such posts must not be deleted for 24 hours to receive the payment and can't be edited.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -989,6 +993,10 @@ class Message(MaybeInaccessibleMessage):
             messages chat of a channel has changed.
 
             .. versionadded:: 22.3
+        is_paid_post (:obj:`bool`): Optional. :obj:`True`, if the message is a paid post. Note that
+            such posts must not be deleted for 24 hours to receive the payment and can't be edited.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1051,6 +1059,7 @@ class Message(MaybeInaccessibleMessage):
         "invoice",
         "is_automatic_forward",
         "is_from_offline",
+        "is_paid_post",
         "is_topic_message",
         "left_chat_member",
         "link_preview_options",
@@ -1195,6 +1204,7 @@ class Message(MaybeInaccessibleMessage):
         checklist: Optional[Checklist] = None,
         checklist_tasks_done: Optional[ChecklistTasksDone] = None,
         checklist_tasks_added: Optional[ChecklistTasksAdded] = None,
+        is_paid_post: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1310,6 +1320,7 @@ class Message(MaybeInaccessibleMessage):
             self.direct_message_price_changed: Optional[DirectMessagePriceChanged] = (
                 direct_message_price_changed
             )
+            self.is_paid_post: Optional[bool] = is_paid_post
 
             self._effective_attachment = DEFAULT_NONE
 
