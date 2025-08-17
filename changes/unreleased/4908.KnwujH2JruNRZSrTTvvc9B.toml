@@ -1,0 +1,5 @@
+bugfixes = "Fix ``ResourceWarning`` when passing ``pathlib.Path`` objects to methods which accept file input"
+[[pull_requests]]
+uid = "4908"
+author_uid = "harshil21"
+closes_threads = ["4907"]
