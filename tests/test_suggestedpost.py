@@ -50,35 +50,9 @@ class TestSuggestedPostParameterWithoutRequest(SuggestedPostParameterTestBase):
             set(mro_slots(suggested_post_parameters))
         ), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "price": self.price.to_dict(),
-            "send_date": to_timestamp(self.send_date),
-        }
-        spp = SuggestedPostParameters.de_json(json_dict, offline_bot)
-        assert spp.price == self.price
-        assert spp.send_date == self.send_date
-        assert spp.api_kwargs == {}
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "price": self.price.to_dict(),
-            "send_date": to_timestamp(self.send_date),
-        }
-
-        spp_bot = SuggestedPostParameters.de_json(json_dict, offline_bot)
-        spp_bot_raw = SuggestedPostParameters.de_json(json_dict, raw_bot)
-        spp_bot_tz = SuggestedPostParameters.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        send_date_offset = spp_bot_tz.send_date.utcoffset()
-        send_date_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
-            spp_bot_tz.send_date.replace(tzinfo=None)
-        )
-
-        assert spp_bot.send_date.tzinfo == UTC
-        assert spp_bot_raw.send_date.tzinfo == UTC
-        assert send_date_offset_tz == send_date_offset
+    def test_expected_values(self, suggested_post_parameters):
+        assert suggested_post_parameters.price == self.price
+        assert suggested_post_parameters.send_date == self.send_date
 
     def test_to_dict(self, suggested_post_parameters):
         spp_dict = suggested_post_parameters.to_dict()
@@ -126,15 +100,9 @@ class TestSuggestedPostPriceWithoutRequest(SuggestedPostPriceTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "currency": self.currency,
-            "amount": self.amount,
-        }
-        spp = SuggestedPostPrice.de_json(json_dict, offline_bot)
-        assert spp.currency == self.currency
-        assert spp.amount == self.amount
-        assert spp.api_kwargs == {}
+    def test_expected_values(self, suggested_post_price):
+        assert suggested_post_price.currency == self.currency
+        assert suggested_post_price.amount == self.amount
 
     def test_to_dict(self, suggested_post_price):
         spp_dict = suggested_post_price.to_dict()
