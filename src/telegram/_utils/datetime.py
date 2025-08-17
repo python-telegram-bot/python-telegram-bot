@@ -34,6 +34,8 @@ import time
 import zoneinfo
 from typing import TYPE_CHECKING, Optional, Union
 
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -229,23 +231,17 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     return dt_obj.timestamp()
 
 
-def verify_timezone(
-    tz: Union[dtm.tzinfo, zoneinfo.ZoneInfo],
-) -> Optional[Union[zoneinfo.ZoneInfo, dtm.tzinfo]]:
-    """
-    Verifies that the given timezone is a valid timezone.
-    """
+def verify_timezone(tz: Optional[str]) -> Optional[zoneinfo.ZoneInfo]:
+    """Wrapper around the `ZoneInfo` constructor with slightly more helpful error messages"""
 
-    if isinstance(tz, (dtm.tzinfo, zoneinfo.ZoneInfo)):
-        return tz
+    if tz is None:
+        return None
 
     try:
         return zoneinfo.ZoneInfo(tz)
     except (TypeError, ValueError) as e:
         raise zoneinfo.ZoneInfoNotFoundError(
-            f"No time zone found with key {tz}. "
-            f"Make sure to use a valid time zone name and "
-            f"correct install tzdata (https://pypi.org/project/tzdata/)"
+            f"ZoneInfo keys may not be absolute paths, got: {tz}."
         ) from e
     except zoneinfo.ZoneInfoNotFoundError as err:
         raise zoneinfo.ZoneInfoNotFoundError(
@@ -254,7 +250,7 @@ def verify_timezone(
             f"correct install tzdata (https://pypi.org/project/tzdata/)"
         ) from err
 
-        
+
 def get_timedelta_value(
     value: Optional[dtm.timedelta], attribute: str
 ) -> Optional[Union[int, dtm.timedelta]]:
@@ -295,5 +291,5 @@ def get_timedelta_value(
     return (
         int(seconds)
         if (seconds := value.total_seconds()).is_integer()
-        else seconds  # type: ignore[return-value]
+        else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
     )

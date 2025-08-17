@@ -656,8 +656,8 @@ class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
 
         expected = (
             (
-                dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
-                dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+                dtm.datetime(2023, 11, 6, 3, 0, tzinfo=time_zone),
+                dtm.datetime(2023, 11, 6, 15, 30, tzinfo=time_zone),
             ),
         )
 
@@ -672,8 +672,12 @@ class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
 
         expected = (
             (
-                dtm.datetime(2023, 11, 6, 8, 0, tzinfo=None),
-                dtm.datetime(2023, 11, 6, 20, 30, tzinfo=None),
+                dtm.datetime(
+                    2023, 11, 6, 8, 0, tzinfo=ZoneInfo(sample_opening_hours.time_zone_name)
+                ),
+                dtm.datetime(
+                    2023, 11, 6, 20, 30, tzinfo=ZoneInfo(sample_opening_hours.time_zone_name)
+                ),
             ),
         )
 
