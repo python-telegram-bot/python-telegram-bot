@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._files.location import Location
+from telegram._inputchecklist import InputChecklist
 from telegram._message import MaybeInaccessibleMessage, Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -343,6 +344,43 @@ class CallbackQuery(TelegramObject):
             api_kwargs=api_kwargs,
             caption_entities=caption_entities,
             show_caption_above_media=show_caption_above_media,
+        )
+
+    async def edit_message_checklist(
+        self,
+        checklist: InputChecklist,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Union[Message, bool]:
+        """Shortcut for::
+
+            await update.callback_query.message.edit_checklist(*args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Message.edit_checklist`.
+
+        .. versionadded:: 22.3
+
+        Returns:
+            :class:`telegram.Message`: On success, the edited Message is returned.
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
+
+        """
+        return await self._get_message().edit_checklist(
+            checklist=checklist,
+            reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def edit_message_reply_markup(

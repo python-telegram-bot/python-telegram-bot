@@ -20,7 +20,15 @@
 
 import pytest
 
-from telegram import Bot, Chat, ChatPermissions, ReactionTypeEmoji, User
+from telegram import (
+    Bot,
+    Chat,
+    ChatPermissions,
+    InputChecklist,
+    InputChecklistTask,
+    ReactionTypeEmoji,
+    User,
+)
 from telegram.constants import ChatAction, ChatType, ReactionEmoji
 from telegram.helpers import escape_markdown
 from tests.auxil.bot_method_checks import (
@@ -578,6 +586,23 @@ class TestChatWithoutRequest(ChatTestBase):
 
         monkeypatch.setattr(chat.get_bot(), "send_dice", make_assertion)
         assert await chat.send_dice(emoji="test_dice")
+
+    async def test_instance_method_send_checklist(self, monkeypatch, chat):
+        checklist = InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")])
+
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["business_connection_id"] == "123"
+                and kwargs["checklist"] == checklist
+            )
+
+        assert check_shortcut_signature(Chat.send_checklist, Bot.send_checklist, ["chat_id"], [])
+        assert await check_shortcut_call(chat.send_checklist, chat.get_bot(), "send_checklist")
+        assert await check_defaults_handling(chat.send_checklist, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_checklist", make_assertion)
+        assert await chat.send_checklist("123", checklist)
 
     async def test_instance_method_send_game(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):

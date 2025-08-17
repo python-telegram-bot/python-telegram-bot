@@ -80,7 +80,7 @@ class CustomChango(DirectoryChanGo):
         """replace "14.5" with version.uid except in the contrib guide
         then call super
         """
-        root = Path(__file__).parent.parent / "telegram"
+        root = Path(__file__).parent.parent / "src"
         python_files = root.rglob("*.py")
         pattern = re.compile(r"NEXT\.VERSION")
         excluded_paths = {root / "docs/source/contribute.rst"}
