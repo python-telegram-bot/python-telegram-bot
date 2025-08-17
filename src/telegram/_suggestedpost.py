@@ -37,26 +37,33 @@ class SuggestedPostPrice(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`currency` and :attr:`amount` are equal.
 
+    .. versionadded:: NEXT.VERSION
+
     Args:
         currency (:obj:`str`):
-            Currency in which the post will be paid. Currently, must be one of “XTR” for Telegram
-            Stars or “TON” for toncoins.
+            Currency in which the post will be paid. Currently, must be one of `“XTR”` for Telegram
+            Stars or `“TON”` for toncoins.
         amount (:obj:`int`):
             The amount of the currency that will be paid for the post in the smallest units of the
             currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must
-            be between 5 and 100000, and price in nanotoncoins must be between
-            10000000 and 10000000000000.
+            be between :tg-const:`telegram.constants.SuggestedPost.MIN_PRICE_STARS`
+            and :tg-const:`telegram.constants.SuggestedPost.MAX_PRICE_STARS`, and price in
+            nanotoncoins must be between
+            :tg-const:`telegram.constants.SuggestedPost.MIN_PRICE_NANOTONCOINS`
+            and :tg-const:`telegram.constants.SuggestedPost.MAX_PRICE_NANOTONCOINS`.
 
     Attributes:
         currency (:obj:`str`):
-            Currency in which the post will be paid. Currently, must be one of “XTR” for Telegram
-            Stars or “TON” for toncoins.
+            Currency in which the post will be paid. Currently, must be one of `“XTR”` for Telegram
+            Stars or `“TON”` for toncoins.
         amount (:obj:`int`):
             The amount of the currency that will be paid for the post in the smallest units of the
             currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must
-            be between 5 and 100000, and price in nanotoncoins must be between
-            10000000 and 10000000000000.
-
+            be between :tg-const:`telegram.constants.SuggestedPost.MIN_PRICE_STARS`
+            and :tg-const:`telegram.constants.SuggestedPost.MAX_PRICE_STARS`, and price in
+            nanotoncoins must be between
+            :tg-const:`telegram.constants.SuggestedPost.MIN_PRICE_NANOTONCOINS`
+            and :tg-const:`telegram.constants.SuggestedPost.MAX_PRICE_NANOTONCOINS`.
     """
 
     __slots__ = ("amount", "currency")
@@ -70,7 +77,7 @@ class SuggestedPostPrice(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.currency: str = currency
-        self.amount: Optional[dtm.datetime] = amount
+        self.amount: int = amount
 
         self._id_attrs = (self.currency, self.amount)
 
@@ -84,15 +91,18 @@ class SuggestedPostParameters(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`price` and :attr:`send_date` are equal.
 
+    .. versionadded:: NEXT.VERSION
+
     Args:
         price (:class:`telegram.SuggestedPostPrice`, optional):
-            Proposed price for the post. If the field is omitted, then the post is unpaid..
+            Proposed price for the post. If the field is omitted, then the post is unpaid.
         send_date (:class:`datetime.datetime`, optional):
             Proposed send date of the post. If specified, then the date
-            must be between 300 second and 2678400 seconds (30 days) in the future. If the field is
-            omitted, then the post can be published at any time within 30 days at the sole
-            discretion of the user who approves it.
-
+            must be between :tg-const:`telegram.constants.SuggestedPost.MIN_SEND_DATE`
+            second and :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days)
+            in the future. If the field is omitted, then the post can be published at any time
+            within :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days) at
+            the sole discretion of the user who approves it.
             |datetime_localization|
 
     Attributes:
@@ -101,10 +111,11 @@ class SuggestedPostParameters(TelegramObject):
             is unpaid.
         send_date (:obj:`d`):
             Optional. Proposed send date of the post. If specified, then the date
-            must be between 300 second and 2678400 seconds (30 days) in the future. If the field is
-            omitted, then the post can be published at any time within 30 days at the sole
-            discretion of the user who approves it.
-
+            must be between :tg-const:`telegram.constants.SuggestedPost.MIN_SEND_DATE`
+            second and :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days)
+            in the future. If the field is omitted, then the post can be published at any time
+            within :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days) at
+            the sole discretion of the user who approves it.
             |datetime_localization|
 
     """
@@ -127,9 +138,7 @@ class SuggestedPostParameters(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(
-        cls, data: JSONDict, bot: Optional["Bot"] = None
-    ) -> "SuggestedPostParameters":
+    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuggestedPostParameters":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
