@@ -1452,6 +1452,44 @@ class TestChatWithoutRequest(ChatTestBase):
             message_id="message_id", business_connection_id="business_connection_id"
         )
 
+    async def test_instance_method_approve_suggested_post(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["message_id"] == "message_id"
+                and kwargs["send_date"] == "send_date"
+            )
+
+        assert check_shortcut_signature(
+            Chat.approve_suggested_post, Bot.approve_suggested_post, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.approve_suggested_post, chat.get_bot(), "approve_suggested_post"
+        )
+        assert await check_defaults_handling(chat.approve_suggested_post, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "approve_suggested_post", make_assertion)
+        assert await chat.approve_suggested_post(message_id="message_id", send_date="send_date")
+
+    async def test_instance_method_decline_suggested_post(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["message_id"] == "message_id"
+                and kwargs["comment"] == "comment"
+            )
+
+        assert check_shortcut_signature(
+            Chat.decline_suggested_post, Bot.decline_suggested_post, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.decline_suggested_post, chat.get_bot(), "decline_suggested_post"
+        )
+        assert await check_defaults_handling(chat.decline_suggested_post, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "decline_suggested_post", make_assertion)
+        assert await chat.decline_suggested_post(message_id="message_id", comment="comment")
+
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
