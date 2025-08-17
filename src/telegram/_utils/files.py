@@ -145,7 +145,8 @@ def parse_file_input(  # pylint: disable=too-many-return-statements
             path = Path(file_input)
             if local_mode:
                 return path.absolute().as_uri()
-            return InputFile(path.open(mode="rb"), filename=filename, attach=attach)
+            with path.open(mode="rb") as file_handle:
+                return InputFile(file_handle, filename=filename, attach=attach)
 
         return file_input
     if isinstance(file_input, bytes):

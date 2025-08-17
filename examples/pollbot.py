@@ -7,6 +7,7 @@ Basic example for a bot that works with polls. Only 3 people are allowed to inte
 poll/quiz the bot generates. The preview command generates a closed poll/quiz, exactly like the
 one the user sends the bot
 """
+
 import logging
 
 from telegram import (

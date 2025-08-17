@@ -46,9 +46,9 @@ class TestInputChecklistTaskWithoutRequest(InputChecklistTaskTestBase):
     def test_slot_behaviour(self, input_checklist_task):
         for attr in input_checklist_task.__slots__:
             assert getattr(input_checklist_task, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(input_checklist_task)) == len(
-            set(mro_slots(input_checklist_task))
-        ), "duplicate slot"
+        assert len(mro_slots(input_checklist_task)) == len(set(mro_slots(input_checklist_task))), (
+            "duplicate slot"
+        )
 
     def test_expected_values(self, input_checklist_task):
         assert input_checklist_task.id == self.id
@@ -117,9 +117,9 @@ class TestInputChecklistWithoutRequest(InputChecklistTestBase):
     def test_slot_behaviour(self, input_checklist):
         for attr in input_checklist.__slots__:
             assert getattr(input_checklist, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(input_checklist)) == len(
-            set(mro_slots(input_checklist))
-        ), "duplicate slot"
+        assert len(mro_slots(input_checklist)) == len(set(mro_slots(input_checklist))), (
+            "duplicate slot"
+        )
 
     def test_expected_values(self, input_checklist):
         assert input_checklist.title == self.title

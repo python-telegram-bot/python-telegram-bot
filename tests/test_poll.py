@@ -50,12 +50,11 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
     def test_slot_behaviour(self, input_poll_option):
         for attr in input_poll_option.__slots__:
             assert getattr(input_poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(input_poll_option)) == len(
-            set(mro_slots(input_poll_option))
-        ), "duplicate slot"
+        assert len(mro_slots(input_poll_option)) == len(set(mro_slots(input_poll_option))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self):
-
         json_dict = {
             "text": self.text,
             "text_parse_mode": self.text_parse_mode,

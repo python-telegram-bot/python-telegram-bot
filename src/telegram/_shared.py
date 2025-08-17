@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects used for request chats/users service messages."""
+
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
@@ -24,6 +25,7 @@ from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
 from telegram._utils.types import JSONDict
+from telegram._utils.usernames import get_full_name, get_link, get_name
 
 if TYPE_CHECKING:
     from telegram._bot import Bot
@@ -177,6 +179,15 @@ class ChatShared(TelegramObject):
         data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
         return super().de_json(data=data, bot=bot)
 
+    @property
+    def link(self) -> Optional[str]:
+        """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
+        of the chat.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return get_link(self)
+
 
 class SharedUser(TelegramObject):
     """
@@ -243,6 +254,33 @@ class SharedUser(TelegramObject):
         self._id_attrs = (self.user_id,)
 
         self._freeze()
+
+    @property
+    def name(self) -> Optional[str]:
+        """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
+        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return get_name(self)
+
+    @property
+    def full_name(self) -> Optional[str]:
+        """:obj:`str`: Convenience property. If :attr:`first_name` is not :obj:`None`, gives
+        :attr:`first_name` followed by (if available) :attr:`last_name`.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return get_full_name(self)
+
+    @property
+    def link(self) -> Optional[str]:
+        """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
+        of the user.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return get_link(self)
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SharedUser":

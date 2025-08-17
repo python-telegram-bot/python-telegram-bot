@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects with thumbnails"""
+
 from typing import TYPE_CHECKING, Optional, TypeVar
 
 from telegram._files._basemedium import _BaseMedium

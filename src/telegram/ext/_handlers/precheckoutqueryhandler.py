@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PreCheckoutQueryHandler class."""
 
-
 import re
 from re import Pattern
 from typing import Optional, TypeVar, Union

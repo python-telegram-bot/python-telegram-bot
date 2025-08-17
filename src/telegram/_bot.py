@@ -339,7 +339,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self._initialized: bool = False
 
         self._request: tuple[BaseRequest, BaseRequest] = (
-            HTTPXRequest() if get_updates_request is None else get_updates_request,
+            (
+                HTTPXRequest(connection_pool_size=1)
+                if get_updates_request is None
+                else get_updates_request
+            ),
             HTTPXRequest() if request is None else request,
         )
 
@@ -3620,8 +3624,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 next_offset_int = current_offset_int + 1
                 next_offset = str(next_offset_int)
                 effective_results = results[
-                    current_offset_int
-                    * InlineQueryLimit.RESULTS : next_offset_int
+                    current_offset_int * InlineQueryLimit.RESULTS : next_offset_int
                     * InlineQueryLimit.RESULTS
                 ]
             else:

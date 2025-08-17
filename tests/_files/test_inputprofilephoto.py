@@ -32,7 +32,6 @@ from tests.auxil.slots import mro_slots
 
 
 class TestInputProfilePhotoWithoutRequest:
-
     def test_type_enum_conversion(self):
         instance = InputProfilePhoto(type="static")
         assert isinstance(instance.type, InputProfilePhotoType)

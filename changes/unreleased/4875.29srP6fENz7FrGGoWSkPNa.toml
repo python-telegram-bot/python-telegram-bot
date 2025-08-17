@@ -1,0 +1,5 @@
+bugfixes = "Adapt logic on getting the event loop in ``Application.run_polling/webhook`` to Python 3.14"
+[[pull_requests]]
+uid = "4875"
+author_uid = "harshil21"
+closes_threads = ["4874"]

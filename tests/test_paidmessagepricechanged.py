@@ -35,9 +35,9 @@ def paid_message_price_changed():
 class TestPaidMessagePriceChangedWithoutRequest(PaidMessagePriceChangedTestBase):
     def test_slot_behaviour(self, paid_message_price_changed):
         for attr in paid_message_price_changed.__slots__:
-            assert (
-                getattr(paid_message_price_changed, attr, "err") != "err"
-            ), f"got extra slot '{attr}'"
+            assert getattr(paid_message_price_changed, attr, "err") != "err", (
+                f"got extra slot '{attr}'"
+            )
         assert len(mro_slots(paid_message_price_changed)) == len(
             set(mro_slots(paid_message_price_changed))
         ), "duplicate slot"

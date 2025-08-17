@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
+
 import contextlib
 import datetime as dtm
 import inspect
@@ -206,8 +207,7 @@ class TelegramObject:
             if (
                 as_dict[k] is not None
                 and not (
-                    isinstance(as_dict[k], Sized)
-                    and len(as_dict[k]) == 0  # type: ignore[arg-type]
+                    isinstance(as_dict[k], Sized) and len(as_dict[k]) == 0  # type: ignore[arg-type]
                 )
             )
         )

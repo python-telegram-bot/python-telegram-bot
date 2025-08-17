@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PollHandler class."""
 
-
 from telegram import Update
 from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, RT

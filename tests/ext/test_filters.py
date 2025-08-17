@@ -158,9 +158,9 @@ class TestFilters:
             )
         }
         actual = set(filters.__all__)
-        assert (
-            actual == expected
-        ), f"Members {expected - actual} were not listed in constants.__all__"
+        assert actual == expected, (
+            f"Members {expected - actual} were not listed in constants.__all__"
+        )
 
     def test_filters_all(self, update):
         assert filters.ALL.check_update(update)
@@ -1495,6 +1495,11 @@ class TestFilters:
 
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"
+
+    def test_filters_forum(self, update):
+        assert not filters.FORUM.check_update(update)
+        update.message.chat.is_forum = True
+        assert filters.FORUM.check_update(update)
 
     def test_filters_forwarded_from_init(self):
         with pytest.raises(RuntimeError, match="in conjunction with"):
