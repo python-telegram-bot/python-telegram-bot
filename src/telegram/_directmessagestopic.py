@@ -62,10 +62,10 @@ class DirectMessagesTopic(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required:
-        self.topic_id = topic_id
+        self.topic_id: int = topic_id
 
         # Optionals:
-        self.user = user
+        self.user: Optional[User] = user
 
         self._id_attrs = (self.topic_id, self.user)
         self._freeze()
