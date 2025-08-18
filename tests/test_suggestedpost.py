@@ -30,17 +30,17 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def suggested_post_parameters():
     return SuggestedPostParameters(
-        price=SuggestedPostParameterTestBase.price,
-        send_date=SuggestedPostParameterTestBase.send_date,
+        price=SuggestedPostParametersTestBase.price,
+        send_date=SuggestedPostParametersTestBase.send_date,
     )
 
 
-class SuggestedPostParameterTestBase:
+class SuggestedPostParametersTestBase:
     price = SuggestedPostPrice(currency="XTR", amount=100)
     send_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
-class TestSuggestedPostParameterWithoutRequest(SuggestedPostParameterTestBase):
+class TestSuggestedPostParametersWithoutRequest(SuggestedPostParametersTestBase):
     def test_slot_behaviour(self, suggested_post_parameters):
         for attr in suggested_post_parameters.__slots__:
             assert getattr(suggested_post_parameters, attr, "err") != "err", (

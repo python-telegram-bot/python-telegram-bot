@@ -1277,8 +1277,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            suggested_post_parameters (:obj:`bool`, optional): An object containing the parameters
-                of the suggested post to send; for direct messages chats only.
+            suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional): An
+                object containing the parameters of the suggested post to send; for direct messages
+                chats only.
 
                 .. versionadded:: NEXT.VERSION
 

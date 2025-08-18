@@ -19,7 +19,7 @@
 """This module contains objects related to Telegram suggested posts."""
 
 import datetime as dtm
-from typing import Optional
+from typing import Literal, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -27,7 +27,7 @@ from telegram._utils.types import JSONDict
 
 class SuggestedPostPrice(TelegramObject):
     """
-    Desribes price of a suggested post.
+    Desribes the price of a suggested post.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`currency` and :attr:`amount` are equal.
@@ -36,8 +36,8 @@ class SuggestedPostPrice(TelegramObject):
 
     Args:
         currency (:obj:`str`):
-            Currency in which the post will be paid. Currently, must be one of `“XTR”` for Telegram
-            Stars or `“TON”` for toncoins.
+            Currency in which the post will be paid. Currently, must be one of ``“XTR”`` for
+            Telegram Stars or ``“TON”`` for toncoins.
         amount (:obj:`int`):
             The amount of the currency that will be paid for the post in the smallest units of the
             currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must
@@ -49,8 +49,8 @@ class SuggestedPostPrice(TelegramObject):
 
     Attributes:
         currency (:obj:`str`):
-            Currency in which the post will be paid. Currently, must be one of `“XTR”` for Telegram
-            Stars or `“TON”` for toncoins.
+            Currency in which the post will be paid. Currently, must be one of ``“XTR”`` for
+            Telegram Stars or ``“TON”`` for toncoins.
         amount (:obj:`int`):
             The amount of the currency that will be paid for the post in the smallest units of the
             currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must
@@ -65,13 +65,13 @@ class SuggestedPostPrice(TelegramObject):
 
     def __init__(
         self,
-        currency: str,
+        currency: Literal["XTR", "TON"],
         amount: int,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.currency: str = currency
+        self.currency: Literal["XTR", "TON"] = currency
         self.amount: int = amount
 
         self._id_attrs = (self.currency, self.amount)
@@ -104,7 +104,7 @@ class SuggestedPostParameters(TelegramObject):
         price (:class:`telegram.SuggestedPostPrice`):
             Optional. Proposed price for the post. If the field is omitted, then the post
             is unpaid.
-        send_date (:obj:`d`):
+        send_date (:class:`datetime.datetime`):
             Optional. Proposed send date of the post. If specified, then the date
             must be between :tg-const:`telegram.constants.SuggestedPost.MIN_SEND_DATE`
             second and :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days)

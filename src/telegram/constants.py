@@ -3055,7 +3055,7 @@ class StoryLimit(StringEnum):
     :meth:`telegram.Bot.post_story`."""
 
 
-class SuggestedPost(StringEnum):
+class SuggestedPost(IntEnum):
     """This enum contains limitations for :class:`telegram.SuggestedPostPrice`\
 /:class:`telegram.SuggestedPostParameters`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -3070,17 +3070,17 @@ class SuggestedPost(StringEnum):
     :paramref:`~telegram.SuggestedPostPrice.amount`
     parameter of :class:`telegram.SuggestedPostPrice`.
     """
-    MAX_PRICE_STARS = 100000
+    MAX_PRICE_STARS = 100_000
     """:obj:`int`: Maximum number of Telegram Stars in
     :paramref:`~telegram.SuggestedPostPrice.amount`
     parameter of :class:`telegram.SuggestedPostPrice`.
     """
-    MIN_PRICE_NANOTONCOINS = 10000000
+    MIN_PRICE_NANOTONCOINS = 10_000_000
     """:obj:`int`: Minimum number of nanotoncoins in
     :paramref:`~telegram.SuggestedPostPrice.amount`
     parameter of :class:`telegram.SuggestedPostPrice`.
     """
-    MAX_PRICE_NANOTONCOINS = 10000000000000
+    MAX_PRICE_NANOTONCOINS = 10_000_000_000_000
     """:obj:`int`: Maximum number of nanotoncoins in
     :paramref:`~telegram.SuggestedPostPrice.amount`
     parameter of :class:`telegram.SuggestedPostPrice`.
@@ -3089,7 +3089,7 @@ class SuggestedPost(StringEnum):
     """:obj:`int`: Minimum number of seconds in the future for
     the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
     :class:`telegram.SuggestedPostParameters`."""
-    MAX_SEND_DATE = 2678400
+    MAX_SEND_DATE = 2_678_400
     """:obj:`int`: Maximum number of seconds in the future for
     the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
     :class:`telegram.SuggestedPostParameters`."""
