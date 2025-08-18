@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ShippingQuery."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._telegramobject import TelegramObject
@@ -66,7 +66,7 @@ class ShippingQuery(TelegramObject):
         invoice_payload: str,
         shipping_address: ShippingAddress,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
@@ -79,7 +79,7 @@ class ShippingQuery(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ShippingQuery":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ShippingQuery":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -93,14 +93,14 @@ class ShippingQuery(TelegramObject):
     async def answer(
         self,
         ok: bool,
-        shipping_options: Optional[Sequence["ShippingOption"]] = None,
-        error_message: Optional[str] = None,
+        shipping_options: Sequence["ShippingOption"] | None = None,
+        error_message: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 

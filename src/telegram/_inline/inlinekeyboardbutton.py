@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._copytextbutton import CopyTextButton
@@ -248,36 +248,36 @@ class InlineKeyboardButton(TelegramObject):
     def __init__(
         self,
         text: str,
-        url: Optional[str] = None,
-        callback_data: Optional[Union[str, object]] = None,
-        switch_inline_query: Optional[str] = None,
-        switch_inline_query_current_chat: Optional[str] = None,
-        callback_game: Optional[CallbackGame] = None,
-        pay: Optional[bool] = None,
-        login_url: Optional[LoginUrl] = None,
-        web_app: Optional[WebAppInfo] = None,
-        switch_inline_query_chosen_chat: Optional[SwitchInlineQueryChosenChat] = None,
-        copy_text: Optional[CopyTextButton] = None,
+        url: str | None = None,
+        callback_data: str | object | None = None,
+        switch_inline_query: str | None = None,
+        switch_inline_query_current_chat: str | None = None,
+        callback_game: CallbackGame | None = None,
+        pay: bool | None = None,
+        login_url: LoginUrl | None = None,
+        web_app: WebAppInfo | None = None,
+        switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = None,
+        copy_text: CopyTextButton | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.text: str = text
 
         # Optionals
-        self.url: Optional[str] = url
-        self.login_url: Optional[LoginUrl] = login_url
-        self.callback_data: Optional[Union[str, object]] = callback_data
-        self.switch_inline_query: Optional[str] = switch_inline_query
-        self.switch_inline_query_current_chat: Optional[str] = switch_inline_query_current_chat
-        self.callback_game: Optional[CallbackGame] = callback_game
-        self.pay: Optional[bool] = pay
-        self.web_app: Optional[WebAppInfo] = web_app
-        self.switch_inline_query_chosen_chat: Optional[SwitchInlineQueryChosenChat] = (
+        self.url: str | None = url
+        self.login_url: LoginUrl | None = login_url
+        self.callback_data: str | object | None = callback_data
+        self.switch_inline_query: str | None = switch_inline_query
+        self.switch_inline_query_current_chat: str | None = switch_inline_query_current_chat
+        self.callback_game: CallbackGame | None = callback_game
+        self.pay: bool | None = pay
+        self.web_app: WebAppInfo | None = web_app
+        self.switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = (
             switch_inline_query_chosen_chat
         )
-        self.copy_text: Optional[CopyTextButton] = copy_text
+        self.copy_text: CopyTextButton | None = copy_text
         self._id_attrs = ()
         self._set_id_attrs()
 
@@ -297,7 +297,7 @@ class InlineKeyboardButton(TelegramObject):
         )
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InlineKeyboardButton":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InlineKeyboardButton":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -311,7 +311,7 @@ class InlineKeyboardButton(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def update_callback_data(self, callback_data: Union[str, object]) -> None:
+    def update_callback_data(self, callback_data: str | object) -> None:
         """
         Sets :attr:`callback_data` to the passed object. Intended to be used by
         :class:`telegram.ext.CallbackDataCache`.

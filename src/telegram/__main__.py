@@ -20,13 +20,12 @@
 # ruff: noqa: T201, D100, S607
 import subprocess
 import sys
-from typing import Optional
 
 from . import __version__ as telegram_ver
 from .constants import BOT_API_VERSION
 
 
-def _git_revision() -> Optional[str]:
+def _git_revision() -> str | None:
     try:
         output = subprocess.check_output(
             ["git", "describe", "--long", "--tags"], stderr=subprocess.STDOUT
