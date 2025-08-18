@@ -5,7 +5,6 @@ ci:
     # frequent updates.
     autoupdate_schedule: quarterly
     autoupdate_commit_msg: 'Bump `pre-commit` Hooks to Latest Versions'
-    skip: [renovate-config-validator]  # This is too big in size to run on pre-commit.ci, so we skip it
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
