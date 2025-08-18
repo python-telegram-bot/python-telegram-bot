@@ -355,6 +355,7 @@ def message(bot):
                 tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
             )
         },
+        {"reply_to_checklist_task_id": 11},
     ],
     ids=[
         "reply",
@@ -436,6 +437,7 @@ def message(bot):
         "checklist",
         "checklist_tasks_done",
         "checklist_tasks_added",
+        "reply_to_checklist_task_id",
     ],
 )
 def message_params(bot, request):

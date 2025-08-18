@@ -628,6 +628,10 @@ class Message(MaybeInaccessibleMessage):
             of a channel has changed.
 
             .. versionadded:: 22.3
+        reply_to_checklist_task_id (:obj:`int`, optional): Identifier of the specific checklist
+            task that is being replied to.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -989,6 +993,10 @@ class Message(MaybeInaccessibleMessage):
             messages chat of a channel has changed.
 
             .. versionadded:: 22.3
+        reply_to_checklist_task_id (:obj:`int`): Optional. Identifier of the specific checklist
+            task that is being replied to.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1074,6 +1082,7 @@ class Message(MaybeInaccessibleMessage):
         "quote",
         "refunded_payment",
         "reply_markup",
+        "reply_to_checklist_task_id",
         "reply_to_message",
         "reply_to_story",
         "sender_boost_count",
@@ -1195,6 +1204,7 @@ class Message(MaybeInaccessibleMessage):
         checklist: Optional[Checklist] = None,
         checklist_tasks_done: Optional[ChecklistTasksDone] = None,
         checklist_tasks_added: Optional[ChecklistTasksAdded] = None,
+        reply_to_checklist_task_id: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1310,6 +1320,7 @@ class Message(MaybeInaccessibleMessage):
             self.direct_message_price_changed: Optional[DirectMessagePriceChanged] = (
                 direct_message_price_changed
             )
+            self.reply_to_checklist_task_id: Optional[int] = reply_to_checklist_task_id
 
             self._effective_attachment = DEFAULT_NONE
 
