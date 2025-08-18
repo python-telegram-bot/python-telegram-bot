@@ -40,7 +40,3 @@ jobs:
 
       - name: Install the project
         run: uv sync --all-extras --all-groups --locked
-    
-      - name: Install linting dependencies
-        # Make sure the pinned versions here match the ones in .pre-commit-config.yaml
-        run: uv pip install black==25.1.0 isort==6.0.1 mypy==1.16.1 flake8==7.3.0 ruff==0.12.2

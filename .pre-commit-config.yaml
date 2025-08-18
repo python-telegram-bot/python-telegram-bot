@@ -1,7 +1,8 @@
-# Make sure that the additional_dependencies here match pyproject.toml
-
 ci:
     autofix_prs: false
+    # We use Renovate to update this file now, but we can't disable automatic pre-commit updates
+    # when using the `pre-commit` GitHub Action, so we set the schedule to quarterly to avoid
+    # frequent updates.
     autoupdate_schedule: quarterly
     autoupdate_commit_msg: 'Bump `pre-commit` Hooks to Latest Versions'
 
@@ -11,14 +12,16 @@ repos:
     hooks:
     # Run the linter:
     -   id: ruff-check
-        name: ruff
+        name: ruff check
     # Run the formatter:
     -   id: ruff-format
+        name: ruff format
 -   repo: https://github.com/PyCQA/pylint
     rev: v3.3.7
     hooks:
     -   id: pylint
         files: ^(?!(tests|docs)).*\.py$
+        language: python
         additional_dependencies:
           - httpx~=0.27
           - tornado~=6.4
@@ -32,6 +35,7 @@ repos:
     -   id: mypy
         name: mypy-ptb
         files: ^(?!(tests|examples|docs)).*\.py$
+        language: python
         additional_dependencies:
           - types-pytz
           - types-cryptography
@@ -45,6 +49,7 @@ repos:
     - id: mypy
       name: mypy-examples
       files: ^examples/.*\.py$
+      language: python
       args:
         - --no-strict-optional
         - --follow-imports=silent
