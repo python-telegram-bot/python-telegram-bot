@@ -1,0 +1,5 @@
+features = "API 9.2 Direct Messages in Channels"
+[[pull_requests]]
+uid = "4914"
+author_uid = "harshil21"
+closes_threads = []
