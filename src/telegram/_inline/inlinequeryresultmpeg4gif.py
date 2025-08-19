@@ -64,7 +64,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
             .. versionadded:: 20.2
 
-            ..versionchanged:: 20.5
+            .. versionchanged:: 20.5
               |thumbnail_url_mandatory|
 
         thumbnail_mime_type (:obj:`str`, optional): MIME type of the thumbnail, must be one of
