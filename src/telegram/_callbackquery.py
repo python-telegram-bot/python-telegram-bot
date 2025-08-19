@@ -885,6 +885,7 @@ class CallbackQuery(TelegramObject):
             await update.callback_query.message.copy(
                 from_chat_id=update.message.chat_id,
                 message_id=update.message.message_id,
+                direct_messages_topic_id=update.message.direct_messages_topic.topic_id,
                 *args,
                 **kwargs
             )
