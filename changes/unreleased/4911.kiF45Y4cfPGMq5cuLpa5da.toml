@@ -3,10 +3,5 @@ features = "Full Support for Bot API 9.2"
 pull_requests = [
     { uid = "4911", author_uid = "aelkheir", closes_threads = ["4910"] },
     { uid = "4917", author_uid = "Poolitzer" },
-
-
-
-
-  { uid = "4914", author_uid = "harshil21"},
-
+    { uid = "4914", author_uid = "harshil21"},
 ]
