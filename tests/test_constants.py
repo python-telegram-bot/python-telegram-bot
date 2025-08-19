@@ -182,6 +182,7 @@ class TestConstantsWithoutRequest:
             "caption",
             "chat",
             "chat_id",
+            "direct_messages_topic",
             "effective_attachment",
             "entities",
             "from_user",

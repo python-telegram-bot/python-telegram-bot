@@ -31,6 +31,7 @@ from telegram._chatboost import ChatBoostAdded
 from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
 from telegram._dice import Dice
 from telegram._directmessagepricechanged import DirectMessagePriceChanged
+from telegram._directmessagestopic import DirectMessagesTopic
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
@@ -628,6 +629,10 @@ class Message(MaybeInaccessibleMessage):
             of a channel has changed.
 
             .. versionadded:: 22.3
+        direct_messages_topic (:class:`telegram.DirectMessagesTopic`, optional): Information about
+            the direct messages chat topic that contains the message.
+
+            .. versionadded:: NEXT.VERSION
         reply_to_checklist_task_id (:obj:`int`, optional): Identifier of the specific checklist
             task that is being replied to.
 
@@ -993,6 +998,10 @@ class Message(MaybeInaccessibleMessage):
             messages chat of a channel has changed.
 
             .. versionadded:: 22.3
+        direct_messages_topic (:class:`telegram.DirectMessagesTopic`): Optional. Information about
+            the direct messages chat topic that contains the message.
+
+            .. versionadded:: NEXT.VERSION
         reply_to_checklist_task_id (:obj:`int`): Optional. Identifier of the specific checklist
             task that is being replied to.
 
@@ -1034,6 +1043,7 @@ class Message(MaybeInaccessibleMessage):
         "delete_chat_photo",
         "dice",
         "direct_message_price_changed",
+        "direct_messages_topic",
         "document",
         "edit_date",
         "effect_id",
@@ -1204,6 +1214,7 @@ class Message(MaybeInaccessibleMessage):
         checklist: Optional[Checklist] = None,
         checklist_tasks_done: Optional[ChecklistTasksDone] = None,
         checklist_tasks_added: Optional[ChecklistTasksAdded] = None,
+        direct_messages_topic: Optional[DirectMessagesTopic] = None,
         reply_to_checklist_task_id: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -1320,6 +1331,7 @@ class Message(MaybeInaccessibleMessage):
             self.direct_message_price_changed: Optional[DirectMessagePriceChanged] = (
                 direct_message_price_changed
             )
+            self.direct_messages_topic: Optional[DirectMessagesTopic] = direct_messages_topic
             self.reply_to_checklist_task_id: Optional[int] = reply_to_checklist_task_id
 
             self._effective_attachment = DEFAULT_NONE
@@ -1506,6 +1518,9 @@ class Message(MaybeInaccessibleMessage):
         )
         data["checklist_tasks_added"] = de_json_optional(
             data.get("checklist_tasks_added"), ChecklistTasksAdded, bot
+        )
+        data["direct_messages_topic"] = de_json_optional(
+            data.get("direct_messages_topic"), DirectMessagesTopic, bot
         )
 
         api_kwargs = {}
@@ -1863,6 +1878,10 @@ class Message(MaybeInaccessibleMessage):
         # the same chat.
         return self.message_thread_id if chat_id in {self.chat_id, self.chat.username} else None
 
+    def _extract_direct_messages_topic_id(self) -> Optional[int]:
+        """Return the topic id of the direct messages chat, if it is present."""
+        return self.direct_messages_topic.topic_id if self.direct_messages_topic else None
+
     async def reply_text(
         self,
         text: str,
@@ -1893,6 +1912,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -1938,6 +1958,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_markdown(
@@ -1970,6 +1991,7 @@ class Message(MaybeInaccessibleMessage):
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN,
                 business_connection_id=self.business_connection_id,
+                direct_messages_topic_id=self.direct_messages_topic.topic_id,
                 *args,
                 **kwargs,
             )
@@ -2020,6 +2042,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_markdown_v2(
@@ -2051,6 +2074,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN_V2,
+                direct_messages_topic_id=self.direct_messages_topic.topic_id,
                 business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
@@ -2098,6 +2122,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_html(
@@ -2129,6 +2154,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.HTML,
+                direct_messages_topic_id=self.direct_messages_topic.topic_id,
                 business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
@@ -2176,6 +2202,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_media_group(
@@ -2208,6 +2235,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2253,6 +2281,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_photo(
@@ -2287,6 +2316,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2334,6 +2364,7 @@ class Message(MaybeInaccessibleMessage):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_audio(
@@ -2370,6 +2401,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2419,6 +2451,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_document(
@@ -2453,6 +2486,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2500,6 +2534,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_animation(
@@ -2538,6 +2573,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2589,6 +2625,7 @@ class Message(MaybeInaccessibleMessage):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_sticker(
@@ -2618,6 +2655,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2660,6 +2698,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_video(
@@ -2701,6 +2740,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2755,6 +2795,7 @@ class Message(MaybeInaccessibleMessage):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_video_note(
@@ -2787,6 +2828,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2832,6 +2874,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_voice(
@@ -2865,6 +2908,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2911,6 +2955,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_location(
@@ -2945,6 +2990,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2992,6 +3038,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_venue(
@@ -3028,6 +3075,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -3077,6 +3125,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_contact(
@@ -3109,6 +3158,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -3153,6 +3203,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             allow_paid_broadcast=allow_paid_broadcast,
         )
 
@@ -3277,6 +3328,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -3318,6 +3370,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_checklist(
@@ -3537,6 +3590,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_invoice(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -3609,6 +3663,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def forward(
@@ -3630,6 +3685,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.forward_message(
                  from_chat_id=update.effective_message.chat_id,
                  message_id=update.effective_message.message_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs
              )
@@ -3661,6 +3717,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def copy(
@@ -3692,6 +3749,7 @@ class Message(MaybeInaccessibleMessage):
                  chat_id=chat_id,
                  from_chat_id=update.effective_message.chat_id,
                  message_id=update.effective_message.message_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs
              )
@@ -3724,6 +3782,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_copy(
@@ -3757,6 +3816,7 @@ class Message(MaybeInaccessibleMessage):
                  chat_id=message.chat.id,
                  message_thread_id=update.effective_message.message_thread_id,
                  message_id=message_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs
              )
@@ -3802,6 +3862,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_paid_media(
@@ -3833,6 +3894,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_paid_media(
                  chat_id=message.chat.id,
                  business_connection_id=message.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs
              )
@@ -3871,6 +3933,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def edit_text(
