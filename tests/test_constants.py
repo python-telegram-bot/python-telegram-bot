@@ -205,6 +205,7 @@ class TestConstantsWithoutRequest:
             "is_from_offline",
             "show_caption_above_media",
             "paid_star_count",
+            "reply_to_checklist_task_id",
         }
 
     @pytest.mark.parametrize(

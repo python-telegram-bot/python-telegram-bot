@@ -362,6 +362,7 @@ def message(bot):
                 user=User(id=5678, first_name="TestUser", is_bot=False),
             )
         },
+        {"reply_to_checklist_task_id": 11},
     ],
     ids=[
         "reply",
@@ -444,6 +445,7 @@ def message(bot):
         "checklist_tasks_done",
         "checklist_tasks_added",
         "direct_messages_topic",
+        "reply_to_checklist_task_id",
     ],
 )
 def message_params(bot, request):

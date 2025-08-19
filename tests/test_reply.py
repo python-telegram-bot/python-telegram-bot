@@ -218,6 +218,7 @@ def reply_parameters():
         quote_parse_mode=ReplyParametersTestBase.quote_parse_mode,
         quote_entities=ReplyParametersTestBase.quote_entities,
         quote_position=ReplyParametersTestBase.quote_position,
+        checklist_task_id=ReplyParametersTestBase.checklist_task_id,
     )
 
 
@@ -232,6 +233,7 @@ class ReplyParametersTestBase:
         MessageEntity(MessageEntity.EMAIL, 3, 4),
     ]
     quote_position = 5
+    checklist_task_id = 9
 
 
 class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
@@ -251,6 +253,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
             "quote_parse_mode": self.quote_parse_mode,
             "quote_entities": [entity.to_dict() for entity in self.quote_entities],
             "quote_position": self.quote_position,
+            "checklist_task_id": self.checklist_task_id,
         }
 
         reply_parameters = ReplyParameters.de_json(json_dict, offline_bot)
@@ -263,6 +266,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
         assert reply_parameters.quote_parse_mode == self.quote_parse_mode
         assert reply_parameters.quote_entities == tuple(self.quote_entities)
         assert reply_parameters.quote_position == self.quote_position
+        assert reply_parameters.checklist_task_id == self.checklist_task_id
 
     def test_to_dict(self, reply_parameters):
         reply_parameters_dict = reply_parameters.to_dict()
@@ -280,6 +284,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
             entity.to_dict() for entity in self.quote_entities
         ]
         assert reply_parameters_dict["quote_position"] == self.quote_position
+        assert reply_parameters_dict["checklist_task_id"] == self.checklist_task_id
 
     def test_equality(self, reply_parameters):
         a = reply_parameters
