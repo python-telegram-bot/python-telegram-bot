@@ -1,0 +1,394 @@
+pip install python-telegram-bot==21.* pillow fpdf
+sudo apt update
+sudoapt install -y ffmpeg libreoffice poppler-utils
+brew install ffmpeg libreoffice poppler
+pip install python-telegram-bot==21.* pillow fpdf pdf2image python-magic-bin ffmpeg-python
+import os
+import io
+import uuid
+import shutil
+import asyncio
+import tempfile
+import subprocess
+from zipfile import ZipFile
+from typing import Dict, Any, List
+
+from telegram import (
+    Update, InlineKeyboardButton, InlineKeyboardMarkup, InputFile
+)
+from telegram.ext import (
+    Application, CommandHandler, MessageHandler,
+    CallbackQueryHandler, ContextTypes, filters
+)
+
+from PIL import Image
+from fpdf import FPDF
+from pdf2image import convert_from_path
+import ffmpeg
+
+# ========= CONFIG =========
+TOKEN = 8293274851:AAGO3vpyw8I9UwU328LmvrM02KsRsw2mOa8
+
+# User state: user_id -> { mode: str, tempdir: str, queue: [files], extra: dict }
+USER_STATE: Dict[int, Dict[str, Any]] = {}
+
+# ========= HELPERS =========
+def ensure_user_state(user_id: int):
+    if user_id not in USER_STATE:
+        USER_STATE[user_id] = {
+            "mode": None,
+            "tempdir": tempfile.mkdtemp(prefix=f"tgconv_{user_id}_"),
+            "queue": [],
+            "extra": {}
+        }
+    return USER_STATE[user_id]
+
+def cleanup_user_state(user_id: int):
+    st = USER_STATE.get(user_id)
+    if st:
+        tmp = st.get("tempdir")
+        if tmp and os.path.isdir(tmp):
+            shutil.rmtree(tmp, ignore_errors=True)
+        USER_STATE.pop(user_id, None)
+
+def unique_path(tempdir: str, suffix: str):
+    return os.path.join(tempdir, f"{uuid.uuid4().hex}{suffix}")
+
+async def download_telegram_file(message, tgfile, dest_path: str):
+    await tgfile.download_to_drive(dest_path)
+
+def build_menu():
+    kb = [
+        [InlineKeyboardButton("🖼 Images → PDF", callback_data="img2pdf")],
+        [InlineKeyboardButton("📄 Office → PDF", callback_data="doc2pdf")],
+        [InlineKeyboardButton("📑 PDF → Images (ZIP)", callback_data="pdf2img")],
+        [InlineKeyboardButton("🎵 Audio Convert (MP3↔WAV)", callback_data="audio2audio")],
+        [InlineKeyboardButton("🎥 Video → MP3", callback_data="video2mp3")],
+        [InlineKeyboardButton("🖼 Image Format (PNG↔JPG)", callback_data="img2img")],
+    ]
+    return InlineKeyboardMarkup(kb)
+
+# ========= COMMANDS =========
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    cleanup_user_state(user_id)
+    ensure_user_state(user_id)
+    text = (
+        "नमस्ते! 👋 यह All-in-One File Converter Bot है.\n\n"
+        "कन्वर्ज़न चुनें:\n"
+        "• Images → PDF (कई इमेज जोड़कर एक PDF)\n"
+        "• Office → PDF (DOCX/PPTX/XLSX…)\n"
+        "• PDF → Images (ZIP में)\n"
+        "• Audio Convert (MP3↔WAV)\n"
+        "• Video → MP3\n"
+        "• Image Format (PNG↔JPG)\n\n"
+        "ℹ️ किसी भी समय /cancel कर सकते हैं।"
+    )
+    await update.message.reply_text(text, reply_markup=build_menu())
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    cleanup_user_state(user_id)
+    await update.message.reply_text("सभी प्रोसेस रद्द कर दिए गए। फिर से शुरू करने को /start भेजें।")
+
+# ========= MENU HANDLER =========
+async def on_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
+    st = ensure_user_state(user_id)
+    st["mode"] = query.data
+    st["queue"] = []
+    st["extra"] = {}
+
+    if query.data == "img2pdf":
+        msg = (
+            "📸 *Images → PDF*\n\n"
+            "एक या कई इमेज भेजें (photo/doc के रूप में)।\n"
+            "सब इमेज भेजने के बाद */done* लिखें।\n"
+            "रद्द करने को /cancel।"
+        )
+    elif query.data == "doc2pdf":
+        msg = (
+            "📄 *Office → PDF*\n\n"
+            "DOCX, PPTX, XLSX, ODT आदि फ़ाइल भेजें (document के रूप में)।\n"
+            "मैं उसे PDF में बदलकर भेजूँगा।\n"
+            "रद्द करने को /cancel।"
+        )
+    elif query.data == "pdf2img":
+        msg = (
+            "📑 *PDF → Images*\n\n"
+            "एक PDF फ़ाइल भेजें (document के रूप में)।\n"
+            "मैं सभी पन्नों को PNG में बदलकर ZIP भेजूँगा।\n"
+            "रद्द करने को /cancel।"
+        )
+    elif query.data == "audio2audio":
+        msg = (
+            "🎵 *Audio Convert (MP3↔WAV)*\n\n"
+            "MP3 या WAV फ़ाइल भेजें, मैं दूसरे फ़ॉर्मेट में दूँगा।\n"
+            "रद्द करने को /cancel।"
+        )
+    elif query.data == "video2mp3":
+        msg = (
+            "🎥 *Video → MP3*\n\n"
+            "कोई वीडियो फ़ाइल भेजें (MP4/MKV/… ), मैं उसका MP3 ऑडियो निकालकर भेजूँगा।\n"
+            "रद्द करने को /cancel।"
+        )
+    elif query.data == "img2img":
+        msg = (
+            "🖼 *Image Format (PNG↔JPG)*\n\n"
+            "PNG या JPG भेजें, मैं दूसरे फ़ॉर्मेट में दूँगा।\n"
+            "रद्द करने को /cancel।"
+        )
+    else:
+        msg = "कृपया कोई विकल्प चुनें।"
+
+    await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=None)
+
+# ========= FLOW ACTIONS =========
+async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    st = USER_STATE.get(user_id)
+    if not st or st.get("mode") != "img2pdf":
+        await update.message.reply_text("अभी कोई Images → PDF सत्र सक्रिय नहीं है। पहले /start करके विकल्प चुनें।")
+        return
+
+    if not st["queue"]:
+        await update.message.reply_text("आपने अभी तक कोई इमेज नहीं भेजी।")
+        return
+
+    # Make single PDF from multiple images
+    out_path = unique_path(st["tempdir"], ".pdf")
+    images: List[str] = st["queue"]
+
+    try:
+        # Create PDF with PIL to auto-fit
+        pil_images = []
+        for imgp in images:
+            img = Image.open(imgp).convert("RGB")
+            pil_images.append(img)
+
+        pil_images[0].save(out_path, save_all=True, append_images=pil_images[1:])
+
+        await update.message.reply_document(document=open(out_path, "rb"), filename="converted.pdf")
+    except Exception as e:
+        await update.message.reply_text(f"❌ PDF बनाते समय त्रुटि: {e}")
+    finally:
+        cleanup_user_state(user_id)
+
+# ========= FILE HANDLERS =========
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    st = USER_STATE.get(user_id)
+    if not st or st.get("mode") not in ("img2pdf", "img2img"):
+        return  # ignore photos if not in relevant mode
+
+    tempdir = st["tempdir"]
+    photo = update.message.photo[-1]
+    tgfile = await photo.get_file()
+    in_path = unique_path(tempdir, ".jpg")
+    await download_telegram_file(update.message, tgfile, in_path)
+
+    if st["mode"] == "img2pdf":
+        st["queue"].append(in_path)
+        await update.message.reply_text(f"✅ इमेज जोड़ दी गई। अब और भेजें या */done* लिखें।", parse_mode="Markdown")
+    elif st["mode"] == "img2img":
+        # Convert JPG -> PNG
+        out_path = unique_path(tempdir, ".png")
+        try:
+            Image.open(in_path).save(out_path, "PNG")
+            await update.message.reply_document(open(out_path, "rb"), filename="converted.png")
+        except Exception as e:
+            await update.message.reply_text(f"❌ कन्वर्ज़न त्रुटि: {e}")
+        finally:
+            cleanup_user_state(user_id)
+
+async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    st = USER_STATE.get(user_id)
+    if not st or not st.get("mode"):
+        await update.message.reply_text("पहले /start करके कन्वर्ज़न चुनें।")
+        return
+
+    tempdir = st["tempdir"]
+    doc = update.message.document
+    tgfile = await doc.get_file()
+
+    # Detect extension
+    name = doc.file_name or "file"
+    _, ext = os.path.splitext(name.lower())
+    in_path = unique_path(tempdir, ext if ext else "")
+
+    await download_telegram_file(update.message, tgfile, in_path)
+
+    mode = st["mode"]
+
+    if mode == "img2pdf":
+        # If user sent image as document (png/jpg)
+        if ext in [".jpg", ".jpeg", ".png", ".webp"]:
+            st["queue"].append(in_path)
+            await update.message.reply_text("✅ इमेज जोड़ दी गई। अब और भेजें या */done* लिखें।", parse_mode="Markdown")
+        else:
+            await update.message.reply_text("कृपया इमेज फ़ाइल भेजें (JPG/PNG/WebP) या /cancel।")
+
+    elif mode == "doc2pdf":
+        # Use LibreOffice headless for conversion
+        try:
+            # Convert to PDF in same tempdir
+            subprocess.check_call([
+                "soffice", "--headless", "--convert-to", "pdf",
+                "--outdir", tempdir, in_path
+            ])
+            base = os.path.splitext(os.path.basename(in_path))[0]
+            out_path = os.path.join(tempdir, base + ".pdf")
+            if not os.path.exists(out_path):
+                raise RuntimeError("LibreOffice conversion failed.")
+            await update.message.reply_document(open(out_path, "rb"), filename=f"{base}.pdf")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Office → PDF त्रुटि: {e}\n"
+                                            f"ध्यान दें: LibreOffice इंस्टॉल/PATH में होना चाहिए.")
+        finally:
+            cleanup_user_state(user_id)
+
+    elif mode == "pdf2img":
+        # Convert PDF pages to images then ZIP
+        try:
+            images = convert_from_path(in_path)  # requires poppler
+            zip_path = unique_path(tempdir, ".zip")
+            with ZipFile(zip_path, "w") as zf:
+                for idx, im in enumerate(images, start=1):
+                    page_path = os.path.join(tempdir, f"page_{idx}.png")
+                    im.save(page_path, "PNG")
+                    zf.write(page_path, arcname=os.path.basename(page_path))
+
+            await update.message.reply_document(open(zip_path, "rb"), filename="pages.zip")
+        except Exception as e:
+            await update.message.reply_text(f"❌ PDF → Images त्रुटि: {e}\n"
+                                            f"ध्यान दें: Poppler (pdf2image dependency) इंस्टॉल होना चाहिए.")
+        finally:
+            cleanup_user_state(user_id)
+
+    elif mode == "audio2audio":
+        # Convert MP3 <-> WAV with ffmpeg
+        try:
+            # Decide target based on input
+            if ext == ".mp3":
+                out_path = unique_path(tempdir, ".wav")
+            elif ext == ".wav":
+                out_path = unique_path(tempdir, ".mp3")
+            else:
+                # default to mp3
+                out_path = unique_path(tempdir, ".mp3")
+
+            (
+                ffmpeg
+                .input(in_path)
+                .output(out_path, **({"ar": "44100"} if out_path.endswith(".wav") else {}))
+                .overwrite_output()
+                .run(quiet=True)
+            )
+            await update.message.reply_document(open(out_path, "rb"), filename=os.path.basename(out_path))
+        except Exception as e:
+            await update.message.reply_text(f"❌ Audio कन्वर्ज़न त्रुटि: {e}\n"
+                                            f"ध्यान दें: FFmpeg इंस्टॉल/PATH में होना चाहिए.")
+        finally:
+            cleanup_user_state(user_id)
+
+    elif mode == "video2mp3":
+        # Extract audio as MP3
+        try:
+            out_path = unique_path(tempdir, ".mp3")
+            (
+                ffmpeg
+                .input(in_path)
+                .output(out_path, format="mp3", acodec="libmp3lame", qscale:a=2)
+                .overwrite_output()
+                .run(quiet=True)
+            )
+            await update.message.reply_document(open(out_path, "rb"), filename="audio.mp3")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Video → MP3 त्रुटि: {e}\n"
+                                            f"ध्यान दें: FFmpeg इंस्टॉल/PATH में होना चाहिए.")
+        finally:
+            cleanup_user_state(user_id)
+
+    elif mode == "img2img":
+        # PNG <-> JPG
+        try:
+            img = Image.open(in_path)
+            # Decide output
+            if ext in [".png", ".webp"]:
+                out_path = unique_path(tempdir, ".jpg")
+                rgb = img.convert("RGB")
+                rgb.save(out_path, "JPEG", quality=92)
+            elif ext in [".jpg", ".jpeg"]:
+                out_path = unique_path(tempdir, ".png")
+                img.save(out_path, "PNG")
+            else:
+                # fallback to jpg
+                out_path = unique_path(tempdir, ".jpg")
+                img.convert("RGB").save(out_path, "JPEG", quality=92)
+
+            await update.message.reply_document(open(out_path, "rb"), filename=os.path.basename(out_path))
+        except Exception as e:
+            await update.message.reply_text(f"❌ Image कन्वर्ज़न त्रुटि: {e}")
+        finally:
+            cleanup_user_state(user_id)
+
+# ========= MISC HANDLERS =========
+async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    st = USER_STATE.get(user_id)
+    if not st or st.get("mode") != "video2mp3":
+        return
+
+    tempdir = st["tempdir"]
+    v = update.message.video or update.message.document  # some videos come as document
+    tgfile = await v.get_file()
+    ext = ".mp4"
+    if v and v.file_name:
+        _, e = os.path.splitext(v.file_name.lower())
+        if e:
+            ext = e
+    in_path = unique_path(tempdir, ext)
+    await download_telegram_file(update.message, tgfile, in_path)
+
+    # Process same as document branch for video2mp3
+    try:
+        out_path = unique_path(tempdir, ".mp3")
+        (
+            ffmpeg
+            .input(in_path)
+            .output(out_path, format="mp3", acodec="libmp3lame", qscale:a=2)
+            .overwrite_output()
+            .run(quiet=True)
+        )
+        await update.message.reply_document(open(out_path, "rb"), filename="audio.mp3")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Video → MP3 त्रुटि: {e}")
+    finally:
+        cleanup_user_state(user_id)
+
+# ========= APP =========
+def main():
+    app = Application.builder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("cancel", cancel))
+    app.add_handler(CommandHandler("done", done))
+    app.add_handler(CallbackQueryHandler(on_choice))
+
+    # Photos (for img2pdf/img2img quick sends)
+    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+
+    # Videos explicitly
+    app.add_handler(MessageHandler(filters.VIDEO, handle_video))
+
+    # Documents (PDF, Office, audio/video sent as doc, images as doc)
+    app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
+
+    print("Bot चालू है ✅")
+    app.run_polling(close_loop=False)
+
+if __name__ == "__main__":
+    main()
