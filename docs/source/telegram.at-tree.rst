@@ -168,8 +168,8 @@ Available Types
     telegram.storyareatypesuggestedreaction
     telegram.storyareatypeuniquegift
     telegram.storyareatypeweather
-    telegram.suggestedpostparameters.rst
-    telegram.suggestedpostprice.rst
+    telegram.suggestedpostparameters
+    telegram.suggestedpostprice
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.textquote
