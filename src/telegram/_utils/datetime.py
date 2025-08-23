@@ -289,5 +289,8 @@ def get_timedelta_value(
         ),
         stacklevel=2,
     )
-    return (int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
-           )
+    return (
+       int(seconds)
+       if (seconds := value.total_seconds()).is_integer()
+       else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
+   )
