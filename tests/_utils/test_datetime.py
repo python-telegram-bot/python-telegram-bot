@@ -23,6 +23,7 @@ import zoneinfo
 import pytest
 
 from telegram._utils import datetime as tg_dtm
+from telegram._utils.datetime import verify_timezone
 from telegram.ext import Defaults
 
 # sample time specification values categorised into absolute / delta / time-of-day
@@ -168,7 +169,7 @@ class TestDatetime:
             assert tg_dtm.to_timestamp(i) == int(tg_dtm.to_float_timestamp(i)), f"Failed for {i}"
 
     def test_to_timestamp_none(self):
-        # this 'convenience' behaviour has been left left for backwards compatibility
+        # this 'convenience' behaviour has been left for backwards compatibility
         assert tg_dtm.to_timestamp(None) is None
 
     def test_from_timestamp_none(self):
@@ -192,6 +193,21 @@ class TestDatetime:
         assert tg_dtm.extract_tzinfo_from_defaults(tz_bot) == tz_bot.defaults.tzinfo
         assert tg_dtm.extract_tzinfo_from_defaults(bot) is None
         assert tg_dtm.extract_tzinfo_from_defaults(raw_bot) is None
+
+
+
+    def test_with_valid_timezone_string(self):
+        """Test with a valid timezone string."""
+        tz = "Asia/Tokyo"
+        result = verify_timezone(tz)
+        assert isinstance(result, zoneinfo.ZoneInfo)
+        assert str(result) == "Asia/Tokyo"
+
+
+    def test_with_invalid_timezone_string(self):
+        """Test with an invalid timezone string."""
+        with pytest.raises(zoneinfo.ZoneInfoNotFoundError, match="No time zone found"):
+            verify_timezone("Invalid/Timezone")
 
     @pytest.mark.parametrize(
         ("arg", "timedelta_result", "number_result"),
