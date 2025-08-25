@@ -165,7 +165,7 @@ class SuggestedPostDeclined(TelegramObject):
 
     Args:
         suggested_post_message (:class:`telegram.Message`, optional):
-            Message containing the suggested post. Note that the :class:`telegram.Message` object
+            Message containing the suggested post. Note that the :class:`~telegram.Message` object
             in this field will not contain the :attr:`~telegram.Message.reply_to_message` field
             even if it itself is a reply.
         comment (:obj:`str`, optional):
@@ -174,7 +174,7 @@ class SuggestedPostDeclined(TelegramObject):
     Attributes:
         suggested_post_message (:class:`telegram.Message`):
             Optional. Message containing the suggested post. Note that the
-            :class:`telegram.Message` object in this field will not contain
+            :class:`~telegram.Message` object in this field will not contain
             the :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
         comment (:obj:`str`):
             Optional. Comment with which the post was declined.
@@ -221,7 +221,7 @@ class SuggestedPostPaid(TelegramObject):
 
     Args:
         suggested_post_message (:class:`telegram.Message`, optional):
-            Message containing the suggested post. Note that the :class:`telegram.Message` object
+            Message containing the suggested post. Note that the :class:`~telegram.Message` object
             in this field will not contain the :attr:`~telegram.Message.reply_to_message` field
             even if it itself is a reply.
         currency (:obj:`str`):
@@ -238,7 +238,7 @@ class SuggestedPostPaid(TelegramObject):
     Attributes:
         suggested_post_message (:class:`telegram.Message`):
             Optional. Message containing the suggested post. Note that the
-            :class:`telegram.Message` object in this field will not contain
+            :class:`~telegram.Message` object in this field will not contain
             the :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
         currency (:obj:`str`):
             Currency in which the payment was made. Currently, one of ``“XTR”`` for Telegram Stars
@@ -304,27 +304,29 @@ class SuggestedPostRefunded(TelegramObject):
 
     Args:
         suggested_post_message (:class:`telegram.Message`, optional):
-            Message containing the suggested post. Note that the :class:`telegram.Message` object
+            Message containing the suggested post. Note that the :class:`~telegram.Message` object
             in this field will not contain the :attr:`~telegram.Message.reply_to_message` field
             even if it itself is a reply.
         reason (:obj:`str`):
-            Reason for the refund. Currently, one of “post_deleted” if the post was deleted within
-            24 hours of being posted or removed from scheduled messages without being posted,
-            or “payment_refunded” if the payer refunded their payment.
+            Reason for the refund. Currently,
+            one of :tg-const:`telegram.constants.SuggestedPostRefunded.POST_DELETED` if the post
+            was deleted within 24 hours of being posted or removed from scheduled messages without
+            being posted, or :tg-const:`telegram.constants.SuggestedPostRefunded.PAYMENT_REFUNDED`
+            if the payer refunded their payment.
 
     Attributes:
         suggested_post_message (:class:`telegram.Message`):
             Optional. Message containing the suggested post. Note that the
-            :class:`telegram.Message` object in this field will not contain
+            :class:`~telegram.Message` object in this field will not contain
             the :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
         reason (:obj:`str`):
-            Reason for the refund. Currently, one of “post_deleted” if the post was deleted within
-            24 hours of being posted or removed from scheduled messages without being posted,
-            or “payment_refunded” if the payer refunded their payment.
+            Reason for the refund. Currently,
+            one of :tg-const:`telegram.constants.SuggestedPostRefunded.POST_DELETED` if the post
+            was deleted within 24 hours of being posted or removed from scheduled messages without
+            being posted, or :tg-const:`telegram.constants.SuggestedPostRefunded.PAYMENT_REFUNDED`
+            if the payer refunded their payment.
 
     """
-
-    # TODO: Link param `reason` from constatns
 
     __slots__ = ("reason", "suggested_post_message")
 

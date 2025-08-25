@@ -118,6 +118,7 @@ __all__ = [
     "StoryAreaTypeType",
     "StoryLimit",
     "SuggestedPost",
+    "SuggestedPostRefunded",
     "TransactionPartnerType",
     "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
@@ -3093,6 +3094,22 @@ class SuggestedPost(IntEnum):
     """:obj:`int`: Maximum number of seconds in the future for
     the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
     :class:`telegram.SuggestedPostParameters`."""
+
+
+class SuggestedPostRefunded(StringEnum):
+    """This enum contains available refund reasons for :class:`telegram.SuggestedPostRefunded`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    POST_DELETED = "post_deleted"
+    """:obj:`str`: The post was deleted within 24 hours of being posted or removed from
+    scheduled messages without being posted."""
+    PAYMENT_REFUNDED = "payment_refunded"
+    """:obj:`str`: The payer refunded their payment."""
 
 
 class TransactionPartnerType(StringEnum):
