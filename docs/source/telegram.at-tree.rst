@@ -169,6 +169,11 @@ Available Types
     telegram.storyareatypesuggestedreaction
     telegram.storyareatypeuniquegift
     telegram.storyareatypeweather
+    telegram.suggestedpostdeclined
+    telegram.suggestedpostpaid
+    telegram.suggestedpostparameters
+    telegram.suggestedpostprice
+    telegram.suggestedpostrefunded
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.textquote
