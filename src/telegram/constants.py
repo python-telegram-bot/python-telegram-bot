@@ -2222,6 +2222,21 @@ class MessageType(StringEnum):
 
     .. versionadded:: v22.2
     """
+    SUGGESTED_POST_DECLINED = "suggested_post_declined"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_declined`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SUGGESTED_POST_PAID = "suggested_post_paid"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_paid`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SUGGESTED_POST_REFUNDED = "suggested_post_refunded"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_refunded`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
