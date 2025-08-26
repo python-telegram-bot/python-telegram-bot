@@ -265,6 +265,8 @@ __all__ = (
     "StoryAreaTypeUniqueGift",
     "StoryAreaTypeWeather",
     "SuccessfulPayment",
+    "SuggestedPostParameters",
+    "SuggestedPostPrice",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
     "TextQuote",
@@ -573,6 +575,7 @@ from ._storyarea import (
     StoryAreaTypeUniqueGift,
     StoryAreaTypeWeather,
 )
+from ._suggestedpost import SuggestedPostParameters, SuggestedPostPrice
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
 from ._uniquegift import (
