@@ -117,6 +117,7 @@ __all__ = [
     "StoryAreaTypeLimit",
     "StoryAreaTypeType",
     "StoryLimit",
+    "SuggestedPost",
     "TransactionPartnerType",
     "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
@@ -173,7 +174,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=1)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=2)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -3052,6 +3053,46 @@ class StoryLimit(StringEnum):
     ACTIVITY_TWO_DAYS = 2 * 86400
     """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
     :meth:`telegram.Bot.post_story`."""
+
+
+class SuggestedPost(IntEnum):
+    """This enum contains limitations for :class:`telegram.SuggestedPostPrice`\
+/:class:`telegram.SuggestedPostParameters`. The enum
+    members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_PRICE_STARS = 5
+    """:obj:`int`: Minimum number of Telegram Stars in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MAX_PRICE_STARS = 100_000
+    """:obj:`int`: Maximum number of Telegram Stars in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MIN_PRICE_NANOTONCOINS = 10_000_000
+    """:obj:`int`: Minimum number of nanotoncoins in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MAX_PRICE_NANOTONCOINS = 10_000_000_000_000
+    """:obj:`int`: Maximum number of nanotoncoins in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MIN_SEND_DATE = 300
+    """:obj:`int`: Minimum number of seconds in the future for
+    the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
+    :class:`telegram.SuggestedPostParameters`."""
+    MAX_SEND_DATE = 2_678_400
+    """:obj:`int`: Maximum number of seconds in the future for
+    the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
+    :class:`telegram.SuggestedPostParameters`."""
 
 
 class TransactionPartnerType(StringEnum):

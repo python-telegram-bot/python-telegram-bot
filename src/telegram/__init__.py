@@ -93,6 +93,7 @@ __all__ = (
     "DataCredentials",
     "Dice",
     "DirectMessagePriceChanged",
+    "DirectMessagesTopic",
     "Document",
     "EncryptedCredentials",
     "EncryptedPassportElement",
@@ -264,6 +265,8 @@ __all__ = (
     "StoryAreaTypeUniqueGift",
     "StoryAreaTypeWeather",
     "SuccessfulPayment",
+    "SuggestedPostParameters",
+    "SuggestedPostPrice",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
     "TextQuote",
@@ -394,6 +397,7 @@ from ._choseninlineresult import ChosenInlineResult
 from ._copytextbutton import CopyTextButton
 from ._dice import Dice
 from ._directmessagepricechanged import DirectMessagePriceChanged
+from ._directmessagestopic import DirectMessagesTopic
 from ._files._inputstorycontent import (
     InputStoryContent,
     InputStoryContentPhoto,
@@ -571,6 +575,7 @@ from ._storyarea import (
     StoryAreaTypeUniqueGift,
     StoryAreaTypeWeather,
 )
+from ._suggestedpost import SuggestedPostParameters, SuggestedPostPrice
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
 from ._uniquegift import (
