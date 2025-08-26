@@ -759,6 +759,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -802,6 +803,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 "business_connection_id": business_connection_id,
                 "caption": caption,
                 "caption_entities": caption_entities,
+                "direct_messages_topic_id": direct_messages_topic_id,
                 "disable_notification": disable_notification,
                 "link_preview_options": link_preview_options,
                 "message_thread_id": message_thread_id,
@@ -1006,6 +1008,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1063,6 +1066,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.7
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
+
+                .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
                 .. versionadded:: NEXT.VERSION
 
@@ -1124,6 +1130,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             reply_parameters=reply_parameters,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1241,6 +1248,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         video_start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1282,6 +1290,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 chats only.
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
+                topic to which the message will be forwarded; required if the message is
+                forwarded to a direct messages chat.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1308,6 +1321,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def forward_messages(
@@ -1318,6 +1332,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1344,6 +1359,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
+                topic to which the messages will be forwarded; required if the messages are
+                forwarded to a direct messages chat.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
@@ -1359,6 +1379,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "disable_notification": disable_notification,
             "protect_content": protect_content,
             "message_thread_id": message_thread_id,
+            "direct_messages_topic_id": direct_messages_topic_id,
         }
 
         result = await self._post(
@@ -1389,6 +1410,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1466,7 +1488,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1528,6 +1552,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1550,6 +1575,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1637,6 +1663,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1700,6 +1729,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1720,6 +1750,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1802,6 +1833,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1861,6 +1895,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1877,6 +1912,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1939,6 +1975,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1990,6 +2029,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2017,6 +2057,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         show_caption_above_media: Optional[bool] = None,
         cover: Optional[FileInput] = None,
         start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2122,6 +2163,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2190,6 +2234,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2208,6 +2253,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2289,6 +2335,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2348,6 +2397,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2372,6 +2422,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2464,6 +2515,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2529,6 +2583,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2548,6 +2603,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2631,6 +2687,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2691,6 +2750,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2707,6 +2767,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2763,6 +2824,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
                 .. versionadded:: 21.7
+            direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
+                topic to which the messages will be sent; required if the messages are sent to a
+                direct messages chat.
+
+                .. versionadded:: NEXT.VERSION
+
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2858,6 +2925,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "business_connection_id": business_connection_id,
             "message_effect_id": message_effect_id,
             "allow_paid_broadcast": allow_paid_broadcast,
+            "direct_messages_topic_id": direct_messages_topic_id,
         }
 
         result = await self._post(
@@ -2889,6 +2957,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2958,6 +3027,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.7
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
+
+                .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
                 .. versionadded:: NEXT.VERSION
 
@@ -3031,6 +3103,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -3219,6 +3292,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3280,6 +3354,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.7
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
+
+                .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
                 .. versionadded:: NEXT.VERSION
 
@@ -3364,6 +3441,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -3382,6 +3460,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3433,6 +3512,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 21.7
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
+
+                .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
                 .. versionadded:: NEXT.VERSION
 
@@ -3508,6 +3590,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -5314,6 +5397,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -5439,6 +5523,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -5509,6 +5596,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -7796,6 +7884,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -7853,6 +7942,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7902,6 +7994,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -8235,6 +8328,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
         video_start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -8292,6 +8386,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 21.7
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
+
+                .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
                 .. versionadded:: NEXT.VERSION
 
@@ -8353,6 +8450,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "reply_parameters": reply_parameters,
             "show_caption_above_media": show_caption_above_media,
             "allow_paid_broadcast": allow_paid_broadcast,
+            "direct_messages_topic_id": direct_messages_topic_id,
             "video_start_timestamp": video_start_timestamp,
             "suggested_post_parameters": suggested_post_parameters,
         }
@@ -8377,6 +8475,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         remove_caption: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -8409,6 +8508,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
             remove_caption (:obj:`bool`, optional): Pass :obj:`True` to copy the messages without
                 their captions.
+            direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
+                topic to which the message will be sent; required if the message is sent to a
+                direct messages chat.
+
+                .. versionadded:: NEXT.VERSION
+
 
         Returns:
             tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -8426,6 +8531,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "protect_content": protect_content,
             "message_thread_id": message_thread_id,
             "remove_caption": remove_caption,
+            "direct_messages_topic_id": direct_messages_topic_id,
         }
 
         result = await self._post(
@@ -10830,6 +10936,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         business_connection_id: Optional[str] = None,
         payload: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -10881,6 +10988,9 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 |suggested_post_parameters|
 
                 .. versionadded:: NEXT.VERSION
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -10925,6 +11035,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 

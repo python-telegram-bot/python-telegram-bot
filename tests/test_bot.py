@@ -2375,6 +2375,16 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_message(2, "text", allow_paid_broadcast=42)
 
+    async def test_direct_messages_topic_id_argument(self, offline_bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("direct_messages_topic_id") == 42
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_message(2, "text", direct_messages_topic_id=42)
+
     async def test_suggested_post_parameters_argument(self, offline_bot, monkeypatch):
         """We can't test every single method easily, so we just test one. Our linting will catch
         any unused args with the others."""

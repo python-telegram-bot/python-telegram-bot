@@ -86,7 +86,16 @@ class _ChatBase(TelegramObject):
     .. versionadded:: 21.3
     """
 
-    __slots__ = ("first_name", "id", "is_forum", "last_name", "title", "type", "username")
+    __slots__ = (
+        "first_name",
+        "id",
+        "is_direct_messages",
+        "is_forum",
+        "last_name",
+        "title",
+        "type",
+        "username",
+    )
 
     def __init__(
         self,
@@ -97,6 +106,7 @@ class _ChatBase(TelegramObject):
         first_name: Optional[str] = None,
         last_name: Optional[str] = None,
         is_forum: Optional[bool] = None,
+        is_direct_messages: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -110,6 +120,7 @@ class _ChatBase(TelegramObject):
         self.first_name: Optional[str] = first_name
         self.last_name: Optional[str] = last_name
         self.is_forum: Optional[bool] = is_forum
+        self.is_direct_messages: Optional[bool] = is_direct_messages
 
         self._id_attrs = (self.id,)
 
@@ -1019,6 +1030,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1062,6 +1074,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1141,6 +1154,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1184,6 +1198,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def send_chat_action(
@@ -1239,6 +1254,7 @@ class _ChatBase(TelegramObject):
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1284,6 +1300,7 @@ class _ChatBase(TelegramObject):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1301,6 +1318,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1344,6 +1362,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1365,6 +1384,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1412,6 +1432,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1431,6 +1452,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1476,6 +1498,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1538,6 +1561,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1576,6 +1600,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1659,6 +1684,7 @@ class _ChatBase(TelegramObject):
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1726,6 +1752,7 @@ class _ChatBase(TelegramObject):
             reply_parameters=reply_parameters,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1745,6 +1772,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1790,6 +1818,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1813,6 +1842,7 @@ class _ChatBase(TelegramObject):
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
         show_caption_above_media: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1862,6 +1892,7 @@ class _ChatBase(TelegramObject):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1877,6 +1908,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1916,6 +1948,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -1937,6 +1970,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1984,6 +2018,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2010,6 +2045,7 @@ class _ChatBase(TelegramObject):
         show_caption_above_media: Optional[bool] = None,
         cover: Optional[FileInput] = None,
         start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2062,6 +2098,7 @@ class _ChatBase(TelegramObject):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2079,6 +2116,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2122,6 +2160,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2140,6 +2179,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2184,6 +2224,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2278,6 +2319,7 @@ class _ChatBase(TelegramObject):
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
         video_start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2322,6 +2364,7 @@ class _ChatBase(TelegramObject):
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2340,6 +2383,7 @@ class _ChatBase(TelegramObject):
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
         video_start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2384,6 +2428,7 @@ class _ChatBase(TelegramObject):
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2395,6 +2440,7 @@ class _ChatBase(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         remove_caption: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2430,6 +2476,7 @@ class _ChatBase(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def copy_messages(
@@ -2440,6 +2487,7 @@ class _ChatBase(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         remove_caption: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2475,6 +2523,7 @@ class _ChatBase(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def forward_from(
@@ -2485,6 +2534,7 @@ class _ChatBase(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         video_start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2520,6 +2570,7 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2531,6 +2582,7 @@ class _ChatBase(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         video_start_timestamp: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2567,6 +2619,7 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -2577,6 +2630,7 @@ class _ChatBase(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2611,6 +2665,7 @@ class _ChatBase(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def forward_messages_to(
@@ -2620,6 +2675,7 @@ class _ChatBase(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        direct_messages_topic_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2654,6 +2710,7 @@ class _ChatBase(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def export_invite_link(
@@ -3493,6 +3550,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         payload: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
+        direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3537,6 +3595,7 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             payload=payload,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
         )
 
@@ -3758,6 +3817,10 @@ class Chat(_ChatBase):
             (has topics_ enabled).
 
             .. versionadded:: 20.0
+        is_direct_messages (:obj:`bool`, optional): :obj:`True`, if the chat is the direct messages
+            chat of a channel.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -3772,6 +3835,10 @@ class Chat(_ChatBase):
             (has topics_ enabled).
 
             .. versionadded:: 20.0
+        is_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the chat is the direct messages
+            chat of a channel.
+
+            .. versionadded:: NEXT.VERSION
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """

@@ -71,6 +71,7 @@ Available Types
     telegram.contact
     telegram.dice
     telegram.directmessagepricechanged
+    telegram.directmessagestopic
     telegram.document
     telegram.externalreplyinfo
     telegram.file
