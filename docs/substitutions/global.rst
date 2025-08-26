@@ -98,6 +98,8 @@
 
 .. |direct_messages_topic_id| replace:: Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat.
 
+.. |suggested_post_parameters| replace:: An object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
+
 .. |tz-naive-dtms| replace:: For timezone naive :obj:`datetime.datetime` objects, the default timezone of the bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
 
 .. |org-verify| replace:: `on behalf of the organization <https://telegram.org/verify#third-party-verification>`__

@@ -75,6 +75,8 @@ from telegram import (
     ShippingOption,
     StarTransaction,
     StarTransactions,
+    SuggestedPostParameters,
+    SuggestedPostPrice,
     Update,
     User,
     WebAppInfo,
@@ -2382,6 +2384,22 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_message(2, "text", direct_messages_topic_id=42)
+
+    async def test_suggested_post_parameters_argument(self, offline_bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
+        suggested_post_parameters = SuggestedPostParameters(price=SuggestedPostPrice("TON", 10))
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return (
+                request_data.parameters.get("suggested_post_parameters")
+                == suggested_post_parameters.to_dict()
+            )
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_message(
+            2, "text", suggested_post_parameters=suggested_post_parameters
+        )
 
     async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
         async def make_assertion(*args, **_):
