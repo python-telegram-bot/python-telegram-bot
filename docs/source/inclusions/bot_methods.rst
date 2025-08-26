@@ -121,6 +121,10 @@
       - Used for approving a chat join request
     * - :meth:`~telegram.Bot.decline_chat_join_request`
       - Used for declining a chat join request
+    * - :meth:`~telegram.Bot.approve_suggested_post`
+      - Used for approving a suggested post
+    * - :meth:`~telegram.Bot.decline_suggested_post`
+      - Used for declining a suggested post
     * - :meth:`~telegram.Bot.ban_chat_member`
       - Used for banning a member from the chat
     * - :meth:`~telegram.Bot.unban_chat_member`
