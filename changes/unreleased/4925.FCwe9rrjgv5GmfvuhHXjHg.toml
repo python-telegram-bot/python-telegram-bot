@@ -1,0 +1,6 @@
+dependencies = "Bump actions/checkout from 4.2.2 to 5.0.0"
+internal = "Bump actions/checkout from 4.2.2 to 5.0.0"
+[[pull_requests]]
+uid = "4925"
+author_uid = "dependabot[bot]"
+closes_threads = []
