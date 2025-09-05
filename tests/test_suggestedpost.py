@@ -22,7 +22,16 @@ import datetime as dtm
 import pytest
 
 from telegram import Dice
-from telegram._suggestedpost import SuggestedPostParameters, SuggestedPostPrice
+from telegram._chat import Chat
+from telegram._message import Message
+from telegram._payment.stars.staramount import StarAmount
+from telegram._suggestedpost import (
+    SuggestedPostDeclined,
+    SuggestedPostPaid,
+    SuggestedPostParameters,
+    SuggestedPostPrice,
+    SuggestedPostRefunded,
+)
 from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
 
@@ -147,6 +156,198 @@ class TestSuggestedPostPriceWithoutRequest(SuggestedPostPriceTestBase):
         a = suggested_post_price
         b = SuggestedPostPrice(currency=self.currency, amount=self.amount)
         c = SuggestedPostPrice(currency="TON", amount=self.amount)
+        e = Dice(4, "emoji")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+@pytest.fixture(scope="module")
+def suggested_post_declined():
+    return SuggestedPostDeclined(
+        suggested_post_message=SuggestedPostDeclinedTestBase.suggested_post_message,
+        comment=SuggestedPostDeclinedTestBase.comment,
+    )
+
+
+class SuggestedPostDeclinedTestBase:
+    suggested_post_message = Message(1, dtm.datetime.now(), Chat(1, ""), text="post this pls.")
+    comment = "another time"
+
+
+class TestSuggestedPostDeclinedWithoutRequest(SuggestedPostDeclinedTestBase):
+    def test_slot_behaviour(self, suggested_post_declined):
+        for attr in suggested_post_declined.__slots__:
+            assert getattr(suggested_post_declined, attr, "err") != "err", (
+                f"got extra slot '{attr}'"
+            )
+        assert len(mro_slots(suggested_post_declined)) == len(
+            set(mro_slots(suggested_post_declined))
+        ), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "suggested_post_message": self.suggested_post_message.to_dict(),
+            "comment": self.comment,
+        }
+        spd = SuggestedPostDeclined.de_json(json_dict, offline_bot)
+        assert spd.suggested_post_message == self.suggested_post_message
+        assert spd.comment == self.comment
+        assert spd.api_kwargs == {}
+
+    def test_to_dict(self, suggested_post_declined):
+        spd_dict = suggested_post_declined.to_dict()
+
+        assert isinstance(spd_dict, dict)
+        assert spd_dict["suggested_post_message"] == self.suggested_post_message.to_dict()
+        assert spd_dict["comment"] == self.comment
+
+    def test_equality(self, suggested_post_declined):
+        a = suggested_post_declined
+        b = SuggestedPostDeclined(
+            suggested_post_message=self.suggested_post_message, comment=self.comment
+        )
+        c = SuggestedPostDeclined(suggested_post_message=self.suggested_post_message, comment="no")
+        e = Dice(4, "emoji")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+@pytest.fixture(scope="module")
+def suggested_post_paid():
+    return SuggestedPostPaid(
+        currency=SuggestedPostPaidTestBase.currency,
+        suggested_post_message=SuggestedPostPaidTestBase.suggested_post_message,
+        amount=SuggestedPostPaidTestBase.amount,
+        star_amount=SuggestedPostPaidTestBase.star_amount,
+    )
+
+
+class SuggestedPostPaidTestBase:
+    suggested_post_message = Message(1, dtm.datetime.now(), Chat(1, ""), text="post this pls.")
+    currency = "XTR"
+    amount = 100
+    star_amount = StarAmount(100)
+
+
+class TestSuggestedPostPaidWithoutRequest(SuggestedPostPaidTestBase):
+    def test_slot_behaviour(self, suggested_post_paid):
+        for attr in suggested_post_paid.__slots__:
+            assert getattr(suggested_post_paid, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(suggested_post_paid)) == len(set(mro_slots(suggested_post_paid))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "suggested_post_message": self.suggested_post_message.to_dict(),
+            "currency": self.currency,
+            "amount": self.amount,
+            "star_amount": self.star_amount.to_dict(),
+        }
+        spp = SuggestedPostPaid.de_json(json_dict, offline_bot)
+        assert spp.suggested_post_message == self.suggested_post_message
+        assert spp.currency == self.currency
+        assert spp.amount == self.amount
+        assert spp.star_amount == self.star_amount
+        assert spp.api_kwargs == {}
+
+    def test_to_dict(self, suggested_post_paid):
+        spp_dict = suggested_post_paid.to_dict()
+
+        assert isinstance(spp_dict, dict)
+        assert spp_dict["suggested_post_message"] == self.suggested_post_message.to_dict()
+        assert spp_dict["currency"] == self.currency
+        assert spp_dict["amount"] == self.amount
+        assert spp_dict["star_amount"] == self.star_amount.to_dict()
+
+    def test_equality(self, suggested_post_paid):
+        a = suggested_post_paid
+        b = SuggestedPostPaid(
+            suggested_post_message=self.suggested_post_message,
+            currency=self.currency,
+            amount=self.amount,
+            star_amount=self.star_amount,
+        )
+        c = SuggestedPostPaid(
+            suggested_post_message=self.suggested_post_message,
+            currency=self.currency,
+            amount=self.amount - 1,
+            star_amount=StarAmount(self.amount - 1),
+        )
+        e = Dice(4, "emoji")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+@pytest.fixture(scope="module")
+def suggested_post_refunded():
+    return SuggestedPostRefunded(
+        reason=SuggestedPostRefundedTestBase.reason,
+        suggested_post_message=SuggestedPostRefundedTestBase.suggested_post_message,
+    )
+
+
+class SuggestedPostRefundedTestBase:
+    reason = "post_deleted"
+    suggested_post_message = Message(1, dtm.datetime.now(), Chat(1, ""), text="post this pls.")
+
+
+class TestSuggestedPostRefundedWithoutRequest(SuggestedPostRefundedTestBase):
+    def test_slot_behaviour(self, suggested_post_refunded):
+        for attr in suggested_post_refunded.__slots__:
+            assert getattr(suggested_post_refunded, attr, "err") != "err", (
+                f"got extra slot '{attr}'"
+            )
+        assert len(mro_slots(suggested_post_refunded)) == len(
+            set(mro_slots(suggested_post_refunded))
+        ), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "suggested_post_message": self.suggested_post_message.to_dict(),
+            "reason": self.reason,
+        }
+        spr = SuggestedPostRefunded.de_json(json_dict, offline_bot)
+        assert spr.suggested_post_message == self.suggested_post_message
+        assert spr.reason == self.reason
+        assert spr.api_kwargs == {}
+
+    def test_to_dict(self, suggested_post_refunded):
+        spr_dict = suggested_post_refunded.to_dict()
+
+        assert isinstance(spr_dict, dict)
+        assert spr_dict["suggested_post_message"] == self.suggested_post_message.to_dict()
+        assert spr_dict["reason"] == self.reason
+
+    def test_equality(self, suggested_post_refunded):
+        a = suggested_post_refunded
+        b = SuggestedPostRefunded(
+            suggested_post_message=self.suggested_post_message, reason=self.reason
+        )
+        c = SuggestedPostRefunded(
+            suggested_post_message=self.suggested_post_message, reason="payment_refunded"
+        )
         e = Dice(4, "emoji")
 
         assert a == b

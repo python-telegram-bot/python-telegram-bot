@@ -119,7 +119,10 @@ if TYPE_CHECKING:
         MessageId,
         MessageOrigin,
         ReactionType,
+        SuggestedPostDeclined,
+        SuggestedPostPaid,
         SuggestedPostParameters,
+        SuggestedPostRefunded,
         TextQuote,
     )
 
@@ -568,6 +571,18 @@ class Message(MaybeInaccessibleMessage):
             message: the price for paid messages has changed in the chat
 
             .. versionadded:: 22.1
+        suggested_post_declined (:class:`telegram.SuggestedPostDeclined`, optional): Service
+            message: a suggested post was declined.
+
+            .. versionadded:: NEXT.VERSION
+        suggested_post_paid (:class:`telegram.SuggestedPostPaid`, optional): Service
+            message: payment for a suggested post was received.
+
+            .. versionadded:: NEXT.VERSION
+        suggested_post_refunded (:class:`telegram.SuggestedPostRefunded`, optional): Service
+            message: payment for a suggested post was refunded.
+
+            .. versionadded:: NEXT.VERSION
         external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -940,6 +955,18 @@ class Message(MaybeInaccessibleMessage):
             message: the price for paid messages has changed in the chat
 
             .. versionadded:: 22.1
+        suggested_post_declined (:class:`telegram.SuggestedPostDeclined`): Optional. Service
+            message: a suggested post was declined.
+
+            .. versionadded:: NEXT.VERSION
+        suggested_post_paid (:class:`telegram.SuggestedPostPaid`): Optional. Service
+            message: payment for a suggested post was received.
+
+            .. versionadded:: NEXT.VERSION
+        suggested_post_refunded (:class:`telegram.SuggestedPostRefunded`): Optional. Service
+            message: payment for a suggested post was refunded.
+
+            .. versionadded:: NEXT.VERSION
         external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -1112,6 +1139,9 @@ class Message(MaybeInaccessibleMessage):
         "sticker",
         "story",
         "successful_payment",
+        "suggested_post_declined",
+        "suggested_post_paid",
+        "suggested_post_refunded",
         "supergroup_chat_created",
         "text",
         "unique_gift",
@@ -1227,6 +1257,9 @@ class Message(MaybeInaccessibleMessage):
         is_paid_post: Optional[bool] = None,
         direct_messages_topic: Optional[DirectMessagesTopic] = None,
         reply_to_checklist_task_id: Optional[int] = None,
+        suggested_post_declined: Optional["SuggestedPostDeclined"] = None,
+        suggested_post_paid: Optional["SuggestedPostPaid"] = None,
+        suggested_post_refunded: Optional["SuggestedPostRefunded"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1345,6 +1378,9 @@ class Message(MaybeInaccessibleMessage):
             self.is_paid_post: Optional[bool] = is_paid_post
             self.direct_messages_topic: Optional[DirectMessagesTopic] = direct_messages_topic
             self.reply_to_checklist_task_id: Optional[int] = reply_to_checklist_task_id
+            self.suggested_post_declined: Optional[SuggestedPostDeclined] = suggested_post_declined
+            self.suggested_post_paid: Optional[SuggestedPostPaid] = suggested_post_paid
+            self.suggested_post_refunded: Optional[SuggestedPostRefunded] = suggested_post_refunded
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1499,6 +1535,11 @@ class Message(MaybeInaccessibleMessage):
             ExternalReplyInfo,
             TextQuote,
         )
+        from telegram._suggestedpost import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
+            SuggestedPostDeclined,
+            SuggestedPostPaid,
+            SuggestedPostRefunded,
+        )
 
         data["giveaway"] = de_json_optional(data.get("giveaway"), Giveaway, bot)
         data["giveaway_completed"] = de_json_optional(
@@ -1533,6 +1574,15 @@ class Message(MaybeInaccessibleMessage):
         )
         data["direct_messages_topic"] = de_json_optional(
             data.get("direct_messages_topic"), DirectMessagesTopic, bot
+        )
+        data["suggested_post_declined"] = de_json_optional(
+            data.get("suggested_post_declined"), SuggestedPostDeclined, bot
+        )
+        data["suggested_post_paid"] = de_json_optional(
+            data.get("suggested_post_paid"), SuggestedPostPaid, bot
+        )
+        data["suggested_post_refunded"] = de_json_optional(
+            data.get("suggested_post_refunded"), SuggestedPostRefunded, bot
         )
 
         api_kwargs = {}

@@ -92,6 +92,7 @@ from telegram import (
     WebAppData,
 )
 from telegram._directmessagestopic import DirectMessagesTopic
+from telegram._suggestedpost import SuggestedPostDeclined, SuggestedPostPaid, SuggestedPostRefunded
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -364,6 +365,31 @@ def message(bot):
             )
         },
         {"reply_to_checklist_task_id": 11},
+        {
+            "suggested_post_declined": SuggestedPostDeclined(
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+                comment="comment",
+            )
+        },
+        {
+            "suggested_post_paid": SuggestedPostPaid(
+                currency="XTR",
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+                amount=100,
+            )
+        },
+        {
+            "suggested_post_refunded": SuggestedPostRefunded(
+                reason="post_deleted",
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+            )
+        },
     ],
     ids=[
         "reply",
@@ -448,6 +474,9 @@ def message(bot):
         "is_paid_post",
         "direct_messages_topic",
         "reply_to_checklist_task_id",
+        "suggested_post_declined",
+        "suggested_post_paid",
+        "suggested_post_refunded",
     ],
 )
 def message_params(bot, request):
