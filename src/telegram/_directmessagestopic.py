@@ -39,14 +39,20 @@ class DirectMessagesTopic(TelegramObject):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        topic_id (:obj:`int`): Unique identifier of the topic.
+        topic_id (:obj:`int`): Unique identifier of the topic. This number may have more than 32
+            significant bits and some programming languages may have difficulty/silent defects in
+            interpreting it. But it has at most 52 significant bits, so a 64-bit integer or
+            double-precision float type are safe for storing this identifier.
         user (:class:`telegram.User`, optional): Information about the user that created the topic.
 
             .. hint::
                 According to Telegram, this field is always present as of Bot API 9.2.
 
     Attributes:
-        topic_id (:obj:`int`): Unique identifier of the topic.
+        topic_id (:obj:`int`): Unique identifier of the topic. This number may have more than 32
+            significant bits and some programming languages may have difficulty/silent defects in
+            interpreting it. But it has at most 52 significant bits, so a 64-bit integer or
+            double-precision float type are safe for storing this identifier.
         user (:class:`telegram.User`): Optional. Information about the user that created the topic.
 
             .. hint::
