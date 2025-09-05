@@ -40,7 +40,7 @@ class ChecklistTask(TelegramObject):
     Describes a task in a checklist.
 
     Objects of this class are comparable in terms of equality.
-    Two objects of this class are considered equal, if all their :attr:`id` is equal.
+    Two objects of this class are considered equal, if their :attr:`id` is equal.
 
     .. versionadded:: 22.3
 

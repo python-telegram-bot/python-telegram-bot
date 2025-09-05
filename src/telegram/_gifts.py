@@ -42,28 +42,30 @@ class Gift(TelegramObject):
     .. versionadded:: 21.8
 
     Args:
-        id (:obj:`str`): Unique identifier of the gift
-        sticker (:class:`~telegram.Sticker`): The sticker that represents the gift
-        star_count (:obj:`int`): The number of Telegram Stars that must be paid to send the sticker
+        id (:obj:`str`): Unique identifier of the gift.
+        sticker (:class:`~telegram.Sticker`): The sticker that represents the gift.
+        star_count (:obj:`int`): The number of Telegram Stars that must be paid to send the
+            sticker.
         total_count (:obj:`int`, optional): The total number of the gifts of this type that can be
-            sent; for limited gifts only
+            sent; for limited gifts only.
         remaining_count (:obj:`int`, optional): The number of remaining gifts of this type that can
-            be sent; for limited gifts only
+            be sent; for limited gifts only.
         upgrade_star_count (:obj:`int`, optional): The number of Telegram Stars that must be paid
-            to upgrade the gift to a unique one
+            to upgrade the gift to a unique one.
 
             .. versionadded:: 21.10
 
     Attributes:
-        id (:obj:`str`): Unique identifier of the gift
-        sticker (:class:`~telegram.Sticker`): The sticker that represents the gift
-        star_count (:obj:`int`): The number of Telegram Stars that must be paid to send the sticker
+        id (:obj:`str`): Unique identifier of the gift.
+        sticker (:class:`~telegram.Sticker`): The sticker that represents the gift.
+        star_count (:obj:`int`): The number of Telegram Stars that must be paid to send the
+            sticker.
         total_count (:obj:`int`): Optional. The total number of the gifts of this type that can be
-            sent; for limited gifts only
+            sent; for limited gifts only.
         remaining_count (:obj:`int`): Optional. The number of remaining gifts of this type that can
-            be sent; for limited gifts only
+            be sent; for limited gifts only.
         upgrade_star_count (:obj:`int`): Optional. The number of Telegram Stars that must be paid
-            to upgrade the gift to a unique one
+            to upgrade the gift to a unique one.
 
             .. versionadded:: 21.10
 
@@ -119,10 +121,10 @@ class Gifts(TelegramObject):
     .. versionadded:: 21.8
 
     Args:
-        gifts (Sequence[:class:`Gift`]): The sequence of gifts
+        gifts (Sequence[:class:`Gift`]): The sequence of gifts.
 
     Attributes:
-        gifts (tuple[:class:`Gift`]): The sequence of gifts
+        gifts (tuple[:class:`Gift`]): The sequence of gifts.
 
     """
 
@@ -161,12 +163,12 @@ class GiftInfo(TelegramObject):
     Args:
         gift (:class:`Gift`): Information about the gift.
         owned_gift_id (:obj:`str`, optional): Unique identifier of the received gift for the bot;
-            only present for gifts received on behalf of business accounts
+            only present for gifts received on behalf of business accounts.
         convert_star_count (:obj:`int`, optional) Number of Telegram Stars that can be claimed by
             the receiver by converting the gift; omitted if conversion to Telegram Stars
-            is impossible
+            is impossible.
         prepaid_upgrade_star_count (:obj:`int`, optional): Number of Telegram Stars that were
-            prepaid by the sender for the ability to upgrade the gift
+            prepaid by the sender for the ability to upgrade the gift.
         can_be_upgraded (:obj:`bool`, optional): :obj:`True`, if the gift can be upgraded
             to a unique gift.
         text (:obj:`str`, optional): Text of the message that was added to the gift.
@@ -178,12 +180,12 @@ class GiftInfo(TelegramObject):
     Attributes:
         gift (:class:`Gift`): Information about the gift.
         owned_gift_id (:obj:`str`): Optional. Unique identifier of the received gift for the bot;
-            only present for gifts received on behalf of business accounts
+            only present for gifts received on behalf of business accounts.
         convert_star_count (:obj:`int`): Optional. Number of Telegram Stars that can be claimed by
             the receiver by converting the gift; omitted if conversion to Telegram Stars
-            is impossible
+            is impossible.
         prepaid_upgrade_star_count (:obj:`int`): Optional. Number of Telegram Stars that were
-            prepaid by the sender for the ability to upgrade the gift
+            prepaid by the sender for the ability to upgrade the gift.
         can_be_upgraded (:obj:`bool`): Optional. :obj:`True`, if the gift can be upgraded
             to a unique gift.
         text (:obj:`str`): Optional. Text of the message that was added to the gift.
