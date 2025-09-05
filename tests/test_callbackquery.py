@@ -576,11 +576,14 @@ class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
         assert check_shortcut_signature(
             CallbackQuery.copy_message,
             Bot.copy_message,
-            ["message_id", "from_chat_id"],
+            ["message_id", "from_chat_id", "direct_messages_topic_id"],
             [],
         )
         assert await check_shortcut_call(
-            callback_query.copy_message, callback_query.get_bot(), "copy_message"
+            callback_query.copy_message,
+            callback_query.get_bot(),
+            "copy_message",
+            shortcut_kwargs=["direct_messages_topic_id"],
         )
         assert await check_defaults_handling(callback_query.copy_message, callback_query.get_bot())
 

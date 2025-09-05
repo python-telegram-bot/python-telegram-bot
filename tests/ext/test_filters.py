@@ -2814,3 +2814,10 @@ class TestFilters:
         update.message.checklist = "test"
         assert filters.CHECKLIST.check_update(update)
         assert str(filters.CHECKLIST) == "filters.CHECKLIST"
+
+    def test_filters_direct_messages(self, update):
+        assert not filters.DIRECT_MESSAGES.check_update(update)
+
+        update.message.chat.is_direct_messages = True
+        assert filters.DIRECT_MESSAGES.check_update(update)
+        assert str(filters.DIRECT_MESSAGES) == "filters.DIRECT_MESSAGES"

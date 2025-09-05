@@ -49,6 +49,7 @@ __all__ = (
     "CHECKLIST",
     "COMMAND",
     "CONTACT",
+    "DIRECT_MESSAGES",
     "EFFECT_ID",
     "FORWARDED",
     "GAME",
@@ -1146,6 +1147,22 @@ class Dice(_Dice):
 
     SLOT_MACHINE = _Dice(emoji=DiceEmojiEnum.SLOT_MACHINE)
     """Dice messages with the emoji 🎰. Matches any dice value."""
+
+
+class _DirectMessages(UpdateFilter):
+    __slots__ = ()
+
+    def filter(self, update: Update) -> bool:
+        return bool(update.effective_chat and update.effective_chat.is_direct_messages)
+
+
+DIRECT_MESSAGES = _DirectMessages(name="filters.DIRECT_MESSAGES")
+"""Filter chats which are the direct messages for a channel.
+
+.. seealso:: :attr:`telegram.Chat.is_direct_messages`
+
+.. versionadded:: NEXT.VERSION
+"""
 
 
 class Document:
