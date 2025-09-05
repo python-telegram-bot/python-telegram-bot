@@ -265,8 +265,14 @@ __all__ = (
     "StoryAreaTypeUniqueGift",
     "StoryAreaTypeWeather",
     "SuccessfulPayment",
+    "SuggestedPostApprovalFailed",
+    "SuggestedPostApproved",
+    "SuggestedPostDeclined",
+    "SuggestedPostInfo",
+    "SuggestedPostPaid",
     "SuggestedPostParameters",
     "SuggestedPostPrice",
+    "SuggestedPostRefunded",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
     "TextQuote",
@@ -575,7 +581,16 @@ from ._storyarea import (
     StoryAreaTypeUniqueGift,
     StoryAreaTypeWeather,
 )
-from ._suggestedpost import SuggestedPostParameters, SuggestedPostPrice
+from ._suggestedpost import (
+    SuggestedPostApprovalFailed,
+    SuggestedPostApproved,
+    SuggestedPostDeclined,
+    SuggestedPostInfo,
+    SuggestedPostPaid,
+    SuggestedPostParameters,
+    SuggestedPostPrice,
+    SuggestedPostRefunded,
+)
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
 from ._uniquegift import (
