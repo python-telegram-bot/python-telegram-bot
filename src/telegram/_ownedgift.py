@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._gifts import Gift
@@ -68,7 +68,7 @@ class OwnedGift(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.OwnedGiftType, type, type)
@@ -77,7 +77,7 @@ class OwnedGift(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "OwnedGift":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OwnedGift":
         """Converts JSON data to the appropriate :class:`OwnedGift` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -133,21 +133,21 @@ class OwnedGifts(TelegramObject):
         self,
         total_count: int,
         gifts: Sequence[OwnedGift],
-        next_offset: Optional[str] = None,
+        next_offset: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.total_count: int = total_count
         self.gifts: tuple[OwnedGift, ...] = parse_sequence_arg(gifts)
-        self.next_offset: Optional[str] = next_offset
+        self.next_offset: str | None = next_offset
 
         self._id_attrs = (self.total_count, self.gifts)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "OwnedGifts":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OwnedGifts":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -233,39 +233,39 @@ class OwnedGiftRegular(OwnedGift):
         self,
         gift: Gift,
         send_date: dtm.datetime,
-        owned_gift_id: Optional[str] = None,
-        sender_user: Optional[User] = None,
-        text: Optional[str] = None,
-        entities: Optional[Sequence[MessageEntity]] = None,
-        is_private: Optional[bool] = None,
-        is_saved: Optional[bool] = None,
-        can_be_upgraded: Optional[bool] = None,
-        was_refunded: Optional[bool] = None,
-        convert_star_count: Optional[int] = None,
-        prepaid_upgrade_star_count: Optional[int] = None,
+        owned_gift_id: str | None = None,
+        sender_user: User | None = None,
+        text: str | None = None,
+        entities: Sequence[MessageEntity] | None = None,
+        is_private: bool | None = None,
+        is_saved: bool | None = None,
+        can_be_upgraded: bool | None = None,
+        was_refunded: bool | None = None,
+        convert_star_count: int | None = None,
+        prepaid_upgrade_star_count: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=OwnedGift.REGULAR, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.gift: Gift = gift
             self.send_date: dtm.datetime = send_date
-            self.owned_gift_id: Optional[str] = owned_gift_id
-            self.sender_user: Optional[User] = sender_user
-            self.text: Optional[str] = text
+            self.owned_gift_id: str | None = owned_gift_id
+            self.sender_user: User | None = sender_user
+            self.text: str | None = text
             self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.is_private: Optional[bool] = is_private
-            self.is_saved: Optional[bool] = is_saved
-            self.can_be_upgraded: Optional[bool] = can_be_upgraded
-            self.was_refunded: Optional[bool] = was_refunded
-            self.convert_star_count: Optional[int] = convert_star_count
-            self.prepaid_upgrade_star_count: Optional[int] = prepaid_upgrade_star_count
+            self.is_private: bool | None = is_private
+            self.is_saved: bool | None = is_saved
+            self.can_be_upgraded: bool | None = can_be_upgraded
+            self.was_refunded: bool | None = was_refunded
+            self.convert_star_count: int | None = convert_star_count
+            self.prepaid_upgrade_star_count: int | None = prepaid_upgrade_star_count
 
             self._id_attrs = (self.type, self.gift, self.send_date)
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "OwnedGiftRegular":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OwnedGiftRegular":
         """See :meth:`telegram.OwnedGift.de_json`."""
         data = cls._parse_data(data)
 
@@ -302,7 +302,7 @@ class OwnedGiftRegular(OwnedGift):
 
         return parse_message_entity(self.text, entity)
 
-    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
+    def parse_entities(self, types: list[str] | None = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this owned gift's text filtered by their ``type`` attribute as
@@ -394,31 +394,31 @@ class OwnedGiftUnique(OwnedGift):
         self,
         gift: UniqueGift,
         send_date: dtm.datetime,
-        owned_gift_id: Optional[str] = None,
-        sender_user: Optional[User] = None,
-        is_saved: Optional[bool] = None,
-        can_be_transferred: Optional[bool] = None,
-        transfer_star_count: Optional[int] = None,
-        next_transfer_date: Optional[dtm.datetime] = None,
+        owned_gift_id: str | None = None,
+        sender_user: User | None = None,
+        is_saved: bool | None = None,
+        can_be_transferred: bool | None = None,
+        transfer_star_count: int | None = None,
+        next_transfer_date: dtm.datetime | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=OwnedGift.UNIQUE, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.gift: UniqueGift = gift
             self.send_date: dtm.datetime = send_date
-            self.owned_gift_id: Optional[str] = owned_gift_id
-            self.sender_user: Optional[User] = sender_user
-            self.is_saved: Optional[bool] = is_saved
-            self.can_be_transferred: Optional[bool] = can_be_transferred
-            self.transfer_star_count: Optional[int] = transfer_star_count
-            self.next_transfer_date: Optional[dtm.datetime] = next_transfer_date
+            self.owned_gift_id: str | None = owned_gift_id
+            self.sender_user: User | None = sender_user
+            self.is_saved: bool | None = is_saved
+            self.can_be_transferred: bool | None = can_be_transferred
+            self.transfer_star_count: int | None = transfer_star_count
+            self.next_transfer_date: dtm.datetime | None = next_transfer_date
 
             self._id_attrs = (self.type, self.gift, self.send_date)
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "OwnedGiftUnique":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OwnedGiftUnique":
         """See :meth:`telegram.OwnedGift.de_json`."""
         data = cls._parse_data(data)
 

@@ -20,7 +20,7 @@
 
 import re
 from re import Pattern
-from typing import Optional, TypeVar, Union
+from typing import TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -76,11 +76,11 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT, RT]):
         self: "PreCheckoutQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
-        pattern: Optional[Union[str, Pattern[str]]] = None,
+        pattern: str | Pattern[str] | None = None,
     ):
         super().__init__(callback, block=block)
 
-        self.pattern: Optional[Pattern[str]] = re.compile(pattern) if pattern is not None else None
+        self.pattern: Pattern[str] | None = re.compile(pattern) if pattern is not None else None
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

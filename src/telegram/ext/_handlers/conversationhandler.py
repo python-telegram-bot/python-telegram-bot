@@ -21,7 +21,7 @@
 import asyncio
 import datetime as dtm
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Final, Generic, NoReturn, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Final, Generic, NoReturn, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
@@ -292,10 +292,10 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         per_chat: bool = True,
         per_user: bool = True,
         per_message: bool = False,
-        conversation_timeout: Optional[Union[float, dtm.timedelta]] = None,
-        name: Optional[str] = None,
+        conversation_timeout: float | dtm.timedelta | None = None,
+        name: str | None = None,
         persistent: bool = False,
-        map_to_parent: Optional[dict[object, object]] = None,
+        map_to_parent: dict[object, object] | None = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         # these imports need to be here because of circular import error otherwise
@@ -320,9 +320,9 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         self._per_user: bool = per_user
         self._per_chat: bool = per_chat
         self._per_message: bool = per_message
-        self._conversation_timeout: Optional[Union[float, dtm.timedelta]] = conversation_timeout
-        self._name: Optional[str] = name
-        self._map_to_parent: Optional[dict[object, object]] = map_to_parent
+        self._conversation_timeout: float | dtm.timedelta | None = conversation_timeout
+        self._name: str | None = name
+        self._map_to_parent: dict[object, object] | None = map_to_parent
 
         # if conversation_timeout is used, this dict is used to schedule a job which runs when the
         # conv has timed out.
@@ -366,7 +366,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         # this loop is going to warn the user about handlers which can work unexpectedly
         # in conversations
         for handler in all_handlers:
-            if isinstance(handler, (StringCommandHandler, StringRegexHandler)):
+            if isinstance(handler, StringCommandHandler | StringRegexHandler):
                 warn(
                     "The `ConversationHandler` only handles updates of type `telegram.Update`. "
                     f"{handler.__class__.__name__} handles updates of type `str`.",
@@ -389,13 +389,11 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
             elif self.per_chat and (
                 isinstance(
                     handler,
-                    (
-                        ShippingQueryHandler,
-                        InlineQueryHandler,
-                        ChosenInlineResultHandler,
-                        PreCheckoutQueryHandler,
-                        PollAnswerHandler,
-                    ),
+                    ShippingQueryHandler
+                    | InlineQueryHandler
+                    | ChosenInlineResultHandler
+                    | PreCheckoutQueryHandler
+                    | PollAnswerHandler,
                 )
             ):
                 warn(
@@ -529,7 +527,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
     @property
     def conversation_timeout(
         self,
-    ) -> Optional[Union[float, dtm.timedelta]]:
+    ) -> float | dtm.timedelta | None:
         """:obj:`float` | :obj:`datetime.timedelta`: Optional. When this
         handler is inactive more than this timeout (in seconds), it will be automatically
         ended.
@@ -543,7 +541,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         )
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """:obj:`str`: Optional. The name for this :class:`ConversationHandler`."""
         return self._name
 
@@ -564,7 +562,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         raise AttributeError("You can not assign a new value to persistent after initialization.")
 
     @property
-    def map_to_parent(self) -> Optional[dict[object, object]]:
+    def map_to_parent(self) -> dict[object, object] | None:
         """dict[:obj:`object`, :obj:`object`]: Optional. A :obj:`dict` that can be
         used to instruct a nested :class:`ConversationHandler` to transition into a mapped state on
         its parent :class:`ConversationHandler` in place of a specified nested state.
@@ -634,7 +632,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         chat = update.effective_chat
         user = update.effective_user
 
-        key: list[Union[int, str]] = []
+        key: list[int | str] = []
 
         if self.per_chat:
             if chat is None:
@@ -705,7 +703,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
             _LOGGER.exception("Failed to schedule timeout.", exc_info=exc)
 
     # pylint: disable=too-many-return-statements
-    def check_update(self, update: object) -> Optional[_CheckUpdateType[CCT]]:
+    def check_update(self, update: object) -> _CheckUpdateType[CCT] | None:
         """
         Determines whether an update should be handled by this conversation handler, and if so in
         which state the conversation currently is.
@@ -733,7 +731,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
 
         key = self._get_key(update)
         state = self._conversations.get(key)
-        check: Optional[object] = None
+        check: object | None = None
 
         # Resolve futures
         if isinstance(state, PendingState):
@@ -761,7 +759,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
 
         _LOGGER.debug("Selecting conversation %s with state %s", str(key), str(state))
 
-        handler: Optional[BaseHandler] = None
+        handler: BaseHandler | None = None
 
         # Search entry points for a match
         if state is None or self.allow_reentry:
@@ -802,7 +800,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         application: "Application[Any, CCT, Any, Any, Any, Any]",
         check_result: _CheckUpdateType[CCT],
         context: CCT,
-    ) -> Optional[object]:
+    ) -> object | None:
         """Send the update to the callback for the current state and BaseHandler
 
         Args:
@@ -897,7 +895,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         return None
 
     def _update_state(
-        self, new_state: object, key: ConversationKey, handler: Optional[BaseHandler] = None
+        self, new_state: object, key: ConversationKey, handler: BaseHandler | None = None
     ) -> None:
         if new_state == self.END:
             if key in self._conversations:

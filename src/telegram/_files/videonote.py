@@ -19,7 +19,6 @@
 """This module contains an object that represents a Telegram VideoNote."""
 
 import datetime as dtm
-from typing import Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -83,10 +82,10 @@ class VideoNote(_BaseThumbedMedium):
         file_unique_id: str,
         length: int,
         duration: TimePeriod,
-        file_size: Optional[int] = None,
-        thumbnail: Optional[PhotoSize] = None,
+        file_size: int | None = None,
+        thumbnail: PhotoSize | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -101,7 +100,7 @@ class VideoNote(_BaseThumbedMedium):
             self._duration: dtm.timedelta = to_timedelta(duration)
 
     @property
-    def duration(self) -> Union[int, dtm.timedelta]:
+    def duration(self) -> int | dtm.timedelta:
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )

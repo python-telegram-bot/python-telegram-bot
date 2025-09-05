@@ -98,6 +98,3 @@ Scripts/
 
 # environment manager:
 .mise.toml
-
-# Support for uv.lock will come in a future PR. See #4796
-uv.lock

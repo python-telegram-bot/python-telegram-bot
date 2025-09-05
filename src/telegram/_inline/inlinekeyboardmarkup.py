@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -74,7 +74,7 @@ class InlineKeyboardMarkup(TelegramObject):
         self,
         inline_keyboard: Sequence[Sequence[InlineKeyboardButton]],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(inline_keyboard):
@@ -92,7 +92,7 @@ class InlineKeyboardMarkup(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InlineKeyboardMarkup":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InlineKeyboardMarkup":
         """See :meth:`telegram.TelegramObject.de_json`."""
 
         keyboard = []
