@@ -22,6 +22,7 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
+from telegram._chat import Chat
 from telegram._files.sticker import Sticker
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
@@ -53,6 +54,10 @@ class Gift(TelegramObject):
             to upgrade the gift to a unique one
 
             .. versionadded:: 21.10
+        publisher_chat (:class:`telegram.Chat`, optional): Information about the chat that
+            published the gift.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`str`): Unique identifier of the gift
@@ -66,11 +71,16 @@ class Gift(TelegramObject):
             to upgrade the gift to a unique one
 
             .. versionadded:: 21.10
+        publisher_chat (:class:`telegram.Chat`): Optional. Information about the chat that
+            published the gift.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
     __slots__ = (
         "id",
+        "publisher_chat",
         "remaining_count",
         "star_count",
         "sticker",
@@ -86,6 +96,7 @@ class Gift(TelegramObject):
         total_count: Optional[int] = None,
         remaining_count: Optional[int] = None,
         upgrade_star_count: Optional[int] = None,
+        publisher_chat: Optional[Chat] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -96,6 +107,7 @@ class Gift(TelegramObject):
         self.total_count: Optional[int] = total_count
         self.remaining_count: Optional[int] = remaining_count
         self.upgrade_star_count: Optional[int] = upgrade_star_count
+        self.publisher_chat: Optional[Chat] = publisher_chat
 
         self._id_attrs = (self.id,)
 
@@ -107,6 +119,7 @@ class Gift(TelegramObject):
         data = cls._parse_data(data)
 
         data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
+        data["publisher_chat"] = de_json_optional(data.get("publisher_chat"), Chat, bot)
         return super().de_json(data=data, bot=bot)
 
 

@@ -91,6 +91,8 @@ from telegram import (
     Voice,
     WebAppData,
 )
+from telegram._directmessagestopic import DirectMessagesTopic
+from telegram._suggestedpost import SuggestedPostDeclined, SuggestedPostPaid, SuggestedPostRefunded
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -355,6 +357,39 @@ def message(bot):
                 tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
             )
         },
+        {"is_paid_post": True},
+        {
+            "direct_messages_topic": DirectMessagesTopic(
+                topic_id=1234,
+                user=User(id=5678, first_name="TestUser", is_bot=False),
+            )
+        },
+        {"reply_to_checklist_task_id": 11},
+        {
+            "suggested_post_declined": SuggestedPostDeclined(
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+                comment="comment",
+            )
+        },
+        {
+            "suggested_post_paid": SuggestedPostPaid(
+                currency="XTR",
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+                amount=100,
+            )
+        },
+        {
+            "suggested_post_refunded": SuggestedPostRefunded(
+                reason="post_deleted",
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+            )
+        },
     ],
     ids=[
         "reply",
@@ -436,6 +471,12 @@ def message(bot):
         "checklist",
         "checklist_tasks_done",
         "checklist_tasks_added",
+        "is_paid_post",
+        "direct_messages_topic",
+        "reply_to_checklist_task_id",
+        "suggested_post_declined",
+        "suggested_post_paid",
+        "suggested_post_refunded",
     ],
 )
 def message_params(bot, request):
@@ -1563,7 +1604,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_text,
             Bot.send_message,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1572,7 +1618,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_text, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1605,7 +1651,13 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_markdown,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "parse_mode",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1614,7 +1666,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_text, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1654,7 +1706,13 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_markdown_v2,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "parse_mode",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1663,7 +1721,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_text, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1706,7 +1764,13 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_html,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "parse_mode",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1715,7 +1779,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_text, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1743,7 +1807,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_media_group,
             Bot.send_media_group,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1752,7 +1821,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_media_group",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_media_group, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1785,7 +1854,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_photo,
             Bot.send_photo,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1794,7 +1868,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_photo",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_photo, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1819,7 +1893,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_audio,
             Bot.send_audio,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1828,7 +1907,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_audio",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_audio, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1853,7 +1932,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_document,
             Bot.send_document,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1862,7 +1946,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_document",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_document, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1887,7 +1971,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_animation,
             Bot.send_animation,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1896,7 +1985,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_animation",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_animation, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1921,7 +2010,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_sticker,
             Bot.send_sticker,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1930,7 +2024,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_sticker",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_sticker, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1955,7 +2049,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_video,
             Bot.send_video,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1964,7 +2063,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_video",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_video, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -1989,7 +2088,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_video_note,
             Bot.send_video_note,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -1998,7 +2102,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_video_note",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_video_note, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -2023,7 +2127,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_voice,
             Bot.send_voice,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -2032,7 +2141,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_voice",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_voice, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -2057,7 +2166,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_location,
             Bot.send_location,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -2066,7 +2180,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_location",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_location, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -2091,7 +2205,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_venue,
             Bot.send_venue,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -2100,7 +2219,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_venue",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_venue, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -2125,7 +2244,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_contact,
             Bot.send_contact,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -2134,7 +2258,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_contact",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_contact, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -2169,7 +2293,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_poll",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_poll, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -2194,7 +2318,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_dice,
             Bot.send_dice,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -2203,7 +2332,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_dice",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_dice, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -2345,7 +2474,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_invoice,
             Bot.send_invoice,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
@@ -2354,7 +2488,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_invoice",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_invoice, message.get_bot(), no_default_kwargs={"message_thread_id"}
@@ -2396,9 +2530,17 @@ class TestMessageWithoutRequest(MessageTestBase):
             return chat_id and from_chat and message_id and notification and protected_cont
 
         assert check_shortcut_signature(
-            Message.forward, Bot.forward_message, ["from_chat_id", "message_id"], []
+            Message.forward,
+            Bot.forward_message,
+            ["from_chat_id", "message_id", "direct_messages_topic_id"],
+            [],
         )
-        assert await check_shortcut_call(message.forward, message.get_bot(), "forward_message")
+        assert await check_shortcut_call(
+            message.forward,
+            message.get_bot(),
+            "forward_message",
+            shortcut_kwargs=["direct_messages_topic_id"],
+        )
         assert await check_defaults_handling(message.forward, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "forward_message", make_assertion)
@@ -2431,9 +2573,17 @@ class TestMessageWithoutRequest(MessageTestBase):
             )
 
         assert check_shortcut_signature(
-            Message.copy, Bot.copy_message, ["from_chat_id", "message_id"], []
+            Message.copy,
+            Bot.copy_message,
+            ["from_chat_id", "message_id", "direct_messages_topic_id"],
+            [],
         )
-        assert await check_shortcut_call(message.copy, message.get_bot(), "copy_message")
+        assert await check_shortcut_call(
+            message.copy,
+            message.get_bot(),
+            "copy_message",
+            shortcut_kwargs=["direct_messages_topic_id"],
+        )
         assert await check_defaults_handling(message.copy, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "copy_message", make_assertion)
@@ -2474,11 +2624,21 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_copy,
             Bot.copy_message,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
             annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
-        assert await check_shortcut_call(message.copy, message.get_bot(), "copy_message")
+        assert await check_shortcut_call(
+            message.copy,
+            message.get_bot(),
+            "copy_message",
+            shortcut_kwargs=["direct_messages_topic_id"],
+        )
         assert await check_defaults_handling(message.copy, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "copy_message", make_assertion)
@@ -2518,7 +2678,12 @@ class TestMessageWithoutRequest(MessageTestBase):
         assert check_shortcut_signature(
             Message.reply_paid_media,
             Bot.send_paid_media,
-            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
             ["do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -2526,7 +2691,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             message.get_bot(),
             "send_paid_media",
             skip_params=["reply_to_message_id"],
-            shortcut_kwargs=["business_connection_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
         )
         assert await check_defaults_handling(
             message.reply_paid_media, message.get_bot(), no_default_kwargs={"message_thread_id"}

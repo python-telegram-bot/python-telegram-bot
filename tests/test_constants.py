@@ -182,6 +182,7 @@ class TestConstantsWithoutRequest:
             "caption",
             "chat",
             "chat_id",
+            "direct_messages_topic",
             "effective_attachment",
             "entities",
             "from_user",
@@ -204,6 +205,8 @@ class TestConstantsWithoutRequest:
             "is_from_offline",
             "show_caption_above_media",
             "paid_star_count",
+            "is_paid_post",
+            "reply_to_checklist_task_id",
         }
 
     @pytest.mark.parametrize(

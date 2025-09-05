@@ -20,7 +20,7 @@ from collections.abc import Sequence
 
 import pytest
 
-from telegram import BotCommand, Gift, GiftInfo, Gifts, MessageEntity, Sticker
+from telegram import BotCommand, Chat, Gift, GiftInfo, Gifts, MessageEntity, Sticker
 from telegram._gifts import AcceptedGiftTypes
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.request import RequestData
@@ -36,6 +36,7 @@ def gift(request):
         total_count=GiftTestBase.total_count,
         remaining_count=GiftTestBase.remaining_count,
         upgrade_star_count=GiftTestBase.upgrade_star_count,
+        publisher_chat=GiftTestBase.publisher_chat,
     )
 
 
@@ -54,6 +55,7 @@ class GiftTestBase:
     total_count = 10
     remaining_count = 5
     upgrade_star_count = 10
+    publisher_chat = Chat(1, Chat.PRIVATE)
 
 
 class TestGiftWithoutRequest(GiftTestBase):
@@ -70,6 +72,7 @@ class TestGiftWithoutRequest(GiftTestBase):
             "total_count": self.total_count,
             "remaining_count": self.remaining_count,
             "upgrade_star_count": self.upgrade_star_count,
+            "publisher_chat": self.publisher_chat.to_dict(),
         }
         gift = Gift.de_json(json_dict, offline_bot)
         assert gift.api_kwargs == {}
@@ -80,6 +83,7 @@ class TestGiftWithoutRequest(GiftTestBase):
         assert gift.total_count == self.total_count
         assert gift.remaining_count == self.remaining_count
         assert gift.upgrade_star_count == self.upgrade_star_count
+        assert gift.publisher_chat == self.publisher_chat
 
     def test_to_dict(self, gift):
         gift_dict = gift.to_dict()
@@ -91,6 +95,7 @@ class TestGiftWithoutRequest(GiftTestBase):
         assert gift_dict["total_count"] == self.total_count
         assert gift_dict["remaining_count"] == self.remaining_count
         assert gift_dict["upgrade_star_count"] == self.upgrade_star_count
+        assert gift_dict["publisher_chat"] == self.publisher_chat.to_dict()
 
     def test_equality(self, gift):
         a = gift
@@ -101,6 +106,7 @@ class TestGiftWithoutRequest(GiftTestBase):
             self.total_count,
             self.remaining_count,
             self.upgrade_star_count,
+            self.publisher_chat,
         )
         c = Gift(
             "other_uid",
@@ -109,6 +115,7 @@ class TestGiftWithoutRequest(GiftTestBase):
             self.total_count,
             self.remaining_count,
             self.upgrade_star_count,
+            self.publisher_chat,
         )
         d = BotCommand("start", "description")
 
@@ -210,6 +217,7 @@ class GiftsTestBase:
             total_count=5,
             remaining_count=5,
             upgrade_star_count=5,
+            publisher_chat=Chat(5, Chat.PRIVATE),
         ),
         Gift(
             id="id2",
@@ -226,6 +234,7 @@ class GiftsTestBase:
             total_count=6,
             remaining_count=6,
             upgrade_star_count=6,
+            publisher_chat=Chat(6, Chat.PRIVATE),
         ),
         Gift(
             id="id3",
@@ -242,6 +251,7 @@ class GiftsTestBase:
             total_count=7,
             remaining_count=7,
             upgrade_star_count=7,
+            publisher_chat=Chat(7, Chat.PRIVATE),
         ),
     ]
 
@@ -265,6 +275,7 @@ class TestGiftsWithoutRequest(GiftsTestBase):
             assert de_json_gift.total_count == original_gift.total_count
             assert de_json_gift.remaining_count == original_gift.remaining_count
             assert de_json_gift.upgrade_star_count == original_gift.upgrade_star_count
+            assert de_json_gift.publisher_chat == original_gift.publisher_chat
 
     def test_to_dict(self, gifts):
         gifts_dict = gifts.to_dict()
