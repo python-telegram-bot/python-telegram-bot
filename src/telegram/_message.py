@@ -630,6 +630,10 @@ class Message(MaybeInaccessibleMessage):
             of a channel has changed.
 
             .. versionadded:: 22.3
+        is_paid_post (:obj:`bool`, optional): :obj:`True`, if the message is a paid post. Note that
+            such posts must not be deleted for 24 hours to receive the payment and can't be edited.
+
+            .. versionadded:: NEXT.VERSION
         direct_messages_topic (:class:`telegram.DirectMessagesTopic`, optional): Information about
             the direct messages chat topic that contains the message.
 
@@ -999,6 +1003,10 @@ class Message(MaybeInaccessibleMessage):
             messages chat of a channel has changed.
 
             .. versionadded:: 22.3
+        is_paid_post (:obj:`bool`): Optional. :obj:`True`, if the message is a paid post. Note that
+            such posts must not be deleted for 24 hours to receive the payment and can't be edited.
+
+            .. versionadded:: NEXT.VERSION
         direct_messages_topic (:class:`telegram.DirectMessagesTopic`): Optional. Information about
             the direct messages chat topic that contains the message.
 
@@ -1070,6 +1078,7 @@ class Message(MaybeInaccessibleMessage):
         "invoice",
         "is_automatic_forward",
         "is_from_offline",
+        "is_paid_post",
         "is_topic_message",
         "left_chat_member",
         "link_preview_options",
@@ -1215,6 +1224,7 @@ class Message(MaybeInaccessibleMessage):
         checklist: Optional[Checklist] = None,
         checklist_tasks_done: Optional[ChecklistTasksDone] = None,
         checklist_tasks_added: Optional[ChecklistTasksAdded] = None,
+        is_paid_post: Optional[bool] = None,
         direct_messages_topic: Optional[DirectMessagesTopic] = None,
         reply_to_checklist_task_id: Optional[int] = None,
         *,
@@ -1332,6 +1342,7 @@ class Message(MaybeInaccessibleMessage):
             self.direct_message_price_changed: Optional[DirectMessagePriceChanged] = (
                 direct_message_price_changed
             )
+            self.is_paid_post: Optional[bool] = is_paid_post
             self.direct_messages_topic: Optional[DirectMessagesTopic] = direct_messages_topic
             self.reply_to_checklist_task_id: Optional[int] = reply_to_checklist_task_id
 

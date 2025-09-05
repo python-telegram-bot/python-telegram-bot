@@ -75,6 +75,7 @@ class ChatMemberTestBase:
     can_send_voice_notes = True
     can_send_messages = True
     is_member = True
+    can_manage_direct_messages = True
 
 
 class TestChatMemberWithoutRequest(ChatMemberTestBase):
@@ -170,6 +171,7 @@ def chat_member_administrator():
         TestChatMemberAdministratorWithoutRequest.can_restrict_members,
         TestChatMemberAdministratorWithoutRequest.custom_title,
         TestChatMemberAdministratorWithoutRequest.is_anonymous,
+        TestChatMemberAdministratorWithoutRequest.can_manage_direct_messages,
     )
 
 
@@ -202,6 +204,7 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
             "can_restrict_members": self.can_restrict_members,
             "custom_title": self.custom_title,
             "is_anonymous": self.is_anonymous,
+            "can_manage_direct_messages": self.can_manage_direct_messages,
         }
         chat_member = ChatMemberAdministrator.de_json(data, offline_bot)
 
@@ -226,6 +229,7 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
         assert chat_member.can_restrict_members == self.can_restrict_members
         assert chat_member.custom_title == self.custom_title
         assert chat_member.is_anonymous == self.is_anonymous
+        assert chat_member.can_manage_direct_messages == self.can_manage_direct_messages
 
     def test_to_dict(self, chat_member_administrator):
         assert chat_member_administrator.to_dict() == {
@@ -248,6 +252,7 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
             "can_restrict_members": chat_member_administrator.can_restrict_members,
             "custom_title": chat_member_administrator.custom_title,
             "is_anonymous": chat_member_administrator.is_anonymous,
+            "can_manage_direct_messages": chat_member_administrator.can_manage_direct_messages,
         }
 
     def test_equality(self, chat_member_administrator):
@@ -266,9 +271,11 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
             True,
             True,
             True,
+            True,
         )
         c = ChatMemberAdministrator(
             User(1, "test_user", is_bot=False),
+            False,
             False,
             False,
             False,
