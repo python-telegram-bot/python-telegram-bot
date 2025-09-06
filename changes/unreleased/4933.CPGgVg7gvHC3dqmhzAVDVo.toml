@@ -1,5 +1,5 @@
-dependencies = "Bump pytest from 8.4.1 to 8.4.2"
+internal = "Bump pytest from 8.4.1 to 8.4.2"
 [[pull_requests]]
 uid = "4933"
-author_uid = "dependabot[bot]"
+author_uid = "dependabot"
 closes_threads = []
