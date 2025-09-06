@@ -1,0 +1,5 @@
+features = "Added two convenience methods for ``BusinessOpeningHours``"
+[[pull_requests]]
+uid = "4861"
+author_uid = "Aweryc"
+closes_threads = ["4194"]

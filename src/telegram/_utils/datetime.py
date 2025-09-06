@@ -32,6 +32,7 @@ import contextlib
 import datetime as dtm
 import os
 import time
+import zoneinfo
 from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._utils.warnings import warn
@@ -231,6 +232,26 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     return dt_obj.timestamp()
 
 
+def verify_timezone(tz: Optional[str]) -> Optional[zoneinfo.ZoneInfo]:
+    """Wrapper around the `ZoneInfo` constructor with slightly more helpful error messages"""
+
+    if tz is None:
+        return None
+
+    try:
+        return zoneinfo.ZoneInfo(tz)
+    except (TypeError, ValueError) as e:
+        raise zoneinfo.ZoneInfoNotFoundError(
+            f"ZoneInfo keys may not be absolute paths, got: {tz}."
+        ) from e
+    except zoneinfo.ZoneInfoNotFoundError as err:
+        raise zoneinfo.ZoneInfoNotFoundError(
+            f"No time zone found with key {tz}. "
+            f"Make sure to use a valid time zone name and "
+            f"correct install tzdata (https://pypi.org/project/tzdata/)"
+        ) from err
+
+
 def get_timedelta_value(
     value: Optional[dtm.timedelta], attribute: str
 ) -> Optional[Union[int, dtm.timedelta]]:
@@ -269,5 +290,7 @@ def get_timedelta_value(
         stacklevel=2,
     )
     return (
-        int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
-    )
+       int(seconds)
+       if (seconds := value.total_seconds()).is_integer()
+       else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
+   )
