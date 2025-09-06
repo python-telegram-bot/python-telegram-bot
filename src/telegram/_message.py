@@ -119,7 +119,10 @@ if TYPE_CHECKING:
         MessageId,
         MessageOrigin,
         ReactionType,
+        SuggestedPostApprovalFailed,
+        SuggestedPostApproved,
         SuggestedPostDeclined,
+        SuggestedPostInfo,
         SuggestedPostPaid,
         SuggestedPostParameters,
         SuggestedPostRefunded,
@@ -347,6 +350,13 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 20.8
 
+        suggested_post_info (:class:`telegram.SuggestedPostInfo`, optional): Information about
+            suggested post parameters if the message is a suggested post in a channel direct
+            messages chat. If the message is an approved or declined suggested post, then it can't
+            be edited.
+
+            .. versionadded:: NEXT.VERSION
+
         effect_id (:obj:`str`, optional): Unique identifier of the message effect added to the
             message.
 
@@ -571,6 +581,14 @@ class Message(MaybeInaccessibleMessage):
             message: the price for paid messages has changed in the chat
 
             .. versionadded:: 22.1
+        suggested_post_approved (:class:`telegram.SuggestedPostApproved`, optional): Service
+            message: a suggested post was approved.
+
+            .. versionadded:: NEXT.VERSION
+        suggested_post_approval_failed (:class:`telegram.SuggestedPostApproved`, optional): Service
+            message: approval of a suggested post has failed.
+
+            .. versionadded:: NEXT.VERSION
         suggested_post_declined (:class:`telegram.SuggestedPostDeclined`, optional): Service
             message: a suggested post was declined.
 
@@ -711,6 +729,13 @@ class Message(MaybeInaccessibleMessage):
             options were changed.
 
             .. versionadded:: 20.8
+
+        suggested_post_info (:class:`telegram.SuggestedPostInfo`): Optional. Information about
+            suggested post parameters if the message is a suggested post in a channel direct
+            messages chat. If the message is an approved or declined suggested post, then it can't
+            be edited.
+
+            .. versionadded:: NEXT.VERSION
 
         effect_id (:obj:`str`): Optional. Unique identifier of the message effect added to the
             message.
@@ -951,6 +976,14 @@ class Message(MaybeInaccessibleMessage):
             message: the price for paid messages has changed in the chat
 
             .. versionadded:: 22.1
+        suggested_post_approved (:class:`telegram.SuggestedPostApproved`): Optional. Service
+            message: a suggested post was approved.
+
+            .. versionadded:: NEXT.VERSION
+        suggested_post_approval_failed (:class:`telegram.SuggestedPostApproved`): Optional. Service
+            message: approval of a suggested post has failed.
+
+            .. versionadded:: NEXT.VERSION
         suggested_post_declined (:class:`telegram.SuggestedPostDeclined`): Optional. Service
             message: a suggested post was declined.
 
@@ -1130,7 +1163,10 @@ class Message(MaybeInaccessibleMessage):
         "sticker",
         "story",
         "successful_payment",
+        "suggested_post_approval_failed",
+        "suggested_post_approved",
         "suggested_post_declined",
+        "suggested_post_info",
         "suggested_post_paid",
         "suggested_post_refunded",
         "supergroup_chat_created",
@@ -1250,6 +1286,9 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_declined: Optional["SuggestedPostDeclined"] = None,
         suggested_post_paid: Optional["SuggestedPostPaid"] = None,
         suggested_post_refunded: Optional["SuggestedPostRefunded"] = None,
+        suggested_post_info: Optional["SuggestedPostInfo"] = None,
+        suggested_post_approved: Optional["SuggestedPostApproved"] = None,
+        suggested_post_approval_failed: Optional["SuggestedPostApprovalFailed"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1370,6 +1409,11 @@ class Message(MaybeInaccessibleMessage):
             self.suggested_post_declined: Optional[SuggestedPostDeclined] = suggested_post_declined
             self.suggested_post_paid: Optional[SuggestedPostPaid] = suggested_post_paid
             self.suggested_post_refunded: Optional[SuggestedPostRefunded] = suggested_post_refunded
+            self.suggested_post_info: Optional[SuggestedPostInfo] = suggested_post_info
+            self.suggested_post_approved: Optional[SuggestedPostApproved] = suggested_post_approved
+            self.suggested_post_approval_failed: Optional[SuggestedPostApprovalFailed] = (
+                suggested_post_approval_failed
+            )
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1525,7 +1569,10 @@ class Message(MaybeInaccessibleMessage):
             TextQuote,
         )
         from telegram._suggestedpost import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
+            SuggestedPostApprovalFailed,
+            SuggestedPostApproved,
             SuggestedPostDeclined,
+            SuggestedPostInfo,
             SuggestedPostPaid,
             SuggestedPostRefunded,
         )
@@ -1572,6 +1619,15 @@ class Message(MaybeInaccessibleMessage):
         )
         data["suggested_post_refunded"] = de_json_optional(
             data.get("suggested_post_refunded"), SuggestedPostRefunded, bot
+        )
+        data["suggested_post_info"] = de_json_optional(
+            data.get("suggested_post_info"), SuggestedPostInfo, bot
+        )
+        data["suggested_post_approved"] = de_json_optional(
+            data.get("suggested_post_approved"), SuggestedPostApproved, bot
+        )
+        data["suggested_post_approval_failed"] = de_json_optional(
+            data.get("suggested_post_approval_failed"), SuggestedPostApprovalFailed, bot
         )
 
         api_kwargs = {}

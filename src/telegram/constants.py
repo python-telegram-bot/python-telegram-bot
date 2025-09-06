@@ -2223,8 +2223,23 @@ class MessageType(StringEnum):
 
     .. versionadded:: v22.2
     """
+    SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SUGGESTED_POST_APPROVED = "suggested_post_approved"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approved`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     SUGGESTED_POST_DECLINED = "suggested_post_declined"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_declined`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SUGGESTED_POST_INFO = "suggested_post_info"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_info`.
 
     .. versionadded:: NEXT.VERSION
     """

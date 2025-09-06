@@ -92,7 +92,15 @@ from telegram import (
     WebAppData,
 )
 from telegram._directmessagestopic import DirectMessagesTopic
-from telegram._suggestedpost import SuggestedPostDeclined, SuggestedPostPaid, SuggestedPostRefunded
+from telegram._suggestedpost import (
+    SuggestedPostApprovalFailed,
+    SuggestedPostApproved,
+    SuggestedPostDeclined,
+    SuggestedPostInfo,
+    SuggestedPostPaid,
+    SuggestedPostPrice,
+    SuggestedPostRefunded,
+)
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -389,6 +397,30 @@ def message(bot):
                 ),
             )
         },
+        {
+            "suggested_post_approved": SuggestedPostApproved(
+                send_date=dtm.datetime.utcnow(),
+                price=SuggestedPostPrice(currency="XTR", amount=100),
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+            )
+        },
+        {
+            "suggested_post_approval_failed": SuggestedPostApprovalFailed(
+                price=SuggestedPostPrice(currency="XTR", amount=100),
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+            )
+        },
+        {
+            "suggested_post_info": SuggestedPostInfo(
+                state="pending",
+                price=SuggestedPostPrice(currency="XTR", amount=100),
+                send_date=dtm.datetime.utcnow(),
+            )
+        },
     ],
     ids=[
         "reply",
@@ -475,6 +507,9 @@ def message(bot):
         "suggested_post_declined",
         "suggested_post_paid",
         "suggested_post_refunded",
+        "suggested_post_approved",
+        "suggested_post_approval_failed",
+        "suggested_post_info",
     ],
 )
 def message_params(bot, request):
