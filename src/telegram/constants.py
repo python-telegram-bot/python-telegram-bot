@@ -118,6 +118,7 @@ __all__ = [
     "StoryAreaTypeType",
     "StoryLimit",
     "SuggestedPost",
+    "SuggestedPostInfoState",
     "SuggestedPostRefunded",
     "TransactionPartnerType",
     "TransactionPartnerUser",
@@ -3598,6 +3599,25 @@ class ForumTopicLimit(IntEnum):
       :meth:`telegram.Bot.edit_forum_topic`
     * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
       :meth:`telegram.Bot.edit_general_forum_topic`
+    """
+
+
+class SuggestedPostInfoState(StringEnum):
+    """This enum contains the available states of :attr:`telegram.SuggestedPostInfo.state`.
+    The enum members of this enumeration are instances
+    of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PENDING = "pending"
+    """:obj:`str`: Suggested post is pending."""
+    APPROVED = "approved"
+    """:obj:`str`: Suggested post was approved."""
+    DECLINED = "declined"
+    """:obj:`str`: Suggested post was declined.
     """
 
 

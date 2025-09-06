@@ -165,8 +165,10 @@ class SuggestedPostInfo(TelegramObject):
 
     Args:
         state (:obj:`str`):
-            State of the suggested post. Currently, it can be one of “pending”, “approved”,
-            “declined”.
+            State of the suggested post. Currently, it can be one of
+            :tg-const:`~telegram.constants.SuggestedPostInfoState.PENDING`,
+            :tg-const:`~telegram.constants.SuggestedPostInfoState.APPROVED`,
+            :tg-const:`~telegram.constants.SuggestedPostInfoState.DECLINED`.
         price (:obj:`SuggestedPostPrice`, optional):
             Proposed price of the post. If the field is omitted, then the post is unpaid.
         send_date (:class:`datetime.datetime`, optional):
@@ -177,8 +179,10 @@ class SuggestedPostInfo(TelegramObject):
 
     Attributes:
         state (:obj:`str`):
-            State of the suggested post. Currently, it can be one of “pending”, “approved”,
-            “declined”.
+            State of the suggested post. Currently, it can be one of
+            :tg-const:`~telegram.constants.SuggestedPostInfoState.PENDING`,
+            :tg-const:`~telegram.constants.SuggestedPostInfoState.APPROVED`,
+            :tg-const:`~telegram.constants.SuggestedPostInfoState.DECLINED`.
         price (:obj:`SuggestedPostPrice`):
             Optional. Proposed price of the post. If the field is omitted, then the post is unpaid.
         send_date (:class:`datetime.datetime`):
@@ -189,13 +193,11 @@ class SuggestedPostInfo(TelegramObject):
 
     """
 
-    # TODO: link `state` from constants
-
     __slots__ = ("price", "send_date", "state")
 
     def __init__(
         self,
-        state: str,
+        state: Literal["pending", "approved", "declined"],
         price: Optional[SuggestedPostPrice] = None,
         send_date: Optional[dtm.datetime] = None,
         *,

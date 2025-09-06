@@ -118,6 +118,86 @@ class TestSuggestedPostParametersWithoutRequest(SuggestedPostParametersTestBase)
 
 
 @pytest.fixture(scope="module")
+def suggested_post_info():
+    return SuggestedPostInfo(
+        state=SuggestedPostInfoTestBase.state,
+        price=SuggestedPostInfoTestBase.price,
+        send_date=SuggestedPostInfoTestBase.send_date,
+    )
+
+
+class SuggestedPostInfoTestBase:
+    state = "pending"
+    price = SuggestedPostPrice(currency="XTR", amount=100)
+    send_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
+
+
+class TestSuggestedPostInfoWithoutRequest(SuggestedPostInfoTestBase):
+    def test_slot_behaviour(self, suggested_post_info):
+        for attr in suggested_post_info.__slots__:
+            assert getattr(suggested_post_info, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(suggested_post_info)) == len(set(mro_slots(suggested_post_info))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "state": self.state,
+            "price": self.price.to_dict(),
+            "send_date": to_timestamp(self.send_date),
+        }
+        spi = SuggestedPostInfo.de_json(json_dict, offline_bot)
+        assert spi.state == self.state
+        assert spi.price == self.price
+        assert spi.send_date == self.send_date
+        assert spi.api_kwargs == {}
+
+    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
+        json_dict = {
+            "state": self.state,
+            "price": self.price.to_dict(),
+            "send_date": to_timestamp(self.send_date),
+        }
+
+        spi_bot = SuggestedPostInfo.de_json(json_dict, offline_bot)
+        spi_bot_raw = SuggestedPostInfo.de_json(json_dict, raw_bot)
+        spi_bot_tz = SuggestedPostInfo.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing tzinfo objects is not reliable
+        send_date_offset = spi_bot_tz.send_date.utcoffset()
+        send_date_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
+            spi_bot_tz.send_date.replace(tzinfo=None)
+        )
+
+        assert spi_bot.send_date.tzinfo == UTC
+        assert spi_bot_raw.send_date.tzinfo == UTC
+        assert send_date_offset_tz == send_date_offset
+
+    def test_to_dict(self, suggested_post_info):
+        spi_dict = suggested_post_info.to_dict()
+
+        assert isinstance(spi_dict, dict)
+        assert spi_dict["state"] == self.state
+        assert spi_dict["price"] == self.price.to_dict()
+        assert spi_dict["send_date"] == to_timestamp(self.send_date)
+
+    def test_equality(self, suggested_post_info):
+        a = suggested_post_info
+        b = SuggestedPostInfo(state=self.state, price=self.price)
+        c = SuggestedPostInfo(state="declined", price=self.price)
+        e = Dice(4, "emoji")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+@pytest.fixture(scope="module")
 def suggested_post_price():
     return SuggestedPostPrice(
         currency=SuggestedPostPriceTestBase.currency,
@@ -364,86 +444,6 @@ class TestSuggestedPostRefundedWithoutRequest(SuggestedPostRefundedTestBase):
 
 
 @pytest.fixture(scope="module")
-def suggested_post_info():
-    return SuggestedPostInfo(
-        state=SuggestedPostInfoTestBase.state,
-        price=SuggestedPostInfoTestBase.price,
-        send_date=SuggestedPostInfoTestBase.send_date,
-    )
-
-
-class SuggestedPostInfoTestBase:
-    state = "pending"
-    price = SuggestedPostPrice(currency="XTR", amount=100)
-    send_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
-
-
-class TestSuggestedPostInfoWithoutRequest(SuggestedPostInfoTestBase):
-    def test_slot_behaviour(self, suggested_post_info):
-        for attr in suggested_post_info.__slots__:
-            assert getattr(suggested_post_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(suggested_post_info)) == len(set(mro_slots(suggested_post_info))), (
-            "duplicate slot"
-        )
-
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "state": self.state,
-            "price": self.price.to_dict(),
-            "send_date": to_timestamp(self.send_date),
-        }
-        spi = SuggestedPostInfo.de_json(json_dict, offline_bot)
-        assert spi.state == self.state
-        assert spi.price == self.price
-        assert spi.send_date == self.send_date
-        assert spi.api_kwargs == {}
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "state": self.state,
-            "price": self.price.to_dict(),
-            "send_date": to_timestamp(self.send_date),
-        }
-
-        spi_bot = SuggestedPostInfo.de_json(json_dict, offline_bot)
-        spi_bot_raw = SuggestedPostInfo.de_json(json_dict, raw_bot)
-        spi_bot_tz = SuggestedPostInfo.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        send_date_offset = spi_bot_tz.send_date.utcoffset()
-        send_date_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
-            spi_bot_tz.send_date.replace(tzinfo=None)
-        )
-
-        assert spi_bot.send_date.tzinfo == UTC
-        assert spi_bot_raw.send_date.tzinfo == UTC
-        assert send_date_offset_tz == send_date_offset
-
-    def test_to_dict(self, suggested_post_info):
-        spi_dict = suggested_post_info.to_dict()
-
-        assert isinstance(spi_dict, dict)
-        assert spi_dict["state"] == self.state
-        assert spi_dict["price"] == self.price.to_dict()
-        assert spi_dict["send_date"] == to_timestamp(self.send_date)
-
-    def test_equality(self, suggested_post_info):
-        a = suggested_post_info
-        b = SuggestedPostInfo(state=self.state, price=self.price)
-        c = SuggestedPostInfo(state="declined", price=self.price)
-        e = Dice(4, "emoji")
-
-        assert a == b
-        assert hash(a) == hash(b)
-
-        assert a != c
-        assert hash(a) != hash(c)
-
-        assert a != e
-        assert hash(a) != hash(e)
-
-
-@pytest.fixture(scope="module")
 def suggested_post_approved():
     return SuggestedPostApproved(
         send_date=SuggestedPostApprovedTestBase.send_date,
@@ -519,7 +519,7 @@ class TestSuggestedPostApprovedWithoutRequest(SuggestedPostApprovedTestBase):
         c = SuggestedPostApproved(
             send_date=self.send_date,
             suggested_post_message=self.suggested_post_message,
-            price=SuggestedPostPrice(currency="XTR", amount=99),
+            price=SuggestedPostPrice(currency="XTR", amount=self.price.amount - 1),
         )
         e = Dice(4, "emoji")
 
@@ -580,7 +580,7 @@ class TestSuggestedPostApprovalFailedWithoutRequest(SuggestedPostApprovalFailedT
             suggested_post_message=self.suggested_post_message,
         )
         c = SuggestedPostApprovalFailed(
-            price=SuggestedPostPrice(currency="XTR", amount=99),
+            price=SuggestedPostPrice(currency="XTR", amount=self.price.amount - 1),
             suggested_post_message=self.suggested_post_message,
         )
         e = Dice(4, "emoji")
