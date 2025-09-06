@@ -1977,6 +1977,9 @@ class StatusUpdate:
                 or StatusUpdate.REFUNDED_PAYMENT.check_update(update)
                 or StatusUpdate.SUGGESTED_POST_APPROVAL_FAILED.check_update(update)
                 or StatusUpdate.SUGGESTED_POST_APPROVED.check_update(update)
+                or StatusUpdate.SUGGESTED_POST_DECLINED.check_update(update)
+                or StatusUpdate.SUGGESTED_POST_PAID.check_update(update)
+                or StatusUpdate.SUGGESTED_POST_REFUNDED.check_update(update)
                 or StatusUpdate.UNIQUE_GIFT.check_update(update)
                 or StatusUpdate.USERS_SHARED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
@@ -2321,6 +2324,43 @@ class StatusUpdate:
         "filters.StatusUpdate.SUGGESTED_POST_APPROVED"
     )
     """Messages that contain :attr:`telegram.Message.suggested_post_approved`.
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _SuggestedPostDeclined(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.suggested_post_declined)
+
+    SUGGESTED_POST_DECLINED = _SuggestedPostDeclined(
+        "filters.StatusUpdate.SUGGESTED_POST_DECLINED"
+    )
+    """Messages that contain :attr:`telegram.Message.suggested_post_declined`.
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _SuggestedPostPaid(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.suggested_post_paid)
+
+    SUGGESTED_POST_PAID = _SuggestedPostPaid("filters.StatusUpdate.SUGGESTED_POST_PAID")
+    """Messages that contain :attr:`telegram.Message.suggested_post_paid`.
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _SuggestedPostRefunded(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.suggested_post_refunded)
+
+    SUGGESTED_POST_REFUNDED = _SuggestedPostRefunded(
+        "filters.StatusUpdate.SUGGESTED_POST_REFUNDED"
+    )
+    """Messages that contain :attr:`telegram.Message.suggested_post_refunded`.
     .. versionadded:: NEXT.VERSION
     """
 

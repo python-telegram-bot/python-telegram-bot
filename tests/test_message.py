@@ -71,6 +71,13 @@ from telegram import (
     Sticker,
     Story,
     SuccessfulPayment,
+    SuggestedPostApprovalFailed,
+    SuggestedPostApproved,
+    SuggestedPostDeclined,
+    SuggestedPostInfo,
+    SuggestedPostPaid,
+    SuggestedPostPrice,
+    SuggestedPostRefunded,
     TextQuote,
     UniqueGift,
     UniqueGiftBackdrop,
@@ -92,15 +99,6 @@ from telegram import (
     WebAppData,
 )
 from telegram._directmessagestopic import DirectMessagesTopic
-from telegram._suggestedpost import (
-    SuggestedPostApprovalFailed,
-    SuggestedPostApproved,
-    SuggestedPostDeclined,
-    SuggestedPostInfo,
-    SuggestedPostPaid,
-    SuggestedPostPrice,
-    SuggestedPostRefunded,
-)
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -365,6 +363,7 @@ def message(bot):
                 tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
             )
         },
+        {"is_paid_post": True},
         {
             "direct_messages_topic": DirectMessagesTopic(
                 topic_id=1234,
@@ -502,6 +501,7 @@ def message(bot):
         "checklist",
         "checklist_tasks_done",
         "checklist_tasks_added",
+        "is_paid_post",
         "direct_messages_topic",
         "reply_to_checklist_task_id",
         "suggested_post_declined",

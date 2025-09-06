@@ -1111,6 +1111,21 @@ class TestFilters:
         assert filters.StatusUpdate.SUGGESTED_POST_APPROVED.check_update(update)
         update.message.suggested_post_approved = None
 
+        update.message.suggested_post_declined = "suggested_post_declined"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_DECLINED.check_update(update)
+        update.message.suggested_post_declined = None
+
+        update.message.suggested_post_paid = "suggested_post_paid"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_PAID.check_update(update)
+        update.message.suggested_post_paid = None
+
+        update.message.suggested_post_refunded = "suggested_post_refunded"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_REFUNDED.check_update(update)
+        update.message.suggested_post_refunded = None
+
         update.message.gift = "gift"
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.GIFT.check_update(update)
