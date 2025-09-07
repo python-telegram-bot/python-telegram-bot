@@ -42,6 +42,7 @@ if TYPE_CHECKING:
         MessageEntity,
         MessageId,
         ReplyParameters,
+        SuggestedPostParameters,
     )
 
 
@@ -871,6 +872,7 @@ class CallbackQuery(TelegramObject):
         show_caption_above_media: Optional[bool] = None,
         allow_paid_broadcast: Optional[bool] = None,
         video_start_timestamp: Optional[int] = None,
+        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -885,6 +887,7 @@ class CallbackQuery(TelegramObject):
             await update.callback_query.message.copy(
                 from_chat_id=update.message.chat_id,
                 message_id=update.message.message_id,
+                direct_messages_topic_id=update.message.direct_messages_topic.topic_id,
                 *args,
                 **kwargs
             )
@@ -920,6 +923,7 @@ class CallbackQuery(TelegramObject):
             reply_parameters=reply_parameters,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     MAX_ANSWER_TEXT_LENGTH: Final[int] = (

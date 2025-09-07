@@ -49,6 +49,7 @@ __all__ = (
     "CHECKLIST",
     "COMMAND",
     "CONTACT",
+    "DIRECT_MESSAGES",
     "EFFECT_ID",
     "FORWARDED",
     "GAME",
@@ -1148,6 +1149,22 @@ class Dice(_Dice):
     """Dice messages with the emoji 🎰. Matches any dice value."""
 
 
+class _DirectMessages(UpdateFilter):
+    __slots__ = ()
+
+    def filter(self, update: Update) -> bool:
+        return bool(update.effective_chat and update.effective_chat.is_direct_messages)
+
+
+DIRECT_MESSAGES = _DirectMessages(name="filters.DIRECT_MESSAGES")
+"""Filter chats which are the direct messages for a channel.
+
+.. seealso:: :attr:`telegram.Chat.is_direct_messages`
+
+.. versionadded:: NEXT.VERSION
+"""
+
+
 class Document:
     """
     Subset for messages containing a document/file.
@@ -1957,6 +1974,9 @@ class StatusUpdate:
                 or StatusUpdate.PINNED_MESSAGE.check_update(update)
                 or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
                 or StatusUpdate.REFUNDED_PAYMENT.check_update(update)
+                or StatusUpdate.SUGGESTED_POST_DECLINED.check_update(update)
+                or StatusUpdate.SUGGESTED_POST_PAID.check_update(update)
+                or StatusUpdate.SUGGESTED_POST_REFUNDED.check_update(update)
                 or StatusUpdate.UNIQUE_GIFT.check_update(update)
                 or StatusUpdate.USERS_SHARED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
@@ -2276,6 +2296,43 @@ class StatusUpdate:
     REFUNDED_PAYMENT = _RefundedPayment("filters.StatusUpdate.REFUNDED_PAYMENT")
     """Messages that contain :attr:`telegram.Message.refunded_payment`.
     .. versionadded:: 21.4
+    """
+
+    class _SuggestedPostDeclined(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.suggested_post_declined)
+
+    SUGGESTED_POST_DECLINED = _SuggestedPostDeclined(
+        "filters.StatusUpdate.SUGGESTED_POST_DECLINED"
+    )
+    """Messages that contain :attr:`telegram.Message.suggested_post_declined`.
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _SuggestedPostPaid(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.suggested_post_paid)
+
+    SUGGESTED_POST_PAID = _SuggestedPostPaid("filters.StatusUpdate.SUGGESTED_POST_PAID")
+    """Messages that contain :attr:`telegram.Message.suggested_post_paid`.
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _SuggestedPostRefunded(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.suggested_post_refunded)
+
+    SUGGESTED_POST_REFUNDED = _SuggestedPostRefunded(
+        "filters.StatusUpdate.SUGGESTED_POST_REFUNDED"
+    )
+    """Messages that contain :attr:`telegram.Message.suggested_post_refunded`.
+    .. versionadded:: NEXT.VERSION
     """
 
     class _UniqueGift(MessageFilter):

@@ -117,6 +117,8 @@ __all__ = [
     "StoryAreaTypeLimit",
     "StoryAreaTypeType",
     "StoryLimit",
+    "SuggestedPost",
+    "SuggestedPostRefunded",
     "TransactionPartnerType",
     "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
@@ -2220,6 +2222,21 @@ class MessageType(StringEnum):
 
     .. versionadded:: v22.2
     """
+    SUGGESTED_POST_DECLINED = "suggested_post_declined"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_declined`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SUGGESTED_POST_PAID = "suggested_post_paid"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_paid`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SUGGESTED_POST_REFUNDED = "suggested_post_refunded"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_refunded`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -3052,6 +3069,62 @@ class StoryLimit(StringEnum):
     ACTIVITY_TWO_DAYS = 2 * 86400
     """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
     :meth:`telegram.Bot.post_story`."""
+
+
+class SuggestedPost(IntEnum):
+    """This enum contains limitations for :class:`telegram.SuggestedPostPrice`\
+/:class:`telegram.SuggestedPostParameters`. The enum
+    members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_PRICE_STARS = 5
+    """:obj:`int`: Minimum number of Telegram Stars in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MAX_PRICE_STARS = 100_000
+    """:obj:`int`: Maximum number of Telegram Stars in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MIN_PRICE_NANOTONCOINS = 10_000_000
+    """:obj:`int`: Minimum number of nanotoncoins in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MAX_PRICE_NANOTONCOINS = 10_000_000_000_000
+    """:obj:`int`: Maximum number of nanotoncoins in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MIN_SEND_DATE = 300
+    """:obj:`int`: Minimum number of seconds in the future for
+    the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
+    :class:`telegram.SuggestedPostParameters`."""
+    MAX_SEND_DATE = 2_678_400
+    """:obj:`int`: Maximum number of seconds in the future for
+    the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
+    :class:`telegram.SuggestedPostParameters`."""
+
+
+class SuggestedPostRefunded(StringEnum):
+    """This enum contains available refund reasons for :class:`telegram.SuggestedPostRefunded`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    POST_DELETED = "post_deleted"
+    """:obj:`str`: The post was deleted within 24 hours of being posted or removed from
+    scheduled messages without being posted."""
+    PAYMENT_REFUNDED = "payment_refunded"
+    """:obj:`str`: The payer refunded their payment."""
 
 
 class TransactionPartnerType(StringEnum):

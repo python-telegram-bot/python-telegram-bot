@@ -1101,6 +1101,21 @@ class TestFilters:
         assert filters.StatusUpdate.REFUNDED_PAYMENT.check_update(update)
         update.message.refunded_payment = None
 
+        update.message.suggested_post_declined = "suggested_post_declined"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_DECLINED.check_update(update)
+        update.message.suggested_post_declined = None
+
+        update.message.suggested_post_paid = "suggested_post_paid"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_PAID.check_update(update)
+        update.message.suggested_post_paid = None
+
+        update.message.suggested_post_refunded = "suggested_post_refunded"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_REFUNDED.check_update(update)
+        update.message.suggested_post_refunded = None
+
         update.message.gift = "gift"
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.GIFT.check_update(update)
@@ -2814,3 +2829,10 @@ class TestFilters:
         update.message.checklist = "test"
         assert filters.CHECKLIST.check_update(update)
         assert str(filters.CHECKLIST) == "filters.CHECKLIST"
+
+    def test_filters_direct_messages(self, update):
+        assert not filters.DIRECT_MESSAGES.check_update(update)
+
+        update.message.chat.is_direct_messages = True
+        assert filters.DIRECT_MESSAGES.check_update(update)
+        assert str(filters.DIRECT_MESSAGES) == "filters.DIRECT_MESSAGES"
