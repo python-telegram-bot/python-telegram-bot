@@ -1,0 +1,6 @@
+dependencies = "Use Tagged Release of `pydantic` in Development Dependencies"
+internal = "Use Tagged Release of `pydantic` in Development Dependencies"
+[[pull_requests]]
+uid = "4934"
+author_uid = "harshil21"
+closes_threads = ["4932"]
