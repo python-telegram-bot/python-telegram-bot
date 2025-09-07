@@ -1511,6 +1511,11 @@ class TestFilters:
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"
 
+    def test_filters_forum(self, update):
+        assert not filters.FORUM.check_update(update)
+        update.message.chat.is_forum = True
+        assert filters.FORUM.check_update(update)
+
     def test_filters_forwarded_from_init(self):
         with pytest.raises(RuntimeError, match="in conjunction with"):
             filters.ForwardedFrom(chat_id=1, username="chat")

@@ -51,6 +51,7 @@ __all__ = (
     "CONTACT",
     "DIRECT_MESSAGES",
     "EFFECT_ID",
+    "FORUM",
     "FORWARDED",
     "GAME",
     "GIVEAWAY",
@@ -1381,6 +1382,20 @@ class Entity(MessageFilter):
 
     def filter(self, message: Message) -> bool:
         return any(entity.type == self.entity_type for entity in message.entities)
+
+
+class _Forum(UpdateFilter):
+    __slots__ = ()
+
+    def filter(self, update: Update) -> bool:
+        return bool(update.effective_chat and update.effective_chat.is_forum)
+
+
+FORUM = _Forum(name="filters.FORUM")
+"""Messages that are from a forum (topics enabled) chat.
+
+.. versionadded:: NEXT.VERSION
+"""
 
 
 class _Forwarded(MessageFilter):

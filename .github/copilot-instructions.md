@@ -9,8 +9,8 @@ Your environment has all extra dependencies and groups installed, on Python 3.13
 and for any scripts or tools you need to run.
 
 Some example commands on `uv`:
-- `uv sync --all-extras --all-groups` to install all dependencies and groups required by the project.
-- `uv run -p 3.14 --all-groups --all-extras tests/` to run tests on a specific Python version. Please use the `-p` flag often.
+- `uv sync --all-extras --all-groups --locked` to install all dependencies and groups required by the project.
+- `uv run -p 3.14 --all-groups --all-extras --locked tests/` to run tests on a specific Python version. Please use the `-p` flag often.
 - `uv pip install <package>` to install a package in the current environment.
 
 If uv is somehow not available, you can install it using `pip install uv`.
