@@ -4338,6 +4338,11 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.delete_message` and :meth:`telegram.Bot.delete_business_messages`.
 
+        .. versionchanged:: NEXT.VERSION
+           Calls either :meth:`telegram.Bot.delete_message`
+           or :meth:`telegram.Bot.delete_business_messages` based
+           on :attr:`business_connection_id`.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
