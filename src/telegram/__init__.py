@@ -265,7 +265,10 @@ __all__ = (
     "StoryAreaTypeUniqueGift",
     "StoryAreaTypeWeather",
     "SuccessfulPayment",
+    "SuggestedPostApprovalFailed",
+    "SuggestedPostApproved",
     "SuggestedPostDeclined",
+    "SuggestedPostInfo",
     "SuggestedPostPaid",
     "SuggestedPostParameters",
     "SuggestedPostPrice",
@@ -579,7 +582,10 @@ from ._storyarea import (
     StoryAreaTypeWeather,
 )
 from ._suggestedpost import (
+    SuggestedPostApprovalFailed,
+    SuggestedPostApproved,
     SuggestedPostDeclined,
+    SuggestedPostInfo,
     SuggestedPostPaid,
     SuggestedPostParameters,
     SuggestedPostPrice,
