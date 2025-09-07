@@ -3552,6 +3552,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: Optional[bool] = None,
         direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        message_thread_id: Optional[int] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3597,6 +3598,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_thread_id=message_thread_id,
         )
 
     async def send_gift(

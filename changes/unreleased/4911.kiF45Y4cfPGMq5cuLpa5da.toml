@@ -8,4 +8,5 @@ pull_requests = [
     { uid = "4916", author_uid = "harshil21"},
     { uid = "4912", author_uid = "aelkheir" },
     { uid = "4921", author_uid = "aelkheir" },
+    { uid = "4936", author_uid = "Bibo-Joshi" },
 ]
