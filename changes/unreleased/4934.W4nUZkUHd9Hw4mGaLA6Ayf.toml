@@ -1,4 +1,3 @@
-dependencies = "Use Tagged Release of `pydantic` in Development Dependencies"
 internal = "Use Tagged Release of `pydantic` in Development Dependencies"
 [[pull_requests]]
 uid = "4934"
