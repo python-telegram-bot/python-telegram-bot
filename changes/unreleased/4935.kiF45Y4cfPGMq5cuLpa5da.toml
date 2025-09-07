@@ -1,0 +1,5 @@
+features = "Add Parameter `can_manage_direct_messages` to `promote_chat_member`"
+[[pull_requests]]
+uid = "4935"
+author_uid = "Bibo-Joshi"
+closes_threads = []
