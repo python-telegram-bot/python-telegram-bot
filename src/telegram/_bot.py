@@ -11481,9 +11481,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             send_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the post is
                 expected to be published; omit if the date has already been specified when the
                 suggested post was created. If specified, then the date must be not more than
-                2678400 seconds (30 days) in the future.
-
-                Todo: use constant for 30 days, waiting for #4912.
+                :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days)
+                in the future.
 
                 |tz-naive-dtms|
 
@@ -11532,9 +11531,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             chat_id (:obj:`int`): Unique identifier of the target direct messages chat.
             message_id (:obj:`int`): Identifier of a suggested post message to decline.
             comment (:obj:`str`, optional): Comment for the creator of the suggested post.
-                0-128 characters.
-
-                todo: update the 128 character to a constant
+                0-:tg-const:`telegram.constants.SuggestedPost.MAX_COMMENT_LENGTH` characters.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
