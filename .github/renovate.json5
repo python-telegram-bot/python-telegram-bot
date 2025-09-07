@@ -61,6 +61,11 @@
       "description": "Group chango updates together",
       "matchPackageNames": ["chango", "Bibo-Joshi/chango"],
       "groupName": "Chango"
+    },
+    // Automerge PR's for minor/patch/pin/digest (except major) updates:
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
     }
   ],
 
