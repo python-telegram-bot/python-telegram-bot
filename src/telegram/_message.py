@@ -4320,13 +4320,23 @@ class Message(MaybeInaccessibleMessage):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Shortcut for::
+        """Shortcut for either::
 
               await bot.delete_message(
                   chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
               )
 
-        For the documentation of the arguments, please see :meth:`telegram.Bot.delete_message`.
+        or::
+
+              await bot.delete_business_messages(
+                  business_connection_id=self.business_connection_id,
+                  message_ids=[self.message_id],
+                  *args,
+                  **kwargs,
+              )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_message` and :meth:`telegram.Bot.delete_business_messages`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
