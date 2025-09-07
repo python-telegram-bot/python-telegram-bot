@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import datetime as dtm
-from copy import copy
+from copy import copy, deepcopy
 
 import pytest
 
@@ -71,6 +71,13 @@ from telegram import (
     Sticker,
     Story,
     SuccessfulPayment,
+    SuggestedPostApprovalFailed,
+    SuggestedPostApproved,
+    SuggestedPostDeclined,
+    SuggestedPostInfo,
+    SuggestedPostPaid,
+    SuggestedPostPrice,
+    SuggestedPostRefunded,
     TextQuote,
     UniqueGift,
     UniqueGiftBackdrop,
@@ -92,7 +99,6 @@ from telegram import (
     WebAppData,
 )
 from telegram._directmessagestopic import DirectMessagesTopic
-from telegram._suggestedpost import SuggestedPostDeclined, SuggestedPostPaid, SuggestedPostRefunded
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -390,6 +396,30 @@ def message(bot):
                 ),
             )
         },
+        {
+            "suggested_post_approved": SuggestedPostApproved(
+                send_date=dtm.datetime.utcnow(),
+                price=SuggestedPostPrice(currency="XTR", amount=100),
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+            )
+        },
+        {
+            "suggested_post_approval_failed": SuggestedPostApprovalFailed(
+                price=SuggestedPostPrice(currency="XTR", amount=100),
+                suggested_post_message=Message(
+                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                ),
+            )
+        },
+        {
+            "suggested_post_info": SuggestedPostInfo(
+                state="pending",
+                price=SuggestedPostPrice(currency="XTR", amount=100),
+                send_date=dtm.datetime.utcnow(),
+            )
+        },
     ],
     ids=[
         "reply",
@@ -477,6 +507,9 @@ def message(bot):
         "suggested_post_declined",
         "suggested_post_paid",
         "suggested_post_refunded",
+        "suggested_post_approved",
+        "suggested_post_approval_failed",
+        "suggested_post_info",
     ],
 )
 def message_params(bot, request):
@@ -2939,20 +2972,49 @@ class TestMessageWithoutRequest(MessageTestBase):
         monkeypatch.setattr(message.get_bot(), "get_game_high_scores", make_assertion)
         assert await message.get_game_high_scores(user_id=1)
 
-    async def test_delete(self, monkeypatch, message):
+    @pytest.mark.parametrize("business_connection_id", [None, "123456789"])
+    async def test_delete(self, monkeypatch, message, business_connection_id):
+        message = deepcopy(message)
+        message.business_connection_id = business_connection_id
+
         async def make_assertion(*_, **kwargs):
-            chat_id = kwargs["chat_id"] == message.chat_id
-            message_id = kwargs["message_id"] == message.message_id
-            return chat_id and message_id
+            url: str = kwargs.get("url")
+            data = kwargs.get("request_data").parameters
 
-        assert check_shortcut_signature(
-            Message.delete, Bot.delete_message, ["chat_id", "message_id"], []
-        )
-        assert await check_shortcut_call(message.delete, message.get_bot(), "delete_message")
-        assert await check_defaults_handling(message.delete, message.get_bot())
+            if not message.business_connection_id:
+                endpoint = url.endswith("deleteMessage")
+                chat_id = data.get("chat_id") == message.chat_id
+                message_id = data.get("message_id") == message.message_id
+                return endpoint and chat_id and message_id
 
-        monkeypatch.setattr(message.get_bot(), "delete_message", make_assertion)
-        assert await message.delete()
+            endpoint = url.endswith("deleteBusinessMessages")
+            business_connection_id = (
+                data.get("business_connection_id") == message.business_connection_id
+            )
+            message_ids = data.get("message_ids") == [message.message_id]
+            return business_connection_id and message_ids and endpoint
+
+        monkeypatch.setattr(message.get_bot().request, "post", make_assertion)
+
+        if not message.business_connection_id:
+            assert check_shortcut_signature(
+                Message.delete, Bot.delete_message, ["chat_id", "message_id"], []
+            )
+            assert await check_shortcut_call(message.delete, message.get_bot(), "delete_message")
+            assert await check_defaults_handling(message.delete, message.get_bot())
+            assert await message.delete()
+        else:
+            assert check_shortcut_signature(
+                Message.delete,
+                Bot.delete_business_messages,
+                ["business_connection_id", "message_ids"],
+                [],
+            )
+            assert await check_shortcut_call(
+                message.delete, message.get_bot(), "delete_business_messages"
+            )
+            assert await check_defaults_handling(message.delete, message.get_bot())
+            assert await message.delete()
 
     async def test_stop_poll(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):

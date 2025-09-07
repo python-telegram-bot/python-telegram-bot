@@ -51,6 +51,7 @@ __all__ = (
     "CONTACT",
     "DIRECT_MESSAGES",
     "EFFECT_ID",
+    "FORUM",
     "FORWARDED",
     "GAME",
     "GIVEAWAY",
@@ -72,6 +73,7 @@ __all__ = (
     "SENDER_BOOST_COUNT",
     "STORY",
     "SUCCESSFUL_PAYMENT",
+    "SUGGESTED_POST_INFO",
     "TEXT",
     "USER",
     "USER_ATTACHMENT",
@@ -1383,6 +1385,20 @@ class Entity(MessageFilter):
         return any(entity.type == self.entity_type for entity in message.entities)
 
 
+class _Forum(UpdateFilter):
+    __slots__ = ()
+
+    def filter(self, update: Update) -> bool:
+        return bool(update.effective_chat and update.effective_chat.is_forum)
+
+
+FORUM = _Forum(name="filters.FORUM")
+"""Messages that are from a forum (topics enabled) chat.
+
+.. versionadded:: NEXT.VERSION
+"""
+
+
 class _Forwarded(MessageFilter):
     __slots__ = ()
 
@@ -1974,6 +1990,8 @@ class StatusUpdate:
                 or StatusUpdate.PINNED_MESSAGE.check_update(update)
                 or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
                 or StatusUpdate.REFUNDED_PAYMENT.check_update(update)
+                or StatusUpdate.SUGGESTED_POST_APPROVAL_FAILED.check_update(update)
+                or StatusUpdate.SUGGESTED_POST_APPROVED.check_update(update)
                 or StatusUpdate.SUGGESTED_POST_DECLINED.check_update(update)
                 or StatusUpdate.SUGGESTED_POST_PAID.check_update(update)
                 or StatusUpdate.SUGGESTED_POST_REFUNDED.check_update(update)
@@ -2298,6 +2316,32 @@ class StatusUpdate:
     .. versionadded:: 21.4
     """
 
+    class _SuggestedPostApprovalFailed(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.suggested_post_approval_failed)
+
+    SUGGESTED_POST_APPROVAL_FAILED = _SuggestedPostApprovalFailed(
+        "filters.StatusUpdate.SUGGESTED_POST_APPROVAL_FAILED"
+    )
+    """Messages that contain :attr:`telegram.Message.suggested_post_approval_failed`.
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _SuggestedPostApproved(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.suggested_post_approved)
+
+    SUGGESTED_POST_APPROVED = _SuggestedPostApproved(
+        "filters.StatusUpdate.SUGGESTED_POST_APPROVED"
+    )
+    """Messages that contain :attr:`telegram.Message.suggested_post_approved`.
+    .. versionadded:: NEXT.VERSION
+    """
+
     class _SuggestedPostDeclined(MessageFilter):
         __slots__ = ()
 
@@ -2579,6 +2623,20 @@ class SuccessfulPayment(MessageFilter):
 
 SUCCESSFUL_PAYMENT = SuccessfulPayment()
 """Messages that contain :attr:`telegram.Message.successful_payment`."""
+
+
+class _SuggestedPostInfo(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.suggested_post_info)
+
+
+SUGGESTED_POST_INFO = _SuggestedPostInfo(name="filters.SUGGESTED_POST_INFO")
+"""Messages that contain :attr:`telegram.Message.suggested_post_info`.
+
+.. versionadded:: NEXT.VERSION
+"""
 
 
 class Text(MessageFilter):

@@ -156,3 +156,13 @@ class TestFiles:
             proc.kill()
             # This exception may be thrown if the process has finished before we had the chance
             # to kill it.
+
+    @pytest.mark.filterwarnings("error::ResourceWarning")
+    def test_parse_file_input_path_no_resource_warning(self):
+        """Test that parsing a Path input doesn't generate ResourceWarning."""
+        test_file = data_file(filename="telegram.png")
+
+        # This should not raise a ResourceWarning
+        result = telegram._utils.files.parse_file_input(test_file)
+        assert isinstance(result, InputFile)
+        assert result.filename.endswith(".png")
