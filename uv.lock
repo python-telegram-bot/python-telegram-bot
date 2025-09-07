@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.9"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -8,6 +8,18 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
     "python_full_version == '3.10.*'",
     "python_full_version < '3.10'",
+]
+
+[[package]]
+name = "accessible-pygments"
+version = "0.0.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pygments" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bc/c1/bbac6a50d02774f91572938964c582fff4270eee73ab822a4aeea4d8b11b/accessible_pygments-0.0.5.tar.gz", hash = "sha256:40918d3e6a2b619ad424cb91e556bd3bd8865443d9f22f1dcdf79e33c8046872", size = 1377899, upload-time = "2024-05-10T11:23:10.216Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/3f/95338030883d8c8b91223b4e21744b04d11b161a3ef117295d8241f50ab4/accessible_pygments-0.0.5-py3-none-any.whl", hash = "sha256:88ae3211e68a1d0b011504b2ffc1691feafce124b845bd072ab6f9f66f34d4b7", size = 1395903, upload-time = "2024-05-10T11:23:08.421Z" },
 ]
 
 [[package]]
@@ -639,9 +651,10 @@ wheels = [
 
 [[package]]
 name = "furo"
-version = "2024.8.6"
+version = "2025.7.19"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "accessible-pygments" },
     { name = "beautifulsoup4" },
     { name = "pygments" },
     { name = "sphinx", version = "7.4.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -649,9 +662,9 @@ dependencies = [
     { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "sphinx-basic-ng" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a0/e2/d351d69a9a9e4badb4a5be062c2d0e87bd9e6c23b5e57337fef14bef34c8/furo-2024.8.6.tar.gz", hash = "sha256:b63e4cee8abfc3136d3bc03a3d45a76a850bada4d6374d24c1716b0e01394a01", size = 1661506, upload-time = "2024-08-06T08:07:57.567Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d0/69/312cd100fa45ddaea5a588334d2defa331ff427bcb61f5fe2ae61bdc3762/furo-2025.7.19.tar.gz", hash = "sha256:4164b2cafcf4023a59bb3c594e935e2516f6b9d35e9a5ea83d8f6b43808fe91f", size = 1662054, upload-time = "2025-07-19T10:52:09.754Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/48/e791a7ed487dbb9729ef32bb5d1af16693d8925f4366befef54119b2e576/furo-2024.8.6-py3-none-any.whl", hash = "sha256:6cd97c58b47813d3619e63e9081169880fbe331f0ca883c871ff1f3f11814f5c", size = 341333, upload-time = "2024-08-06T08:07:54.44Z" },
+    { url = "https://files.pythonhosted.org/packages/3a/34/2b07b72bee02a63241d654f5d8af87a2de977c59638eec41ca356ab915cd/furo-2025.7.19-py3-none-any.whl", hash = "sha256:bdea869822dfd2b494ea84c0973937e35d1575af088b6721a29c7f7878adc9e3", size = 342175, upload-time = "2025-07-19T10:52:02.399Z" },
 ]
 
 [[package]]
@@ -961,8 +974,8 @@ wheels = [
 
 [[package]]
 name = "pydantic"
-version = "2.12.0a1+dev"
-source = { git = "https://github.com/pydantic/pydantic#be5ca62e8909465349ad1cda7232043866fbac4b" }
+version = "2.12.0a1"
+source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14'",
 ]
@@ -971,6 +984,10 @@ dependencies = [
     { name = "pydantic-core", version = "2.37.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
     { name = "typing-extensions", marker = "python_full_version >= '3.14'" },
     { name = "typing-inspection", marker = "python_full_version >= '3.14'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/02/e0/1a4cb54fbbb606f3b19fc0f5a3c8776902c49da847c32546674644cfa212/pydantic-2.12.0a1.tar.gz", hash = "sha256:5724048f8b728a721f993de95cadf6ef47ce18043034316798aa5acbab30f7ce", size = 802751, upload-time = "2025-07-26T18:28:55.313Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d5/6c/e7f4ff7094ea277cc164c56325cf903a93312655f5d1ac68d7d5dd10facc/pydantic-2.12.0a1-py3-none-any.whl", hash = "sha256:f292f0df096a522be36558f1c569d840b27de8ad64234996b068b891c4bc99e7", size = 453772, upload-time = "2025-07-26T18:28:52.799Z" },
 ]
 
 [[package]]
@@ -1212,7 +1229,7 @@ version = "2.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic", version = "2.11.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' and python_full_version < '3.14'" },
-    { name = "pydantic", version = "2.12.0a1+dev", source = { git = "https://github.com/pydantic/pydantic#be5ca62e8909465349ad1cda7232043866fbac4b" }, marker = "python_full_version >= '3.14'" },
+    { name = "pydantic", version = "2.12.0a1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
     { name = "python-dotenv", marker = "python_full_version >= '3.12'" },
     { name = "typing-inspection", marker = "python_full_version >= '3.12'" },
 ]
@@ -1241,7 +1258,7 @@ wheels = [
 
 [[package]]
 name = "pytest"
-version = "8.4.0"
+version = "8.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -1252,9 +1269,9 @@ dependencies = [
     { name = "pygments" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fb/aa/405082ce2749be5398045152251ac69c0f3578c7077efc53431303af97ce/pytest-8.4.0.tar.gz", hash = "sha256:14d920b48472ea0dbf68e45b96cd1ffda4705f33307dcc86c676c1b5104838a6", size = 1515232, upload-time = "2025-06-02T17:36:30.03Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a3/5c/00a0e072241553e1a7496d638deababa67c5058571567b92a7eaa258397c/pytest-8.4.2.tar.gz", hash = "sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01", size = 1519618, upload-time = "2025-09-04T14:34:22.711Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2f/de/afa024cbe022b1b318a3d224125aa24939e99b4ff6f22e0ba639a2eaee47/pytest-8.4.0-py3-none-any.whl", hash = "sha256:f40f825768ad76c0977cbacdf1fd37c6f7a468e460ea6a0636078f8972d4517e", size = 363797, upload-time = "2025-06-02T17:36:27.859Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl", hash = "sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79", size = 365750, upload-time = "2025-09-04T14:34:20.226Z" },
 ]
 
 [[package]]
@@ -1285,15 +1302,15 @@ wheels = [
 
 [[package]]
 name = "pytest-xdist"
-version = "3.6.1"
+version = "3.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "execnet" },
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/41/c4/3c310a19bc1f1e9ef50075582652673ef2bfc8cd62afef9585683821902f/pytest_xdist-3.6.1.tar.gz", hash = "sha256:ead156a4db231eec769737f57668ef58a2084a34b2e55c4a8fa20d861107300d", size = 84060, upload-time = "2024-04-28T19:29:54.414Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/78/b4/439b179d1ff526791eb921115fca8e44e596a13efeda518b9d845a619450/pytest_xdist-3.8.0.tar.gz", hash = "sha256:7e578125ec9bc6050861aa93f2d59f1d8d085595d6551c2c90b6f4fad8d3a9f1", size = 88069, upload-time = "2025-07-01T13:30:59.346Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6d/82/1d96bf03ee4c0fdc3c0cbe61470070e659ca78dc0086fb88b66c185e2449/pytest_xdist-3.6.1-py3-none-any.whl", hash = "sha256:9ed4adfb68a016610848639bb7e02c9352d5d9f03d04809919e2dafc3be4cca7", size = 46108, upload-time = "2024-04-28T19:29:52.813Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/31/d4e37e9e550c2b92a9cbc2e4d0b7420a27224968580b5a447f420847c975/pytest_xdist-3.8.0-py3-none-any.whl", hash = "sha256:202ca578cfeb7370784a8c33d6d05bc6e13b4f25b5053c30a152269fd10f0b88", size = 46396, upload-time = "2025-07-01T13:30:56.632Z" },
 ]
 
 [[package]]
@@ -1359,7 +1376,7 @@ all = [
     { name = "flaky" },
     { name = "furo" },
     { name = "pre-commit" },
-    { name = "pydantic", version = "2.12.0a1+dev", source = { git = "https://github.com/pydantic/pydantic#be5ca62e8909465349ad1cda7232043866fbac4b" }, marker = "python_full_version >= '3.14'" },
+    { name = "pydantic", version = "2.12.0a1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
@@ -1376,7 +1393,7 @@ all = [
 docs = [
     { name = "chango", marker = "python_full_version >= '3.12'" },
     { name = "furo" },
-    { name = "pydantic", version = "2.12.0a1+dev", source = { git = "https://github.com/pydantic/pydantic#be5ca62e8909465349ad1cda7232043866fbac4b" }, marker = "python_full_version >= '3.14'" },
+    { name = "pydantic", version = "2.12.0a1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
     { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "sphinx-build-compatibility" },
     { name = "sphinx-copybutton" },
@@ -1404,9 +1421,9 @@ requires-dist = [
     { name = "apscheduler", marker = "extra == 'all'", specifier = ">=3.10.4,<3.12.0" },
     { name = "apscheduler", marker = "extra == 'ext'", specifier = ">=3.10.4,<3.12.0" },
     { name = "apscheduler", marker = "extra == 'job-queue'", specifier = ">=3.10.4,<3.12.0" },
-    { name = "cachetools", marker = "extra == 'all'", specifier = ">=5.3.3,<6.2.0" },
-    { name = "cachetools", marker = "extra == 'callback-data'", specifier = ">=5.3.3,<6.2.0" },
-    { name = "cachetools", marker = "extra == 'ext'", specifier = ">=5.3.3,<6.2.0" },
+    { name = "cachetools", marker = "extra == 'all'", specifier = ">=5.3.3,<6.3.0" },
+    { name = "cachetools", marker = "extra == 'callback-data'", specifier = ">=5.3.3,<6.3.0" },
+    { name = "cachetools", marker = "extra == 'ext'", specifier = ">=5.3.3,<6.3.0" },
     { name = "cffi", marker = "python_full_version >= '3.13' and extra == 'all'", specifier = ">=1.17.0rc1" },
     { name = "cffi", marker = "python_full_version >= '3.13' and extra == 'passport'", specifier = ">=1.17.0rc1" },
     { name = "cryptography", marker = "extra == 'all'", specifier = "!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1" },
@@ -1428,13 +1445,13 @@ all = [
     { name = "build" },
     { name = "chango", marker = "python_full_version >= '3.12'", specifier = "~=0.4.0" },
     { name = "flaky", specifier = ">=3.8.1" },
-    { name = "furo", specifier = "==2024.8.6" },
+    { name = "furo", specifier = "==2025.7.19" },
     { name = "pre-commit" },
-    { name = "pydantic", marker = "python_full_version >= '3.14'", git = "https://github.com/pydantic/pydantic" },
-    { name = "pytest", specifier = "==8.4.0" },
+    { name = "pydantic", marker = "python_full_version >= '3.14'", specifier = ">=2.12.0a1" },
+    { name = "pytest", specifier = "==8.4.2" },
     { name = "pytest-asyncio", specifier = "==0.21.2" },
     { name = "pytest-cov" },
-    { name = "pytest-xdist", specifier = "==3.6.1" },
+    { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "pytz" },
     { name = "sphinx", marker = "python_full_version >= '3.11'", specifier = "==8.2.3" },
     { name = "sphinx-build-compatibility", git = "https://github.com/readthedocs/sphinx-build-compatibility.git?rev=58aabc5f207c6c2421f23d3578adc0b14af57047" },
@@ -1446,8 +1463,8 @@ all = [
 ]
 docs = [
     { name = "chango", marker = "python_full_version >= '3.12'", specifier = "~=0.4.0" },
-    { name = "furo", specifier = "==2024.8.6" },
-    { name = "pydantic", marker = "python_full_version >= '3.14'", git = "https://github.com/pydantic/pydantic" },
+    { name = "furo", specifier = "==2025.7.19" },
+    { name = "pydantic", marker = "python_full_version >= '3.14'", specifier = ">=2.12.0a1" },
     { name = "sphinx", marker = "python_full_version >= '3.11'", specifier = "==8.2.3" },
     { name = "sphinx-build-compatibility", git = "https://github.com/readthedocs/sphinx-build-compatibility.git?rev=58aabc5f207c6c2421f23d3578adc0b14af57047" },
     { name = "sphinx-copybutton", specifier = "==0.5.2" },
@@ -1459,10 +1476,10 @@ tests = [
     { name = "beautifulsoup4" },
     { name = "build" },
     { name = "flaky", specifier = ">=3.8.1" },
-    { name = "pytest", specifier = "==8.4.0" },
+    { name = "pytest", specifier = "==8.4.2" },
     { name = "pytest-asyncio", specifier = "==0.21.2" },
     { name = "pytest-cov" },
-    { name = "pytest-xdist", specifier = "==3.6.1" },
+    { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "pytz" },
     { name = "tzdata" },
 ]
