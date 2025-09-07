@@ -3073,7 +3073,7 @@ class StoryLimit(StringEnum):
 
 class SuggestedPost(IntEnum):
     """This enum contains limitations for :class:`telegram.SuggestedPostPrice`\
-/:class:`telegram.SuggestedPostParameters`. The enum
+/:class:`telegram.SuggestedPostParameters`/:meth:`telegram.Bot.decline_suggested_post`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: NEXT.VERSION
@@ -3109,6 +3109,10 @@ class SuggestedPost(IntEnum):
     """:obj:`int`: Maximum number of seconds in the future for
     the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
     :class:`telegram.SuggestedPostParameters`."""
+    MAX_COMMENT_LENGTH = 128
+    """:obj:`int`: Maximum number of characters in the
+    :paramref:`telegram.Bot.decline_suggested_post.comment` parameter.
+    """
 
 
 class SuggestedPostRefunded(StringEnum):

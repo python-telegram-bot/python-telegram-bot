@@ -3214,3 +3214,53 @@ class TestMessageWithoutRequest(MessageTestBase):
         )
         assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__
+
+    async def test_approve_suggested_post(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_id"] == message.message_id
+                and kwargs["send_date"] == 1234567890
+            )
+
+        assert check_shortcut_signature(
+            Message.approve_suggested_post,
+            Bot.approve_suggested_post,
+            ["chat_id", "message_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.approve_suggested_post,
+            message.get_bot(),
+            "approve_suggested_post",
+            shortcut_kwargs=["chat_id", "message_id"],
+        )
+        assert await check_defaults_handling(message.approve_suggested_post, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "approve_suggested_post", make_assertion)
+        assert await message.approve_suggested_post(send_date=1234567890)
+
+    async def test_decline_suggested_post(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_id"] == message.message_id
+                and kwargs["comment"] == "some comment"
+            )
+
+        assert check_shortcut_signature(
+            Message.decline_suggested_post,
+            Bot.decline_suggested_post,
+            ["chat_id", "message_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.decline_suggested_post,
+            message.get_bot(),
+            "decline_suggested_post",
+            shortcut_kwargs=["chat_id", "message_id"],
+        )
+        assert await check_defaults_handling(message.decline_suggested_post, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "decline_suggested_post", make_assertion)
+        assert await message.decline_suggested_post(comment="some comment")

@@ -11365,8 +11365,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """Removes verification from a chat that is currently verified |org-verify|
         represented by the bot.
 
-
-
         .. versionadded:: 21.10
 
         Args:
@@ -11403,8 +11401,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     ) -> bool:
         """Removes verification from a user who is currently verified |org-verify|
         represented by the bot.
-
-
 
         .. versionadded:: 21.10
 
@@ -11458,6 +11454,105 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 pool_timeout=pool_timeout,
                 api_kwargs=api_kwargs,
             )
+        )
+
+    async def approve_suggested_post(
+        self,
+        chat_id: int,
+        message_id: int,
+        send_date: Optional[Union[int, dtm.datetime]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Use this method to approve a suggested post in a direct messages chat.
+        The bot must have the :attr:`~telegram.ChatMemberAdministrator.can_post_messages`
+        administrator right in the corresponding channel chat.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int`): Unique identifier of the target direct messages chat.
+            message_id (:obj:`int`): Identifier of a suggested post message to approve.
+            send_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the post is
+                expected to be published; omit if the date has already been specified when the
+                suggested post was created. If specified, then the date must be not more than
+                :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days)
+                in the future.
+
+                |tz-naive-dtms|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "send_date": send_date,
+        }
+
+        return await self._post(
+            "approveSuggestedPost",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def decline_suggested_post(
+        self,
+        chat_id: int,
+        message_id: int,
+        comment: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Use this method to decline a suggested post in a direct messages chat.
+        The bot must have the :attr:`~telegram.ChatMemberAdministrator.can_manage_direct_messages`
+        administrator right in the corresponding channel chat.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int`): Unique identifier of the target direct messages chat.
+            message_id (:obj:`int`): Identifier of a suggested post message to decline.
+            comment (:obj:`str`, optional): Comment for the creator of the suggested post.
+                0-:tg-const:`telegram.constants.SuggestedPost.MAX_COMMENT_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "comment": comment,
+        }
+
+        return await self._post(
+            "declineSuggestedPost",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
@@ -11780,3 +11875,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`remove_user_verification`"""
     getMyStarBalance = get_my_star_balance
     """Alias for :meth:`get_my_star_balance`"""
+    approveSuggestedPost = approve_suggested_post
+    """Alias for :meth:`approve_suggested_post`"""
+    declineSuggestedPost = decline_suggested_post
+    """Alias for :meth:`decline_suggested_post`"""
