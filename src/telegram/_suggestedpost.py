@@ -19,11 +19,13 @@
 """This module contains objects related to Telegram suggested posts."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Final, Literal, Optional
 
+from telegram import constants
 from telegram._message import Message
 from telegram._payment.stars.staramount import StarAmount
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
@@ -195,6 +197,13 @@ class SuggestedPostInfo(TelegramObject):
 
     __slots__ = ("price", "send_date", "state")
 
+    PENDING: Final[str] = constants.SuggestedPostInfoState.PENDING
+    """:const:`telegram.constants.SuggestedPostInfoState.PENDING`"""
+    APPROVED: Final[str] = constants.SuggestedPostInfoState.APPROVED
+    """:const:`telegram.constants.SuggestedPostInfoState.APPROVED`"""
+    DECLINED: Final[str] = constants.SuggestedPostInfoState.DECLINED
+    """:const:`telegram.constants.SuggestedPostInfoState.DECLINED`"""
+
     def __init__(
         self,
         state: Literal["pending", "approved", "declined"],
@@ -205,7 +214,7 @@ class SuggestedPostInfo(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.state: str = state
+        self.state: str = enum.get_member(constants.SuggestedPostInfoState, state, state)
         # Optionals
         self.price: Optional[SuggestedPostPrice] = price
         self.send_date: Optional[dtm.datetime] = send_date

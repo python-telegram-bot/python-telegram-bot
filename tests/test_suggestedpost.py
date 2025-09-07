@@ -36,6 +36,7 @@ from telegram._suggestedpost import (
     SuggestedPostRefunded,
 )
 from telegram._utils.datetime import UTC, to_timestamp
+from telegram.constants import SuggestedPostInfoState
 from tests.auxil.slots import mro_slots
 
 
@@ -127,7 +128,7 @@ def suggested_post_info():
 
 
 class SuggestedPostInfoTestBase:
-    state = "pending"
+    state = SuggestedPostInfoState.PENDING
     price = SuggestedPostPrice(currency="XTR", amount=100)
     send_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
@@ -139,6 +140,10 @@ class TestSuggestedPostInfoWithoutRequest(SuggestedPostInfoTestBase):
         assert len(mro_slots(suggested_post_info)) == len(set(mro_slots(suggested_post_info))), (
             "duplicate slot"
         )
+
+    def test_type_enum_conversion(self):
+        assert type(SuggestedPostInfo("pending").state) is SuggestedPostInfoState
+        assert SuggestedPostInfo("unknown").state == "unknown"
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -184,7 +189,7 @@ class TestSuggestedPostInfoWithoutRequest(SuggestedPostInfoTestBase):
     def test_equality(self, suggested_post_info):
         a = suggested_post_info
         b = SuggestedPostInfo(state=self.state, price=self.price)
-        c = SuggestedPostInfo(state="declined", price=self.price)
+        c = SuggestedPostInfo(state=SuggestedPostInfoState.DECLINED, price=self.price)
         e = Dice(4, "emoji")
 
         assert a == b
