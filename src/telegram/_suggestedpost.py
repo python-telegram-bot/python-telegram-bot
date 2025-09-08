@@ -19,7 +19,7 @@
 """This module contains objects related to Telegram suggested posts."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Literal, Optional
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._message import Message
@@ -74,13 +74,13 @@ class SuggestedPostPrice(TelegramObject):
 
     def __init__(
         self,
-        currency: Literal["XTR", "TON"],
+        currency: str,
         amount: int,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.currency: Literal["XTR", "TON"] = currency
+        self.currency: str = currency
         self.amount: int = amount
 
         self._id_attrs = (self.currency, self.amount)
@@ -206,7 +206,7 @@ class SuggestedPostInfo(TelegramObject):
 
     def __init__(
         self,
-        state: Literal["pending", "approved", "declined"],
+        state: str,
         price: Optional[SuggestedPostPrice] = None,
         send_date: Optional[dtm.datetime] = None,
         *,
@@ -339,7 +339,7 @@ class SuggestedPostPaid(TelegramObject):
 
     def __init__(
         self,
-        currency: Literal["XTR", "TON"],
+        currency: str,
         suggested_post_message: Optional[Message] = None,
         amount: Optional[int] = None,
         star_amount: Optional[StarAmount] = None,
@@ -348,7 +348,7 @@ class SuggestedPostPaid(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.currency: Literal["XTR", "TON"] = currency
+        self.currency: str = currency
         # Optionals
         self.suggested_post_message: Optional[Message] = suggested_post_message
         self.amount: Optional[int] = amount
