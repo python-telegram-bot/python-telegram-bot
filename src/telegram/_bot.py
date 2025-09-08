@@ -5850,6 +5850,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         can_post_stories: Optional[bool] = None,
         can_edit_stories: Optional[bool] = None,
         can_delete_stories: Optional[bool] = None,
+        can_manage_direct_messages: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5918,6 +5919,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 delete stories posted by other users.
 
                 .. versionadded:: 20.6
+            can_manage_direct_messages (:obj:`bool`, optional): Pass :obj:`True`, if the
+                administrator can manage direct messages within the channel and decline suggested
+                posts; for channels only
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5944,6 +5950,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "can_post_stories": can_post_stories,
             "can_edit_stories": can_edit_stories,
             "can_delete_stories": can_delete_stories,
+            "can_manage_direct_messages": can_manage_direct_messages,
         }
 
         return await self._post(

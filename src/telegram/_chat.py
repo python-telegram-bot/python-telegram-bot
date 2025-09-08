@@ -616,6 +616,7 @@ class _ChatBase(TelegramObject):
         can_post_stories: Optional[bool] = None,
         can_edit_stories: Optional[bool] = None,
         can_delete_stories: Optional[bool] = None,
+        can_manage_direct_messages: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -666,6 +667,7 @@ class _ChatBase(TelegramObject):
             can_post_stories=can_post_stories,
             can_edit_stories=can_edit_stories,
             can_delete_stories=can_delete_stories,
+            can_manage_direct_messages=can_manage_direct_messages,
         )
 
     async def restrict_member(
