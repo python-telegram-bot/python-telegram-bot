@@ -10945,6 +10945,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         allow_paid_broadcast: Optional[bool] = None,
         direct_messages_topic_id: Optional[int] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        message_thread_id: Optional[int] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -10998,6 +10999,9 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
                 .. versionadded:: NEXT.VERSION
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -11044,6 +11048,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_thread_id=message_thread_id,
         )
 
     async def create_chat_subscription_invite_link(

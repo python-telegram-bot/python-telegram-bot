@@ -2718,6 +2718,7 @@ class TestMessageWithoutRequest(MessageTestBase):
                 "direct_messages_topic_id",
             ],
             ["do_quote", "reply_to_message_id"],
+            annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
         )
         assert await check_shortcut_call(
             message.reply_paid_media,

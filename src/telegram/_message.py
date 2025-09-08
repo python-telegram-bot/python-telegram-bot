@@ -4038,6 +4038,7 @@ class Message(MaybeInaccessibleMessage):
         payload: Optional[str] = None,
         allow_paid_broadcast: Optional[bool] = None,
         suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -4052,6 +4053,7 @@ class Message(MaybeInaccessibleMessage):
 
              await bot.send_paid_media(
                  chat_id=message.chat.id,
+                 message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=message.business_connection_id,
                  direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
@@ -4072,6 +4074,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_paid_media(
             chat_id=chat_id,
             caption=caption,
@@ -4094,6 +4097,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            message_thread_id=message_thread_id,
         )
 
     async def edit_text(
