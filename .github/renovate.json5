@@ -1,0 +1,81 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [ // See what config:best-practices does: https://docs.renovatebot.com/presets-config/#configbest-practices
+    "config:best-practices",
+    // Opt-in to updating the pre-commit-config.yaml file too:
+    ":enablePreCommit",
+    ":prConcurrentLimitNone"  // No limits on the number of open PRs.
+  ],
+
+  // Add pull request labels:
+  "labels": ["dependencies"],
+
+  // Bump even patch versions:
+  "bumpVersion": "patch",
+
+  // Let Renovate decide how to update. See docs: https://docs.renovatebot.com/configuration-options/#rangestrategy
+  "rangeStrategy": "auto",
+
+  // Update the lock files:
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["* * * * 1,4"]  // Run sometime on Monday and Thursday
+  },
+
+  // Bump the versions even in other files:
+  "bumpVersions": [
+    {
+      "name": "Update dependency versions in README.rst",
+      "filePatterns": ["README.rst"],
+      "matchStrings": [
+        "cryptography>=(?<version>\\d+\\.\\d+\\.\\d+)",
+        "aiolimiter~=(?<version>\\d+\\.\\d+\\.\\d+)",
+        "tornado~=(?<version>\\d+\\.\\d+)",
+        "cachetools>=(?<version>\\d+\\.\\d+\\.\\d+)",        // Lower bound only
+        "APScheduler>=(?<version>\\d+\\.\\d+\\.\\d+)"        // Lower bound only
+      ],
+      "bumpType": "minor"
+    }
+  ],
+
+  // Group package updates together:
+  "packageRules": [
+    // Linting dependencies in pyproject.toml in sync with the pre-commit-config hooks:
+    // Unfortunately it seems we need to do this for every dependency group (https://github.com/python-telegram-bot/python-telegram-bot/pull/4887#discussion_r2272025832):
+    {
+      "description": "Group Ruff updates together",
+      "matchPackageNames": ["ruff", "astral-sh/ruff-pre-commit"],
+      "groupName": "Ruff"
+    },
+    {
+      "description": "Group mypy updates together",
+      "matchPackageNames": ["mypy", "pre-commit/mirrors-mypy"],
+      "groupName": "Mypy"
+    },
+    {
+      "description": "Group pylint updates together",
+      "matchPackageNames": ["pylint", "PyCQA/pylint"],
+      "groupName": "Pylint"
+    },
+    {
+      "description": "Group chango updates together",
+      "matchPackageNames": ["chango", "Bibo-Joshi/chango"],
+      "groupName": "Chango"
+    },
+    // Automerge PR's for minor/patch/pin/digest (except major) updates:
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    }
+  ],
+
+  // Increase the number of PR's Renovate can create in a hour. Default is 2.
+  "prHourlyLimit": 5,
+
+  // Temporarily disabled:
+  "ignoreDeps": ["pytest-asyncio"],
+
+  // schedule to allow PR's from Renovate:
+  "schedule": ["* * * * 0,6"]  // Every weekend
+
+}

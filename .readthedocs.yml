@@ -26,7 +26,7 @@ build:
   jobs:
     install:
       - pip install -U pip
-      - pip install .[all] --group 'all'  # install all the dependency groups
+      - pip install .[all] --group 'docs' --group 'tests' # install most dependency groups
 
     post_build:
       # Based on https://github.com/readthedocs/readthedocs.org/issues/3242#issuecomment-1410321534
