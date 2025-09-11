@@ -36,7 +36,7 @@ jobs:
           fi
 
       # Create the new fragment
-      - uses: Bibo-Joshi/chango@9d6bd9d7612eca5fab2c5161687011be59baaf19 # v0.4.0
+      - uses: Bibo-Joshi/chango@9d6bd9d7612eca5fab2c5161687011be59baaf19 # 0.4.0
         with:
           github-token: ${{ secrets.CHANGO_PAT }}
           query-issue-types: true

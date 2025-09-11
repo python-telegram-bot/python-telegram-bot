@@ -52,14 +52,12 @@ dependencies = [
 "Support" = "https://t.me/pythontelegrambotgroup"
 
 [project.optional-dependencies]
-# Make sure to install those as additional_dependencies in the
-# pre-commit hooks for pylint & mypy
-# Also update the readme accordingly
+# Make sure to install those as additional_dependencies in the pre-commit hooks
 #
 # When dependencies release new versions and tests succeed, we should try to expand the allowed
 # versions and only increase the lower bound if necessary
 #
-# When adding new groups, make sure to update `ext` and `all` accordingly
+# When adding new extras, make sure to update `ext` and `all` accordingly
 
 # Optional dependencies for production
 all = [
@@ -133,7 +131,13 @@ docs = [
     # stable pydantic version is released.
     "pydantic >= 2.12.0a1 ; python_version >= '3.14'"
 ]
-all = ["pre-commit", { include-group = "tests" }, { include-group = "docs" }]
+linting = [
+    "pre-commit",
+    "ruff==0.12.7",
+    "mypy==1.16.1",
+    "pylint==3.3.7"
+]
+all = [{ include-group = "tests" }, { include-group = "docs" }, { include-group = "linting"}]
 
 # HATCH
 [tool.hatch.version]
