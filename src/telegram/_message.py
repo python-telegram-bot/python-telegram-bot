@@ -355,7 +355,7 @@ class Message(MaybeInaccessibleMessage):
             messages chat. If the message is an approved or declined suggested post, then it can't
             be edited.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
         effect_id (:obj:`str`, optional): Unique identifier of the message effect added to the
             message.
@@ -584,23 +584,23 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_approved (:class:`telegram.SuggestedPostApproved`, optional): Service
             message: a suggested post was approved.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         suggested_post_approval_failed (:class:`telegram.SuggestedPostApproved`, optional): Service
             message: approval of a suggested post has failed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         suggested_post_declined (:class:`telegram.SuggestedPostDeclined`, optional): Service
             message: a suggested post was declined.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         suggested_post_paid (:class:`telegram.SuggestedPostPaid`, optional): Service
             message: payment for a suggested post was received.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         suggested_post_refunded (:class:`telegram.SuggestedPostRefunded`, optional): Service
             message: payment for a suggested post was refunded.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -666,15 +666,15 @@ class Message(MaybeInaccessibleMessage):
         is_paid_post (:obj:`bool`, optional): :obj:`True`, if the message is a paid post. Note that
             such posts must not be deleted for 24 hours to receive the payment and can't be edited.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         direct_messages_topic (:class:`telegram.DirectMessagesTopic`, optional): Information about
             the direct messages chat topic that contains the message.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         reply_to_checklist_task_id (:obj:`int`, optional): Identifier of the specific checklist
             task that is being replied to.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -739,7 +739,7 @@ class Message(MaybeInaccessibleMessage):
             messages chat. If the message is an approved or declined suggested post, then it can't
             be edited.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
         effect_id (:obj:`str`): Optional. Unique identifier of the message effect added to the
             message.
@@ -983,23 +983,23 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_approved (:class:`telegram.SuggestedPostApproved`): Optional. Service
             message: a suggested post was approved.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         suggested_post_approval_failed (:class:`telegram.SuggestedPostApproved`): Optional. Service
             message: approval of a suggested post has failed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         suggested_post_declined (:class:`telegram.SuggestedPostDeclined`): Optional. Service
             message: a suggested post was declined.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         suggested_post_paid (:class:`telegram.SuggestedPostPaid`): Optional. Service
             message: payment for a suggested post was received.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         suggested_post_refunded (:class:`telegram.SuggestedPostRefunded`): Optional. Service
             message: payment for a suggested post was refunded.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -1066,15 +1066,15 @@ class Message(MaybeInaccessibleMessage):
         is_paid_post (:obj:`bool`): Optional. :obj:`True`, if the message is a paid post. Note that
             such posts must not be deleted for 24 hours to receive the payment and can't be edited.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         direct_messages_topic (:class:`telegram.DirectMessagesTopic`): Optional. Information about
             the direct messages chat topic that contains the message.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         reply_to_checklist_task_id (:obj:`int`): Optional. Identifier of the specific checklist
             task that is being replied to.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -4576,7 +4576,7 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.delete_message` and :meth:`telegram.Bot.delete_business_messages`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.4
            Calls either :meth:`telegram.Bot.delete_message`
            or :meth:`telegram.Bot.delete_business_messages` based
            on :attr:`business_connection_id`.
@@ -4996,7 +4996,7 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.approve_suggested_post`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -5033,7 +5033,7 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.decline_suggested_post`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.

@@ -50,7 +50,7 @@ class ChatAdministratorRights(TelegramObject):
         and :attr:`can_delete_stories` is now required. Thus, the order of arguments had to be
         changed.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.4
         :attr:`can_manage_direct_messages` is considered as well when comparing objects of
         this type in terms of equality.
 
@@ -105,7 +105,7 @@ class ChatAdministratorRights(TelegramObject):
         can_manage_direct_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can
             manage direct messages of the channel and decline suggested posts; for channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -158,7 +158,7 @@ class ChatAdministratorRights(TelegramObject):
         can_manage_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can
             manage direct messages of the channel and decline suggested posts; for channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
     """
 
     __slots__ = (

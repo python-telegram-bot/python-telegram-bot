@@ -227,11 +227,11 @@ class ChatFullInfo(_ChatBase):
         is_direct_messages (:obj:`bool`, optional): :obj:`True`, if the chat is the direct messages
             chat of a channel.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         parent_chat (:obj:`telegram.Chat`, optional): Information about the corresponding channel
             chat; for direct messages chats only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -399,11 +399,11 @@ class ChatFullInfo(_ChatBase):
         is_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the chat is the direct messages
             chat of a channel.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
         parent_chat (:obj:`telegram.Chat`): Optional. Information about the corresponding channel
             chat; for direct messages chats only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups

@@ -41,7 +41,7 @@ class SuggestedPostPrice(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`currency` and :attr:`amount` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         currency (:obj:`str`):
@@ -95,7 +95,7 @@ class SuggestedPostParameters(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`price` and :attr:`send_date` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         price (:class:`telegram.SuggestedPostPrice`, optional):
@@ -163,7 +163,7 @@ class SuggestedPostInfo(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`state` and :attr:`price` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         state (:obj:`str`):
@@ -244,7 +244,7 @@ class SuggestedPostDeclined(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`suggested_post_message` and :attr:`comment` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         suggested_post_message (:class:`telegram.Message`, optional):
@@ -300,7 +300,7 @@ class SuggestedPostPaid(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if all of their attributes are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         suggested_post_message (:class:`telegram.Message`, optional):
@@ -383,7 +383,7 @@ class SuggestedPostRefunded(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`suggested_post_message` and :attr:`reason` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         suggested_post_message (:class:`telegram.Message`, optional):
@@ -449,7 +449,7 @@ class SuggestedPostApproved(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if all of their attributes are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         suggested_post_message (:class:`telegram.Message`, optional):
@@ -521,7 +521,7 @@ class SuggestedPostApprovalFailed(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`suggested_post_message` and :attr:`price` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         suggested_post_message (:class:`telegram.Message`, optional):

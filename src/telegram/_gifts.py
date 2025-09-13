@@ -58,7 +58,7 @@ class Gift(TelegramObject):
         publisher_chat (:class:`telegram.Chat`, optional): Information about the chat that
             published the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     Attributes:
         id (:obj:`str`): Unique identifier of the gift.
@@ -76,7 +76,7 @@ class Gift(TelegramObject):
         publisher_chat (:class:`telegram.Chat`): Optional. Information about the chat that
             published the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     """
 

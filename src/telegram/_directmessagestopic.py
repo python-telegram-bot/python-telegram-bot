@@ -36,7 +36,7 @@ class DirectMessagesTopic(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`topic_id` and :attr:`user` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
 
     Args:
         topic_id (:obj:`int`): Unique identifier of the topic. This number may have more than 32

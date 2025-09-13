@@ -272,7 +272,7 @@ class UniqueGift(TelegramObject):
         publisher_chat (:class:`telegram.Chat`, optional): Information about the chat that
             published the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     Attributes:
         base_name (:obj:`str`): Human-readable name of the regular gift from which this unique
@@ -287,7 +287,7 @@ class UniqueGift(TelegramObject):
         publisher_chat (:class:`telegram.Chat`): Optional. Information about the chat that
             published the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     """
 

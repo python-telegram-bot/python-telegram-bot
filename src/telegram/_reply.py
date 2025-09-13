@@ -403,7 +403,7 @@ class ReplyParameters(TelegramObject):
         checklist_task_id (:obj:`int`, optional): Identifier of the specific checklist task to be
             replied to.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     Attributes:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
@@ -430,7 +430,7 @@ class ReplyParameters(TelegramObject):
         checklist_task_id (:obj:`int`): Optional. Identifier of the specific checklist task to be
             replied to.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
     """
 
     __slots__ = (
