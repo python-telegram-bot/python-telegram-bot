@@ -1,4 +1,10 @@
-features = "Added two convenience methods for ``BusinessOpeningHours``"
+features = """
+Added a two convenience methods for ``BusinessOpeningHours``:
+
+* ``get_opening_hours_for_day`` gives you the opening hours applicable for a specific date
+* ``is_open`` tells you if the business is open at the specified date and time.
+
+"""
 [[pull_requests]]
 uid = "4861"
 author_uid = "Aweryc"

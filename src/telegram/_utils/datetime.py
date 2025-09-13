@@ -232,23 +232,22 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     return dt_obj.timestamp()
 
 
-def verify_timezone(tz: Optional[str]) -> Optional[zoneinfo.ZoneInfo]:
-    """Wrapper around the `ZoneInfo` constructor with slightly more helpful error messages"""
+def get_zone_info(tz: str) -> zoneinfo.ZoneInfo:
+    """Wrapper around the `ZoneInfo` constructor with slightly more helpful error message
+    in case tzdata is not installed.
+    """
 
     if tz is None:
         return None
 
     try:
         return zoneinfo.ZoneInfo(tz)
-    except (TypeError, ValueError) as e:
-        raise zoneinfo.ZoneInfoNotFoundError(
-            f"ZoneInfo keys may not be absolute paths, got: {tz}."
-        ) from e
     except zoneinfo.ZoneInfoNotFoundError as err:
         raise zoneinfo.ZoneInfoNotFoundError(
             f"No time zone found with key {tz}. "
-            f"Make sure to use a valid time zone name and "
-            f"correct install tzdata (https://pypi.org/project/tzdata/)"
+            "Make sure to use a valid time zone name and "
+            f"correct install the tzdata (https://pypi.org/project/tzdata/) package if "
+            "your system does not provide the time zone data."
         ) from err
 
 
@@ -290,7 +289,5 @@ def get_timedelta_value(
         stacklevel=2,
     )
     return (
-       int(seconds)
-       if (seconds := value.total_seconds()).is_integer()
-       else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
-   )
+        int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
+    )

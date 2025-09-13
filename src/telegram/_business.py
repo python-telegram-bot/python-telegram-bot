@@ -29,8 +29,16 @@ from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, verify_timezone
+from telegram._utils.argumentparsing import (
+    de_json_optional,
+    de_list_optional,
+    parse_sequence_arg,
+)
+from telegram._utils.datetime import (
+    extract_tzinfo_from_defaults,
+    from_timestamp,
+    get_zone_info,
+)
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -553,7 +561,7 @@ class BusinessOpeningHours(TelegramObject):
             time intervals describing business opening hours.
     """
 
-    __slots__ = ("opening_hours", "time_zone_name")
+    __slots__ = ("__zone_info", "opening_hours", "time_zone_name")
 
     def __init__(
         self,
@@ -568,12 +576,20 @@ class BusinessOpeningHours(TelegramObject):
             opening_hours
         )
 
+        self.__zone_info: Optional[ZoneInfo] = None
+
         self._id_attrs = (self.time_zone_name, self.opening_hours)
 
         self._freeze()
 
+    @property
+    def _zone_info(self) -> ZoneInfo:
+        if self.__zone_info is None:
+            self.__zone_info = get_zone_info(self.time_zone_name)
+        return self.__zone_info
+
     def get_opening_hours_for_day(
-        self, date: dtm.date, time_zone: Optional[Union[dtm.tzinfo, Union[ZoneInfo, str]]] = None
+        self, date: dtm.date, time_zone: Union[dtm.tzinfo, str, None] = None
     ) -> tuple[tuple[dtm.datetime, dtm.datetime], ...]:
         """Returns the opening hours intervals for a specific day as datetime objects.
 
@@ -581,10 +597,8 @@ class BusinessOpeningHours(TelegramObject):
 
         Args:
             date (:obj:`datetime.date`): The date to get opening hours for.
-                Only the weekday component
-                is used to determine matching opening intervals.
-            time_zone (:obj:`zoneinfo.ZoneInfo`, optional): Timezone to use for the returned
-                datetime objects. if not specified, then self.time_zone_name.
+            time_zone (:obj:`datetime.tzinfo` | :obj:`str`, optional): Timezone to use for the
+                returned datetime objects. If not specified, then :attr:`time_zone_name` be used.
 
         Returns:
             tuple[tuple[:obj:`datetime.datetime`, :obj:`datetime.datetime`], ...]:
@@ -595,12 +609,19 @@ class BusinessOpeningHours(TelegramObject):
 
         week_day = date.weekday()
         res = []
-        tz_native = verify_timezone(self.time_zone_name)
-        tz_target = verify_timezone(time_zone) if isinstance(time_zone, str) else time_zone
+        if isinstance(time_zone, str):
+            tz_target: dtm.tzinfo = get_zone_info(time_zone)
+        elif time_zone is None:
+            tz_target = self._zone_info
+        else:
+            tz_target = time_zone
 
         for interval in self.opening_hours:
             int_open = interval.opening_time
             int_close = interval.closing_time
+
+            if int_open[0] != week_day:
+                continue
 
             result_int_open = dtm.datetime(
                 year=date.year,
@@ -608,30 +629,22 @@ class BusinessOpeningHours(TelegramObject):
                 day=date.day,
                 hour=int_open[1],
                 minute=int_open[2],
-                tzinfo=tz_native,
-            )
+                tzinfo=self._zone_info,
+            ).astimezone(tz_target)
 
-            result_int_open_user_tz_aware = (
-                result_int_open.astimezone(tz_target) if time_zone else result_int_open
-            )
+            result_int_close = dtm.datetime(
+                year=date.year,
+                month=date.month,
+                day=date.day,
+                hour=int_close[1],
+                minute=int_close[2],
+                tzinfo=self._zone_info,
+            ).astimezone(tz_target)
 
-            if result_int_open_user_tz_aware.weekday() == week_day and week_day == int_open[0]:
-                result_int_close = dtm.datetime(
-                    year=date.year,
-                    month=date.month,
-                    day=date.day,
-                    hour=int_close[1],
-                    minute=int_close[2],
-                    tzinfo=tz_native,
-                )
+            res.append((result_int_open, result_int_close))
 
-                result_int_close_user_tz_aware = (
-                    result_int_close.astimezone(tz_target) if time_zone else result_int_close
-                )
-                res.append((result_int_open_user_tz_aware, result_int_close_user_tz_aware))
-
-        sort_res = sorted(res, key=lambda x: x[0].hour)
-        return tuple(sort_res)
+        # The sorting is currently an implementation detail
+        return tuple(sorted(res, key=lambda x: x[0]))
 
     def is_open(self, datetime: dtm.datetime) -> bool:
         """Check if the business is open at the specified datetime.
@@ -640,20 +653,21 @@ class BusinessOpeningHours(TelegramObject):
 
         Args:
             datetime (:obj:`datetime.datetime`): The datetime to check.
-                If timezone-aware, the check will be performed in that timezone.
-                If timezone-naive, the check will be performed in the
+                If the object is timezone-naive, it is assumed to be in the
                 timezone specified by :attr:`time_zone_name`.
+
         Returns:
             :obj:`bool`: True if the business is open at the specified time, False otherwise.
         """
 
-        aware_datetime = (
-            datetime.replace(tzinfo=verify_timezone(self.time_zone_name))
-            if datetime.tzinfo is None
-            else datetime
+        datetime_in_native_tz = (
+            datetime.replace(tzinfo=self._zone_info) if datetime.tzinfo is None else datetime
+        ).astimezone(self._zone_info)
+        minute_of_week = (
+            datetime_in_native_tz.weekday() * 1440
+            + datetime_in_native_tz.hour * 60
+            + datetime_in_native_tz.minute
         )
-        weekday = aware_datetime.weekday()
-        minute_of_week = weekday * 1440 + aware_datetime.hour * 60 + aware_datetime.minute
 
         for interval in self.opening_hours:
             if interval.opening_minute <= minute_of_week < interval.closing_minute:
