@@ -61,7 +61,7 @@ class InlineQueryResultVideo(InlineQueryResult):
 
             .. versionadded:: 20.2
 
-            ..versionchanged:: 20.5
+            .. versionchanged:: 20.5
               |thumbnail_url_mandatory|
 
         title (:obj:`str`): Title for the result.

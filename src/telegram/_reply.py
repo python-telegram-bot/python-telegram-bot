@@ -91,7 +91,7 @@ class ExternalReplyInfo(TelegramObject):
             the file.
         has_media_spoiler (:obj:`bool`, optional): :obj:`True`, if the message media is covered by
             a spoiler animation.
-        checklist (:class:`telegram.Checklist`, optional): Message is a checklist
+        checklist (:class:`telegram.Checklist`, optional): Message is a checklist.
 
             .. versionadded:: 22.3
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
@@ -143,7 +143,7 @@ class ExternalReplyInfo(TelegramObject):
             the file.
         has_media_spoiler (:obj:`bool`): Optional. :obj:`True`, if the message media is covered by
             a spoiler animation.
-        checklist (:class:`telegram.Checklist`): Optional. Message is a checklist
+        checklist (:class:`telegram.Checklist`): Optional. Message is a checklist.
 
             .. versionadded:: 22.3
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information

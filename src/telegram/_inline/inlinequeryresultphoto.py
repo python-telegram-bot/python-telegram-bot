@@ -54,7 +54,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
             .. versionadded:: 20.2
 
-            ..versionchanged:: 20.5
+            .. versionchanged:: 20.5
               |thumbnail_url_mandatory|
 
         photo_width (:obj:`int`, optional): Width of the photo.

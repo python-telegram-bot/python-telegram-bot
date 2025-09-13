@@ -3176,7 +3176,7 @@ class TransactionPartnerType(StringEnum):
     """:obj:`str`: Transaction with with payment for
     `paid broadcasting <https://core.telegram.org/bots/api#paid-broadcasts>`_.
 
-    ..versionadded:: 21.7
+    .. versionadded:: 21.7
     """
     USER = "user"
     """:obj:`str`: Transaction with a user."""

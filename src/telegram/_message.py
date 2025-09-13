@@ -744,7 +744,7 @@ class Message(MaybeInaccessibleMessage):
         effect_id (:obj:`str`): Optional. Unique identifier of the message effect added to the
             message.
 
-            ..versionadded:: 21.3
+            .. versionadded:: 21.3
 
         caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
