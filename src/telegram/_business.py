@@ -561,7 +561,7 @@ class BusinessOpeningHours(TelegramObject):
             time intervals describing business opening hours.
     """
 
-    __slots__ = ("__zone_info", "opening_hours", "time_zone_name")
+    __slots__ = ("_cached_zone_info", "opening_hours", "time_zone_name")
 
     def __init__(
         self,
@@ -576,7 +576,7 @@ class BusinessOpeningHours(TelegramObject):
             opening_hours
         )
 
-        self.__zone_info: Optional[ZoneInfo] = None
+        self._cached_zone_info: Optional[ZoneInfo] = None
 
         self._id_attrs = (self.time_zone_name, self.opening_hours)
 
@@ -584,9 +584,9 @@ class BusinessOpeningHours(TelegramObject):
 
     @property
     def _zone_info(self) -> ZoneInfo:
-        if self.__zone_info is None:
-            self.__zone_info = get_zone_info(self.time_zone_name)
-        return self.__zone_info
+        if self._cached_zone_info is None:
+            self._cached_zone_info = get_zone_info(self.time_zone_name)
+        return self._cached_zone_info
 
     def get_opening_hours_for_day(
         self, date: dtm.date, time_zone: Union[dtm.tzinfo, str, None] = None
