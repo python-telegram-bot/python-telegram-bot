@@ -3803,7 +3803,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.approve_suggested_post`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3838,7 +3838,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.decline_suggested_post`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3894,7 +3894,7 @@ class Chat(_ChatBase):
         is_direct_messages (:obj:`bool`, optional): :obj:`True`, if the chat is the direct messages
             chat of a channel.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -3912,7 +3912,7 @@ class Chat(_ChatBase):
         is_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the chat is the direct messages
             chat of a channel.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """

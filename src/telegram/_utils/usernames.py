@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Helper utilities around Telegram Objects first_name, last_name and username.
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 22.4
 
 Warning:
     Contents of this module are intended to be used internally by the library and *not* by the

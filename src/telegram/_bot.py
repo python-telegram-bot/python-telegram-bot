@@ -1067,10 +1067,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1289,12 +1289,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 object containing the parameters of the suggested post to send; for direct messages
                 chats only.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): Identifier of the direct messages
                 topic to which the message will be forwarded; required if the message is
                 forwarded to a direct messages chat.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1363,7 +1363,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 topic to which the messages will be forwarded; required if the messages are
                 forwarded to a direct messages chat.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Returns:
             tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
@@ -1487,10 +1487,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1662,10 +1662,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1832,10 +1832,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1974,10 +1974,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2162,10 +2162,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2334,10 +2334,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2514,10 +2514,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2686,10 +2686,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2828,7 +2828,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 topic to which the messages will be sent; required if the messages are sent to a
                 direct messages chat.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
 
         Keyword Args:
@@ -3028,10 +3028,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3355,10 +3355,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3513,10 +3513,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -5522,10 +5522,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -5923,7 +5923,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 administrator can manage direct messages within the channel and decline suggested
                 posts; for channels only
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -7948,10 +7948,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -8394,10 +8394,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -8519,7 +8519,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 topic to which the message will be sent; required if the message is sent to a
                 direct messages chat.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
 
         Returns:
@@ -10995,13 +10995,13 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
                 |suggested_post_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.4
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -11485,7 +11485,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         The bot must have the :attr:`~telegram.ChatMemberAdministrator.can_post_messages`
         administrator right in the corresponding channel chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
 
         Args:
             chat_id (:obj:`int`): Unique identifier of the target direct messages chat.
@@ -11537,7 +11537,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         The bot must have the :attr:`~telegram.ChatMemberAdministrator.can_manage_direct_messages`
         administrator right in the corresponding channel chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
 
         Args:
             chat_id (:obj:`int`): Unique identifier of the target direct messages chat.

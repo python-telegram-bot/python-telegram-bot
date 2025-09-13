@@ -256,7 +256,7 @@ class ChatMemberAdministrator(ChatMember):
         can_manage_direct_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can
             manage direct messages of the channel and decline suggested posts; for channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -320,7 +320,7 @@ class ChatMemberAdministrator(ChatMember):
         can_manage_direct_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can
             manage direct messages of the channel and decline suggested posts; for channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.4
     """
 
     __slots__ = (

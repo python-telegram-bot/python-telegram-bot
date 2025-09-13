@@ -1163,7 +1163,7 @@ DIRECT_MESSAGES = _DirectMessages(name="filters.DIRECT_MESSAGES")
 
 .. seealso:: :attr:`telegram.Chat.is_direct_messages`
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 22.4
 """
 
 
@@ -1395,7 +1395,7 @@ class _Forum(UpdateFilter):
 FORUM = _Forum(name="filters.FORUM")
 """Messages that are from a forum (topics enabled) chat.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 22.4
 """
 
 
@@ -2326,7 +2326,7 @@ class StatusUpdate:
         "filters.StatusUpdate.SUGGESTED_POST_APPROVAL_FAILED"
     )
     """Messages that contain :attr:`telegram.Message.suggested_post_approval_failed`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
 
     class _SuggestedPostApproved(MessageFilter):
@@ -2339,7 +2339,7 @@ class StatusUpdate:
         "filters.StatusUpdate.SUGGESTED_POST_APPROVED"
     )
     """Messages that contain :attr:`telegram.Message.suggested_post_approved`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
 
     class _SuggestedPostDeclined(MessageFilter):
@@ -2352,7 +2352,7 @@ class StatusUpdate:
         "filters.StatusUpdate.SUGGESTED_POST_DECLINED"
     )
     """Messages that contain :attr:`telegram.Message.suggested_post_declined`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
 
     class _SuggestedPostPaid(MessageFilter):
@@ -2363,7 +2363,7 @@ class StatusUpdate:
 
     SUGGESTED_POST_PAID = _SuggestedPostPaid("filters.StatusUpdate.SUGGESTED_POST_PAID")
     """Messages that contain :attr:`telegram.Message.suggested_post_paid`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
 
     class _SuggestedPostRefunded(MessageFilter):
@@ -2376,7 +2376,7 @@ class StatusUpdate:
         "filters.StatusUpdate.SUGGESTED_POST_REFUNDED"
     )
     """Messages that contain :attr:`telegram.Message.suggested_post_refunded`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
 
     class _UniqueGift(MessageFilter):
@@ -2635,7 +2635,7 @@ class _SuggestedPostInfo(MessageFilter):
 SUGGESTED_POST_INFO = _SuggestedPostInfo(name="filters.SUGGESTED_POST_INFO")
 """Messages that contain :attr:`telegram.Message.suggested_post_info`.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 22.4
 """
 
 

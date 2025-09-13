@@ -2226,32 +2226,32 @@ class MessageType(StringEnum):
     SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
     SUGGESTED_POST_APPROVED = "suggested_post_approved"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approved`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
     SUGGESTED_POST_DECLINED = "suggested_post_declined"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_declined`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
     SUGGESTED_POST_INFO = "suggested_post_info"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_info`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
     SUGGESTED_POST_PAID = "suggested_post_paid"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_paid`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
     SUGGESTED_POST_REFUNDED = "suggested_post_refunded"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_refunded`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
@@ -3092,7 +3092,7 @@ class SuggestedPost(IntEnum):
 /:class:`telegram.SuggestedPostParameters`/:meth:`telegram.Bot.decline_suggested_post`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
 
     __slots__ = ()
@@ -3135,7 +3135,7 @@ class SuggestedPostRefunded(StringEnum):
     """This enum contains available refund reasons for :class:`telegram.SuggestedPostRefunded`.
     The enum members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
 
     __slots__ = ()
@@ -3626,7 +3626,7 @@ class SuggestedPostInfoState(StringEnum):
     The enum members of this enumeration are instances
     of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.4
     """
 
     __slots__ = ()
