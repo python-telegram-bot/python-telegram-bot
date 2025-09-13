@@ -49,6 +49,7 @@ def chat(bot):
         is_forum=True,
         first_name=ChatTestBase.first_name,
         last_name=ChatTestBase.last_name,
+        is_direct_messages=ChatTestBase.is_direct_messages,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -63,6 +64,7 @@ class ChatTestBase:
     is_forum = True
     first_name = "first"
     last_name = "last"
+    is_direct_messages = True
 
 
 class TestChatWithoutRequest(ChatTestBase):
@@ -80,6 +82,7 @@ class TestChatWithoutRequest(ChatTestBase):
             "is_forum": self.is_forum,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "is_direct_messages": self.is_direct_messages,
         }
         chat = Chat.de_json(json_dict, offline_bot)
 
@@ -90,6 +93,7 @@ class TestChatWithoutRequest(ChatTestBase):
         assert chat.is_forum == self.is_forum
         assert chat.first_name == self.first_name
         assert chat.last_name == self.last_name
+        assert chat.is_direct_messages == self.is_direct_messages
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -102,6 +106,7 @@ class TestChatWithoutRequest(ChatTestBase):
         assert chat_dict["is_forum"] == chat.is_forum
         assert chat_dict["first_name"] == chat.first_name
         assert chat_dict["last_name"] == chat.last_name
+        assert chat_dict["is_direct_messages"] == chat.is_direct_messages
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")
@@ -1451,6 +1456,44 @@ class TestChatWithoutRequest(ChatTestBase):
         assert await chat.read_business_message(
             message_id="message_id", business_connection_id="business_connection_id"
         )
+
+    async def test_instance_method_approve_suggested_post(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["message_id"] == "message_id"
+                and kwargs["send_date"] == "send_date"
+            )
+
+        assert check_shortcut_signature(
+            Chat.approve_suggested_post, Bot.approve_suggested_post, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.approve_suggested_post, chat.get_bot(), "approve_suggested_post"
+        )
+        assert await check_defaults_handling(chat.approve_suggested_post, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "approve_suggested_post", make_assertion)
+        assert await chat.approve_suggested_post(message_id="message_id", send_date="send_date")
+
+    async def test_instance_method_decline_suggested_post(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["message_id"] == "message_id"
+                and kwargs["comment"] == "comment"
+            )
+
+        assert check_shortcut_signature(
+            Chat.decline_suggested_post, Bot.decline_suggested_post, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.decline_suggested_post, chat.get_bot(), "decline_suggested_post"
+        )
+        assert await check_defaults_handling(chat.decline_suggested_post, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "decline_suggested_post", make_assertion)
+        assert await chat.decline_suggested_post(message_id="message_id", comment="comment")
 
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
