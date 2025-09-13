@@ -253,6 +253,10 @@ class ChatMemberAdministrator(ChatMember):
 
             .. versionadded:: 20.0
         custom_title (:obj:`str`, optional): Custom title for this user.
+        can_manage_direct_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can
+            manage direct messages of the channel and decline suggested posts; for channels only.
+
+            .. versionadded:: 22.4
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -313,6 +317,10 @@ class ChatMemberAdministrator(ChatMember):
 
             .. versionadded:: 20.0
         custom_title (:obj:`str`): Optional. Custom title for this user.
+        can_manage_direct_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can
+            manage direct messages of the channel and decline suggested posts; for channels only.
+
+            .. versionadded:: 22.4
     """
 
     __slots__ = (
@@ -324,6 +332,7 @@ class ChatMemberAdministrator(ChatMember):
         "can_edit_stories",
         "can_invite_users",
         "can_manage_chat",
+        "can_manage_direct_messages",
         "can_manage_topics",
         "can_manage_video_chats",
         "can_pin_messages",
@@ -355,6 +364,7 @@ class ChatMemberAdministrator(ChatMember):
         can_pin_messages: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
         custom_title: Optional[str] = None,
+        can_manage_direct_messages: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -378,6 +388,7 @@ class ChatMemberAdministrator(ChatMember):
             self.can_pin_messages: Optional[bool] = can_pin_messages
             self.can_manage_topics: Optional[bool] = can_manage_topics
             self.custom_title: Optional[str] = custom_title
+            self.can_manage_direct_messages: Optional[bool] = can_manage_direct_messages
 
 
 class ChatMemberMember(ChatMember):

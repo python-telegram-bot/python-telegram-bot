@@ -1,0 +1,5 @@
+features = "Extend :meth:`telegram.Message.delete` shortcut to support business message deletion"
+[[pull_requests]]
+uid = "4869"
+author_uid = "jainamoswal"
+closes_threads = ["4867"]

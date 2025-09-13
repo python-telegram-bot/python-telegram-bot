@@ -9,9 +9,6 @@ on:
   push:
     branches:
       - master
-  schedule:
-    # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
-    - cron: '7 3 * * 1,5'
 
 permissions: {}
 
@@ -25,7 +22,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: False
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
@@ -86,7 +83,7 @@ jobs:
             .test_report_optionals_junit.xml
 
       - name: Submit coverage
-        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24  # v5.4.3
+        uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00  # v5.5.0
         with:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}

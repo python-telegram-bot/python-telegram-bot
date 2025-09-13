@@ -23,6 +23,7 @@ import datetime as dtm
 from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
+from telegram._chat import Chat
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
@@ -268,6 +269,10 @@ class UniqueGift(TelegramObject):
         model (:class:`UniqueGiftModel`): Model of the gift.
         symbol (:class:`UniqueGiftSymbol`): Symbol of the gift.
         backdrop (:class:`UniqueGiftBackdrop`): Backdrop of the gift.
+        publisher_chat (:class:`telegram.Chat`, optional): Information about the chat that
+            published the gift.
+
+            .. versionadded:: 22.4
 
     Attributes:
         base_name (:obj:`str`): Human-readable name of the regular gift from which this unique
@@ -279,6 +284,10 @@ class UniqueGift(TelegramObject):
         model (:class:`telegram.UniqueGiftModel`): Model of the gift.
         symbol (:class:`telegram.UniqueGiftSymbol`): Symbol of the gift.
         backdrop (:class:`telegram.UniqueGiftBackdrop`): Backdrop of the gift.
+        publisher_chat (:class:`telegram.Chat`): Optional. Information about the chat that
+            published the gift.
+
+            .. versionadded:: 22.4
 
     """
 
@@ -288,6 +297,7 @@ class UniqueGift(TelegramObject):
         "model",
         "name",
         "number",
+        "publisher_chat",
         "symbol",
     )
 
@@ -299,6 +309,7 @@ class UniqueGift(TelegramObject):
         model: UniqueGiftModel,
         symbol: UniqueGiftSymbol,
         backdrop: UniqueGiftBackdrop,
+        publisher_chat: Optional[Chat] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -309,6 +320,7 @@ class UniqueGift(TelegramObject):
         self.model: UniqueGiftModel = model
         self.symbol: UniqueGiftSymbol = symbol
         self.backdrop: UniqueGiftBackdrop = backdrop
+        self.publisher_chat: Optional[Chat] = publisher_chat
 
         self._id_attrs = (
             self.base_name,
@@ -329,6 +341,7 @@ class UniqueGift(TelegramObject):
         data["model"] = de_json_optional(data.get("model"), UniqueGiftModel, bot)
         data["symbol"] = de_json_optional(data.get("symbol"), UniqueGiftSymbol, bot)
         data["backdrop"] = de_json_optional(data.get("backdrop"), UniqueGiftBackdrop, bot)
+        data["publisher_chat"] = de_json_optional(data.get("publisher_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)
 

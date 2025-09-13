@@ -75,6 +75,8 @@ from telegram import (
     ShippingOption,
     StarTransaction,
     StarTransactions,
+    SuggestedPostParameters,
+    SuggestedPostPrice,
     Update,
     User,
     WebAppInfo,
@@ -2373,6 +2375,32 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_message(2, "text", allow_paid_broadcast=42)
 
+    async def test_direct_messages_topic_id_argument(self, offline_bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("direct_messages_topic_id") == 42
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_message(2, "text", direct_messages_topic_id=42)
+
+    async def test_suggested_post_parameters_argument(self, offline_bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
+        suggested_post_parameters = SuggestedPostParameters(price=SuggestedPostPrice("TON", 10))
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return (
+                request_data.parameters.get("suggested_post_parameters")
+                == suggested_post_parameters.to_dict()
+            )
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_message(
+            2, "text", suggested_post_parameters=suggested_post_parameters
+        )
+
     async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
         async def make_assertion(*args, **_):
             kwargs = args[1]
@@ -2585,6 +2613,51 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "do_request", do_request)
         obj = await offline_bot.get_my_star_balance()
         assert isinstance(obj, StarAmount)
+
+    async def test_approve_suggested_post(self, offline_bot, monkeypatch):
+        "No way to test this without receiving suggested posts"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.json_parameters
+            chat_id = data.get("chat_id") == "1234"
+            message_id = data.get("message_id") == "5678"
+            send_date = data.get("send_date", "1577887200") == "1577887200"
+            return chat_id and message_id and send_date
+
+        until = from_timestamp(1577887200)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        assert await offline_bot.approve_suggested_post(1234, 5678, 1577887200)
+        assert await offline_bot.approve_suggested_post(1234, 5678, until)
+
+    async def test_approve_suggested_post_with_tz(self, monkeypatch, tz_bot):
+        until = dtm.datetime(2020, 1, 11, 16, 13)
+        until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.parameters
+            chat_id = data["chat_id"] == 2
+            message_id = data["message_id"] == 32
+            until_date = data.get("until_date", until_timestamp) == until_timestamp
+            return chat_id and message_id and until_date
+
+        monkeypatch.setattr(tz_bot.request, "post", make_assertion)
+
+        assert await tz_bot.approve_suggested_post(2, 32)
+        assert await tz_bot.approve_suggested_post(2, 32, send_date=until)
+        assert await tz_bot.approve_suggested_post(2, 32, send_date=until_timestamp)
+
+    async def test_decline_suggested_post(self, offline_bot, monkeypatch):
+        "No way to test this without receiving suggested posts"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("message_id") == 5678
+            assert request_data.parameters.get("comment") == "declined"
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.decline_suggested_post(1234, 5678, "declined")
 
 
 class TestBotWithRequest:
@@ -3552,6 +3625,7 @@ class TestBotWithRequest:
                 can_post_stories=True,
                 can_edit_stories=True,
                 can_delete_stories=True,
+                can_manage_direct_messages=True,
             )
 
         # Test that we pass the correct params to TG
@@ -3575,6 +3649,7 @@ class TestBotWithRequest:
                 and data.get("can_post_stories") == 13
                 and data.get("can_edit_stories") == 14
                 and data.get("can_delete_stories") == 15
+                and data.get("can_manage_direct_messages") == 16
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -3596,6 +3671,7 @@ class TestBotWithRequest:
             can_post_stories=13,
             can_edit_stories=14,
             can_delete_stories=15,
+            can_manage_direct_messages=16,
         )
 
     async def test_export_chat_invite_link(self, bot, channel_id):
