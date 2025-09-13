@@ -236,10 +236,6 @@ def get_zone_info(tz: str) -> zoneinfo.ZoneInfo:
     """Wrapper around the `ZoneInfo` constructor with slightly more helpful error message
     in case tzdata is not installed.
     """
-
-    if tz is None:
-        return None
-
     try:
         return zoneinfo.ZoneInfo(tz)
     except zoneinfo.ZoneInfoNotFoundError as err:
