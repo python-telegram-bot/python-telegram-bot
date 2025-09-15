@@ -8,7 +8,7 @@
   ],
 
   // Add pull request labels:
-  "labels": ["dependencies"],
+  "labels": ["⚙️ ci-cd"],
 
   // Bump even patch versions:
   "bumpVersion": "patch",
@@ -19,24 +19,9 @@
   // Update the lock files:
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["* * * * 1,4"]  // Run sometime on Monday and Thursday
+    "schedule": ["* * * * 1,4"],  // Run sometime on Monday and Thursday
+    "automerge": true
   },
-
-  // Bump the versions even in other files:
-  "bumpVersions": [
-    {
-      "name": "Update dependency versions in README.rst",
-      "filePatterns": ["README.rst"],
-      "matchStrings": [
-        "cryptography>=(?<version>\\d+\\.\\d+\\.\\d+)",
-        "aiolimiter~=(?<version>\\d+\\.\\d+\\.\\d+)",
-        "tornado~=(?<version>\\d+\\.\\d+)",
-        "cachetools>=(?<version>\\d+\\.\\d+\\.\\d+)",        // Lower bound only
-        "APScheduler>=(?<version>\\d+\\.\\d+\\.\\d+)"        // Lower bound only
-      ],
-      "bumpType": "minor"
-    }
-  ],
 
   // Group package updates together:
   "packageRules": [
@@ -66,6 +51,13 @@
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
+    },
+
+    // Apply the "dependencies" label to all updates of optional-dependencies:
+    {
+      "matchDepTypes": ["project.optional-dependencies"],
+      "automerge": false,
+      "labels": ["⚙️ dependencies"]
     }
   ],
 
