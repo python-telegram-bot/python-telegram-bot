@@ -1,0 +1,5 @@
+internal = "Update codecov/codecov-action action to v5.5.1"
+[[pull_requests]]
+uid = "4944"
+author_uid = "renovate[bot]"
+closes_threads = []
