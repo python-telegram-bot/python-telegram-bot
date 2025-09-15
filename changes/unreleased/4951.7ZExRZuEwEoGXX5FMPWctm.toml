@@ -1,5 +1,5 @@
-internal = "Update pre-commit hook cachetools to >=5.5.2,<5.6.0"
+internal = "Align pre-commit hook cachetools to with ``pyproject.toml``"
 [[pull_requests]]
 uid = "4951"
-author_uids = ["renovate[bot]"]
+author_uids = ["renovate[bot]", "Bibo-Joshi"]
 closes_threads = []
