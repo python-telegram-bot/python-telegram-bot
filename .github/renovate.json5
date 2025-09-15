@@ -8,7 +8,7 @@
   ],
 
   // Add pull request labels:
-  "labels": ["ci-cd"],
+  "labels": ["⚙️ ci-cd"],
 
   // Bump even patch versions:
   "bumpVersion": "patch",
@@ -57,7 +57,7 @@
     {
       "matchDepTypes": ["project.optional-dependencies"],
       "automerge": false,
-      "labels": ["dependencies"]
+      "labels": ["⚙️ dependencies"]
     }
   ],
 
