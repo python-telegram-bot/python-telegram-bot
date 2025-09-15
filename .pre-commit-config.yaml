@@ -30,7 +30,7 @@ repos:
           - aiolimiter~=1.1,<1.3
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.1
+    rev: v1.18.1
     hooks:
     -   id: mypy
         name: mypy-ptb
