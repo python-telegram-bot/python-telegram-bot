@@ -55,7 +55,7 @@
 
     // Apply the "dependencies" label to all updates of optional-dependencies:
     {
-      "matchDepTypes": "project.optional-dependencies",
+      "matchDepTypes": ["project.optional-dependencies"],
       "automerge": false,
       "labels": ["dependencies"]
     }
