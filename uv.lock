@@ -347,7 +347,7 @@ wheels = [
 
 [[package]]
 name = "chango"
-version = "0.4.0"
+version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic-settings", marker = "python_full_version >= '3.12'" },
@@ -356,9 +356,9 @@ dependencies = [
     { name = "tomlkit", marker = "python_full_version >= '3.12'" },
     { name = "typer", marker = "python_full_version >= '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/42/36/55bf601b738510260acf37f16bbf51eec1f44f1f292c827be95b3b09b9d4/chango-0.4.0.tar.gz", hash = "sha256:c2126b7cf57d37c6ffdebc2293d0c1e513872112f25b91fabc0d913adc2e5459", size = 339860, upload-time = "2025-03-09T13:33:18.912Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4d/a2/82ed52fee3dd2d1a4025378db20924e6d888690a81be0274a368ad16f96c/chango-0.5.0.tar.gz", hash = "sha256:17d8b42ea10e8b2643d3d48ee51db5af762aacb5677239f9703ac4fa3a8f51e5", size = 341954, upload-time = "2025-08-02T15:36:55.375Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/e0/26c61b4104db8041f88a32a8edd315b61950b5e444360af8624952de18b9/chango-0.4.0-py3-none-any.whl", hash = "sha256:ce2475d0ae19f5e6ecc02b2fac15c828116a9f9fb6f198d7e3b03c6e8b68c78e", size = 56464, upload-time = "2025-03-09T13:33:17.375Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/7d/7e6b276290dca7374f71943c3f71dff95a96fe91f0c5d11b715ca6fbbe84/chango-0.5.0-py3-none-any.whl", hash = "sha256:e8ccbec15ba687b07f18778948009be60851fe79df2a129bce7207c66e69a47e", size = 56936, upload-time = "2025-08-02T15:36:53.631Z" },
 ]
 
 [[package]]
@@ -1574,7 +1574,7 @@ provides-extras = ["all", "callback-data", "ext", "http2", "job-queue", "passpor
 all = [
     { name = "beautifulsoup4" },
     { name = "build" },
-    { name = "chango", marker = "python_full_version >= '3.12'", specifier = "~=0.4.0" },
+    { name = "chango", marker = "python_full_version >= '3.12'", specifier = "~=0.5.0" },
     { name = "flaky", specifier = ">=3.8.1" },
     { name = "furo", specifier = "==2025.7.19" },
     { name = "mypy", specifier = "==1.16.1" },
@@ -1596,7 +1596,7 @@ all = [
     { name = "tzdata" },
 ]
 docs = [
-    { name = "chango", marker = "python_full_version >= '3.12'", specifier = "~=0.4.0" },
+    { name = "chango", marker = "python_full_version >= '3.12'", specifier = "~=0.5.0" },
     { name = "furo", specifier = "==2025.7.19" },
     { name = "pydantic", marker = "python_full_version >= '3.14'", specifier = ">=2.12.0a1" },
     { name = "sphinx", marker = "python_full_version >= '3.11'", specifier = "==8.2.3" },
