@@ -1,0 +1,5 @@
+internal = "Update pre-commit hook APScheduler to ~=3.11.0"
+[[pull_requests]]
+uid = "4950"
+author_uids = ["renovate[bot]"]
+closes_threads = []
