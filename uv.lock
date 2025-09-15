@@ -1272,7 +1272,7 @@ wheels = [
 
 [[package]]
 name = "pylint"
-version = "3.3.7"
+version = "3.3.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astroid" },
@@ -1285,9 +1285,9 @@ dependencies = [
     { name = "tomlkit" },
     { name = "typing-extensions", marker = "python_full_version < '3.10'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1c/e4/83e487d3ddd64ab27749b66137b26dc0c5b5c161be680e6beffdc99070b3/pylint-3.3.7.tar.gz", hash = "sha256:2b11de8bde49f9c5059452e0c310c079c746a0a8eeaa789e5aa966ecc23e4559", size = 1520709, upload-time = "2025-05-04T17:07:51.089Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/58/1f614a84d3295c542e9f6e2c764533eea3f318f4592dc1ea06c797114767/pylint-3.3.8.tar.gz", hash = "sha256:26698de19941363037e2937d3db9ed94fb3303fdadf7d98847875345a8bb6b05", size = 1523947, upload-time = "2025-08-09T09:12:57.234Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/83/bff755d09e31b5d25cc7fdc4bf3915d1a404e181f1abf0359af376845c24/pylint-3.3.7-py3-none-any.whl", hash = "sha256:43860aafefce92fca4cf6b61fe199cdc5ae54ea28f9bf4cd49de267b5195803d", size = 522565, upload-time = "2025-05-04T17:07:48.714Z" },
+    { url = "https://files.pythonhosted.org/packages/2d/1a/711e93a7ab6c392e349428ea56e794a3902bb4e0284c1997cff2d7efdbc1/pylint-3.3.8-py3-none-any.whl", hash = "sha256:7ef94aa692a600e82fabdd17102b73fc226758218c97473c7ad67bd4cb905d83", size = 523153, upload-time = "2025-08-09T09:12:54.836Z" },
 ]
 
 [[package]]
@@ -1501,7 +1501,7 @@ all = [
     { name = "mypy", specifier = "==1.16.1" },
     { name = "pre-commit" },
     { name = "pydantic", marker = "python_full_version >= '3.14'", specifier = ">=2.12.0a1" },
-    { name = "pylint", specifier = "==3.3.7" },
+    { name = "pylint", specifier = "==3.3.8" },
     { name = "pytest", specifier = "==8.4.2" },
     { name = "pytest-asyncio", specifier = "==0.21.2" },
     { name = "pytest-cov" },
@@ -1530,7 +1530,7 @@ docs = [
 linting = [
     { name = "mypy", specifier = "==1.16.1" },
     { name = "pre-commit" },
-    { name = "pylint", specifier = "==3.3.7" },
+    { name = "pylint", specifier = "==3.3.8" },
     { name = "ruff", specifier = "==0.12.7" },
 ]
 tests = [
