@@ -580,7 +580,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
         if isinstance(obj, CallbackQuery):
             self.callback_data_cache.process_callback_query(obj)
-            return obj  # type: ignore[return-value]
+            return obj
 
         if isinstance(obj, Message):
             if obj.reply_to_message:
@@ -595,7 +595,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
             # Finally, handle the message itself
             self.callback_data_cache.process_message(message=obj)
-            return obj  # type: ignore[return-value]
+            return obj
 
         if isinstance(obj, ChatFullInfo) and obj.pinned_message:
             self.callback_data_cache.process_message(obj.pinned_message)
