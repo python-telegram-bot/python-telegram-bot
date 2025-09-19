@@ -1,0 +1,138 @@
+wingo_signal_app/
+├── android/
+├── ios/
+├── lib/
+│   └── main.dart
+├── pubspec.yaml
+├── README.mdname: wingo_signal_app
+description: WinGo Live Big/Small Signal App
+version: 1.0.0+1
+environment:
+  sdk: ">=2.19.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.1.0
+  flutter_spinkit: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: trueimport 'dart:async';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+void main() {
+  runApp(WinGoSignalApp());
+}
+
+class WinGoSignalApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'WinGo Live Signal',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: SignalHomePage(),
+    );
+  }
+}
+
+class SignalHomePage extends StatefulWidget {
+  @override
+  _SignalHomePageState createState() => _SignalHomePageState();
+}
+
+class _SignalHomePageState extends State<SignalHomePage> {
+  String _latestSignal = 'Loading...';
+  String _latestRound = '';
+  Timer? _timer;
+
+  final String apiUrl = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSignal();
+    _timer = Timer.periodic(Duration(seconds: 5), (_) => _fetchSignal());
+  }
+
+  Future<void> _fetchSignal() async {
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data'];
+        if (data != null && data.length > 0) {
+          final latest = data[0];
+          setState(() {
+            _latestRound = latest['issue'] ?? '';
+            _latestSignal = latest['result'] ?? '';
+          });
+        }
+      } else {
+        setState(() => _latestSignal = 'Error fetching data');
+      }
+    } catch (e) {
+      setState(() => _latestSignal = 'Error: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('WinGo Live Signal'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Latest Round: $_latestRound',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Signal: $_latestSignal',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: _latestSignal == 'Big' ? Colors.green : Colors.red,
+              ),
+            ),
+            SizedBox(height: 50),
+            SpinKitFadingCircle(
+              color: Colors.blue,
+              size: 50.0,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}# WinGo Live Signal App
+
+এই অ্যাপটি সরাসরি WinGo লাইভ মার্কেটের সাথে কানেক্ট করে Big/Small সিগন্যাল দেখায়।
+
+## ব্যবহার:
+1. Flutter SDK এবং Android Studio ইনস্টল করুন।
+2. প্রোজেক্টটি Android Studio-তে খুলুন।
+3. Terminal-এ `flutter pub get` রান করুন।
+4. Android Studio থেকে “Build APK” ক্লিক করুন।
+5. তৈরি APK ফোনে ইনস্টল করুন।
+
+## লক্ষ্য:
+- প্রতি ৫ সেকেন্ডে নতুন রাউন্ড চেক করে signal আপডেট হবে।
+- Big = Green, Small = Red।
