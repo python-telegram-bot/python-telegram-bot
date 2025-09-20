@@ -1,0 +1,5 @@
+internal = "Update actions/setup-python action to v6"
+[[pull_requests]]
+uid = "4963"
+author_uids = ["renovate[bot]"]
+closes_threads = []
