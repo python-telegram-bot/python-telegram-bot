@@ -1,0 +1,5 @@
+internal = "Update actions/stale action to v10"
+[[pull_requests]]
+uid = "4964"
+author_uids = ["renovate[bot]"]
+closes_threads = []
