@@ -1,0 +1,5 @@
+other = "Update Chango to v0.5.0"
+[[pull_requests]]
+uid = "4948"
+author_uids = ["renovate[bot]"]
+closes_threads = []

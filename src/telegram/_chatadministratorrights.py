@@ -30,8 +30,8 @@ class ChatAdministratorRights(TelegramObject):
     :attr:`can_delete_messages`, :attr:`can_manage_video_chats`, :attr:`can_restrict_members`,
     :attr:`can_promote_members`, :attr:`can_change_info`, :attr:`can_invite_users`,
     :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages`,
-    :attr:`can_manage_topics`, :attr:`can_post_stories`, :attr:`can_delete_stories`, and
-    :attr:`can_edit_stories` are equal.
+    :attr:`can_manage_topics`, :attr:`can_post_stories`, :attr:`can_delete_stories`,
+    :attr:`can_edit_stories` and :attr:`can_manage_direct_messages` are equal.
 
     .. versionadded:: 20.0
 
@@ -47,6 +47,10 @@ class ChatAdministratorRights(TelegramObject):
         As of this version, :attr:`can_post_stories`, :attr:`can_edit_stories`,
         and :attr:`can_delete_stories` is now required. Thus, the order of arguments had to be
         changed.
+
+    .. versionchanged:: 22.4
+        :attr:`can_manage_direct_messages` is considered as well when comparing objects of
+        this type in terms of equality.
 
     Args:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -96,6 +100,10 @@ class ChatAdministratorRights(TelegramObject):
             to create, rename, close, and reopen forum topics; for supergroups only.
 
             .. versionadded:: 20.0
+        can_manage_direct_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can
+            manage direct messages of the channel and decline suggested posts; for channels only.
+
+            .. versionadded:: 22.4
 
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -145,6 +153,10 @@ class ChatAdministratorRights(TelegramObject):
             to create, rename, close, and reopen forum topics; for supergroups only.
 
             .. versionadded:: 20.0
+        can_manage_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can
+            manage direct messages of the channel and decline suggested posts; for channels only.
+
+            .. versionadded:: 22.4
     """
 
     __slots__ = (
@@ -155,6 +167,7 @@ class ChatAdministratorRights(TelegramObject):
         "can_edit_stories",
         "can_invite_users",
         "can_manage_chat",
+        "can_manage_direct_messages",
         "can_manage_topics",
         "can_manage_video_chats",
         "can_pin_messages",
@@ -182,6 +195,7 @@ class ChatAdministratorRights(TelegramObject):
         can_edit_messages: bool | None = None,
         can_pin_messages: bool | None = None,
         can_manage_topics: bool | None = None,
+        can_manage_direct_messages: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
@@ -203,6 +217,7 @@ class ChatAdministratorRights(TelegramObject):
         self.can_edit_messages: bool | None = can_edit_messages
         self.can_pin_messages: bool | None = can_pin_messages
         self.can_manage_topics: bool | None = can_manage_topics
+        self.can_manage_direct_messages: bool | None = can_manage_direct_messages
 
         self._id_attrs = (
             self.is_anonymous,
@@ -220,6 +235,7 @@ class ChatAdministratorRights(TelegramObject):
             self.can_post_stories,
             self.can_edit_stories,
             self.can_delete_stories,
+            self.can_manage_direct_messages,
         )
 
         self._freeze()

@@ -184,7 +184,7 @@ class ChatShared(TelegramObject):
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
         of the chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
         """
         return get_link(self)
 
@@ -260,7 +260,7 @@ class SharedUser(TelegramObject):
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
         prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
         """
         return get_name(self)
 
@@ -269,7 +269,7 @@ class SharedUser(TelegramObject):
         """:obj:`str`: Convenience property. If :attr:`first_name` is not :obj:`None`, gives
         :attr:`first_name` followed by (if available) :attr:`last_name`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
         """
         return get_full_name(self)
 
@@ -278,7 +278,7 @@ class SharedUser(TelegramObject):
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
         of the user.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.4
         """
         return get_link(self)
 

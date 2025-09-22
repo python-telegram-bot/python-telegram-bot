@@ -38,6 +38,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
+Tele = TypeVar("Tele", bound="TelegramObject")
 
 
 class TelegramObject:
@@ -457,7 +458,7 @@ class TelegramObject:
         return tuple(cls.de_json(d, bot) for d in data)
 
     @contextmanager
-    def _unfrozen(self: Tele_co) -> Iterator[Tele_co]:
+    def _unfrozen(self: Tele) -> Iterator[Tele]:
         """Context manager to temporarily unfreeze the object. For internal use only.
 
         Note:

@@ -51,7 +51,7 @@ class HTTPXRequest(BaseRequest):
         connection_pool_size (:obj:`int`, optional): Number of connections to keep in the
             connection pool. Defaults to ``256``.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.4
                 Set the default to ``256``.
                 Stopped applying to ``httpx.Limits.max_keepalive_connections``. Now only applies to
                 ``httpx.Limits.max_connections``. See `Resource Limits

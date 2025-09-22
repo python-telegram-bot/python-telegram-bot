@@ -1,0 +1,5 @@
+other = "Update astral-sh/setup-uv digest to b75a909"
+[[pull_requests]]
+uid = "4943"
+author_uid = "renovate[bot]"
+closes_threads = []

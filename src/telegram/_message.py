@@ -31,6 +31,7 @@ from telegram._chatboost import ChatBoostAdded
 from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
 from telegram._dice import Dice
 from telegram._directmessagepricechanged import DirectMessagePriceChanged
+from telegram._directmessagestopic import DirectMessagesTopic
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
@@ -116,6 +117,13 @@ if TYPE_CHECKING:
         MessageId,
         MessageOrigin,
         ReactionType,
+        SuggestedPostApprovalFailed,
+        SuggestedPostApproved,
+        SuggestedPostDeclined,
+        SuggestedPostInfo,
+        SuggestedPostPaid,
+        SuggestedPostParameters,
+        SuggestedPostRefunded,
         TextQuote,
     )
     from telegram._utils.types import FileInput, ReplyMarkup
@@ -338,6 +346,13 @@ class Message(MaybeInaccessibleMessage):
             options were changed.
 
             .. versionadded:: 20.8
+
+        suggested_post_info (:class:`telegram.SuggestedPostInfo`, optional): Information about
+            suggested post parameters if the message is a suggested post in a channel direct
+            messages chat. If the message is an approved or declined suggested post, then it can't
+            be edited.
+
+            .. versionadded:: 22.4
 
         effect_id (:obj:`str`, optional): Unique identifier of the message effect added to the
             message.
@@ -563,6 +578,26 @@ class Message(MaybeInaccessibleMessage):
             message: the price for paid messages has changed in the chat
 
             .. versionadded:: 22.1
+        suggested_post_approved (:class:`telegram.SuggestedPostApproved`, optional): Service
+            message: a suggested post was approved.
+
+            .. versionadded:: 22.4
+        suggested_post_approval_failed (:class:`telegram.SuggestedPostApproved`, optional): Service
+            message: approval of a suggested post has failed.
+
+            .. versionadded:: 22.4
+        suggested_post_declined (:class:`telegram.SuggestedPostDeclined`, optional): Service
+            message: a suggested post was declined.
+
+            .. versionadded:: 22.4
+        suggested_post_paid (:class:`telegram.SuggestedPostPaid`, optional): Service
+            message: payment for a suggested post was received.
+
+            .. versionadded:: 22.4
+        suggested_post_refunded (:class:`telegram.SuggestedPostRefunded`, optional): Service
+            message: payment for a suggested post was refunded.
+
+            .. versionadded:: 22.4
         external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -625,6 +660,18 @@ class Message(MaybeInaccessibleMessage):
             of a channel has changed.
 
             .. versionadded:: 22.3
+        is_paid_post (:obj:`bool`, optional): :obj:`True`, if the message is a paid post. Note that
+            such posts must not be deleted for 24 hours to receive the payment and can't be edited.
+
+            .. versionadded:: 22.4
+        direct_messages_topic (:class:`telegram.DirectMessagesTopic`, optional): Information about
+            the direct messages chat topic that contains the message.
+
+            .. versionadded:: 22.4
+        reply_to_checklist_task_id (:obj:`int`, optional): Identifier of the specific checklist
+            task that is being replied to.
+
+            .. versionadded:: 22.4
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -684,10 +731,17 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 20.8
 
+        suggested_post_info (:class:`telegram.SuggestedPostInfo`): Optional. Information about
+            suggested post parameters if the message is a suggested post in a channel direct
+            messages chat. If the message is an approved or declined suggested post, then it can't
+            be edited.
+
+            .. versionadded:: 22.4
+
         effect_id (:obj:`str`): Optional. Unique identifier of the message effect added to the
             message.
 
-            ..versionadded:: 21.3
+            .. versionadded:: 21.3
 
         caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -923,6 +977,26 @@ class Message(MaybeInaccessibleMessage):
             message: the price for paid messages has changed in the chat
 
             .. versionadded:: 22.1
+        suggested_post_approved (:class:`telegram.SuggestedPostApproved`): Optional. Service
+            message: a suggested post was approved.
+
+            .. versionadded:: 22.4
+        suggested_post_approval_failed (:class:`telegram.SuggestedPostApproved`): Optional. Service
+            message: approval of a suggested post has failed.
+
+            .. versionadded:: 22.4
+        suggested_post_declined (:class:`telegram.SuggestedPostDeclined`): Optional. Service
+            message: a suggested post was declined.
+
+            .. versionadded:: 22.4
+        suggested_post_paid (:class:`telegram.SuggestedPostPaid`): Optional. Service
+            message: payment for a suggested post was received.
+
+            .. versionadded:: 22.4
+        suggested_post_refunded (:class:`telegram.SuggestedPostRefunded`): Optional. Service
+            message: payment for a suggested post was refunded.
+
+            .. versionadded:: 22.4
         external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
@@ -986,6 +1060,18 @@ class Message(MaybeInaccessibleMessage):
             messages chat of a channel has changed.
 
             .. versionadded:: 22.3
+        is_paid_post (:obj:`bool`): Optional. :obj:`True`, if the message is a paid post. Note that
+            such posts must not be deleted for 24 hours to receive the payment and can't be edited.
+
+            .. versionadded:: 22.4
+        direct_messages_topic (:class:`telegram.DirectMessagesTopic`): Optional. Information about
+            the direct messages chat topic that contains the message.
+
+            .. versionadded:: 22.4
+        reply_to_checklist_task_id (:obj:`int`): Optional. Identifier of the specific checklist
+            task that is being replied to.
+
+            .. versionadded:: 22.4
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1023,6 +1109,7 @@ class Message(MaybeInaccessibleMessage):
         "delete_chat_photo",
         "dice",
         "direct_message_price_changed",
+        "direct_messages_topic",
         "document",
         "edit_date",
         "effect_id",
@@ -1048,6 +1135,7 @@ class Message(MaybeInaccessibleMessage):
         "invoice",
         "is_automatic_forward",
         "is_from_offline",
+        "is_paid_post",
         "is_topic_message",
         "left_chat_member",
         "link_preview_options",
@@ -1071,6 +1159,7 @@ class Message(MaybeInaccessibleMessage):
         "quote",
         "refunded_payment",
         "reply_markup",
+        "reply_to_checklist_task_id",
         "reply_to_message",
         "reply_to_story",
         "sender_boost_count",
@@ -1080,6 +1169,12 @@ class Message(MaybeInaccessibleMessage):
         "sticker",
         "story",
         "successful_payment",
+        "suggested_post_approval_failed",
+        "suggested_post_approved",
+        "suggested_post_declined",
+        "suggested_post_info",
+        "suggested_post_paid",
+        "suggested_post_refunded",
         "supergroup_chat_created",
         "text",
         "unique_gift",
@@ -1192,6 +1287,15 @@ class Message(MaybeInaccessibleMessage):
         checklist: Checklist | None = None,
         checklist_tasks_done: ChecklistTasksDone | None = None,
         checklist_tasks_added: ChecklistTasksAdded | None = None,
+        is_paid_post: bool | None = None,
+        direct_messages_topic: DirectMessagesTopic | None = None,
+        reply_to_checklist_task_id: int | None = None,
+        suggested_post_declined: "SuggestedPostDeclined | None" = None,
+        suggested_post_paid: "SuggestedPostPaid | None" = None,
+        suggested_post_refunded: "SuggestedPostRefunded | None" = None,
+        suggested_post_info: "SuggestedPostInfo | None" = None,
+        suggested_post_approved: "SuggestedPostApproved | None" = None,
+        suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1306,6 +1410,17 @@ class Message(MaybeInaccessibleMessage):
             self.paid_star_count: int | None = paid_star_count
             self.direct_message_price_changed: DirectMessagePriceChanged | None = (
                 direct_message_price_changed
+            )
+            self.is_paid_post: bool | None = is_paid_post
+            self.direct_messages_topic: DirectMessagesTopic | None = direct_messages_topic
+            self.reply_to_checklist_task_id: int | None = reply_to_checklist_task_id
+            self.suggested_post_declined: SuggestedPostDeclined | None = suggested_post_declined
+            self.suggested_post_paid: SuggestedPostPaid | None = suggested_post_paid
+            self.suggested_post_refunded: SuggestedPostRefunded | None = suggested_post_refunded
+            self.suggested_post_info: SuggestedPostInfo | None = suggested_post_info
+            self.suggested_post_approved: SuggestedPostApproved | None = suggested_post_approved
+            self.suggested_post_approval_failed: SuggestedPostApprovalFailed | None = (
+                suggested_post_approval_failed
             )
 
             self._effective_attachment = DEFAULT_NONE
@@ -1461,6 +1576,14 @@ class Message(MaybeInaccessibleMessage):
             ExternalReplyInfo,
             TextQuote,
         )
+        from telegram._suggestedpost import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
+            SuggestedPostApprovalFailed,
+            SuggestedPostApproved,
+            SuggestedPostDeclined,
+            SuggestedPostInfo,
+            SuggestedPostPaid,
+            SuggestedPostRefunded,
+        )
 
         data["giveaway"] = de_json_optional(data.get("giveaway"), Giveaway, bot)
         data["giveaway_completed"] = de_json_optional(
@@ -1492,6 +1615,27 @@ class Message(MaybeInaccessibleMessage):
         )
         data["checklist_tasks_added"] = de_json_optional(
             data.get("checklist_tasks_added"), ChecklistTasksAdded, bot
+        )
+        data["direct_messages_topic"] = de_json_optional(
+            data.get("direct_messages_topic"), DirectMessagesTopic, bot
+        )
+        data["suggested_post_declined"] = de_json_optional(
+            data.get("suggested_post_declined"), SuggestedPostDeclined, bot
+        )
+        data["suggested_post_paid"] = de_json_optional(
+            data.get("suggested_post_paid"), SuggestedPostPaid, bot
+        )
+        data["suggested_post_refunded"] = de_json_optional(
+            data.get("suggested_post_refunded"), SuggestedPostRefunded, bot
+        )
+        data["suggested_post_info"] = de_json_optional(
+            data.get("suggested_post_info"), SuggestedPostInfo, bot
+        )
+        data["suggested_post_approved"] = de_json_optional(
+            data.get("suggested_post_approved"), SuggestedPostApproved, bot
+        )
+        data["suggested_post_approval_failed"] = de_json_optional(
+            data.get("suggested_post_approval_failed"), SuggestedPostApprovalFailed, bot
         )
 
         api_kwargs = {}
@@ -1848,6 +1992,10 @@ class Message(MaybeInaccessibleMessage):
         # the same chat.
         return self.message_thread_id if chat_id in {self.chat_id, self.chat.username} else None
 
+    def _extract_direct_messages_topic_id(self) -> int | None:
+        """Return the topic id of the direct messages chat, if it is present."""
+        return self.direct_messages_topic.topic_id if self.direct_messages_topic else None
+
     async def reply_text(
         self,
         text: str,
@@ -1861,6 +2009,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1878,6 +2027,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -1923,6 +2073,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_markdown(
@@ -1937,6 +2089,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1955,6 +2108,7 @@ class Message(MaybeInaccessibleMessage):
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN,
                 business_connection_id=self.business_connection_id,
+                direct_messages_topic_id=self.direct_messages_topic.topic_id,
                 *args,
                 **kwargs,
             )
@@ -2005,6 +2159,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_markdown_v2(
@@ -2019,6 +2175,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2036,6 +2193,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN_V2,
+                direct_messages_topic_id=self.direct_messages_topic.topic_id,
                 business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
@@ -2083,6 +2241,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_html(
@@ -2097,6 +2257,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2114,6 +2275,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.HTML,
+                direct_messages_topic_id=self.direct_messages_topic.topic_id,
                 business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
@@ -2161,6 +2323,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_media_group(
@@ -2193,6 +2357,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2238,6 +2403,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def reply_photo(
@@ -2255,6 +2421,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         show_caption_above_media: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2272,6 +2439,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2319,6 +2487,8 @@ class Message(MaybeInaccessibleMessage):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_audio(
@@ -2338,6 +2508,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2355,6 +2526,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2404,6 +2576,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_document(
@@ -2421,6 +2595,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2438,6 +2613,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2485,6 +2661,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_animation(
@@ -2506,6 +2684,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         show_caption_above_media: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2523,6 +2702,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2574,6 +2754,8 @@ class Message(MaybeInaccessibleMessage):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_sticker(
@@ -2587,6 +2769,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2603,6 +2786,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2645,6 +2829,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_video(
@@ -2669,6 +2855,7 @@ class Message(MaybeInaccessibleMessage):
         show_caption_above_media: bool | None = None,
         cover: "FileInput | None" = None,
         start_timestamp: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2686,6 +2873,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2740,6 +2928,8 @@ class Message(MaybeInaccessibleMessage):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_video_note(
@@ -2755,6 +2945,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2772,6 +2963,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2817,6 +3009,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_voice(
@@ -2833,6 +3027,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2850,6 +3045,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2896,6 +3092,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_location(
@@ -2913,6 +3111,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2930,6 +3129,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -2977,6 +3177,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_venue(
@@ -2996,6 +3198,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3013,6 +3216,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -3062,6 +3266,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_contact(
@@ -3077,6 +3283,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3094,6 +3301,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -3138,7 +3346,9 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             allow_paid_broadcast=allow_paid_broadcast,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_poll(
@@ -3246,6 +3456,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3262,6 +3473,7 @@ class Message(MaybeInaccessibleMessage):
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -3303,6 +3515,8 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_checklist(
@@ -3507,6 +3721,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3522,6 +3737,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_invoice(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs,
              )
@@ -3594,6 +3810,8 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def forward(
@@ -3603,6 +3821,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         video_start_timestamp: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3615,6 +3834,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.forward_message(
                  from_chat_id=update.effective_message.chat_id,
                  message_id=update.effective_message.message_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs
              )
@@ -3641,11 +3861,13 @@ class Message(MaybeInaccessibleMessage):
             disable_notification=disable_notification,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            suggested_post_parameters=suggested_post_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
         )
 
     async def copy(
@@ -3662,6 +3884,7 @@ class Message(MaybeInaccessibleMessage):
         show_caption_above_media: bool | None = None,
         allow_paid_broadcast: bool | None = None,
         video_start_timestamp: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3677,6 +3900,7 @@ class Message(MaybeInaccessibleMessage):
                  chat_id=chat_id,
                  from_chat_id=update.effective_message.chat_id,
                  message_id=update.effective_message.message_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs
              )
@@ -3709,6 +3933,8 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_copy(
@@ -3726,6 +3952,7 @@ class Message(MaybeInaccessibleMessage):
         show_caption_above_media: bool | None = None,
         allow_paid_broadcast: bool | None = None,
         video_start_timestamp: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3742,6 +3969,7 @@ class Message(MaybeInaccessibleMessage):
                  chat_id=message.chat.id,
                  message_thread_id=update.effective_message.message_thread_id,
                  message_id=message_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs
              )
@@ -3787,6 +4015,8 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def reply_paid_media(
@@ -3803,6 +4033,8 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: "ReplyMarkup | None" = None,
         payload: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3817,7 +4049,9 @@ class Message(MaybeInaccessibleMessage):
 
              await bot.send_paid_media(
                  chat_id=message.chat.id,
+                 message_thread_id=update.effective_message.message_thread_id,
                  business_connection_id=message.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
                  *args,
                  **kwargs
              )
@@ -3836,6 +4070,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_paid_media(
             chat_id=chat_id,
             caption=caption,
@@ -3856,6 +4091,9 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
+            message_thread_id=message_thread_id,
         )
 
     async def edit_text(
@@ -4316,18 +4554,43 @@ class Message(MaybeInaccessibleMessage):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
     ) -> bool:
-        """Shortcut for::
+        """Shortcut for either::
 
               await bot.delete_message(
                   chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
               )
 
-        For the documentation of the arguments, please see :meth:`telegram.Bot.delete_message`.
+        or::
+
+              await bot.delete_business_messages(
+                  business_connection_id=self.business_connection_id,
+                  message_ids=[self.message_id],
+                  *args,
+                  **kwargs,
+              )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_message` and :meth:`telegram.Bot.delete_business_messages`.
+
+        .. versionchanged:: 22.4
+           Calls either :meth:`telegram.Bot.delete_message`
+           or :meth:`telegram.Bot.delete_business_messages` based
+           on :attr:`business_connection_id`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
+        if self.business_connection_id:
+            return await self.get_bot().delete_business_messages(
+                business_connection_id=self.business_connection_id,
+                message_ids=[self.message_id],
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            )
         return await self.get_bot().delete_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -4699,6 +4962,80 @@ class Message(MaybeInaccessibleMessage):
             chat_id=self.chat_id,
             message_id=self.message_id,
             business_connection_id=self.business_connection_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def approve_suggested_post(
+        self,
+        send_date: int | dtm.datetime | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.approve_suggested_post(
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.approve_suggested_post`.
+
+        .. versionadded:: 22.4
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().approve_suggested_post(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            send_date=send_date,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def decline_suggested_post(
+        self,
+        comment: str | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.decline_suggested_post(
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.decline_suggested_post`.
+
+        .. versionadded:: 22.4
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().decline_suggested_post(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            comment=comment,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

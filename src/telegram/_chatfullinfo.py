@@ -224,6 +224,14 @@ class ChatFullInfo(_ChatBase):
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
             .. versionadded:: 21.4
+        is_direct_messages (:obj:`bool`, optional): :obj:`True`, if the chat is the direct messages
+            chat of a channel.
+
+            .. versionadded:: 22.4
+        parent_chat (:obj:`telegram.Chat`, optional): Information about the corresponding channel
+            chat; for direct messages chats only.
+
+            .. versionadded:: 22.4
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -388,6 +396,14 @@ class ChatFullInfo(_ChatBase):
             sent or forwarded to the channel chat. The field is available only for channel chats.
 
             .. versionadded:: 21.4
+        is_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the chat is the direct messages
+            chat of a channel.
+
+            .. versionadded:: 22.4
+        parent_chat (:obj:`telegram.Chat`): Optional. Information about the corresponding channel
+            chat; for direct messages chats only.
+
+            .. versionadded:: 22.4
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
@@ -424,6 +440,7 @@ class ChatFullInfo(_ChatBase):
         "linked_chat_id",
         "location",
         "max_reaction_count",
+        "parent_chat",
         "permissions",
         "personal_chat",
         "photo",
@@ -481,6 +498,8 @@ class ChatFullInfo(_ChatBase):
         linked_chat_id: int | None = None,
         location: ChatLocation | None = None,
         can_send_paid_media: bool | None = None,
+        is_direct_messages: bool | None = None,
+        parent_chat: Chat | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -492,6 +511,7 @@ class ChatFullInfo(_ChatBase):
             first_name=first_name,
             last_name=last_name,
             is_forum=is_forum,
+            is_direct_messages=is_direct_messages,
             api_kwargs=api_kwargs,
         )
         # Required and unique to this class-
@@ -542,6 +562,7 @@ class ChatFullInfo(_ChatBase):
             self.business_opening_hours: BusinessOpeningHours | None = business_opening_hours
             self.can_send_paid_media: bool | None = can_send_paid_media
             self.accepted_gift_types: AcceptedGiftTypes = accepted_gift_types
+            self.parent_chat: Chat | None = parent_chat
 
     @property
     def slow_mode_delay(self) -> int | dtm.timedelta | None:
@@ -592,5 +613,6 @@ class ChatFullInfo(_ChatBase):
         data["business_opening_hours"] = de_json_optional(
             data.get("business_opening_hours"), BusinessOpeningHours, bot
         )
+        data["parent_chat"] = de_json_optional(data.get("parent_chat"), Chat, bot)
 
         return super().de_json(data=data, bot=bot)

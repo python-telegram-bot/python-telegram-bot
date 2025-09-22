@@ -125,6 +125,7 @@ if TYPE_CHECKING:
         PassportElementError,
         ShippingOption,
         StoryArea,
+        SuggestedPostParameters,
         Venue,
     )
     from telegram.ext import BaseRateLimiter, Defaults
@@ -574,7 +575,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
         if isinstance(obj, CallbackQuery):
             self.callback_data_cache.process_callback_query(obj)
-            return obj  # type: ignore[return-value]
+            return obj
 
         if isinstance(obj, Message):
             if obj.reply_to_message:
@@ -589,7 +590,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
             # Finally, handle the message itself
             self.callback_data_cache.process_message(message=obj)
-            return obj  # type: ignore[return-value]
+            return obj
 
         if isinstance(obj, ChatFullInfo) and obj.pinned_message:
             self.callback_data_cache.process_message(obj.pinned_message)
@@ -612,6 +613,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -645,6 +648,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
         if isinstance(result, Message):
             self._insert_callback_data(result)
@@ -824,6 +829,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         show_caption_above_media: bool | None = None,
         allow_paid_broadcast: bool | None = None,
         video_start_timestamp: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -857,6 +864,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             show_caption_above_media=show_caption_above_media,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def copy_messages(
@@ -868,6 +877,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         remove_caption: bool | None = None,
+        direct_messages_topic_id: int | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -890,6 +900,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def get_chat(
@@ -1763,6 +1774,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
         video_start_timestamp: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1779,11 +1792,13 @@ class ExtBot(Bot, Generic[RLARGS]):
             disable_notification=disable_notification,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            suggested_post_parameters=suggested_post_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def forward_messages(
@@ -1794,6 +1809,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1809,6 +1825,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             disable_notification=disable_notification,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2344,6 +2361,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         can_post_stories: bool | None = None,
         can_edit_stories: bool | None = None,
         can_delete_stories: bool | None = None,
+        can_manage_direct_messages: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2370,6 +2388,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             can_post_stories=can_post_stories,
             can_edit_stories=can_edit_stories,
             can_delete_stories=can_delete_stories,
+            can_manage_direct_messages=can_manage_direct_messages,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2470,6 +2489,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         show_caption_above_media: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2509,6 +2530,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_audio(
@@ -2530,6 +2553,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2567,6 +2592,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_chat_action(
@@ -2610,6 +2637,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2642,7 +2671,9 @@ class ExtBot(Bot, Generic[RLARGS]):
             business_connection_id=business_connection_id,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_checklist(
@@ -2723,6 +2754,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2751,6 +2784,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_document(
@@ -2770,6 +2805,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2805,6 +2842,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_game(
@@ -2880,6 +2919,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: "ReplyParameters | None" = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2927,6 +2968,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_location(
@@ -2946,6 +2989,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2981,6 +3026,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_media_group(
@@ -2996,6 +3043,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3029,6 +3077,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             caption_entities=caption_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
         )
 
     async def send_message(
@@ -3046,6 +3095,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         disable_web_page_preview: bool | None = None,
         reply_to_message_id: int | None = None,
@@ -3079,6 +3130,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             link_preview_options=link_preview_options,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_photo(
@@ -3098,6 +3151,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         show_caption_above_media: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3133,6 +3188,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_poll(
@@ -3216,6 +3273,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3245,6 +3304,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_venue(
@@ -3266,6 +3327,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3303,6 +3366,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_video(
@@ -3329,6 +3394,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         show_caption_above_media: bool | None = None,
         cover: "FileInput | None" = None,
         start_timestamp: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3371,6 +3438,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_video_note(
@@ -3388,6 +3457,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3421,6 +3492,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def send_voice(
@@ -3439,6 +3512,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3472,7 +3547,9 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             business_connection_id=business_connection_id,
             message_effect_id=message_effect_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            suggested_post_parameters=suggested_post_parameters,
         )
 
     async def set_chat_administrator_custom_title(
@@ -4911,6 +4988,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         payload: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_thread_id: int | None = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
@@ -4943,6 +5023,9 @@ class ExtBot(Bot, Generic[RLARGS]):
             business_connection_id=business_connection_id,
             payload=payload,
             allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
+            message_thread_id=message_thread_id,
         )
 
     async def create_chat_subscription_invite_link(
@@ -5147,6 +5230,54 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def decline_suggested_post(
+        self,
+        chat_id: int,
+        message_id: int,
+        comment: str | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().decline_suggested_post(
+            chat_id=chat_id,
+            message_id=message_id,
+            comment=comment,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def approve_suggested_post(
+        self,
+        chat_id: int,
+        message_id: int,
+        send_date: int | dtm.datetime | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().approve_suggested_post(
+            chat_id=chat_id,
+            message_id=message_id,
+            send_date=send_date,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -5303,3 +5434,5 @@ class ExtBot(Bot, Generic[RLARGS]):
     removeChatVerification = remove_chat_verification
     removeUserVerification = remove_user_verification
     getMyStarBalance = get_my_star_balance
+    approveSuggestedPost = approve_suggested_post
+    declineSuggestedPost = decline_suggested_post

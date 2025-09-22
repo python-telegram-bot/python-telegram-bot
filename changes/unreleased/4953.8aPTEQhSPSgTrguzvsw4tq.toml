@@ -1,0 +1,5 @@
+other = "Renovate: No README updates, label behaviour change, automerge lockfiles"
+[[pull_requests]]
+uid = "4953"
+author_uid = "harshil21"
+closes_threads = []

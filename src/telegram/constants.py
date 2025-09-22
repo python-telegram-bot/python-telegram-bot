@@ -117,6 +117,9 @@ __all__ = [
     "StoryAreaTypeLimit",
     "StoryAreaTypeType",
     "StoryLimit",
+    "SuggestedPost",
+    "SuggestedPostInfoState",
+    "SuggestedPostRefunded",
     "TransactionPartnerType",
     "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
@@ -173,7 +176,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=1)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=2)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -2220,6 +2223,36 @@ class MessageType(StringEnum):
 
     .. versionadded:: v22.2
     """
+    SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
+
+    .. versionadded:: 22.4
+    """
+    SUGGESTED_POST_APPROVED = "suggested_post_approved"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approved`.
+
+    .. versionadded:: 22.4
+    """
+    SUGGESTED_POST_DECLINED = "suggested_post_declined"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_declined`.
+
+    .. versionadded:: 22.4
+    """
+    SUGGESTED_POST_INFO = "suggested_post_info"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_info`.
+
+    .. versionadded:: 22.4
+    """
+    SUGGESTED_POST_PAID = "suggested_post_paid"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_paid`.
+
+    .. versionadded:: 22.4
+    """
+    SUGGESTED_POST_REFUNDED = "suggested_post_refunded"
+    """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_refunded`.
+
+    .. versionadded:: 22.4
+    """
     PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = "photo"
@@ -3054,6 +3087,66 @@ class StoryLimit(StringEnum):
     :meth:`telegram.Bot.post_story`."""
 
 
+class SuggestedPost(IntEnum):
+    """This enum contains limitations for :class:`telegram.SuggestedPostPrice`\
+/:class:`telegram.SuggestedPostParameters`/:meth:`telegram.Bot.decline_suggested_post`. The enum
+    members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 22.4
+    """
+
+    __slots__ = ()
+
+    MIN_PRICE_STARS = 5
+    """:obj:`int`: Minimum number of Telegram Stars in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MAX_PRICE_STARS = 100_000
+    """:obj:`int`: Maximum number of Telegram Stars in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MIN_PRICE_NANOTONCOINS = 10_000_000
+    """:obj:`int`: Minimum number of nanotoncoins in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MAX_PRICE_NANOTONCOINS = 10_000_000_000_000
+    """:obj:`int`: Maximum number of nanotoncoins in
+    :paramref:`~telegram.SuggestedPostPrice.amount`
+    parameter of :class:`telegram.SuggestedPostPrice`.
+    """
+    MIN_SEND_DATE = 300
+    """:obj:`int`: Minimum number of seconds in the future for
+    the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
+    :class:`telegram.SuggestedPostParameters`."""
+    MAX_SEND_DATE = 2_678_400
+    """:obj:`int`: Maximum number of seconds in the future for
+    the :paramref:`~telegram.SuggestedPostParameters.send_date` parameter of
+    :class:`telegram.SuggestedPostParameters`."""
+    MAX_COMMENT_LENGTH = 128
+    """:obj:`int`: Maximum number of characters in the
+    :paramref:`telegram.Bot.decline_suggested_post.comment` parameter.
+    """
+
+
+class SuggestedPostRefunded(StringEnum):
+    """This enum contains available refund reasons for :class:`telegram.SuggestedPostRefunded`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 22.4
+    """
+
+    __slots__ = ()
+
+    POST_DELETED = "post_deleted"
+    """:obj:`str`: The post was deleted within 24 hours of being posted or removed from
+    scheduled messages without being posted."""
+    PAYMENT_REFUNDED = "payment_refunded"
+    """:obj:`str`: The payer refunded their payment."""
+
+
 class TransactionPartnerType(StringEnum):
     """This enum contains the available types of :class:`telegram.TransactionPartner`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -3083,7 +3176,7 @@ class TransactionPartnerType(StringEnum):
     """:obj:`str`: Transaction with with payment for
     `paid broadcasting <https://core.telegram.org/bots/api#paid-broadcasts>`_.
 
-    ..versionadded:: 21.7
+    .. versionadded:: 21.7
     """
     USER = "user"
     """:obj:`str`: Transaction with a user."""
@@ -3525,6 +3618,25 @@ class ForumTopicLimit(IntEnum):
       :meth:`telegram.Bot.edit_forum_topic`
     * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
       :meth:`telegram.Bot.edit_general_forum_topic`
+    """
+
+
+class SuggestedPostInfoState(StringEnum):
+    """This enum contains the available states of :attr:`telegram.SuggestedPostInfo.state`.
+    The enum members of this enumeration are instances
+    of :class:`str` and can be treated as such.
+
+    .. versionadded:: 22.4
+    """
+
+    __slots__ = ()
+
+    PENDING = "pending"
+    """:obj:`str`: Suggested post is pending."""
+    APPROVED = "approved"
+    """:obj:`str`: Suggested post was approved."""
+    DECLINED = "declined"
+    """:obj:`str`: Suggested post was declined.
     """
 
 

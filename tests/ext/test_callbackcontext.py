@@ -200,12 +200,12 @@ class TestCallbackContext:
 
         callback_context = CallbackContext.from_update(update, app)
 
-        with pytest.raises(RuntimeError, match="This telegram.ext.ExtBot instance does not"):
+        with pytest.raises(RuntimeError, match="This telegram\\.ext\\.ExtBot instance does not"):
             callback_context.drop_callback_data(None)
 
         try:
             app.bot = raw_bot
-            with pytest.raises(RuntimeError, match="telegram.Bot does not allow for"):
+            with pytest.raises(RuntimeError, match="telegram\\.Bot does not allow for"):
                 callback_context.drop_callback_data(None)
         finally:
             app.bot = bot

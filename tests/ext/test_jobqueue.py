@@ -629,7 +629,7 @@ class TestJobQueue:
     async def test_attribute_error(self):
         job = Job(self.job_run_once)
         with pytest.raises(
-            AttributeError, match="nor 'apscheduler.job.Job' has attribute 'error'"
+            AttributeError, match="nor 'apscheduler\\.job\\.Job' has attribute 'error'"
         ):
             job.error
 

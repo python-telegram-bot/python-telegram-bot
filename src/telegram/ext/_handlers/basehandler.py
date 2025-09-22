@@ -33,7 +33,7 @@ RT = TypeVar("RT")
 UT = TypeVar("UT")
 
 
-class BaseHandler(Generic[UT, CCT, RT], ABC):
+class BaseHandler(ABC, Generic[UT, CCT, RT]):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Warning:

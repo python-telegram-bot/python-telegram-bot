@@ -1,0 +1,5 @@
+internal = "Align pre-commit hook APScheduler to with ``pyproject.toml``"
+[[pull_requests]]
+uid = "4950"
+author_uids = ["renovate[bot]", "Bibo-Joshi"]
+closes_threads = []
