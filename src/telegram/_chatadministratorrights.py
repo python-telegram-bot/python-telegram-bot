@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class which represents a Telegram ChatAdministratorRights."""
 
-from typing import Optional
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -193,13 +191,13 @@ class ChatAdministratorRights(TelegramObject):
         can_post_stories: bool,
         can_edit_stories: bool,
         can_delete_stories: bool,
-        can_post_messages: Optional[bool] = None,
-        can_edit_messages: Optional[bool] = None,
-        can_pin_messages: Optional[bool] = None,
-        can_manage_topics: Optional[bool] = None,
-        can_manage_direct_messages: Optional[bool] = None,
+        can_post_messages: bool | None = None,
+        can_edit_messages: bool | None = None,
+        can_pin_messages: bool | None = None,
+        can_manage_topics: bool | None = None,
+        can_manage_direct_messages: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -215,11 +213,11 @@ class ChatAdministratorRights(TelegramObject):
         self.can_edit_stories: bool = can_edit_stories
         self.can_delete_stories: bool = can_delete_stories
         # Optionals
-        self.can_post_messages: Optional[bool] = can_post_messages
-        self.can_edit_messages: Optional[bool] = can_edit_messages
-        self.can_pin_messages: Optional[bool] = can_pin_messages
-        self.can_manage_topics: Optional[bool] = can_manage_topics
-        self.can_manage_direct_messages: Optional[bool] = can_manage_direct_messages
+        self.can_post_messages: bool | None = can_post_messages
+        self.can_edit_messages: bool | None = can_edit_messages
+        self.can_pin_messages: bool | None = can_pin_messages
+        self.can_manage_topics: bool | None = can_manage_topics
+        self.can_manage_direct_messages: bool | None = can_manage_direct_messages
 
         self._id_attrs = (
             self.is_anonymous,

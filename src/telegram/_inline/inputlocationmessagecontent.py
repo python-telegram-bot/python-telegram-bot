@@ -19,7 +19,7 @@
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
 import datetime as dtm
-from typing import Final, Optional, Union
+from typing import Final
 
 from telegram import constants
 from telegram._inline.inputmessagecontent import InputMessageContent
@@ -100,12 +100,12 @@ class InputLocationMessageContent(InputMessageContent):
         self,
         latitude: float,
         longitude: float,
-        live_period: Optional[TimePeriod] = None,
-        horizontal_accuracy: Optional[float] = None,
-        heading: Optional[int] = None,
-        proximity_alert_radius: Optional[int] = None,
+        live_period: TimePeriod | None = None,
+        horizontal_accuracy: float | None = None,
+        heading: int | None = None,
+        proximity_alert_radius: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -114,17 +114,17 @@ class InputLocationMessageContent(InputMessageContent):
             self.longitude: float = longitude
 
             # Optionals
-            self._live_period: Optional[dtm.timedelta] = to_timedelta(live_period)
-            self.horizontal_accuracy: Optional[float] = horizontal_accuracy
-            self.heading: Optional[int] = heading
-            self.proximity_alert_radius: Optional[int] = (
+            self._live_period: dtm.timedelta | None = to_timedelta(live_period)
+            self.horizontal_accuracy: float | None = horizontal_accuracy
+            self.heading: int | None = heading
+            self.proximity_alert_radius: int | None = (
                 int(proximity_alert_radius) if proximity_alert_radius else None
             )
 
             self._id_attrs = (self.latitude, self.longitude)
 
     @property
-    def live_period(self) -> Optional[Union[int, dtm.timedelta]]:
+    def live_period(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._live_period, attribute="live_period")
 
     HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY

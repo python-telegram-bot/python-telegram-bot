@@ -25,7 +25,6 @@ Warning:
 """
 
 from collections.abc import Sequence
-from typing import Optional
 
 from telegram._messageentity import MessageEntity
 from telegram._utils.strings import TextEncoding
@@ -48,7 +47,7 @@ def parse_message_entity(text: str, entity: MessageEntity) -> str:
 
 
 def parse_message_entities(
-    text: str, entities: Sequence[MessageEntity], types: Optional[Sequence[str]] = None
+    text: str, entities: Sequence[MessageEntity], types: Sequence[str] | None = None
 ) -> dict[MessageEntity, str]:
     """
     Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.

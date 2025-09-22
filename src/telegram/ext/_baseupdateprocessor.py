@@ -21,7 +21,7 @@
 from abc import ABC, abstractmethod
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, final
+from typing import TYPE_CHECKING, Any, TypeVar, final
 
 from telegram.ext._utils.asyncio import TrackedBoundedSemaphore
 
@@ -94,9 +94,9 @@ class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], AB
 
     async def __aexit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """|async_context_manager| :meth:`shuts down <shutdown>` the Processor."""
         await self.shutdown()

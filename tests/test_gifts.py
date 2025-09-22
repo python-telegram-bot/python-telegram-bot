@@ -268,7 +268,7 @@ class TestGiftsWithoutRequest(GiftsTestBase):
         assert gifts.api_kwargs == {}
 
         assert gifts.gifts == tuple(self.gifts)
-        for de_json_gift, original_gift in zip(gifts.gifts, self.gifts):
+        for de_json_gift, original_gift in zip(gifts.gifts, self.gifts, strict=False):
             assert de_json_gift.id == original_gift.id
             assert de_json_gift.sticker == original_gift.sticker
             assert de_json_gift.star_count == original_gift.star_count

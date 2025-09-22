@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
 from collections.abc import Sequence
-from typing import Final, Optional, Union
+from typing import Final
 
 from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
@@ -132,14 +132,14 @@ class ReplyKeyboardMarkup(TelegramObject):
 
     def __init__(
         self,
-        keyboard: Sequence[Sequence[Union[str, KeyboardButton]]],
-        resize_keyboard: Optional[bool] = None,
-        one_time_keyboard: Optional[bool] = None,
-        selective: Optional[bool] = None,
-        input_field_placeholder: Optional[str] = None,
-        is_persistent: Optional[bool] = None,
+        keyboard: Sequence[Sequence[str | KeyboardButton]],
+        resize_keyboard: bool | None = None,
+        one_time_keyboard: bool | None = None,
+        selective: bool | None = None,
+        input_field_placeholder: str | None = None,
+        is_persistent: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(keyboard):
@@ -155,11 +155,11 @@ class ReplyKeyboardMarkup(TelegramObject):
         )
 
         # Optionals
-        self.resize_keyboard: Optional[bool] = resize_keyboard
-        self.one_time_keyboard: Optional[bool] = one_time_keyboard
-        self.selective: Optional[bool] = selective
-        self.input_field_placeholder: Optional[str] = input_field_placeholder
-        self.is_persistent: Optional[bool] = is_persistent
+        self.resize_keyboard: bool | None = resize_keyboard
+        self.one_time_keyboard: bool | None = one_time_keyboard
+        self.selective: bool | None = selective
+        self.input_field_placeholder: str | None = input_field_placeholder
+        self.is_persistent: bool | None = is_persistent
 
         self._id_attrs = (self.keyboard,)
 
@@ -168,12 +168,12 @@ class ReplyKeyboardMarkup(TelegramObject):
     @classmethod
     def from_button(
         cls,
-        button: Union[KeyboardButton, str],
+        button: KeyboardButton | str,
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        input_field_placeholder: Optional[str] = None,
-        is_persistent: Optional[bool] = None,
+        input_field_placeholder: str | None = None,
+        is_persistent: bool | None = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -226,12 +226,12 @@ class ReplyKeyboardMarkup(TelegramObject):
     @classmethod
     def from_row(
         cls,
-        button_row: Sequence[Union[str, KeyboardButton]],
+        button_row: Sequence[str | KeyboardButton],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        input_field_placeholder: Optional[str] = None,
-        is_persistent: Optional[bool] = None,
+        input_field_placeholder: str | None = None,
+        is_persistent: bool | None = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -288,12 +288,12 @@ class ReplyKeyboardMarkup(TelegramObject):
     @classmethod
     def from_column(
         cls,
-        button_column: Sequence[Union[str, KeyboardButton]],
+        button_column: Sequence[str | KeyboardButton],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        input_field_placeholder: Optional[str] = None,
-        is_persistent: Optional[bool] = None,
+        input_field_placeholder: str | None = None,
+        is_persistent: bool | None = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::

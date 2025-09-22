@@ -77,7 +77,7 @@ class SuggestedPostPrice(TelegramObject):
         currency: str,
         amount: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.currency: str = currency
@@ -128,14 +128,14 @@ class SuggestedPostParameters(TelegramObject):
 
     def __init__(
         self,
-        price: Optional[SuggestedPostPrice] = None,
-        send_date: Optional[dtm.datetime] = None,
+        price: SuggestedPostPrice | None = None,
+        send_date: dtm.datetime | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.price: Optional[SuggestedPostPrice] = price
-        self.send_date: Optional[dtm.datetime] = send_date
+        self.price: SuggestedPostPrice | None = price
+        self.send_date: dtm.datetime | None = send_date
 
         self._id_attrs = (self.price, self.send_date)
 
@@ -207,17 +207,17 @@ class SuggestedPostInfo(TelegramObject):
     def __init__(
         self,
         state: str,
-        price: Optional[SuggestedPostPrice] = None,
-        send_date: Optional[dtm.datetime] = None,
+        price: SuggestedPostPrice | None = None,
+        send_date: dtm.datetime | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.state: str = enum.get_member(constants.SuggestedPostInfoState, state, state)
         # Optionals
-        self.price: Optional[SuggestedPostPrice] = price
-        self.send_date: Optional[dtm.datetime] = send_date
+        self.price: SuggestedPostPrice | None = price
+        self.send_date: dtm.datetime | None = send_date
 
         self._id_attrs = (self.state, self.price)
 
@@ -268,14 +268,14 @@ class SuggestedPostDeclined(TelegramObject):
 
     def __init__(
         self,
-        suggested_post_message: Optional[Message] = None,
-        comment: Optional[str] = None,
+        suggested_post_message: Message | None = None,
+        comment: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.suggested_post_message: Optional[Message] = suggested_post_message
-        self.comment: Optional[str] = comment
+        self.suggested_post_message: Message | None = suggested_post_message
+        self.comment: str | None = comment
 
         self._id_attrs = (self.suggested_post_message, self.comment)
 
@@ -340,19 +340,19 @@ class SuggestedPostPaid(TelegramObject):
     def __init__(
         self,
         currency: str,
-        suggested_post_message: Optional[Message] = None,
-        amount: Optional[int] = None,
-        star_amount: Optional[StarAmount] = None,
+        suggested_post_message: Message | None = None,
+        amount: int | None = None,
+        star_amount: StarAmount | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.currency: str = currency
         # Optionals
-        self.suggested_post_message: Optional[Message] = suggested_post_message
-        self.amount: Optional[int] = amount
-        self.star_amount: Optional[StarAmount] = star_amount
+        self.suggested_post_message: Message | None = suggested_post_message
+        self.amount: int | None = amount
+        self.star_amount: StarAmount | None = star_amount
 
         self._id_attrs = (
             self.currency,
@@ -416,15 +416,15 @@ class SuggestedPostRefunded(TelegramObject):
     def __init__(
         self,
         reason: str,
-        suggested_post_message: Optional[Message] = None,
+        suggested_post_message: Message | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.reason: str = reason
         # Optionals
-        self.suggested_post_message: Optional[Message] = suggested_post_message
+        self.suggested_post_message: Message | None = suggested_post_message
 
         self._id_attrs = (self.reason, self.suggested_post_message)
 
@@ -480,17 +480,17 @@ class SuggestedPostApproved(TelegramObject):
     def __init__(
         self,
         send_date: dtm.datetime,
-        suggested_post_message: Optional[Message] = None,
-        price: Optional[SuggestedPostPrice] = None,
+        suggested_post_message: Message | None = None,
+        price: SuggestedPostPrice | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.send_date: dtm.datetime = send_date
         # Optionals
-        self.suggested_post_message: Optional[Message] = suggested_post_message
-        self.price: Optional[SuggestedPostPrice] = price
+        self.suggested_post_message: Message | None = suggested_post_message
+        self.price: SuggestedPostPrice | None = price
 
         self._id_attrs = (self.send_date, self.suggested_post_message, self.price)
 
@@ -546,15 +546,15 @@ class SuggestedPostApprovalFailed(TelegramObject):
     def __init__(
         self,
         price: SuggestedPostPrice,
-        suggested_post_message: Optional[Message] = None,
+        suggested_post_message: Message | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.price: SuggestedPostPrice = price
         # Optionals
-        self.suggested_post_message: Optional[Message] = suggested_post_message
+        self.suggested_post_message: Message | None = suggested_post_message
 
         self._id_attrs = (self.price, self.suggested_post_message)
 

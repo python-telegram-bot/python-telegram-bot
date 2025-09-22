@@ -28,7 +28,7 @@ Warning:
 
 from collections import UserDict
 from collections.abc import Mapping
-from typing import Final, Generic, Optional, TypeVar, Union
+from typing import Final, Generic, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 
@@ -64,7 +64,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
         self.__track_write(key)
         super().__delitem__(key)
 
-    def __track_write(self, key: Union[_KT, set[_KT]]) -> None:
+    def __track_write(self, key: _KT | set[_KT]) -> None:
         if isinstance(key, set):
             self._write_access_keys |= key
         else:
@@ -117,7 +117,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
 
     # Mypy seems a bit inconsistent about what it wants as types for `default` and return value
     # so we just ignore a bit
-    def setdefault(self: "TrackingDict[_KT, _T]", key: _KT, default: Optional[_T] = None) -> _T:
+    def setdefault(self: "TrackingDict[_KT, _T]", key: _KT, default: _T | None = None) -> _T:
         if key in self:
             return self[key]
 
