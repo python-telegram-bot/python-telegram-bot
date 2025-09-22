@@ -603,13 +603,13 @@ class TestMessageWithoutRequest(MessageTestBase):
         """Used in testing reply_* below. Makes sure that do_quote is handled correctly"""
         with pytest.raises(
             ValueError,
-            match="`reply_to_message_id` and `reply_parameters` are mutually exclusive.",
+            match="`reply_to_message_id` and `reply_parameters` are mutually exclusive\\.",
         ):
             await method(*args, reply_to_message_id=42, reply_parameters=42)
 
         with pytest.raises(
             ValueError,
-            match="`allow_sending_without_reply` and `reply_parameters` are mutually exclusive.",
+            match="`allow_sending_without_reply` and `reply_parameters` are mutually exclusive\\.",
         ):
             await method(*args, allow_sending_without_reply=True, reply_parameters=42)
 
@@ -1463,7 +1463,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         message.text = "AA"
         with pytest.raises(
             ValueError,
-            match="You requested the 5-th occurrence of 'A', but this text appears only 2 times.",
+            match="You requested the 5-th occurrence of 'A', but this text appears only 2 times",
         ):
             message.compute_quote_position_and_entities("A", 5)
 
@@ -1472,7 +1472,7 @@ class TestMessageWithoutRequest(MessageTestBase):
         message.caption = None
         with pytest.raises(
             RuntimeError,
-            match="This message has neither text nor caption.",
+            match="This message has neither text nor caption\\.",
         ):
             message.compute_quote_position_and_entities("A", 5)
 

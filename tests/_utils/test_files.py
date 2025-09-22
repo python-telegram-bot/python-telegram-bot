@@ -75,7 +75,7 @@ class TestFiles:
                 telegram._utils.files.parse_file_input(string, local_mode=False), InputFile
             )
         elif expected_non_local is ValueError:
-            with pytest.raises(ValueError, match="but local mode is not enabled."):
+            with pytest.raises(ValueError, match="but local mode is not enabled\\."):
                 telegram._utils.files.parse_file_input(string, local_mode=False)
         else:
             assert (

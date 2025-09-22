@@ -320,7 +320,7 @@ class TestCallbackDataCache:
             data=out.inline_keyboard[0][1].callback_data,
         )
 
-        with pytest.raises(KeyError, match="CallbackQuery was not found in cache."):
+        with pytest.raises(KeyError, match="CallbackQuery was not found in cache\\."):
             callback_data_cache.drop_data(callback_query)
 
         callback_data_cache.process_callback_query(callback_query)

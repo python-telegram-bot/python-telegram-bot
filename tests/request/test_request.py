@@ -273,7 +273,7 @@ class TestRequestWithoutRequest:
 
         with pytest.raises(
             BadRequest,
-            match="{'unknown': '42'}",
+            match="\\{'unknown': '42'\\}",
         ):
             await httpx_request.post(None, None, None)
 

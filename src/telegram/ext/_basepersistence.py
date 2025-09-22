@@ -54,7 +54,7 @@ class PersistenceInput(NamedTuple):
     callback_data: bool = True
 
 
-class BasePersistence(Generic[UD, CD, BD], ABC):
+class BasePersistence(ABC, Generic[UD, CD, BD]):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 

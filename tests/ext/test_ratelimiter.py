@@ -54,7 +54,7 @@ class TestBaseRateLimiter:
     request_received = None
 
     async def test_no_rate_limiter(self, bot):
-        with pytest.raises(ValueError, match="if a `ExtBot.rate_limiter` is set"):
+        with pytest.raises(ValueError, match="if a `ExtBot\\.rate_limiter` is set"):
             await bot.send_message(chat_id=42, text="test", rate_limit_args="something")
 
     async def test_argument_passing(self, bot_info, monkeypatch, bot):

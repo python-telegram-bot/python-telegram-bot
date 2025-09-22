@@ -42,23 +42,23 @@ from tests.auxil.slots import mro_slots
 
 class TestErrors:
     def test_telegram_error(self):
-        with pytest.raises(TelegramError, match="^test message$"):
+        with pytest.raises(TelegramError, match=r"^test message$"):
             raise TelegramError("test message")
-        with pytest.raises(TelegramError, match="^Test message$"):
+        with pytest.raises(TelegramError, match=r"^Test message$"):
             raise TelegramError("Error: test message")
-        with pytest.raises(TelegramError, match="^Test message$"):
+        with pytest.raises(TelegramError, match=r"^Test message$"):
             raise TelegramError("[Error]: test message")
-        with pytest.raises(TelegramError, match="^Test message$"):
+        with pytest.raises(TelegramError, match=r"^Test message$"):
             raise TelegramError("Bad Request: test message")
 
     def test_unauthorized(self):
         with pytest.raises(Forbidden, match="test message"):
             raise Forbidden("test message")
-        with pytest.raises(Forbidden, match="^Test message$"):
+        with pytest.raises(Forbidden, match=r"^Test message$"):
             raise Forbidden("Error: test message")
-        with pytest.raises(Forbidden, match="^Test message$"):
+        with pytest.raises(Forbidden, match=r"^Test message$"):
             raise Forbidden("[Error]: test message")
-        with pytest.raises(Forbidden, match="^Test message$"):
+        with pytest.raises(Forbidden, match=r"^Test message$"):
             raise Forbidden("Bad Request: test message")
 
     def test_invalid_token(self):
@@ -68,25 +68,25 @@ class TestErrors:
     def test_network_error(self):
         with pytest.raises(NetworkError, match="test message"):
             raise NetworkError("test message")
-        with pytest.raises(NetworkError, match="^Test message$"):
+        with pytest.raises(NetworkError, match=r"^Test message$"):
             raise NetworkError("Error: test message")
-        with pytest.raises(NetworkError, match="^Test message$"):
+        with pytest.raises(NetworkError, match=r"^Test message$"):
             raise NetworkError("[Error]: test message")
-        with pytest.raises(NetworkError, match="^Test message$"):
+        with pytest.raises(NetworkError, match=r"^Test message$"):
             raise NetworkError("Bad Request: test message")
 
     def test_bad_request(self):
         with pytest.raises(BadRequest, match="test message"):
             raise BadRequest("test message")
-        with pytest.raises(BadRequest, match="^Test message$"):
+        with pytest.raises(BadRequest, match=r"^Test message$"):
             raise BadRequest("Error: test message")
-        with pytest.raises(BadRequest, match="^Test message$"):
+        with pytest.raises(BadRequest, match=r"^Test message$"):
             raise BadRequest("[Error]: test message")
-        with pytest.raises(BadRequest, match="^Test message$"):
+        with pytest.raises(BadRequest, match=r"^Test message$"):
             raise BadRequest("Bad Request: test message")
 
     def test_timed_out(self):
-        with pytest.raises(TimedOut, match="^Timed out$"):
+        with pytest.raises(TimedOut, match=r"^Timed out$"):
             raise TimedOut
 
     def test_chat_migrated(self):
@@ -97,11 +97,11 @@ class TestErrors:
     @pytest.mark.parametrize("retry_after", [12, dtm.timedelta(seconds=12)])
     def test_retry_after(self, PTB_TIMEDELTA, retry_after):
         if PTB_TIMEDELTA:
-            with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 0:00:12"):
+            with pytest.raises(RetryAfter, match="Flood control exceeded\\. Retry in 0:00:12"):
                 raise (exception := RetryAfter(retry_after))
             assert type(exception.retry_after) is dtm.timedelta
         else:
-            with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12 seconds"):
+            with pytest.raises(RetryAfter, match="Flood control exceeded\\. Retry in 12 seconds"):
                 raise (exception := RetryAfter(retry_after))
             assert type(exception.retry_after) is int
 
@@ -118,7 +118,7 @@ class TestErrors:
             assert type(retry_after) is int
 
     def test_conflict(self):
-        with pytest.raises(Conflict, match="Something something."):
+        with pytest.raises(Conflict, match="Something something\\."):
             raise Conflict("Something something.")
 
     @pytest.mark.parametrize(

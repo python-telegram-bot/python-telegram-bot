@@ -404,7 +404,7 @@ class TestBasePersistence:
 
     @default_papp
     def test_set_bot_error(self, papp):
-        with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
+        with pytest.raises(TypeError, match="when using telegram\\.ext\\.ExtBot"):
             papp.persistence.set_bot(Bot(papp.bot.token))
 
         # just making sure that setting an ExtBoxt without callback_data_cache doesn't raise an
@@ -419,7 +419,7 @@ class TestBasePersistence:
                 self.store_data = PersistenceInput(False, False, False, False)
 
         with pytest.raises(
-            TypeError, match="persistence must be based on telegram.ext.BasePersistence"
+            TypeError, match="persistence must be based on telegram\\.ext\\.BasePersistence"
         ):
             ApplicationBuilder().bot(bot).persistence(MyPersistence()).build()
 

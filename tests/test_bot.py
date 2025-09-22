@@ -2672,7 +2672,7 @@ class TestBotWithRequest:
     # No need to duplicate here.
 
     async def test_invalid_token_server_response(self):
-        with pytest.raises(InvalidToken, match="The token `12` was rejected by the server."):
+        with pytest.raises(InvalidToken, match="The token `12` was rejected by the server\\."):
             async with ExtBot(token="12"):
                 pass
 
@@ -3835,7 +3835,7 @@ class TestBotWithRequest:
         #
         # The error message Hide_requester_missing started showing up instead of
         # User_already_participant. Don't know why …
-        with pytest.raises(BadRequest, match="User_already_participant|Hide_requester_missing"):
+        with pytest.raises(BadRequest, match=r"User_already_participant|Hide_requester_missing"):
             await bot.decline_chat_join_request(chat_id=channel_id, user_id=chat_id)
 
     async def test_set_chat_photo(self, bot, channel_id):

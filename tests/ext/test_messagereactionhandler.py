@@ -210,7 +210,7 @@ class TestMessageReactionHandler:
     )
     async def test_username_with_anonymous_reaction(self, app, allowed_types, kwargs):
         with pytest.raises(
-            ValueError, match="You can not filter for users and include anonymous reactions."
+            ValueError, match="You can not filter for users and include anonymous reactions\\."
         ):
             MessageReactionHandler(self.callback, message_reaction_types=allowed_types, **kwargs)
 
