@@ -110,7 +110,7 @@ class TestApplicationBuilder:
             ApplicationBuilder()
 
     def test_build_without_token(self, builder):
-        with pytest.raises(RuntimeError, match="No bot token was set."):
+        with pytest.raises(RuntimeError, match="No bot token was set\\."):
             builder.build()
 
     def test_build_custom_bot(self, builder, bot):

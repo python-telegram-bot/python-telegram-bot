@@ -116,8 +116,8 @@ class ApplicationHandlerStop(Exception):
 
 
 class Application(
-    Generic[BT, CCT, UD, CD, BD, JQ],
     contextlib.AbstractAsyncContextManager["Application"],
+    Generic[BT, CCT, UD, CD, BD, JQ],
 ):
     """This class dispatches all kinds of updates to its registered handlers, and is the entry
     point to a PTB application.

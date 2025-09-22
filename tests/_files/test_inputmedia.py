@@ -760,7 +760,7 @@ class TestSendMediaGroupWithoutRequest:
         ):
             with pytest.raises(
                 ValueError,
-                match="You can only supply either group caption or media with captions.",
+                match="You can only supply either group caption or media with captions\\.",
             ):
                 await offline_bot.send_media_group(chat_id, group, caption="foo")
 

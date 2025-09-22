@@ -420,7 +420,7 @@ class TestPassportWithoutRequest(PassportTestBase):
 
         # Different error messages for different cryptography versions
         with pytest.raises(
-            ValueError, match="(Could not deserialize key data)|(Unable to load PEM file)"
+            ValueError, match=r"(Could not deserialize key data)|(Unable to load PEM file)"
         ):
             Bot(offline_bot.token, private_key=b"Invalid key!")
 
