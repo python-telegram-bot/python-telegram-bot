@@ -625,7 +625,7 @@ class TestBusinessOpeningHoursWithoutRequest(BusinessTestBase):
         def test_multiple_intervals_same_day(self):
             # Test with multiple intervals on the same day
             intervals = [
-                # unsorted on purpose to check that the sorting works (event though this is
+                # unsorted on purpose to check that the sorting works (even though this is
                 # currently undocumented behaviour)
                 BusinessOpeningHoursInterval(900, 1230),  # Monday 3pm-8:30pm
                 BusinessOpeningHoursInterval(480, 720),  # Monday 8am-12pm
