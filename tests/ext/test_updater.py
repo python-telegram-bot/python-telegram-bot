@@ -1141,3 +1141,52 @@ class TestUpdater:
 
             await updater.stop()
             assert not updater.running
+
+    @pytest.mark.parametrize("method_name", ["start_polling", "start_webhook"])
+    async def test_infinite_bootstrap_retries(self, updater, monkeypatch, method_name):
+        """Here we simply test that setting `bootstrap_retries=-1` does not lead to the wrong
+        infinite-loop behavior reported in #4966. Raising an exception on the first call to
+        `set/delete_webhook` ensures that a retry actually happens.
+        """
+
+        original_delete_webhook = updater.bot.delete_webhook
+        original_set_webhook = updater.bot.set_webhook
+        counts = {"delete": 0, "set": 0}
+
+        def patch_builder(func, name):
+            async def wrapped(*args, **kwargs):
+                if counts[name] >= 3:
+                    pytest.fail("Should be called only once. Test failed.")
+                counts[name] += 1
+                if counts[name] == 1:
+                    raise TelegramError("1")
+                return await func(*args, **kwargs)
+
+            return wrapped
+
+        async def get_updates(*args, **kwargs):
+            return []
+
+        monkeypatch.setattr(
+            updater.bot, "delete_webhook", patch_builder(original_delete_webhook, "delete")
+        )
+        monkeypatch.setattr(updater.bot, "set_webhook", patch_builder(original_set_webhook, "set"))
+        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+
+        kwargs = {"bootstrap_retries": -1}
+        if method_name == "start_webhook":
+            kwargs.update(
+                {
+                    "listen": "127.0.0.1",
+                    "port": randrange(1024, 49152),
+                }
+            )
+
+        async with updater:
+            task = asyncio.create_task(getattr(updater, method_name)(**kwargs))
+            try:
+                await asyncio.wait_for(task, timeout=10)
+            except TimeoutError:
+                pytest.fail(f"{method_name} did not succeed within the timeout. Aborting.")
+            finally:
+                await updater.stop()

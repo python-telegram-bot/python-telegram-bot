@@ -704,7 +704,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         # delete_webhook for polling
         if drop_pending_updates or not webhook_url:
             await network_retry_loop(
-                is_running=lambda: self._initialized,
+                is_running=lambda: not self._initialized,
                 action_cb=bootstrap_del_webhook,
                 description="Bootstrap delete Webhook",
                 interval=bootstrap_interval,
