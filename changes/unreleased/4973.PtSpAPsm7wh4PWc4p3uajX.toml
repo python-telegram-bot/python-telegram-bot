@@ -1,4 +1,4 @@
-bugfixes = "Fix Handling of Infinite Bootstrap Retries in ``Application.run_*`` and ``UPdater.start_*``"
+bugfixes = "Fix Handling of Infinite Bootstrap Retries in ``Application.run_*`` and ``Updater.start_*``"
 [[pull_requests]]
 uid = "4973"
 author_uids = ["Bibo-Joshi"]
