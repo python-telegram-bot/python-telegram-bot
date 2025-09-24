@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -554,3 +555,227 @@ class TestBusinessOpeningHoursWithoutRequest(BusinessTestBase):
 
         assert boh1 != boh3
         assert hash(boh1) != hash(boh3)
+
+    class TestBusinessOpeningHoursGetOpeningHoursForDayWithoutRequest:
+        @pytest.fixture
+        def sample_opening_hours(self):
+            # Monday 8am-8:30pm (480-1230)
+            # Tuesday 24 hours (1440-2879)
+            # Sunday 12am-11:58pm (8640-10078)
+            intervals = [
+                BusinessOpeningHoursInterval(480, 1230),  # Monday 8am-8:30pm
+                BusinessOpeningHoursInterval(1440, 2879),  # Tuesday 24 hours
+                BusinessOpeningHoursInterval(8640, 10078),  # Sunday 12am-11:58pm
+            ]
+            return BusinessOpeningHours(time_zone_name="UTC", opening_hours=intervals)
+
+        def test_monday_opening_hours(self, sample_opening_hours):
+            # Test for Monday
+            test_date = dtm.date(2023, 11, 6)  # Monday
+            time_zone = ZoneInfo("UTC")
+            result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
+
+            expected = (
+                (
+                    dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
+                    dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+                ),
+            )
+
+            assert result == expected
+
+        def test_tuesday_24_hours(self, sample_opening_hours):
+            # Test for Tuesday (24 hours)
+            test_date = dtm.date(2023, 11, 7)  # Tuesday
+            time_zone = ZoneInfo("UTC")
+            result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
+
+            expected = (
+                (
+                    dtm.datetime(2023, 11, 7, 0, 0, tzinfo=time_zone),
+                    dtm.datetime(2023, 11, 7, 23, 59, tzinfo=time_zone),
+                ),
+            )
+
+            assert result == expected
+
+        def test_sunday_opening_hours(self, sample_opening_hours):
+            # Test for Sunday
+            test_date = dtm.date(2023, 11, 12)  # Sunday
+            time_zone = ZoneInfo("UTC")
+            result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
+
+            expected = (
+                (
+                    dtm.datetime(2023, 11, 12, 0, 0, tzinfo=time_zone),
+                    dtm.datetime(2023, 11, 12, 23, 58, tzinfo=time_zone),
+                ),
+            )
+
+            assert result == expected
+
+        def test_day_with_no_opening_hours(self, sample_opening_hours):
+            # Test for Wednesday (no opening hours defined)
+            test_date = dtm.date(2023, 11, 8)  # Wednesday
+            time_zone = ZoneInfo("UTC")
+            result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
+
+            assert result == ()
+
+        def test_multiple_intervals_same_day(self):
+            # Test with multiple intervals on the same day
+            intervals = [
+                # unsorted on purpose to check that the sorting works (even though this is
+                # currently undocumented behaviour)
+                BusinessOpeningHoursInterval(900, 1230),  # Monday 3pm-8:30pm
+                BusinessOpeningHoursInterval(480, 720),  # Monday 8am-12pm
+            ]
+            opening_hours = BusinessOpeningHours(time_zone_name="UTC", opening_hours=intervals)
+
+            test_date = dtm.date(2023, 11, 6)  # Monday
+            time_zone = ZoneInfo("UTC")
+            result = opening_hours.get_opening_hours_for_day(test_date, time_zone)
+
+            expected = (
+                (
+                    dtm.datetime(2023, 11, 6, 8, 0, tzinfo=time_zone),
+                    dtm.datetime(2023, 11, 6, 12, 0, tzinfo=time_zone),
+                ),
+                (
+                    dtm.datetime(2023, 11, 6, 15, 0, tzinfo=time_zone),
+                    dtm.datetime(2023, 11, 6, 20, 30, tzinfo=time_zone),
+                ),
+            )
+
+            assert result == expected
+
+        @pytest.mark.parametrize("input_type", [str, ZoneInfo])
+        def test_timezone_conversion(self, sample_opening_hours, input_type):
+            # Test that timezone is properly applied
+            test_date = dtm.date(2023, 11, 6)  # Monday
+            time_zone = input_type("America/New_York")
+            zone_info = ZoneInfo("America/New_York")
+            result = sample_opening_hours.get_opening_hours_for_day(test_date, time_zone)
+
+            expected = (
+                (
+                    dtm.datetime(2023, 11, 6, 3, 0, tzinfo=zone_info),
+                    dtm.datetime(2023, 11, 6, 15, 30, tzinfo=zone_info),
+                ),
+            )
+
+            assert result == expected
+            assert result[0][0].tzinfo == zone_info
+            assert result[0][1].tzinfo == zone_info
+
+        def test_timezone_conversation_changing_date(self):
+            # test for the edge case where the returned time is on a different date in the target
+            # timezone than in the business timezone
+            intervals = [
+                BusinessOpeningHoursInterval(60, 120),  # Monday 1am-2am UTC
+            ]
+            opening_hours = BusinessOpeningHours(time_zone_name="UTC", opening_hours=intervals)
+            test_date = dtm.date(2023, 11, 6)  # Monday
+            time_zone = ZoneInfo("America/New_York")  # UTC-5, so 1am UTC is 8pm previous day
+            result = opening_hours.get_opening_hours_for_day(test_date, time_zone)
+            expected = (
+                (
+                    dtm.datetime(2023, 11, 5, 20, 0, tzinfo=time_zone),
+                    dtm.datetime(2023, 11, 5, 21, 0, tzinfo=time_zone),
+                ),
+            )
+            assert result == expected
+
+        def test_no_timezone_provided(self, sample_opening_hours):
+            # Test when no timezone is provided
+            test_date = dtm.date(2023, 11, 6)  # Monday
+            result = sample_opening_hours.get_opening_hours_for_day(test_date)
+
+            expected = (
+                (
+                    dtm.datetime(
+                        2023,
+                        11,
+                        6,
+                        8,
+                        0,
+                        tzinfo=ZoneInfo(sample_opening_hours.time_zone_name),
+                    ),
+                    dtm.datetime(
+                        2023,
+                        11,
+                        6,
+                        20,
+                        30,
+                        tzinfo=ZoneInfo(sample_opening_hours.time_zone_name),
+                    ),
+                ),
+            )
+
+            assert result == expected
+
+    class TestBusinessOpeningHoursIsOpenWithoutRequest:
+        @pytest.fixture
+        def sample_opening_hours(self):
+            # Monday 8am-8:30pm (480-1230)
+            # Tuesday 24 hours (1440-2879)
+            # Sunday 12am-11:59pm (8640-10079)
+            intervals = [
+                BusinessOpeningHoursInterval(480, 1230),  # Monday 8am-8:30pm UTC
+                BusinessOpeningHoursInterval(1440, 2879),  # Tuesday 24 hours UTC
+                BusinessOpeningHoursInterval(8640, 10079),  # Sunday 12am-11:59pm UTC
+            ]
+            return BusinessOpeningHours(time_zone_name="UTC", opening_hours=intervals)
+
+        def test_is_open_during_business_hours(self, sample_opening_hours):
+            # Monday 10am UTC (within 8am-8:30pm)
+            dt = dtm.datetime(2023, 11, 6, 10, 0, tzinfo=ZoneInfo("UTC"))
+            assert sample_opening_hours.is_open(dt) is True
+
+        def test_is_open_at_opening_time(self, sample_opening_hours):
+            # Monday exactly 8am UTC
+            dt = dtm.datetime(2023, 11, 6, 8, 0, tzinfo=ZoneInfo("UTC"))
+            assert sample_opening_hours.is_open(dt) is True
+
+        def test_is_closed_at_closing_time(self, sample_opening_hours):
+            # Monday exactly 8:30pm UTC (closing time is exclusive)
+            dt = dtm.datetime(2023, 11, 6, 20, 30, tzinfo=ZoneInfo("UTC"))
+            assert sample_opening_hours.is_open(dt) is False
+
+        def test_is_closed_outside_business_hours(self, sample_opening_hours):
+            # Monday 7am UTC (before opening)
+            dt = dtm.datetime(2023, 11, 6, 7, 0, tzinfo=ZoneInfo("UTC"))
+            assert sample_opening_hours.is_open(dt) is False
+
+        def test_is_open_24h_day(self, sample_opening_hours):
+            # Tuesday 3am UTC (24h opening)
+            dt = dtm.datetime(2023, 11, 7, 3, 0, tzinfo=ZoneInfo("UTC"))
+            assert sample_opening_hours.is_open(dt) is True
+
+        def test_is_closed_on_day_with_no_hours(self, sample_opening_hours):
+            # Wednesday (no opening hours)
+            dt = dtm.datetime(2023, 11, 8, 12, 0, tzinfo=ZoneInfo("UTC"))
+            assert sample_opening_hours.is_open(dt) is False
+
+        def test_timezone_conversion(self, sample_opening_hours):
+            # Monday 5am EDT is 10am UTC (should be open)
+            dt = dtm.datetime(2023, 11, 6, 5, 0, tzinfo=ZoneInfo("America/New_York"))
+            assert sample_opening_hours.is_open(dt) is True
+
+            # Monday 2am EDT is 7am UTC (should be closed)
+            dt = dtm.datetime(2023, 11, 6, 2, 0, tzinfo=ZoneInfo("America/New_York"))
+            assert sample_opening_hours.is_open(dt) is False
+
+        def test_naive_datetime_uses_business_timezone(self, sample_opening_hours):
+            # Naive datetime - should be interpreted as UTC (business timezone)
+            dt = dtm.datetime(2023, 11, 6, 10, 0)  # 10am naive
+            assert sample_opening_hours.is_open(dt) is True
+
+        def test_boundary_conditions(self, sample_opening_hours):
+            # Sunday 11:58pm UTC (should be open)
+            dt = dtm.datetime(2023, 11, 12, 23, 58, tzinfo=ZoneInfo("UTC"))
+            assert sample_opening_hours.is_open(dt) is True
+
+            # Sunday 11:59pm UTC (should be closed)
+            dt = dtm.datetime(2023, 11, 12, 23, 59, tzinfo=ZoneInfo("UTC"))
+            assert sample_opening_hours.is_open(dt) is False

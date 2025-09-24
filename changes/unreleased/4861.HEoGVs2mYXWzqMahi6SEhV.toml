@@ -1,0 +1,10 @@
+features = """
+Add convenience methods for ``BusinessOpeningHours``:
+
+* ``get_opening_hours_for_day``: returns the opening hours applicable for a specific date
+* ``is_open``: indicates whether the business is open at the specified date and time.
+"""
+[[pull_requests]]
+uid = "4861"
+author_uid = "Aweryc"
+closes_threads = ["4194"]
