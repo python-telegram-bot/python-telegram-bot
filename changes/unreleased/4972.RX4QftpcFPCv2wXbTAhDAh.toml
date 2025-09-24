@@ -1,9 +1,8 @@
-breaking = """Move param `ReplyParameters.checklist_task_id` to last position.
+breaking = """Move param ``ReplyParameters.checklist_task_id`` to last position.
 
-This change reduces the impact of a breaking change accidentally introduced in
-version 22.4 where parameter ordering was not maintained. Existing code using
-keyword arguments is unaffected; only code using positional arguments (and based on version 22.4)
-may need updates.
+.. hint::
+   This change addresses a breaking change accidentally introduced in version 22.4 where the introduction of the new parameter was not done in a backward compatible way.
+   Existing code using keyword arguments is unaffected. Only code using positional arguments (and based on version 22.4) may need updates.
 """
 [[pull_requests]]
 uid = "4972"
