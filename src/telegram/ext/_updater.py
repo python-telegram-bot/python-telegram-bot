@@ -677,12 +677,14 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         updates if appropriate. If there are unsuccessful attempts, this will retry as specified by
         :paramref:`max_retries`.
         """
+        cb_success = {"del": False, "set": False}
 
         async def bootstrap_del_webhook() -> None:
             _LOGGER.debug("Deleting webhook")
             if drop_pending_updates:
                 _LOGGER.debug("Dropping pending updates from Telegram server")
             await self.bot.delete_webhook(drop_pending_updates=drop_pending_updates)
+            cb_success["del"] = True
 
         async def bootstrap_set_webhook() -> None:
             _LOGGER.debug("Setting webhook")
@@ -697,6 +699,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 max_connections=max_connections,
                 secret_token=secret_token,
             )
+            cb_success["set"] = True
 
         # Dropping pending updates from TG can be efficiently done with the drop_pending_updates
         # parameter of delete/start_webhook, even in the case of polling. Also, we want to make
@@ -704,7 +707,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         # delete_webhook for polling
         if drop_pending_updates or not webhook_url:
             await network_retry_loop(
-                is_running=lambda: not self._initialized,
+                is_running=lambda: not cb_success["del"],
                 action_cb=bootstrap_del_webhook,
                 description="Bootstrap delete Webhook",
                 interval=bootstrap_interval,
@@ -716,7 +719,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         # so we set it anyhow.
         if webhook_url:
             await network_retry_loop(
-                is_running=lambda: not self._initialized,
+                is_running=lambda: not cb_success["set"],
                 action_cb=bootstrap_set_webhook,
                 description="Bootstrap Set Webhook",
                 interval=bootstrap_interval,
