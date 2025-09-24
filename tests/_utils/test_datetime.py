@@ -208,7 +208,7 @@ class TestDatetime:
         """Test with an invalid timezone string."""
         with pytest.raises(
             zoneinfo.ZoneInfoNotFoundError,
-            match="No time zone found.*Invalid/Timezone.*install the tzdata",
+            match=r"No time zone found.*Invalid/Timezone.*install the tzdata",
         ):
             get_zone_info("Invalid/Timezone")
 
