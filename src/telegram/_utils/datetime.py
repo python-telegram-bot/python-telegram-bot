@@ -242,7 +242,7 @@ def get_zone_info(tz: str) -> zoneinfo.ZoneInfo:
         raise zoneinfo.ZoneInfoNotFoundError(
             f"No time zone found with key {tz}. "
             "Make sure to use a valid time zone name and "
-            f"correct install the tzdata (https://pypi.org/project/tzdata/) package if "
+            f"correctly install the tzdata (https://pypi.org/project/tzdata/) package if "
             "your system does not provide the time zone data."
         ) from err
 

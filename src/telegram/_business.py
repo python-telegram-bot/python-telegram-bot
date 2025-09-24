@@ -623,6 +623,10 @@ class BusinessOpeningHours(TelegramObject):
             if int_open[0] != week_day:
                 continue
 
+            # To get the correct localization, we first need to create the dtm object in
+            # self.time_zone_name, then convert it to the target timezone. We could check if
+            # self._zone_info == tz_target and skip the conversion, but it's not worth the added
+            # complexity.
             result_int_open = dtm.datetime(
                 year=date.year,
                 month=date.month,
