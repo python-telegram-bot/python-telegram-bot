@@ -377,6 +377,12 @@ class ReplyParameters(TelegramObject):
 
     .. versionadded:: 20.8
 
+    .. versionchanged:: NEXT.VERSION
+        The :paramref:`checklist_task_id` parameter has been moved to the last position to
+        maintain backward compatibility with versions prior to 22.4.
+        This resolves a breaking change accidentally introduced in version 22.4. See the changelog
+        for version NEXT.VERSION for more information.
+
     Args:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
             chat, or in the chat :paramref:`chat_id` if it is specified.
@@ -449,11 +455,11 @@ class ReplyParameters(TelegramObject):
         message_id: int,
         chat_id: Optional[Union[int, str]] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        checklist_task_id: Optional[int] = None,
         quote: Optional[str] = None,
         quote_parse_mode: ODVInput[str] = DEFAULT_NONE,
         quote_entities: Optional[Sequence[MessageEntity]] = None,
         quote_position: Optional[int] = None,
+        checklist_task_id: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
