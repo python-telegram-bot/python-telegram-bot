@@ -32,6 +32,7 @@ import contextlib
 import datetime as dtm
 import os
 import time
+import zoneinfo
 from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._utils.warnings import warn
@@ -229,6 +230,21 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     if dt_obj.tzinfo is None:
         dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
     return dt_obj.timestamp()
+
+
+def get_zone_info(tz: str) -> zoneinfo.ZoneInfo:
+    """Wrapper around the `ZoneInfo` constructor with slightly more helpful error message
+    in case tzdata is not installed.
+    """
+    try:
+        return zoneinfo.ZoneInfo(tz)
+    except zoneinfo.ZoneInfoNotFoundError as err:
+        raise zoneinfo.ZoneInfoNotFoundError(
+            f"No time zone found with key {tz}. "
+            "Make sure to use a valid time zone name and "
+            f"correctly install the tzdata (https://pypi.org/project/tzdata/) package if "
+            "your system does not provide the time zone data."
+        ) from err
 
 
 def get_timedelta_value(
