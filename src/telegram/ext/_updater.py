@@ -382,6 +382,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 interval=poll_interval,
                 stop_event=self.__polling_task_stop_event,
                 max_retries=-1,
+                repeat_on_success=True,
             ),
             name="Updater:start_polling:polling_task",
         )
@@ -704,7 +705,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         # delete_webhook for polling
         if drop_pending_updates or not webhook_url:
             await network_retry_loop(
-                is_running=lambda: self.running,
                 action_cb=bootstrap_del_webhook,
                 description="Bootstrap delete Webhook",
                 interval=bootstrap_interval,
@@ -716,7 +716,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         # so we set it anyhow.
         if webhook_url:
             await network_retry_loop(
-                is_running=lambda: self.running,
                 action_cb=bootstrap_set_webhook,
                 description="Bootstrap Set Webhook",
                 interval=bootstrap_interval,
