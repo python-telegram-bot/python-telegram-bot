@@ -1,0 +1,5 @@
+internal = "Update dependency furo to v2025.9.25"
+[[pull_requests]]
+uid = "4978"
+author_uids = ["renovate[bot]"]
+closes_threads = []
