@@ -51,12 +51,14 @@ async def network_retry_loop(
     stop_event: Optional[asyncio.Event] = None,
     is_running: Optional[Callable[[], bool]] = None,
     max_retries: int,
+    repeat_on_success: bool = False,
 ) -> None:
     """Perform a loop calling `action_cb`, retrying after network errors.
 
     Stop condition for loop in case of ``max_retries < 0``:
         * `is_running()` evaluates :obj:`False`
-        * or `stop_event` is set.
+        * `stop_event` is set.
+        * calling `action_cb` succeeds and `repeat_on_success` is :obj:`False`.
 
     Additional stop condition for loop in case of `max_retries >= 0``:
         * a call to `action_cb` succeeds
@@ -87,8 +89,18 @@ async def network_retry_loop(
             * 0: No retries.
             * > 0: Number of retries.
 
+        repeat_on_success (:obj:`bool`): Whether to repeat the action after a successful call.
+            Defaults to :obj:`False`.
+
+    Raises:
+        ValueError: When passing `repeat_on_success=True` and `max_retries >= 0`. This case is
+            currently not supported.
+
     """
-    infinite_loop = max_retries < 0
+    if repeat_on_success and max_retries >= 0:  # pragma: no cover
+        # This case here is only for completeness. It should not be used anywhere in the library.
+        raise ValueError("Cannot use repeat_on_success=True with max_retries >= 0")
+
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
@@ -120,7 +132,7 @@ async def network_retry_loop(
     while effective_is_running():
         try:
             await do_action()
-            if not infinite_loop:
+            if not repeat_on_success:
                 _LOGGER.debug("%s Action succeeded. Stopping loop.", log_prefix)
                 break
         except RetryAfter as exc:

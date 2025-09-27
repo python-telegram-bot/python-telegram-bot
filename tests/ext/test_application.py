@@ -2359,6 +2359,58 @@ class TestApplication:
         thread.join(timeout=10)
         assert not thread.is_alive(), "Test took to long to run. Aborting"
 
+    @pytest.mark.parametrize("method_name", ["run_polling", "run_webhook"])
+    async def test_run_polling_webhook_infinite_bootstrap_retries(
+        self, monkeypatch, offline_bot, method_name
+    ):
+        """Here we simply test that setting `bootstrap_retries=-1` does not lead to the wrong
+        infinite-loop behavior reported in #4966. Raising an exception on the first call to
+        `initialize` ensures that a retry actually happens.
+        """
+
+        def thread_target():
+            asyncio.set_event_loop(asyncio.new_event_loop())
+
+            async def post_init(application):
+                application.stop_running()
+
+            app = (
+                ApplicationBuilder()
+                .bot(offline_bot)
+                .application_class(PytestApplication)
+                .post_init(post_init)
+                .build()
+            )
+
+            async def do_pass(*args, **kwargs):
+                pass
+
+            monkeypatch.setattr(app.bot, "initialize", do_pass)
+            monkeypatch.setattr(app.bot, "delete_webhook", do_pass)
+
+            original_initialize = app.initialize
+
+            async def initialize(*args, **kwargs):
+                if self.count >= 3:
+                    pytest.fail("Should be called only once. Test failed.")
+
+                self.count += 1
+                if self.count == 1:
+                    raise TelegramError("Test Exception")
+                await original_initialize(*args, **kwargs)
+
+            monkeypatch.setattr(app, "initialize", initialize)
+            getattr(app, method_name)(
+                bootstrap_retries=-1,
+                close_loop=False,
+                stop_signals=None,
+            )
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        thread.join(timeout=10)
+        assert not thread.is_alive(), "Test took to long to run. Aborting"
+
     def test_signal_handlers(self, offline_bot, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
