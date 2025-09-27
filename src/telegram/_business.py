@@ -593,7 +593,7 @@ class BusinessOpeningHours(TelegramObject):
     ) -> tuple[tuple[dtm.datetime, dtm.datetime], ...]:
         """Returns the opening hours intervals for a specific day as datetime objects.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.5
 
         Args:
             date (:obj:`datetime.date`): The date to get opening hours for.
@@ -653,7 +653,7 @@ class BusinessOpeningHours(TelegramObject):
     def is_open(self, datetime: dtm.datetime) -> bool:
         """Check if the business is open at the specified datetime.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.5
 
         Args:
             datetime (:obj:`datetime.datetime`): The datetime to check.

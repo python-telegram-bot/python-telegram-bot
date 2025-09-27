@@ -377,11 +377,11 @@ class ReplyParameters(TelegramObject):
 
     .. versionadded:: 20.8
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.5
         The :paramref:`checklist_task_id` parameter has been moved to the last position to
         maintain backward compatibility with versions prior to 22.4.
         This resolves a breaking change accidentally introduced in version 22.4. See the changelog
-        for version NEXT.VERSION for more information.
+        for version 22.5 for more information.
 
     Args:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
