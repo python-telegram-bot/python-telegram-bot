@@ -133,7 +133,7 @@ docs = [
 ]
 linting = [
     "pre-commit",
-    "ruff==0.13.2",
+    "ruff==0.13.3",
     "mypy==1.18.2",
     "pylint==3.3.8"
 ]
