@@ -19,6 +19,6 @@ jobs:
           days-before-close: 2
           days-before-pr-stale: -1
           stale-issue-label: '📋 stale'
-          only-labels: 'question'
+          only-issue-types: '❔ question'
           stale-issue-message: ''
           close-issue-message: 'This issue has been automatically closed due to inactivity. Feel free to comment in order to reopen or ask again in our Telegram support group at https://t.me/pythontelegrambotgroup.'

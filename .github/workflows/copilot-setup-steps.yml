@@ -31,10 +31,10 @@ jobs:
           persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        uses: astral-sh/setup-uv@eb1897b8dc4b5d5bfe39a428a8f2304605e0983c # v7.0.0
         with:
           # Install a specific version of uv.
-          version: "0.8.22"
+          version: "0.9.2"
           # Install 3.13:
           python-version: 3.13
 
