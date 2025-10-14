@@ -8,7 +8,7 @@ ci:
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.13.1'
+    rev: 'v0.14.0'
     hooks:
     # Run the linter:
     -   id: ruff-check
@@ -17,7 +17,7 @@ repos:
     -   id: ruff-format
         name: ruff format
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.3.8
+    rev: v3.3.9
     hooks:
     -   id: pylint
         files: ^(?!(tests|docs)).*\.py$

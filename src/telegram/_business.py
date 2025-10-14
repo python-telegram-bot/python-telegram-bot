@@ -22,14 +22,23 @@
 import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 from telegram._chat import Chat
 from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.argumentparsing import (
+    de_json_optional,
+    de_list_optional,
+    parse_sequence_arg,
+)
+from telegram._utils.datetime import (
+    extract_tzinfo_from_defaults,
+    from_timestamp,
+    get_zone_info,
+)
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -449,7 +458,7 @@ class BusinessOpeningHoursInterval(TelegramObject):
 
     Examples:
         A day has (24 * 60 =) 1440 minutes, a week has (7 * 1440 =) 10080 minutes.
-        Starting the the minute's sequence from Monday, example values of
+        Starting the minute's sequence from Monday, example values of
         :attr:`opening_minute`, :attr:`closing_minute` will map to the following day times:
 
         * Monday - 8am to 8:30pm:
@@ -552,7 +561,7 @@ class BusinessOpeningHours(TelegramObject):
             time intervals describing business opening hours.
     """
 
-    __slots__ = ("opening_hours", "time_zone_name")
+    __slots__ = ("_cached_zone_info", "opening_hours", "time_zone_name")
 
     def __init__(
         self,
@@ -567,9 +576,108 @@ class BusinessOpeningHours(TelegramObject):
             opening_hours
         )
 
+        self._cached_zone_info: ZoneInfo | None = None
+
         self._id_attrs = (self.time_zone_name, self.opening_hours)
 
         self._freeze()
+
+    @property
+    def _zone_info(self) -> ZoneInfo:
+        if self._cached_zone_info is None:
+            self._cached_zone_info = get_zone_info(self.time_zone_name)
+        return self._cached_zone_info
+
+    def get_opening_hours_for_day(
+        self, date: dtm.date, time_zone: dtm.tzinfo | str | None = None
+    ) -> tuple[tuple[dtm.datetime, dtm.datetime], ...]:
+        """Returns the opening hours intervals for a specific day as datetime objects.
+
+        .. versionadded:: 22.5
+
+        Args:
+            date (:obj:`datetime.date`): The date to get opening hours for.
+            time_zone (:obj:`datetime.tzinfo` | :obj:`str`, optional): Timezone to use for the
+                returned datetime objects. If not specified, then :attr:`time_zone_name` be used.
+
+        Returns:
+            tuple[tuple[:obj:`datetime.datetime`, :obj:`datetime.datetime`], ...]:
+            A tuple of datetime pairs representing opening and closing times for the specified day.
+            Each pair consists of ``(opening_time, closing_time)``.
+            Returns an empty tuple if there are no opening hours for the given day.
+        """
+
+        week_day = date.weekday()
+        res = []
+        if isinstance(time_zone, str):
+            tz_target: dtm.tzinfo = get_zone_info(time_zone)
+        elif time_zone is None:
+            tz_target = self._zone_info
+        else:
+            tz_target = time_zone
+
+        for interval in self.opening_hours:
+            int_open = interval.opening_time
+            int_close = interval.closing_time
+
+            if int_open[0] != week_day:
+                continue
+
+            # To get the correct localization, we first need to create the dtm object in
+            # self.time_zone_name, then convert it to the target timezone. We could check if
+            # self._zone_info == tz_target and skip the conversion, but it's not worth the added
+            # complexity.
+            result_int_open = dtm.datetime(
+                year=date.year,
+                month=date.month,
+                day=date.day,
+                hour=int_open[1],
+                minute=int_open[2],
+                tzinfo=self._zone_info,
+            ).astimezone(tz_target)
+
+            result_int_close = dtm.datetime(
+                year=date.year,
+                month=date.month,
+                day=date.day,
+                hour=int_close[1],
+                minute=int_close[2],
+                tzinfo=self._zone_info,
+            ).astimezone(tz_target)
+
+            res.append((result_int_open, result_int_close))
+
+        # The sorting is currently an implementation detail
+        return tuple(sorted(res, key=lambda x: x[0]))
+
+    def is_open(self, datetime: dtm.datetime) -> bool:
+        """Check if the business is open at the specified datetime.
+
+        .. versionadded:: 22.5
+
+        Args:
+            datetime (:obj:`datetime.datetime`): The datetime to check.
+                If the object is timezone-naive, it is assumed to be in the
+                timezone specified by :attr:`time_zone_name`.
+
+        Returns:
+            :obj:`bool`: True if the business is open at the specified time, False otherwise.
+        """
+
+        datetime_in_native_tz = (
+            datetime.replace(tzinfo=self._zone_info) if datetime.tzinfo is None else datetime
+        ).astimezone(self._zone_info)
+        minute_of_week = (
+            datetime_in_native_tz.weekday() * 1440
+            + datetime_in_native_tz.hour * 60
+            + datetime_in_native_tz.minute
+        )
+
+        for interval in self.opening_hours:
+            if interval.opening_minute <= minute_of_week < interval.closing_minute:
+                return True
+
+        return False
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessOpeningHours":

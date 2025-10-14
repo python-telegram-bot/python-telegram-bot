@@ -1,5 +1,5 @@
-other = "Update Chango to v0.5.0"
+internal = "Update Pylint to v3.3.9"
 [[pull_requests]]
-uid = "4948"
+uid = "4995"
 author_uids = ["renovate[bot]"]
 closes_threads = []

@@ -118,7 +118,7 @@ tests = [
 docs = [
     "chango~=0.5.0; python_version >= '3.12'",
     "sphinx==8.2.3; python_version >= '3.11'",
-    "furo==2025.7.19",
+    "furo==2025.9.25",
     "sphinx-paramlinks==0.6.0",
     "sphinxcontrib-mermaid==1.0.0",
     "sphinx-copybutton==0.5.2",
@@ -133,9 +133,9 @@ docs = [
 ]
 linting = [
     "pre-commit",
-    "ruff==0.13.1",
+    "ruff==0.14.0",
     "mypy==1.18.2",
-    "pylint==3.3.8"
+    "pylint==3.3.9"
 ]
 all = [{ include-group = "tests" }, { include-group = "docs" }, { include-group = "linting"}]
 
