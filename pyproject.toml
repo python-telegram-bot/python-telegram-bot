@@ -39,7 +39,7 @@ classifiers = [
 ]
 dependencies = [
     "httpx >=0.27,<0.29",
-    "httpcore >=1.0.9; python_version >= '3.14'"  # httpx needs an update so 3.14 support works
+    "httpcore >=1.0.9; python_version >= '3.14'"  # httpx doesn't pin this as of 0.28.1
 ]
 
 [project.urls]
