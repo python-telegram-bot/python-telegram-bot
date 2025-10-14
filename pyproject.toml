@@ -279,10 +279,6 @@ omit = [
     "tests/",
     "src/telegram/__main__.py"
 ]
-# Relevant for python 3.14: https://github.com/nedbat/coveragepy/issues/1983
-disable_warnings = [
-    "no-ctracer",
-]
 
 [tool.coverage.report]
 exclude_also = [
