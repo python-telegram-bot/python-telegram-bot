@@ -79,8 +79,6 @@ job-queue = [
 ]
 passport = [
     "cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1",
-    # cffi is a dependency of cryptography and added support for python 3.13 in 1.17.0rc1
-    "cffi >= 1.17.0rc1; python_version > '3.12'"
 ]
 rate-limiter = [
     "aiolimiter>=1.1,<1.3",
