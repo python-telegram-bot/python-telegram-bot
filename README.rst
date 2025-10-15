@@ -94,6 +94,12 @@ Notable Features
 - Seamless integration with `webhooks <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_ and `polling <https://docs.python-telegram-bot.org/en/stable/telegram.ext.application.html#telegram.ext.Application.run_polling>`_
 - `Comprehensive documentation and examples <#working-with-ptb>`_
 
+Free threading
+~~~~~~~~~~~~~~
+
+While ``python-telegram-bot`` is tested to work with Python 3.14 free threading, we do not guarantee that
+PTB is thread-safe for all use cases. Please see issue `#4873 <https://github.com/python-telegram-bot/python-telegram-bot/issues/4873>`_ for more information.
+
 Installing
 ----------
 
