@@ -1,5 +1,7 @@
 name: 'Mark & close stale questions'
 on:
+  workflow_dispatch:
+  pull_request:
   schedule:
     - cron: '42 2 * * *'
 
@@ -8,11 +10,11 @@ permissions: {}
 jobs:
   stale:
     runs-on: ubuntu-latest
-    permissions:
+    # permissions:
       # For adding labels and closing
-      issues: write
+      # issues: write
     steps:
-      - uses: actions/stale@5f858e3efba33a5ca4407a664cc011ad407f2008 # v10.1.0
+      - uses: Bibo-Joshi/stale@copilot/analyze-only-issue-types-flaw
         with:
           # PRs never get stale
           days-before-stale: 3
