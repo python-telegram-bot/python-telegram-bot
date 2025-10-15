@@ -44,6 +44,7 @@ def json_dict():
         "added_to_attachment_menu": UserTestBase.added_to_attachment_menu,
         "can_connect_to_business": UserTestBase.can_connect_to_business,
         "has_main_web_app": UserTestBase.has_main_web_app,
+        "has_topics_enabled": UserTestBase.has_topics_enabled,
     }
 
 
@@ -63,6 +64,7 @@ def user(bot):
         added_to_attachment_menu=UserTestBase.added_to_attachment_menu,
         can_connect_to_business=UserTestBase.can_connect_to_business,
         has_main_web_app=UserTestBase.has_main_web_app,
+        has_topics_enabled=UserTestBase.has_topics_enabled,
     )
     user.set_bot(bot)
     user._unfreeze()
@@ -83,6 +85,7 @@ class UserTestBase:
     added_to_attachment_menu = False
     can_connect_to_business = True
     has_main_web_app = False
+    has_topics_enabled = False
 
 
 class TestUserWithoutRequest(UserTestBase):
@@ -108,6 +111,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user.added_to_attachment_menu == self.added_to_attachment_menu
         assert user.can_connect_to_business == self.can_connect_to_business
         assert user.has_main_web_app == self.has_main_web_app
+        assert user.has_topics_enabled == self.has_topics_enabled
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -126,6 +130,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user_dict["added_to_attachment_menu"] == user.added_to_attachment_menu
         assert user_dict["can_connect_to_business"] == user.can_connect_to_business
         assert user_dict["has_main_web_app"] == user.has_main_web_app
+        assert user_dict["has_topics_enabled"] == user.has_topics_enabled
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)

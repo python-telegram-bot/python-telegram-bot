@@ -113,6 +113,10 @@ class User(TelegramObject):
             Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 21.5
+        has_topics_enabled (:obj:`bool`, optional): :obj:`True`, if the bot has forum topic mode
+            enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -144,6 +148,10 @@ class User(TelegramObject):
             Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 21.5
+        has_topics_enabled (:obj:`bool`): Optional. :obj:`True`, if the bot has forum topic mode
+            enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -157,6 +165,7 @@ class User(TelegramObject):
         "can_read_all_group_messages",
         "first_name",
         "has_main_web_app",
+        "has_topics_enabled",
         "id",
         "is_bot",
         "is_premium",
@@ -181,6 +190,7 @@ class User(TelegramObject):
         added_to_attachment_menu: Optional[bool] = None,
         can_connect_to_business: Optional[bool] = None,
         has_main_web_app: Optional[bool] = None,
+        has_topics_enabled: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -200,6 +210,7 @@ class User(TelegramObject):
         self.added_to_attachment_menu: Optional[bool] = added_to_attachment_menu
         self.can_connect_to_business: Optional[bool] = can_connect_to_business
         self.has_main_web_app: Optional[bool] = has_main_web_app
+        self.has_topics_enabled: Optional[bool] = has_topics_enabled
 
         self._id_attrs = (self.id,)
 
