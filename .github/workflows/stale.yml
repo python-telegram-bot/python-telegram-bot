@@ -14,7 +14,7 @@ jobs:
       # For adding labels and closing
       # issues: write
     steps:
-      - uses: Bibo-Joshi/stale@copilot/analyze-only-issue-types-flaw
+      - uses: Bibo-Joshi/stale@184dc59e415111144a8bb0b692d426bde7d4bef4
         with:
           # PRs never get stale
           days-before-stale: 0
