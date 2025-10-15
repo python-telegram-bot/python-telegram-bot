@@ -17,8 +17,8 @@ jobs:
       - uses: Bibo-Joshi/stale@copilot/analyze-only-issue-types-flaw
         with:
           # PRs never get stale
-          days-before-stale: 3
-          days-before-close: 2
+          days-before-stale: 0
+          days-before-close: 100
           days-before-pr-stale: -1
           stale-issue-label: '📋 stale'
           only-issue-types: '❔ question'
