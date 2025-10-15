@@ -1,0 +1,5 @@
+other = "[Debug PR] Testing what goes wrong with stale issue types"
+[[pull_requests]]
+uid = "5005"
+author_uids = ["Bibo-Joshi"]
+closes_threads = []
