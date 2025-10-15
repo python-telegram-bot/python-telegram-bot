@@ -24,7 +24,6 @@ jobs:
         with:
           # needed for commit and push step at the end
           persist-credentials: true
-          # custom token to ensure that the push will also re-trigger workflows
           token: ${{ secrets.CHANGO_PAT }}
       - name: Check PR Title
         id: check_title
@@ -38,8 +37,12 @@ jobs:
           fi
 
       # Create the new fragment
-      - uses: Bibo-Joshi/chango@212fc662da1b1026f335e110270d75690df05758 # 0.5.0
+      #- uses: Bibo-Joshi/chango@212fc662da1b1026f335e110270d75690df05758 # 0.5.0
+      - uses: Bibo-Joshi/chango@customize-checkout-token
         with:
+          # passing this custom token has two purposes
+          # 1. it allows us to fetch info about issue types
+          # 2. it ensures that the push will also re-trigger workflows
           github-token: ${{ secrets.CHANGO_PAT }}
           query-issue-types: true
           commit-and-push: ${{ steps.check_title.outputs.COMMIT_AND_PUSH }}
