@@ -24,6 +24,8 @@ jobs:
         with:
           # needed for commit and push step at the end
           persist-credentials: true
+          # custom token to ensure that the push will also re-trigger workflows
+          token: ${{ secrets.CHANGO_PAT }}
       - name: Check PR Title
         id: check_title
         run: | # zizmor: ignore[template-injection]
