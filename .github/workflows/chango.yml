@@ -24,7 +24,6 @@ jobs:
         with:
           # needed for commit and push step at the end
           persist-credentials: true
-          token: ${{ secrets.CHANGO_PAT }}
       - name: Check PR Title
         id: check_title
         run: | # zizmor: ignore[template-injection]
@@ -37,8 +36,7 @@ jobs:
           fi
 
       # Create the new fragment
-      #- uses: Bibo-Joshi/chango@212fc662da1b1026f335e110270d75690df05758 # 0.5.0
-      - uses: Bibo-Joshi/chango@customize-checkout-token
+      - uses: Bibo-Joshi/chango@617976e1706dc9a72ea40e529d4b1dcc433d4e22 # 0.6.0
         with:
           # passing this custom token has two purposes
           # 1. it allows us to fetch info about issue types
