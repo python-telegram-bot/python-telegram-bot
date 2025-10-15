@@ -1445,6 +1445,7 @@ all = [
     { name = "aiolimiter" },
     { name = "apscheduler" },
     { name = "cachetools" },
+    { name = "cffi", marker = "python_full_version >= '3.13'" },
     { name = "cryptography" },
     { name = "httpx", extra = ["http2", "socks"] },
     { name = "tornado" },
@@ -1465,6 +1466,7 @@ job-queue = [
     { name = "apscheduler" },
 ]
 passport = [
+    { name = "cffi", marker = "python_full_version >= '3.13'" },
     { name = "cryptography" },
 ]
 rate-limiter = [
@@ -1542,6 +1544,8 @@ requires-dist = [
     { name = "cachetools", marker = "extra == 'all'", specifier = ">=5.3.3,<6.3.0" },
     { name = "cachetools", marker = "extra == 'callback-data'", specifier = ">=5.3.3,<6.3.0" },
     { name = "cachetools", marker = "extra == 'ext'", specifier = ">=5.3.3,<6.3.0" },
+    { name = "cffi", marker = "python_full_version >= '3.13' and extra == 'all'", specifier = ">=1.17.0rc1" },
+    { name = "cffi", marker = "python_full_version >= '3.13' and extra == 'passport'", specifier = ">=1.17.0rc1" },
     { name = "cryptography", marker = "extra == 'all'", specifier = "!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1" },
     { name = "cryptography", marker = "extra == 'passport'", specifier = "!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1" },
     { name = "httpx", specifier = ">=0.27,<0.29" },
