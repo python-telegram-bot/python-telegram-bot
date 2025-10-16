@@ -215,6 +215,12 @@ Noteworthy parts of ``python-telegram-bots`` API that are likely to cause issues
 * ``telegram.ext.BasePersistence``
 * all classes in the ``telegram.ext.filters`` module that allow to add/remove allowed users/chats at runtime
 
+Free threading
+~~~~~~~~~~~~~~
+
+While ``python-telegram-bot`` is tested to work with Python 3.14 free threading, we do not guarantee that
+PTB is thread-safe for all use cases. Please see issue `#4873 <https://github.com/python-telegram-bot/python-telegram-bot/issues/4873>`_ for more information.
+
 Contributing
 ------------
 

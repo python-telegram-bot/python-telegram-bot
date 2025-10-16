@@ -1,7 +1,9 @@
 name: 'Mark & close stale questions'
 on:
-  schedule:
-    - cron: '42 2 * * *'
+  workflow_dispatch:
+# Currently disabled due to https://github.com/actions/stale/pull/1298
+#  schedule:
+#    - cron: '42 2 * * *'
 
 permissions: {}
 
