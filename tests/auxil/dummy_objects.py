@@ -99,8 +99,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     "int": 123456,
     "MenuButton": MenuButton(type="dummy_type"),
     "Message": make_message("dummy_text"),
-    # Really bad hack to get tests passing, but we need to significantly overhaul how shortcuts
-    # work, we should not invent a type checker!
+    # Bad hack to get tests passing (we should not be using annotations as a key here)
     "Message | bool": make_message("dummy_text"),
     "MessageId": MessageId(123456),
     "OwnedGifts": OwnedGifts(
