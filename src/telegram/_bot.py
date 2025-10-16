@@ -8893,8 +8893,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """
-        Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must
-        be an administrator in the chat for this to work and must have the
+        Use this method to edit name and icon of a topic in a forum supergroup chat or a private
+        chat with a user. In the case of a supergroup chat the bot must be an administrator in the
+        chat for this to work and must have the
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
         unless it is the creator of the topic.
 
@@ -9036,7 +9037,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """
         Use this method to delete a forum topic along with all its messages in a forum supergroup
-        chat. The bot must be an administrator in the chat for this to work and must have
+        chat or a private chat with a user. In the case of a supergroup chat the bot must be an
+        administrator in the chat for this to work and must have the
         :paramref:`~telegram.ChatAdministratorRights.can_delete_messages` administrator rights.
 
         .. versionadded:: 20.0
@@ -9078,10 +9080,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """
-        Use this method to clear the list of pinned messages in a forum topic. The bot must
-        be an administrator in the chat for this to work and must have
-        :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator rights
-        in the supergroup.
+        Use this method to clear the list of pinned messages in a forum topic in a forum supergroup
+        chat or a private chat with a user. In the case of a supergroup chat the bot must be an
+        administrator in the chat for this to work and must have the
+        :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator right in
+        the supergroup.
 
         .. versionadded:: 20.0
 
