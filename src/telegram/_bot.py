@@ -3718,7 +3718,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             action(:obj:`str`): Type of action to broadcast. Choose one, depending on what the user
                 is about to receive. For convenience look at the constants in
                 :class:`telegram.constants.ChatAction`.
-            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread or topic of a forum; for supergroups and private chats of bots with forum
+                topic mode enabled only
 
                 .. versionadded:: 20.0
             business_connection_id (:obj:`str`, optional): |business_id_str|
