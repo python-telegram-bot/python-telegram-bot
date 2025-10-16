@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPermission."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -156,39 +156,39 @@ class ChatPermissions(TelegramObject):
 
     def __init__(
         self,
-        can_send_messages: Optional[bool] = None,
-        can_send_polls: Optional[bool] = None,
-        can_send_other_messages: Optional[bool] = None,
-        can_add_web_page_previews: Optional[bool] = None,
-        can_change_info: Optional[bool] = None,
-        can_invite_users: Optional[bool] = None,
-        can_pin_messages: Optional[bool] = None,
-        can_manage_topics: Optional[bool] = None,
-        can_send_audios: Optional[bool] = None,
-        can_send_documents: Optional[bool] = None,
-        can_send_photos: Optional[bool] = None,
-        can_send_videos: Optional[bool] = None,
-        can_send_video_notes: Optional[bool] = None,
-        can_send_voice_notes: Optional[bool] = None,
+        can_send_messages: bool | None = None,
+        can_send_polls: bool | None = None,
+        can_send_other_messages: bool | None = None,
+        can_add_web_page_previews: bool | None = None,
+        can_change_info: bool | None = None,
+        can_invite_users: bool | None = None,
+        can_pin_messages: bool | None = None,
+        can_manage_topics: bool | None = None,
+        can_send_audios: bool | None = None,
+        can_send_documents: bool | None = None,
+        can_send_photos: bool | None = None,
+        can_send_videos: bool | None = None,
+        can_send_video_notes: bool | None = None,
+        can_send_voice_notes: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.can_send_messages: Optional[bool] = can_send_messages
-        self.can_send_polls: Optional[bool] = can_send_polls
-        self.can_send_other_messages: Optional[bool] = can_send_other_messages
-        self.can_add_web_page_previews: Optional[bool] = can_add_web_page_previews
-        self.can_change_info: Optional[bool] = can_change_info
-        self.can_invite_users: Optional[bool] = can_invite_users
-        self.can_pin_messages: Optional[bool] = can_pin_messages
-        self.can_manage_topics: Optional[bool] = can_manage_topics
-        self.can_send_audios: Optional[bool] = can_send_audios
-        self.can_send_documents: Optional[bool] = can_send_documents
-        self.can_send_photos: Optional[bool] = can_send_photos
-        self.can_send_videos: Optional[bool] = can_send_videos
-        self.can_send_video_notes: Optional[bool] = can_send_video_notes
-        self.can_send_voice_notes: Optional[bool] = can_send_voice_notes
+        self.can_send_messages: bool | None = can_send_messages
+        self.can_send_polls: bool | None = can_send_polls
+        self.can_send_other_messages: bool | None = can_send_other_messages
+        self.can_add_web_page_previews: bool | None = can_add_web_page_previews
+        self.can_change_info: bool | None = can_change_info
+        self.can_invite_users: bool | None = can_invite_users
+        self.can_pin_messages: bool | None = can_pin_messages
+        self.can_manage_topics: bool | None = can_manage_topics
+        self.can_send_audios: bool | None = can_send_audios
+        self.can_send_documents: bool | None = can_send_documents
+        self.can_send_photos: bool | None = can_send_photos
+        self.can_send_videos: bool | None = can_send_videos
+        self.can_send_video_notes: bool | None = can_send_video_notes
+        self.can_send_voice_notes: bool | None = can_send_voice_notes
 
         self._id_attrs = (
             self.can_send_messages,
@@ -232,7 +232,7 @@ class ChatPermissions(TelegramObject):
         return cls(*(14 * (False,)))
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatPermissions":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatPermissions":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

@@ -20,7 +20,7 @@
 """This module contains classes related to unique gifs."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._chat import Chat
@@ -69,7 +69,7 @@ class UniqueGiftModel(TelegramObject):
         sticker: Sticker,
         rarity_per_mille: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
@@ -81,7 +81,7 @@ class UniqueGiftModel(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UniqueGiftModel":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftModel":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -124,7 +124,7 @@ class UniqueGiftSymbol(TelegramObject):
         sticker: Sticker,
         rarity_per_mille: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
@@ -136,7 +136,7 @@ class UniqueGiftSymbol(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UniqueGiftSymbol":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftSymbol":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -182,7 +182,7 @@ class UniqueGiftBackdropColors(TelegramObject):
         symbol_color: int,
         text_color: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.center_color: int = center_color
@@ -229,7 +229,7 @@ class UniqueGiftBackdrop(TelegramObject):
         colors: UniqueGiftBackdropColors,
         rarity_per_mille: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
@@ -241,7 +241,7 @@ class UniqueGiftBackdrop(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UniqueGiftBackdrop":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftBackdrop":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -309,9 +309,9 @@ class UniqueGift(TelegramObject):
         model: UniqueGiftModel,
         symbol: UniqueGiftSymbol,
         backdrop: UniqueGiftBackdrop,
-        publisher_chat: Optional[Chat] = None,
+        publisher_chat: Chat | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.base_name: str = base_name
@@ -320,7 +320,7 @@ class UniqueGift(TelegramObject):
         self.model: UniqueGiftModel = model
         self.symbol: UniqueGiftSymbol = symbol
         self.backdrop: UniqueGiftBackdrop = backdrop
-        self.publisher_chat: Optional[Chat] = publisher_chat
+        self.publisher_chat: Chat | None = publisher_chat
 
         self._id_attrs = (
             self.base_name,
@@ -334,7 +334,7 @@ class UniqueGift(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UniqueGift":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGift":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -422,29 +422,29 @@ class UniqueGiftInfo(TelegramObject):
         self,
         gift: UniqueGift,
         origin: str,
-        owned_gift_id: Optional[str] = None,
-        transfer_star_count: Optional[int] = None,
-        last_resale_star_count: Optional[int] = None,
-        next_transfer_date: Optional[dtm.datetime] = None,
+        owned_gift_id: str | None = None,
+        transfer_star_count: int | None = None,
+        last_resale_star_count: int | None = None,
+        next_transfer_date: dtm.datetime | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.gift: UniqueGift = gift
         self.origin: str = enum.get_member(constants.UniqueGiftInfoOrigin, origin, origin)
         # Optional
-        self.owned_gift_id: Optional[str] = owned_gift_id
-        self.transfer_star_count: Optional[int] = transfer_star_count
-        self.last_resale_star_count: Optional[int] = last_resale_star_count
-        self.next_transfer_date: Optional[dtm.datetime] = next_transfer_date
+        self.owned_gift_id: str | None = owned_gift_id
+        self.transfer_star_count: int | None = transfer_star_count
+        self.last_resale_star_count: int | None = last_resale_star_count
+        self.next_transfer_date: dtm.datetime | None = next_transfer_date
 
         self._id_attrs = (self.gift, self.origin)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "UniqueGiftInfo":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

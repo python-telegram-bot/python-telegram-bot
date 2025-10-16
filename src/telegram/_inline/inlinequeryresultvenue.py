@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVenue."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -128,17 +128,17 @@ class InlineQueryResultVenue(InlineQueryResult):
         longitude: float,
         title: str,
         address: str,
-        foursquare_id: Optional[str] = None,
-        foursquare_type: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
-        google_place_id: Optional[str] = None,
-        google_place_type: Optional[str] = None,
-        thumbnail_url: Optional[str] = None,
-        thumbnail_width: Optional[int] = None,
-        thumbnail_height: Optional[int] = None,
+        foursquare_id: str | None = None,
+        foursquare_type: str | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
+        google_place_id: str | None = None,
+        google_place_type: str | None = None,
+        thumbnail_url: str | None = None,
+        thumbnail_width: int | None = None,
+        thumbnail_height: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.VENUE, id, api_kwargs=api_kwargs)
@@ -149,12 +149,12 @@ class InlineQueryResultVenue(InlineQueryResult):
             self.address: str = address
 
             # Optional
-            self.foursquare_id: Optional[str] = foursquare_id
-            self.foursquare_type: Optional[str] = foursquare_type
-            self.google_place_id: Optional[str] = google_place_id
-            self.google_place_type: Optional[str] = google_place_type
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_url: Optional[str] = thumbnail_url
-            self.thumbnail_width: Optional[int] = thumbnail_width
-            self.thumbnail_height: Optional[int] = thumbnail_height
+            self.foursquare_id: str | None = foursquare_id
+            self.foursquare_type: str | None = foursquare_type
+            self.google_place_id: str | None = google_place_id
+            self.google_place_type: str | None = google_place_type
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
+            self.thumbnail_url: str | None = thumbnail_url
+            self.thumbnail_width: int | None = thumbnail_width
+            self.thumbnail_height: int | None = thumbnail_height

@@ -26,7 +26,7 @@ Warning:
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union, overload
+from typing import TYPE_CHECKING, Protocol, TypeVar, overload
 
 from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._telegramobject import TelegramObject
@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
-def parse_sequence_arg(arg: Optional[Sequence[T]]) -> tuple[T, ...]:
+def parse_sequence_arg(arg: Sequence[T] | None) -> tuple[T, ...]:
     """Parses an optional sequence into a tuple
 
     Args:
@@ -58,13 +58,13 @@ def to_timedelta(arg: None) -> None: ...
 
 @overload
 def to_timedelta(
-    arg: Union[  # noqa: PYI041 (be more explicit about `int` and `float` arguments)
-        int, float, dtm.timedelta
-    ],
+    arg: (
+        int | float | dtm.timedelta  # noqa: PYI041 (be more explicit about `int` and `float` args)
+    ),
 ) -> dtm.timedelta: ...
 
 
-def to_timedelta(arg: Optional[Union[int, float, dtm.timedelta]]) -> Optional[dtm.timedelta]:
+def to_timedelta(arg: int | float | dtm.timedelta | None) -> dtm.timedelta | None:  # noqa: PYI041
     """Parses an optional time period in seconds into a timedelta
 
     Args:
@@ -75,13 +75,13 @@ def to_timedelta(arg: Optional[Union[int, float, dtm.timedelta]]) -> Optional[dt
     """
     if arg is None:
         return None
-    if isinstance(arg, (int, float)):
+    if isinstance(arg, int | float):
         return dtm.timedelta(seconds=arg)
     return arg
 
 
 def parse_lpo_and_dwpp(
-    disable_web_page_preview: Optional[bool], link_preview_options: ODVInput[LinkPreviewOptions]
+    disable_web_page_preview: bool | None, link_preview_options: ODVInput[LinkPreviewOptions]
 ) -> ODVInput[LinkPreviewOptions]:
     """Wrapper around warn_about_deprecated_arg_return_new_arg. Takes care of converting
     disable_web_page_preview to LinkPreviewOptions.
@@ -111,7 +111,7 @@ if TYPE_CHECKING:
         def de_json_decrypted(
             cls: type[TeleCrypto_co],
             data: JSONDict,
-            bot: Optional["Bot"],
+            bot: "Bot | None",
             credentials: list["FileCredentials"],
         ) -> TeleCrypto_co: ...
 
@@ -119,14 +119,14 @@ if TYPE_CHECKING:
         def de_list_decrypted(
             cls: type[TeleCrypto_co],
             data: list[JSONDict],
-            bot: Optional["Bot"],
+            bot: "Bot | None",
             credentials: list["FileCredentials"],
         ) -> tuple[TeleCrypto_co, ...]: ...
 
 
 def de_json_optional(
-    data: Optional[JSONDict], cls: type[Tele_co], bot: Optional["Bot"]
-) -> Optional[Tele_co]:
+    data: JSONDict | None, cls: type[Tele_co], bot: "Bot | None"
+) -> Tele_co | None:
     """Wrapper around TO.de_json that returns None if data is None."""
     if data is None:
         return None
@@ -135,11 +135,11 @@ def de_json_optional(
 
 
 def de_json_decrypted_optional(
-    data: Optional[JSONDict],
+    data: JSONDict | None,
     cls: type[TeleCrypto_co],
-    bot: Optional["Bot"],
+    bot: "Bot | None",
     credentials: list["FileCredentials"],
-) -> Optional[TeleCrypto_co]:
+) -> TeleCrypto_co | None:
     """Wrapper around TO.de_json_decrypted that returns None if data is None."""
     if data is None:
         return None
@@ -148,7 +148,7 @@ def de_json_decrypted_optional(
 
 
 def de_list_optional(
-    data: Optional[list[JSONDict]], cls: type[Tele_co], bot: Optional["Bot"]
+    data: list[JSONDict] | None, cls: type[Tele_co], bot: "Bot | None"
 ) -> tuple[Tele_co, ...]:
     """Wrapper around TO.de_list that returns an empty list if data is None."""
     if data is None:
@@ -158,9 +158,9 @@ def de_list_optional(
 
 
 def de_list_decrypted_optional(
-    data: Optional[list[JSONDict]],
+    data: list[JSONDict] | None,
     cls: type[TeleCrypto_co],
-    bot: Optional["Bot"],
+    bot: "Bot | None",
     credentials: list["FileCredentials"],
 ) -> tuple[TeleCrypto_co, ...]:
     """Wrapper around TO.de_list_decrypted that returns an empty list if data is None."""

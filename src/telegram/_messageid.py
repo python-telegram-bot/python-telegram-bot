@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents an instance of a Telegram MessageId."""
 
-from typing import Optional
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -45,7 +43,7 @@ class MessageId(TelegramObject):
 
     __slots__ = ("message_id",)
 
-    def __init__(self, message_id: int, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, message_id: int, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
         self.message_id: int = message_id
 

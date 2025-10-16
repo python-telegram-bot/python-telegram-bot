@@ -27,11 +27,11 @@ import platform
 import signal
 import sys
 from collections import defaultdict
-from collections.abc import Awaitable, Coroutine, Generator, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Coroutine, Generator, Mapping, Sequence
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType, TracebackType
-from typing import TYPE_CHECKING, Any, Callable, Generic, NoReturn, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, NoReturn, TypeAlias, TypeVar
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import (
@@ -77,9 +77,9 @@ _DEFAULT_0 = DefaultValue(0)
 if sys.version_info >= (3, 12):
     _CoroType = Awaitable[RT]
 else:
-    _CoroType = Union[Generator["asyncio.Future[object]", None, RT], Awaitable[RT]]
+    _CoroType: TypeAlias = Generator["asyncio.Future[object]", None, RT] | Awaitable[RT]
 
-_ErrorCoroType = Optional[_CoroType[RT]]
+_ErrorCoroType: TypeAlias = _CoroType[RT] | None
 
 _LOGGER = get_logger(__name__)
 
@@ -110,9 +110,9 @@ class ApplicationHandlerStop(Exception):
 
     __slots__ = ("state",)
 
-    def __init__(self, state: Optional[object] = None) -> None:
+    def __init__(self, state: object | None = None) -> None:
         super().__init__()
-        self.state: Optional[object] = state
+        self.state: object | None = state
 
 
 class Application(
@@ -280,20 +280,20 @@ class Application(
         *,
         bot: BT,
         update_queue: "asyncio.Queue[object]",
-        updater: Optional[Updater],
+        updater: Updater | None,
         job_queue: JQ,
         update_processor: "BaseUpdateProcessor",
-        persistence: Optional[BasePersistence[UD, CD, BD]],
+        persistence: BasePersistence[UD, CD, BD] | None,
         context_types: ContextTypes[CCT, UD, CD, BD],
-        post_init: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
-        ],
-        post_shutdown: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
-        ],
-        post_stop: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
-        ],
+        post_init: (
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]] | None
+        ),
+        post_shutdown: (
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]] | None
+        ),
+        post_stop: (
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]] | None
+        ),
     ):
         if not was_called_by(
             inspect.currentframe(), Path(__file__).parent.resolve() / "_applicationbuilder.py"
@@ -306,20 +306,20 @@ class Application(
         self.bot: BT = bot
         self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
-        self.updater: Optional[Updater] = updater
+        self.updater: Updater | None = updater
         self.handlers: dict[int, list[BaseHandler[Any, CCT, Any]]] = {}
         self.error_handlers: dict[
-            HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
+            HandlerCallback[object, CCT, None], bool | DefaultValue[bool]
         ] = {}
-        self.post_init: Optional[
-            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
-        ] = post_init
-        self.post_shutdown: Optional[
-            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
-        ] = post_shutdown
-        self.post_stop: Optional[
-            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
-        ] = post_stop
+        self.post_init: (
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]] | None
+        ) = post_init
+        self.post_shutdown: (
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]] | None
+        ) = post_shutdown
+        self.post_stop: (
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]] | None
+        ) = post_stop
         self._update_processor = update_processor
         self.bot_data: BD = self.context_types.bot_data()
         self._user_data: defaultdict[int, UD] = defaultdict(self.context_types.user_data)
@@ -328,7 +328,7 @@ class Application(
         self.user_data: Mapping[int, UD] = MappingProxyType(self._user_data)
         self.chat_data: Mapping[int, CD] = MappingProxyType(self._chat_data)
 
-        self.persistence: Optional[BasePersistence[UD, CD, BD]] = None
+        self.persistence: BasePersistence[UD, CD, BD] | None = None
         if persistence and not isinstance(persistence, BasePersistence):
             raise TypeError("persistence must be based on telegram.ext.BasePersistence")
         self.persistence = persistence
@@ -349,8 +349,8 @@ class Application(
         self._initialized = False
         self._running = False
         self._job_queue: JQ = job_queue
-        self.__update_fetcher_task: Optional[asyncio.Task] = None
-        self.__update_persistence_task: Optional[asyncio.Task] = None
+        self.__update_fetcher_task: asyncio.Task | None = None
+        self.__update_persistence_task: asyncio.Task | None = None
         self.__update_persistence_event = asyncio.Event()
         self.__update_persistence_lock = asyncio.Lock()
         self.__create_task_tasks: set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
@@ -375,9 +375,9 @@ class Application(
 
     async def __aexit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """|async_context_manager| :meth:`shuts down <shutdown>` the App."""
         # Make sure not to return `True` so that exceptions are not suppressed
@@ -418,7 +418,7 @@ class Application(
         return self._update_processor.max_concurrent_updates
 
     @property
-    def job_queue(self) -> Optional["JobQueue[CCT]"]:
+    def job_queue(self) -> "JobQueue[CCT] | None":
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
@@ -744,8 +744,8 @@ class Application(
         poll_interval: float = 0.0,
         timeout: TimePeriod = dtm.timedelta(seconds=10),
         bootstrap_retries: int = 0,
-        allowed_updates: Optional[Sequence[str]] = None,
-        drop_pending_updates: Optional[bool] = None,
+        allowed_updates: Sequence[str] | None = None,
+        drop_pending_updates: bool | None = None,
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
     ) -> None:
@@ -855,18 +855,18 @@ class Application(
         listen: DVType[str] = DEFAULT_IP,
         port: DVType[int] = DEFAULT_80,
         url_path: str = "",
-        cert: Optional[Union[str, Path]] = None,
-        key: Optional[Union[str, Path]] = None,
+        cert: str | Path | None = None,
+        key: str | Path | None = None,
         bootstrap_retries: int = 0,
-        webhook_url: Optional[str] = None,
-        allowed_updates: Optional[Sequence[str]] = None,
-        drop_pending_updates: Optional[bool] = None,
-        ip_address: Optional[str] = None,
+        webhook_url: str | None = None,
+        allowed_updates: Sequence[str] | None = None,
+        drop_pending_updates: bool | None = None,
+        ip_address: str | None = None,
         max_connections: int = 40,
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
-        secret_token: Optional[str] = None,
-        unix: Optional[Union[str, Path, "socket"]] = None,
+        secret_token: str | None = None,
+        unix: "str | Path | socket | None" = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         listening for updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -1086,9 +1086,9 @@ class Application(
     def create_task(
         self,
         coroutine: _CoroType[RT],
-        update: Optional[object] = None,
+        update: object | None = None,
         *,
-        name: Optional[str] = None,
+        name: str | None = None,
     ) -> "asyncio.Task[RT]":
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
@@ -1126,9 +1126,9 @@ class Application(
     def __create_task(
         self,
         coroutine: _CoroType[RT],
-        update: Optional[object] = None,
+        update: object | None = None,
         is_error_handler: bool = False,
-        name: Optional[str] = None,
+        name: str | None = None,
     ) -> "asyncio.Task[RT]":
         # Unfortunately, we can't know if `coroutine` runs one of the error handler functions
         # but by passing `is_error_handler=True` from `process_error`, we can make sure that we
@@ -1163,7 +1163,7 @@ class Application(
     async def __create_task_callback(
         self,
         coroutine: _CoroType[RT],
-        update: Optional[object] = None,
+        update: object | None = None,
         is_error_handler: bool = False,
     ) -> RT:
         try:
@@ -1407,11 +1407,10 @@ class Application(
 
     def add_handlers(
         self,
-        handlers: Union[
-            Sequence[BaseHandler[Any, CCT, Any]],
-            dict[int, Sequence[BaseHandler[Any, CCT, Any]]],
-        ],
-        group: Union[int, DefaultValue[int]] = _DEFAULT_0,
+        handlers: (
+            Sequence[BaseHandler[Any, CCT, Any]] | dict[int, Sequence[BaseHandler[Any, CCT, Any]]]
+        ),
+        group: int | DefaultValue[int] = _DEFAULT_0,
     ) -> None:
         """Registers multiple handlers at once. The order of the handlers in the passed
         sequence(s) matters. See :meth:`add_handler` for details.
@@ -1528,9 +1527,9 @@ class Application(
 
     def migrate_chat_data(
         self,
-        message: Optional["Message"] = None,
-        old_chat_id: Optional[int] = None,
-        new_chat_id: Optional[int] = None,
+        message: "Message | None" = None,
+        old_chat_id: int | None = None,
+        new_chat_id: int | None = None,
     ) -> None:
         """Moves the contents of :attr:`chat_data` at key :paramref:`old_chat_id` to the key
         :paramref:`new_chat_id`. Also marks the entries to be updated accordingly in the next run
@@ -1594,7 +1593,7 @@ class Application(
         # old_chat_id is marked for deletion by drop_chat_data above
 
     def _mark_for_persistence_update(
-        self, *, update: Optional[object] = None, job: Optional["Job"] = None
+        self, *, update: object | None = None, job: "Job | None" = None
     ) -> None:
         if isinstance(update, Update):
             if update.effective_chat:
@@ -1609,7 +1608,7 @@ class Application(
                 self._user_ids_to_be_updated_in_persistence.add(job.user_id)
 
     def mark_data_for_update_persistence(
-        self, chat_ids: Optional[SCT[int]] = None, user_ids: Optional[SCT[int]] = None
+        self, chat_ids: SCT[int] | None = None, user_ids: SCT[int] | None = None
     ) -> None:
         """Mark entries of :attr:`chat_data` and :attr:`user_data` to be updated on the next
         run of :meth:`update_persistence`.
@@ -1821,7 +1820,7 @@ class Application(
             callback (:term:`coroutine function`): The callback function for this error handler.
                 Will be called when an error is raised. Callback signature::
 
-                    async def callback(update: Optional[object], context: CallbackContext)
+                    async def callback(update: object | None, context: CallbackContext)
 
                 The error that happened will be present in
                 :attr:`telegram.ext.CallbackContext.error`.
@@ -1854,10 +1853,10 @@ class Application(
 
     async def process_error(
         self,
-        update: Optional[object],
+        update: object | None,
         error: Exception,
-        job: Optional["Job[CCT]"] = None,
-        coroutine: Optional[_ErrorCoroType[RT]] = None,
+        job: "Job[CCT] | None" = None,
+        coroutine: _ErrorCoroType[RT] | None = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises

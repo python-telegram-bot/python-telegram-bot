@@ -112,7 +112,7 @@ import re
 from abc import ABC, abstractmethod
 from collections.abc import Collection, Iterable, Sequence
 from re import Match, Pattern
-from typing import NoReturn, Optional, Union, cast
+from typing import NoReturn, cast
 
 from telegram import Chat as TGChat
 from telegram import (
@@ -189,7 +189,7 @@ class BaseFilter:
 
     __slots__ = ("_data_filter", "_name")
 
-    def __init__(self, name: Optional[str] = None, data_filter: bool = False):
+    def __init__(self, name: str | None = None, data_filter: bool = False):
         self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
 
@@ -265,7 +265,7 @@ class BaseFilter:
     def name(self, name: str) -> None:
         self._name = name
 
-    def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
+    def check_update(self, update: Update) -> bool | FilterDataDict | None:
         """Checks if the specified update should be handled by this filter.
 
         .. versionchanged:: 21.1
@@ -305,7 +305,7 @@ class MessageFilter(BaseFilter):
 
     __slots__ = ()
 
-    def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
+    def check_update(self, update: Update) -> bool | FilterDataDict | None:
         """Checks if the specified update should be handled by this filter by passing
         :attr:`~telegram.Update.effective_message` to :meth:`filter`.
 
@@ -323,7 +323,7 @@ class MessageFilter(BaseFilter):
         return False
 
     @abstractmethod
-    def filter(self, message: Message) -> Optional[Union[bool, FilterDataDict]]:
+    def filter(self, message: Message) -> bool | FilterDataDict | None:
         """This method must be overwritten.
 
         Args:
@@ -347,7 +347,7 @@ class UpdateFilter(BaseFilter):
 
     __slots__ = ()
 
-    def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
+    def check_update(self, update: Update) -> bool | FilterDataDict | None:
         """Checks if the specified update should be handled by this filter.
 
         Args:
@@ -362,7 +362,7 @@ class UpdateFilter(BaseFilter):
         return self.filter(update) if super().check_update(update) else False
 
     @abstractmethod
-    def filter(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
+    def filter(self, update: Update) -> bool | FilterDataDict | None:
         """This method must be overwritten.
 
         Args:
@@ -415,8 +415,8 @@ class _MergedFilter(UpdateFilter):
     def __init__(
         self,
         base_filter: BaseFilter,
-        and_filter: Optional[BaseFilter] = None,
-        or_filter: Optional[BaseFilter] = None,
+        and_filter: BaseFilter | None = None,
+        or_filter: BaseFilter | None = None,
     ):
         super().__init__()
         self.base_filter = base_filter
@@ -434,7 +434,7 @@ class _MergedFilter(UpdateFilter):
             self.data_filter = True
 
     @staticmethod
-    def _merge(base_output: Union[bool, dict], comp_output: Union[bool, dict]) -> FilterDataDict:
+    def _merge(base_output: bool | dict, comp_output: bool | dict) -> FilterDataDict:
         base = base_output if isinstance(base_output, dict) else {}
         comp = comp_output if isinstance(comp_output, dict) else {}
         for k in comp:
@@ -451,7 +451,7 @@ class _MergedFilter(UpdateFilter):
         return base
 
     # pylint: disable=too-many-return-statements
-    def filter(self, update: Update) -> Union[bool, FilterDataDict]:
+    def filter(self, update: Update) -> bool | FilterDataDict:
         base_output = self.base_filter.check_update(update)
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
@@ -509,7 +509,7 @@ class _XORFilter(UpdateFilter):
         self.xor_filter = xor_filter
         self.merged_filter = (base_filter & ~xor_filter) | (~base_filter & xor_filter)
 
-    def filter(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
+    def filter(self, update: Update) -> bool | FilterDataDict | None:
         return self.merged_filter.check_update(update)
 
     @property
@@ -584,8 +584,8 @@ class Caption(MessageFilter):
 
     __slots__ = ("strings",)
 
-    def __init__(self, strings: Optional[Union[list[str], tuple[str, ...]]] = None):
-        self.strings: Optional[Sequence[str]] = strings
+    def __init__(self, strings: list[str] | tuple[str, ...] | None = None):
+        self.strings: Sequence[str] | None = strings
         super().__init__(name=f"filters.Caption({strings})" if strings else "filters.CAPTION")
 
     def filter(self, message: Message) -> bool:
@@ -647,13 +647,13 @@ class CaptionRegex(MessageFilter):
 
     __slots__ = ("pattern",)
 
-    def __init__(self, pattern: Union[str, Pattern[str]]):
+    def __init__(self, pattern: str | Pattern[str]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
         self.pattern: Pattern[str] = pattern
         super().__init__(name=f"filters.CaptionRegex({self.pattern})", data_filter=True)
 
-    def filter(self, message: Message) -> Optional[dict[str, list[Match[str]]]]:
+    def filter(self, message: Message) -> dict[str, list[Match[str]]] | None:
         if message.caption and (match := self.pattern.search(message.caption)):
             return {"matches": [match]}
         return {}
@@ -670,8 +670,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
     def __init__(
         self,
-        chat_id: Optional[SCT[int]] = None,
-        username: Optional[SCT[str]] = None,
+        chat_id: SCT[int] | None = None,
+        username: SCT[str] | None = None,
         allow_empty: bool = False,
     ):
         super().__init__()
@@ -686,9 +686,9 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._set_usernames(username)
 
     @abstractmethod
-    def _get_chat_or_user(self, message: Message) -> Union[TGChat, TGUser, None]: ...
+    def _get_chat_or_user(self, message: Message) -> TGChat | TGUser | None: ...
 
-    def _set_chat_ids(self, chat_id: Optional[SCT[int]]) -> None:
+    def _set_chat_ids(self, chat_id: SCT[int] | None) -> None:
         if chat_id and self._usernames:
             raise RuntimeError(
                 f"Can't set {self._chat_id_name} in conjunction with (already set) "
@@ -696,7 +696,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
             )
         self._chat_ids = set(parse_chat_id(chat_id))
 
-    def _set_usernames(self, username: Optional[SCT[str]]) -> None:
+    def _set_usernames(self, username: SCT[str] | None) -> None:
         if username and self._chat_ids:
             raise RuntimeError(
                 f"Can't set {self._username_name} in conjunction with (already set) "
@@ -841,7 +841,7 @@ class Chat(_ChatUserBaseFilter):
 
     __slots__ = ()
 
-    def _get_chat_or_user(self, message: Message) -> Optional[TGChat]:
+    def _get_chat_or_user(self, message: Message) -> TGChat | None:
         return message.chat
 
     def add_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -998,10 +998,10 @@ CONTACT = _Contact(name="filters.CONTACT")
 class _Dice(MessageFilter):
     __slots__ = ("emoji", "values")
 
-    def __init__(self, values: Optional[SCT[int]] = None, emoji: Optional[DiceEmojiEnum] = None):
+    def __init__(self, values: SCT[int] | None = None, emoji: DiceEmojiEnum | None = None):
         super().__init__()
-        self.emoji: Optional[DiceEmojiEnum] = emoji
-        self.values: Optional[Collection[int]] = [values] if isinstance(values, int) else values
+        self.emoji: DiceEmojiEnum | None = emoji
+        self.values: Collection[int] | None = [values] if isinstance(values, int) else values
 
         if emoji:  # for filters.Dice.BASKETBALL
             self.name = f"filters.Dice.{emoji.name}"
@@ -1262,7 +1262,7 @@ class Document:
 
         __slots__ = ("_file_extension", "is_case_sensitive")
 
-        def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
+        def __init__(self, file_extension: str | None, case_sensitive: bool = False):
             super().__init__()
             self.is_case_sensitive: bool = case_sensitive
             if file_extension is None:
@@ -1466,7 +1466,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
 
     __slots__ = ()
 
-    def _get_chat_or_user(self, message: Message) -> Union[TGUser, TGChat, None]:
+    def _get_chat_or_user(self, message: Message) -> TGUser | TGChat | None:
         if (forward_origin := message.forward_origin) is None:
             return None
 
@@ -1683,7 +1683,7 @@ class Mention(MessageFilter):
 
     __slots__ = ("_mentions",)
 
-    def __init__(self, mentions: SCT[Union[int, str, TGUser]]):
+    def __init__(self, mentions: SCT[int | str | TGUser]):
         super().__init__(name=f"filters.Mention({mentions})")
         if isinstance(mentions, Iterable) and not isinstance(mentions, str):
             self._mentions = {self._fix_mention_username(mention) for mention in mentions}
@@ -1691,13 +1691,13 @@ class Mention(MessageFilter):
             self._mentions = {self._fix_mention_username(mentions)}
 
     @staticmethod
-    def _fix_mention_username(mention: Union[int, str, TGUser]) -> Union[int, str, TGUser]:
+    def _fix_mention_username(mention: int | str | TGUser) -> int | str | TGUser:
         if not isinstance(mention, str):
             return mention
         return mention.lstrip("@")
 
     @classmethod
-    def _check_mention(cls, message: Message, mention: Union[int, str, TGUser]) -> bool:
+    def _check_mention(cls, message: Message, mention: int | str | TGUser) -> bool:
         if not message.entities:
             return False
 
@@ -1811,13 +1811,13 @@ class Regex(MessageFilter):
 
     __slots__ = ("pattern",)
 
-    def __init__(self, pattern: Union[str, Pattern[str]]):
+    def __init__(self, pattern: str | Pattern[str]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
         self.pattern: Pattern[str] = pattern
         super().__init__(name=f"filters.Regex({self.pattern})", data_filter=True)
 
-    def filter(self, message: Message) -> Optional[dict[str, list[Match[str]]]]:
+    def filter(self, message: Message) -> dict[str, list[Match[str]]] | None:
         if message.text and (match := self.pattern.search(message.text)):
             return {"matches": [match]}
         return {}
@@ -1927,7 +1927,7 @@ class SenderChat(_ChatUserBaseFilter):
         """
         return super()._add_chat_ids(chat_id)
 
-    def _get_chat_or_user(self, message: Message) -> Optional[TGChat]:
+    def _get_chat_or_user(self, message: Message) -> TGChat | None:
         return message.sender_chat
 
     def remove_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -2601,8 +2601,8 @@ class SuccessfulPayment(MessageFilter):
 
     __slots__ = ("invoice_payloads",)
 
-    def __init__(self, invoice_payloads: Optional[Union[list[str], tuple[str, ...]]] = None):
-        self.invoice_payloads: Optional[Sequence[str]] = invoice_payloads
+    def __init__(self, invoice_payloads: list[str] | tuple[str, ...] | None = None):
+        self.invoice_payloads: Sequence[str] | None = invoice_payloads
         super().__init__(
             name=(
                 f"filters.SuccessfulPayment({invoice_payloads})"
@@ -2670,8 +2670,8 @@ class Text(MessageFilter):
 
     __slots__ = ("strings",)
 
-    def __init__(self, strings: Optional[Union[list[str], tuple[str, ...]]] = None):
-        self.strings: Optional[Sequence[str]] = strings
+    def __init__(self, strings: list[str] | tuple[str, ...] | None = None):
+        self.strings: Sequence[str] | None = strings
         super().__init__(name=f"filters.Text({strings})" if strings else "filters.TEXT")
 
     def filter(self, message: Message) -> bool:
@@ -2849,14 +2849,14 @@ class User(_ChatUserBaseFilter):
 
     def __init__(
         self,
-        user_id: Optional[SCT[int]] = None,
-        username: Optional[SCT[str]] = None,
+        user_id: SCT[int] | None = None,
+        username: SCT[str] | None = None,
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
         self._chat_id_name = "user_id"
 
-    def _get_chat_or_user(self, message: Message) -> Optional[TGUser]:
+    def _get_chat_or_user(self, message: Message) -> TGUser | None:
         return message.from_user
 
     @property
@@ -2987,14 +2987,14 @@ class ViaBot(_ChatUserBaseFilter):
 
     def __init__(
         self,
-        bot_id: Optional[SCT[int]] = None,
-        username: Optional[SCT[str]] = None,
+        bot_id: SCT[int] | None = None,
+        username: SCT[str] | None = None,
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)
         self._chat_id_name = "bot_id"
 
-    def _get_chat_or_user(self, message: Message) -> Optional[TGUser]:
+    def _get_chat_or_user(self, message: Message) -> TGUser | None:
         return message.via_bot
 
     @property

@@ -23,7 +23,7 @@ import datetime as dtm
 import re
 from collections.abc import Sequence
 from html import escape
-from typing import TYPE_CHECKING, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, TypedDict
 
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
@@ -79,11 +79,9 @@ from telegram._utils.entities import parse_message_entities, parse_message_entit
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
     CorrectOptionID,
-    FileInput,
     JSONDict,
     MarkdownVersion,
     ODVInput,
-    ReplyMarkup,
     TimePeriod,
 )
 from telegram._utils.warnings import warn
@@ -128,12 +126,13 @@ if TYPE_CHECKING:
         SuggestedPostRefunded,
         TextQuote,
     )
+    from telegram._utils.types import FileInput, ReplyMarkup
 
 
 class _ReplyKwargs(TypedDict):
     __slots__ = ("chat_id", "reply_parameters")  # type: ignore[misc]
 
-    chat_id: Union[str, int]
+    chat_id: str | int
     reply_parameters: ReplyParameters
 
 
@@ -175,7 +174,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         message_id: int,
         date: dtm.datetime,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.chat: Chat = chat
@@ -192,17 +191,15 @@ class MaybeInaccessibleMessage(TelegramObject):
 
         .. versionadded:: 20.8
         """
-        # Once we drop support for python 3.9, this can be made a TypeGuard function:
-        # def is_accessible(self) -> TypeGuard[Message]:
         return self.date != ZERO_DATE
 
     @classmethod
     def _de_json(
         cls,
-        data: Optional[JSONDict],
-        bot: Optional["Bot"] = None,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Optional["MaybeInaccessibleMessage"]:
+        data: JSONDict | None,
+        bot: "Bot | None" = None,
+        api_kwargs: JSONDict | None = None,
+    ) -> "MaybeInaccessibleMessage | None":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -252,7 +249,7 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
         chat: Chat,
         message_id: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(chat=chat, message_id=message_id, date=ZERO_DATE, api_kwargs=api_kwargs)
         self._freeze()
@@ -1200,107 +1197,107 @@ class Message(MaybeInaccessibleMessage):
         message_id: int,
         date: dtm.datetime,
         chat: Chat,
-        from_user: Optional[User] = None,
-        reply_to_message: Optional["Message"] = None,
-        edit_date: Optional[dtm.datetime] = None,
-        text: Optional[str] = None,
-        entities: Optional[Sequence["MessageEntity"]] = None,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        audio: Optional[Audio] = None,
-        document: Optional[Document] = None,
-        game: Optional[Game] = None,
-        photo: Optional[Sequence[PhotoSize]] = None,
-        sticker: Optional[Sticker] = None,
-        video: Optional[Video] = None,
-        voice: Optional[Voice] = None,
-        video_note: Optional[VideoNote] = None,
-        new_chat_members: Optional[Sequence[User]] = None,
-        caption: Optional[str] = None,
-        contact: Optional[Contact] = None,
-        location: Optional[Location] = None,
-        venue: Optional[Venue] = None,
-        left_chat_member: Optional[User] = None,
-        new_chat_title: Optional[str] = None,
-        new_chat_photo: Optional[Sequence[PhotoSize]] = None,
-        delete_chat_photo: Optional[bool] = None,
-        group_chat_created: Optional[bool] = None,
-        supergroup_chat_created: Optional[bool] = None,
-        channel_chat_created: Optional[bool] = None,
-        migrate_to_chat_id: Optional[int] = None,
-        migrate_from_chat_id: Optional[int] = None,
-        pinned_message: Optional[MaybeInaccessibleMessage] = None,
-        invoice: Optional[Invoice] = None,
-        successful_payment: Optional[SuccessfulPayment] = None,
-        author_signature: Optional[str] = None,
-        media_group_id: Optional[str] = None,
-        connected_website: Optional[str] = None,
-        animation: Optional[Animation] = None,
-        passport_data: Optional[PassportData] = None,
-        poll: Optional[Poll] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        dice: Optional[Dice] = None,
-        via_bot: Optional[User] = None,
-        proximity_alert_triggered: Optional[ProximityAlertTriggered] = None,
-        sender_chat: Optional[Chat] = None,
-        video_chat_started: Optional[VideoChatStarted] = None,
-        video_chat_ended: Optional[VideoChatEnded] = None,
-        video_chat_participants_invited: Optional[VideoChatParticipantsInvited] = None,
-        message_auto_delete_timer_changed: Optional[MessageAutoDeleteTimerChanged] = None,
-        video_chat_scheduled: Optional[VideoChatScheduled] = None,
-        is_automatic_forward: Optional[bool] = None,
-        has_protected_content: Optional[bool] = None,
-        web_app_data: Optional[WebAppData] = None,
-        is_topic_message: Optional[bool] = None,
-        message_thread_id: Optional[int] = None,
-        forum_topic_created: Optional[ForumTopicCreated] = None,
-        forum_topic_closed: Optional[ForumTopicClosed] = None,
-        forum_topic_reopened: Optional[ForumTopicReopened] = None,
-        forum_topic_edited: Optional[ForumTopicEdited] = None,
-        general_forum_topic_hidden: Optional[GeneralForumTopicHidden] = None,
-        general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = None,
-        write_access_allowed: Optional[WriteAccessAllowed] = None,
-        has_media_spoiler: Optional[bool] = None,
-        chat_shared: Optional[ChatShared] = None,
-        story: Optional[Story] = None,
-        giveaway: Optional["Giveaway"] = None,
-        giveaway_completed: Optional["GiveawayCompleted"] = None,
-        giveaway_created: Optional["GiveawayCreated"] = None,
-        giveaway_winners: Optional["GiveawayWinners"] = None,
-        users_shared: Optional[UsersShared] = None,
-        link_preview_options: Optional[LinkPreviewOptions] = None,
-        external_reply: Optional["ExternalReplyInfo"] = None,
-        quote: Optional["TextQuote"] = None,
-        forward_origin: Optional["MessageOrigin"] = None,
-        reply_to_story: Optional[Story] = None,
-        boost_added: Optional[ChatBoostAdded] = None,
-        sender_boost_count: Optional[int] = None,
-        business_connection_id: Optional[str] = None,
-        sender_business_bot: Optional[User] = None,
-        is_from_offline: Optional[bool] = None,
-        chat_background_set: Optional[ChatBackground] = None,
-        effect_id: Optional[str] = None,
-        show_caption_above_media: Optional[bool] = None,
-        paid_media: Optional[PaidMediaInfo] = None,
-        refunded_payment: Optional[RefundedPayment] = None,
-        gift: Optional[GiftInfo] = None,
-        unique_gift: Optional[UniqueGiftInfo] = None,
-        paid_message_price_changed: Optional[PaidMessagePriceChanged] = None,
-        paid_star_count: Optional[int] = None,
-        direct_message_price_changed: Optional[DirectMessagePriceChanged] = None,
-        checklist: Optional[Checklist] = None,
-        checklist_tasks_done: Optional[ChecklistTasksDone] = None,
-        checklist_tasks_added: Optional[ChecklistTasksAdded] = None,
-        is_paid_post: Optional[bool] = None,
-        direct_messages_topic: Optional[DirectMessagesTopic] = None,
-        reply_to_checklist_task_id: Optional[int] = None,
-        suggested_post_declined: Optional["SuggestedPostDeclined"] = None,
-        suggested_post_paid: Optional["SuggestedPostPaid"] = None,
-        suggested_post_refunded: Optional["SuggestedPostRefunded"] = None,
-        suggested_post_info: Optional["SuggestedPostInfo"] = None,
-        suggested_post_approved: Optional["SuggestedPostApproved"] = None,
-        suggested_post_approval_failed: Optional["SuggestedPostApprovalFailed"] = None,
+        from_user: User | None = None,
+        reply_to_message: "Message | None" = None,
+        edit_date: dtm.datetime | None = None,
+        text: str | None = None,
+        entities: Sequence["MessageEntity"] | None = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        audio: Audio | None = None,
+        document: Document | None = None,
+        game: Game | None = None,
+        photo: Sequence[PhotoSize] | None = None,
+        sticker: Sticker | None = None,
+        video: Video | None = None,
+        voice: Voice | None = None,
+        video_note: VideoNote | None = None,
+        new_chat_members: Sequence[User] | None = None,
+        caption: str | None = None,
+        contact: "Contact | None" = None,
+        location: "Location | None" = None,
+        venue: Venue | None = None,
+        left_chat_member: User | None = None,
+        new_chat_title: str | None = None,
+        new_chat_photo: Sequence[PhotoSize] | None = None,
+        delete_chat_photo: bool | None = None,
+        group_chat_created: bool | None = None,
+        supergroup_chat_created: bool | None = None,
+        channel_chat_created: bool | None = None,
+        migrate_to_chat_id: int | None = None,
+        migrate_from_chat_id: int | None = None,
+        pinned_message: MaybeInaccessibleMessage | None = None,
+        invoice: Invoice | None = None,
+        successful_payment: SuccessfulPayment | None = None,
+        author_signature: str | None = None,
+        media_group_id: str | None = None,
+        connected_website: str | None = None,
+        animation: Animation | None = None,
+        passport_data: PassportData | None = None,
+        poll: Poll | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        dice: Dice | None = None,
+        via_bot: User | None = None,
+        proximity_alert_triggered: ProximityAlertTriggered | None = None,
+        sender_chat: Chat | None = None,
+        video_chat_started: VideoChatStarted | None = None,
+        video_chat_ended: VideoChatEnded | None = None,
+        video_chat_participants_invited: VideoChatParticipantsInvited | None = None,
+        message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged | None = None,
+        video_chat_scheduled: VideoChatScheduled | None = None,
+        is_automatic_forward: bool | None = None,
+        has_protected_content: bool | None = None,
+        web_app_data: WebAppData | None = None,
+        is_topic_message: bool | None = None,
+        message_thread_id: int | None = None,
+        forum_topic_created: ForumTopicCreated | None = None,
+        forum_topic_closed: ForumTopicClosed | None = None,
+        forum_topic_reopened: ForumTopicReopened | None = None,
+        forum_topic_edited: ForumTopicEdited | None = None,
+        general_forum_topic_hidden: GeneralForumTopicHidden | None = None,
+        general_forum_topic_unhidden: GeneralForumTopicUnhidden | None = None,
+        write_access_allowed: WriteAccessAllowed | None = None,
+        has_media_spoiler: bool | None = None,
+        chat_shared: ChatShared | None = None,
+        story: Story | None = None,
+        giveaway: "Giveaway | None" = None,
+        giveaway_completed: "GiveawayCompleted | None" = None,
+        giveaway_created: "GiveawayCreated | None" = None,
+        giveaway_winners: "GiveawayWinners | None" = None,
+        users_shared: UsersShared | None = None,
+        link_preview_options: LinkPreviewOptions | None = None,
+        external_reply: "ExternalReplyInfo | None" = None,
+        quote: "TextQuote | None" = None,
+        forward_origin: "MessageOrigin | None" = None,
+        reply_to_story: Story | None = None,
+        boost_added: ChatBoostAdded | None = None,
+        sender_boost_count: int | None = None,
+        business_connection_id: str | None = None,
+        sender_business_bot: User | None = None,
+        is_from_offline: bool | None = None,
+        chat_background_set: ChatBackground | None = None,
+        effect_id: str | None = None,
+        show_caption_above_media: bool | None = None,
+        paid_media: PaidMediaInfo | None = None,
+        refunded_payment: RefundedPayment | None = None,
+        gift: GiftInfo | None = None,
+        unique_gift: UniqueGiftInfo | None = None,
+        paid_message_price_changed: PaidMessagePriceChanged | None = None,
+        paid_star_count: int | None = None,
+        direct_message_price_changed: DirectMessagePriceChanged | None = None,
+        checklist: Checklist | None = None,
+        checklist_tasks_done: ChecklistTasksDone | None = None,
+        checklist_tasks_added: ChecklistTasksAdded | None = None,
+        is_paid_post: bool | None = None,
+        direct_messages_topic: DirectMessagesTopic | None = None,
+        reply_to_checklist_task_id: int | None = None,
+        suggested_post_declined: "SuggestedPostDeclined | None" = None,
+        suggested_post_paid: "SuggestedPostPaid | None" = None,
+        suggested_post_refunded: "SuggestedPostRefunded | None" = None,
+        suggested_post_info: "SuggestedPostInfo | None" = None,
+        suggested_post_approved: "SuggestedPostApproved | None" = None,
+        suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(chat=chat, message_id=message_id, date=date, api_kwargs=api_kwargs)
 
@@ -1308,121 +1305,121 @@ class Message(MaybeInaccessibleMessage):
             # Required
             self.message_id: int = message_id
             # Optionals
-            self.from_user: Optional[User] = from_user
-            self.sender_chat: Optional[Chat] = sender_chat
+            self.from_user: User | None = from_user
+            self.sender_chat: Chat | None = sender_chat
             self.date: dtm.datetime = date
             self.chat: Chat = chat
-            self.is_automatic_forward: Optional[bool] = is_automatic_forward
-            self.reply_to_message: Optional[Message] = reply_to_message
-            self.edit_date: Optional[dtm.datetime] = edit_date
-            self.has_protected_content: Optional[bool] = has_protected_content
-            self.text: Optional[str] = text
+            self.is_automatic_forward: bool | None = is_automatic_forward
+            self.reply_to_message: Message | None = reply_to_message
+            self.edit_date: dtm.datetime | None = edit_date
+            self.has_protected_content: bool | None = has_protected_content
+            self.text: str | None = text
             self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.audio: Optional[Audio] = audio
-            self.game: Optional[Game] = game
-            self.document: Optional[Document] = document
+            self.audio: Audio | None = audio
+            self.game: Game | None = game
+            self.document: Document | None = document
             self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
-            self.sticker: Optional[Sticker] = sticker
-            self.video: Optional[Video] = video
-            self.voice: Optional[Voice] = voice
-            self.video_note: Optional[VideoNote] = video_note
-            self.caption: Optional[str] = caption
-            self.contact: Optional[Contact] = contact
-            self.location: Optional[Location] = location
-            self.venue: Optional[Venue] = venue
+            self.sticker: Sticker | None = sticker
+            self.video: Video | None = video
+            self.voice: Voice | None = voice
+            self.video_note: VideoNote | None = video_note
+            self.caption: str | None = caption
+            self.contact: Contact | None = contact
+            self.location: Location | None = location
+            self.venue: Venue | None = venue
             self.new_chat_members: tuple[User, ...] = parse_sequence_arg(new_chat_members)
-            self.left_chat_member: Optional[User] = left_chat_member
-            self.new_chat_title: Optional[str] = new_chat_title
+            self.left_chat_member: User | None = left_chat_member
+            self.new_chat_title: str | None = new_chat_title
             self.new_chat_photo: tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
-            self.delete_chat_photo: Optional[bool] = bool(delete_chat_photo)
-            self.group_chat_created: Optional[bool] = bool(group_chat_created)
-            self.supergroup_chat_created: Optional[bool] = bool(supergroup_chat_created)
-            self.migrate_to_chat_id: Optional[int] = migrate_to_chat_id
-            self.migrate_from_chat_id: Optional[int] = migrate_from_chat_id
-            self.channel_chat_created: Optional[bool] = bool(channel_chat_created)
-            self.message_auto_delete_timer_changed: Optional[MessageAutoDeleteTimerChanged] = (
+            self.delete_chat_photo: bool | None = bool(delete_chat_photo)
+            self.group_chat_created: bool | None = bool(group_chat_created)
+            self.supergroup_chat_created: bool | None = bool(supergroup_chat_created)
+            self.migrate_to_chat_id: int | None = migrate_to_chat_id
+            self.migrate_from_chat_id: int | None = migrate_from_chat_id
+            self.channel_chat_created: bool | None = bool(channel_chat_created)
+            self.message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged | None = (
                 message_auto_delete_timer_changed
             )
-            self.pinned_message: Optional[MaybeInaccessibleMessage] = pinned_message
-            self.invoice: Optional[Invoice] = invoice
-            self.successful_payment: Optional[SuccessfulPayment] = successful_payment
-            self.connected_website: Optional[str] = connected_website
-            self.author_signature: Optional[str] = author_signature
-            self.media_group_id: Optional[str] = media_group_id
-            self.animation: Optional[Animation] = animation
-            self.passport_data: Optional[PassportData] = passport_data
-            self.poll: Optional[Poll] = poll
-            self.dice: Optional[Dice] = dice
-            self.via_bot: Optional[User] = via_bot
-            self.proximity_alert_triggered: Optional[ProximityAlertTriggered] = (
+            self.pinned_message: MaybeInaccessibleMessage | None = pinned_message
+            self.invoice: Invoice | None = invoice
+            self.successful_payment: SuccessfulPayment | None = successful_payment
+            self.connected_website: str | None = connected_website
+            self.author_signature: str | None = author_signature
+            self.media_group_id: str | None = media_group_id
+            self.animation: Animation | None = animation
+            self.passport_data: PassportData | None = passport_data
+            self.poll: Poll | None = poll
+            self.dice: Dice | None = dice
+            self.via_bot: User | None = via_bot
+            self.proximity_alert_triggered: ProximityAlertTriggered | None = (
                 proximity_alert_triggered
             )
-            self.video_chat_scheduled: Optional[VideoChatScheduled] = video_chat_scheduled
-            self.video_chat_started: Optional[VideoChatStarted] = video_chat_started
-            self.video_chat_ended: Optional[VideoChatEnded] = video_chat_ended
-            self.video_chat_participants_invited: Optional[VideoChatParticipantsInvited] = (
+            self.video_chat_scheduled: VideoChatScheduled | None = video_chat_scheduled
+            self.video_chat_started: VideoChatStarted | None = video_chat_started
+            self.video_chat_ended: VideoChatEnded | None = video_chat_ended
+            self.video_chat_participants_invited: VideoChatParticipantsInvited | None = (
                 video_chat_participants_invited
             )
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.web_app_data: Optional[WebAppData] = web_app_data
-            self.is_topic_message: Optional[bool] = is_topic_message
-            self.message_thread_id: Optional[int] = message_thread_id
-            self.forum_topic_created: Optional[ForumTopicCreated] = forum_topic_created
-            self.forum_topic_closed: Optional[ForumTopicClosed] = forum_topic_closed
-            self.forum_topic_reopened: Optional[ForumTopicReopened] = forum_topic_reopened
-            self.forum_topic_edited: Optional[ForumTopicEdited] = forum_topic_edited
-            self.general_forum_topic_hidden: Optional[GeneralForumTopicHidden] = (
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.web_app_data: WebAppData | None = web_app_data
+            self.is_topic_message: bool | None = is_topic_message
+            self.message_thread_id: int | None = message_thread_id
+            self.forum_topic_created: ForumTopicCreated | None = forum_topic_created
+            self.forum_topic_closed: ForumTopicClosed | None = forum_topic_closed
+            self.forum_topic_reopened: ForumTopicReopened | None = forum_topic_reopened
+            self.forum_topic_edited: ForumTopicEdited | None = forum_topic_edited
+            self.general_forum_topic_hidden: GeneralForumTopicHidden | None = (
                 general_forum_topic_hidden
             )
-            self.general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = (
+            self.general_forum_topic_unhidden: GeneralForumTopicUnhidden | None = (
                 general_forum_topic_unhidden
             )
-            self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
-            self.has_media_spoiler: Optional[bool] = has_media_spoiler
-            self.checklist: Optional[Checklist] = checklist
-            self.users_shared: Optional[UsersShared] = users_shared
-            self.chat_shared: Optional[ChatShared] = chat_shared
-            self.story: Optional[Story] = story
-            self.giveaway: Optional[Giveaway] = giveaway
-            self.giveaway_completed: Optional[GiveawayCompleted] = giveaway_completed
-            self.giveaway_created: Optional[GiveawayCreated] = giveaway_created
-            self.giveaway_winners: Optional[GiveawayWinners] = giveaway_winners
-            self.link_preview_options: Optional[LinkPreviewOptions] = link_preview_options
-            self.external_reply: Optional[ExternalReplyInfo] = external_reply
-            self.quote: Optional[TextQuote] = quote
-            self.forward_origin: Optional[MessageOrigin] = forward_origin
-            self.reply_to_story: Optional[Story] = reply_to_story
-            self.boost_added: Optional[ChatBoostAdded] = boost_added
-            self.sender_boost_count: Optional[int] = sender_boost_count
-            self.business_connection_id: Optional[str] = business_connection_id
-            self.sender_business_bot: Optional[User] = sender_business_bot
-            self.is_from_offline: Optional[bool] = is_from_offline
-            self.chat_background_set: Optional[ChatBackground] = chat_background_set
-            self.checklist_tasks_done: Optional[ChecklistTasksDone] = checklist_tasks_done
-            self.checklist_tasks_added: Optional[ChecklistTasksAdded] = checklist_tasks_added
-            self.effect_id: Optional[str] = effect_id
-            self.show_caption_above_media: Optional[bool] = show_caption_above_media
-            self.paid_media: Optional[PaidMediaInfo] = paid_media
-            self.refunded_payment: Optional[RefundedPayment] = refunded_payment
-            self.gift: Optional[GiftInfo] = gift
-            self.unique_gift: Optional[UniqueGiftInfo] = unique_gift
-            self.paid_message_price_changed: Optional[PaidMessagePriceChanged] = (
+            self.write_access_allowed: WriteAccessAllowed | None = write_access_allowed
+            self.has_media_spoiler: bool | None = has_media_spoiler
+            self.checklist: Checklist | None = checklist
+            self.users_shared: UsersShared | None = users_shared
+            self.chat_shared: ChatShared | None = chat_shared
+            self.story: Story | None = story
+            self.giveaway: Giveaway | None = giveaway
+            self.giveaway_completed: GiveawayCompleted | None = giveaway_completed
+            self.giveaway_created: GiveawayCreated | None = giveaway_created
+            self.giveaway_winners: GiveawayWinners | None = giveaway_winners
+            self.link_preview_options: LinkPreviewOptions | None = link_preview_options
+            self.external_reply: ExternalReplyInfo | None = external_reply
+            self.quote: TextQuote | None = quote
+            self.forward_origin: MessageOrigin | None = forward_origin
+            self.reply_to_story: Story | None = reply_to_story
+            self.boost_added: ChatBoostAdded | None = boost_added
+            self.sender_boost_count: int | None = sender_boost_count
+            self.business_connection_id: str | None = business_connection_id
+            self.sender_business_bot: User | None = sender_business_bot
+            self.is_from_offline: bool | None = is_from_offline
+            self.chat_background_set: ChatBackground | None = chat_background_set
+            self.checklist_tasks_done: ChecklistTasksDone | None = checklist_tasks_done
+            self.checklist_tasks_added: ChecklistTasksAdded | None = checklist_tasks_added
+            self.effect_id: str | None = effect_id
+            self.show_caption_above_media: bool | None = show_caption_above_media
+            self.paid_media: PaidMediaInfo | None = paid_media
+            self.refunded_payment: RefundedPayment | None = refunded_payment
+            self.gift: GiftInfo | None = gift
+            self.unique_gift: UniqueGiftInfo | None = unique_gift
+            self.paid_message_price_changed: PaidMessagePriceChanged | None = (
                 paid_message_price_changed
             )
-            self.paid_star_count: Optional[int] = paid_star_count
-            self.direct_message_price_changed: Optional[DirectMessagePriceChanged] = (
+            self.paid_star_count: int | None = paid_star_count
+            self.direct_message_price_changed: DirectMessagePriceChanged | None = (
                 direct_message_price_changed
             )
-            self.is_paid_post: Optional[bool] = is_paid_post
-            self.direct_messages_topic: Optional[DirectMessagesTopic] = direct_messages_topic
-            self.reply_to_checklist_task_id: Optional[int] = reply_to_checklist_task_id
-            self.suggested_post_declined: Optional[SuggestedPostDeclined] = suggested_post_declined
-            self.suggested_post_paid: Optional[SuggestedPostPaid] = suggested_post_paid
-            self.suggested_post_refunded: Optional[SuggestedPostRefunded] = suggested_post_refunded
-            self.suggested_post_info: Optional[SuggestedPostInfo] = suggested_post_info
-            self.suggested_post_approved: Optional[SuggestedPostApproved] = suggested_post_approved
-            self.suggested_post_approval_failed: Optional[SuggestedPostApprovalFailed] = (
+            self.is_paid_post: bool | None = is_paid_post
+            self.direct_messages_topic: DirectMessagesTopic | None = direct_messages_topic
+            self.reply_to_checklist_task_id: int | None = reply_to_checklist_task_id
+            self.suggested_post_declined: SuggestedPostDeclined | None = suggested_post_declined
+            self.suggested_post_paid: SuggestedPostPaid | None = suggested_post_paid
+            self.suggested_post_refunded: SuggestedPostRefunded | None = suggested_post_refunded
+            self.suggested_post_info: SuggestedPostInfo | None = suggested_post_info
+            self.suggested_post_approved: SuggestedPostApproved | None = suggested_post_approved
+            self.suggested_post_approval_failed: SuggestedPostApprovalFailed | None = (
                 suggested_post_approval_failed
             )
 
@@ -1445,7 +1442,7 @@ class Message(MaybeInaccessibleMessage):
         return self.message_id
 
     @property
-    def link(self) -> Optional[str]:
+    def link(self) -> str | None:
         """:obj:`str`: Convenience property. If the chat of the message is not
         a private chat or normal group, returns a t.me link of the message.
 
@@ -1465,7 +1462,7 @@ class Message(MaybeInaccessibleMessage):
         return None
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Message":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Message":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -1663,28 +1660,28 @@ class Message(MaybeInaccessibleMessage):
     @property
     def effective_attachment(
         self,
-    ) -> Union[
-        Animation,
-        Audio,
-        Contact,
-        Dice,
-        Document,
-        Game,
-        Invoice,
-        Location,
-        PassportData,
-        Sequence[PhotoSize],
-        PaidMediaInfo,
-        Poll,
-        Sticker,
-        Story,
-        SuccessfulPayment,
-        Venue,
-        Video,
-        VideoNote,
-        Voice,
-        None,
-    ]:
+    ) -> (
+        Animation
+        | Audio
+        | Contact
+        | Dice
+        | Document
+        | Game
+        | Invoice
+        | Location
+        | PassportData
+        | Sequence[PhotoSize]
+        | PaidMediaInfo
+        | Poll
+        | Sticker
+        | Story
+        | SuccessfulPayment
+        | Venue
+        | Video
+        | VideoNote
+        | Voice
+        | None
+    ):
         """If the message is a user generated content which is not a plain text message, this
         property is set to this content. It may be one of
 
@@ -1745,8 +1742,8 @@ class Message(MaybeInaccessibleMessage):
         return self._effective_attachment  # type: ignore[return-value]
 
     def _do_quote(
-        self, do_quote: Optional[bool], allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE
-    ) -> Optional[ReplyParameters]:
+        self, do_quote: bool | None, allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE
+    ) -> ReplyParameters | None:
         """Modify kwargs for replying with or without quoting."""
         # `Defaults` handling for allow_sending_without_reply is not necessary, as
         # `ReplyParameters` have special defaults handling in (ExtBot)._insert_defaults
@@ -1771,8 +1768,8 @@ class Message(MaybeInaccessibleMessage):
         return None
 
     def compute_quote_position_and_entities(
-        self, quote: str, index: Optional[int] = None
-    ) -> tuple[int, Optional[tuple[MessageEntity, ...]]]:
+        self, quote: str, index: int | None = None
+    ) -> tuple[int, tuple[MessageEntity, ...] | None]:
         """
         Use this function to compute position and entities of a quote in the message text or
         caption. Useful for filling the parameters
@@ -1848,9 +1845,9 @@ class Message(MaybeInaccessibleMessage):
 
     def build_reply_arguments(
         self,
-        quote: Optional[str] = None,
-        quote_index: Optional[int] = None,
-        target_chat_id: Optional[Union[int, str]] = None,
+        quote: str | None = None,
+        quote_index: int | None = None,
+        target_chat_id: int | (str | None) = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
     ) -> _ReplyKwargs:
@@ -1937,22 +1934,21 @@ class Message(MaybeInaccessibleMessage):
 
     async def _parse_quote_arguments(
         self,
-        do_quote: Optional[Union[bool, _ReplyKwargs]],
-        reply_to_message_id: Optional[int],
-        reply_parameters: Optional["ReplyParameters"],
+        do_quote: bool | _ReplyKwargs | None,
+        reply_to_message_id: int | None,
+        reply_parameters: "ReplyParameters | None",
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-    ) -> tuple[Union[str, int], ReplyParameters]:
+    ) -> tuple[str | int, ReplyParameters]:
         if allow_sending_without_reply is not DEFAULT_NONE and reply_parameters is not None:
             raise ValueError(
                 "`allow_sending_without_reply` and `reply_parameters` are mutually exclusive."
             )
-
         if reply_to_message_id is not None and reply_parameters is not None:
             raise ValueError(
                 "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
             )
 
-        chat_id: Union[str, int] = self.chat_id
+        chat_id: str | int = self.chat_id
 
         # reply_parameters and reply_to_message_id overrule the do_quote parameter
         if reply_parameters is not None:
@@ -1978,9 +1974,9 @@ class Message(MaybeInaccessibleMessage):
 
     def _parse_message_thread_id(
         self,
-        chat_id: Union[str, int],
+        chat_id: str | int,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-    ) -> Optional[int]:
+    ) -> int | None:
         # values set by user have the highest priority
         if not isinstance(message_thread_id, DefaultValue):
             return message_thread_id
@@ -1996,7 +1992,7 @@ class Message(MaybeInaccessibleMessage):
         # the same chat.
         return self.message_thread_id if chat_id in {self.chat_id, self.chat.username} else None
 
-    def _extract_direct_messages_topic_id(self) -> Optional[int]:
+    def _extract_direct_messages_topic_id(self) -> int | None:
         """Return the topic id of the direct messages chat, if it is present."""
         return self.direct_messages_topic.topic_id if self.direct_messages_topic else None
 
@@ -2005,25 +2001,25 @@ class Message(MaybeInaccessibleMessage):
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        entities: Optional[Sequence["MessageEntity"]] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        disable_web_page_preview: Optional[bool] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        disable_web_page_preview: bool | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2085,25 +2081,25 @@ class Message(MaybeInaccessibleMessage):
         self,
         text: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        entities: Optional[Sequence["MessageEntity"]] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        disable_web_page_preview: Optional[bool] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        disable_web_page_preview: bool | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2171,25 +2167,25 @@ class Message(MaybeInaccessibleMessage):
         self,
         text: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        entities: Optional[Sequence["MessageEntity"]] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        disable_web_page_preview: Optional[bool] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        disable_web_page_preview: bool | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2253,25 +2249,25 @@ class Message(MaybeInaccessibleMessage):
         self,
         text: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        entities: Optional[Sequence["MessageEntity"]] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        disable_web_page_preview: Optional[bool] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        disable_web_page_preview: bool | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2334,26 +2330,26 @@ class Message(MaybeInaccessibleMessage):
     async def reply_media_group(
         self,
         media: Sequence[
-            Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-        caption: Optional[str] = None,
+        api_kwargs: JSONDict | None = None,
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
     ) -> tuple["Message", ...]:
         """Shortcut for::
 
@@ -2412,30 +2408,30 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_photo(
         self,
-        photo: Union[FileInput, "PhotoSize"],
-        caption: Optional[str] = None,
+        photo: "FileInput | PhotoSize",
+        caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        has_spoiler: Optional[bool] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        show_caption_above_media: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        has_spoiler: bool | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        show_caption_above_media: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: Optional[str] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2497,32 +2493,32 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_audio(
         self,
-        audio: Union[FileInput, "Audio"],
-        duration: Optional[TimePeriod] = None,
-        performer: Optional[str] = None,
-        title: Optional[str] = None,
-        caption: Optional[str] = None,
+        audio: "FileInput | Audio",
+        duration: TimePeriod | None = None,
+        performer: str | None = None,
+        title: str | None = None,
+        caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        thumbnail: Optional[FileInput] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        thumbnail: "FileInput | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: Optional[str] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2586,30 +2582,30 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_document(
         self,
-        document: Union[FileInput, "Document"],
-        caption: Optional[str] = None,
+        document: "FileInput | Document",
+        caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        disable_content_type_detection: Optional[bool] = None,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        disable_content_type_detection: bool | None = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        thumbnail: Optional[FileInput] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        thumbnail: "FileInput | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: Optional[str] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2671,34 +2667,34 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_animation(
         self,
-        animation: Union[FileInput, "Animation"],
-        duration: Optional[TimePeriod] = None,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
-        caption: Optional[str] = None,
+        animation: "FileInput | Animation",
+        duration: TimePeriod | None = None,
+        width: int | None = None,
+        height: int | None = None,
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        has_spoiler: Optional[bool] = None,
-        thumbnail: Optional[FileInput] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        show_caption_above_media: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        has_spoiler: bool | None = None,
+        thumbnail: "FileInput | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        show_caption_above_media: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: Optional[str] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2764,25 +2760,25 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_sticker(
         self,
-        sticker: Union[FileInput, "Sticker"],
+        sticker: "FileInput | Sticker",
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        emoji: Optional[str] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        emoji: str | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2839,37 +2835,37 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_video(
         self,
-        video: Union[FileInput, "Video"],
-        duration: Optional[TimePeriod] = None,
-        caption: Optional[str] = None,
+        video: "FileInput | Video",
+        duration: TimePeriod | None = None,
+        caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        width: int | None = None,
+        height: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        supports_streaming: Optional[bool] = None,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        supports_streaming: bool | None = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        has_spoiler: Optional[bool] = None,
-        thumbnail: Optional[FileInput] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        show_caption_above_media: Optional[bool] = None,
-        cover: Optional[FileInput] = None,
-        start_timestamp: Optional[int] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        has_spoiler: bool | None = None,
+        thumbnail: "FileInput | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        show_caption_above_media: bool | None = None,
+        cover: "FileInput | None" = None,
+        start_timestamp: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: Optional[str] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -2938,28 +2934,28 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_video_note(
         self,
-        video_note: Union[FileInput, "VideoNote"],
-        duration: Optional[TimePeriod] = None,
-        length: Optional[int] = None,
+        video_note: "FileInput | VideoNote",
+        duration: TimePeriod | None = None,
+        length: int | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        thumbnail: Optional[FileInput] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        thumbnail: "FileInput | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: Optional[str] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3019,29 +3015,29 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_voice(
         self,
-        voice: Union[FileInput, "Voice"],
-        duration: Optional[TimePeriod] = None,
-        caption: Optional[str] = None,
+        voice: "FileInput | Voice",
+        duration: TimePeriod | None = None,
+        caption: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: "ReplyMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: Optional[str] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3102,30 +3098,30 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_location(
         self,
-        latitude: Optional[float] = None,
-        longitude: Optional[float] = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        live_period: Optional[TimePeriod] = None,
-        horizontal_accuracy: Optional[float] = None,
-        heading: Optional[int] = None,
-        proximity_alert_radius: Optional[int] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        live_period: TimePeriod | None = None,
+        horizontal_accuracy: float | None = None,
+        heading: int | None = None,
+        proximity_alert_radius: int | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        location: Optional[Location] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        location: "Location | None" = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3187,32 +3183,32 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_venue(
         self,
-        latitude: Optional[float] = None,
-        longitude: Optional[float] = None,
-        title: Optional[str] = None,
-        address: Optional[str] = None,
-        foursquare_id: Optional[str] = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        title: str | None = None,
+        address: str | None = None,
+        foursquare_id: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        foursquare_type: Optional[str] = None,
-        google_place_id: Optional[str] = None,
-        google_place_type: Optional[str] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        foursquare_type: str | None = None,
+        google_place_id: str | None = None,
+        google_place_type: str | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        venue: Optional[Venue] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        venue: "Venue | None" = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3276,28 +3272,28 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_contact(
         self,
-        phone_number: Optional[str] = None,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
+        phone_number: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        vcard: Optional[str] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        vcard: str | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        contact: Optional[Contact] = None,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        contact: "Contact | None" = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3358,35 +3354,35 @@ class Message(MaybeInaccessibleMessage):
     async def reply_poll(
         self,
         question: str,
-        options: Sequence[Union[str, "InputPollOption"]],
-        is_anonymous: Optional[bool] = None,
-        type: Optional[str] = None,  # pylint: disable=redefined-builtin
-        allows_multiple_answers: Optional[bool] = None,
-        correct_option_id: Optional[CorrectOptionID] = None,
-        is_closed: Optional[bool] = None,
+        options: Sequence["str | InputPollOption"],
+        is_anonymous: bool | None = None,
+        type: str | None = None,  # pylint: disable=redefined-builtin
+        allows_multiple_answers: bool | None = None,
+        correct_option_id: CorrectOptionID | None = None,
+        is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        explanation: Optional[str] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        explanation: str | None = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        open_period: Optional[TimePeriod] = None,
-        close_date: Optional[Union[int, dtm.datetime]] = None,
-        explanation_entities: Optional[Sequence["MessageEntity"]] = None,
+        open_period: TimePeriod | None = None,
+        close_date: int | (dtm.datetime | None) = None,
+        explanation_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        question_entities: Optional[Sequence["MessageEntity"]] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
+        question_entities: Sequence["MessageEntity"] | None = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3453,23 +3449,23 @@ class Message(MaybeInaccessibleMessage):
     async def reply_dice(
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
-        emoji: Optional[str] = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        emoji: str | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3528,18 +3524,18 @@ class Message(MaybeInaccessibleMessage):
         checklist: InputChecklist,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_effect_id: Optional[str] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        message_effect_id: str | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3589,7 +3585,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -3628,21 +3624,21 @@ class Message(MaybeInaccessibleMessage):
         self,
         game_short_name: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3702,39 +3698,39 @@ class Message(MaybeInaccessibleMessage):
         payload: str,
         currency: str,
         prices: Sequence["LabeledPrice"],
-        provider_token: Optional[str] = None,
-        start_parameter: Optional[str] = None,
-        photo_url: Optional[str] = None,
-        photo_size: Optional[int] = None,
-        photo_width: Optional[int] = None,
-        photo_height: Optional[int] = None,
-        need_name: Optional[bool] = None,
-        need_phone_number: Optional[bool] = None,
-        need_email: Optional[bool] = None,
-        need_shipping_address: Optional[bool] = None,
-        is_flexible: Optional[bool] = None,
+        provider_token: str | None = None,
+        start_parameter: str | None = None,
+        photo_url: str | None = None,
+        photo_size: int | None = None,
+        photo_width: int | None = None,
+        photo_height: int | None = None,
+        need_name: bool | None = None,
+        need_phone_number: bool | None = None,
+        need_email: bool | None = None,
+        need_shipping_address: bool | None = None,
+        is_flexible: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
-        provider_data: Optional[Union[str, object]] = None,
-        send_phone_number_to_provider: Optional[bool] = None,
-        send_email_to_provider: Optional[bool] = None,
-        max_tip_amount: Optional[int] = None,
-        suggested_tip_amounts: Optional[Sequence[int]] = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
+        provider_data: str | (object | None) = None,
+        send_phone_number_to_provider: bool | None = None,
+        send_email_to_provider: bool | None = None,
+        max_tip_amount: int | None = None,
+        suggested_tip_amounts: Sequence[int] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        message_effect_id: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3820,18 +3816,18 @@ class Message(MaybeInaccessibleMessage):
 
     async def forward(
         self,
-        chat_id: Union[int, str],
+        chat_id: int | str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
-        video_start_timestamp: Optional[int] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        message_thread_id: int | None = None,
+        video_start_timestamp: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3876,27 +3872,27 @@ class Message(MaybeInaccessibleMessage):
 
     async def copy(
         self,
-        chat_id: Union[int, str],
-        caption: Optional[str] = None,
+        chat_id: int | str,
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        show_caption_above_media: Optional[bool] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        video_start_timestamp: Optional[int] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        message_thread_id: int | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        show_caption_above_media: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
+        video_start_timestamp: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "MessageId":
         """Shortcut for::
 
@@ -3943,29 +3939,29 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_copy(
         self,
-        from_chat_id: Union[str, int],
+        from_chat_id: str | int,
         message_id: int,
-        caption: Optional[str] = None,
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[ReplyMarkup] = None,
+        reply_markup: "ReplyMarkup | None" = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        show_caption_above_media: Optional[bool] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        video_start_timestamp: Optional[int] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        show_caption_above_media: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
+        video_start_timestamp: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "MessageId":
         """Shortcut for::
 
@@ -4027,27 +4023,27 @@ class Message(MaybeInaccessibleMessage):
         self,
         star_count: int,
         media: Sequence["InputPaidMedia"],
-        caption: Optional[str] = None,
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        show_caption_above_media: Optional[bool] = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        reply_parameters: Optional["ReplyParameters"] = None,
-        reply_markup: Optional[ReplyMarkup] = None,
-        payload: Optional[str] = None,
-        allow_paid_broadcast: Optional[bool] = None,
-        suggested_post_parameters: Optional["SuggestedPostParameters"] = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        payload: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         *,
-        reply_to_message_id: Optional[int] = None,
+        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -4104,17 +4100,17 @@ class Message(MaybeInaccessibleMessage):
         self,
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
-        entities: Optional[Sequence["MessageEntity"]] = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
+        entities: Sequence["MessageEntity"] | None = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
-        disable_web_page_preview: Optional[bool] = None,
+        disable_web_page_preview: bool | None = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Union["Message", bool]:
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message | bool":
         """Shortcut for::
 
              await bot.edit_message_text(
@@ -4159,18 +4155,18 @@ class Message(MaybeInaccessibleMessage):
 
     async def edit_caption(
         self,
-        caption: Optional[str] = None,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        caption: str | None = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        show_caption_above_media: Optional[bool] = None,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Union["Message", bool]:
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message | bool":
         """Shortcut for::
 
              await bot.edit_message_caption(
@@ -4216,13 +4212,13 @@ class Message(MaybeInaccessibleMessage):
     async def edit_checklist(
         self,
         checklist: InputChecklist,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -4263,14 +4259,14 @@ class Message(MaybeInaccessibleMessage):
     async def edit_media(
         self,
         media: "InputMedia",
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Union["Message", bool]:
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message | bool":
         """Shortcut for::
 
              await bot.edit_message_media(
@@ -4312,14 +4308,14 @@ class Message(MaybeInaccessibleMessage):
 
     async def edit_reply_markup(
         self,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Union["Message", bool]:
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message | bool":
         """Shortcut for::
 
              await bot.edit_message_reply_markup(
@@ -4359,21 +4355,21 @@ class Message(MaybeInaccessibleMessage):
 
     async def edit_live_location(
         self,
-        latitude: Optional[float] = None,
-        longitude: Optional[float] = None,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
-        horizontal_accuracy: Optional[float] = None,
-        heading: Optional[int] = None,
-        proximity_alert_radius: Optional[int] = None,
-        live_period: Optional[TimePeriod] = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
+        horizontal_accuracy: float | None = None,
+        heading: int | None = None,
+        proximity_alert_radius: int | None = None,
+        live_period: TimePeriod | None = None,
         *,
-        location: Optional[Location] = None,
+        location: "Location | None" = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Union["Message", bool]:
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message | bool":
         """Shortcut for::
 
              await bot.edit_message_live_location(
@@ -4420,14 +4416,14 @@ class Message(MaybeInaccessibleMessage):
 
     async def stop_live_location(
         self,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Union["Message", bool]:
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message | bool":
         """Shortcut for::
 
              await bot.stop_message_live_location(
@@ -4469,15 +4465,15 @@ class Message(MaybeInaccessibleMessage):
         self,
         user_id: int,
         score: int,
-        force: Optional[bool] = None,
-        disable_edit_message: Optional[bool] = None,
+        force: bool | None = None,
+        disable_edit_message: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Union["Message", bool]:
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message | bool":
         """Shortcut for::
 
              await bot.set_game_score(
@@ -4518,7 +4514,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> tuple["GameHighScore", ...]:
         """Shortcut for::
 
@@ -4556,7 +4552,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for either::
 
@@ -4607,13 +4603,13 @@ class Message(MaybeInaccessibleMessage):
 
     async def stop_poll(
         self,
-        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        reply_markup: "InlineKeyboardMarkup | None" = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> Poll:
         """Shortcut for::
 
@@ -4654,7 +4650,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4694,7 +4690,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4728,14 +4724,14 @@ class Message(MaybeInaccessibleMessage):
 
     async def edit_forum_topic(
         self,
-        name: Optional[str] = None,
-        icon_custom_emoji_id: Optional[str] = None,
+        name: str | None = None,
+        icon_custom_emoji_id: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4771,7 +4767,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4805,7 +4801,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4839,7 +4835,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4873,7 +4869,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4902,16 +4898,14 @@ class Message(MaybeInaccessibleMessage):
 
     async def set_reaction(
         self,
-        reaction: Optional[
-            Union[Sequence["ReactionType"], "ReactionType", Sequence[str], str]
-        ] = None,
-        is_big: Optional[bool] = None,
+        reaction: "Sequence[ReactionType] | ReactionType | Sequence[str] | str | None" = None,
+        is_big: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4945,7 +4939,7 @@ class Message(MaybeInaccessibleMessage):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -4977,13 +4971,13 @@ class Message(MaybeInaccessibleMessage):
 
     async def approve_suggested_post(
         self,
-        send_date: Optional[Union[int, dtm.datetime]] = None,
+        send_date: int | dtm.datetime | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -5014,13 +5008,13 @@ class Message(MaybeInaccessibleMessage):
 
     async def decline_suggested_post(
         self,
-        comment: Optional[str] = None,
+        comment: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 
@@ -5097,7 +5091,7 @@ class Message(MaybeInaccessibleMessage):
 
         return parse_message_entity(self.caption, entity)
 
-    def parse_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
+    def parse_entities(self, types: list[str | None] | None = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their
@@ -5123,7 +5117,7 @@ class Message(MaybeInaccessibleMessage):
         return parse_message_entities(self.text, self.entities, types=types)
 
     def parse_caption_entities(
-        self, types: Optional[list[str]] = None
+        self, types: list[str | None] | None = None
     ) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
@@ -5152,11 +5146,11 @@ class Message(MaybeInaccessibleMessage):
     @classmethod
     def _parse_html(
         cls,
-        message_text: Optional[str],
+        message_text: str | None,
         entities: dict[MessageEntity, str],
         urled: bool = False,
         offset: int = 0,
-    ) -> Optional[str]:
+    ) -> str | None:
         if message_text is None:
             return None
 
@@ -5341,12 +5335,12 @@ class Message(MaybeInaccessibleMessage):
     @classmethod
     def _parse_markdown(
         cls,
-        message_text: Optional[str],
+        message_text: str | None,
         entities: dict[MessageEntity, str],
         urled: bool = False,
         version: MarkdownVersion = 1,
         offset: int = 0,
-    ) -> Optional[str]:
+    ) -> str | None:
         if version == 1:
             for entity_type in (
                 MessageEntity.EXPANDABLE_BLOCKQUOTE,

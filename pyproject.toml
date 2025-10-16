@@ -8,7 +8,7 @@ dynamic = ["version"]
 name = "python-telegram-bot"
 description = "We have made you a wrapper you can't refuse"
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "LGPL-3.0-only"
 license-files = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"]
 authors = [
@@ -31,7 +31,6 @@ classifiers = [
     "Topic :: Internet",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -40,6 +39,7 @@ classifiers = [
 ]
 dependencies = [
     "httpx >=0.27,<0.29",
+    "httpcore >=1.0.9; python_version >= '3.14'"  # httpx doesn't pin this as of 0.28.1
 ]
 
 [project.urls]
@@ -198,6 +198,7 @@ disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods",
 #  run pylint across multiple cpu cores to speed it up-
 # https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
 jobs = 0
+py-version = "3.10"
 
 [tool.pylint.classes]
 exclude-protected = ["_unfrozen"]
@@ -235,7 +236,7 @@ disallow_untyped_defs = true
 disallow_incomplete_defs = true
 disallow_untyped_decorators = true
 show_error_codes = true
-python_version = "3.9"
+python_version = "3.10"
 
 # For some files, it's easier to just disable strict-optional all together instead of
 # cluttering the code with `# type: ignore`s or stuff like

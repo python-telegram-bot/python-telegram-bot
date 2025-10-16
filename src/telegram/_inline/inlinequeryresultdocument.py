@@ -19,7 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -135,17 +135,17 @@ class InlineQueryResultDocument(InlineQueryResult):
         document_url: str,
         title: str,
         mime_type: str,
-        caption: Optional[str] = None,
-        description: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
+        caption: str | None = None,
+        description: str | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        thumbnail_url: Optional[str] = None,
-        thumbnail_width: Optional[int] = None,
-        thumbnail_height: Optional[int] = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        thumbnail_url: str | None = None,
+        thumbnail_width: int | None = None,
+        thumbnail_height: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.DOCUMENT, id, api_kwargs=api_kwargs)
@@ -155,12 +155,12 @@ class InlineQueryResultDocument(InlineQueryResult):
             self.mime_type: str = mime_type
 
             # Optionals
-            self.caption: Optional[str] = caption
+            self.caption: str | None = caption
             self.parse_mode: ODVInput[str] = parse_mode
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.description: Optional[str] = description
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_url: Optional[str] = thumbnail_url
-            self.thumbnail_width: Optional[int] = thumbnail_width
-            self.thumbnail_height: Optional[int] = thumbnail_height
+            self.description: str | None = description
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
+            self.thumbnail_url: str | None = thumbnail_url
+            self.thumbnail_width: int | None = thumbnail_width
+            self.thumbnail_height: int | None = thumbnail_height

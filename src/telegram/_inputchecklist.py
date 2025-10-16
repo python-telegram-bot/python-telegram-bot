@@ -19,7 +19,6 @@
 """This module contains an objects that are related to Telegram input checklists."""
 
 from collections.abc import Sequence
-from typing import Optional
 
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
@@ -83,9 +82,9 @@ class InputChecklistTask(TelegramObject):
         id: int,  # pylint: disable=redefined-builtin
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        text_entities: Optional[Sequence[MessageEntity]] = None,
+        text_entities: Sequence[MessageEntity] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: int = id
@@ -168,19 +167,19 @@ class InputChecklist(TelegramObject):
         title: str,
         tasks: Sequence[InputChecklistTask],
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        title_entities: Optional[Sequence[MessageEntity]] = None,
-        others_can_add_tasks: Optional[bool] = None,
-        others_can_mark_tasks_as_done: Optional[bool] = None,
+        title_entities: Sequence[MessageEntity] | None = None,
+        others_can_add_tasks: bool | None = None,
+        others_can_mark_tasks_as_done: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.title: str = title
         self.tasks: tuple[InputChecklistTask, ...] = parse_sequence_arg(tasks)
         self.parse_mode: ODVInput[str] = parse_mode
         self.title_entities: tuple[MessageEntity, ...] = parse_sequence_arg(title_entities)
-        self.others_can_add_tasks: Optional[bool] = others_can_add_tasks
-        self.others_can_mark_tasks_as_done: Optional[bool] = others_can_mark_tasks_as_done
+        self.others_can_add_tasks: bool | None = others_can_add_tasks
+        self.others_can_mark_tasks_as_done: bool | None = others_can_mark_tasks_as_done
 
         self._id_attrs = (self.tasks,)
 

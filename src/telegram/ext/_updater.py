@@ -22,10 +22,10 @@ import asyncio
 import contextlib
 import datetime as dtm
 import ssl
-from collections.abc import Coroutine, Sequence
+from collections.abc import Callable, Coroutine, Sequence
 from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_80, DEFAULT_IP, DefaultValue
 from telegram._utils.logging import get_logger
@@ -119,11 +119,11 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         self._last_update_id = 0
         self._running = False
         self._initialized = False
-        self._httpd: Optional[WebhookServer] = None
+        self._httpd: WebhookServer | None = None
         self.__lock = asyncio.Lock()
-        self.__polling_task: Optional[asyncio.Task] = None
+        self.__polling_task: asyncio.Task | None = None
         self.__polling_task_stop_event: asyncio.Event = asyncio.Event()
-        self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
+        self.__polling_cleanup_cb: Callable[[], Coroutine[Any, Any, None]] | None = None
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:
         """
@@ -145,9 +145,9 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
 
     async def __aexit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """|async_context_manager| :meth:`shuts down <shutdown>` the Updater."""
         # Make sure not to return `True` so that exceptions are not suppressed
@@ -209,9 +209,9 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         poll_interval: float = 0.0,
         timeout: TimePeriod = dtm.timedelta(seconds=10),
         bootstrap_retries: int = 0,
-        allowed_updates: Optional[Sequence[str]] = None,
-        drop_pending_updates: Optional[bool] = None,
-        error_callback: Optional[Callable[[TelegramError], None]] = None,
+        allowed_updates: Sequence[str] | None = None,
+        drop_pending_updates: bool | None = None,
+        error_callback: Callable[[TelegramError], None] | None = None,
     ) -> "asyncio.Queue[object]":
         """Starts polling updates from Telegram.
 
@@ -316,10 +316,10 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         poll_interval: float,
         timeout: TimePeriod,
         bootstrap_retries: int,
-        drop_pending_updates: Optional[bool],
-        allowed_updates: Optional[Sequence[str]],
+        drop_pending_updates: bool | None,
+        allowed_updates: Sequence[str] | None,
         ready: asyncio.Event,
-        error_callback: Optional[Callable[[TelegramError], None]],
+        error_callback: Callable[[TelegramError], None] | None,
     ) -> None:
         _LOGGER.debug("Updater started (polling)")
 
@@ -421,16 +421,16 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         listen: DVType[str] = DEFAULT_IP,
         port: DVType[int] = DEFAULT_80,
         url_path: str = "",
-        cert: Optional[Union[str, Path]] = None,
-        key: Optional[Union[str, Path]] = None,
+        cert: str | Path | None = None,
+        key: str | Path | None = None,
         bootstrap_retries: int = 0,
-        webhook_url: Optional[str] = None,
-        allowed_updates: Optional[Sequence[str]] = None,
-        drop_pending_updates: Optional[bool] = None,
-        ip_address: Optional[str] = None,
+        webhook_url: str | None = None,
+        allowed_updates: Sequence[str] | None = None,
+        drop_pending_updates: bool | None = None,
+        ip_address: str | None = None,
         max_connections: int = 40,
-        secret_token: Optional[str] = None,
-        unix: Optional[Union[str, Path, "socket"]] = None,
+        secret_token: str | None = None,
+        unix: "str | Path | socket | None" = None,
     ) -> "asyncio.Queue[object]":
         """
         Starts a small http server to listen for updates via webhook. If :paramref:`cert`
@@ -595,16 +595,16 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         port: int,
         url_path: str,
         bootstrap_retries: int,
-        allowed_updates: Optional[Sequence[str]],
-        cert: Optional[Union[str, Path]] = None,
-        key: Optional[Union[str, Path]] = None,
-        drop_pending_updates: Optional[bool] = None,
-        webhook_url: Optional[str] = None,
-        ready: Optional[asyncio.Event] = None,
-        ip_address: Optional[str] = None,
+        allowed_updates: Sequence[str] | None,
+        cert: str | Path | None = None,
+        key: str | Path | None = None,
+        drop_pending_updates: bool | None = None,
+        webhook_url: str | None = None,
+        ready: asyncio.Event | None = None,
+        ip_address: str | None = None,
         max_connections: int = 40,
-        secret_token: Optional[str] = None,
-        unix: Optional[Union[str, Path, "socket"]] = None,
+        secret_token: str | None = None,
+        unix: "str | Path | socket | None" = None,
     ) -> None:
         _LOGGER.debug("Updater thread started (webhook)")
 
@@ -621,7 +621,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         # the SSL handshake, e.g. in case a reverse proxy is used
         if cert is not None and key is not None:
             try:
-                ssl_ctx: Optional[ssl.SSLContext] = ssl.create_default_context(
+                ssl_ctx: ssl.SSLContext | None = ssl.create_default_context(
                     ssl.Purpose.CLIENT_AUTH
                 )
                 ssl_ctx.load_cert_chain(cert, key)  # type: ignore[union-attr]
@@ -665,14 +665,14 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
     async def _bootstrap(
         self,
         max_retries: int,
-        webhook_url: Optional[str],
-        allowed_updates: Optional[Sequence[str]],
-        drop_pending_updates: Optional[bool] = None,
-        cert: Optional[bytes] = None,
+        webhook_url: str | None,
+        allowed_updates: Sequence[str] | None,
+        drop_pending_updates: bool | None = None,
+        cert: bytes | None = None,
         bootstrap_interval: float = 1,
-        ip_address: Optional[str] = None,
+        ip_address: str | None = None,
         max_connections: int = 40,
-        secret_token: Optional[str] = None,
+        secret_token: str | None = None,
     ) -> None:
         """Prepares the setup for fetching updates: delete or set the webhook and drop pending
         updates if appropriate. If there are unsuccessful attempts, this will retry as specified by

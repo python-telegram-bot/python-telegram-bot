@@ -20,7 +20,7 @@
 
 from collections.abc import Awaitable, Generator
 from re import Match
-from typing import TYPE_CHECKING, Any, Generic, NoReturn, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, NoReturn, TypeVar
 
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
@@ -128,19 +128,17 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     def __init__(
         self: ST,
         application: "Application[BT, ST, UD, CD, BD, Any]",
-        chat_id: Optional[int] = None,
-        user_id: Optional[int] = None,
+        chat_id: int | None = None,
+        user_id: int | None = None,
     ):
         self._application: Application[BT, ST, UD, CD, BD, Any] = application
-        self._chat_id: Optional[int] = chat_id
-        self._user_id: Optional[int] = user_id
-        self.args: Optional[list[str]] = None
-        self.matches: Optional[list[Match[str]]] = None
-        self.error: Optional[Exception] = None
-        self.job: Optional[Job[Any]] = None
-        self.coroutine: Optional[
-            Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
-        ] = None
+        self._chat_id: int | None = chat_id
+        self._user_id: int | None = user_id
+        self.args: list[str] | None = None
+        self.matches: list[Match[str]] | None = None
+        self.error: Exception | None = None
+        self.job: Job[Any] | None = None
+        self.coroutine: Generator[Future[object] | None, None, Any] | Awaitable[Any] | None = None
 
     @property
     def application(self) -> "Application[BT, ST, UD, CD, BD, Any]":
@@ -164,7 +162,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         )
 
     @property
-    def chat_data(self) -> Optional[CD]:
+    def chat_data(self) -> CD | None:
         """:obj:`ContextTypes.chat_data`: Optional. An object that can be used to keep any data in.
         For each update from the same chat id it will be the same :obj:`ContextTypes.chat_data`.
         Defaults to :obj:`dict`.
@@ -191,7 +189,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         )
 
     @property
-    def user_data(self) -> Optional[UD]:
+    def user_data(self) -> UD | None:
         """:obj:`ContextTypes.user_data`: Optional. An object that can be used to keep any data in.
         For each update from the same user it will be the same :obj:`ContextTypes.user_data`.
         Defaults to :obj:`dict`.
@@ -275,10 +273,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         update: object,
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
-        job: Optional["Job[Any]"] = None,
-        coroutine: Optional[
-            Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]]
-        ] = None,
+        job: "Job[Any] | None" = None,
+        coroutine: Generator["Future[object] | None", None, Any] | Awaitable[Any] | None = None,
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
@@ -391,7 +387,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> Optional["JobQueue[ST]"]:
+    def job_queue(self) -> "JobQueue[ST] | None":
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
         :class:`telegram.ext.Application`.
@@ -417,7 +413,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.update_queue
 
     @property
-    def match(self) -> Optional[Match[str]]:
+    def match(self) -> Match[str] | None:
         """
         :meth:`re.Match <re.Match.expand>`: The first match from :attr:`matches`.
             Useful if you are only filtering using a single regex filter.

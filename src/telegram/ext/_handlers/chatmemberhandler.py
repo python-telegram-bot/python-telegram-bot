@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatMemberHandler class."""
 
-from typing import Final, Optional, TypeVar
+from typing import Final, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -92,11 +92,11 @@ class ChatMemberHandler(BaseHandler[Update, CCT, RT]):
         callback: HandlerCallback[Update, CCT, RT],
         chat_member_types: int = MY_CHAT_MEMBER,
         block: DVType[bool] = DEFAULT_TRUE,
-        chat_id: Optional[SCT[int]] = None,
+        chat_id: SCT[int] | None = None,
     ):
         super().__init__(callback, block=block)
 
-        self.chat_member_types: Optional[int] = chat_member_types
+        self.chat_member_types: int | None = chat_member_types
         self._chat_ids = parse_chat_id(chat_id)
 
     def check_update(self, update: object) -> bool:

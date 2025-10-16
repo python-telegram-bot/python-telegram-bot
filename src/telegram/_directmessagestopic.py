@@ -63,7 +63,7 @@ class DirectMessagesTopic(TelegramObject):
     __slots__ = ("topic_id", "user")
 
     def __init__(
-        self, topic_id: int, user: Optional[User] = None, *, api_kwargs: Optional[JSONDict] = None
+        self, topic_id: int, user: User | None = None, *, api_kwargs: JSONDict | None = None
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -71,7 +71,7 @@ class DirectMessagesTopic(TelegramObject):
         self.topic_id: int = topic_id
 
         # Optionals:
-        self.user: Optional[User] = user
+        self.user: User | None = user
 
         self._id_attrs = (self.topic_id, self.user)
         self._freeze()

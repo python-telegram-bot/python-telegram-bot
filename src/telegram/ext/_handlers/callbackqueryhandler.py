@@ -20,8 +20,9 @@
 
 import asyncio
 import re
+from collections.abc import Callable
 from re import Match, Pattern
-from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -129,10 +130,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
     def __init__(
         self: "CallbackQueryHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Optional[
-            Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
-        ] = None,
-        game_pattern: Optional[Union[str, Pattern[str]]] = None,
+        pattern: str | Pattern[str] | type | Callable[[object], bool] | None = None,
+        game_pattern: str | Pattern[str] | None = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
@@ -146,12 +145,10 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
 
         if isinstance(game_pattern, str):
             game_pattern = re.compile(game_pattern)
-        self.pattern: Optional[
-            Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
-        ] = pattern
-        self.game_pattern: Optional[Union[str, Pattern[str]]] = game_pattern
+        self.pattern: str | Pattern[str] | type | Callable[[object], bool] | None = pattern
+        self.game_pattern: str | Pattern[str] | None = game_pattern
 
-    def check_update(self, update: object) -> Optional[Union[bool, object]]:
+    def check_update(self, update: object) -> bool | object | None:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -199,7 +196,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
         context: CCT,
         update: Update,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Union[bool, Match[str]],
+        check_result: bool | Match[str],
     ) -> None:
         """Add the result of ``re.match(pattern, update.callback_query.data)`` to
         :attr:`CallbackContext.matches` as list with one element.

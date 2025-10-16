@@ -4589,7 +4589,7 @@ class TestBotWithRequest:
                 assert isinstance(entry, dict)
             result = Message.de_list(result, bot)
 
-        for message, file_name in zip(result, ("text_file.txt", "local_file.txt")):
+        for message, file_name in zip(result, ("text_file.txt", "local_file.txt"), strict=False):
             assert isinstance(message, Message)
             assert message.chat_id == int(chat_id)
             out = BytesIO()
