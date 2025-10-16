@@ -499,12 +499,12 @@ class Message(MaybeInaccessibleMessage):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
             represented as ordinary url buttons.
-        is_topic_message (:obj:`bool`, optional): :obj:`True`, if the message is sent to a forum
-            topic.
+        is_topic_message (:obj:`bool`, optional): :obj:`True`, if the message is sent to a topic
+            in a forum supergroup or a private chat with the bot.
 
             .. versionadded:: 20.0
-        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread to which
-            the message belongs; for supergroups only.
+        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread or forum
+            topic to which the message belongs; for supergroups and private chats only.
 
             .. versionadded:: 20.0
         forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
@@ -901,12 +901,12 @@ class Message(MaybeInaccessibleMessage):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
             represented as ordinary url buttons.
-        is_topic_message (:obj:`bool`): Optional. :obj:`True`, if the message is sent to a forum
-            topic.
+        is_topic_message (:obj:`bool`): Optional. :obj:`True`, if the message is sent to a topic
+            in a forum supergroup or a private chat with the bot.
 
             .. versionadded:: 20.0
-        message_thread_id (:obj:`int`): Optional. Unique identifier of a message thread to which
-            the message belongs; for supergroups only.
+        message_thread_id (:obj:`int`): Optional. Unique identifier of a message thread or forum
+            topic to which the message belongs; for supergroups and private chats only.
 
             .. versionadded:: 20.0
         forum_topic_created (:class:`telegram.ForumTopicCreated`): Optional. Service message:
