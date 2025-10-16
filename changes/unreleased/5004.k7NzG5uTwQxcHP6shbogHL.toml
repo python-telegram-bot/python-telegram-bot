@@ -1,4 +1,4 @@
-internal = "Use Python 3.14 Final in the Test Suite"
+internal = "Add Freethreaded Python 3.14 to the Test Suite"
 [[pull_requests]]
 uid = "5004"
 author_uids = ["harshil21"]
