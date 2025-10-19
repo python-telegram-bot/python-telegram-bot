@@ -405,8 +405,8 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
                 )
             except TelegramError:
                 _LOGGER.exception(
-                    "Error while calling `get_updates` one more time to mark all fetched updates "
-                    "as read: %s. Suppressing error to ensure graceful shutdown. When polling for "
+                    "Error while calling `get_updates` one more time to mark all fetched updates. "
+                    "Suppressing error to ensure graceful shutdown. When polling for "
                     "updates is restarted, updates may be fetched again. Please adjust timeouts "
                     "via `ApplicationBuilder` or the parameter `get_updates_request` of `Bot`.",
                 )
