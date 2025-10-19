@@ -528,7 +528,7 @@ class _All(MessageFilter):
         return True
 
 
-ALL = _All(name="filters.ALL")
+ALL = _All(name="filters.ALL")  # pylint: disable=invalid-name
 """All Messages."""
 
 
@@ -563,7 +563,7 @@ class _Audio(MessageFilter):
         return bool(message.audio)
 
 
-AUDIO = _Audio(name="filters.AUDIO")
+AUDIO = _Audio(name="filters.AUDIO")  # pylint: disable=invalid-name
 """Messages that contain :attr:`telegram.Message.audio`."""
 
 
@@ -2680,7 +2680,7 @@ class Text(MessageFilter):
         return message.text in self.strings if message.text else False
 
 
-TEXT = Text()
+TEXT = Text()  # pylint: disable=invalid-name
 """
 Shortcut for :class:`telegram.ext.filters.Text()`.
 
@@ -3059,7 +3059,7 @@ class _Video(MessageFilter):
         return bool(message.video)
 
 
-VIDEO = _Video(name="filters.VIDEO")
+VIDEO = _Video(name="filters.VIDEO")  # pylint: disable=invalid-name
 """Messages that contain :attr:`telegram.Message.video`."""
 
 
