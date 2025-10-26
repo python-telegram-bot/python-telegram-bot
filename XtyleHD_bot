@@ -1,0 +1,111 @@
+from telegram import Update, ChatPermissions from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes import datetime, re, asyncio
+
+TOKEN = "8493254275:AAHmDbX5o7cM2qptZa1DKmHyt8x_1_Z-pjc"
+
+=========================
+
+DATOS DEL BOT EN MEMORIA
+
+=========================
+
+bot_activo = True usuarios_baneados = {} usuarios_warn = {} actividad_usuarios = {} puntos_usuarios = {} rangos_usuarios = {} multiplicadores_usuarios = {} user_message_times = {} EXCLUIDO_TIMERS = {}
+
+grupo_reglas = ( "📜 Reglas del grupo:
+
+1. Respeta a los demás.
+
+
+2. No spam.
+
+
+3. No links no permitidos (VIP exento).
+
+
+4. Sigue indicaciones de admins." )
+
+
+
+RANKS_CONFIG = { "VIP": {"label": "⭐VIP", "emoji": "⭐"}, "HELPER": {"label": "🛡️HELPER", "emoji": "🛡️"}, "ADMIN": {"label": "👑ADMIN", "emoji": "👑"}, "VETERANO": {"label": "🔥VETERANO", "emoji": "🔥"}, "NOVATO": {"label": "🌱NOVATO", "emoji": "🌱"}, "HABLADOR": {"label": "💬HABLADOR", "emoji": "💬"}, "ARROGANTE": {"label": "😎ARROGANTE", "emoji": "😎"}, "EXCLUIDO": {"label": "🚨EXCLUIDO", "emoji": "🚨"} }
+
+tienda_items = { "HELPER": 200, "VIP": 9999, "ADMIN": 30000, "MULT_1.5": 100, "MULT_2": 250, "MULT_2.5": 400, "MULT_5": 800, "MULT_10": 1500 }
+
+=========================
+
+UTILIDADES
+
+=========================
+
+def ensure_chat(chat_id): for d in [actividad_usuarios, puntos_usuarios, usuarios_warn, usuarios_baneados, rangos_usuarios, multiplicadores_usuarios, user_message_times, EXCLUIDO_TIMERS]: if chat_id not in d: d[chat_id] = {}
+
+async def es_admin_chat(user_id, chat_id, context): try: admins = await context.bot.get_chat_administrators(chat_id) return user_id in [a.user.id for a in admins] except: return False
+
+def get_rank_label(chat_id, user_id): if chat_id in rangos_usuarios and user_id in rangos_usuarios[chat_id]: r = rangos_usuarios[chat_id][user_id].upper() cfg = RANKS_CONFIG.get(r) if cfg: return cfg["label"] return ""
+
+def tiene_multiplicador(chat_id, user_id): if chat_id in multiplicadores_usuarios and user_id in multiplicadores_usuarios[chat_id]: data = multiplicadores_usuarios[chat_id][user_id] if datetime.datetime.utcnow().timestamp() < data["expira"]: return data["factor"] else: multiplicadores_usuarios[chat_id].pop(user_id) return 1
+
+def contiene_link(texto): return re.search(r"http[s]?://", texto) is not None
+
+=========================
+
+COMANDOS DE TIENDA
+
+=========================
+
+async def cmd_tienda(update: Update, context: ContextTypes.DEFAULT_TYPE): texto = "🛒 Tienda de points: " for item, precio in tienda_items.items(): if "MULT" in item: texto += f"- Multiplicador {item.split('_')[1]}x → {precio} pts\n" else: texto += f"- Rango {item} → {precio} pts\n" await update.message.reply_text(texto, parse_mode="Markdown")
+
+async def cmd_comprar(update: Update, context: ContextTypes.DEFAULT_TYPE): chat_id = update.effective_chat.id user = update.effective_user ensure_chat(chat_id) if not context.args: return await update.message.reply_text("⚠️ Uso: /comprar <item>") item = context.args[0].upper() if item not in tienda_items: return await update.message.reply_text("⚠️ Item no encontrado.") costo = tienda_items[item] puntos = puntos_usuarios[chat_id].get(user.id,0) if puntos < costo: return await update.message.reply_text(f"⚠️ Necesitas {costo} pts, tienes {puntos} pts.") puntos_usuarios[chat_id][user.id]-=costo if item in ["VIP","HELPER","ADMIN"]: rangos_usuarios[chat_id][user.id] = item await update.message.reply_text(f"✅ Compraste el rango {item}!") elif "MULT" in item: factor = float(item.split("_")[1]) duraciones = {"1.5":243600,"2":363600,"2.5":2243600,"5":5243600,"10":15243600} multiplicadores_usuarios[chat_id][user.id] = {"factor":factor,"expira":datetime.datetime.utcnow().timestamp()+duraciones[str(factor)]} await update.message.reply_text(f"✅ Compraste multiplicador x{factor} por {duraciones[str(factor)]/3600} horas!")
+
+async def cmd_multiplicador(update: Update, context: ContextTypes.DEFAULT_TYPE): chat_id = update.effective_chat.id user = update.effective_user factor = tiene_multiplicador(chat_id,user.id) if factor>1: expira = multiplicadores_usuarios[chat_id][user.id]["expira"] tiempo_restante = int(expira - datetime.datetime.utcnow().timestamp()) await update.message.reply_text(f"⚡ Multiplicador activo: x{factor} por {tiempo_restante//3600} horas") else: await update.message.reply_text("⚡ No tienes multiplicador activo.")
+
+=========================
+
+HANDLER DE MENSAJES PARA PUNTOS Y ANTI-SPAM
+
+=========================
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE): chat_id = update.effective_chat.id user = update.effective_user ensure_chat(chat_id)
+
+# Anti-flood
+timestamps = user_message_times[chat_id].setdefault(user.id,[])
+now = datetime.datetime.utcnow().timestamp()
+timestamps.append(now)
+user_message_times[chat_id][user.id] = [t for t in timestamps if now-t<10]
+if len(user_message_times[chat_id][user.id])>10:
+    try: await context.bot.restrict_chat_member(chat_id,user.id,permissions=ChatPermissions(can_send_messages=False),until_date=datetime.datetime.utcnow()+datetime.timedelta(minutes=2))
+    except: pass
+    return
+
+# Anti-link
+if contiene_link(update.message.text) and get_rank_label(chat_id,user.id) != "⭐VIP":
+    try: await context.bot.restrict_chat_member(chat_id,user.id,permissions=ChatPermissions(can_send_messages=False),until_date=datetime.datetime.utcnow()+datetime.timedelta(minutes=50))
+    except: pass
+    return
+
+# Conteo de mensajes ≥50 caracteres
+if len(update.message.text)>=50:
+    factor = tiene_multiplicador(chat_id,user.id)
+    actividad_usuarios[chat_id][user.id] = actividad_usuarios[chat_id].get(user.id,0)+1
+    msg_count = actividad_usuarios[chat_id][user.id]
+    threshold = 200
+    if get_rank_label(chat_id,user.id)=="⭐VIP": threshold=100
+    if msg_count >= threshold:
+        puntos_usuarios[chat_id][user.id] = puntos_usuarios[chat_id].get(user.id,0)+int(1*factor)
+        actividad_usuarios[chat_id][user.id]=0
+
+=========================
+
+SETUP DEL BOT
+
+=========================
+
+app = ApplicationBuilder().token(TOKEN).build()
+
+Comandos tienda
+
+app.add_handler(CommandHandler("tienda", cmd_tienda)) app.add_handler(CommandHandler("comprar", cmd_comprar)) app.add_handler(CommandHandler("multiplicador", cmd_multiplicador))
+
+Mensajes
+
+app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
+
+print("Bot iniciado...") app.run_polling()
