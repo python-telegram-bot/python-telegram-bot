@@ -303,7 +303,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         "_base_file_url",
         "_base_url",
         "_bot_user",
-        "_initialized",
+        "_requests_initialized",
+        "_bot_initialized",
         "_local_mode",
         "_private_key",
         "_request",
@@ -334,7 +335,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self._local_mode: bool = local_mode
         self._bot_user: User | None = None
         self._private_key: bytes | None = None
-        self._initialized: bool = False
+        self._requests_initialized: bool = False
+        self._bot_initialized: bool = False
 
         self._request: tuple[BaseRequest, BaseRequest] = (
             (
@@ -837,20 +839,26 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         .. versionadded:: 20.0
         """
-        if self._initialized:
+        if self._requests_initialized and self._bot_initialized:
             self._LOGGER.debug("This Bot is already initialized.")
             return
 
-        await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
-        # this needs to be set before we call get_me, since this can trigger an error in the
-        # request backend, which would then NOT lead to a proper shutdown if this flag isn't set
-        self._initialized = True
+        # Initialize request objects if not already done
+        if not self._requests_initialized:
+            await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
+            self._requests_initialized = True
+
+        # Initialize bot user if not already done
         # Since the bot is to be initialized only once, we can also use it for
         # verifying the token passed and raising an exception if it's invalid.
-        try:
-            await self.get_me()
-        except InvalidToken as exc:
-            raise InvalidToken(f"The token `{self._token}` was rejected by the server.") from exc
+        if not self._bot_initialized:
+            try:
+                await self.get_me()
+                self._bot_initialized = True
+            except InvalidToken as exc:
+                raise InvalidToken(
+                    f"The token `{self._token}` was rejected by the server."
+                ) from exc
 
     async def shutdown(self) -> None:
         """Stop & clear resources used by this class. Currently just calls
@@ -860,12 +868,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         .. versionadded:: 20.0
         """
-        if not self._initialized:
+        if not self._requests_initialized:
             self._LOGGER.debug("This Bot is already shut down. Returning.")
             return
 
         await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
-        self._initialized = False
+        self._requests_initialized = False
+        self._bot_initialized = False
 
     async def do_api_request(
         self,
@@ -943,7 +952,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             #   2) correct tokens but non-existing method, e.g. api.tg.org/botTOKEN/unkonwnMethod
             # 2) is relevant only for Bot.do_api_request, that's why we have special handling for
             # that here rather than in BaseRequest._request_wrapper
-            if self._initialized:
+            if self._bot_initialized:
                 raise EndPointNotFound(
                     f"Endpoint '{camel_case_endpoint}' not found in Bot API"
                 ) from exc

@@ -141,13 +141,52 @@ async def network_retry_loop(
             )
             # pylint: disable=protected-access
             cur_interval = slack_time + exc._retry_after.total_seconds()
+
+            # Check max_retries for RetryAfter as well
+            if on_err_cb:
+                on_err_cb(exc)
+
+            if max_retries >= 0 and retries >= max_retries:
+                _LOGGER.exception(
+                    "%s Failed run number %s of %s. Aborting.", log_prefix, retries, max_retries
+                )
+                raise
         except TimedOut as toe:
             _LOGGER.debug("%s Timed out: %s. Retrying immediately.", log_prefix, toe)
             # If failure is due to timeout, we should retry asap.
             cur_interval = 0
-        except InvalidToken:
-            _LOGGER.exception("%s Invalid token. Aborting retry loop.", log_prefix)
-            raise
+
+            # Check max_retries for TimedOut as well
+            if on_err_cb:
+                on_err_cb(toe)
+
+            if max_retries >= 0 and retries >= max_retries:
+                _LOGGER.exception(
+                    "%s Failed run number %s of %s. Aborting.", log_prefix, retries, max_retries
+                )
+                raise
+        except InvalidToken as invalid_token_exc:
+            # Check max_retries for InvalidToken as well
+            if on_err_cb:
+                on_err_cb(invalid_token_exc)
+
+            if max_retries >= 0 and retries >= max_retries:
+                _LOGGER.exception(
+                    "%s Invalid token. Failed run number %s of %s. Aborting retry loop.",
+                    log_prefix,
+                    retries,
+                    max_retries,
+                )
+                raise
+
+            _LOGGER.debug(
+                "%s Invalid token. Failed run number %s of %s. Retrying.",
+                log_prefix,
+                retries,
+                max_retries,
+            )
+            # increase waiting times on subsequent errors up to 30secs
+            cur_interval = 1 if cur_interval == 0 else min(30, 1.5 * cur_interval)
         except TelegramError as telegram_exc:
             if on_err_cb:
                 on_err_cb(telegram_exc)
