@@ -302,12 +302,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     __slots__ = (
         "_base_file_url",
         "_base_url",
-        "_bot_user",
-        "_requests_initialized",
         "_bot_initialized",
+        "_bot_user",
         "_local_mode",
         "_private_key",
         "_request",
+        "_requests_initialized",
         "_token",
     )
 

@@ -146,7 +146,7 @@ async def network_retry_loop(
             if on_err_cb:
                 on_err_cb(exc)
 
-            if max_retries >= 0 and retries >= max_retries:
+            if 0 <= max_retries <= retries:
                 _LOGGER.exception(
                     "%s Failed run number %s of %s. Aborting.", log_prefix, retries, max_retries
                 )
@@ -160,7 +160,7 @@ async def network_retry_loop(
             if on_err_cb:
                 on_err_cb(toe)
 
-            if max_retries >= 0 and retries >= max_retries:
+            if 0 <= max_retries <= retries:
                 _LOGGER.exception(
                     "%s Failed run number %s of %s. Aborting.", log_prefix, retries, max_retries
                 )
@@ -170,7 +170,7 @@ async def network_retry_loop(
             if on_err_cb:
                 on_err_cb(invalid_token_exc)
 
-            if max_retries >= 0 and retries >= max_retries:
+            if 0 <= max_retries <= retries:
                 _LOGGER.exception(
                     "%s Invalid token. Failed run number %s of %s. Aborting retry loop.",
                     log_prefix,
