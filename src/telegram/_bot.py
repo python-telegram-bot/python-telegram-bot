@@ -7190,12 +7190,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 **.TGS** animation with the thumbnail up to
                 :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
                 kilobytes in size; see
-                `the docs <https://core.telegram.org/stickers#animation-requirements>`_ for
+                `the docs <https://core.telegram.org/stickers#animated-stickers-and-emoji>`_ for
                 animated sticker technical requirements, or a ``.WEBM`` video with the thumbnail up
                 to :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
                 kilobytes in size; see
-                `this <https://core.telegram.org/stickers#video-requirements>`_ for video sticker
-                technical requirements.
+                `this <https://core.telegram.org/stickers#video-stickers-and-emoji>`_ for video
+                sticker technical requirements.
 
                 |fileinput|
 
