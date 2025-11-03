@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains tests for the network_retry_loop function."""
-import asyncio
-from datetime import timedelta
 
 import pytest
 

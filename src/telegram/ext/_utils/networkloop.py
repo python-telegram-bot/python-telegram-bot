@@ -105,7 +105,7 @@ async def network_retry_loop(
 
     def check_max_retries_and_log(current_retries: int) -> bool:
         """Check if max retries reached and log accordingly.
-        
+
         Returns:
             bool: True if max retries reached (should abort), False otherwise (should retry).
         """

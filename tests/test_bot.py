@@ -4637,13 +4637,15 @@ class TestBotWithRequest:
     async def test_initialize_partial_failure_recovery(self, offline_bot):
         """Test that bot properly tracks partial initialization and can recover."""
         test_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
-        
+
         try:
             # Manually simulate partial initialization state
             # Initialize requests but not bot user
-            await asyncio.gather(test_bot._request[0].initialize(), test_bot._request[1].initialize())
+            await asyncio.gather(
+                test_bot._request[0].initialize(), test_bot._request[1].initialize()
+            )
             test_bot._requests_initialized = True
-            
+
             # Verify partial initialization state
             assert test_bot._requests_initialized is True
             assert test_bot._bot_initialized is False
@@ -4651,7 +4653,7 @@ class TestBotWithRequest:
 
             # Now complete initialization with initialize()
             await test_bot.initialize()
-            
+
             # Verify full initialization
             assert test_bot._requests_initialized is True
             assert test_bot._bot_initialized is True
