@@ -103,6 +103,25 @@ async def network_retry_loop(
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
+    def check_max_retries_and_log(current_retries: int) -> bool:
+        """Check if max retries reached and log accordingly.
+        
+        Returns:
+            bool: True if max retries reached (should abort), False otherwise (should retry).
+        """
+        if max_retries < 0 or current_retries < max_retries:
+            _LOGGER.debug(
+                "%s Failed run number %s of %s. Retrying.",
+                log_prefix,
+                current_retries,
+                max_retries,
+            )
+            return False
+        _LOGGER.exception(
+            "%s Failed run number %s of %s. Aborting.", log_prefix, current_retries, max_retries
+        )
+        return True
+
     async def do_action() -> None:
         if not stop_event:
             await action_cb()
@@ -143,13 +162,7 @@ async def network_retry_loop(
             cur_interval = slack_time + exc._retry_after.total_seconds()
 
             # Check max_retries for RetryAfter as well
-            if on_err_cb:
-                on_err_cb(exc)
-
-            if 0 <= max_retries <= retries:
-                _LOGGER.exception(
-                    "%s Failed run number %s of %s. Aborting.", log_prefix, retries, max_retries
-                )
+            if check_max_retries_and_log(retries):
                 raise
         except TimedOut as toe:
             _LOGGER.debug("%s Timed out: %s. Retrying immediately.", log_prefix, toe)
@@ -157,48 +170,16 @@ async def network_retry_loop(
             cur_interval = 0
 
             # Check max_retries for TimedOut as well
-            if on_err_cb:
-                on_err_cb(toe)
-
-            if 0 <= max_retries <= retries:
-                _LOGGER.exception(
-                    "%s Failed run number %s of %s. Aborting.", log_prefix, retries, max_retries
-                )
+            if check_max_retries_and_log(retries):
                 raise
-        except InvalidToken as invalid_token_exc:
-            # Check max_retries for InvalidToken as well
-            if on_err_cb:
-                on_err_cb(invalid_token_exc)
-
-            if 0 <= max_retries <= retries:
-                _LOGGER.exception(
-                    "%s Invalid token. Failed run number %s of %s. Aborting retry loop.",
-                    log_prefix,
-                    retries,
-                    max_retries,
-                )
-                raise
-
-            _LOGGER.debug(
-                "%s Invalid token. Failed run number %s of %s. Retrying.",
-                log_prefix,
-                retries,
-                max_retries,
-            )
-            # increase waiting times on subsequent errors up to 30secs
-            cur_interval = 1 if cur_interval == 0 else min(30, 1.5 * cur_interval)
+        except InvalidToken:
+            _LOGGER.exception("%s Invalid token. Aborting retry loop.", log_prefix)
+            raise
         except TelegramError as telegram_exc:
             if on_err_cb:
                 on_err_cb(telegram_exc)
 
-            if max_retries < 0 or retries < max_retries:
-                _LOGGER.debug(
-                    "%s Failed run number %s of %s. Retrying.", log_prefix, retries, max_retries
-                )
-            else:
-                _LOGGER.exception(
-                    "%s Failed run number %s of %s. Aborting.", log_prefix, retries, max_retries
-                )
+            if check_max_retries_and_log(retries):
                 raise
 
             # increase waiting times on subsequent errors up to 30secs
