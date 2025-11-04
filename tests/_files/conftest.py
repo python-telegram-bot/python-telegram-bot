@@ -53,7 +53,8 @@ def animated_sticker_file():
 
 @pytest.fixture
 async def animated_sticker_set(bot):
-    ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
+    """Returns the main mixed sticker set which now contains animated stickers."""
+    ss = await bot.get_sticker_set(f"test_by_{bot.username}")
     if len(ss.stickers) > 100:
         try:
             for i in range(1, 50):
@@ -128,7 +129,23 @@ def sticker_file():
 
 
 @pytest.fixture
+async def mixed_sticker_set(bot):
+    """Fixture for a sticker set that contains static, animated, and video stickers."""
+    ss = await bot.get_sticker_set(f"test_by_{bot.username}")
+    if len(ss.stickers) > 100:
+        try:
+            for i in range(1, 50):
+                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
+        except BadRequest as e:
+            if e.message == "Stickerset_not_modified":
+                return ss
+            raise Exception("stickerset is growing too large.") from None
+    return ss
+
+
+@pytest.fixture
 async def sticker_set(bot):
+    """Alias for mixed_sticker_set for backward compatibility."""
     ss = await bot.get_sticker_set(f"test_by_{bot.username}")
     if len(ss.stickers) > 100:
         try:
@@ -178,7 +195,8 @@ def video_sticker(bot, chat_id):
 
 @pytest.fixture
 async def video_sticker_set(bot):
-    ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
+    """Returns the main mixed sticker set which now contains video stickers."""
+    ss = await bot.get_sticker_set(f"test_by_{bot.username}")
     if len(ss.stickers) > 100:
         try:
             for i in range(1, 50):
