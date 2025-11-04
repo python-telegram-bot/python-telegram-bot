@@ -294,12 +294,45 @@ class HTTPXRequest(BaseRequest):
                     )
                 ) from err
             raise TimedOut from err
+        except httpx.ConnectError as err:
+            raise NetworkError(
+                f"Failed to establish connection to Telegram servers: {err}"
+            ) from err
+        except httpx.ReadError as err:
+            raise NetworkError(
+                f"Failed to receive data from Telegram servers: {err}"
+            ) from err
+        except httpx.WriteError as err:
+            raise NetworkError(
+                f"Failed to send data to Telegram servers: {err}"
+            ) from err
+        except httpx.ProxyError as err:
+            raise NetworkError(
+                f"Proxy connection error: {err}"
+            ) from err
+        except httpx.RemoteProtocolError as err:
+            raise NetworkError(
+                f"Protocol error from Telegram servers (malformed response): {err}"
+            ) from err
+        except httpx.LocalProtocolError as err:
+            raise NetworkError(
+                f"Local protocol error (invalid request format): {err}"
+            ) from err
+        except httpx.UnsupportedProtocol as err:
+            raise NetworkError(
+                f"Unsupported protocol: {err}"
+            ) from err
+        except httpx.DecodingError as err:
+            raise NetworkError(
+                f"Failed to decode response from Telegram servers: {err}"
+            ) from err
+        except httpx.TooManyRedirects as err:
+            raise NetworkError(
+                f"Too many redirects: {err}"
+            ) from err
         except httpx.HTTPError as err:
-            # HTTPError must come last as its the base httpx exception class
-            # TODO p4: do something smart here; for now just raise NetworkError
-
-            # We include the class name for easier debugging. Especially useful if the error
-            # message of `err` is empty.
+            # HTTPError must come last as it's the base httpx exception class
+            # This catches any other httpx errors not explicitly handled above
             raise NetworkError(f"httpx.{err.__class__.__name__}: {err}") from err
 
         return res.status_code, res.content
