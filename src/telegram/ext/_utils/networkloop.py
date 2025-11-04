@@ -103,22 +103,31 @@ async def network_retry_loop(
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
-    def check_max_retries_and_log(current_retries: int) -> bool:
+    def check_max_retries_and_log(current_retries: int, exception_info: str = "") -> bool:
         """Check if max retries reached and log accordingly.
+
+        Args:
+            current_retries: The current retry count.
+            exception_info: Additional context about the exception (e.g., "Timed out: ...").
 
         Returns:
             bool: True if max retries reached (should abort), False otherwise (should retry).
         """
+        prefix_with_info = f"{log_prefix} {exception_info}" if exception_info else log_prefix
+
         if max_retries < 0 or current_retries < max_retries:
             _LOGGER.debug(
                 "%s Failed run number %s of %s. Retrying.",
-                log_prefix,
+                prefix_with_info,
                 current_retries,
                 max_retries,
             )
             return False
         _LOGGER.exception(
-            "%s Failed run number %s of %s. Aborting.", log_prefix, current_retries, max_retries
+            "%s Failed run number %s of %s. Aborting.",
+            prefix_with_info,
+            current_retries,
+            max_retries,
         )
         return True
 
@@ -155,22 +164,20 @@ async def network_retry_loop(
                 break
         except RetryAfter as exc:
             slack_time = 0.5
-            _LOGGER.info(
-                "%s %s. Adding %s seconds to the specified time.", log_prefix, exc, slack_time
-            )
             # pylint: disable=protected-access
             cur_interval = slack_time + exc._retry_after.total_seconds()
+            exception_info = f"{exc}. Adding {slack_time} seconds to the specified time."
 
             # Check max_retries for RetryAfter as well
-            if check_max_retries_and_log(retries):
+            if check_max_retries_and_log(retries, exception_info):
                 raise
         except TimedOut as toe:
-            _LOGGER.debug("%s Timed out: %s. Retrying immediately.", log_prefix, toe)
             # If failure is due to timeout, we should retry asap.
             cur_interval = 0
+            exception_info = f"Timed out: {toe}."
 
             # Check max_retries for TimedOut as well
-            if check_max_retries_and_log(retries):
+            if check_max_retries_and_log(retries, exception_info):
                 raise
         except InvalidToken:
             _LOGGER.exception("%s Invalid token. Aborting retry loop.", log_prefix)

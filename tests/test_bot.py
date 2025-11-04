@@ -93,7 +93,7 @@ from telegram.constants import (
     ParseMode,
     ReactionEmoji,
 )
-from telegram.error import BadRequest, EndPointNotFound, InvalidToken
+from telegram.error import BadRequest, EndPointNotFound, InvalidToken, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
@@ -372,6 +372,53 @@ class TestBotWithoutRequest:
         # 2 instead of 1 since we have to request objects for each offline_bot
         assert self.received["init"] == 2
         assert self.received["shutdown"] == 2
+
+    async def test_initialize_with_get_me_failure_then_success(self, offline_bot, monkeypatch):
+        """Test that bot can recover from get_me failure during initialization."""
+        get_me_call_count = 0
+        request_init_count = 0
+
+        test_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
+        original_get_me = test_bot.get_me
+        original_request_init = test_bot.request.initialize
+
+        async def failing_then_succeeding_get_me(*args, **kwargs):
+            nonlocal get_me_call_count
+            get_me_call_count += 1
+            if get_me_call_count == 1:
+                # First call fails
+                raise TimedOut("Test timeout")
+            # Subsequent calls succeed
+            return await original_get_me(*args, **kwargs)
+
+        async def counting_request_init(*args, **kwargs):
+            nonlocal request_init_count
+            request_init_count += 1
+            await original_request_init(*args, **kwargs)
+
+        monkeypatch.setattr(test_bot, "get_me", failing_then_succeeding_get_me)
+        monkeypatch.setattr(test_bot.request, "initialize", counting_request_init)
+
+        try:
+            # First initialize attempt should fail due to get_me timeout
+            with pytest.raises(TimedOut):
+                await test_bot.initialize()
+
+            # Request initialization should have been called (once per initialize call)
+            assert request_init_count == 1
+            # get_me should have been called once and failed
+            assert get_me_call_count == 1
+
+            # Second initialize attempt should succeed
+            await test_bot.initialize()
+            # Request initialization should not be called again (still 1)
+            assert request_init_count == 1
+            # get_me should have been called a second time and succeeded
+            assert get_me_call_count == 2
+            # Verify bot is now accessible
+            assert test_bot.bot.id == offline_bot.id
+        finally:
+            await test_bot.shutdown()
 
     async def test_context_manager(self, monkeypatch, offline_bot):
         async def initialize():
@@ -4634,36 +4681,8 @@ class TestBotWithRequest:
         assert isinstance(balance, StarAmount)
         assert balance.amount == 0
 
-    async def test_initialize_partial_failure_recovery(self, offline_bot):
-        """Test that bot properly tracks partial initialization and can recover."""
-        test_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
-
-        try:
-            # Manually simulate partial initialization state
-            # Initialize requests but not bot user
-            await asyncio.gather(
-                test_bot._request[0].initialize(), test_bot._request[1].initialize()
-            )
-            test_bot._requests_initialized = True
-
-            # Verify partial initialization state
-            assert test_bot._requests_initialized is True
-            assert test_bot._bot_initialized is False
-            assert test_bot._bot_user is None
-
-            # Now complete initialization with initialize()
-            await test_bot.initialize()
-
-            # Verify full initialization
-            assert test_bot._requests_initialized is True
-            assert test_bot._bot_initialized is True
-            assert test_bot._bot_user is not None
-            assert test_bot.bot.id == offline_bot.id
-        finally:
-            await test_bot.shutdown()
-
     async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
-        """Test that _requests_initialized and _bot_initialized are tracked separately."""
+        """Test that requests and bot user are initialized separately and only once."""
         request_init_count = 0
         get_me_call_count = 0
 
@@ -4687,8 +4706,6 @@ class TestBotWithRequest:
             await test_bot.initialize()
             assert request_init_count == 1
             assert get_me_call_count == 1
-            assert test_bot._requests_initialized is True
-            assert test_bot._bot_initialized is True
 
             # Second initialization should not call either again
             await test_bot.initialize()
@@ -4697,19 +4714,45 @@ class TestBotWithRequest:
         finally:
             await test_bot.shutdown()
 
-    async def test_shutdown_resets_both_initialization_flags(self, offline_bot):
-        """Test that shutdown resets both _requests_initialized and _bot_initialized."""
+    async def test_shutdown_allows_reinitialization(self, offline_bot, monkeypatch):
+        """Test that after shutdown, bot can be reinitialized."""
+        request_init_count = 0
+        request_shutdown_count = 0
+        get_me_call_count = 0
+
+        async def counting_request_init(*args, **kwargs):
+            nonlocal request_init_count
+            request_init_count += 1
+
+        async def counting_request_shutdown(*args, **kwargs):
+            nonlocal request_shutdown_count
+            request_shutdown_count += 1
+
+        original_get_me = offline_bot.get_me
+
+        async def counting_get_me(*args, **kwargs):
+            nonlocal get_me_call_count
+            get_me_call_count += 1
+            return await original_get_me(*args, **kwargs)
+
         test_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
+        monkeypatch.setattr(test_bot.request, "initialize", counting_request_init)
+        monkeypatch.setattr(test_bot.request, "shutdown", counting_request_shutdown)
+        monkeypatch.setattr(test_bot, "get_me", counting_get_me)
 
         try:
+            # First initialization
             await test_bot.initialize()
-            assert test_bot._requests_initialized is True
-            assert test_bot._bot_initialized is True
+            assert request_init_count == 1
+            assert get_me_call_count == 1
 
+            # Shutdown
             await test_bot.shutdown()
-            assert test_bot._requests_initialized is False
-            assert test_bot._bot_initialized is False
+            assert request_shutdown_count == 1
+
+            # Re-initialize should call everything again
+            await test_bot.initialize()
+            assert request_init_count == 2
+            assert get_me_call_count == 2
         finally:
-            # Ensure cleanup even if test fails
-            if test_bot._requests_initialized:
-                await test_bot.shutdown()
+            await test_bot.shutdown()
