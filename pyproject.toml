@@ -98,7 +98,7 @@ tests = [
     # required for building the wheels for releases
     "build",
     # For the test suite
-    "pytest==8.4.2",
+    "pytest==9.0.0",
     # needed because pytest doesn't come with native support for coroutines as tests
     "pytest-asyncio==0.21.2",
     # xdist runs tests in parallel
@@ -133,7 +133,7 @@ docs = [
 ]
 linting = [
     "pre-commit",
-    "ruff==0.14.2",
+    "ruff==0.14.4",
     "mypy==1.18.2",
     "pylint==4.0.2"
 ]
