@@ -1,0 +1,4 @@
+internal = "Reduce Frequence of Renovate Updates for Development Dependencies"
+[[pull_requests]]
+uid = "5043"
+author_uids = ["Bibo-Joshi"]
