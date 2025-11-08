@@ -67,7 +67,7 @@
     // Workflow and dev-dependencies update once a month
     // https://docs.renovatebot.com/presets-schedule/#schedulemonthly
     {
-      "matchPaths": [".github/workflows/**"],
+      "matchFileNames": [".github/workflows/**"],
       "schedule": ["* 0-3 1 * *"]
     },
     {
