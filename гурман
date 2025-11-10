@@ -1,0 +1,147 @@
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.ext import (
+    ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler,
+    ContextTypes, filters
+)
+import requests
+import random
+
+TOKEN = "ТОКЕН_ТВОЕГО_БОТА"  # ← сюда вставь токен от @BotFather
+WEATHER_API_KEY = "КЛЮЧ_ПОГОДЫ"  # ← можно получить на openweathermap.org/api
+
+# === /start ===
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("🌍 Переводчик", callback_data="translate")],
+        [InlineKeyboardButton("☀ Погода", callback_data="weather")],
+        [InlineKeyboardButton("🎯 Викторина", callback_data="quiz")],
+        [InlineKeyboardButton("💬 Поболтать", callback_data="chat")]
+    ]
+    await update.message.reply_text(
+        "Привет! Я твой помощник 🤖\nВыбери, что хочешь сделать:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+# === Главное меню ===
+async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    choice = query.data
+
+    if choice == "translate":
+        await query.message.reply_text("Отправь мне текст для перевода (русский ↔ английский)")
+        context.user_data["mode"] = "translate"
+    elif choice == "weather":
+        await query.message.reply_text("Напиши город, и я покажу погоду ☁️")
+        context.user_data["mode"] = "weather"
+    elif choice == "quiz":
+        await send_quiz(update, context)
+    elif choice == "chat":
+        await query.message.reply_text("Пиши что хочешь, поболтаем 💬")
+        context.user_data["mode"] = "chat"
+
+# === Викторина ===
+QUIZ = [
+    ("Столица Франции?", "Париж"),
+    ("Сколько будет 5 × 6?", "30"),
+    ("Как называется спутник Земли?", "Луна"),
+]
+
+async def send_quiz(update: Update, context):
+    question, answer = random.choice(QUIZ)
+    context.user_data["quiz_answer"] = answer.lower()
+    await update.callback_query.message.reply_text(f"🎯 Викторина:\n{question}")
+
+# === Обработка сообщений ===
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    mode = context.user_data.get("mode", None)
+    text = update.message.text.strip()
+
+    # Переводчик
+    if mode == "translate":
+        url = f"https://api.mymemory.translated.net/get?q={text}&langpair=ru|en"
+        res = requests.get(url).json()
+        translated = res["responseData"]["translatedText"]
+        await update.message.reply_text(f"Перевод: {translated}")
+
+    # Погода
+    elif mode == "weather":
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={text}&appid={WEATHER_API_KEY}&units=metric&lang=ru"
+        res = requests.get(url).json()
+        if res.get("main"):
+            temp = res["main"]["temp"]
+            desc = res["weather"][0]["description"]
+            await update.message.reply_text(f"Погода в {text}: {temp}°C, {desc}")
+        else:
+            await update.message.reply_text("Город не найден 😿")
+
+    # Викторина
+    elif "quiz_answer" in context.user_data:
+        correct = context.user_data["quiz_answer"]
+        if text.lower() == correct:
+            await update.message.reply_text("✅ Правильно!")
+        else:
+            await update.message.reply_text(f"❌ Неправильно. Правильный ответ: {correct}")
+        context.user_data.pop("quiz_answer")
+
+    # Чат (упрощённый)
+    elif mode == "chat":
+        responses = [
+            "Интересно! Расскажи подробнее 😺",
+            "О, я думал о том же!",
+            "Хмм… а ты как считаешь?",
+            "Ха-ха, забавно 😆",
+        ]
+        await update.message.reply_text(random.choice(responses))
+
+    else:
+        await update.message.reply_text("Выбери действие через /start 😊")
+
+# === Запуск ===
+def main():
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(menu))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.run_polling()
+
+if __name__ == "__main__":
+    main() 
+elif mode == "weather":
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={text}&appid={WEATHER_API_KEY}&units=metric&lang=ru"
+        res = requests.get(url).json()
+
+        if res.get("main"):
+            temp = res["main"]["temp"]
+            feels = res["main"]["feels_like"]
+            humidity = res["main"]["humidity"]
+            wind = res["wind"]["speed"]
+            desc = res["weather"][0]["description"]
+            icon = res["weather"][0]["icon"]
+
+            # Эмодзи в зависимости от погоды
+            if "01" in icon:
+                emoji = "☀️"
+            elif "02" in icon or "03" in icon or "04" in icon:
+                emoji = "🌤️"
+            elif "09" in icon or "10" in icon:
+                emoji = "🌧️"
+            elif "11" in icon:
+                emoji = "⛈️"
+            elif "13" in icon:
+                emoji = "❄️"
+            elif "50" in icon:
+                emoji = "🌫️"
+            else:
+                emoji = "🌈"
+
+            await update.message.reply_text(
+                f"{emoji} *Погода в {text}:*\n"
+                f"🌡 Температура: {temp}°C (ощущается как {feels}°C)\n"
+                f"💧 Влажность: {humidity}%\n"
+                f"💨 Ветер: {wind} м/с\n"
+                f"📋 Описание: {desc.capitalize()}",
+                parse_mode="Markdown"
+            )
+        else:
+            await update.message.reply_text("😿 Город не найден, попробуй ещё раз.")
