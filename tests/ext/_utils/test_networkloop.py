@@ -21,7 +21,7 @@
 Note:
     Most of the retry loop functionality is already covered in test_updater and test_application.
     These tests focus specifically on the max_retries behavior for different exception types
-    and the error callback handling, which were added as part of the bug fix.
+    and the error callback handling, which were added as part of the bug fix in #5030.
 """
 
 import pytest

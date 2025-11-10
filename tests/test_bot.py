@@ -417,6 +417,12 @@ class TestBotWithoutRequest:
             assert get_me_call_count == 2
             # Verify bot is now accessible
             assert test_bot.bot.id == offline_bot.id
+
+            # Third initialize attempt should be a no-op (both flags already True)
+            await test_bot.initialize()
+            # Neither should be called again
+            assert request_init_count == 1
+            assert get_me_call_count == 2
         finally:
             await test_bot.shutdown()
 
