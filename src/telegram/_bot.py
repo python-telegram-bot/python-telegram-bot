@@ -855,9 +855,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             await self.get_me()
             self._bot_initialized = True
         except InvalidToken as exc:
-            raise InvalidToken(
-                f"The token `{self._token}` was rejected by the server."
-            ) from exc
+            raise InvalidToken(f"The token `{self._token}` was rejected by the server.") from exc
 
     async def shutdown(self) -> None:
         """Stop & clear resources used by this class. Currently just calls
