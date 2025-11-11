@@ -4720,6 +4720,41 @@ class TestBotWithRequest:
         finally:
             await test_bot.shutdown()
 
+    async def test_initialize_with_bot_already_initialized_but_not_requests(
+        self, offline_bot, monkeypatch
+    ):
+        """Test initialization when bot user is set but requests are not initialized."""
+        request_init_count = 0
+        get_me_call_count = 0
+
+        async def counting_request_init(*args, **kwargs):
+            nonlocal request_init_count
+            request_init_count += 1
+
+        original_get_me = offline_bot.get_me
+
+        async def counting_get_me(*args, **kwargs):
+            nonlocal get_me_call_count
+            get_me_call_count += 1
+            return await original_get_me(*args, **kwargs)
+
+        test_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
+        monkeypatch.setattr(test_bot.request, "initialize", counting_request_init)
+        monkeypatch.setattr(test_bot, "get_me", counting_get_me)
+
+        try:
+            # Manually set bot as initialized (simulating a partial state)
+            # This creates the edge case where _requests_initialized=False but _bot_initialized=True
+            test_bot._bot_initialized = True
+            test_bot._bot_user = offline_bot.bot
+
+            # Initialize should only initialize requests, not call get_me
+            await test_bot.initialize()
+            assert request_init_count == 1
+            assert get_me_call_count == 0  # Should not be called since bot is already initialized
+        finally:
+            await test_bot.shutdown()
+
     async def test_shutdown_allows_reinitialization(self, offline_bot, monkeypatch):
         """Test that after shutdown, bot can be reinitialized."""
         request_init_count = 0
