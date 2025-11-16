@@ -17,7 +17,7 @@ repos:
     -   id: ruff-format
         name: ruff format
 -   repo: https://github.com/PyCQA/pylint
-    rev: v4.0.2
+    rev: v4.0.3
     hooks:
     -   id: pylint
         files: ^(?!(tests|docs)).*\.py$
