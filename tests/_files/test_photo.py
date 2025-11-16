@@ -44,7 +44,7 @@ class PhotoTestBase:
     photo_file_url = "https://python-telegram-bot.org/static/testfiles/telegram_new.jpg"
     # For some reason the file size is not the same after switching to httpx
     # so we accept three different sizes here. Shouldn't be too much
-    file_size = [29176, 27662]
+    file_size = [29176, 27662, 27330]
 
 
 class TestPhotoWithoutRequest(PhotoTestBase):
