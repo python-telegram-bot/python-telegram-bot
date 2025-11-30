@@ -135,7 +135,7 @@ linting = [
     "pre-commit",
     "ruff==0.14.7",
     "mypy==1.18.2",
-    "pylint==4.0.3"
+    "pylint==4.0.4"
 ]
 all = [{ include-group = "tests" }, { include-group = "docs" }, { include-group = "linting"}]
 
