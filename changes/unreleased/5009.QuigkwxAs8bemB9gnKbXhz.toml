@@ -1,0 +1,4 @@
+internal = "Re-Enable ``actions/stale`` Workflow"
+[[pull_requests]]
+uid = "5009"
+author_uids = ["Bibo-Joshi"]
