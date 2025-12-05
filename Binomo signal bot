@@ -1,0 +1,68 @@
+import time
+import ccxt
+import pandas as pd
+from ta.momentum import RSIIndicator
+from telegram import Bot
+
+TOKEN = "YOUR_TELEGRAM_TOKEN"
+CHAT_ID = "YOUR_CHAT_ID"
+
+bot = Bot(token=TOKEN)
+
+exchange = ccxt.binance({'enableRateLimit': True})
+
+SYMBOL = "BTC/USDT"
+TIMEFRAME = "1m"
+
+def get_candles():
+    data = exchange.fetch_ohlcv(SYMBOL, TIMEFRAME, limit=200)
+    df = pd.DataFrame(data, columns=["time","open","high","low","close","volume"])
+    return df
+
+def get_signal(df):
+    df["ema9"]  = df["close"].ewm(span=9).mean()
+    df["ema21"] = df["close"].ewm(span=21).mean()
+    df["rsi3"]  = RSIIndicator(df["close"], window=3).rsi()
+
+    last = df.iloc[-1]
+    prev = df.iloc[-2]
+
+    uptrend = last["ema9"] > last["ema21"]
+    downtrend = last["ema9"] < last["ema21"]
+
+    rsi_long = prev["rsi3"] < 30 and last["rsi3"] > prev["rsi3"]
+    rsi_short = prev["rsi3"] > 70 and last["rsi3"] < prev["rsi3"]
+
+    if uptrend and rsi_long:
+        return "UP"
+    if downtrend and rsi_short:
+        return "DOWN"
+    return None
+
+def send(msg):
+    bot.send_message(chat_id=CHAT_ID, text=msg)
+
+def main():
+    last_signal = None
+    send("📡 BOT STARTED — SENDING 1-MINUTE SIGNALS")
+    
+    while True:
+        try:
+            df = get_candles()
+            signal = get_signal(df)
+
+            if signal and signal != last_signal:
+                price = df["close"].iloc[-1]
+                message = f"⚡ 1-Minute Signal\n➡️ {signal}\n💰 Price: {price}"
+                send(message)
+                last_signal = signal
+
+        except Exception as e:
+            print("Error:", e)
+
+        time.sleep(10)
+
+if __name__ == "__main__":
+    main()
+
+python binomo_signal_bot.py
