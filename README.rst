@@ -100,12 +100,12 @@ Installing
 You can install or upgrade ``python-telegram-bot`` via
 
 .. code:: shell
-
+    Requires Python 3.10+.
     $ pip install python-telegram-bot --upgrade
 
 To install a pre-release, use the ``--pre`` `flag <https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-pre>`_ in addition.
 
-You can also install ``python-telegram-bot`` from source, though this is usually not necessary.
+You can also install ``python-telegram-bot`` from source, though this is usually not necessary.  Before building from source, check that Pything headers and a C compiler are installed.
 
 .. code:: shell
 
@@ -166,8 +166,8 @@ To install multiple optional dependencies, separate them by commas, e.g. ``pip i
 
 Additionally, two shortcuts are provided:
 
-* ``pip install "python-telegram-bot[all]"`` installs all optional dependencies.
-* ``pip install "python-telegram-bot[ext]"`` installs all optional dependencies that are related to ``telegram.ext``, i.e. ``[rate-limiter, webhooks, callback-data, job-queue]``.
+* ``pip install -U "python-telegram-bot[all]"`` installs all optional dependencies.
+* ``pip install -U "python-telegram-bot[ext]"`` installs all optional dependencies that are related to ``telegram.ext``, i.e. ``[rate-limiter, webhooks, callback-data, job-queue]``.
 
 Working with PTB
 ----------------
