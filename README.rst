@@ -100,6 +100,7 @@ Installing
 You can install or upgrade ``python-telegram-bot`` via
 
 .. code:: shell
+
     Requires Python 3.10+.
     $ pip install python-telegram-bot --upgrade
 
