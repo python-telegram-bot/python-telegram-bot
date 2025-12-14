@@ -1080,6 +1080,42 @@ class _ChatBase(TelegramObject):
             suggested_post_parameters=suggested_post_parameters,
         )
 
+    async def send_message_draft(
+        self,
+        text: str,
+        message_thread_id: Optional[int] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.send_message_draft(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_message_draft`.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().send_message_draft(
+            chat_id=self.id,
+            text=text,
+            message_thread_id=message_thread_id,
+            parse_mode=parse_mode,
+            entities=entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def delete_message(
         self,
         message_id: int,

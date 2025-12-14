@@ -1986,9 +1986,9 @@ class Message(MaybeInaccessibleMessage):
             return message_thread_id
 
         # self.message_thread_id can be used for send_*.param.message_thread_id only if the
-        # thread is a forum topic. It does not work if the thread is a chain of replies to a
-        # message in a normal group. In that case, self.message_thread_id is just the message_id
-        # of the first message in the chain.
+        # thread is a forum topic (in supergroups or private chats). It does not work if the
+        # thread is a chain of replies to a message in a normal group. In that case,
+        # self.message_thread_id is just the message_id of the first message in the chain.
         if not self.is_topic_message:
             return None
 
@@ -2079,6 +2079,51 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+        )
+
+    async def reply_text_draft(
+        self,
+        text: str,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        entities: Optional[Sequence["MessageEntity"]] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.send_message_draft(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 *args,
+                 **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_message_draft`.
+
+        Note:
+            |reply_same_thread|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        message_thread_id = self._parse_message_thread_id(self.chat_id, message_thread_id)
+        return await self.get_bot().send_message_draft(
+            chat_id=self.chat_id,
+            text=text,
+            parse_mode=parse_mode,
+            entities=entities,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def reply_markdown(

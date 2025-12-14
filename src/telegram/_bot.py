@@ -1197,6 +1197,60 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
+    async def send_message_draft(
+        self,
+        chat_id: int,
+        text: str,
+        message_thread_id: Optional[int] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        entities: Optional[Sequence["MessageEntity"]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Use this method to stream a partial message to a user while the message is being
+        generated; supported only for bots with forum topic mode enabled.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int`): Unique identifier for the target private chat.
+            text (:obj:`str`): Text of the message to be sent. Max
+                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                entities parsing.
+            parse_mode (:obj:`str`): |parse_mode|
+            entities (Sequence[:class:`telegram.MessageEntity`], optional): Sequence of special
+                entities that appear in message text, which can be specified instead of
+                :paramref:`parse_mode`.
+
+                    |sequenceargs|
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target
+                message thread.
+
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id, "text": text, "entities": entities}
+        return await self._send_message(
+            "sendMessageDraft",
+            data,
+            message_thread_id=message_thread_id,
+            parse_mode=parse_mode,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def delete_messages(
         self,
         chat_id: Union[int, str],
@@ -11586,6 +11640,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_me`"""
     sendMessage = send_message
     """Alias for :meth:`send_message`"""
+    sendMessageDraft = send_message_draft
+    """Alias for :meth:`send_message_draft`"""
     deleteMessage = delete_message
     """Alias for :meth:`delete_message`"""
     deleteMessages = delete_messages
