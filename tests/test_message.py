@@ -735,7 +735,8 @@ class TestMessageWithoutRequest(MessageTestBase):
             message_thread_id = await method(*args, message_thread_id=None)
             assert message_thread_id is None
 
-            if bot_method_name == "send_chat_action":
+            # These methods do not accept `do_quote` as passed below
+            if bot_method_name in ["send_chat_action", "send_message_draft"]:
                 return
 
             message_thread_id = await method(
@@ -1829,6 +1830,37 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         await self.check_thread_id_parsing(
             message, message.reply_html, "send_message", ["test"], monkeypatch
+        )
+
+    async def test_reply_text_draft(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            id_ = kwargs["chat_id"] == message.chat_id
+            text = kwargs["text"] == "test"
+            return id_ and text
+
+        assert check_shortcut_signature(
+            Message.reply_text_draft,
+            Bot.send_message_draft,
+            ["chat_id"],
+            [],
+            annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
+        )
+        assert await check_shortcut_call(
+            message.reply_text_draft,
+            message.get_bot(),
+            "send_message_draft",
+            skip_params=[""],
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(
+            message.reply_text_draft, message.get_bot(), no_default_kwargs={"message_thread_id"}
+        )
+
+        monkeypatch.setattr(message.get_bot(), "send_message_draft", make_assertion)
+        assert await message.reply_text_draft(draft_id=1, text="test")
+
+        await self.check_thread_id_parsing(
+            message, message.reply_text_draft, "send_message_draft", [1, "test"], monkeypatch
         )
 
     async def test_reply_media_group(self, monkeypatch, message):
