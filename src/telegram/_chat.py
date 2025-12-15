@@ -1082,6 +1082,7 @@ class _ChatBase(TelegramObject):
 
     async def send_message_draft(
         self,
+        draft_id: int,
         text: str,
         message_thread_id: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1105,6 +1106,7 @@ class _ChatBase(TelegramObject):
         """
         return await self.get_bot().send_message_draft(
             chat_id=self.id,
+            draft_id=draft_id,
             text=text,
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,

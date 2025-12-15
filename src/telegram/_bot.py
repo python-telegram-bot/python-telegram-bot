@@ -1200,6 +1200,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     async def send_message_draft(
         self,
         chat_id: int,
+        draft_id: int,
         text: str,
         message_thread_id: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1218,7 +1219,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int`): Unique identifier for the target private chat.
-            text (:obj:`str`): Text of the message to be sent. Max
+            draft_id (:obj:`int`): Unique identifier of the message draft; must be non-zero.
+                Changes of drafts with the same identifier are animated.
+            text (:obj:`str`): Text of the message to be sent,
+                :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
                 :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`): |parse_mode|
@@ -1238,7 +1242,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "text": text, "entities": entities}
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "draft_id": draft_id,
+            "text": text,
+            "entities": entities,
+        }
         return await self._send_message(
             "sendMessageDraft",
             data,

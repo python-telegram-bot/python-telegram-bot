@@ -3133,6 +3133,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def send_message_draft(
         self,
         chat_id: int,
+        draft_id: int,
         text: str,
         message_thread_id: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -3147,6 +3148,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> bool:
         return await super().send_message_draft(
             chat_id=chat_id,
+            draft_id=draft_id,
             text=text,
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,

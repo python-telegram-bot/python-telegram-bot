@@ -2083,6 +2083,7 @@ class Message(MaybeInaccessibleMessage):
 
     async def reply_text_draft(
         self,
+        draft_id: int,
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Optional[Sequence["MessageEntity"]] = None,
@@ -2115,6 +2116,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id = self._parse_message_thread_id(self.chat_id, message_thread_id)
         return await self.get_bot().send_message_draft(
             chat_id=self.chat_id,
+            draft_id=draft_id,
             text=text,
             parse_mode=parse_mode,
             entities=entities,
