@@ -1,0 +1,30 @@
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
+
+# Токен, который ты получил от BotFather
+TOKEN = 'YOUR_BOT_TOKEN'
+
+def start(update: Update, context: CallbackContext):
+    update.message.reply_text("Привет! Ты готов сыграть в Мафию? Напиши /join, чтобы присоединиться.")
+
+def join(update: Update, context: CallbackContext):
+    user = update.message.from_user
+    update.message.reply_text(f"Игрок {user.first_name} присоединился!")
+
+def start_game(update: Update, context: CallbackContext):
+    update.message.reply_text("Игра началась! Выберите свою роль.")
+
+def main():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("join", join))
+    dp.add_handler(CommandHandler("start_game", start_game))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
+
