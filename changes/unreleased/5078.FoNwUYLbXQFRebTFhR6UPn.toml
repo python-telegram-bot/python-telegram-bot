@@ -1,0 +1,5 @@
+features = "Full Support for Bot API 9.3"
+[[pull_requests]]
+uid = "5078"
+author_uids = ["aelkheir"]
+closes_threads = ["5077"]
