@@ -765,6 +765,14 @@ class TestStickerSetWithRequest:
             try:
                 ss = await bot.get_sticker_set(sticker_set)
                 assert isinstance(ss, StickerSet)
+
+                if len(ss.stickers) > 100:
+                    try:
+                        for i in range(1, 50):
+                            await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
+                    except BadRequest as e:
+                        if e.message != "Stickerset_not_modified":
+                            raise Exception("stickerset is growing too large.") from None
             except BadRequest as e:
                 if not e.message == "Stickerset_invalid":
                     raise e
