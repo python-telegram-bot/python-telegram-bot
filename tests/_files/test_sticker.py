@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -765,6 +765,14 @@ class TestStickerSetWithRequest:
             try:
                 ss = await bot.get_sticker_set(sticker_set)
                 assert isinstance(ss, StickerSet)
+
+                if len(ss.stickers) > 100:
+                    try:
+                        for i in range(1, 50):
+                            await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
+                    except BadRequest as e:
+                        if e.message != "Stickerset_not_modified":
+                            raise Exception("stickerset is growing too large.") from None
             except BadRequest as e:
                 if not e.message == "Stickerset_invalid":
                     raise e
