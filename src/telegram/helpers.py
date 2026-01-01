@@ -33,7 +33,7 @@ __all__ = (
 
 import re
 from html import escape
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._utils.types import MarkdownVersion
 from telegram.constants import MessageLimit, MessageType
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
 
 def escape_markdown(
-    text: str, version: MarkdownVersion = 1, entity_type: Optional[str] = None
+    text: str, version: MarkdownVersion = 1, entity_type: str | None = None
 ) -> str:
     """Helper function to escape telegram markup symbols.
 
@@ -77,7 +77,7 @@ def escape_markdown(
     return re.sub(f"([{re.escape(escape_chars)}])", r"\\\1", text)
 
 
-def mention_html(user_id: Union[int, str], name: str) -> str:
+def mention_html(user_id: int | str, name: str) -> str:
     """
     Helper function to create a user mention as HTML tag.
 
@@ -91,7 +91,7 @@ def mention_html(user_id: Union[int, str], name: str) -> str:
     return f'<a href="tg://user?id={user_id}">{escape(name)}</a>'
 
 
-def mention_markdown(user_id: Union[int, str], name: str, version: MarkdownVersion = 1) -> str:
+def mention_markdown(user_id: int | str, name: str, version: MarkdownVersion = 1) -> str:
     """
     Helper function to create a user mention in Markdown syntax.
 
@@ -110,7 +110,7 @@ def mention_markdown(user_id: Union[int, str], name: str, version: MarkdownVersi
     return f"[{escape_markdown(name, version=version)}]({tg_link})"
 
 
-def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
+def effective_message_type(entity: "Message | Update") -> str | None:
     """
     Extracts the type of message as a string identifier from a :class:`telegram.Message` or a
     :class:`telegram.Update`.
@@ -147,7 +147,7 @@ def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
 
 
 def create_deep_linked_url(
-    bot_username: str, payload: Optional[str] = None, group: bool = False
+    bot_username: str, payload: str | None = None, group: bool = False
 ) -> str:
     """
     Creates a deep-linked URL for this :paramref:`~create_deep_linked_url.bot_username` with the

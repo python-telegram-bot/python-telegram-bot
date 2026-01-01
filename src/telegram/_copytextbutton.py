@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram CopyTextButton."""
 
-from typing import Optional
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -47,7 +45,7 @@ class CopyTextButton(TelegramObject):
 
     __slots__ = ("text",)
 
-    def __init__(self, text: str, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, text: str, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
 

@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -119,14 +119,14 @@ class Video(_BaseThumbedMedium):
         width: int,
         height: int,
         duration: TimePeriod,
-        mime_type: Optional[str] = None,
-        file_size: Optional[int] = None,
-        file_name: Optional[str] = None,
-        thumbnail: Optional[PhotoSize] = None,
-        cover: Optional[Sequence[PhotoSize]] = None,
-        start_timestamp: Optional[TimePeriod] = None,
+        mime_type: str | None = None,
+        file_size: int | None = None,
+        file_name: str | None = None,
+        thumbnail: PhotoSize | None = None,
+        cover: Sequence[PhotoSize] | None = None,
+        start_timestamp: TimePeriod | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -141,23 +141,23 @@ class Video(_BaseThumbedMedium):
             self.height: int = height
             self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
-            self.mime_type: Optional[str] = mime_type
-            self.file_name: Optional[str] = file_name
-            self.cover: Optional[Sequence[PhotoSize]] = parse_sequence_arg(cover)
-            self._start_timestamp: Optional[dtm.timedelta] = to_timedelta(start_timestamp)
+            self.mime_type: str | None = mime_type
+            self.file_name: str | None = file_name
+            self.cover: Sequence[PhotoSize] | None = parse_sequence_arg(cover)
+            self._start_timestamp: dtm.timedelta | None = to_timedelta(start_timestamp)
 
     @property
-    def duration(self) -> Union[int, dtm.timedelta]:
+    def duration(self) -> int | dtm.timedelta:
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )
 
     @property
-    def start_timestamp(self) -> Optional[Union[int, dtm.timedelta]]:
+    def start_timestamp(self) -> dtm.timedelta | None | int:
         return get_timedelta_value(self._start_timestamp, attribute="start_timestamp")
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Video":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Video":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

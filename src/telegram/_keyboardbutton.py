@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
@@ -135,26 +135,26 @@ class KeyboardButton(TelegramObject):
     def __init__(
         self,
         text: str,
-        request_contact: Optional[bool] = None,
-        request_location: Optional[bool] = None,
-        request_poll: Optional[KeyboardButtonPollType] = None,
-        web_app: Optional[WebAppInfo] = None,
-        request_chat: Optional[KeyboardButtonRequestChat] = None,
-        request_users: Optional[KeyboardButtonRequestUsers] = None,
+        request_contact: bool | None = None,
+        request_location: bool | None = None,
+        request_poll: KeyboardButtonPollType | None = None,
+        web_app: WebAppInfo | None = None,
+        request_chat: KeyboardButtonRequestChat | None = None,
+        request_users: KeyboardButtonRequestUsers | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
         self.text: str = text
         # Optionals
-        self.request_contact: Optional[bool] = request_contact
-        self.request_location: Optional[bool] = request_location
-        self.request_poll: Optional[KeyboardButtonPollType] = request_poll
-        self.web_app: Optional[WebAppInfo] = web_app
-        self.request_users: Optional[KeyboardButtonRequestUsers] = request_users
-        self.request_chat: Optional[KeyboardButtonRequestChat] = request_chat
+        self.request_contact: bool | None = request_contact
+        self.request_location: bool | None = request_location
+        self.request_poll: KeyboardButtonPollType | None = request_poll
+        self.web_app: WebAppInfo | None = web_app
+        self.request_users: KeyboardButtonRequestUsers | None = request_users
+        self.request_chat: KeyboardButtonRequestChat | None = request_chat
 
         self._id_attrs = (
             self.text,
@@ -169,7 +169,7 @@ class KeyboardButton(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "KeyboardButton":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "KeyboardButton":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

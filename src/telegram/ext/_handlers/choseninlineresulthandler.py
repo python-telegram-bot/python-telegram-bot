@@ -20,7 +20,7 @@
 
 import re
 from re import Match, Pattern
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -81,16 +81,16 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT, RT]):
         self: "ChosenInlineResultHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
-        pattern: Optional[Union[str, Pattern[str]]] = None,
+        pattern: str | Pattern[str] | None = None,
     ):
         super().__init__(callback, block=block)
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern: Optional[Union[str, Pattern[str]]] = pattern
+        self.pattern: str | Pattern[str] | None = pattern
 
-    def check_update(self, update: object) -> Optional[Union[bool, object]]:
+    def check_update(self, update: object) -> bool | object | None:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -113,7 +113,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT, RT]):
         context: CCT,
         update: Update,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Union[bool, Match[str]],
+        check_result: bool | Match[str],
     ) -> None:
         """This function adds the matched regex pattern result to
         :attr:`telegram.ext.CallbackContext.matches`.

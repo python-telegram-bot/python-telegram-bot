@@ -20,7 +20,7 @@
 import json
 from base64 import b64decode
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, no_type_check
+from typing import TYPE_CHECKING, no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -145,7 +145,7 @@ class EncryptedCredentials(TelegramObject):
         hash: str,
         secret: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -155,8 +155,8 @@ class EncryptedCredentials(TelegramObject):
 
         self._id_attrs = (self.data, self.hash, self.secret)
 
-        self._decrypted_secret: Optional[bytes] = None
-        self._decrypted_data: Optional[Credentials] = None
+        self._decrypted_secret: bytes | None = None
+        self._decrypted_data: Credentials | None = None
 
         self._freeze()
 
@@ -224,7 +224,7 @@ class Credentials(TelegramObject):
         secure_data: "SecureData",
         nonce: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -234,7 +234,7 @@ class Credentials(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Credentials":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Credentials":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -309,39 +309,39 @@ class SecureData(TelegramObject):
 
     def __init__(
         self,
-        personal_details: Optional["SecureValue"] = None,
-        passport: Optional["SecureValue"] = None,
-        internal_passport: Optional["SecureValue"] = None,
-        driver_license: Optional["SecureValue"] = None,
-        identity_card: Optional["SecureValue"] = None,
-        address: Optional["SecureValue"] = None,
-        utility_bill: Optional["SecureValue"] = None,
-        bank_statement: Optional["SecureValue"] = None,
-        rental_agreement: Optional["SecureValue"] = None,
-        passport_registration: Optional["SecureValue"] = None,
-        temporary_registration: Optional["SecureValue"] = None,
+        personal_details: "SecureValue | None" = None,
+        passport: "SecureValue | None" = None,
+        internal_passport: "SecureValue | None" = None,
+        driver_license: "SecureValue | None" = None,
+        identity_card: "SecureValue | None" = None,
+        address: "SecureValue | None" = None,
+        utility_bill: "SecureValue | None" = None,
+        bank_statement: "SecureValue | None" = None,
+        rental_agreement: "SecureValue | None" = None,
+        passport_registration: "SecureValue | None" = None,
+        temporary_registration: "SecureValue | None" = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         # Optionals
-        self.temporary_registration: Optional[SecureValue] = temporary_registration
-        self.passport_registration: Optional[SecureValue] = passport_registration
-        self.rental_agreement: Optional[SecureValue] = rental_agreement
-        self.bank_statement: Optional[SecureValue] = bank_statement
-        self.utility_bill: Optional[SecureValue] = utility_bill
-        self.address: Optional[SecureValue] = address
-        self.identity_card: Optional[SecureValue] = identity_card
-        self.driver_license: Optional[SecureValue] = driver_license
-        self.internal_passport: Optional[SecureValue] = internal_passport
-        self.passport: Optional[SecureValue] = passport
-        self.personal_details: Optional[SecureValue] = personal_details
+        self.temporary_registration: SecureValue | None = temporary_registration
+        self.passport_registration: SecureValue | None = passport_registration
+        self.rental_agreement: SecureValue | None = rental_agreement
+        self.bank_statement: SecureValue | None = bank_statement
+        self.utility_bill: SecureValue | None = utility_bill
+        self.address: SecureValue | None = address
+        self.identity_card: SecureValue | None = identity_card
+        self.driver_license: SecureValue | None = driver_license
+        self.internal_passport: SecureValue | None = internal_passport
+        self.passport: SecureValue | None = passport
+        self.personal_details: SecureValue | None = personal_details
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SecureData":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "SecureData":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -426,27 +426,27 @@ class SecureValue(TelegramObject):
 
     def __init__(
         self,
-        data: Optional["DataCredentials"] = None,
-        front_side: Optional["FileCredentials"] = None,
-        reverse_side: Optional["FileCredentials"] = None,
-        selfie: Optional["FileCredentials"] = None,
-        files: Optional[Sequence["FileCredentials"]] = None,
-        translation: Optional[Sequence["FileCredentials"]] = None,
+        data: "DataCredentials | None" = None,
+        front_side: "FileCredentials | None" = None,
+        reverse_side: "FileCredentials | None" = None,
+        selfie: "FileCredentials | None" = None,
+        files: Sequence["FileCredentials"] | None = None,
+        translation: Sequence["FileCredentials"] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.data: Optional[DataCredentials] = data
-        self.front_side: Optional[FileCredentials] = front_side
-        self.reverse_side: Optional[FileCredentials] = reverse_side
-        self.selfie: Optional[FileCredentials] = selfie
+        self.data: DataCredentials | None = data
+        self.front_side: FileCredentials | None = front_side
+        self.reverse_side: FileCredentials | None = reverse_side
+        self.selfie: FileCredentials | None = selfie
         self.files: tuple[FileCredentials, ...] = parse_sequence_arg(files)
         self.translation: tuple[FileCredentials, ...] = parse_sequence_arg(translation)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SecureValue":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "SecureValue":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -470,7 +470,7 @@ class _CredentialsBase(TelegramObject):
         hash: str,
         secret: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -498,7 +498,7 @@ class DataCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, data_hash: str, secret: str, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, data_hash: str, secret: str, *, api_kwargs: JSONDict | None = None):
         super().__init__(hash=data_hash, secret=secret, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -519,6 +519,6 @@ class FileCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, file_hash: str, secret: str, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, file_hash: str, secret: str, *, api_kwargs: JSONDict | None = None):
         super().__init__(hash=file_hash, secret=secret, api_kwargs=api_kwargs)
         self._freeze()

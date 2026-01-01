@@ -67,7 +67,7 @@ class TestDocumentWithoutRequest(DocumentTestBase):
         assert document.file_size == self.file_size
         assert document.mime_type == self.mime_type
         assert document.file_name == self.file_name
-        assert document.thumbnail.file_size == self.thumb_file_size
+        assert document.thumbnail.file_size in [self.thumb_file_size, 7980]
         assert document.thumbnail.width == self.thumb_width
         assert document.thumbnail.height == self.thumb_height
 

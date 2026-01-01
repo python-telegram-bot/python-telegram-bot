@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChosenInlineResult."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
@@ -73,10 +73,10 @@ class ChosenInlineResult(TelegramObject):
         result_id: str,
         from_user: User,
         query: str,
-        location: Optional[Location] = None,
-        inline_message_id: Optional[str] = None,
+        location: "Location | None" = None,
+        inline_message_id: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -85,15 +85,15 @@ class ChosenInlineResult(TelegramObject):
         self.from_user: User = from_user
         self.query: str = query
         # Optionals
-        self.location: Optional[Location] = location
-        self.inline_message_id: Optional[str] = inline_message_id
+        self.location: Location | None = location
+        self.inline_message_id: str | None = inline_message_id
 
         self._id_attrs = (self.result_id,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChosenInlineResult":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChosenInlineResult":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

@@ -19,7 +19,6 @@
 """This module contains an object that represents a Telegram Voice."""
 
 import datetime as dtm
-from typing import Optional, Union
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._utils.argumentparsing import to_timedelta
@@ -70,10 +69,10 @@ class Voice(_BaseMedium):
         file_id: str,
         file_unique_id: str,
         duration: TimePeriod,
-        mime_type: Optional[str] = None,
-        file_size: Optional[int] = None,
+        mime_type: str | None = None,
+        file_size: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -85,10 +84,10 @@ class Voice(_BaseMedium):
             # Required
             self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
-            self.mime_type: Optional[str] = mime_type
+            self.mime_type: str | None = mime_type
 
     @property
-    def duration(self) -> Union[int, dtm.timedelta]:
+    def duration(self) -> int | dtm.timedelta:
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )

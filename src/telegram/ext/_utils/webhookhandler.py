@@ -24,7 +24,7 @@ from pathlib import Path
 from socket import socket
 from ssl import SSLContext
 from types import TracebackType
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 # Instead of checking for ImportError here, we do that in `updater.py`, where we import from
 # this module. Doing it here would be tricky, as the classes below subclass tornado classes
@@ -67,8 +67,8 @@ class WebhookServer:
         listen: str,
         port: int,
         webhook_app: "WebhookAppClass",
-        ssl_ctx: Optional[SSLContext],
-        unix: Optional[Union[str, Path, socket]] = None,
+        ssl_ctx: SSLContext | None,
+        unix: str | Path | socket | None = None,
     ):
         if unix and not UNIX_AVAILABLE:
             raise RuntimeError("This OS does not support binding unix sockets.")
@@ -84,7 +84,7 @@ class WebhookServer:
         self._server_lock = asyncio.Lock()
         self._shutdown_lock = asyncio.Lock()
 
-    async def serve_forever(self, ready: Optional[asyncio.Event] = None) -> None:
+    async def serve_forever(self, ready: asyncio.Event | None = None) -> None:
         async with self._server_lock:
             if self.unix:
                 self._http_server.add_socket(self.unix)
@@ -116,7 +116,7 @@ class WebhookAppClass(tornado.web.Application):
         webhook_path: str,
         bot: "Bot",
         update_queue: asyncio.Queue,
-        secret_token: Optional[str] = None,
+        secret_token: str | None = None,
     ):
         self.shared_objects = {
             "bot": bot,
@@ -210,9 +210,9 @@ class TelegramHandler(tornado.web.RequestHandler):
 
     def log_exception(
         self,
-        typ: Optional[type[BaseException]],
-        value: Optional[BaseException],
-        tb: Optional[TracebackType],
+        typ: type[BaseException] | None,
+        value: BaseException | None,
+        tb: TracebackType | None,
     ) -> None:
         """Override the default logging and instead use our custom logging."""
         _LOGGER.debug(

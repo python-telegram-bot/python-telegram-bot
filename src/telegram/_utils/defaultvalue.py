@@ -28,7 +28,7 @@ Warning:
     the changelog.
 """
 
-from typing import Generic, TypeVar, Union, overload
+from typing import Generic, TypeVar, overload
 
 DVType = TypeVar("DVType", bound=object)  # pylint: disable=invalid-name
 OT = TypeVar("OT", bound=object)
@@ -106,7 +106,7 @@ class DefaultValue(Generic[DVType]):
     def get_value(obj: OT) -> OT: ...
 
     @staticmethod
-    def get_value(obj: Union[OT, "DefaultValue[OT]"]) -> OT:
+    def get_value(obj: "OT | DefaultValue[OT]") -> OT:
         """Shortcut for::
 
             return obj.value if isinstance(obj, DefaultValue) else obj

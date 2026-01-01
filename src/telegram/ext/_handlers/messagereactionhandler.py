@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the MessageReactionHandler class."""
 
-from typing import Final, Optional
+from typing import Final
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -112,10 +112,10 @@ class MessageReactionHandler(BaseHandler[Update, CCT, RT]):
     def __init__(
         self: "MessageReactionHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
-        chat_id: Optional[SCT[int]] = None,
-        chat_username: Optional[SCT[str]] = None,
-        user_id: Optional[SCT[int]] = None,
-        user_username: Optional[SCT[str]] = None,
+        chat_id: SCT[int] | None = None,
+        chat_username: SCT[str] | None = None,
+        user_id: SCT[int] | None = None,
+        user_username: SCT[str] | None = None,
         message_reaction_types: int = MESSAGE_REACTION,
         block: DVType[bool] = DEFAULT_TRUE,
     ):

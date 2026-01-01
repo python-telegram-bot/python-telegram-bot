@@ -24,10 +24,10 @@ import datetime as dtm
 import json
 import logging
 from collections import defaultdict
-from collections.abc import Coroutine
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Callable
+from typing import Any
 
 import httpx
 import pytest

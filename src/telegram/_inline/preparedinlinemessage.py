@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Prepared inline Message."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
@@ -57,7 +57,7 @@ class PreparedInlineMessage(TelegramObject):
         id: str,  # pylint: disable=redefined-builtin
         expiration_date: dtm.datetime,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
@@ -68,7 +68,7 @@ class PreparedInlineMessage(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PreparedInlineMessage":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PreparedInlineMessage":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

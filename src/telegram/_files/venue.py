@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Venue."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
@@ -80,12 +80,12 @@ class Venue(TelegramObject):
         location: Location,
         title: str,
         address: str,
-        foursquare_id: Optional[str] = None,
-        foursquare_type: Optional[str] = None,
-        google_place_id: Optional[str] = None,
-        google_place_type: Optional[str] = None,
+        foursquare_id: str | None = None,
+        foursquare_type: str | None = None,
+        google_place_id: str | None = None,
+        google_place_type: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -94,17 +94,17 @@ class Venue(TelegramObject):
         self.title: str = title
         self.address: str = address
         # Optionals
-        self.foursquare_id: Optional[str] = foursquare_id
-        self.foursquare_type: Optional[str] = foursquare_type
-        self.google_place_id: Optional[str] = google_place_id
-        self.google_place_type: Optional[str] = google_place_type
+        self.foursquare_id: str | None = foursquare_id
+        self.foursquare_type: str | None = foursquare_type
+        self.google_place_id: str | None = google_place_id
+        self.google_place_type: str | None = google_place_type
 
         self._id_attrs = (self.location, self.title)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Venue":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Venue":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

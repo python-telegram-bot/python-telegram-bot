@@ -21,7 +21,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 from telegram._chat import Chat
@@ -136,38 +136,38 @@ class BusinessBotRights(TelegramObject):
 
     def __init__(
         self,
-        can_reply: Optional[bool] = None,
-        can_read_messages: Optional[bool] = None,
-        can_delete_sent_messages: Optional[bool] = None,
-        can_delete_all_messages: Optional[bool] = None,
-        can_edit_name: Optional[bool] = None,
-        can_edit_bio: Optional[bool] = None,
-        can_edit_profile_photo: Optional[bool] = None,
-        can_edit_username: Optional[bool] = None,
-        can_change_gift_settings: Optional[bool] = None,
-        can_view_gifts_and_stars: Optional[bool] = None,
-        can_convert_gifts_to_stars: Optional[bool] = None,
-        can_transfer_and_upgrade_gifts: Optional[bool] = None,
-        can_transfer_stars: Optional[bool] = None,
-        can_manage_stories: Optional[bool] = None,
+        can_reply: bool | None = None,
+        can_read_messages: bool | None = None,
+        can_delete_sent_messages: bool | None = None,
+        can_delete_all_messages: bool | None = None,
+        can_edit_name: bool | None = None,
+        can_edit_bio: bool | None = None,
+        can_edit_profile_photo: bool | None = None,
+        can_edit_username: bool | None = None,
+        can_change_gift_settings: bool | None = None,
+        can_view_gifts_and_stars: bool | None = None,
+        can_convert_gifts_to_stars: bool | None = None,
+        can_transfer_and_upgrade_gifts: bool | None = None,
+        can_transfer_stars: bool | None = None,
+        can_manage_stories: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.can_reply: Optional[bool] = can_reply
-        self.can_read_messages: Optional[bool] = can_read_messages
-        self.can_delete_sent_messages: Optional[bool] = can_delete_sent_messages
-        self.can_delete_all_messages: Optional[bool] = can_delete_all_messages
-        self.can_edit_name: Optional[bool] = can_edit_name
-        self.can_edit_bio: Optional[bool] = can_edit_bio
-        self.can_edit_profile_photo: Optional[bool] = can_edit_profile_photo
-        self.can_edit_username: Optional[bool] = can_edit_username
-        self.can_change_gift_settings: Optional[bool] = can_change_gift_settings
-        self.can_view_gifts_and_stars: Optional[bool] = can_view_gifts_and_stars
-        self.can_convert_gifts_to_stars: Optional[bool] = can_convert_gifts_to_stars
-        self.can_transfer_and_upgrade_gifts: Optional[bool] = can_transfer_and_upgrade_gifts
-        self.can_transfer_stars: Optional[bool] = can_transfer_stars
-        self.can_manage_stories: Optional[bool] = can_manage_stories
+        self.can_reply: bool | None = can_reply
+        self.can_read_messages: bool | None = can_read_messages
+        self.can_delete_sent_messages: bool | None = can_delete_sent_messages
+        self.can_delete_all_messages: bool | None = can_delete_all_messages
+        self.can_edit_name: bool | None = can_edit_name
+        self.can_edit_bio: bool | None = can_edit_bio
+        self.can_edit_profile_photo: bool | None = can_edit_profile_photo
+        self.can_edit_username: bool | None = can_edit_username
+        self.can_change_gift_settings: bool | None = can_change_gift_settings
+        self.can_view_gifts_and_stars: bool | None = can_view_gifts_and_stars
+        self.can_convert_gifts_to_stars: bool | None = can_convert_gifts_to_stars
+        self.can_transfer_and_upgrade_gifts: bool | None = can_transfer_and_upgrade_gifts
+        self.can_transfer_stars: bool | None = can_transfer_stars
+        self.can_manage_stories: bool | None = can_manage_stories
 
         self._id_attrs = (
             self.can_reply,
@@ -243,9 +243,9 @@ class BusinessConnection(TelegramObject):
         user_chat_id: int,
         date: dtm.datetime,
         is_enabled: bool,
-        rights: Optional[BusinessBotRights] = None,
+        rights: BusinessBotRights | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
@@ -253,7 +253,7 @@ class BusinessConnection(TelegramObject):
         self.user_chat_id: int = user_chat_id
         self.date: dtm.datetime = date
         self.is_enabled: bool = is_enabled
-        self.rights: Optional[BusinessBotRights] = rights
+        self.rights: BusinessBotRights | None = rights
 
         self._id_attrs = (
             self.id,
@@ -267,7 +267,7 @@ class BusinessConnection(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessConnection":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessConnection":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -318,7 +318,7 @@ class BusinessMessagesDeleted(TelegramObject):
         chat: Chat,
         message_ids: Sequence[int],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.business_connection_id: str = business_connection_id
@@ -334,7 +334,7 @@ class BusinessMessagesDeleted(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessMessagesDeleted":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessMessagesDeleted":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -372,23 +372,23 @@ class BusinessIntro(TelegramObject):
 
     def __init__(
         self,
-        title: Optional[str] = None,
-        message: Optional[str] = None,
-        sticker: Optional[Sticker] = None,
+        title: str | None = None,
+        message: str | None = None,
+        sticker: Sticker | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.title: Optional[str] = title
-        self.message: Optional[str] = message
-        self.sticker: Optional[Sticker] = sticker
+        self.title: str | None = title
+        self.message: str | None = message
+        self.sticker: Sticker | None = sticker
 
         self._id_attrs = (self.title, self.message, self.sticker)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessIntro":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessIntro":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -424,20 +424,20 @@ class BusinessLocation(TelegramObject):
     def __init__(
         self,
         address: str,
-        location: Optional[Location] = None,
+        location: "Location | None" = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.address: str = address
-        self.location: Optional[Location] = location
+        self.location: Location | None = location
 
         self._id_attrs = (self.address,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessLocation":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessLocation":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -495,14 +495,14 @@ class BusinessOpeningHoursInterval(TelegramObject):
         opening_minute: int,
         closing_minute: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.opening_minute: int = opening_minute
         self.closing_minute: int = closing_minute
 
-        self._opening_time: Optional[tuple[int, int, int]] = None
-        self._closing_time: Optional[tuple[int, int, int]] = None
+        self._opening_time: tuple[int, int, int] | None = None
+        self._closing_time: tuple[int, int, int] | None = None
 
         self._id_attrs = (self.opening_minute, self.closing_minute)
 
@@ -568,7 +568,7 @@ class BusinessOpeningHours(TelegramObject):
         time_zone_name: str,
         opening_hours: Sequence[BusinessOpeningHoursInterval],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.time_zone_name: str = time_zone_name
@@ -576,7 +576,7 @@ class BusinessOpeningHours(TelegramObject):
             opening_hours
         )
 
-        self._cached_zone_info: Optional[ZoneInfo] = None
+        self._cached_zone_info: ZoneInfo | None = None
 
         self._id_attrs = (self.time_zone_name, self.opening_hours)
 
@@ -589,7 +589,7 @@ class BusinessOpeningHours(TelegramObject):
         return self._cached_zone_info
 
     def get_opening_hours_for_day(
-        self, date: dtm.date, time_zone: Union[dtm.tzinfo, str, None] = None
+        self, date: dtm.date, time_zone: dtm.tzinfo | str | None = None
     ) -> tuple[tuple[dtm.datetime, dtm.datetime], ...]:
         """Returns the opening hours intervals for a specific day as datetime objects.
 
@@ -680,7 +680,7 @@ class BusinessOpeningHours(TelegramObject):
         return False
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BusinessOpeningHours":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessOpeningHours":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

@@ -19,7 +19,7 @@
 """This module contains the CommandHandler class."""
 
 import re
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from telegram import MessageEntity, Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -128,9 +128,9 @@ class CommandHandler(BaseHandler[Update, CCT, RT]):
         self: "CommandHandler[CCT, RT]",
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
-        filters: Optional[filters_module.BaseFilter] = None,
+        filters: filters_module.BaseFilter | None = None,
         block: DVType[bool] = DEFAULT_TRUE,
-        has_args: Optional[Union[bool, int]] = None,
+        has_args: bool | int | None = None,
     ):
         super().__init__(callback, block=block)
 
@@ -147,12 +147,12 @@ class CommandHandler(BaseHandler[Update, CCT, RT]):
             filters if filters is not None else filters_module.UpdateType.MESSAGES
         )
 
-        self.has_args: Optional[Union[bool, int]] = has_args
+        self.has_args: bool | int | None = has_args
 
         if (isinstance(self.has_args, int)) and (self.has_args < 0):
             raise ValueError("CommandHandler argument has_args cannot be a negative integer")
 
-    def _check_correct_args(self, args: list[str]) -> Optional[bool]:
+    def _check_correct_args(self, args: list[str]) -> bool | None:
         """Determines whether the args are correct for this handler. Implemented in check_update().
         Args:
             args (:obj:`list`): The args for the handler.
@@ -168,7 +168,7 @@ class CommandHandler(BaseHandler[Update, CCT, RT]):
 
     def check_update(
         self, update: object
-    ) -> Optional[Union[bool, tuple[list[str], Optional[Union[bool, FilterDataDict]]]]]:
+    ) -> bool | tuple[list[str], bool | FilterDataDict | None] | None:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -213,7 +213,7 @@ class CommandHandler(BaseHandler[Update, CCT, RT]):
         context: CCT,
         update: Update,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Optional[Union[bool, tuple[list[str], Optional[bool]]]],
+        check_result: bool | tuple[list[str], bool] | None,
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single
         whitespaces and add output of data filters to :attr:`CallbackContext` as well.

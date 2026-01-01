@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ShippingOption."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -64,7 +64,7 @@ class ShippingOption(TelegramObject):
         title: str,
         prices: Sequence["LabeledPrice"],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 

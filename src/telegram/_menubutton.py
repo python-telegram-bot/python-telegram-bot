@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
 
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -61,7 +61,7 @@ class MenuButton(TelegramObject):
         self,
         type: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):  # pylint: disable=redefined-builtin
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.MenuButtonType, type, type)
@@ -71,7 +71,7 @@ class MenuButton(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MenuButton":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MenuButton":
         """Converts JSON data to the appropriate :class:`MenuButton` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -119,7 +119,7 @@ class MenuButtonCommands(MenuButton):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=constants.MenuButtonType.COMMANDS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -157,7 +157,7 @@ class MenuButtonWebApp(MenuButton):
 
     __slots__ = ("text", "web_app")
 
-    def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=constants.MenuButtonType.WEB_APP, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.text: str = text
@@ -166,7 +166,7 @@ class MenuButtonWebApp(MenuButton):
             self._id_attrs = (self.type, self.text, self.web_app)
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MenuButtonWebApp":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MenuButtonWebApp":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -185,6 +185,6 @@ class MenuButtonDefault(MenuButton):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=constants.MenuButtonType.DEFAULT, api_kwargs=api_kwargs)
         self._freeze()

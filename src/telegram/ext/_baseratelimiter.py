@@ -19,8 +19,8 @@
 """This module contains a class that allows to rate limit requests to the Bot API."""
 
 from abc import ABC, abstractmethod
-from collections.abc import Coroutine
-from typing import Any, Callable, Generic, Optional, Union
+from collections.abc import Callable, Coroutine
+from typing import Any, Generic
 
 from telegram._utils.types import JSONDict
 from telegram.ext._utils.types import RLARGS
@@ -58,13 +58,13 @@ class BaseRateLimiter(ABC, Generic[RLARGS]):
     @abstractmethod
     async def process_request(
         self,
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, list[JSONDict]]]],
+        callback: Callable[..., Coroutine[Any, Any, bool | JSONDict | list[JSONDict]]],
         args: Any,
         kwargs: dict[str, Any],
         endpoint: str,
         data: dict[str, Any],
-        rate_limit_args: Optional[RLARGS],
-    ) -> Union[bool, JSONDict, list[JSONDict]]:
+        rate_limit_args: RLARGS | None,
+    ) -> bool | JSONDict | list[JSONDict]:
         """
         Process a request. Must be implemented by a subclass.
 

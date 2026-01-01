@@ -11,7 +11,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-9.2-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-9.3-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API version
 
@@ -70,7 +70,7 @@ Introduction
 
 This library provides a pure Python, asynchronous interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions **3.9+**.
+It's compatible with Python versions **3.10+**.
 
 In addition to the pure API implementation, this library features several convenience methods and shortcuts as well as a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
@@ -81,7 +81,7 @@ After installing_ the library, be sure to check out the section on `working with
 Telegram API support
 ~~~~~~~~~~~~~~~~~~~~
 
-All types and methods of the Telegram Bot API **9.2** are natively supported by this library.
+All types and methods of the Telegram Bot API **9.3** are natively supported by this library.
 In addition, Bot API functionality not yet natively included can still be used as described `in our wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Bot-API-Forward-Compatibility>`_.
 
 Notable Features
@@ -214,6 +214,12 @@ Noteworthy parts of ``python-telegram-bots`` API that are likely to cause issues
 * ``telegram.ext.CallbackDataCache``
 * ``telegram.ext.BasePersistence``
 * all classes in the ``telegram.ext.filters`` module that allow to add/remove allowed users/chats at runtime
+
+Free threading
+~~~~~~~~~~~~~~
+
+While ``python-telegram-bot`` is tested to work with Python 3.14 free threading, we do not guarantee that
+PTB is thread-safe for all use cases. Please see issue `#4873 <https://github.com/python-telegram-bot/python-telegram-bot/issues/4873>`_ for more information.
 
 Contributing
 ------------

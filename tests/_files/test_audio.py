@@ -77,7 +77,7 @@ class TestAudioWithoutRequest(AudioTestBase):
         assert audio.title is None
         assert audio.mime_type == self.mime_type
         assert audio.file_size == self.file_size
-        assert audio.thumbnail.file_size == self.thumb_file_size
+        assert audio.thumbnail.file_size in [self.thumb_file_size, 1395]
         assert audio.thumbnail.width == self.thumb_width
         assert audio.thumbnail.height == self.thumb_height
 

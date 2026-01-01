@@ -132,7 +132,7 @@ __all__ = [
 import datetime as dtm
 import sys
 from enum import Enum
-from typing import Final, NamedTuple, Optional
+from typing import Final, NamedTuple
 
 from telegram._utils.datetime import UTC
 from telegram._utils.enum import FloatEnum, IntEnum, StringEnum
@@ -164,7 +164,7 @@ class _AccentColor(NamedTuple):
     """
 
     identifier: int
-    name: Optional[str] = None
+    name: str | None = None
     light_colors: tuple[int, ...] = ()
     dark_colors: tuple[int, ...] = ()
 
@@ -176,7 +176,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=2)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=3)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.

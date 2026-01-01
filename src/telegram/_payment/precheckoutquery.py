@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
@@ -92,10 +92,10 @@ class PreCheckoutQuery(TelegramObject):
         currency: str,
         total_amount: int,
         invoice_payload: str,
-        shipping_option_id: Optional[str] = None,
-        order_info: Optional[OrderInfo] = None,
+        shipping_option_id: str | None = None,
+        order_info: OrderInfo | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
@@ -103,15 +103,15 @@ class PreCheckoutQuery(TelegramObject):
         self.currency: str = currency
         self.total_amount: int = total_amount
         self.invoice_payload: str = invoice_payload
-        self.shipping_option_id: Optional[str] = shipping_option_id
-        self.order_info: Optional[OrderInfo] = order_info
+        self.shipping_option_id: str | None = shipping_option_id
+        self.order_info: OrderInfo | None = order_info
 
         self._id_attrs = (self.id,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PreCheckoutQuery":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PreCheckoutQuery":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -123,13 +123,13 @@ class PreCheckoutQuery(TelegramObject):
     async def answer(
         self,
         ok: bool,
-        error_message: Optional[str] = None,
+        error_message: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 

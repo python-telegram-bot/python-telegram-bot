@@ -5,7 +5,6 @@
 import re
 from collections.abc import Collection
 from pathlib import Path
-from typing import Optional
 
 from chango import Version
 from chango.concrete import DirectoryChanGo, DirectoryVersionScanner, HeaderVersionHistory
@@ -39,7 +38,7 @@ class ChangoSectionChangeNote(
     def get_sections(
         cls,
         labels: Collection[str],
-        issue_types: Optional[Collection[str]],
+        issue_types: Collection[str] | None,
     ) -> set[str]:
         """Override get_sections to have customized auto-detection of relevant sections based on
         the pull request and linked issues. Certainly not perfect in all cases, but should be a

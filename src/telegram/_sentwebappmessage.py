@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Sent Web App Message."""
 
-from typing import Optional
-
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -46,11 +44,11 @@ class SentWebAppMessage(TelegramObject):
     __slots__ = ("inline_message_id",)
 
     def __init__(
-        self, inline_message_id: Optional[str] = None, *, api_kwargs: Optional[JSONDict] = None
+        self, inline_message_id: str | None = None, *, api_kwargs: JSONDict | None = None
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Optionals
-        self.inline_message_id: Optional[str] = inline_message_id
+        self.inline_message_id: str | None = inline_message_id
 
         self._id_attrs = (self.inline_message_id,)
 
