@@ -57,7 +57,7 @@ class InlineQueryResultVenue(InlineQueryResult):
         google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
         google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
             `supported types <https://developers.google.com/maps/documentation/places/web-service\
-            /supported_types>`_.)
+            /place-types>`_.)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -88,7 +88,7 @@ class InlineQueryResultVenue(InlineQueryResult):
         google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
         google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See
             `supported types <https://developers.google.com/maps/documentation/places/web-service\
-            /supported_types>`_.)
+            /place-types>`_.)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
