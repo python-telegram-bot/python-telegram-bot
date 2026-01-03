@@ -126,8 +126,6 @@ linkcheck_ignore = [
     re.escape("https://docs.python-telegram-bot.org/en/doc-fixes"),
     # Apparently has some human-verification check and gives 403 in the sphinx build
     re.escape("https://stackoverflow.com/questions/tagged/python-telegram-bot"),
-    # GitHub bot user URLs contain square brackets which cause 404 errors
-    r"https://github\.com/[\w-]+\[bot\]",
 ]
 linkcheck_allowed_redirects = {
     # Redirects to the default version are okay
