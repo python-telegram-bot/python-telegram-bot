@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class that represent a Telegram InlineQueryResultsButton."""
 
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -80,10 +80,10 @@ class InlineQueryResultsButton(TelegramObject):
     def __init__(
         self,
         text: str,
-        web_app: Optional[WebAppInfo] = None,
-        start_parameter: Optional[str] = None,
+        web_app: WebAppInfo | None = None,
+        start_parameter: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -91,15 +91,15 @@ class InlineQueryResultsButton(TelegramObject):
         self.text: str = text
 
         # Optional
-        self.web_app: Optional[WebAppInfo] = web_app
-        self.start_parameter: Optional[str] = start_parameter
+        self.web_app: WebAppInfo | None = web_app
+        self.start_parameter: str | None = start_parameter
 
         self._id_attrs = (self.text, self.web_app, self.start_parameter)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InlineQueryResultsButton":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InlineQueryResultsButton":
         """See :meth:`telegram.TelegramObject.de_json`."""
 
         data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)

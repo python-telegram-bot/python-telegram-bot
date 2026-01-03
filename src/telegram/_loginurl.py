@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LoginUrl."""
-
-from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -87,19 +85,19 @@ class LoginUrl(TelegramObject):
     def __init__(
         self,
         url: str,
-        forward_text: Optional[str] = None,
-        bot_username: Optional[str] = None,
-        request_write_access: Optional[bool] = None,
+        forward_text: str | None = None,
+        bot_username: str | None = None,
+        request_write_access: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.url: str = url
         # Optional
-        self.forward_text: Optional[str] = forward_text
-        self.bot_username: Optional[str] = bot_username
-        self.request_write_access: Optional[bool] = request_write_access
+        self.forward_text: str | None = forward_text
+        self.bot_username: str | None = bot_username
+        self.request_write_access: bool | None = request_write_access
 
         self._id_attrs = (self.url,)
 

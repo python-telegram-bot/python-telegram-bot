@@ -1,6 +1,6 @@
 import datetime as dtm
 from collections.abc import Sequence
-from typing import Union
+from typing import TypeAlias
 
 from telegram import (
     AcceptedGiftTypes,
@@ -99,6 +99,8 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     "int": 123456,
     "MenuButton": MenuButton(type="dummy_type"),
     "Message": make_message("dummy_text"),
+    # Bad hack to get tests passing (we should not be using annotations as a key here)
+    "Message | bool": make_message("dummy_text"),
     "MessageId": MessageId(123456),
     "OwnedGifts": OwnedGifts(
         total_count=1,
@@ -162,7 +164,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
 }
 
 
-def get_dummy_object(obj_type: Union[type, str], as_tuple: bool = False) -> object:
+def get_dummy_object(obj_type: type | str, as_tuple: bool = False) -> object:
     obj_type_name = obj_type.__name__ if isinstance(obj_type, type) else obj_type
     if (return_value := _PREPARED_DUMMY_OBJECTS.get(obj_type_name)) is None:
         raise ValueError(
@@ -174,14 +176,14 @@ def get_dummy_object(obj_type: Union[type, str], as_tuple: bool = False) -> obje
     return return_value
 
 
-_RETURN_TYPES = Union[bool, int, str, dict[str, object]]
-_RETURN_TYPE = Union[_RETURN_TYPES, tuple[_RETURN_TYPES, ...]]
+_RETURN_TYPES: TypeAlias = bool | int | str | dict[str, object]
+_RETURN_TYPE: TypeAlias = _RETURN_TYPES | tuple[_RETURN_TYPES, ...]
 
 
 def _serialize_dummy_object(obj: object) -> _RETURN_TYPE:
     if isinstance(obj, Sequence) and not isinstance(obj, str):
         return tuple(_serialize_dummy_object(item) for item in obj)
-    if isinstance(obj, (str, int, bool)):
+    if isinstance(obj, str | int | bool):
         return obj
     if isinstance(obj, TelegramObject):
         return obj.to_dict()
@@ -189,5 +191,5 @@ def _serialize_dummy_object(obj: object) -> _RETURN_TYPE:
     raise ValueError(f"Serialization of object of type '{type(obj)}' is not supported yet.")
 
 
-def get_dummy_object_json_dict(obj_type: Union[type, str], as_tuple: bool = False) -> _RETURN_TYPE:
+def get_dummy_object_json_dict(obj_type: type | str, as_tuple: bool = False) -> _RETURN_TYPE:
     return _serialize_dummy_object(get_dummy_object(obj_type, as_tuple=as_tuple))

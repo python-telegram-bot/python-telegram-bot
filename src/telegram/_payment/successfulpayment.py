@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram SuccessfulPayment."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
@@ -117,32 +117,32 @@ class SuccessfulPayment(TelegramObject):
         invoice_payload: str,
         telegram_payment_charge_id: str,
         provider_payment_charge_id: str,
-        shipping_option_id: Optional[str] = None,
-        order_info: Optional[OrderInfo] = None,
-        subscription_expiration_date: Optional[dtm.datetime] = None,
-        is_recurring: Optional[bool] = None,
-        is_first_recurring: Optional[bool] = None,
+        shipping_option_id: str | None = None,
+        order_info: OrderInfo | None = None,
+        subscription_expiration_date: dtm.datetime | None = None,
+        is_recurring: bool | None = None,
+        is_first_recurring: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.currency: str = currency
         self.total_amount: int = total_amount
         self.invoice_payload: str = invoice_payload
-        self.shipping_option_id: Optional[str] = shipping_option_id
-        self.order_info: Optional[OrderInfo] = order_info
+        self.shipping_option_id: str | None = shipping_option_id
+        self.order_info: OrderInfo | None = order_info
         self.telegram_payment_charge_id: str = telegram_payment_charge_id
         self.provider_payment_charge_id: str = provider_payment_charge_id
-        self.subscription_expiration_date: Optional[dtm.datetime] = subscription_expiration_date
-        self.is_recurring: Optional[bool] = is_recurring
-        self.is_first_recurring: Optional[bool] = is_first_recurring
+        self.subscription_expiration_date: dtm.datetime | None = subscription_expiration_date
+        self.is_recurring: bool | None = is_recurring
+        self.is_first_recurring: bool | None = is_first_recurring
 
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuccessfulPayment":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "SuccessfulPayment":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

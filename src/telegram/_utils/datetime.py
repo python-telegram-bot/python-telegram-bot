@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import datetime as dtm
 import os
 import time
 import zoneinfo
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
@@ -64,9 +64,9 @@ def localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
 
 
 def to_float_timestamp(
-    time_object: Union[float, dtm.timedelta, dtm.datetime, dtm.time],
-    reference_timestamp: Optional[float] = None,
-    tzinfo: Optional[dtm.tzinfo] = None,
+    time_object: float | dtm.timedelta | dtm.datetime | dtm.time,
+    reference_timestamp: float | None = None,
+    tzinfo: dtm.tzinfo | None = None,
 ) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
@@ -128,7 +128,7 @@ def to_float_timestamp(
 
     if isinstance(time_object, dtm.timedelta):
         return reference_timestamp + time_object.total_seconds()
-    if isinstance(time_object, (int, float)):
+    if isinstance(time_object, int | float):
         return reference_timestamp + time_object
 
     if tzinfo is None:
@@ -166,10 +166,10 @@ def to_float_timestamp(
 
 
 def to_timestamp(
-    dt_obj: Union[float, dtm.timedelta, dtm.datetime, dtm.time, None],
-    reference_timestamp: Optional[float] = None,
-    tzinfo: Optional[dtm.tzinfo] = None,
-) -> Optional[int]:
+    dt_obj: float | dtm.timedelta | dtm.datetime | dtm.time | None,
+    reference_timestamp: float | None = None,
+    tzinfo: dtm.tzinfo | None = None,
+) -> int | None:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
     down to the nearest integer).
@@ -184,9 +184,9 @@ def to_timestamp(
 
 
 def from_timestamp(
-    unixtime: Optional[int],
-    tzinfo: Optional[dtm.tzinfo] = None,
-) -> Optional[dtm.datetime]:
+    unixtime: int | None,
+    tzinfo: dtm.tzinfo | None = None,
+) -> dtm.datetime | None:
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
     :obj:`None` s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
@@ -207,7 +207,7 @@ def from_timestamp(
     return dtm.datetime.fromtimestamp(unixtime, tz=UTC if tzinfo is None else tzinfo)
 
 
-def extract_tzinfo_from_defaults(bot: Optional["Bot"]) -> Union[dtm.tzinfo, None]:
+def extract_tzinfo_from_defaults(bot: "Bot | None") -> dtm.tzinfo | None:
     """
     Extracts the timezone info from the default values of the bot.
     If the bot has no default values, :obj:`None` is returned.
@@ -247,9 +247,7 @@ def get_zone_info(tz: str) -> zoneinfo.ZoneInfo:
         ) from err
 
 
-def get_timedelta_value(
-    value: Optional[dtm.timedelta], attribute: str
-) -> Optional[Union[int, dtm.timedelta]]:
+def get_timedelta_value(value: dtm.timedelta | None, attribute: str) -> int | dtm.timedelta | None:
     """
     Convert a `datetime.timedelta` to seconds or return it as-is, based on environment config.
 
@@ -285,5 +283,7 @@ def get_timedelta_value(
         stacklevel=2,
     )
     return (
-        int(seconds) if (seconds := value.total_seconds()).is_integer() else seconds  # type: ignore[return-value]  # pylint: disable=line-too-long
+        int(seconds)  # type: ignore[return-value]
+        if (seconds := value.total_seconds()).is_integer()
+        else seconds
     )

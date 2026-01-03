@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResult."""
 
-from typing import Final, Optional
+from typing import Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -56,7 +56,7 @@ class InlineQueryResult(TelegramObject):
 
     __slots__ = ("id", "type")
 
-    def __init__(self, type: str, id: str, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, type: str, id: str, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required

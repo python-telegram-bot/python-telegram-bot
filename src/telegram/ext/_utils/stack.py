@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,14 +28,13 @@ Warning:
 
 from pathlib import Path
 from types import FrameType
-from typing import Optional
 
 from telegram._utils.logging import get_logger
 
 _LOGGER = get_logger(__name__)
 
 
-def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
+def was_called_by(frame: FrameType | None, caller: Path) -> bool:
     """Checks if the passed frame was called by the specified file.
 
     Example:

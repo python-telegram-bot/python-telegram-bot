@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultCachedGif."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -107,15 +107,15 @@ class InlineQueryResultCachedGif(InlineQueryResult):
         self,
         id: str,  # pylint: disable=redefined-builtin
         gif_file_id: str,
-        title: Optional[str] = None,
-        caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
+        title: str | None = None,
+        caption: str | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        show_caption_above_media: Optional[bool] = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        show_caption_above_media: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
@@ -123,10 +123,10 @@ class InlineQueryResultCachedGif(InlineQueryResult):
             self.gif_file_id: str = gif_file_id
 
             # Optionals
-            self.title: Optional[str] = title
-            self.caption: Optional[str] = caption
+            self.title: str | None = title
+            self.caption: str | None = caption
             self.parse_mode: ODVInput[str] = parse_mode
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
+            self.show_caption_above_media: bool | None = show_caption_above_media

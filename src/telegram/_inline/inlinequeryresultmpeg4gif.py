@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -153,19 +153,19 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         mpeg4_url: str,
         thumbnail_url: str,
-        mpeg4_width: Optional[int] = None,
-        mpeg4_height: Optional[int] = None,
-        title: Optional[str] = None,
-        caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
-        mpeg4_duration: Optional[TimePeriod] = None,
+        mpeg4_width: int | None = None,
+        mpeg4_height: int | None = None,
+        title: str | None = None,
+        caption: str | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
+        mpeg4_duration: TimePeriod | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        thumbnail_mime_type: Optional[str] = None,
-        show_caption_above_media: Optional[bool] = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        thumbnail_mime_type: str | None = None,
+        show_caption_above_media: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.MPEG4GIF, id, api_kwargs=api_kwargs)
@@ -174,18 +174,18 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             self.thumbnail_url: str = thumbnail_url
 
             # Optional
-            self.mpeg4_width: Optional[int] = mpeg4_width
-            self.mpeg4_height: Optional[int] = mpeg4_height
-            self._mpeg4_duration: Optional[dtm.timedelta] = to_timedelta(mpeg4_duration)
-            self.title: Optional[str] = title
-            self.caption: Optional[str] = caption
+            self.mpeg4_width: int | None = mpeg4_width
+            self.mpeg4_height: int | None = mpeg4_height
+            self._mpeg4_duration: dtm.timedelta | None = to_timedelta(mpeg4_duration)
+            self.title: str | None = title
+            self.caption: str | None = caption
             self.parse_mode: ODVInput[str] = parse_mode
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_mime_type: Optional[str] = thumbnail_mime_type
-            self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
+            self.thumbnail_mime_type: str | None = thumbnail_mime_type
+            self.show_caption_above_media: bool | None = show_caption_above_media
 
     @property
-    def mpeg4_duration(self) -> Optional[Union[int, dtm.timedelta]]:
+    def mpeg4_duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._mpeg4_duration, attribute="mpeg4_duration")

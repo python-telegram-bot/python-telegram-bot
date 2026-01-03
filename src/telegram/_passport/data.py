@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
-from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -81,25 +80,25 @@ class PersonalDetails(TelegramObject):
         gender: str,
         country_code: str,
         residence_country_code: str,
-        first_name_native: Optional[str] = None,
-        last_name_native: Optional[str] = None,
-        middle_name: Optional[str] = None,
-        middle_name_native: Optional[str] = None,
+        first_name_native: str | None = None,
+        last_name_native: str | None = None,
+        middle_name: str | None = None,
+        middle_name_native: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.first_name: str = first_name
         self.last_name: str = last_name
-        self.middle_name: Optional[str] = middle_name
+        self.middle_name: str | None = middle_name
         self.birth_date: str = birth_date
         self.gender: str = gender
         self.country_code: str = country_code
         self.residence_country_code: str = residence_country_code
-        self.first_name_native: Optional[str] = first_name_native
-        self.last_name_native: Optional[str] = last_name_native
-        self.middle_name_native: Optional[str] = middle_name_native
+        self.first_name_native: str | None = first_name_native
+        self.last_name_native: str | None = last_name_native
+        self.middle_name_native: str | None = middle_name_native
 
         self._freeze()
 
@@ -143,7 +142,7 @@ class ResidentialAddress(TelegramObject):
         country_code: str,
         post_code: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -177,7 +176,7 @@ class IdDocumentData(TelegramObject):
         document_no: str,
         expiry_date: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.document_no: str = document_no

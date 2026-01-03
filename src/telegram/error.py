@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@
 """
 
 import datetime as dtm
-from typing import Optional, Union
 
 from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
@@ -122,7 +121,7 @@ class InvalidToken(TelegramError):
 
     __slots__ = ()
 
-    def __init__(self, message: Optional[str] = None) -> None:
+    def __init__(self, message: str | None = None) -> None:
         super().__init__("Invalid token" if message is None else message)
 
 
@@ -176,7 +175,7 @@ class TimedOut(NetworkError):
 
     __slots__ = ()
 
-    def __init__(self, message: Optional[str] = None) -> None:
+    def __init__(self, message: str | None = None) -> None:
         super().__init__(message or "Timed out")
 
 
@@ -239,7 +238,7 @@ class RetryAfter(TelegramError):
             super().__init__(f"Flood control exceeded. Retry in {self.retry_after!s}")
 
     @property
-    def retry_after(self) -> Union[int, dtm.timedelta]:  # noqa: D102
+    def retry_after(self) -> int | dtm.timedelta:  # noqa: D102
         # Diableing D102 because docstring for `retry_after` is present at the class's level
         return get_timedelta_value(  # type: ignore[return-value]
             self._retry_after, attribute="retry_after"
@@ -270,7 +269,7 @@ class PassportDecryptionError(TelegramError):
 
     __slots__ = ("_msg",)
 
-    def __init__(self, message: Union[str, Exception]):
+    def __init__(self, message: str | Exception):
         super().__init__(f"PassportDecryptionError: {message}")
         self._msg = str(message)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=redefined-builtin
 """This module contains objects that represents a Telegram ReactionType."""
 
-from typing import TYPE_CHECKING, Final, Literal, Optional, Union
+from typing import TYPE_CHECKING, Final, Literal
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -65,11 +66,9 @@ class ReactionType(TelegramObject):
 
     def __init__(
         self,
-        type: Union[  # pylint: disable=redefined-builtin
-            Literal["emoji", "custom_emoji", "paid"], constants.ReactionType
-        ],
+        type: Literal["emoji", "custom_emoji", "paid"] | constants.ReactionType,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
@@ -78,7 +77,7 @@ class ReactionType(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReactionType":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ReactionType":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -120,7 +119,7 @@ class ReactionTypeEmoji(ReactionType):
         self,
         emoji: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=ReactionType.EMOJI, api_kwargs=api_kwargs)
 
@@ -154,7 +153,7 @@ class ReactionTypeCustomEmoji(ReactionType):
         self,
         custom_emoji_id: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(type=ReactionType.CUSTOM_EMOJI, api_kwargs=api_kwargs)
 
@@ -176,7 +175,7 @@ class ReactionTypePaid(ReactionType):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=ReactionType.PAID, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -209,7 +208,7 @@ class ReactionCount(TelegramObject):
         type: ReactionType,  # pylint: disable=redefined-builtin
         total_count: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -223,7 +222,7 @@ class ReactionCount(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ReactionCount":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ReactionCount":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

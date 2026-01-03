@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains an object that represents a Encrypted PassportFile."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
@@ -79,9 +79,9 @@ class PassportFile(TelegramObject):
         file_unique_id: str,
         file_date: dtm.datetime,
         file_size: int,
-        credentials: Optional["FileCredentials"] = None,
+        credentials: "FileCredentials | None" = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -92,14 +92,14 @@ class PassportFile(TelegramObject):
         self.file_date: dtm.datetime = file_date
         # Optionals
 
-        self._credentials: Optional[FileCredentials] = credentials
+        self._credentials: FileCredentials | None = credentials
 
         self._id_attrs = (self.file_unique_id,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PassportFile":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PassportFile":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -111,7 +111,7 @@ class PassportFile(TelegramObject):
 
     @classmethod
     def de_json_decrypted(
-        cls, data: JSONDict, bot: Optional["Bot"], credentials: "FileCredentials"
+        cls, data: JSONDict, bot: "Bot | None", credentials: "FileCredentials"
     ) -> "PassportFile":
         """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
         passport credentials.
@@ -142,7 +142,7 @@ class PassportFile(TelegramObject):
     def de_list_decrypted(
         cls,
         data: list[JSONDict],
-        bot: Optional["Bot"],
+        bot: "Bot | None",
         credentials: list["FileCredentials"],
     ) -> tuple["PassportFile", ...]:
         """Variant of :meth:`telegram.TelegramObject.de_list` that also takes into account
@@ -184,7 +184,7 @@ class PassportFile(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "File":
         """
         Wrapper over :meth:`telegram.Bot.get_file`. Will automatically assign the correct

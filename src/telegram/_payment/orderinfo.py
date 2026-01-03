@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram OrderInfo."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._telegramobject import TelegramObject
@@ -54,25 +54,25 @@ class OrderInfo(TelegramObject):
 
     def __init__(
         self,
-        name: Optional[str] = None,
-        phone_number: Optional[str] = None,
-        email: Optional[str] = None,
-        shipping_address: Optional[ShippingAddress] = None,
+        name: str | None = None,
+        phone_number: str | None = None,
+        email: str | None = None,
+        shipping_address: ShippingAddress | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.name: Optional[str] = name
-        self.phone_number: Optional[str] = phone_number
-        self.email: Optional[str] = email
-        self.shipping_address: Optional[ShippingAddress] = shipping_address
+        self.name: str | None = name
+        self.phone_number: str | None = phone_number
+        self.email: str | None = email
+        self.shipping_address: ShippingAddress | None = shipping_address
 
         self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "OrderInfo":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OrderInfo":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects with thumbnails"""
 
-from typing import TYPE_CHECKING, Optional, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
@@ -68,10 +68,10 @@ class _BaseThumbedMedium(_BaseMedium):
         self,
         file_id: str,
         file_unique_id: str,
-        file_size: Optional[int] = None,
-        thumbnail: Optional[PhotoSize] = None,
+        file_size: int | None = None,
+        thumbnail: PhotoSize | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -80,12 +80,10 @@ class _BaseThumbedMedium(_BaseMedium):
             api_kwargs=api_kwargs,
         )
 
-        self.thumbnail: Optional[PhotoSize] = thumbnail
+        self.thumbnail: PhotoSize | None = thumbnail
 
     @classmethod
-    def de_json(
-        cls: type[ThumbedMT_co], data: JSONDict, bot: Optional["Bot"] = None
-    ) -> ThumbedMT_co:
+    def de_json(cls: type[ThumbedMT_co], data: JSONDict, bot: "Bot | None" = None) -> ThumbedMT_co:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

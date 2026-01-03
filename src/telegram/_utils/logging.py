@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,10 +25,9 @@ Warning:
 """
 
 import logging
-from typing import Optional
 
 
-def get_logger(file_name: str, class_name: Optional[str] = None) -> logging.Logger:
+def get_logger(file_name: str, class_name: str | None = None) -> logging.Logger:
     """Returns a logger with an appropriate name.
     Use as follows::
 

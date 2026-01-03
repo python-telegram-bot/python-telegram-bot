@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,13 +20,12 @@
 # ruff: noqa: T201, D100, S607
 import subprocess
 import sys
-from typing import Optional
 
 from . import __version__ as telegram_ver
 from .constants import BOT_API_VERSION
 
 
-def _git_revision() -> Optional[str]:
+def _git_revision() -> str | None:
     try:
         output = subprocess.check_output(
             ["git", "describe", "--long", "--tags"], stderr=subprocess.STDOUT

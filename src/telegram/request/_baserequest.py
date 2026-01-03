@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import json
 from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
-from typing import Final, Optional, TypeVar, Union, final
+from typing import Final, TypeVar, final
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.defaultvalue import DefaultValue
@@ -122,9 +122,9 @@ class BaseRequest(
 
     async def __aexit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """|async_context_manager| :meth:`shuts down <shutdown>` the Request."""
         # Make sure not to return `True` so that exceptions are not suppressed
@@ -133,7 +133,7 @@ class BaseRequest(
 
     @property
     @abc.abstractmethod
-    def read_timeout(self) -> Optional[float]:
+    def read_timeout(self) -> float | None:
         """This property must return the default read timeout in seconds used by this class.
         More precisely, the returned value should be the one used when
         :paramref:`post.read_timeout` of :meth:post` is not passed/equal to :attr:`DEFAULT_NONE`.
@@ -158,12 +158,12 @@ class BaseRequest(
     async def post(
         self,
         url: str,
-        request_data: Optional[RequestData] = None,
+        request_data: RequestData | None = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[JSONDict, list[JSONDict], bool]:
+    ) -> JSONDict | list[JSONDict] | bool:
         """Makes a request to the Bot API handles the return code and parses the answer.
 
         Warning:
@@ -260,7 +260,7 @@ class BaseRequest(
         self,
         url: str,
         method: str,
-        request_data: Optional[RequestData] = None,
+        request_data: RequestData | None = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -326,7 +326,7 @@ class BaseRequest(
         except ValueError:
             message = f"Unknown HTTPError ({code})"
 
-        parsing_exception: Optional[TelegramError] = None
+        parsing_exception: TelegramError | None = None
 
         try:
             response_data = self.parse_json_payload(payload)
@@ -404,7 +404,7 @@ class BaseRequest(
         self,
         url: str,
         method: str,
-        request_data: Optional[RequestData] = None,
+        request_data: RequestData | None = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

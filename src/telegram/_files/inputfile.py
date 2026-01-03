@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram InputFile."""
 
 import mimetypes
-from typing import IO, Optional, Union
+from typing import IO
 from uuid import uuid4
 
 from telegram._utils.files import guess_file_name, load_file
@@ -95,13 +95,13 @@ class InputFile:
 
     def __init__(
         self,
-        obj: Union[IO[bytes], bytes, str],
-        filename: Optional[str] = None,
+        obj: IO[bytes] | bytes | str,
+        filename: str | None = None,
         attach: bool = False,
         read_file_handle: bool = True,
     ):
         if isinstance(obj, bytes):
-            self.input_file_content: Union[bytes, IO[bytes]] = obj
+            self.input_file_content: bytes | IO[bytes] = obj
         elif isinstance(obj, str):
             self.input_file_content = obj.encode(TextEncoding.UTF_8)
         elif read_file_handle:
@@ -111,7 +111,7 @@ class InputFile:
             self.input_file_content = obj
             filename = filename or guess_file_name(obj)
 
-        self.attach_name: Optional[str] = "attached" + uuid4().hex if attach else None
+        self.attach_name: str | None = "attached" + uuid4().hex if attach else None
 
         if filename:
             self.mimetype: str = (
@@ -135,7 +135,7 @@ class InputFile:
         return self.filename, self.input_file_content, self.mimetype
 
     @property
-    def attach_uri(self) -> Optional[str]:
+    def attach_uri(self) -> str | None:
         """URI to insert into the JSON data for uploading the file. Returns :obj:`None`, if
         :attr:`attach_name` is :obj:`None`.
         """

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent story areas."""
 
-from typing import Final, Optional
+from typing import Final
 
 from telegram import constants
 from telegram._reaction import ReactionType
@@ -83,7 +83,7 @@ class StoryAreaPosition(TelegramObject):
         rotation_angle: float,
         corner_radius_percentage: float,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.x_percentage: float = x_percentage
@@ -134,17 +134,17 @@ class LocationAddress(TelegramObject):
     def __init__(
         self,
         country_code: str,
-        state: Optional[str] = None,
-        city: Optional[str] = None,
-        street: Optional[str] = None,
+        state: str | None = None,
+        city: str | None = None,
+        street: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.country_code: str = country_code
-        self.state: Optional[str] = state
-        self.city: Optional[str] = city
-        self.street: Optional[str] = street
+        self.state: str | None = state
+        self.city: str | None = city
+        self.street: str | None = street
 
         self._id_attrs = (self.country_code, self.state, self.city, self.street)
         self._freeze()
@@ -189,7 +189,7 @@ class StoryAreaType(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.StoryAreaTypeType, type, type)
@@ -226,16 +226,16 @@ class StoryAreaTypeLocation(StoryAreaType):
         self,
         latitude: float,
         longitude: float,
-        address: Optional[LocationAddress] = None,
+        address: LocationAddress | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=StoryAreaType.LOCATION, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.latitude: float = latitude
             self.longitude: float = longitude
-            self.address: Optional[LocationAddress] = address
+            self.address: LocationAddress | None = address
 
             self._id_attrs = (self.type, self.latitude, self.longitude)
 
@@ -273,17 +273,17 @@ class StoryAreaTypeSuggestedReaction(StoryAreaType):
     def __init__(
         self,
         reaction_type: ReactionType,
-        is_dark: Optional[bool] = None,
-        is_flipped: Optional[bool] = None,
+        is_dark: bool | None = None,
+        is_flipped: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=StoryAreaType.SUGGESTED_REACTION, api_kwargs=api_kwargs)
 
         with self._unfrozen():
             self.reaction_type: ReactionType = reaction_type
-            self.is_dark: Optional[bool] = is_dark
-            self.is_flipped: Optional[bool] = is_flipped
+            self.is_dark: bool | None = is_dark
+            self.is_flipped: bool | None = is_flipped
 
             self._id_attrs = (self.type, self.reaction_type, self.is_dark, self.is_flipped)
 
@@ -312,7 +312,7 @@ class StoryAreaTypeLink(StoryAreaType):
         self,
         url: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=StoryAreaType.LINK, api_kwargs=api_kwargs)
 
@@ -355,7 +355,7 @@ class StoryAreaTypeWeather(StoryAreaType):
         emoji: str,
         background_color: int,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=StoryAreaType.WEATHER, api_kwargs=api_kwargs)
 
@@ -393,7 +393,7 @@ class StoryAreaTypeUniqueGift(StoryAreaType):
         self,
         name: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=StoryAreaType.UNIQUE_GIFT, api_kwargs=api_kwargs)
 
@@ -428,7 +428,7 @@ class StoryArea(TelegramObject):
         position: StoryAreaPosition,
         type: StoryAreaType,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.position: StoryAreaPosition = position

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,8 @@ inside warnings.py.
 .. versionadded:: 20.2
 """
 
-from typing import Any, Callable, Union
+from collections.abc import Callable
+from typing import Any
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
@@ -57,7 +58,7 @@ def warn_about_deprecated_arg_return_new_arg(
     bot_api_version: str,
     ptb_version: str,
     stacklevel: int = 2,
-    warn_callback: Callable[[Union[str, PTBUserWarning], type[Warning], int], None] = warn,
+    warn_callback: Callable[[str | PTBUserWarning, type[Warning], int], None] = warn,
 ) -> Any:
     """A helper function for the transition in API when argument is renamed.
 

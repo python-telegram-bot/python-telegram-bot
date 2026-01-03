@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,8 +33,7 @@ Warning:
 
 import asyncio
 import contextlib
-from collections.abc import Coroutine
-from typing import Callable, Optional
+from collections.abc import Callable, Coroutine
 
 from telegram._utils.logging import get_logger
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
@@ -45,11 +44,11 @@ _LOGGER = get_logger(__name__)
 async def network_retry_loop(
     *,
     action_cb: Callable[..., Coroutine],
-    on_err_cb: Optional[Callable[[TelegramError], None]] = None,
+    on_err_cb: Callable[[TelegramError], None] | None = None,
     description: str,
     interval: float,
-    stop_event: Optional[asyncio.Event] = None,
-    is_running: Optional[Callable[[], bool]] = None,
+    stop_event: asyncio.Event | None = None,
+    is_running: Callable[[], bool] | None = None,
     max_retries: int,
     repeat_on_success: bool = False,
 ) -> None:
@@ -104,6 +103,34 @@ async def network_retry_loop(
     log_prefix = f"Network Retry Loop ({description}):"
     effective_is_running = is_running or (lambda: True)
 
+    def check_max_retries_and_log(current_retries: int, exception_info: str = "") -> bool:
+        """Check if max retries reached and log accordingly.
+
+        Args:
+            current_retries: The current retry count.
+            exception_info: Additional context about the exception (e.g., "Timed out: ...").
+
+        Returns:
+            bool: True if max retries reached (should abort), False otherwise (should retry).
+        """
+        prefix_with_info = f"{log_prefix} {exception_info}" if exception_info else log_prefix
+
+        if max_retries < 0 or current_retries < max_retries:
+            _LOGGER.debug(
+                "%s Failed run number %s of %s. Retrying.",
+                prefix_with_info,
+                current_retries,
+                max_retries,
+            )
+            return False
+        _LOGGER.exception(
+            "%s Failed run number %s of %s. Aborting.",
+            prefix_with_info,
+            current_retries,
+            max_retries,
+        )
+        return True
+
     async def do_action() -> None:
         if not stop_event:
             await action_cb()
@@ -137,15 +164,21 @@ async def network_retry_loop(
                 break
         except RetryAfter as exc:
             slack_time = 0.5
-            _LOGGER.info(
-                "%s %s. Adding %s seconds to the specified time.", log_prefix, exc, slack_time
-            )
             # pylint: disable=protected-access
             cur_interval = slack_time + exc._retry_after.total_seconds()
+            exception_info = f"{exc}. Adding {slack_time} seconds to the specified time."
+
+            # Check max_retries for RetryAfter as well
+            if check_max_retries_and_log(retries, exception_info):
+                raise
         except TimedOut as toe:
-            _LOGGER.debug("%s Timed out: %s. Retrying immediately.", log_prefix, toe)
             # If failure is due to timeout, we should retry asap.
             cur_interval = 0
+            exception_info = f"Timed out: {toe}."
+
+            # Check max_retries for TimedOut as well
+            if check_max_retries_and_log(retries, exception_info):
+                raise
         except InvalidToken:
             _LOGGER.exception("%s Invalid token. Aborting retry loop.", log_prefix)
             raise
@@ -153,14 +186,7 @@ async def network_retry_loop(
             if on_err_cb:
                 on_err_cb(telegram_exc)
 
-            if max_retries < 0 or retries < max_retries:
-                _LOGGER.debug(
-                    "%s Failed run number %s of %s. Retrying.", log_prefix, retries, max_retries
-                )
-            else:
-                _LOGGER.exception(
-                    "%s Failed run number %s of %s. Aborting.", log_prefix, retries, max_retries
-                )
+            if check_max_retries_and_log(retries):
                 raise
 
             # increase waiting times on subsequent errors up to 30secs

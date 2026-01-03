@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 from abc import ABC, abstractmethod
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, final
+from typing import TYPE_CHECKING, Any, TypeVar, final
 
 from telegram.ext._utils.asyncio import TrackedBoundedSemaphore
 
@@ -94,9 +94,9 @@ class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], AB
 
     async def __aexit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         """|async_context_manager| :meth:`shuts down <shutdown>` the Processor."""
         await self.shutdown()

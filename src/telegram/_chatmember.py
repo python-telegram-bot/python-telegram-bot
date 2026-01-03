@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ChatMember."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -95,7 +95,7 @@ class ChatMember(TelegramObject):
         user: User,
         status: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
@@ -107,7 +107,7 @@ class ChatMember(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatMember":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatMember":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -168,14 +168,14 @@ class ChatMemberOwner(ChatMember):
         self,
         user: User,
         is_anonymous: bool,
-        custom_title: Optional[str] = None,
+        custom_title: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.is_anonymous: bool = is_anonymous
-            self.custom_title: Optional[str] = custom_title
+            self.custom_title: str | None = custom_title
 
 
 class ChatMemberAdministrator(ChatMember):
@@ -359,14 +359,14 @@ class ChatMemberAdministrator(ChatMember):
         can_post_stories: bool,
         can_edit_stories: bool,
         can_delete_stories: bool,
-        can_post_messages: Optional[bool] = None,
-        can_edit_messages: Optional[bool] = None,
-        can_pin_messages: Optional[bool] = None,
-        can_manage_topics: Optional[bool] = None,
-        custom_title: Optional[str] = None,
-        can_manage_direct_messages: Optional[bool] = None,
+        can_post_messages: bool | None = None,
+        can_edit_messages: bool | None = None,
+        can_pin_messages: bool | None = None,
+        can_manage_topics: bool | None = None,
+        custom_title: str | None = None,
+        can_manage_direct_messages: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -383,12 +383,12 @@ class ChatMemberAdministrator(ChatMember):
             self.can_edit_stories: bool = can_edit_stories
             self.can_delete_stories: bool = can_delete_stories
             # Optionals
-            self.can_post_messages: Optional[bool] = can_post_messages
-            self.can_edit_messages: Optional[bool] = can_edit_messages
-            self.can_pin_messages: Optional[bool] = can_pin_messages
-            self.can_manage_topics: Optional[bool] = can_manage_topics
-            self.custom_title: Optional[str] = custom_title
-            self.can_manage_direct_messages: Optional[bool] = can_manage_direct_messages
+            self.can_post_messages: bool | None = can_post_messages
+            self.can_edit_messages: bool | None = can_edit_messages
+            self.can_pin_messages: bool | None = can_pin_messages
+            self.can_manage_topics: bool | None = can_manage_topics
+            self.custom_title: str | None = custom_title
+            self.can_manage_direct_messages: bool | None = can_manage_direct_messages
 
 
 class ChatMemberMember(ChatMember):
@@ -421,13 +421,13 @@ class ChatMemberMember(ChatMember):
     def __init__(
         self,
         user: User,
-        until_date: Optional[dtm.datetime] = None,
+        until_date: dtm.datetime | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.until_date: Optional[dtm.datetime] = until_date
+            self.until_date: dtm.datetime | None = until_date
 
 
 class ChatMemberRestricted(ChatMember):
@@ -582,7 +582,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_video_notes: bool,
         can_send_voice_notes: bool,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -626,7 +626,7 @@ class ChatMemberLeft(ChatMember):
         self,
         user: User,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
         self._freeze()
@@ -666,7 +666,7 @@ class ChatMemberBanned(ChatMember):
         user: User,
         until_date: dtm.datetime,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():

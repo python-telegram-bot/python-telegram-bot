@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains objects that represent paid media in Telegram."""
 
 import datetime as dtm
-from typing import Final, Optional, Union
+from typing import Final
 
 from telegram import constants
 from telegram._files.inputfile import InputFile
@@ -56,7 +56,7 @@ class InputStoryContent(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.InputStoryContentType, type, type)
@@ -64,7 +64,7 @@ class InputStoryContent(TelegramObject):
         self._freeze()
 
     @staticmethod
-    def _parse_file_input(file_input: FileInput) -> Union[str, InputFile]:
+    def _parse_file_input(file_input: FileInput) -> str | InputFile:
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
         return parse_file_input(file_input, attach=True, local_mode=True)
@@ -98,12 +98,12 @@ class InputStoryContentPhoto(InputStoryContent):
         self,
         photo: FileInput,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=InputStoryContent.PHOTO, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.photo: Union[str, InputFile] = self._parse_file_input(photo)
+            self.photo: str | InputFile = self._parse_file_input(photo)
 
 
 class InputStoryContentVideo(InputStoryContent):
@@ -149,18 +149,16 @@ class InputStoryContentVideo(InputStoryContent):
     def __init__(
         self,
         video: FileInput,
-        duration: Optional[Union[float, dtm.timedelta]] = None,
-        cover_frame_timestamp: Optional[Union[float, dtm.timedelta]] = None,
-        is_animation: Optional[bool] = None,
+        duration: float | dtm.timedelta | None = None,
+        cover_frame_timestamp: float | dtm.timedelta | None = None,
+        is_animation: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=InputStoryContent.VIDEO, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.video: Union[str, InputFile] = self._parse_file_input(video)
-            self.duration: Optional[dtm.timedelta] = to_timedelta(duration)
-            self.cover_frame_timestamp: Optional[dtm.timedelta] = to_timedelta(
-                cover_frame_timestamp
-            )
-            self.is_animation: Optional[bool] = is_animation
+            self.video: str | InputFile = self._parse_file_input(video)
+            self.duration: dtm.timedelta | None = to_timedelta(duration)
+            self.cover_frame_timestamp: dtm.timedelta | None = to_timedelta(cover_frame_timestamp)
+            self.is_animation: bool | None = is_animation

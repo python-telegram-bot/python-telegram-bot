@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2025
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,6 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 from pathlib import Path
-from typing import Optional
 
 import pytest
 from httpx import AsyncClient, AsyncHTTPTransport, Response
@@ -38,7 +37,7 @@ class NonchalantHttpxRequest(HTTPXRequest):
         self,
         method: str,
         url: str,
-        request_data: Optional[RequestData] = None,
+        request_data: RequestData | None = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -82,7 +81,7 @@ class OfflineRequest(BaseRequest):
         self,
         url: str,
         method: str,
-        request_data: Optional[RequestData] = None,
+        request_data: RequestData | None = None,
         read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
@@ -117,13 +116,13 @@ async def expect_bad_request(func, message, reason):
 async def send_webhook_message(
     ip: str,
     port: int,
-    payload_str: Optional[str],
+    payload_str: str | None,
     url_path: str = "",
     content_len: int = -1,
     content_type: str = "application/json",
-    get_method: Optional[str] = None,
-    secret_token: Optional[str] = None,
-    unix: Optional[Path] = None,
+    get_method: str | None = None,
+    secret_token: str | None = None,
+    unix: Path | None = None,
 ) -> Response:
     headers = {
         "content-type": content_type,

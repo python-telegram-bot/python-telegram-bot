@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains objects representing Telegram bot command scopes."""
 
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -77,7 +77,7 @@ class BotCommandScope(TelegramObject):
     CHAT_MEMBER: Final[str] = constants.BotCommandScopeType.CHAT_MEMBER
     """:const:`telegram.constants.BotCommandScopeType.CHAT_MEMBER`"""
 
-    def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, type: str, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.BotCommandScopeType, type, type)
         self._id_attrs = (self.type,)
@@ -85,7 +85,7 @@ class BotCommandScope(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "BotCommandScope":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BotCommandScope":
         """Converts JSON data to the appropriate :class:`BotCommandScope` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -131,7 +131,7 @@ class BotCommandScopeDefault(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=BotCommandScope.DEFAULT, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -147,7 +147,7 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=BotCommandScope.ALL_PRIVATE_CHATS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -162,7 +162,7 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=BotCommandScope.ALL_GROUP_CHATS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -177,7 +177,7 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=BotCommandScope.ALL_CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -200,10 +200,10 @@ class BotCommandScopeChat(BotCommandScope):
 
     __slots__ = ("chat_id",)
 
-    def __init__(self, chat_id: Union[str, int], *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, chat_id: str | int, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=BotCommandScope.CHAT, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.chat_id: Union[str, int] = (
+            self.chat_id: str | int = (
                 chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
             )
             self._id_attrs = (self.type, self.chat_id)
@@ -227,10 +227,10 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
 
     __slots__ = ("chat_id",)
 
-    def __init__(self, chat_id: Union[str, int], *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(self, chat_id: str | int, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.chat_id: Union[str, int] = (
+            self.chat_id: str | int = (
                 chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
             )
             self._id_attrs = (self.type, self.chat_id)
@@ -257,12 +257,10 @@ class BotCommandScopeChatMember(BotCommandScope):
 
     __slots__ = ("chat_id", "user_id")
 
-    def __init__(
-        self, chat_id: Union[str, int], user_id: int, *, api_kwargs: Optional[JSONDict] = None
-    ):
+    def __init__(self, chat_id: str | int, user_id: int, *, api_kwargs: JSONDict | None = None):
         super().__init__(type=BotCommandScope.CHAT_MEMBER, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.chat_id: Union[str, int] = (
+            self.chat_id: str | int = (
                 chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
             )
             self.user_id: int = user_id

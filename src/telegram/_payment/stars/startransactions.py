@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
@@ -93,19 +93,19 @@ class StarTransaction(TelegramObject):
         id: str,
         amount: int,
         date: dtm.datetime,
-        source: Optional[TransactionPartner] = None,
-        receiver: Optional[TransactionPartner] = None,
-        nanostar_amount: Optional[int] = None,
+        source: TransactionPartner | None = None,
+        receiver: TransactionPartner | None = None,
+        nanostar_amount: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
         self.amount: int = amount
         self.date: dtm.datetime = date
-        self.source: Optional[TransactionPartner] = source
-        self.receiver: Optional[TransactionPartner] = receiver
-        self.nanostar_amount: Optional[int] = nanostar_amount
+        self.source: TransactionPartner | None = source
+        self.receiver: TransactionPartner | None = receiver
+        self.nanostar_amount: int | None = nanostar_amount
 
         self._id_attrs = (
             self.id,
@@ -115,7 +115,7 @@ class StarTransaction(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "StarTransaction":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "StarTransaction":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -148,7 +148,7 @@ class StarTransactions(TelegramObject):
     __slots__ = ("transactions",)
 
     def __init__(
-        self, transactions: Sequence[StarTransaction], *, api_kwargs: Optional[JSONDict] = None
+        self, transactions: Sequence[StarTransaction], *, api_kwargs: JSONDict | None = None
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.transactions: tuple[StarTransaction, ...] = parse_sequence_arg(transactions)
@@ -157,7 +157,7 @@ class StarTransactions(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "StarTransactions":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "StarTransactions":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

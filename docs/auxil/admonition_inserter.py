@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2025
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,12 @@ import collections.abc
 import contextlib
 import inspect
 import re
+import types
 import typing
 from collections import defaultdict
 from collections.abc import Iterator
 from socket import socket
 from types import FunctionType
-from typing import Union
 
 from apscheduler.job import Job as APSJob
 
@@ -108,7 +108,7 @@ class AdmonitionInserter:
     """
 
     def __init__(self):
-        self.admonitions: dict[str, dict[Union[type, collections.abc.Callable], str]] = {
+        self.admonitions: dict[str, dict[type | collections.abc.Callable, str]] = {
             # dynamically determine which method to use to create a sub-dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
             for admonition_type in self.ALL_ADMONITION_TYPES
@@ -136,7 +136,7 @@ class AdmonitionInserter:
 
     def insert_admonitions(
         self,
-        obj: Union[type, collections.abc.Callable],
+        obj: type | collections.abc.Callable,
         docstring_lines: list[str],
     ):
         """Inserts admonitions into docstring lines for a given class or method.
@@ -324,6 +324,8 @@ class AdmonitionInserter:
 
         for cls, method_names in self.METHOD_NAMES_FOR_BOT_APP_APPBUILDER.items():
             for method_name in method_names:
+                if method_name == "get_file":
+                    pass
                 method_link = self._generate_link_to_method(method_name, cls)
 
                 arg = getattr(cls, method_name)
@@ -509,7 +511,9 @@ class AdmonitionInserter:
         def recurse_type(type_, is_recursed_from_ptb_class: bool):
             next_is_recursed_from_ptb_class = is_recursed_from_ptb_class or _is_ptb_class(type_)
 
-            if hasattr(type_, "__origin__"):  # For generic types like Union, List, etc.
+            if hasattr(type_, "__origin__") or isinstance(
+                type_, types.UnionType
+            ):  # For generic types like Union, List, etc.
                 # Make sure it's not a telegram.ext generic type (e.g. ContextTypes[...])
                 org = typing.get_origin(type_)
                 if "telegram.ext" in str(org):
@@ -541,7 +545,7 @@ class AdmonitionInserter:
         return list(telegram_classes)
 
     @staticmethod
-    def _resolve_class(name: str) -> Union[type, None]:
+    def _resolve_class(name: str) -> type | None:
         """The keys in the admonitions dictionary are not strings like "telegram.StickerSet"
         but classes like <class 'telegram._files.sticker.StickerSet'>.
 

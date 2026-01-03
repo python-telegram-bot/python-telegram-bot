@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,6 @@ from pathlib import Path
 from queue import Queue
 from random import randrange
 from threading import Thread
-from typing import Optional
 
 import pytest
 
@@ -96,7 +95,7 @@ class TestApplication:
     async def callback_increase_count(self, update, context):
         self.count += 1
 
-    def callback_set_count(self, count, sleep: Optional[float] = None):
+    def callback_set_count(self, count, sleep: float | None = None):
         async def callback(update, context):
             if sleep:
                 await asyncio.sleep(sleep)

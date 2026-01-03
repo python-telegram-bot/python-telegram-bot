@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 from base64 import b64decode
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
@@ -156,29 +156,29 @@ class EncryptedPassportElement(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         hash: str,  # pylint: disable=redefined-builtin
-        data: Optional[Union[PersonalDetails, IdDocumentData, ResidentialAddress]] = None,
-        phone_number: Optional[str] = None,
-        email: Optional[str] = None,
-        files: Optional[Sequence[PassportFile]] = None,
-        front_side: Optional[PassportFile] = None,
-        reverse_side: Optional[PassportFile] = None,
-        selfie: Optional[PassportFile] = None,
-        translation: Optional[Sequence[PassportFile]] = None,
+        data: PersonalDetails | IdDocumentData | ResidentialAddress | None = None,
+        phone_number: str | None = None,
+        email: str | None = None,
+        files: Sequence[PassportFile] | None = None,
+        front_side: PassportFile | None = None,
+        reverse_side: PassportFile | None = None,
+        selfie: PassportFile | None = None,
+        translation: Sequence[PassportFile] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
         self.type: str = type
         # Optionals
-        self.data: Optional[Union[PersonalDetails, IdDocumentData, ResidentialAddress]] = data
-        self.phone_number: Optional[str] = phone_number
-        self.email: Optional[str] = email
+        self.data: PersonalDetails | IdDocumentData | ResidentialAddress | None = data
+        self.phone_number: str | None = phone_number
+        self.email: str | None = email
         self.files: tuple[PassportFile, ...] = parse_sequence_arg(files)
-        self.front_side: Optional[PassportFile] = front_side
-        self.reverse_side: Optional[PassportFile] = reverse_side
-        self.selfie: Optional[PassportFile] = selfie
+        self.front_side: PassportFile | None = front_side
+        self.reverse_side: PassportFile | None = reverse_side
+        self.selfie: PassportFile | None = selfie
         self.translation: tuple[PassportFile, ...] = parse_sequence_arg(translation)
         self.hash: str = hash
 
@@ -196,7 +196,7 @@ class EncryptedPassportElement(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "EncryptedPassportElement":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "EncryptedPassportElement":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -210,7 +210,7 @@ class EncryptedPassportElement(TelegramObject):
 
     @classmethod
     def de_json_decrypted(
-        cls, data: JSONDict, bot: Optional["Bot"], credentials: "Credentials"
+        cls, data: JSONDict, bot: "Bot | None", credentials: "Credentials"
     ) -> "EncryptedPassportElement":
         """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
         passport credentials.

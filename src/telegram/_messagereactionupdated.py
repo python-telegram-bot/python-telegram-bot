@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._reaction import ReactionCount, ReactionType
@@ -74,7 +74,7 @@ class MessageReactionCountUpdated(TelegramObject):
         date: dtm.datetime,
         reactions: Sequence[ReactionCount],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -87,7 +87,7 @@ class MessageReactionCountUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageReactionCountUpdated":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MessageReactionCountUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -156,10 +156,10 @@ class MessageReactionUpdated(TelegramObject):
         date: dtm.datetime,
         old_reaction: Sequence[ReactionType],
         new_reaction: Sequence[ReactionType],
-        user: Optional[User] = None,
-        actor_chat: Optional[Chat] = None,
+        user: User | None = None,
+        actor_chat: Chat | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -170,8 +170,8 @@ class MessageReactionUpdated(TelegramObject):
         self.new_reaction: tuple[ReactionType, ...] = parse_sequence_arg(new_reaction)
 
         # Optional
-        self.user: Optional[User] = user
-        self.actor_chat: Optional[Chat] = actor_chat
+        self.user: User | None = user
+        self.actor_chat: Chat | None = actor_chat
 
         self._id_attrs = (
             self.chat,
@@ -183,7 +183,7 @@ class MessageReactionUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "MessageReactionUpdated":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MessageReactionUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

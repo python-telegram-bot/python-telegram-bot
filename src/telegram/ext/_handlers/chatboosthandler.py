@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatBoostHandler class."""
 
-from typing import Final, Optional
+from typing import Final
 
 from telegram import Update
 from telegram.ext._handlers.basehandler import BaseHandler
@@ -87,8 +87,8 @@ class ChatBoostHandler(BaseHandler[Update, CCT, RT]):
         self: "ChatBoostHandler[CCT, RT]",
         callback: HandlerCallback[Update, CCT, RT],
         chat_boost_types: int = CHAT_BOOST,
-        chat_id: Optional[int] = None,
-        chat_username: Optional[str] = None,
+        chat_id: int | None = None,
+        chat_username: str | None = None,
         block: bool = True,
     ):
         super().__init__(callback, block=block)

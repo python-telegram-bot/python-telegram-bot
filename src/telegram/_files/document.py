@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Document."""
-
-from typing import Optional
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -69,12 +67,12 @@ class Document(_BaseThumbedMedium):
         self,
         file_id: str,
         file_unique_id: str,
-        file_name: Optional[str] = None,
-        mime_type: Optional[str] = None,
-        file_size: Optional[int] = None,
-        thumbnail: Optional[PhotoSize] = None,
+        file_name: str | None = None,
+        mime_type: str | None = None,
+        file_size: int | None = None,
+        thumbnail: PhotoSize | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -85,5 +83,5 @@ class Document(_BaseThumbedMedium):
         )
         with self._unfrozen():
             # Optional
-            self.mime_type: Optional[str] = mime_type
-            self.file_name: Optional[str] = file_name
+            self.mime_type: str | None = mime_type
+            self.file_name: str | None = file_name

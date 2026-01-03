@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
@@ -108,26 +108,26 @@ class Giveaway(TelegramObject):
         chats: Sequence[Chat],
         winners_selection_date: dtm.datetime,
         winner_count: int,
-        only_new_members: Optional[bool] = None,
-        has_public_winners: Optional[bool] = None,
-        prize_description: Optional[str] = None,
-        country_codes: Optional[Sequence[str]] = None,
-        premium_subscription_month_count: Optional[int] = None,
-        prize_star_count: Optional[int] = None,
+        only_new_members: bool | None = None,
+        has_public_winners: bool | None = None,
+        prize_description: str | None = None,
+        country_codes: Sequence[str] | None = None,
+        premium_subscription_month_count: int | None = None,
+        prize_star_count: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         self.chats: tuple[Chat, ...] = tuple(chats)
         self.winners_selection_date: dtm.datetime = winners_selection_date
         self.winner_count: int = winner_count
-        self.only_new_members: Optional[bool] = only_new_members
-        self.has_public_winners: Optional[bool] = has_public_winners
-        self.prize_description: Optional[str] = prize_description
+        self.only_new_members: bool | None = only_new_members
+        self.has_public_winners: bool | None = has_public_winners
+        self.prize_description: str | None = prize_description
         self.country_codes: tuple[str, ...] = parse_sequence_arg(country_codes)
-        self.premium_subscription_month_count: Optional[int] = premium_subscription_month_count
-        self.prize_star_count: Optional[int] = prize_star_count
+        self.premium_subscription_month_count: int | None = premium_subscription_month_count
+        self.prize_star_count: int | None = prize_star_count
 
         self._id_attrs = (
             self.chats,
@@ -138,7 +138,7 @@ class Giveaway(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Giveaway":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Giveaway":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -172,11 +172,9 @@ class GiveawayCreated(TelegramObject):
 
     __slots__ = ("prize_star_count",)
 
-    def __init__(
-        self, prize_star_count: Optional[int] = None, *, api_kwargs: Optional[JSONDict] = None
-    ):
+    def __init__(self, prize_star_count: int | None = None, *, api_kwargs: JSONDict | None = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.prize_star_count: Optional[int] = prize_star_count
+        self.prize_star_count: int | None = prize_star_count
 
         self._freeze()
 
@@ -259,15 +257,15 @@ class GiveawayWinners(TelegramObject):
         winners_selection_date: dtm.datetime,
         winner_count: int,
         winners: Sequence[User],
-        additional_chat_count: Optional[int] = None,
-        premium_subscription_month_count: Optional[int] = None,
-        unclaimed_prize_count: Optional[int] = None,
-        only_new_members: Optional[bool] = None,
-        was_refunded: Optional[bool] = None,
-        prize_description: Optional[str] = None,
-        prize_star_count: Optional[int] = None,
+        additional_chat_count: int | None = None,
+        premium_subscription_month_count: int | None = None,
+        unclaimed_prize_count: int | None = None,
+        only_new_members: bool | None = None,
+        was_refunded: bool | None = None,
+        prize_description: str | None = None,
+        prize_star_count: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -276,13 +274,13 @@ class GiveawayWinners(TelegramObject):
         self.winners_selection_date: dtm.datetime = winners_selection_date
         self.winner_count: int = winner_count
         self.winners: tuple[User, ...] = tuple(winners)
-        self.additional_chat_count: Optional[int] = additional_chat_count
-        self.premium_subscription_month_count: Optional[int] = premium_subscription_month_count
-        self.unclaimed_prize_count: Optional[int] = unclaimed_prize_count
-        self.only_new_members: Optional[bool] = only_new_members
-        self.was_refunded: Optional[bool] = was_refunded
-        self.prize_description: Optional[str] = prize_description
-        self.prize_star_count: Optional[int] = prize_star_count
+        self.additional_chat_count: int | None = additional_chat_count
+        self.premium_subscription_month_count: int | None = premium_subscription_month_count
+        self.unclaimed_prize_count: int | None = unclaimed_prize_count
+        self.only_new_members: bool | None = only_new_members
+        self.was_refunded: bool | None = was_refunded
+        self.prize_description: str | None = prize_description
+        self.prize_star_count: int | None = prize_star_count
 
         self._id_attrs = (
             self.chat,
@@ -295,7 +293,7 @@ class GiveawayWinners(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "GiveawayWinners":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "GiveawayWinners":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -346,18 +344,18 @@ class GiveawayCompleted(TelegramObject):
     def __init__(
         self,
         winner_count: int,
-        unclaimed_prize_count: Optional[int] = None,
-        giveaway_message: Optional["Message"] = None,
-        is_star_giveaway: Optional[bool] = None,
+        unclaimed_prize_count: int | None = None,
+        giveaway_message: "Message | None" = None,
+        is_star_giveaway: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         self.winner_count: int = winner_count
-        self.unclaimed_prize_count: Optional[int] = unclaimed_prize_count
-        self.giveaway_message: Optional[Message] = giveaway_message
-        self.is_star_giveaway: Optional[bool] = is_star_giveaway
+        self.unclaimed_prize_count: int | None = unclaimed_prize_count
+        self.giveaway_message: Message | None = giveaway_message
+        self.is_star_giveaway: bool | None = is_star_giveaway
 
         self._id_attrs = (
             self.winner_count,
@@ -367,7 +365,7 @@ class GiveawayCompleted(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "GiveawayCompleted":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "GiveawayCompleted":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

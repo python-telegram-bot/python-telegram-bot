@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Game."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
@@ -104,11 +104,11 @@ class Game(TelegramObject):
         title: str,
         description: str,
         photo: Sequence[PhotoSize],
-        text: Optional[str] = None,
-        text_entities: Optional[Sequence[MessageEntity]] = None,
-        animation: Optional[Animation] = None,
+        text: str | None = None,
+        text_entities: Sequence[MessageEntity] | None = None,
+        animation: Animation | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -116,16 +116,16 @@ class Game(TelegramObject):
         self.description: str = description
         self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
         # Optionals
-        self.text: Optional[str] = text
+        self.text: str | None = text
         self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
-        self.animation: Optional[Animation] = animation
+        self.animation: Animation | None = animation
 
         self._id_attrs = (self.title, self.description, self.photo)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Game":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Game":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -162,7 +162,7 @@ class Game(TelegramObject):
 
         return entity_text.decode(TextEncoding.UTF_16_LE)
 
-    def parse_text_entities(self, types: Optional[list[str]] = None) -> dict[MessageEntity, str]:
+    def parse_text_entities(self, types: list[str] | None = None) -> dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their

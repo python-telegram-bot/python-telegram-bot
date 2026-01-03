@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 """This module contains the classes for Telegram Stars Revenue Withdrawals."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -61,7 +61,7 @@ class RevenueWithdrawalState(TelegramObject):
     FAILED: Final[str] = constants.RevenueWithdrawalStateType.FAILED
     """:const:`telegram.constants.RevenueWithdrawalStateType.FAILED`"""
 
-    def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, type: str, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.RevenueWithdrawalStateType, type, type)
 
@@ -69,7 +69,7 @@ class RevenueWithdrawalState(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "RevenueWithdrawalState":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "RevenueWithdrawalState":
         """Converts JSON data to the appropriate :class:`RevenueWithdrawalState` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -107,7 +107,7 @@ class RevenueWithdrawalStatePending(RevenueWithdrawalState):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(type=RevenueWithdrawalState.PENDING, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -138,7 +138,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
         date: dtm.datetime,
         url: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=RevenueWithdrawalState.SUCCEEDED, api_kwargs=api_kwargs)
 
@@ -152,7 +152,7 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
 
     @classmethod
     def de_json(
-        cls, data: JSONDict, bot: Optional["Bot"] = None
+        cls, data: JSONDict, bot: "Bot | None" = None
     ) -> "RevenueWithdrawalStateSucceeded":
         """See :meth:`telegram.RevenueWithdrawalState.de_json`."""
         data = cls._parse_data(data)
@@ -176,6 +176,6 @@ class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         super().__init__(type=RevenueWithdrawalState.FAILED, api_kwargs=api_kwargs)
         self._freeze()

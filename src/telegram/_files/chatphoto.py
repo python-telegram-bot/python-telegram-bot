@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPhoto."""
 
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -88,7 +88,7 @@ class ChatPhoto(TelegramObject):
         big_file_id: str,
         big_file_unique_id: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.small_file_id: str = small_file_id
@@ -110,7 +110,7 @@ class ChatPhoto(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "File":
         """Convenience wrapper over :meth:`telegram.Bot.get_file` for getting the small
         (:tg-const:`telegram.ChatPhoto.SIZE_SMALL` x :tg-const:`telegram.ChatPhoto.SIZE_SMALL`)
@@ -141,7 +141,7 @@ class ChatPhoto(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> "File":
         """Convenience wrapper over :meth:`telegram.Bot.get_file` for getting the
         big (:tg-const:`telegram.ChatPhoto.SIZE_BIG` x :tg-const:`telegram.ChatPhoto.SIZE_BIG`)

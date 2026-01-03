@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@
 """This module contains the classes that represent Telegram PassportElementError."""
 
 from collections.abc import Sequence
-from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -51,7 +50,7 @@ class PassportElementError(TelegramObject):
     __slots__ = ("message", "source", "type")
 
     def __init__(
-        self, source: str, type: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self, source: str, type: str, message: str, *, api_kwargs: JSONDict | None = None
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -100,7 +99,7 @@ class PassportElementErrorDataField(PassportElementError):
         data_hash: str,
         message: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__("data", type, message, api_kwargs=api_kwargs)
@@ -145,7 +144,7 @@ class PassportElementErrorFile(PassportElementError):
     __slots__ = ("file_hash",)
 
     def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
     ):
         # Required
         super().__init__("file", type, message, api_kwargs=api_kwargs)
@@ -194,7 +193,7 @@ class PassportElementErrorFiles(PassportElementError):
         file_hashes: Sequence[str],
         message: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__("files", type, message, api_kwargs=api_kwargs)
@@ -232,7 +231,7 @@ class PassportElementErrorFrontSide(PassportElementError):
     __slots__ = ("file_hash",)
 
     def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
     ):
         # Required
         super().__init__("front_side", type, message, api_kwargs=api_kwargs)
@@ -270,7 +269,7 @@ class PassportElementErrorReverseSide(PassportElementError):
     __slots__ = ("file_hash",)
 
     def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
     ):
         # Required
         super().__init__("reverse_side", type, message, api_kwargs=api_kwargs)
@@ -306,7 +305,7 @@ class PassportElementErrorSelfie(PassportElementError):
     __slots__ = ("file_hash",)
 
     def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
     ):
         # Required
         super().__init__("selfie", type, message, api_kwargs=api_kwargs)
@@ -346,7 +345,7 @@ class PassportElementErrorTranslationFile(PassportElementError):
     __slots__ = ("file_hash",)
 
     def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
     ):
         # Required
         super().__init__("translation_file", type, message, api_kwargs=api_kwargs)
@@ -397,7 +396,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         file_hashes: Sequence[str],
         message: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
@@ -431,7 +430,7 @@ class PassportElementErrorUnspecified(PassportElementError):
     __slots__ = ("element_hash",)
 
     def __init__(
-        self, type: str, element_hash: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self, type: str, element_hash: str, message: str, *, api_kwargs: JSONDict | None = None
     ):
         # Required
         super().__init__("unspecified", type, message, api_kwargs=api_kwargs)

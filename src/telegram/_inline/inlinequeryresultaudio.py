@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -115,15 +115,15 @@ class InlineQueryResultAudio(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         audio_url: str,
         title: str,
-        performer: Optional[str] = None,
-        audio_duration: Optional[TimePeriod] = None,
-        caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
+        performer: str | None = None,
+        audio_duration: TimePeriod | None = None,
+        caption: str | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.AUDIO, id, api_kwargs=api_kwargs)
@@ -132,14 +132,14 @@ class InlineQueryResultAudio(InlineQueryResult):
             self.title: str = title
 
             # Optionals
-            self.performer: Optional[str] = performer
-            self._audio_duration: Optional[dtm.timedelta] = to_timedelta(audio_duration)
-            self.caption: Optional[str] = caption
+            self.performer: str | None = performer
+            self._audio_duration: dtm.timedelta | None = to_timedelta(audio_duration)
+            self.caption: str | None = caption
             self.parse_mode: ODVInput[str] = parse_mode
             self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
 
     @property
-    def audio_duration(self) -> Optional[Union[int, dtm.timedelta]]:
+    def audio_duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._audio_duration, attribute="audio_duration")

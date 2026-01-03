@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 import json
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Optional, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._utils.types import CDCData, ConversationDict, ConversationKey
@@ -93,7 +93,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
 
     def __init__(
         self,
-        store_data: Optional[PersistenceInput] = None,
+        store_data: PersistenceInput | None = None,
         user_data_json: str = "",
         chat_data_json: str = "",
         bot_data_json: str = "",
@@ -107,11 +107,11 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
         self._bot_data = None
         self._callback_data = None
         self._conversations = None
-        self._user_data_json: Optional[str] = None
-        self._chat_data_json: Optional[str] = None
-        self._bot_data_json: Optional[str] = None
-        self._callback_data_json: Optional[str] = None
-        self._conversations_json: Optional[str] = None
+        self._user_data_json: str | None = None
+        self._chat_data_json: str | None = None
+        self._bot_data_json: str | None = None
+        self._callback_data_json: str | None = None
+        self._conversations_json: str | None = None
         if user_data_json:
             try:
                 self._user_data = self._decode_user_chat_data_from_json(user_data_json)
@@ -171,7 +171,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
                 ) from exc
 
     @property
-    def user_data(self) -> Optional[dict[int, dict[Any, Any]]]:
+    def user_data(self) -> dict[int, dict[Any, Any]] | None:
         """:obj:`dict`: The user_data as a dict."""
         return self._user_data
 
@@ -183,7 +183,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
         return json.dumps(self.user_data)
 
     @property
-    def chat_data(self) -> Optional[dict[int, dict[Any, Any]]]:
+    def chat_data(self) -> dict[int, dict[Any, Any]] | None:
         """:obj:`dict`: The chat_data as a dict."""
         return self._chat_data
 
@@ -195,7 +195,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
         return json.dumps(self.chat_data)
 
     @property
-    def bot_data(self) -> Optional[dict[Any, Any]]:
+    def bot_data(self) -> dict[Any, Any] | None:
         """:obj:`dict`: The bot_data as a dict."""
         return self._bot_data
 
@@ -207,7 +207,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
         return json.dumps(self.bot_data)
 
     @property
-    def callback_data(self) -> Optional[CDCData]:
+    def callback_data(self) -> CDCData | None:
         """tuple[list[tuple[:obj:`str`, :obj:`float`, dict[:obj:`str`, :class:`object`]]], \
         dict[:obj:`str`, :obj:`str`]]: The metadata on the stored callback data.
 
@@ -226,7 +226,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
         return json.dumps(self.callback_data)
 
     @property
-    def conversations(self) -> Optional[dict[str, ConversationDict]]:
+    def conversations(self) -> dict[str, ConversationDict] | None:
         """:obj:`dict`: The conversations as a dict."""
         return self._conversations
 
@@ -269,7 +269,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
             self._bot_data = {}
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    async def get_callback_data(self) -> Optional[CDCData]:
+    async def get_callback_data(self) -> CDCData | None:
         """Returns the callback_data created from the ``callback_data_json`` or :obj:`None`.
 
         .. versionadded:: 13.6
@@ -296,7 +296,7 @@ class DictPersistence(BasePersistence[dict[Any, Any], dict[Any, Any], dict[Any, 
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
     async def update_conversation(
-        self, name: str, key: ConversationKey, new_state: Optional[object]
+        self, name: str, key: ConversationKey, new_state: object | None
     ) -> None:
         """Will update the conversations for the given handler.
 

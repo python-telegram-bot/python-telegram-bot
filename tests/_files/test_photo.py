@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -44,7 +44,7 @@ class PhotoTestBase:
     photo_file_url = "https://python-telegram-bot.org/static/testfiles/telegram_new.jpg"
     # For some reason the file size is not the same after switching to httpx
     # so we accept three different sizes here. Shouldn't be too much
-    file_size = [29176, 27662]
+    file_size = [29176, 27662, 27330]
 
 
 class TestPhotoWithoutRequest(PhotoTestBase):

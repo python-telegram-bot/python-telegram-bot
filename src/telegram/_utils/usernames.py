@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ Warning:
     the changelog.
 """
 
-from typing import TYPE_CHECKING, Optional, Protocol, TypeVar, Union, overload
+from typing import TYPE_CHECKING, Protocol, TypeVar, overload
 
 TeleUserLike = TypeVar("TeleUserLike", bound="UserLike")
 TeleUserLikeOptional = TypeVar("TeleUserLikeOptional", bound="UserLikeOptional")
@@ -36,23 +36,23 @@ if TYPE_CHECKING:
     @type_check_only
     class UserLike(Protocol):
         first_name: str
-        last_name: Optional[str]
-        username: Optional[str]
+        last_name: str | None
+        username: str | None
 
     @type_check_only
     class UserLikeOptional(Protocol):
-        first_name: Optional[str]
-        last_name: Optional[str]
-        username: Optional[str]
+        first_name: str | None
+        last_name: str | None
+        username: str | None
 
 
 @overload
 def get_name(userlike: TeleUserLike) -> str: ...
 @overload
-def get_name(userlike: TeleUserLikeOptional) -> Optional[str]: ...
+def get_name(userlike: TeleUserLikeOptional) -> str | None: ...
 
 
-def get_name(userlike: Union[TeleUserLike, TeleUserLikeOptional]) -> Optional[str]:
+def get_name(userlike: TeleUserLike | TeleUserLikeOptional) -> str | None:
     """Returns ``username`` prefixed with "@". If  ``username`` is not available, calls
     :func:`get_full_name` below`.
     """
@@ -64,10 +64,10 @@ def get_name(userlike: Union[TeleUserLike, TeleUserLikeOptional]) -> Optional[st
 @overload
 def get_full_name(userlike: TeleUserLike) -> str: ...
 @overload
-def get_full_name(userlike: TeleUserLikeOptional) -> Optional[str]: ...
+def get_full_name(userlike: TeleUserLikeOptional) -> str | None: ...
 
 
-def get_full_name(userlike: Union[TeleUserLike, TeleUserLikeOptional]) -> Optional[str]:
+def get_full_name(userlike: TeleUserLike | TeleUserLikeOptional) -> str | None:
     """
     If parameter ``first_name`` is not :obj:`None`, gives
     ``first_name`` followed by (if available) `UserLike.last_name`. Otherwise,
@@ -93,16 +93,16 @@ if TYPE_CHECKING:
 
     @type_check_only
     class LinkableOptional(Protocol):
-        username: Optional[str]
+        username: str | None
 
 
 @overload
 def get_link(linkable: TeleLinkable) -> str: ...
 @overload
-def get_link(linkable: TeleLinkableOptional) -> Optional[str]: ...
+def get_link(linkable: TeleLinkableOptional) -> str | None: ...
 
 
-def get_link(linkable: Union[TeleLinkable, TeleLinkableOptional]) -> Optional[str]:
+def get_link(linkable: TeleLinkable | TeleLinkableOptional) -> str | None:
     """If ``username`` is available, returns a t.me link of the user/chat."""
     if linkable.username:
         return f"https://t.me/{linkable.username}"

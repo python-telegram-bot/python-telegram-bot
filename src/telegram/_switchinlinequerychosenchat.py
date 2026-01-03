@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 """This module contains a class that represents a Telegram SwitchInlineQueryChosenChat."""
-
-from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -74,21 +72,21 @@ class SwitchInlineQueryChosenChat(TelegramObject):
 
     def __init__(
         self,
-        query: Optional[str] = None,
-        allow_user_chats: Optional[bool] = None,
-        allow_bot_chats: Optional[bool] = None,
-        allow_group_chats: Optional[bool] = None,
-        allow_channel_chats: Optional[bool] = None,
+        query: str | None = None,
+        allow_user_chats: bool | None = None,
+        allow_bot_chats: bool | None = None,
+        allow_group_chats: bool | None = None,
+        allow_channel_chats: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Optional
-        self.query: Optional[str] = query
-        self.allow_user_chats: Optional[bool] = allow_user_chats
-        self.allow_bot_chats: Optional[bool] = allow_bot_chats
-        self.allow_group_chats: Optional[bool] = allow_group_chats
-        self.allow_channel_chats: Optional[bool] = allow_channel_chats
+        self.query: str | None = query
+        self.allow_user_chats: bool | None = allow_user_chats
+        self.allow_bot_chats: bool | None = allow_bot_chats
+        self.allow_group_chats: bool | None = allow_group_chats
+        self.allow_channel_chats: bool | None = allow_channel_chats
 
         self._id_attrs = (
             self.query,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ Warning:
     the changelog.
 """
 
-from typing import Generic, TypeVar, Union, overload
+from typing import Generic, TypeVar, overload
 
 DVType = TypeVar("DVType", bound=object)  # pylint: disable=invalid-name
 OT = TypeVar("OT", bound=object)
@@ -106,7 +106,7 @@ class DefaultValue(Generic[DVType]):
     def get_value(obj: OT) -> OT: ...
 
     @staticmethod
-    def get_value(obj: Union[OT, "DefaultValue[OT]"]) -> OT:
+    def get_value(obj: "OT | DefaultValue[OT]") -> OT:
         """Shortcut for::
 
             return obj.value if isinstance(obj, DefaultValue) else obj

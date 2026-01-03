@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@ import asyncio
 import copy
 import datetime as dtm
 from collections.abc import Sequence
-from typing import Optional
 
 import pytest
 
@@ -815,7 +814,7 @@ class TestSendMediaGroupWithoutRequest:
         self, offline_bot, chat_id, video_file, photo_file, monkeypatch
     ):
         async def make_assertion(
-            method: str, url: str, request_data: Optional[RequestData] = None, *args, **kwargs
+            method: str, url: str, request_data: RequestData | None = None, *args, **kwargs
         ):
             files = request_data.multipart_data
             video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
@@ -1004,7 +1003,8 @@ class TestSendMediaGroupWithRequest:
             # make sure that the media_group was not modified
             assert media_group == copied_media_group
             assert all(
-                a.parse_mode == b.parse_mode for a, b in zip(media_group, copied_media_group)
+                a.parse_mode == b.parse_mode
+                for a, b in zip(media_group, copied_media_group, strict=False)
             )
 
             assert isinstance(messages, tuple)

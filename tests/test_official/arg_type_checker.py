@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -126,9 +126,9 @@ def check_param_type(
     assert len(mapped) <= 1, f"More than one match found for {tg_param_type}"
 
     # it may be a list of objects, so let's extract them using _extract_words:
-    mapped_type = _unionizer(_extract_words(tg_param_type)) if not mapped else mapped.pop()
+    org_mapped_type = _unionizer(_extract_words(tg_param_type)) if not mapped else mapped.pop()
     # If the parameter is not required by TG, `None` should be added to `mapped_type`
-    mapped_type = wrap_with_none(tg_parameter, mapped_type, obj)
+    mapped_type = wrap_with_none(tg_parameter, org_mapped_type, obj)
 
     log(
         "At the end of PRE-PROCESSING, the values of variables are:\n"
@@ -211,7 +211,8 @@ def check_param_type(
     # Classes whose parameters are all ODVInput should be converted and checked.
     elif obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
         log("Checking that `%s`'s param is ODVInput:\n", obj.__name__)
-        mapped_type = ODVInput[mapped_type]
+        # We have to use org_mapped_type here, because ODVInput will not take a None value as well
+        mapped_type = ODVInput[org_mapped_type]
     elif not (
         # Defaults checking should not be done for:
         # 1. Parameters that have name conflict with `Defaults.name`
@@ -223,7 +224,8 @@ def check_param_type(
         for name, _ in ALL_DEFAULTS:
             if name == ptb_param.name or "parse_mode" in ptb_param.name:
                 log("Checking that `%s` is a Defaults parameter!\n", ptb_param.name)
-                mapped_type = ODVInput[mapped_type]
+                # We have to use org_mapped_type here, because ODVInput will not take a None value
+                mapped_type = ODVInput[org_mapped_type]
                 break
 
     # RESULTS:-

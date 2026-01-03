@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 import functools
 import re
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, _eval_type, get_type_hints
+from typing import TYPE_CHECKING, Any, TypeVar, _eval_type, get_type_hints
 
 from bs4 import PageElement, Tag
 
@@ -117,7 +117,7 @@ T = TypeVar("T")
 
 def extract_mappings(
     exceptions: dict[str, dict[str, T]], obj: object, param_name: str
-) -> Optional[list[T]]:
+) -> list[T] | None:
     mappings = (
         mapping for pattern, mapping in exceptions.items() if (re.match(pattern, obj.__name__))
     )

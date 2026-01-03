@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from pathlib import Path
-from typing import TYPE_CHECKING, BinaryIO, Optional
+from typing import TYPE_CHECKING, BinaryIO
 
 from telegram._passport.credentials import decrypt
 from telegram._telegramobject import TelegramObject
@@ -86,10 +86,10 @@ class File(TelegramObject):
         self,
         file_id: str,
         file_unique_id: str,
-        file_size: Optional[int] = None,
-        file_path: Optional[str] = None,
+        file_size: int | None = None,
+        file_path: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -97,10 +97,10 @@ class File(TelegramObject):
         self.file_id: str = str(file_id)
         self.file_unique_id: str = str(file_unique_id)
         # Optionals
-        self.file_size: Optional[int] = file_size
-        self.file_path: Optional[str] = file_path
+        self.file_size: int | None = file_size
+        self.file_path: str | None = file_path
 
-        self._credentials: Optional[FileCredentials] = None
+        self._credentials: FileCredentials | None = None
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -120,7 +120,7 @@ class File(TelegramObject):
 
     async def download_to_drive(
         self,
-        custom_path: Optional[FilePathInput] = None,
+        custom_path: FilePathInput | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -294,7 +294,7 @@ class File(TelegramObject):
 
     async def download_as_bytearray(
         self,
-        buf: Optional[bytearray] = None,
+        buf: bytearray | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains the PrefixHandler class."""
 
 import itertools
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -128,7 +128,7 @@ class PrefixHandler(BaseHandler[Update, CCT, RT]):
         prefix: SCT[str],
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
-        filters: Optional[filters_module.BaseFilter] = None,
+        filters: filters_module.BaseFilter | None = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback=callback, block=block)
@@ -146,7 +146,7 @@ class PrefixHandler(BaseHandler[Update, CCT, RT]):
 
     def check_update(
         self, update: object
-    ) -> Optional[Union[bool, tuple[list[str], Optional[Union[bool, dict[Any, Any]]]]]]:
+    ) -> bool | tuple[list[str], bool | dict[Any, Any] | None] | None:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -174,7 +174,7 @@ class PrefixHandler(BaseHandler[Update, CCT, RT]):
         context: CCT,
         update: Update,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Optional[Union[bool, tuple[list[str], Optional[bool]]]],
+        check_result: bool | tuple[list[str], bool] | None,
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single
         whitespaces and add output of data filters to :attr:`CallbackContext` as well.

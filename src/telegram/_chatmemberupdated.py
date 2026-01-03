@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ChatMemberUpdated."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
@@ -113,11 +113,11 @@ class ChatMemberUpdated(TelegramObject):
         date: dtm.datetime,
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
-        invite_link: Optional[ChatInviteLink] = None,
-        via_chat_folder_invite_link: Optional[bool] = None,
-        via_join_request: Optional[bool] = None,
+        invite_link: ChatInviteLink | None = None,
+        via_chat_folder_invite_link: bool | None = None,
+        via_join_request: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -126,11 +126,11 @@ class ChatMemberUpdated(TelegramObject):
         self.date: dtm.datetime = date
         self.old_chat_member: ChatMember = old_chat_member
         self.new_chat_member: ChatMember = new_chat_member
-        self.via_chat_folder_invite_link: Optional[bool] = via_chat_folder_invite_link
+        self.via_chat_folder_invite_link: bool | None = via_chat_folder_invite_link
 
         # Optionals
-        self.invite_link: Optional[ChatInviteLink] = invite_link
-        self.via_join_request: Optional[bool] = via_join_request
+        self.invite_link: ChatInviteLink | None = invite_link
+        self.via_join_request: bool | None = via_join_request
 
         self._id_attrs = (
             self.chat,
@@ -143,7 +143,7 @@ class ChatMemberUpdated(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChatMemberUpdated":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatMemberUpdated":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -176,7 +176,7 @@ class ChatMemberUpdated(TelegramObject):
         self,
     ) -> dict[
         str,
-        tuple[Union[str, bool, dtm.datetime, User], Union[str, bool, dtm.datetime, User]],
+        tuple[str | bool | dtm.datetime | User, str | bool | dtm.datetime | User],
     ]:
         """Computes the difference between :attr:`old_chat_member` and :attr:`new_chat_member`.
 

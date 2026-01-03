@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputVenueMessageContent."""
-
-from typing import Optional
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._utils.types import JSONDict
@@ -82,12 +80,12 @@ class InputVenueMessageContent(InputMessageContent):
         longitude: float,
         title: str,
         address: str,
-        foursquare_id: Optional[str] = None,
-        foursquare_type: Optional[str] = None,
-        google_place_id: Optional[str] = None,
-        google_place_type: Optional[str] = None,
+        foursquare_id: str | None = None,
+        foursquare_type: str | None = None,
+        google_place_id: str | None = None,
+        google_place_type: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -97,10 +95,10 @@ class InputVenueMessageContent(InputMessageContent):
             self.title: str = title
             self.address: str = address
             # Optionals
-            self.foursquare_id: Optional[str] = foursquare_id
-            self.foursquare_type: Optional[str] = foursquare_type
-            self.google_place_id: Optional[str] = google_place_id
-            self.google_place_type: Optional[str] = google_place_type
+            self.foursquare_id: str | None = foursquare_id
+            self.foursquare_type: str | None = foursquare_type
+            self.google_place_id: str | None = google_place_id
+            self.google_place_type: str | None = google_place_type
 
             self._id_attrs = (
                 self.latitude,

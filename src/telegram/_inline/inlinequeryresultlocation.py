@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -147,17 +147,17 @@ class InlineQueryResultLocation(InlineQueryResult):
         latitude: float,
         longitude: float,
         title: str,
-        live_period: Optional[TimePeriod] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
-        input_message_content: Optional["InputMessageContent"] = None,
-        horizontal_accuracy: Optional[float] = None,
-        heading: Optional[int] = None,
-        proximity_alert_radius: Optional[int] = None,
-        thumbnail_url: Optional[str] = None,
-        thumbnail_width: Optional[int] = None,
-        thumbnail_height: Optional[int] = None,
+        live_period: TimePeriod | None = None,
+        reply_markup: InlineKeyboardMarkup | None = None,
+        input_message_content: "InputMessageContent | None" = None,
+        horizontal_accuracy: float | None = None,
+        heading: int | None = None,
+        proximity_alert_radius: int | None = None,
+        thumbnail_url: str | None = None,
+        thumbnail_width: int | None = None,
+        thumbnail_height: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # Required
         super().__init__(constants.InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
@@ -167,20 +167,20 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.title: str = title
 
             # Optionals
-            self._live_period: Optional[dtm.timedelta] = to_timedelta(live_period)
-            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-            self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_url: Optional[str] = thumbnail_url
-            self.thumbnail_width: Optional[int] = thumbnail_width
-            self.thumbnail_height: Optional[int] = thumbnail_height
-            self.horizontal_accuracy: Optional[float] = horizontal_accuracy
-            self.heading: Optional[int] = heading
-            self.proximity_alert_radius: Optional[int] = (
+            self._live_period: dtm.timedelta | None = to_timedelta(live_period)
+            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+            self.input_message_content: InputMessageContent | None = input_message_content
+            self.thumbnail_url: str | None = thumbnail_url
+            self.thumbnail_width: int | None = thumbnail_width
+            self.thumbnail_height: int | None = thumbnail_height
+            self.horizontal_accuracy: float | None = horizontal_accuracy
+            self.heading: int | None = heading
+            self.proximity_alert_radius: int | None = (
                 int(proximity_alert_radius) if proximity_alert_radius else None
             )
 
     @property
-    def live_period(self) -> Optional[Union[int, dtm.timedelta]]:
+    def live_period(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._live_period, attribute="live_period")
 
     HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY

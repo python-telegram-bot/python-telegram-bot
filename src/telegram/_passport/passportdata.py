@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """Contains information about Telegram Passport data shared with the bot by the user."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
@@ -70,20 +70,20 @@ class PassportData(TelegramObject):
         data: Sequence[EncryptedPassportElement],
         credentials: EncryptedCredentials,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         self.data: tuple[EncryptedPassportElement, ...] = parse_sequence_arg(data)
         self.credentials: EncryptedCredentials = credentials
 
-        self._decrypted_data: Optional[tuple[EncryptedPassportElement]] = None
+        self._decrypted_data: tuple[EncryptedPassportElement] | None = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PassportData":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PassportData":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

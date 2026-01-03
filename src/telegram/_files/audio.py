@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,6 @@
 """This module contains an object that represents a Telegram Audio."""
 
 import datetime as dtm
-from typing import Optional, Union
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -90,14 +89,14 @@ class Audio(_BaseThumbedMedium):
         file_id: str,
         file_unique_id: str,
         duration: TimePeriod,
-        performer: Optional[str] = None,
-        title: Optional[str] = None,
-        mime_type: Optional[str] = None,
-        file_size: Optional[int] = None,
-        file_name: Optional[str] = None,
-        thumbnail: Optional[PhotoSize] = None,
+        performer: str | None = None,
+        title: str | None = None,
+        mime_type: str | None = None,
+        file_size: int | None = None,
+        file_name: str | None = None,
+        thumbnail: PhotoSize | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -110,13 +109,13 @@ class Audio(_BaseThumbedMedium):
             # Required
             self._duration: dtm.timedelta = to_timedelta(duration)
             # Optional
-            self.performer: Optional[str] = performer
-            self.title: Optional[str] = title
-            self.mime_type: Optional[str] = mime_type
-            self.file_name: Optional[str] = file_name
+            self.performer: str | None = performer
+            self.title: str | None = title
+            self.mime_type: str | None = mime_type
+            self.file_name: str | None = file_name
 
     @property
-    def duration(self) -> Union[int, dtm.timedelta]:
+    def duration(self) -> int | dtm.timedelta:
         return get_timedelta_value(  # type: ignore[return-value]
             self._duration, attribute="duration"
         )

@@ -2,7 +2,7 @@
 # pylint: disable=too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, Callable, Final, Optional, Union
+from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._files.location import Location
@@ -112,10 +112,10 @@ class InlineQuery(TelegramObject):
         from_user: User,
         query: str,
         offset: str,
-        location: Optional[Location] = None,
-        chat_type: Optional[str] = None,
+        location: "Location | None" = None,
+        chat_type: str | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -125,15 +125,15 @@ class InlineQuery(TelegramObject):
         self.offset: str = offset
 
         # Optional
-        self.location: Optional[Location] = location
-        self.chat_type: Optional[str] = chat_type
+        self.location: Location | None = location
+        self.chat_type: str | None = chat_type
 
         self._id_attrs = (self.id,)
 
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "InlineQuery":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InlineQuery":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -144,21 +144,21 @@ class InlineQuery(TelegramObject):
 
     async def answer(
         self,
-        results: Union[
-            Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
-        ],
-        cache_time: Optional[TimePeriod] = None,
-        is_personal: Optional[bool] = None,
-        next_offset: Optional[str] = None,
-        button: Optional[InlineQueryResultsButton] = None,
+        results: (
+            Sequence["InlineQueryResult"] | Callable[[int], Sequence["InlineQueryResult"] | None]
+        ),
+        cache_time: TimePeriod | None = None,
+        is_personal: bool | None = None,
+        next_offset: str | None = None,
+        button: InlineQueryResultsButton | None = None,
         *,
-        current_offset: Optional[str] = None,
+        current_offset: str | None = None,
         auto_pagination: bool = False,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Shortcut for::
 

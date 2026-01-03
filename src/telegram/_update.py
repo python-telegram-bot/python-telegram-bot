@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._business import BusinessConnection, BusinessMessagesDeleted
@@ -411,73 +411,71 @@ class Update(TelegramObject):
     def __init__(
         self,
         update_id: int,
-        message: Optional[Message] = None,
-        edited_message: Optional[Message] = None,
-        channel_post: Optional[Message] = None,
-        edited_channel_post: Optional[Message] = None,
-        inline_query: Optional[InlineQuery] = None,
-        chosen_inline_result: Optional[ChosenInlineResult] = None,
-        callback_query: Optional[CallbackQuery] = None,
-        shipping_query: Optional[ShippingQuery] = None,
-        pre_checkout_query: Optional[PreCheckoutQuery] = None,
-        poll: Optional[Poll] = None,
-        poll_answer: Optional[PollAnswer] = None,
-        my_chat_member: Optional[ChatMemberUpdated] = None,
-        chat_member: Optional[ChatMemberUpdated] = None,
-        chat_join_request: Optional[ChatJoinRequest] = None,
-        chat_boost: Optional[ChatBoostUpdated] = None,
-        removed_chat_boost: Optional[ChatBoostRemoved] = None,
-        message_reaction: Optional[MessageReactionUpdated] = None,
-        message_reaction_count: Optional[MessageReactionCountUpdated] = None,
-        business_connection: Optional[BusinessConnection] = None,
-        business_message: Optional[Message] = None,
-        edited_business_message: Optional[Message] = None,
-        deleted_business_messages: Optional[BusinessMessagesDeleted] = None,
-        purchased_paid_media: Optional[PaidMediaPurchased] = None,
+        message: Message | None = None,
+        edited_message: Message | None = None,
+        channel_post: Message | None = None,
+        edited_channel_post: Message | None = None,
+        inline_query: InlineQuery | None = None,
+        chosen_inline_result: ChosenInlineResult | None = None,
+        callback_query: CallbackQuery | None = None,
+        shipping_query: ShippingQuery | None = None,
+        pre_checkout_query: PreCheckoutQuery | None = None,
+        poll: Poll | None = None,
+        poll_answer: PollAnswer | None = None,
+        my_chat_member: ChatMemberUpdated | None = None,
+        chat_member: ChatMemberUpdated | None = None,
+        chat_join_request: ChatJoinRequest | None = None,
+        chat_boost: ChatBoostUpdated | None = None,
+        removed_chat_boost: ChatBoostRemoved | None = None,
+        message_reaction: MessageReactionUpdated | None = None,
+        message_reaction_count: MessageReactionCountUpdated | None = None,
+        business_connection: BusinessConnection | None = None,
+        business_message: Message | None = None,
+        edited_business_message: Message | None = None,
+        deleted_business_messages: BusinessMessagesDeleted | None = None,
+        purchased_paid_media: PaidMediaPurchased | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.update_id: int = update_id
         # Optionals
-        self.message: Optional[Message] = message
-        self.edited_message: Optional[Message] = edited_message
-        self.inline_query: Optional[InlineQuery] = inline_query
-        self.chosen_inline_result: Optional[ChosenInlineResult] = chosen_inline_result
-        self.callback_query: Optional[CallbackQuery] = callback_query
-        self.shipping_query: Optional[ShippingQuery] = shipping_query
-        self.pre_checkout_query: Optional[PreCheckoutQuery] = pre_checkout_query
-        self.channel_post: Optional[Message] = channel_post
-        self.edited_channel_post: Optional[Message] = edited_channel_post
-        self.poll: Optional[Poll] = poll
-        self.poll_answer: Optional[PollAnswer] = poll_answer
-        self.my_chat_member: Optional[ChatMemberUpdated] = my_chat_member
-        self.chat_member: Optional[ChatMemberUpdated] = chat_member
-        self.chat_join_request: Optional[ChatJoinRequest] = chat_join_request
-        self.chat_boost: Optional[ChatBoostUpdated] = chat_boost
-        self.removed_chat_boost: Optional[ChatBoostRemoved] = removed_chat_boost
-        self.message_reaction: Optional[MessageReactionUpdated] = message_reaction
-        self.message_reaction_count: Optional[MessageReactionCountUpdated] = message_reaction_count
-        self.business_connection: Optional[BusinessConnection] = business_connection
-        self.business_message: Optional[Message] = business_message
-        self.edited_business_message: Optional[Message] = edited_business_message
-        self.deleted_business_messages: Optional[BusinessMessagesDeleted] = (
-            deleted_business_messages
-        )
-        self.purchased_paid_media: Optional[PaidMediaPurchased] = purchased_paid_media
+        self.message: Message | None = message
+        self.edited_message: Message | None = edited_message
+        self.inline_query: InlineQuery | None = inline_query
+        self.chosen_inline_result: ChosenInlineResult | None = chosen_inline_result
+        self.callback_query: CallbackQuery | None = callback_query
+        self.shipping_query: ShippingQuery | None = shipping_query
+        self.pre_checkout_query: PreCheckoutQuery | None = pre_checkout_query
+        self.channel_post: Message | None = channel_post
+        self.edited_channel_post: Message | None = edited_channel_post
+        self.poll: Poll | None = poll
+        self.poll_answer: PollAnswer | None = poll_answer
+        self.my_chat_member: ChatMemberUpdated | None = my_chat_member
+        self.chat_member: ChatMemberUpdated | None = chat_member
+        self.chat_join_request: ChatJoinRequest | None = chat_join_request
+        self.chat_boost: ChatBoostUpdated | None = chat_boost
+        self.removed_chat_boost: ChatBoostRemoved | None = removed_chat_boost
+        self.message_reaction: MessageReactionUpdated | None = message_reaction
+        self.message_reaction_count: MessageReactionCountUpdated | None = message_reaction_count
+        self.business_connection: BusinessConnection | None = business_connection
+        self.business_message: Message | None = business_message
+        self.edited_business_message: Message | None = edited_business_message
+        self.deleted_business_messages: BusinessMessagesDeleted | None = deleted_business_messages
+        self.purchased_paid_media: PaidMediaPurchased | None = purchased_paid_media
 
-        self._effective_user: Optional[User] = None
-        self._effective_sender: Optional[Union[User, Chat]] = None
-        self._effective_chat: Optional[Chat] = None
-        self._effective_message: Optional[Message] = None
+        self._effective_user: User | None = None
+        self._effective_sender: User | Chat | None = None
+        self._effective_chat: Chat | None = None
+        self._effective_message: Message | None = None
 
         self._id_attrs = (self.update_id,)
 
         self._freeze()
 
     @property
-    def effective_user(self) -> Optional["User"]:
+    def effective_user(self) -> "User | None":
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
         is. If no user is associated with this update, this gives :obj:`None`. This is the case
@@ -563,7 +561,7 @@ class Update(TelegramObject):
         return user
 
     @property
-    def effective_sender(self) -> Optional[Union["User", "Chat"]]:
+    def effective_sender(self) -> "User | Chat | None":
         """
         :class:`telegram.User` or :class:`telegram.Chat`: The user or chat that sent this update,
         no matter what kind of update this is.
@@ -596,7 +594,7 @@ class Update(TelegramObject):
         if self._effective_sender:
             return self._effective_sender
 
-        sender: Optional[Union[User, Chat]] = None
+        sender: User | Chat | None = None
 
         if message := (
             self.message
@@ -621,7 +619,7 @@ class Update(TelegramObject):
         return sender
 
     @property
-    def effective_chat(self) -> Optional["Chat"]:
+    def effective_chat(self) -> "Chat | None":
         """
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
         update this is.
@@ -694,7 +692,7 @@ class Update(TelegramObject):
         return chat
 
     @property
-    def effective_message(self) -> Optional[Message]:
+    def effective_message(self) -> Message | None:
         """
         :class:`telegram.Message`: The message included in this update, no matter what kind of
             update this is. More precisely, this will be the message contained in :attr:`message`,
@@ -717,7 +715,7 @@ class Update(TelegramObject):
         if self._effective_message:
             return self._effective_message
 
-        message: Optional[Message] = None
+        message: Message | None = None
 
         if self.message:
             message = self.message
@@ -758,7 +756,7 @@ class Update(TelegramObject):
         return message
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Update":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Update":
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

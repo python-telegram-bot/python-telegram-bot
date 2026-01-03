@@ -62,6 +62,17 @@
     {
       "matchDepTypes": ["project.optional-dependencies", "project.dependencies"],
       "labels": ["⚙️ dependencies"]
+    },
+
+    // Workflow and dev-dependencies update once a month
+    // https://docs.renovatebot.com/presets-schedule/#schedulemonthly
+    {
+      "matchFileNames": [".github/workflows/**"],
+      "schedule": ["* 0-3 1 * *"]
+    },
+    {
+      "matchDepTypes": ["dependency-groups"],
+      "schedule": ["* 0-3 1 * *"]
     }
   ],
 
@@ -72,6 +83,6 @@
   "ignoreDeps": ["pytest-asyncio"],
 
   // schedule to allow PR's from Renovate:
-  "schedule": ["* * * * 0,6"]  // Every weekend
+  "schedule": ["* * * * 0"]  // Every Sunday
 
 }

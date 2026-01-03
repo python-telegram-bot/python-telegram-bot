@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._files.photosize import PhotoSize
@@ -73,7 +73,7 @@ class PaidMedia(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.PaidMediaType, type, type)
@@ -82,7 +82,7 @@ class PaidMedia(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMedia":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMedia":
         """Converts JSON data to the appropriate :class:`PaidMedia` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -149,23 +149,23 @@ class PaidMediaPreview(PaidMedia):
 
     def __init__(
         self,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
-        duration: Optional[TimePeriod] = None,
+        width: int | None = None,
+        height: int | None = None,
+        duration: TimePeriod | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=PaidMedia.PREVIEW, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.width: Optional[int] = width
-            self.height: Optional[int] = height
-            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
+            self.width: int | None = width
+            self.height: int | None = height
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
 
             self._id_attrs = (self.type, self.width, self.height, self._duration)
 
     @property
-    def duration(self) -> Optional[Union[int, dtm.timedelta]]:
+    def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
@@ -193,7 +193,7 @@ class PaidMediaPhoto(PaidMedia):
         self,
         photo: Sequence["PhotoSize"],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=PaidMedia.PHOTO, api_kwargs=api_kwargs)
 
@@ -203,7 +203,7 @@ class PaidMediaPhoto(PaidMedia):
             self._id_attrs = (self.type, self.photo)
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaPhoto":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaPhoto":
         data = cls._parse_data(data)
 
         data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
@@ -234,7 +234,7 @@ class PaidMediaVideo(PaidMedia):
         self,
         video: Video,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(type=PaidMedia.VIDEO, api_kwargs=api_kwargs)
 
@@ -244,7 +244,7 @@ class PaidMediaVideo(PaidMedia):
             self._id_attrs = (self.type, self.video)
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaVideo":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaVideo":
         data = cls._parse_data(data)
 
         data["video"] = de_json_optional(data.get("video"), Video, bot)
@@ -278,7 +278,7 @@ class PaidMediaInfo(TelegramObject):
         star_count: int,
         paid_media: Sequence[PaidMedia],
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.star_count: int = star_count
@@ -288,7 +288,7 @@ class PaidMediaInfo(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaInfo":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaInfo":
         data = cls._parse_data(data)
 
         data["paid_media"] = de_list_optional(data.get("paid_media"), PaidMedia, bot)
@@ -322,7 +322,7 @@ class PaidMediaPurchased(TelegramObject):
         from_user: "User",
         paid_media_payload: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.from_user: User = from_user
@@ -332,7 +332,7 @@ class PaidMediaPurchased(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "PaidMediaPurchased":
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaPurchased":
         data = cls._parse_data(data)
 
         data["from_user"] = User.de_json(data=data.pop("from"), bot=bot)

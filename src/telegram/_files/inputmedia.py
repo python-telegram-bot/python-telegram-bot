@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import Final, Optional, Union
+from typing import TYPE_CHECKING, Final, TypeAlias
 
 from telegram import constants
 from telegram._files.animation import Animation
@@ -36,10 +36,13 @@ from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
-from telegram._utils.types import FileInput, JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 from telegram.constants import InputMediaType
 
-MediaType = Union[Animation, Audio, Document, PhotoSize, Video]
+if TYPE_CHECKING:
+    from telegram._utils.types import FileInput
+
+MediaType: TypeAlias = Animation | Audio | Document | PhotoSize | Video
 
 
 class InputMedia(TelegramObject):
@@ -87,24 +90,24 @@ class InputMedia(TelegramObject):
     def __init__(
         self,
         media_type: str,
-        media: Union[str, InputFile],
-        caption: Optional[str] = None,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
+        media: str | InputFile,
+        caption: str | None = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.InputMediaType, media_type, media_type)
-        self.media: Union[str, InputFile] = media
-        self.caption: Optional[str] = caption
+        self.media: str | InputFile = media
+        self.caption: str | None = caption
         self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
         self.parse_mode: ODVInput[str] = parse_mode
 
         self._freeze()
 
     @staticmethod
-    def _parse_thumbnail_input(thumbnail: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
+    def _parse_thumbnail_input(thumbnail: "FileInput | None") -> str | InputFile | None:
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
         return (
@@ -145,13 +148,13 @@ class InputPaidMedia(TelegramObject):
     def __init__(
         self,
         type: str,  # pylint: disable=redefined-builtin
-        media: Union[str, InputFile],
+        media: str | InputFile,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.InputPaidMediaType, type, type)
-        self.media: Union[str, InputFile] = media
+        self.media: str | InputFile = media
 
         self._freeze()
 
@@ -178,9 +181,9 @@ class InputPaidMediaPhoto(InputPaidMedia):
 
     def __init__(
         self,
-        media: Union[FileInput, PhotoSize],
+        media: "FileInput | PhotoSize",
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         media = parse_file_input(media, PhotoSize, attach=True, local_mode=True)
         super().__init__(type=InputPaidMedia.PHOTO, media=media, api_kwargs=api_kwargs)
@@ -259,16 +262,16 @@ class InputPaidMediaVideo(InputPaidMedia):
 
     def __init__(
         self,
-        media: Union[FileInput, Video],
-        thumbnail: Optional[FileInput] = None,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
-        duration: Optional[TimePeriod] = None,
-        supports_streaming: Optional[bool] = None,
-        cover: Optional[FileInput] = None,
-        start_timestamp: Optional[int] = None,
+        media: "FileInput | Video",
+        thumbnail: "FileInput | None" = None,
+        width: int | None = None,
+        height: int | None = None,
+        duration: TimePeriod | None = None,
+        supports_streaming: bool | None = None,
+        cover: "FileInput | None" = None,
+        start_timestamp: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         if isinstance(media, Video):
             width = width if width is not None else media.width
@@ -282,20 +285,18 @@ class InputPaidMediaVideo(InputPaidMedia):
 
         super().__init__(type=InputPaidMedia.VIDEO, media=media, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.thumbnail: Optional[Union[str, InputFile]] = InputMedia._parse_thumbnail_input(
-                thumbnail
-            )
-            self.width: Optional[int] = width
-            self.height: Optional[int] = height
-            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
-            self.supports_streaming: Optional[bool] = supports_streaming
-            self.cover: Optional[Union[InputFile, str]] = (
+            self.thumbnail: str | InputFile | None = InputMedia._parse_thumbnail_input(thumbnail)
+            self.width: int | None = width
+            self.height: int | None = height
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
+            self.supports_streaming: bool | None = supports_streaming
+            self.cover: InputFile | str | None = (
                 parse_file_input(cover, attach=True, local_mode=True) if cover else None
             )
-            self.start_timestamp: Optional[int] = start_timestamp
+            self.start_timestamp: int | None = start_timestamp
 
     @property
-    def duration(self) -> Optional[Union[int, dtm.timedelta]]:
+    def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
@@ -395,19 +396,19 @@ class InputMediaAnimation(InputMedia):
 
     def __init__(
         self,
-        media: Union[FileInput, Animation],
-        caption: Optional[str] = None,
+        media: "FileInput | Animation",
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
-        duration: Optional[TimePeriod] = None,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        filename: Optional[str] = None,
-        has_spoiler: Optional[bool] = None,
-        thumbnail: Optional[FileInput] = None,
-        show_caption_above_media: Optional[bool] = None,
+        width: int | None = None,
+        height: int | None = None,
+        duration: TimePeriod | None = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        filename: str | None = None,
+        has_spoiler: bool | None = None,
+        thumbnail: "FileInput | None" = None,
+        show_caption_above_media: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         if isinstance(media, Animation):
             width = media.width if width is None else width
@@ -428,17 +429,15 @@ class InputMediaAnimation(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumbnail_input(
-                thumbnail
-            )
-            self.width: Optional[int] = width
-            self.height: Optional[int] = height
-            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
-            self.has_spoiler: Optional[bool] = has_spoiler
-            self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
+            self.width: int | None = width
+            self.height: int | None = height
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
+            self.has_spoiler: bool | None = has_spoiler
+            self.show_caption_above_media: bool | None = show_caption_above_media
 
     @property
-    def duration(self) -> Optional[Union[int, dtm.timedelta]]:
+    def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
@@ -504,15 +503,15 @@ class InputMediaPhoto(InputMedia):
 
     def __init__(
         self,
-        media: Union[FileInput, PhotoSize],
-        caption: Optional[str] = None,
+        media: "FileInput | PhotoSize",
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        filename: Optional[str] = None,
-        has_spoiler: Optional[bool] = None,
-        show_caption_above_media: Optional[bool] = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        filename: str | None = None,
+        has_spoiler: bool | None = None,
+        show_caption_above_media: bool | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
@@ -527,8 +526,8 @@ class InputMediaPhoto(InputMedia):
         )
 
         with self._unfrozen():
-            self.has_spoiler: Optional[bool] = has_spoiler
-            self.show_caption_above_media: Optional[bool] = show_caption_above_media
+            self.has_spoiler: bool | None = has_spoiler
+            self.show_caption_above_media: bool | None = show_caption_above_media
 
 
 class InputMediaVideo(InputMedia):
@@ -649,22 +648,22 @@ class InputMediaVideo(InputMedia):
 
     def __init__(
         self,
-        media: Union[FileInput, Video],
-        caption: Optional[str] = None,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
-        duration: Optional[TimePeriod] = None,
-        supports_streaming: Optional[bool] = None,
+        media: "FileInput | Video",
+        caption: str | None = None,
+        width: int | None = None,
+        height: int | None = None,
+        duration: TimePeriod | None = None,
+        supports_streaming: bool | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        filename: Optional[str] = None,
-        has_spoiler: Optional[bool] = None,
-        thumbnail: Optional[FileInput] = None,
-        show_caption_above_media: Optional[bool] = None,
-        cover: Optional[FileInput] = None,
-        start_timestamp: Optional[int] = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        filename: str | None = None,
+        has_spoiler: bool | None = None,
+        thumbnail: "FileInput | None" = None,
+        show_caption_above_media: bool | None = None,
+        cover: "FileInput | None" = None,
+        start_timestamp: int | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         if isinstance(media, Video):
             width = width if width is not None else media.width
@@ -685,22 +684,20 @@ class InputMediaVideo(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.width: Optional[int] = width
-            self.height: Optional[int] = height
-            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
-            self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumbnail_input(
-                thumbnail
-            )
-            self.supports_streaming: Optional[bool] = supports_streaming
-            self.has_spoiler: Optional[bool] = has_spoiler
-            self.show_caption_above_media: Optional[bool] = show_caption_above_media
-            self.cover: Optional[Union[InputFile, str]] = (
+            self.width: int | None = width
+            self.height: int | None = height
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
+            self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
+            self.supports_streaming: bool | None = supports_streaming
+            self.has_spoiler: bool | None = has_spoiler
+            self.show_caption_above_media: bool | None = show_caption_above_media
+            self.cover: InputFile | str | None = (
                 parse_file_input(cover, attach=True, local_mode=True) if cover else None
             )
-            self.start_timestamp: Optional[int] = start_timestamp
+            self.start_timestamp: int | None = start_timestamp
 
     @property
-    def duration(self) -> Optional[Union[int, dtm.timedelta]]:
+    def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
@@ -782,17 +779,17 @@ class InputMediaAudio(InputMedia):
 
     def __init__(
         self,
-        media: Union[FileInput, Audio],
-        caption: Optional[str] = None,
+        media: "FileInput | Audio",
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        duration: Optional[TimePeriod] = None,
-        performer: Optional[str] = None,
-        title: Optional[str] = None,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        filename: Optional[str] = None,
-        thumbnail: Optional[FileInput] = None,
+        duration: TimePeriod | None = None,
+        performer: str | None = None,
+        title: str | None = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        filename: str | None = None,
+        thumbnail: "FileInput | None" = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         if isinstance(media, Audio):
             duration = duration if duration is not None else media._duration
@@ -813,15 +810,13 @@ class InputMediaAudio(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumbnail_input(
-                thumbnail
-            )
-            self._duration: Optional[dtm.timedelta] = to_timedelta(duration)
-            self.title: Optional[str] = title
-            self.performer: Optional[str] = performer
+            self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
+            self._duration: dtm.timedelta | None = to_timedelta(duration)
+            self.title: str | None = title
+            self.performer: str | None = performer
 
     @property
-    def duration(self) -> Optional[Union[int, dtm.timedelta]]:
+    def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
@@ -887,15 +882,15 @@ class InputMediaDocument(InputMedia):
 
     def __init__(
         self,
-        media: Union[FileInput, Document],
-        caption: Optional[str] = None,
+        media: "FileInput | Document",
+        caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        disable_content_type_detection: Optional[bool] = None,
-        caption_entities: Optional[Sequence[MessageEntity]] = None,
-        filename: Optional[str] = None,
-        thumbnail: Optional[FileInput] = None,
+        disable_content_type_detection: bool | None = None,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        filename: str | None = None,
+        thumbnail: "FileInput | None" = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
@@ -910,7 +905,5 @@ class InputMediaDocument(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumbnail_input(
-                thumbnail
-            )
-            self.disable_content_type_detection: Optional[bool] = disable_content_type_detection
+            self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
+            self.disable_content_type_detection: bool | None = disable_content_type_detection

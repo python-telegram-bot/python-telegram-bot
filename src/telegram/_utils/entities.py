@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@ Warning:
 """
 
 from collections.abc import Sequence
-from typing import Optional
 
 from telegram._messageentity import MessageEntity
 from telegram._utils.strings import TextEncoding
@@ -48,7 +47,7 @@ def parse_message_entity(text: str, entity: MessageEntity) -> str:
 
 
 def parse_message_entities(
-    text: str, entities: Sequence[MessageEntity], types: Optional[Sequence[str]] = None
+    text: str, entities: Sequence[MessageEntity], types: Sequence[str] | None = None
 ) -> dict[MessageEntity, str]:
     """
     Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.

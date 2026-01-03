@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram InputSticker."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from telegram._files.sticker import MaskPosition
 from telegram._telegramobject import TelegramObject
@@ -97,23 +97,23 @@ class InputSticker(TelegramObject):
         sticker: FileInput,
         emoji_list: Sequence[str],
         format: str,  # pylint: disable=redefined-builtin
-        mask_position: Optional[MaskPosition] = None,
-        keywords: Optional[Sequence[str]] = None,
+        mask_position: MaskPosition | None = None,
+        keywords: Sequence[str] | None = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,
+        api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
-        self.sticker: Union[str, InputFile] = parse_file_input(
+        self.sticker: str | InputFile = parse_file_input(
             sticker,
             local_mode=True,
             attach=True,
         )
         self.emoji_list: tuple[str, ...] = parse_sequence_arg(emoji_list)
         self.format: str = format
-        self.mask_position: Optional[MaskPosition] = mask_position
+        self.mask_position: MaskPosition | None = mask_position
         self.keywords: tuple[str, ...] = parse_sequence_arg(keywords)
 
         self._freeze()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 import re
 from re import Match, Pattern
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
@@ -76,7 +76,7 @@ class StringRegexHandler(BaseHandler[str, CCT, RT]):
 
     def __init__(
         self: "StringRegexHandler[CCT, RT]",
-        pattern: Union[str, Pattern[str]],
+        pattern: str | Pattern[str],
         callback: HandlerCallback[str, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
     ):
@@ -85,9 +85,9 @@ class StringRegexHandler(BaseHandler[str, CCT, RT]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern: Union[str, Pattern[str]] = pattern
+        self.pattern: str | Pattern[str] = pattern
 
-    def check_update(self, update: object) -> Optional[Match[str]]:
+    def check_update(self, update: object) -> Match[str] | None:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -106,7 +106,7 @@ class StringRegexHandler(BaseHandler[str, CCT, RT]):
         context: CCT,
         update: str,  # noqa: ARG002
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
-        check_result: Optional[Match[str]],
+        check_result: Match[str] | None,
     ) -> None:
         """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as
         list with one element.
