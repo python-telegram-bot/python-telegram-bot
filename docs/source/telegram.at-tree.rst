@@ -190,6 +190,7 @@ Available Types
     telegram.user
     telegram.userchatboosts
     telegram.userprofilephotos
+    telegram.userrating
     telegram.usersshared
     telegram.venue
     telegram.video
