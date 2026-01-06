@@ -117,7 +117,7 @@ async def main() -> None:
     # Set up webserver
     quart_app = Quart(__name__)
 
-    @quart_app.post("/telegram")  # type: ignore[misc]
+    @quart_app.post("/telegram")  # type: ignore[untyped-decorator]
     async def telegram() -> Response:
         """Handle incoming Telegram updates by putting them into the `update_queue`"""
         await application.update_queue.put(
@@ -125,7 +125,7 @@ async def main() -> None:
         )
         return Response(status=HTTPStatus.OK)
 
-    @quart_app.route("/submitpayload", methods=["GET", "POST"])  # type: ignore[misc]
+    @quart_app.route("/submitpayload", methods=["GET", "POST"])  # type: ignore[untyped-decorator]
     async def custom_updates() -> Response:
         """
         Handle incoming webhook updates by also putting them into the `update_queue` if
@@ -145,7 +145,7 @@ async def main() -> None:
         await application.update_queue.put(WebhookUpdate(user_id=user_id, payload=payload))
         return Response(status=HTTPStatus.OK)
 
-    @quart_app.get("/healthcheck")  # type: ignore[misc]
+    @quart_app.get("/healthcheck")  # type: ignore[untyped-decorator]
     async def health() -> Response:
         """For the health endpoint, reply with a simple plain text message."""
         response = await make_response("The bot is still running fine :)", HTTPStatus.OK)
