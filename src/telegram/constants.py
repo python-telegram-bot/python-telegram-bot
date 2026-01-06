@@ -3510,7 +3510,7 @@ class InvoiceLimit(IntEnum):
 
     .. versionadded:: 21.6
     """
-    MAX_STAR_COUNT = 10000
+    MAX_STAR_COUNT = 25000
     """:obj:`int`: Maximum amount of starts that must be paid to buy access to a paid media
     passed as :paramref:`~telegram.Bot.send_paid_media.star_count` parameter of
     :meth:`telegram.Bot.send_paid_media`.
@@ -3518,6 +3518,8 @@ class InvoiceLimit(IntEnum):
     .. versionadded:: 21.6
     .. versionchanged:: 22.1
         Bot API 9.0 changed the value to 10000.
+    .. versionchanged:: NEXT.VERSION
+        Bot API 9.3 changed the value to 25000.
     """
     SUBSCRIPTION_PERIOD = dtm.timedelta(days=30).total_seconds()
     """:obj:`int`: The period of time for which the subscription is active before
