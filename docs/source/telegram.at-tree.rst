@@ -181,6 +181,7 @@ Available Types
     telegram.telegramobject
     telegram.textquote
     telegram.uniquegift
+    telegram.uniquegiftcolors
     telegram.uniquegiftbackdrop
     telegram.uniquegiftbackdropcolors
     telegram.uniquegiftinfo
