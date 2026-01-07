@@ -1316,6 +1316,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1361,6 +1362,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 forwarded to a direct messages chat.
 
                 .. versionadded:: 22.4
+            message_effect_id (:obj:`str`, optional): Unique identifier of the message effect to be
+                added to the message; only available when forwarding to private chats
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1388,6 +1393,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             direct_messages_topic_id=direct_messages_topic_id,
+            message_effect_id=message_effect_id,
         )
 
     async def forward_messages(
@@ -8414,6 +8420,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
@@ -8475,6 +8482,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
 
                 .. versionadded:: 22.4
+            message_effect_id (:obj:`str`, optional): Unique identifier of the message effect to be
+                added to the message; only available when copying to private chats
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -8537,6 +8546,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "direct_messages_topic_id": direct_messages_topic_id,
             "video_start_timestamp": video_start_timestamp,
             "suggested_post_parameters": suggested_post_parameters,
+            "message_effect_id": message_effect_id,
         }
 
         result = await self._post(

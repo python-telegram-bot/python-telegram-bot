@@ -1866,6 +1866,7 @@ class User(TelegramObject):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1912,6 +1913,7 @@ class User(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def copy_message(
@@ -1931,6 +1933,7 @@ class User(TelegramObject):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1977,6 +1980,7 @@ class User(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def send_copies(
@@ -2083,6 +2087,7 @@ class User(TelegramObject):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2119,6 +2124,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def forward_to(
@@ -2131,6 +2137,7 @@ class User(TelegramObject):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2168,6 +2175,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def forward_messages_from(
