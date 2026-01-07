@@ -271,7 +271,7 @@ def message(bot):
                     gift_id="gift_id",
                     base_name="human_readable_name",
                     name="unique_name",
-                    numuber=2,
+                    number=2,
                     model=UniqueGiftModel(
                         "model_name",
                         Sticker("file_id1", "file_unique_id1", 512, 512, False, False, "regular"),
@@ -282,7 +282,7 @@ def message(bot):
                         Sticker("file_id2", "file_unique_id2", 512, 512, True, True, "mask"),
                         20,
                     ),
-                    backdroup=UniqueGiftBackdrop(
+                    backdrop=UniqueGiftBackdrop(
                         "backdrop_name",
                         UniqueGiftBackdropColors(0x00FF00, 0xEE00FF, 0xAA22BB, 0x20FE8F),
                         30,
