@@ -2804,7 +2804,8 @@ class TestBotWithoutRequest:
             for param in (
                 "chat_id",
                 "exclude_saved",
-                "exclude_unsavedexclude_unlimited",
+                "exclude_unsaved",
+                "exclude_unlimited",
                 "exclude_limited_upgradable",
                 "exclude_limited_non_upgradable",
                 "exclude_from_blockchain",
@@ -2821,6 +2822,8 @@ class TestBotWithoutRequest:
 
         await offline_bot.get_chat_gifts(
             chat_id="chat_id",
+            exclude_saved="exclude_saved",
+            exclude_unsaved="exclude_unsaved",
             exclude_unlimited="exclude_unlimited",
             exclude_limited_upgradable="exclude_limited_upgradable",
             exclude_limited_non_upgradable="exclude_limited_non_upgradable",
