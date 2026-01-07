@@ -829,3 +829,30 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "remove_user_verification", make_assertion)
         assert await user.remove_verification()
+
+    async def test_instance_method_repost_story(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["from_chat_id"] == user.id
+
+        assert check_shortcut_signature(
+            User.repost_story,
+            Bot.repost_story,
+            [
+                "from_chat_id",
+            ],
+            additional_kwargs=[],
+        )
+        assert await check_shortcut_call(
+            user.repost_story,
+            user.get_bot(),
+            "repost_story",
+            shortcut_kwargs=["from_chat_id"],
+        )
+        assert await check_defaults_handling(user.repost_story, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "repost_story", make_assertion)
+        assert await user.repost_story(
+            business_connection_id="bcid",
+            from_story_id=123,
+            active_period=3600,
+        )

@@ -445,6 +445,8 @@
       - Used for setting the business accounts profile photo
     * - :meth:`~telegram.Bot.post_story`
       - Used for posting a story on behalf of business account.
+    * - :meth:`~telegram.Bot.repost_story`
+      - Used for reposting an existing story on behalf of business account.
     * - :meth:`~telegram.Bot.edit_story`
       - Used for editing business stories posted by the bot.
     * - :meth:`~telegram.Bot.convert_gift_to_stars`
