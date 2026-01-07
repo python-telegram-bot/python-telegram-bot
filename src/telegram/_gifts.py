@@ -189,6 +189,14 @@ class GiftInfo(TelegramObject):
             appear in the text.
         is_private (:obj:`bool`, optional): :obj:`True`, if the sender and gift text are
             shown only to the gift receiver; otherwise, everyone will be able to see them.
+        is_upgrade_separate (:obj:`bool`, optional): :obj:`True`, if the gift's upgrade was
+            purchased after the gift was sent.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift_number (:obj:`int`, optional): Unique number reserved for this gift when
+            upgraded. See the number field in UniqueGift.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         gift (:class:`Gift`): Information about the gift.
@@ -206,6 +214,14 @@ class GiftInfo(TelegramObject):
             appear in the text.
         is_private (:obj:`bool`): Optional. :obj:`True`, if the sender and gift text are
             shown only to the gift receiver; otherwise, everyone will be able to see them.
+        is_upgrade_separate (:obj:`bool`): Optional. :obj:`True`, if the gift's upgrade was
+            purchased after the gift was sent.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift_number (:obj:`int`): Optional. Unique number reserved for this gift when
+            upgraded. See the number field in UniqueGift.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -215,9 +231,11 @@ class GiftInfo(TelegramObject):
         "entities",
         "gift",
         "is_private",
+        "is_upgrade_separate",
         "owned_gift_id",
         "prepaid_upgrade_star_count",
         "text",
+        "unique_gift_number",
     )
 
     def __init__(
@@ -230,6 +248,8 @@ class GiftInfo(TelegramObject):
         text: str | None = None,
         entities: Sequence[MessageEntity] | None = None,
         is_private: bool | None = None,
+        unique_gift_number: int | None = None,
+        is_upgrade_separate: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -244,6 +264,8 @@ class GiftInfo(TelegramObject):
         self.text: str | None = text
         self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
         self.is_private: bool | None = is_private
+        self.unique_gift_number: int | None = unique_gift_number
+        self.is_upgrade_separate: bool | None = is_upgrade_separate
 
         self._id_attrs = (self.gift,)
 
