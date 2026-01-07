@@ -191,6 +191,8 @@ PTB_IGNORED_PARAMS = {
     r"OwnedGift\w+": {"type"},
     r"InputStoryContent\w+": {"type"},
     r"StoryAreaType\w+": {"type"},
+    # Official API field not yet implemented in PTB
+    "User": {"has_topics_enabled"},
 }
 
 
