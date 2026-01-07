@@ -2803,7 +2803,8 @@ class TestBotWithoutRequest:
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             for param in (
                 "chat_id",
-                "exclude_unlimited",
+                "exclude_saved",
+                "exclude_unsavedexclude_unlimited",
                 "exclude_limited_upgradable",
                 "exclude_limited_non_upgradable",
                 "exclude_from_blockchain",
