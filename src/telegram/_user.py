@@ -2562,6 +2562,8 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.repost_story`.
 
+        .. versionadded:: NEXT.VERSION
+
         Returns:
             :class:`Story`: On success, :class:`Story` is returned.
 
