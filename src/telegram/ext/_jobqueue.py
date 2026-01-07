@@ -52,6 +52,18 @@ _ALL_DAYS = tuple(range(7))
 _LOGGER = get_logger(__name__, class_name="JobQueue")
 
 
+def _get_callback_name(callback: object) -> str:
+    """Get the name of a callback function or callable object.
+    
+    Args:
+        callback: A callable object (function, method, or callable class instance)
+        
+    Returns:
+        The name of the callback, using __name__ if available, otherwise the class name.
+    """
+    return getattr(callback, "__name__", None) or callback.__class__.__name__
+
+
 class JobQueue(Generic[CCT]):
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
@@ -312,7 +324,7 @@ class JobQueue(Generic[CCT]):
         if not job_kwargs:
             job_kwargs = {}
 
-        name = name or callback.__name__
+        name = name or _get_callback_name(callback)
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
         date_time = self._parse_time_input(when, shift_day=True)
 
@@ -430,7 +442,7 @@ class JobQueue(Generic[CCT]):
         if not job_kwargs:
             job_kwargs = {}
 
-        name = name or callback.__name__
+        name = name or _get_callback_name(callback)
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         dt_first = self._parse_time_input(first)
@@ -516,7 +528,7 @@ class JobQueue(Generic[CCT]):
         if not job_kwargs:
             job_kwargs = {}
 
-        name = name or callback.__name__
+        name = name or _get_callback_name(callback)
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(
@@ -599,7 +611,7 @@ class JobQueue(Generic[CCT]):
         if not job_kwargs:
             job_kwargs = {}
 
-        name = name or callback.__name__
+        name = name or _get_callback_name(callback)
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(
@@ -662,7 +674,7 @@ class JobQueue(Generic[CCT]):
             queue.
 
         """
-        name = name or callback.__name__
+        name = name or _get_callback_name(callback)
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(self.job_callback, args=(self, job), name=name, **job_kwargs)
@@ -832,7 +844,7 @@ class Job(Generic[CCT]):
 
         self.callback: JobCallback[CCT] = callback
         self.data: object | None = data
-        self.name: str | None = name or callback.__name__
+        self.name: str | None = name or _get_callback_name(callback)
         self.chat_id: int | None = chat_id
         self.user_id: int | None = user_id
 
@@ -899,7 +911,7 @@ class Job(Generic[CCT]):
             self,
             id=self.job.id,
             name=self.name,
-            callback=self.callback.__name__,
+            callback=_get_callback_name(self.callback),
             trigger=self.job.trigger,
         )
 
