@@ -5905,7 +5905,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             can_invite_users (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 invite new users to the chat.
             can_restrict_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
-                can restrict, ban or unban chat members, or access supergroup statistics.
+                can restrict, ban or unban chat members, or access supergroup statistics. For
+                backward compatibility, defaults to :obj:`True` for promotions of channel
+                administrators
             can_pin_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 pin messages, for supergroups only.
             can_promote_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
