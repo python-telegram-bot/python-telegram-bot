@@ -319,9 +319,11 @@ class AcceptedGiftTypes(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal if their :attr:`unlimited_gifts`, :attr:`limited_gifts`,
-    :attr:`unique_gifts` and :attr:`premium_subscription` are equal.
+    :attr:`unique_gifts`, :attr:`premium_subscription` and :attr:`gifts_from_channels` are equal.
 
     .. versionadded:: 22.1
+    .. versionchanged:: NEXT.VERSION
+        :attr:`gifts_from_channels` is now considered for equality checks.
 
     Args:
         unlimited_gifts (:class:`bool`): :obj:`True`, if unlimited regular gifts are accepted.
@@ -330,6 +332,10 @@ class AcceptedGiftTypes(TelegramObject):
             to unique for free are accepted.
         premium_subscription (:class:`bool`): :obj:`True`, if a Telegram Premium subscription
             is accepted.
+        gifts_from_channels (:obj:`bool`): :obj:`True`, if transfers of unique gifts from channels
+            are accepted
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         unlimited_gifts (:class:`bool`): :obj:`True`, if unlimited regular gifts are accepted.
@@ -338,10 +344,15 @@ class AcceptedGiftTypes(TelegramObject):
             to unique for free are accepted.
         premium_subscription (:class:`bool`): :obj:`True`, if a Telegram Premium subscription
             is accepted.
+        gifts_from_channels (:obj:`bool`): :obj:`True`, if transfers of unique gifts from channels
+            are accepted
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
     __slots__ = (
+        "gifts_from_channels",
         "limited_gifts",
         "premium_subscription",
         "unique_gifts",
@@ -354,6 +365,7 @@ class AcceptedGiftTypes(TelegramObject):
         limited_gifts: bool,
         unique_gifts: bool,
         premium_subscription: bool,
+        gifts_from_channels: bool,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -362,12 +374,14 @@ class AcceptedGiftTypes(TelegramObject):
         self.limited_gifts: bool = limited_gifts
         self.unique_gifts: bool = unique_gifts
         self.premium_subscription: bool = premium_subscription
+        self.gifts_from_channels: bool = gifts_from_channels
 
         self._id_attrs = (
             self.unlimited_gifts,
             self.limited_gifts,
             self.unique_gifts,
             self.premium_subscription,
+            self.gifts_from_channels,
         )
 
         self._freeze()
