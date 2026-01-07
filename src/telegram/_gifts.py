@@ -34,6 +34,55 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+class GiftBackground(TelegramObject):
+    """This object describes the background of a gift.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal if their :attr:`center_color`, :attr:`edge_color` and :attr:`text_color` are
+    equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        center_color (:obj:`int`): Center color of the background in RGB format.
+        edge_color (:obj:`int`): Edge color of the background in RGB format.
+        text_color (:obj:`int`): Text color of the background in RGB format.
+
+    Attributes:
+        center_color (:obj:`int`): Center color of the background in RGB format.
+        edge_color (:obj:`int`): Edge color of the background in RGB format.
+        text_color (:obj:`int`): Text color of the background in RGB format.
+
+    """
+
+    __slots__ = (
+        "center_color",
+        "edge_color",
+        "text_color",
+    )
+
+    def __init__(
+        self,
+        center_color: int,
+        edge_color: int,
+        text_color: int,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.center_color: int = center_color
+        self.edge_color: int = edge_color
+        self.text_color: int = text_color
+
+        self._id_attrs = (
+            self.center_color,
+            self.edge_color,
+            self.text_color,
+        )
+
+        self._freeze()
+
+
 class Gift(TelegramObject):
     """This object represents a gift that can be sent by the bot.
 

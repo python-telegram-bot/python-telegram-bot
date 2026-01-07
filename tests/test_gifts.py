@@ -21,10 +21,75 @@ from collections.abc import Sequence
 import pytest
 
 from telegram import BotCommand, Chat, Gift, GiftInfo, Gifts, MessageEntity, Sticker
-from telegram._gifts import AcceptedGiftTypes
+from telegram._gifts import AcceptedGiftTypes, GiftBackground
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.request import RequestData
 from tests.auxil.slots import mro_slots
+
+
+@pytest.fixture
+def gift_background():
+    return GiftBackground(
+        center_color=GiftBackgroundTestBase.center_color,
+        edge_color=GiftBackgroundTestBase.edge_color,
+        text_color=GiftBackgroundTestBase.text_color,
+    )
+
+
+class GiftBackgroundTestBase:
+    center_color = 0xFFFFFF
+    edge_color = 0x000000
+    text_color = 0xFF0000
+
+
+class TestGiftBackgroundWithoutRequest(GiftBackgroundTestBase):
+    def test_slot_behaviour(self, gift_background):
+        for attr in gift_background.__slots__:
+            assert getattr(gift_background, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(gift_background)) == len(set(mro_slots(gift_background))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "center_color": self.center_color,
+            "edge_color": self.edge_color,
+            "text_color": self.text_color,
+        }
+        gift_background = GiftBackground.de_json(json_dict, offline_bot)
+        assert gift_background.api_kwargs == {}
+        assert gift_background.center_color == self.center_color
+        assert gift_background.edge_color == self.edge_color
+        assert gift_background.text_color == self.text_color
+
+    def test_to_dict(self, gift_background):
+        json_dict = gift_background.to_dict()
+        assert json_dict["center_color"] == self.center_color
+        assert json_dict["edge_color"] == self.edge_color
+        assert json_dict["text_color"] == self.text_color
+
+    def test_equality(self, gift_background):
+        a = gift_background
+        b = GiftBackground(
+            self.center_color,
+            self.edge_color,
+            self.text_color,
+        )
+        c = GiftBackground(
+            0x000000,
+            self.edge_color,
+            self.text_color,
+        )
+        d = BotCommand("start", "description")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
 
 
 @pytest.fixture
