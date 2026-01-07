@@ -11688,10 +11688,10 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             from_story_id (:obj:`int`): Unique identifier of the story that should be reposted
             active_period (:obj:`int`): Period after which the story is moved to the archive, in
                 seconds; must be one of
-                :tg-const:`telegram.constants.StoryRepostActivePeriod.SIX_HOURS`,
-                :tg-const:`telegram.constants.StoryRepostActivePeriod.TWELVE_HOURS`,
-                :tg-const:`telegram.constants.StoryRepostActivePeriod.ONE_DAY`, or
-                :tg-const:`telegram.constants.StoryRepostActivePeriod.TWO_DAYS`.
+                :tg-const:`telegram.constants.StoryLimit.SIX_HOURS`,
+                :tg-const:`telegram.constants.StoryLimit.TWELVE_HOURS`,
+                :tg-const:`telegram.constants.StoryLimit.ONE_DAY`, or
+                :tg-const:`telegram.constants.StoryLimit.TWO_DAYS`.
             post_to_chat_page (:obj:`bool`, optional): Pass :obj:`True` to keep the story
                 accessible after it expires.
             protect_content (:obj:`bool`, optional): Pass :obj:`True` if the content of the story

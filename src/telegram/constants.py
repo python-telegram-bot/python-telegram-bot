@@ -117,7 +117,6 @@ __all__ = [
     "StoryAreaTypeLimit",
     "StoryAreaTypeType",
     "StoryLimit",
-    "StoryRepostActivePeriod",
     "SuggestedPost",
     "SuggestedPostInfoState",
     "SuggestedPostRefunded",
@@ -3080,37 +3079,17 @@ class StoryLimit(IntEnum):
     :meth:`telegram.Bot.edit_story`.
     """
     ACTIVITY_SIX_HOURS = 6 * 3600
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_TWELVE_HOURS = 12 * 3600
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_ONE_DAY = 86400
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_TWO_DAYS = 2 * 86400
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
-
-
-class StoryRepostActivePeriod(IntEnum):
-    """This enum contains available active periods for
-    :paramref:`~telegram.Bot.repost_story.active_period` of :meth:`~telegram.Bot.repost_story`.
-    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
-
-    .. versionadded:: NEXT.VERSION
-    """
-
-    __slots__ = ()
-
-    SIX_HOURS = 6 * 3600
-    """:obj:`int`: Story repost is active for 6 hours."""
-    TWELVE_HOURS = 12 * 3600
-    """:obj:`int`: Story repost is active for 12 hours."""
-    ONE_DAY = 86400
-    """:obj:`int`: Story repost is active for 1 day."""
-    TWO_DAYS = 2 * 86400
-    """:obj:`int`: Story repost is active for 2 days."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
 
 
 class SuggestedPost(IntEnum):
