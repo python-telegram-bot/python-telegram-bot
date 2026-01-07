@@ -54,10 +54,10 @@ _LOGGER = get_logger(__name__, class_name="JobQueue")
 
 def _get_callback_name(callback: object) -> str:
     """Get the name of a callback function or callable object.
-    
+
     Args:
         callback: A callable object (function, method, or callable class instance)
-        
+
     Returns:
         The name of the callback, using __name__ if available, otherwise the class name.
     """

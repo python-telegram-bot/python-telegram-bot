@@ -27,7 +27,14 @@ import time
 
 import pytest
 
-from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Defaults, Job, JobQueue
+from telegram.ext import (
+    ApplicationBuilder,
+    CallbackContext,
+    ContextTypes,
+    Defaults,
+    Job,
+    JobQueue,
+)
 from tests.auxil.envvars import GITHUB_ACTIONS, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
@@ -189,7 +196,6 @@ class TestJobQueue:
 
     def test_callback_name_without_name_attribute(self, app):
         """Test that callable class instances work as job callbacks (issue #4992)"""
-        from telegram.ext import ContextTypes
 
         class CallableJob:
             async def __call__(self, context: ContextTypes.DEFAULT_TYPE):
@@ -221,12 +227,15 @@ class TestJobQueue:
 
         # Test with run_custom
         job5 = jq.run_custom(
-            job_instance, {"trigger": "date", "run_date": dtm.datetime.now() + dtm.timedelta(seconds=10)}
+            job_instance,
+            {"trigger": "date", "run_date": dtm.datetime.now() + dtm.timedelta(seconds=10)},
         )
         assert job5.name == "CallableJob", f"Expected 'CallableJob', got '{job5.name}'"
 
         # Test Job.__repr__ uses the correct name
-        assert "callback=CallableJob" in repr(job), f"repr should contain 'callback=CallableJob', got: {repr(job)}"
+        assert "callback=CallableJob" in repr(job), (
+            f"repr should contain 'callback=CallableJob', got: {job!r}"
+        )
 
     async def test_run_repeating(self, job_queue):
         job_queue.run_repeating(self.job_run_once, 0.1)
