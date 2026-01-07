@@ -2105,6 +2105,8 @@ class Message(MaybeInaccessibleMessage):
         Note:
             |reply_same_thread|
 
+        .. versionadded:: NEXT.VERSION
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
