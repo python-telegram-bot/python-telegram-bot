@@ -147,7 +147,7 @@ class ChatFullInfoTestBase:
     first_name = "first_name"
     last_name = "last_name"
     can_send_paid_media = True
-    accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
+    accepted_gift_types = AcceptedGiftTypes(True, True, True, True, True)
     is_direct_messages = True
     parent_chat = Chat(4, "channel", "channel")
 
