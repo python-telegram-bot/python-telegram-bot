@@ -70,6 +70,7 @@ if TYPE_CHECKING:
         PhotoSize,
         ReplyParameters,
         Sticker,
+        Story,
         SuggestedPostParameters,
         UserChatBoosts,
         Venue,
@@ -3893,6 +3894,47 @@ class _ChatBase(TelegramObject):
             chat_id=self.id,
             message_id=message_id,
             comment=comment,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def repost_story(
+        self,
+        business_connection_id: str,
+        from_story_id: int,
+        active_period: int,
+        post_to_chat_page: bool | None = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Story":
+        """Shortcut for::
+
+             await bot.repost_story(
+                from_chat_id=update.effective_chat.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.repost_story`.
+
+        Returns:
+            :class:`Story`: On success, :class:`Story` is returned.
+
+        """
+        return await self.get_bot().repost_story(
+            business_connection_id=business_connection_id,
+            from_chat_id=self.id,
+            from_story_id=from_story_id,
+            active_period=active_period,
+            post_to_chat_page=post_to_chat_page,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

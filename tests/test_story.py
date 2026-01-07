@@ -77,7 +77,7 @@ class TestStoryWithoutRequest(StoryTestBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_shortcut_method_repost(self, monkeypatch, story):
+    async def test_instance_method_repost(self, monkeypatch, story):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["from_chat_id"] == story.chat.id
             story_id = kwargs["from_story_id"] == story.id
@@ -98,9 +98,7 @@ class TestStoryWithoutRequest(StoryTestBase):
             "repost_story",
             shortcut_kwargs=["from_chat_id", "from_story_id"],
         )
-        assert await check_defaults_handling(
-            story.repost, story.get_bot(), no_default_kwargs={"message_thread_id"}
-        )
+        assert await check_defaults_handling(story.repost, story.get_bot())
 
         monkeypatch.setattr(story.get_bot(), "repost_story", make_assertion)
         assert await story.repost(

@@ -1510,6 +1510,33 @@ class TestChatWithoutRequest(ChatTestBase):
         monkeypatch.setattr(chat.get_bot(), "decline_suggested_post", make_assertion)
         assert await chat.decline_suggested_post(message_id="message_id", comment="comment")
 
+    async def test_instance_method_repost(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["from_chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.repost_story,
+            Bot.repost_story,
+            [
+                "from_chat_id",
+            ],
+            additional_kwargs=[],
+        )
+        assert await check_shortcut_call(
+            chat.repost_story,
+            chat.get_bot(),
+            "repost_story",
+            shortcut_kwargs=["from_chat_id"],
+        )
+        assert await check_defaults_handling(chat.repost_story, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "repost_story", make_assertion)
+        assert await chat.repost_story(
+            business_connection_id="bcid",
+            from_story_id=123,
+            active_period=3600,
+        )
+
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
