@@ -1510,7 +1510,7 @@ class TestChatWithoutRequest(ChatTestBase):
         monkeypatch.setattr(chat.get_bot(), "decline_suggested_post", make_assertion)
         assert await chat.decline_suggested_post(message_id="message_id", comment="comment")
 
-    async def test_instance_method_repost(self, monkeypatch, chat):
+    async def test_instance_method_repost_story(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs["from_chat_id"] == chat.id
 
