@@ -3134,6 +3134,36 @@ class ExtBot(Bot, Generic[RLARGS]):
             suggested_post_parameters=suggested_post_parameters,
         )
 
+    async def send_message_draft(
+        self,
+        chat_id: int,
+        draft_id: int,
+        text: str,
+        message_thread_id: int | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        entities: Sequence["MessageEntity"] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().send_message_draft(
+            chat_id=chat_id,
+            draft_id=draft_id,
+            text=text,
+            message_thread_id=message_thread_id,
+            parse_mode=parse_mode,
+            entities=entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def send_photo(
         self,
         chat_id: int | str,
@@ -5281,6 +5311,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
+    sendMessageDraft = send_message_draft
     deleteMessage = delete_message
     deleteMessages = delete_messages
     forwardMessage = forward_message

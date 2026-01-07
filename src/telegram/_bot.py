@@ -1200,6 +1200,69 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
+    async def send_message_draft(
+        self,
+        chat_id: int,
+        draft_id: int,
+        text: str,
+        message_thread_id: int | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        entities: Sequence["MessageEntity"] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Use this method to stream a partial message to a user while the message is being
+        generated; supported only for bots with forum topic mode enabled.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int`): Unique identifier for the target private chat.
+            draft_id (:obj:`int`): Unique identifier of the message draft; must be non-zero.
+                Changes of drafts with the same identifier are animated.
+            text (:obj:`str`): Text of the message to be sent,
+                :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
+                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                entities parsing.
+            parse_mode (:obj:`str`): |parse_mode|
+            entities (Sequence[:class:`telegram.MessageEntity`], optional): Sequence of special
+                entities that appear in message text, which can be specified instead of
+                :paramref:`parse_mode`.
+
+                    |sequenceargs|
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target
+                message thread.
+
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "draft_id": draft_id,
+            "text": text,
+            "entities": entities,
+        }
+        return await self._send_message(
+            "sendMessageDraft",
+            data,
+            message_thread_id=message_thread_id,
+            parse_mode=parse_mode,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def delete_messages(
         self,
         chat_id: int | str,
@@ -3721,7 +3784,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             action(:obj:`str`): Type of action to broadcast. Choose one, depending on what the user
                 is about to receive. For convenience look at the constants in
                 :class:`telegram.constants.ChatAction`.
-            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread or topic of a forum; for supergroups and private chats of bots with forum
+                topic mode enabled only
 
                 .. versionadded:: 20.0
             business_connection_id (:obj:`str`, optional): |business_id_str|
@@ -8905,8 +8970,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: JSONDict | None = None,
     ) -> bool:
         """
-        Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must
-        be an administrator in the chat for this to work and must have the
+        Use this method to edit name and icon of a topic in a forum supergroup chat or a private
+        chat with a user. In the case of a supergroup chat the bot must be an administrator in the
+        chat for this to work and must have the
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
         unless it is the creator of the topic.
 
@@ -9048,7 +9114,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """
         Use this method to delete a forum topic along with all its messages in a forum supergroup
-        chat. The bot must be an administrator in the chat for this to work and must have
+        chat or a private chat with a user. In the case of a supergroup chat the bot must be an
+        administrator in the chat for this to work and must have the
         :paramref:`~telegram.ChatAdministratorRights.can_delete_messages` administrator rights.
 
         .. versionadded:: 20.0
@@ -9090,10 +9157,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: JSONDict | None = None,
     ) -> bool:
         """
-        Use this method to clear the list of pinned messages in a forum topic. The bot must
-        be an administrator in the chat for this to work and must have
-        :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator rights
-        in the supergroup.
+        Use this method to clear the list of pinned messages in a forum topic in a forum supergroup
+        chat or a private chat with a user. In the case of a supergroup chat the bot must be an
+        administrator in the chat for this to work and must have the
+        :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator right in
+        the supergroup.
 
         .. versionadded:: 20.0
 
@@ -11591,6 +11659,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_me`"""
     sendMessage = send_message
     """Alias for :meth:`send_message`"""
+    sendMessageDraft = send_message_draft
+    """Alias for :meth:`send_message_draft`"""
     deleteMessage = delete_message
     """Alias for :meth:`delete_message`"""
     deleteMessages = delete_messages

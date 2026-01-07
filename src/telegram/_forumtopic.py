@@ -38,6 +38,10 @@ class ForumTopic(TelegramObject):
         icon_color (:obj:`int`): Color of the topic icon in RGB format
         icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the custom emoji shown
             as the topic icon.
+        is_name_implicit (:obj:`bool`, optional): :obj:`True`, if the name of the topic wasn't
+            specified explicitly by its creator and likely needs to be changed by the bot.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_thread_id (:obj:`int`): Unique identifier of the forum topic
@@ -45,9 +49,19 @@ class ForumTopic(TelegramObject):
         icon_color (:obj:`int`): Color of the topic icon in RGB format
         icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji shown
             as the topic icon.
+        is_name_implicit (:obj:`bool`): Optional. :obj:`True`, if the name of the topic wasn't
+            specified explicitly by its creator and likely needs to be changed by the bot.
+
+            .. versionadded:: NEXT.VERSION
     """
 
-    __slots__ = ("icon_color", "icon_custom_emoji_id", "message_thread_id", "name")
+    __slots__ = (
+        "icon_color",
+        "icon_custom_emoji_id",
+        "is_name_implicit",
+        "message_thread_id",
+        "name",
+    )
 
     def __init__(
         self,
@@ -55,6 +69,7 @@ class ForumTopic(TelegramObject):
         name: str,
         icon_color: int,
         icon_custom_emoji_id: str | None = None,
+        is_name_implicit: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -63,6 +78,7 @@ class ForumTopic(TelegramObject):
         self.name: str = name
         self.icon_color: int = icon_color
         self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
+        self.is_name_implicit: bool | None = is_name_implicit
 
         self._id_attrs = (self.message_thread_id, self.name, self.icon_color)
 
@@ -84,21 +100,30 @@ class ForumTopicCreated(TelegramObject):
         icon_color (:obj:`int`): Color of the topic icon in RGB format
         icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the custom emoji shown
             as the topic icon.
+        is_name_implicit (:obj:`bool`, optional): :obj:`True`, if the name of the topic wasn't
+            specified explicitly by its creator and likely needs to be changed by the bot.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         name (:obj:`str`): Name of the topic
         icon_color (:obj:`int`): Color of the topic icon in RGB format
         icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji shown
             as the topic icon.
+        is_name_implicit (:obj:`bool`): Optional. :obj:`True`, if the name of the topic wasn't
+            specified explicitly by its creator and likely needs to be changed by the bot.
+
+            .. versionadded:: NEXT.VERSION
     """
 
-    __slots__ = ("icon_color", "icon_custom_emoji_id", "name")
+    __slots__ = ("icon_color", "icon_custom_emoji_id", "is_name_implicit", "name")
 
     def __init__(
         self,
         name: str,
         icon_color: int,
         icon_custom_emoji_id: str | None = None,
+        is_name_implicit: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -106,6 +131,7 @@ class ForumTopicCreated(TelegramObject):
         self.name: str = name
         self.icon_color: int = icon_color
         self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
+        self.is_name_implicit: bool | None = is_name_implicit
 
         self._id_attrs = (self.name, self.icon_color)
 

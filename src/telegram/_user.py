@@ -112,6 +112,10 @@ class User(TelegramObject):
             Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 21.5
+        has_topics_enabled (:obj:`bool`, optional): :obj:`True`, if the bot has forum topic mode
+            enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -143,6 +147,10 @@ class User(TelegramObject):
             Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 21.5
+        has_topics_enabled (:obj:`bool`): Optional. :obj:`True`, if the bot has forum topic mode
+            enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -156,6 +164,7 @@ class User(TelegramObject):
         "can_read_all_group_messages",
         "first_name",
         "has_main_web_app",
+        "has_topics_enabled",
         "id",
         "is_bot",
         "is_premium",
@@ -180,6 +189,7 @@ class User(TelegramObject):
         added_to_attachment_menu: bool | None = None,
         can_connect_to_business: bool | None = None,
         has_main_web_app: bool | None = None,
+        has_topics_enabled: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -199,6 +209,7 @@ class User(TelegramObject):
         self.added_to_attachment_menu: bool | None = added_to_attachment_menu
         self.can_connect_to_business: bool | None = can_connect_to_business
         self.has_main_web_app: bool | None = has_main_web_app
+        self.has_topics_enabled: bool | None = has_topics_enabled
 
         self._id_attrs = (self.id,)
 
@@ -484,6 +495,49 @@ class User(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+        )
+
+    async def send_message_draft(
+        self,
+        draft_id: int,
+        text: str,
+        message_thread_id: int | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        entities: Sequence["MessageEntity"] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.send_message_draft(update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_message_draft`.
+
+        Note:
+            |user_chat_id_note|
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().send_message_draft(
+            chat_id=self.id,
+            draft_id=draft_id,
+            text=text,
+            message_thread_id=message_thread_id,
+            parse_mode=parse_mode,
+            entities=entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def delete_message(

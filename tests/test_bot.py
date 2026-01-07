@@ -1477,6 +1477,61 @@ class TestBotWithoutRequest:
             "SoSecretToken",
         )
 
+    async def test_send_message_draft(self, offline_bot, monkeypatch):
+        entities = [
+            MessageEntity(MessageEntity.BOLD, 0, 3),
+            MessageEntity(MessageEntity.ITALIC, 5, 8),
+        ]
+
+        async def make_assertions(*args, **kwargs):
+            params = kwargs.get("request_data").parameters
+            assert params.get("chat_id") == 123
+            assert params.get("draft_id") == 1
+            assert params.get("text") == "test test"
+            assert params.get("message_thread_id") == 9
+            assert params.get("parse_mode") == "markdown"
+            assert params.get("entities") == [e.to_dict() for e in entities]
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertions)
+        assert await offline_bot.send_message_draft(
+            chat_id=123,
+            draft_id=1,
+            text="test test",
+            message_thread_id=9,
+            parse_mode="markdown",
+            entities=entities,
+        )
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, "Markdown"), ("HTML", "HTML"), (None, None)],
+    )
+    async def test_send_message_draft_default_parse_mode(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("parse_mode") == expected_value
+            return True
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "chat_id": 123,
+            "draft_id": 1,
+            "text": "test test",
+            "message_thread_id": 9,
+            "entities": [
+                MessageEntity(MessageEntity.BOLD, 0, 3),
+                MessageEntity(MessageEntity.ITALIC, 5, 8),
+            ],
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["parse_mode"] = passed_value
+
+        await default_bot.send_message_draft(**kwargs)
+
     # TODO: Needs improvement. Need incoming shipping queries to test
     async def test_answer_shipping_query_ok(self, monkeypatch, offline_bot):
         # For now just test that our internals pass the correct data
