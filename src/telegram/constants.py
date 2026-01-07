@@ -2180,6 +2180,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 22.1
     """
+    GIFT_UPGRADE_SENT = "gift_upgrade_sent"
+    """:obj:`str`: Messages with :attr:`telegram.Message.gift_upgrade_sent`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
 

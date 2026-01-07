@@ -558,6 +558,10 @@ class Message(MaybeInaccessibleMessage):
             was sent or received
 
             .. versionadded:: 22.1
+        gift_upgrade_sent (:class:`telegram.GiftInfo`, optional): Service message: upgrade of a
+            gift was purchased after the gift was sent
+
+            .. versionadded:: NEXT.VERSION
         giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
             scheduled giveaway was created
 
@@ -957,6 +961,10 @@ class Message(MaybeInaccessibleMessage):
             was sent or received
 
             .. versionadded:: 22.1
+        gift_upgrade_sent (:class:`telegram.GiftInfo`): Otional. Service message: upgrade of a
+            gift was purchased after the gift was sent
+
+            .. versionadded:: NEXT.VERSION
         giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
             scheduled giveaway was created
 
@@ -1125,6 +1133,7 @@ class Message(MaybeInaccessibleMessage):
         "general_forum_topic_hidden",
         "general_forum_topic_unhidden",
         "gift",
+        "gift_upgrade_sent",
         "giveaway",
         "giveaway_completed",
         "giveaway_created",
@@ -1296,6 +1305,7 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_info: "SuggestedPostInfo | None" = None,
         suggested_post_approved: "SuggestedPostApproved | None" = None,
         suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
+        gift_upgrade_sent: GiftInfo | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1422,6 +1432,7 @@ class Message(MaybeInaccessibleMessage):
             self.suggested_post_approval_failed: SuggestedPostApprovalFailed | None = (
                 suggested_post_approval_failed
             )
+            self.gift_upgrade_sent: GiftInfo | None = gift_upgrade_sent
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1637,6 +1648,7 @@ class Message(MaybeInaccessibleMessage):
         data["suggested_post_approval_failed"] = de_json_optional(
             data.get("suggested_post_approval_failed"), SuggestedPostApprovalFailed, bot
         )
+        data["gift_upgrade_sent"] = de_json_optional(data.get("gift_upgrade_sent"), GiftInfo, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
