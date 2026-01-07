@@ -108,6 +108,29 @@ class Gift(TelegramObject):
             published the gift.
 
             .. versionadded:: 22.4
+        personal_total_count (:obj:`int`, optional): The total number of gifts of this type that
+            can be sent by the bot; for limited gifts only.
+
+            .. versionadded:: NEXT.VERSION
+        personal_remaining_count (:obj:`int`, optional): The number of remaining gifts of this type
+            that can be sent by the bot; for limited gifts only.
+
+            .. versionadded:: NEXT.VERSION
+        background (:class:`GiftBackground`, optional): Background of the gift.
+
+            .. versionadded:: NEXT.VERSION
+        is_premium (:obj:`bool`, optional): :obj:`True`, if the gift can only be purchased by
+            Telegram Premium subscribers.
+
+            .. versionadded:: NEXT.VERSION
+        has_colors (:obj:`bool`, optional): :obj:`True`, if the gift can be used (after being
+            upgraded) to customize a user's appearance.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift_variant_count (:obj:`int`, optional): The total number of different unique
+            gifts that can be obtained by upgrading the gift.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`str`): Unique identifier of the gift.
@@ -126,16 +149,45 @@ class Gift(TelegramObject):
             published the gift.
 
             .. versionadded:: 22.4
+        personal_total_count (:obj:`int`): optional. The total number of gifts of this type that
+            can be sent by the bot; for limited gifts only.
+
+            .. versionadded:: NEXT.VERSION
+        personal_remaining_count (:obj:`int`): optional. The number of remaining gifts of this type
+            that can be sent by the bot; for limited gifts only.
+
+            .. versionadded:: NEXT.VERSION
+        background (:class:`GiftBackground`): optional. Background of the gift.
+
+            .. versionadded:: NEXT.VERSION
+        is_premium (:obj:`bool`): optional. :obj:`True`, if the gift can only be purchased by
+            Telegram Premium subscribers.
+
+            .. versionadded:: NEXT.VERSION
+        has_colors (:obj:`bool`): optional. :obj:`True`, if the gift can be used (after being
+            upgraded) to customize a user's appearance.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift_variant_count (:obj:`int`): optional. The total number of different unique
+            gifts that can be obtained by upgrading the gift.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
     __slots__ = (
+        "background",
+        "has_colors",
         "id",
+        "is_premium",
+        "personal_remaining_count",
+        "personal_total_count",
         "publisher_chat",
         "remaining_count",
         "star_count",
         "sticker",
         "total_count",
+        "unique_gift_variant_count",
         "upgrade_star_count",
     )
 
@@ -148,6 +200,12 @@ class Gift(TelegramObject):
         remaining_count: int | None = None,
         upgrade_star_count: int | None = None,
         publisher_chat: Chat | None = None,
+        personal_total_count: int | None = None,
+        personal_remaining_count: int | None = None,
+        background: GiftBackground | None = None,
+        is_premium: bool | None = None,
+        has_colors: bool | None = None,
+        unique_gift_variant_count: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -159,6 +217,12 @@ class Gift(TelegramObject):
         self.remaining_count: int | None = remaining_count
         self.upgrade_star_count: int | None = upgrade_star_count
         self.publisher_chat: Chat | None = publisher_chat
+        self.personal_total_count: int | None = personal_total_count
+        self.personal_remaining_count: int | None = personal_remaining_count
+        self.background: GiftBackground | None = background
+        self.is_premium: bool | None = is_premium
+        self.has_colors: bool | None = has_colors
+        self.unique_gift_variant_count: int | None = unique_gift_variant_count
 
         self._id_attrs = (self.id,)
 
@@ -171,6 +235,7 @@ class Gift(TelegramObject):
 
         data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
         data["publisher_chat"] = de_json_optional(data.get("publisher_chat"), Chat, bot)
+        data["background"] = de_json_optional(data.get("background"), GiftBackground, bot)
         return super().de_json(data=data, bot=bot)
 
 

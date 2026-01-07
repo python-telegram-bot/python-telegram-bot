@@ -102,6 +102,12 @@ def gift(request):
         remaining_count=GiftTestBase.remaining_count,
         upgrade_star_count=GiftTestBase.upgrade_star_count,
         publisher_chat=GiftTestBase.publisher_chat,
+        personal_total_count=GiftTestBase.personal_total_count,
+        personal_remaining_count=GiftTestBase.personal_remaining_count,
+        background=GiftTestBase.background,
+        is_premium=GiftTestBase.is_premium,
+        has_colors=GiftTestBase.has_colors,
+        unique_gift_variant_count=GiftTestBase.unique_gift_variant_count,
     )
 
 
@@ -121,6 +127,12 @@ class GiftTestBase:
     remaining_count = 5
     upgrade_star_count = 10
     publisher_chat = Chat(1, Chat.PRIVATE)
+    personal_total_count = 37
+    personal_remaining_count = 23
+    background = GiftBackground(0xFFFFFF, 0x000000, 0xFF0000)
+    is_premium = True
+    has_colors = True
+    unique_gift_variant_count = 42
 
 
 class TestGiftWithoutRequest(GiftTestBase):
@@ -138,6 +150,12 @@ class TestGiftWithoutRequest(GiftTestBase):
             "remaining_count": self.remaining_count,
             "upgrade_star_count": self.upgrade_star_count,
             "publisher_chat": self.publisher_chat.to_dict(),
+            "personal_total_count": self.personal_total_count,
+            "personal_remaining_count": self.personal_remaining_count,
+            "background": self.background.to_dict(),
+            "is_premium": self.is_premium,
+            "has_colors": self.has_colors,
+            "unique_gift_variant_count": self.unique_gift_variant_count,
         }
         gift = Gift.de_json(json_dict, offline_bot)
         assert gift.api_kwargs == {}
@@ -149,6 +167,12 @@ class TestGiftWithoutRequest(GiftTestBase):
         assert gift.remaining_count == self.remaining_count
         assert gift.upgrade_star_count == self.upgrade_star_count
         assert gift.publisher_chat == self.publisher_chat
+        assert gift.personal_total_count == self.personal_total_count
+        assert gift.personal_remaining_count == self.personal_remaining_count
+        assert gift.background == self.background
+        assert gift.is_premium == self.is_premium
+        assert gift.has_colors == self.has_colors
+        assert gift.unique_gift_variant_count == self.unique_gift_variant_count
 
     def test_to_dict(self, gift):
         gift_dict = gift.to_dict()
@@ -161,6 +185,12 @@ class TestGiftWithoutRequest(GiftTestBase):
         assert gift_dict["remaining_count"] == self.remaining_count
         assert gift_dict["upgrade_star_count"] == self.upgrade_star_count
         assert gift_dict["publisher_chat"] == self.publisher_chat.to_dict()
+        assert gift_dict["personal_total_count"] == self.personal_total_count
+        assert gift_dict["personal_remaining_count"] == self.personal_remaining_count
+        assert gift_dict["background"] == self.background.to_dict()
+        assert gift_dict["is_premium"] == self.is_premium
+        assert gift_dict["has_colors"] == self.has_colors
+        assert gift_dict["unique_gift_variant_count"] == self.unique_gift_variant_count
 
     def test_equality(self, gift):
         a = gift
