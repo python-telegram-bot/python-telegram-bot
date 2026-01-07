@@ -60,6 +60,7 @@ class OwnedGiftTestBase:
         star_count=5,
     )
     unique_gift = UniqueGift(
+        gift_id="gift_id",
         base_name="human_readable",
         name="unique_name",
         number=10,

@@ -227,22 +227,24 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
     def test_equality(self, unique_gift):
         a = unique_gift
         b = UniqueGift(
-            self.base_name,
-            self.name,
-            self.number,
-            self.model,
-            self.symbol,
-            self.backdrop,
-            self.publisher_chat,
+            gift_id=self.gift_id,
+            base_name=self.base_name,
+            name=self.name,
+            number=self.number,
+            model=self.model,
+            symbol=self.symbol,
+            backdrop=self.backdrop,
+            publisher_chat=self.publisher_chat,
         )
         c = UniqueGift(
-            "other_base_name",
-            self.name,
-            self.number,
-            self.model,
-            self.symbol,
-            self.backdrop,
-            self.publisher_chat,
+            gift_id=self.gift_id,
+            base_name="other_base_name",
+            name=self.name,
+            number=self.number,
+            model=self.model,
+            symbol=self.symbol,
+            backdrop=self.backdrop,
+            publisher_chat=self.publisher_chat,
         )
         d = BotCommand("start", "description")
 
