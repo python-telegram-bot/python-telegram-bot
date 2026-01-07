@@ -2010,6 +2010,8 @@ class MessageLimit(IntEnum):
     * :paramref:`~telegram.Bot.send_message.text` parameter of :meth:`telegram.Bot.send_message`
     * :paramref:`~telegram.Bot.edit_message_text.text` parameter of
       :meth:`telegram.Bot.edit_message_text`
+    * :paramref:`~telegram.Bot.send_message_draft.text` parameter of
+      :meth:`telegram.Bot.send_message_draft`
     """
     CAPTION_LENGTH = 1024
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as:
@@ -2025,11 +2027,14 @@ class MessageLimit(IntEnum):
     """
     # constants above this line are tested
     MIN_TEXT_LENGTH = 1
-    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
-    :paramref:`~telegram.InputTextMessageContent.message_text` parameter of
-    :class:`telegram.InputTextMessageContent` and the
-    :paramref:`~telegram.Bot.edit_message_text.text` parameter of
-    :meth:`telegram.Bot.edit_message_text`.
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.InputTextMessageContent.message_text` parameter of
+      :class:`telegram.InputTextMessageContent`.
+    * :paramref:`~telegram.Bot.edit_message_text.text` parameter of
+      :meth:`telegram.Bot.edit_message_text`.
+    * :paramref:`~telegram.Bot.send_message_draft.text` parameter of
+      :meth:`telegram.Bot.send_message_draft`.
     """
     DEEP_LINK_LENGTH = 64
     """:obj:`int`: Maximum number of characters for a deep link."""

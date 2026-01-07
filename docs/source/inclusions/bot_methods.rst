@@ -35,6 +35,8 @@
           - Used for sending media grouped together
         * - :meth:`~telegram.Bot.send_message`
           - Used for sending text messages
+        * - :meth:`~telegram.Bot.send_message_draft`
+          - Used for streaming partial text messages
         * - :meth:`~telegram.Bot.send_paid_media`
           - Used for sending paid media to channels
         * - :meth:`~telegram.Bot.send_photo`

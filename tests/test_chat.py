@@ -524,6 +524,21 @@ class TestChatWithoutRequest(ChatTestBase):
         monkeypatch.setattr(chat.get_bot(), "send_message", make_assertion)
         assert await chat.send_message(text="test")
 
+    async def test_instance_method_send_message_draft(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["text"] == "test"
+
+        assert check_shortcut_signature(
+            Chat.send_message_draft, Bot.send_message_draft, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.send_message_draft, chat.get_bot(), "send_message_draft"
+        )
+        assert await check_defaults_handling(chat.send_message_draft, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_message_draft", make_assertion)
+        assert await chat.send_message_draft(draft_id=1, text="test")
+
     async def test_instance_method_send_media_group(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == chat.id and kwargs["media"] == "test_media_group"
