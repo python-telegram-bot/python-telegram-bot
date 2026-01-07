@@ -21,7 +21,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from telegram._birthdate import Birthdate
 from telegram._chat import Chat, _ChatBase
@@ -532,7 +532,7 @@ class ChatFullInfo(_ChatBase):
         is_direct_messages: bool | None = None,
         parent_chat: Chat | None = None,
         rating: UserRating | None = None,
-        unique_gift_colors: Optional["UniqueGiftColors"] = None,
+        unique_gift_colors: UniqueGiftColors | None = None,
         paid_message_star_count: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
@@ -652,11 +652,9 @@ class ChatFullInfo(_ChatBase):
         )
         data["parent_chat"] = de_json_optional(data.get("parent_chat"), Chat, bot)
 
-        # neu: rating und weitere Felder
         data["rating"] = de_json_optional(data.get("rating"), UserRating, bot)
         data["unique_gift_colors"] = de_json_optional(
             data.get("unique_gift_colors"), UniqueGiftColors, bot
         )
-        data["paid_message_star_count"] = data.get("paid_message_star_count")
 
         return super().de_json(data=data, bot=bot)

@@ -155,7 +155,6 @@ class ChatFullInfoTestBase:
     accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
     is_direct_messages = True
     parent_chat = Chat(4, "channel", "channel")
-    # neu:
     rating = UserRating(level=1, rating=2, current_level_rating=3, next_level_rating=4)
     unique_gift_colors = UniqueGiftColors(
         model_custom_emoji_id="model_custom_emoji_id",
@@ -363,7 +362,6 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
         assert cfi_dict["is_direct_messages"] == cfi.is_direct_messages
         assert cfi_dict["parent_chat"] == cfi.parent_chat.to_dict()
-        # neu:
         assert cfi_dict["rating"] == cfi.rating.to_dict()
         assert cfi_dict["unique_gift_colors"] == cfi.unique_gift_colors.to_dict()
         assert cfi_dict["paid_message_star_count"] == cfi.paid_message_star_count
