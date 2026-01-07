@@ -4809,8 +4809,8 @@ class TestBotWithRequest:
         assert isinstance(balance, StarAmount)
         assert balance.amount == 0
 
-    async def test_get_user_gifts_basic(self, bot, user_id):
-        gifts = await bot.get_user_gifts(user_id)
+    async def test_get_user_gifts_basic(self, bot):
+        gifts = await bot.get_user_gifts(bot.bot.id)
         assert isinstance(gifts, OwnedGifts)
         assert gifts.total_count == 0
 
