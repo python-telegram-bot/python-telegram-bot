@@ -22,7 +22,8 @@ from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -77,3 +78,44 @@ class Story(TelegramObject):
 
         data["chat"] = Chat.de_json(data.get("chat", {}), bot)
         return super().de_json(data=data, bot=bot)
+
+    async def repost(
+        self,
+        business_connection_id: str,
+        active_period: int,
+        post_to_chat_page: bool | None = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Story":
+        """Shortcut for::
+
+             await bot.repost_story(
+                from_chat_id=story.chat.id,
+                from_story_id=story.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.repost_story`.
+
+        Returns:
+            :class:`Story`: On success, :class:`Story` is returned.
+
+        """
+        return await self.get_bot().repost_story(
+            business_connection_id=business_connection_id,
+            from_chat_id=self.chat.id,
+            from_story_id=self.id,
+            active_period=active_period,
+            post_to_chat_page=post_to_chat_page,
+            protect_content=protect_content,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
