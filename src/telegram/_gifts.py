@@ -194,7 +194,7 @@ class GiftInfo(TelegramObject):
 
             .. versionadded:: NEXT.VERSION
         unique_gift_number (:obj:`int`, optional): Unique number reserved for this gift when
-            upgraded. See the number field in UniqueGift.
+            upgraded. See the number field in :class:`~telegram.UniqueGift`.
 
             .. versionadded:: NEXT.VERSION
 
@@ -219,7 +219,7 @@ class GiftInfo(TelegramObject):
 
             .. versionadded:: NEXT.VERSION
         unique_gift_number (:obj:`int`): Optional. Unique number reserved for this gift when
-            upgraded. See the number field in UniqueGift.
+            upgraded. See the number field in :class:`~telegram.UniqueGift`.
 
             .. versionadded:: NEXT.VERSION
 
