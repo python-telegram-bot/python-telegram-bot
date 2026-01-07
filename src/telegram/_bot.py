@@ -8485,6 +8485,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_effect_id (:obj:`str`, optional): Unique identifier of the message effect to be
                 added to the message; only available when copying to private chats
 
+                .. versionadded:: NEXT.VERSION
+
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
