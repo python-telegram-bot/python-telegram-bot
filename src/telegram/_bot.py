@@ -11645,6 +11645,140 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def get_user_gifts(
+        self,
+        user_id: int,
+        exclude_unlimited: bool | None = None,
+        exclude_limited_upgradable: bool | None = None,
+        exclude_limited_non_upgradable: bool | None = None,
+        exclude_from_blockchain: bool | None = None,
+        exclude_unique: bool | None = None,
+        sort_by_price: bool | None = None,
+        offset: str | None = None,
+        limit: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> OwnedGifts:
+        """Use this method to get gifts owned by a user.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the user
+            exclude_unlimited (:obj:`bool`, optional): Exclude unlimited gifts
+            exclude_limited_upgradable (:obj:`bool`, optional): Exclude limited upgradable gifts
+            exclude_limited_non_upgradable (:obj:`bool`, optional): Exclude limited non-upgradable
+                gifts
+            exclude_from_blockchain (:obj:`bool`, optional): Exclude blockchain-assigned gifts
+            exclude_unique (:obj:`bool`, optional): Exclude unique gifts
+            sort_by_price (:obj:`bool`, optional): Sort by price before pagination
+            offset (:obj:`str`, optional): Offset for pagination
+            limit (:obj:`int`, optional): Maximum number of gifts to return (1-100)
+
+        Returns:
+            :class:`telegram.OwnedGifts`: The owned gifts for the user.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "exclude_unlimited": exclude_unlimited,
+            "exclude_limited_upgradable": exclude_limited_upgradable,
+            "exclude_limited_non_upgradable": exclude_limited_non_upgradable,
+            "exclude_from_blockchain": exclude_from_blockchain,
+            "exclude_unique": exclude_unique,
+            "sort_by_price": sort_by_price,
+            "offset": offset,
+            "limit": limit,
+        }
+
+        result = await self._post(
+            "getUserGifts",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return OwnedGifts.de_json(result, self)
+
+    async def get_chat_gifts(
+        self,
+        chat_id: int | str,
+        exclude_unsaved: bool | None = None,
+        exclude_saved: bool | None = None,
+        exclude_unlimited: bool | None = None,
+        exclude_limited_upgradable: bool | None = None,
+        exclude_limited_non_upgradable: bool | None = None,
+        exclude_from_blockchain: bool | None = None,
+        exclude_unique: bool | None = None,
+        sort_by_price: bool | None = None,
+        offset: str | None = None,
+        limit: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> OwnedGifts:
+        """Use this method to get gifts owned by a chat.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or channel
+                username
+            exclude_unsaved (:obj:`bool`, optional): Exclude unsaved gifts
+            exclude_saved (:obj:`bool`, optional): Exclude saved gifts
+            exclude_unlimited (:obj:`bool`, optional): Exclude unlimited gifts
+            exclude_limited_upgradable (:obj:`bool`, optional): Exclude limited upgradable gifts
+            exclude_limited_non_upgradable (:obj:`bool`, optional): Exclude limited non-upgradable
+                gifts
+            exclude_from_blockchain (:obj:`bool`, optional): Exclude blockchain-assigned gifts
+            exclude_unique (:obj:`bool`, optional): Exclude unique gifts
+            sort_by_price (:obj:`bool`, optional): Sort by price before pagination
+            offset (:obj:`str`, optional): Offset for pagination
+            limit (:obj:`int`, optional): Maximum number of gifts to return (1-100)
+
+        Returns:
+            :class:`telegram.OwnedGifts`: The owned gifts for the chat.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "exclude_unsaved": exclude_unsaved,
+            "exclude_saved": exclude_saved,
+            "exclude_unlimited": exclude_unlimited,
+            "exclude_limited_upgradable": exclude_limited_upgradable,
+            "exclude_limited_non_upgradable": exclude_limited_non_upgradable,
+            "exclude_from_blockchain": exclude_from_blockchain,
+            "exclude_unique": exclude_unique,
+            "sort_by_price": sort_by_price,
+            "offset": offset,
+            "limit": limit,
+        }
+
+        result = await self._post(
+            "getChatGifts",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return OwnedGifts.de_json(result, self)
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -11971,3 +12105,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`approve_suggested_post`"""
     declineSuggestedPost = decline_suggested_post
     """Alias for :meth:`decline_suggested_post`"""
+    getUserGifts = get_user_gifts
+    """Alias for :meth:`get_user_gifts`"""
+    getChatGifts = get_chat_gifts
+    """Alias for :meth:`get_chat_gifts`"""

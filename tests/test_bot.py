@@ -65,6 +65,7 @@ from telegram import (
     MenuButtonWebApp,
     Message,
     MessageEntity,
+    OwnedGifts,
     Poll,
     PollOption,
     PreparedInlineMessage,
@@ -2767,6 +2768,68 @@ class TestBotWithoutRequest:
 
         await offline_bot.decline_suggested_post(1234, 5678, "declined")
 
+    async def test_get_user_gifts_parameter_passing(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            for param in (
+                "user_id",
+                "exclude_unlimited",
+                "exclude_limited_upgradable",
+                "exclude_limited_non_upgradable",
+                "exclude_from_blockchain",
+                "exclude_unique",
+                "sort_by_price",
+                "offset",
+                "limit",
+            ):
+                assert request_data.parameters.get(param) == param
+
+            return OwnedGifts(0, [], "null").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.get_user_gifts(
+            user_id="user_id",
+            exclude_unlimited="exclude_unlimited",
+            exclude_limited_upgradable="exclude_limited_upgradable",
+            exclude_limited_non_upgradable="exclude_limited_non_upgradable",
+            exclude_from_blockchain="exclude_from_blockchain",
+            exclude_unique="exclude_unique",
+            sort_by_price="sort_by_price",
+            offset="offset",
+            limit="limit",
+        )
+
+    async def test_get_chat_gifts_parameter_passing(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            for param in (
+                "chat_id",
+                "exclude_unlimited",
+                "exclude_limited_upgradable",
+                "exclude_limited_non_upgradable",
+                "exclude_from_blockchain",
+                "exclude_unique",
+                "sort_by_price",
+                "offset",
+                "limit",
+            ):
+                assert request_data.parameters.get(param) == param
+
+            return OwnedGifts(0, [], "null").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.get_chat_gifts(
+            chat_id="chat_id",
+            exclude_unlimited="exclude_unlimited",
+            exclude_limited_upgradable="exclude_limited_upgradable",
+            exclude_limited_non_upgradable="exclude_limited_non_upgradable",
+            exclude_from_blockchain="exclude_from_blockchain",
+            exclude_unique="exclude_unique",
+            sort_by_price="sort_by_price",
+            offset="offset",
+            limit="limit",
+        )
+
 
 class TestBotWithRequest:
     """
@@ -4741,6 +4804,16 @@ class TestBotWithRequest:
         balance = await bot.get_my_star_balance()
         assert isinstance(balance, StarAmount)
         assert balance.amount == 0
+
+    async def test_get_user_gifts_basic(self, bot, user_id):
+        gifts = await bot.get_user_gifts(user_id)
+        assert isinstance(gifts, OwnedGifts)
+        assert gifts.total_count == 0
+
+    async def test_get_chat_gifts_basic(self, bot, chat_id):
+        gifts = await bot.get_chat_gifts(chat_id)
+        assert isinstance(gifts, OwnedGifts)
+        assert gifts.total_count == 0
 
     async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
         """Test that requests and bot user are initialized separately and only once."""
