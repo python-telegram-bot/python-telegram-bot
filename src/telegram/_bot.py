@@ -11655,6 +11655,73 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def repost_story(
+        self,
+        business_connection_id: str,
+        from_chat_id: int,
+        from_story_id: int,
+        active_period: int,
+        post_to_chat_page: bool | None = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> Story:
+        """
+        Reposts a story on behalf of a business account from another business account.
+        Both business accounts must be managed by the same bot, and the story on the source account
+        must have been posted (or reposted) by the bot. Requires the
+        :attr:`~telegram.BusinessBotRight.can_manage_stories` business bot right for both
+        business accounts.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            business_connection_id (:obj:`str`): Unique identifier of the business
+            from_chat_id (:obj:`int`): Unique identifier of the chat which posted the story that
+                should be reposted
+            from_story_id (:obj:`int`): Unique identifier of the story that should be reposted
+            active_period (:obj:`int`): Period after which the story is moved to the archive, in
+                seconds; must be one of
+                :tg-const:`telegram.constants.StoryRepostActivePeriod.SIX_HOURS`,
+                :tg-const:`telegram.constants.StoryRepostActivePeriod.TWELVE_HOURS`,
+                :tg-const:`telegram.constants.StoryRepostActivePeriod.ONE_DAY`, or
+                :tg-const:`telegram.constants.StoryRepostActivePeriod.TWO_DAYS`.
+            post_to_chat_page (:obj:`bool`, optional): Pass :obj:`True` to keep the story
+                accessible after it expires.
+            protect_content (:obj:`bool`, optional): Pass :obj:`True` if the content of the story
+                must be protected from forwarding and screenshotting
+
+        Returns:
+            :class:`telegram.Story`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "business_connection_id": business_connection_id,
+            "from_chat_id": from_chat_id,
+            "from_story_id": from_story_id,
+            "active_period": active_period,
+            "post_to_chat_page": post_to_chat_page,
+            "protect_content": protect_content,
+        }
+        return Story.de_json(
+            data=await self._post(
+                "repostStory",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -11981,3 +12048,5 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`approve_suggested_post`"""
     declineSuggestedPost = decline_suggested_post
     """Alias for :meth:`decline_suggested_post`"""
+    repostStory = repost_story
+    """Alias for :meth:`repost_story`"""
