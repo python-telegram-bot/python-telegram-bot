@@ -829,3 +829,14 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "remove_user_verification", make_assertion)
         assert await user.remove_verification()
+
+    async def test_instance_method_get_gifts(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id
+
+        assert check_shortcut_signature(user.get_gifts, Bot.get_user_gifts, ["user_id"], [])
+        assert await check_shortcut_call(user.get_gifts, user.get_bot(), "get_user_gifts")
+        assert await check_defaults_handling(user.get_gifts, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "get_user_gifts", make_assertion)
+        assert await user.get_gifts()

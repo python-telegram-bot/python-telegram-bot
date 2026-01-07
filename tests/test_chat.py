@@ -1510,6 +1510,17 @@ class TestChatWithoutRequest(ChatTestBase):
         monkeypatch.setattr(chat.get_bot(), "decline_suggested_post", make_assertion)
         assert await chat.decline_suggested_post(message_id="message_id", comment="comment")
 
+    async def test_instance_method_get_gifts(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(Chat.get_gifts, Bot.get_chat_gifts, ["chat_id"], [])
+        assert await check_shortcut_call(chat.get_gifts, chat.get_bot(), "get_chat_gifts")
+        assert await check_defaults_handling(chat.get_gifts, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "get_chat_gifts", make_assertion)
+        assert await chat.get_gifts()
+
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
