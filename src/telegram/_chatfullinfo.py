@@ -30,6 +30,8 @@ from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._gifts import AcceptedGiftTypes
 from telegram._reaction import ReactionType
+from telegram._uniquegift import UniqueGiftColors
+from telegram._userrating import UserRating
 from telegram._utils.argumentparsing import (
     de_json_optional,
     de_list_optional,
@@ -232,6 +234,19 @@ class ChatFullInfo(_ChatBase):
             chat; for direct messages chats only.
 
             .. versionadded:: 22.4
+        rating (:class:`telegram.UserRating`, optional): For private chats, the rating of the user
+            if any.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift_colors (:class:`telegram.UniqueGiftColors`, optional): The color scheme based
+            on a unique gift that must be used for the chat's name, message replies and link
+            previews
+
+            .. versionadded:: NEXT.VERSION
+        paid_message_star_count (:obj:`int`, optional): The number of Telegram Stars a general user
+            have to pay to send a message to the chat
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -404,6 +419,19 @@ class ChatFullInfo(_ChatBase):
             chat; for direct messages chats only.
 
             .. versionadded:: 22.4
+        rating (:class:`telegram.UserRating`): Optional. For private chats, the rating of the user
+            if any.
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift_colors (:class:`telegram.UniqueGiftColors`): Optional. The color scheme based
+            on a unique gift that must be used for the chat's name, message replies and link
+            previews
+
+            .. versionadded:: NEXT.VERSION
+        paid_message_star_count (:obj:`int`): Optional. The number of Telegram Stars a general user
+            have to pay to send a message to the chat
+
+            .. versionadded:: NEXT.VERSION
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
@@ -440,6 +468,7 @@ class ChatFullInfo(_ChatBase):
         "linked_chat_id",
         "location",
         "max_reaction_count",
+        "paid_message_star_count",
         "parent_chat",
         "permissions",
         "personal_chat",
@@ -447,7 +476,9 @@ class ChatFullInfo(_ChatBase):
         "pinned_message",
         "profile_accent_color_id",
         "profile_background_custom_emoji_id",
+        "rating",
         "sticker_set_name",
+        "unique_gift_colors",
         "unrestrict_boost_count",
     )
 
@@ -500,6 +531,9 @@ class ChatFullInfo(_ChatBase):
         can_send_paid_media: bool | None = None,
         is_direct_messages: bool | None = None,
         parent_chat: Chat | None = None,
+        rating: UserRating | None = None,
+        unique_gift_colors: UniqueGiftColors | None = None,
+        paid_message_star_count: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -563,6 +597,9 @@ class ChatFullInfo(_ChatBase):
             self.can_send_paid_media: bool | None = can_send_paid_media
             self.accepted_gift_types: AcceptedGiftTypes = accepted_gift_types
             self.parent_chat: Chat | None = parent_chat
+            self.rating: UserRating | None = rating
+            self.unique_gift_colors: UniqueGiftColors | None = unique_gift_colors
+            self.paid_message_star_count: int | None = paid_message_star_count
 
     @property
     def slow_mode_delay(self) -> int | dtm.timedelta | None:
@@ -614,5 +651,10 @@ class ChatFullInfo(_ChatBase):
             data.get("business_opening_hours"), BusinessOpeningHours, bot
         )
         data["parent_chat"] = de_json_optional(data.get("parent_chat"), Chat, bot)
+
+        data["rating"] = de_json_optional(data.get("rating"), UserRating, bot)
+        data["unique_gift_colors"] = de_json_optional(
+            data.get("unique_gift_colors"), UniqueGiftColors, bot
+        )
 
         return super().de_json(data=data, bot=bot)

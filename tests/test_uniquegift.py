@@ -28,6 +28,7 @@ from telegram import (
     UniqueGift,
     UniqueGiftBackdrop,
     UniqueGiftBackdropColors,
+    UniqueGiftColors,
     UniqueGiftInfo,
     UniqueGiftModel,
     UniqueGiftSymbol,
@@ -35,6 +36,92 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import UniqueGiftInfoOrigin
 from tests.auxil.slots import mro_slots
+
+
+@pytest.fixture
+def unique_gift_colors():
+    return UniqueGiftColors(
+        model_custom_emoji_id=UniqueGiftColorsTestBase.model_custom_emoji_id,
+        symbol_custom_emoji_id=UniqueGiftColorsTestBase.symbol_custom_emoji_id,
+        light_theme_main_color=UniqueGiftColorsTestBase.light_theme_main_color,
+        light_theme_other_colors=UniqueGiftColorsTestBase.light_theme_other_colors,
+        dark_theme_main_color=UniqueGiftColorsTestBase.dark_theme_main_color,
+        dark_theme_other_colors=UniqueGiftColorsTestBase.dark_theme_other_colors,
+    )
+
+
+class UniqueGiftColorsTestBase:
+    model_custom_emoji_id = "model_emoji_id"
+    symbol_custom_emoji_id = "symbol_emoji_id"
+    light_theme_main_color = 0xFFFFFF
+    light_theme_other_colors = [0xAAAAAA, 0xBBBBBB]
+    dark_theme_main_color = 0x000000
+    dark_theme_other_colors = [0x111111, 0x222222]
+
+
+class TestUniqueGiftColorsWithoutRequest(UniqueGiftColorsTestBase):
+    def test_slot_behaviour(self, unique_gift_colors):
+        for attr in unique_gift_colors.__slots__:
+            assert getattr(unique_gift_colors, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(unique_gift_colors)) == len(set(mro_slots(unique_gift_colors))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "model_custom_emoji_id": self.model_custom_emoji_id,
+            "symbol_custom_emoji_id": self.symbol_custom_emoji_id,
+            "light_theme_main_color": self.light_theme_main_color,
+            "light_theme_other_colors": self.light_theme_other_colors,
+            "dark_theme_main_color": self.dark_theme_main_color,
+            "dark_theme_other_colors": self.dark_theme_other_colors,
+        }
+        unique_gift_colors = UniqueGiftColors.de_json(json_dict, offline_bot)
+        assert unique_gift_colors.api_kwargs == {}
+        assert unique_gift_colors.model_custom_emoji_id == self.model_custom_emoji_id
+        assert unique_gift_colors.symbol_custom_emoji_id == self.symbol_custom_emoji_id
+        assert unique_gift_colors.light_theme_main_color == self.light_theme_main_color
+        assert unique_gift_colors.light_theme_other_colors == tuple(self.light_theme_other_colors)
+        assert unique_gift_colors.dark_theme_main_color == self.dark_theme_main_color
+        assert unique_gift_colors.dark_theme_other_colors == tuple(self.dark_theme_other_colors)
+
+    def test_to_dict(self, unique_gift_colors):
+        json_dict = unique_gift_colors.to_dict()
+        assert json_dict["model_custom_emoji_id"] == self.model_custom_emoji_id
+        assert json_dict["symbol_custom_emoji_id"] == self.symbol_custom_emoji_id
+        assert json_dict["light_theme_main_color"] == self.light_theme_main_color
+        assert json_dict["light_theme_other_colors"] == self.light_theme_other_colors
+        assert json_dict["dark_theme_main_color"] == self.dark_theme_main_color
+        assert json_dict["dark_theme_other_colors"] == self.dark_theme_other_colors
+
+    def test_equality(self, unique_gift_colors):
+        a = unique_gift_colors
+        b = UniqueGiftColors(
+            self.model_custom_emoji_id,
+            self.symbol_custom_emoji_id,
+            self.light_theme_main_color,
+            self.light_theme_other_colors,
+            self.dark_theme_main_color,
+            self.dark_theme_other_colors,
+        )
+        c = UniqueGiftColors(
+            "other_model_emoji_id",
+            self.symbol_custom_emoji_id,
+            self.light_theme_main_color,
+            self.light_theme_other_colors,
+            self.dark_theme_main_color,
+            self.dark_theme_other_colors,
+        )
+        d = BotCommand("start", "description")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
 
 
 @pytest.fixture
