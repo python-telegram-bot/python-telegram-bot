@@ -961,7 +961,7 @@ class Message(MaybeInaccessibleMessage):
             was sent or received
 
             .. versionadded:: 22.1
-        gift_upgrade_sent (:class:`telegram.GiftInfo`): Otional. Service message: upgrade of a
+        gift_upgrade_sent (:class:`telegram.GiftInfo`): Optional. Service message: upgrade of a
             gift was purchased after the gift was sent
 
             .. versionadded:: NEXT.VERSION
