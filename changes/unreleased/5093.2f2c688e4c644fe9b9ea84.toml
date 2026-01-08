@@ -15,5 +15,5 @@ Bot API 9.3 Deprecations Support
 """
 [[pull_requests]]
 uid = "5093"
-author_uids = []
+author_uids = ["grrrru"]
 closes_threads = ["5093"]
