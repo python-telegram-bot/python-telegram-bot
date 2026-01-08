@@ -83,6 +83,7 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
+    telegram.giftbackground
     telegram.giftinfo
     telegram.giveaway
     telegram.giveawaycompleted
