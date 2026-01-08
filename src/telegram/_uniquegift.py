@@ -432,10 +432,14 @@ class UniqueGiftInfo(TelegramObject):
         gift (:class:`UniqueGift`): Information about the gift.
         origin (:obj:`str`): Origin of the gift. Currently, either :attr:`UPGRADE` for gifts
             upgraded from regular gifts, :attr:`TRANSFER` for gifts transferred from other users
-            or channels, or :attr:`RESALE` for gifts bought from other users.
+            or channels, :attr:`RESALE` for gifts bought from other users,
+            :attr:`GIFTED_UPGRADE` for upgrades purchased after the gift was sent, or :attr:`OFFER`
+            for gifts bought or sold through gift purchase offers
 
             .. versionchanged:: 22.3
                 The :attr:`RESALE` origin was added.
+            .. versionchanged:: NEXT.VERSION
+                Bot API 9.3 added the :attr:`GIFTED_UPGRADE` and :attr:`OFFER` origins.
         owned_gift_id (:obj:`str`, optional) Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
         transfer_star_count (:obj:`int`, optional): Number of Telegram Stars that must be paid
@@ -454,10 +458,14 @@ class UniqueGiftInfo(TelegramObject):
         gift (:class:`UniqueGift`): Information about the gift.
         origin (:obj:`str`): Origin of the gift. Currently, either :attr:`UPGRADE` for gifts
             upgraded from regular gifts, :attr:`TRANSFER` for gifts transferred from other users
-            or channels, or :attr:`RESALE` for gifts bought from other users.
+            or channels, :attr:`RESALE` for gifts bought from other users,
+            :attr:`GIFTED_UPGRADE` for upgrades purchased after the gift was sent, or :attr:`OFFER`
+            for gifts bought or sold through gift purchase offers
 
             .. versionchanged:: 22.3
                 The :attr:`RESALE` origin was added.
+            .. versionchanged:: NEXT.VERSION
+                Bot API 9.3 added the :attr:`GIFTED_UPGRADE` and :attr:`OFFER` origins.
         owned_gift_id (:obj:`str`) Optional. Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
         transfer_star_count (:obj:`int`): Optional. Number of Telegram Stars that must be paid
@@ -473,15 +481,25 @@ class UniqueGiftInfo(TelegramObject):
             .. versionadded:: 22.3
     """
 
-    UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.UPGRADE
-    """:const:`telegram.constants.UniqueGiftInfoOrigin.UPGRADE`"""
-    TRANSFER: Final[str] = constants.UniqueGiftInfoOrigin.TRANSFER
-    """:const:`telegram.constants.UniqueGiftInfoOrigin.TRANSFER`"""
+    GIFTED_UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.GIFTED_UPGRADE
+    """:const:`telegram.constants.UniqueGiftInfoOrigin.GIFTED_UPGRADE`
+
+    .. versionadded:: NEXT.VERSION
+    """
+    OFFER: Final[str] = constants.UniqueGiftInfoOrigin.OFFER
+    """:const:`telegram.constants.UniqueGiftInfoOrigin.OFFER`
+
+    .. versionadded:: NEXT.VERSION
+    """
     RESALE: Final[str] = constants.UniqueGiftInfoOrigin.RESALE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.RESALE`
 
     .. versionadded:: 22.3
     """
+    TRANSFER: Final[str] = constants.UniqueGiftInfoOrigin.TRANSFER
+    """:const:`telegram.constants.UniqueGiftInfoOrigin.TRANSFER`"""
+    UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.UPGRADE
+    """:const:`telegram.constants.UniqueGiftInfoOrigin.UPGRADE`"""
 
     __slots__ = (
         "gift",
