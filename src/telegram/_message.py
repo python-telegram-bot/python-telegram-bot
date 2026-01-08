@@ -1392,7 +1392,9 @@ class Message(MaybeInaccessibleMessage):
             self.reply_to_story: Story | None = reply_to_story
             self.boost_added: ChatBoostAdded | None = boost_added
             self.sender_boost_count: int | None = sender_boost_count
-            self.business_connection_id: str | None = business_connection_id
+            self.business_connection_id: str | None = DefaultValue.get_value(
+                business_connection_id
+            )
             self.sender_business_bot: User | None = sender_business_bot
             self.is_from_offline: bool | None = is_from_offline
             self.chat_background_set: ChatBackground | None = chat_background_set
