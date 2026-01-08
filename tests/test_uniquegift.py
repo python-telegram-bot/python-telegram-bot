@@ -35,6 +35,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import UniqueGiftInfoOrigin
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -483,6 +484,8 @@ def unique_gift_info():
         owned_gift_id=UniqueGiftInfoTestBase.owned_gift_id,
         transfer_star_count=UniqueGiftInfoTestBase.transfer_star_count,
         last_resale_star_count=UniqueGiftInfoTestBase.last_resale_star_count,
+        last_resale_currency=UniqueGiftInfoTestBase.last_resale_currency,
+        last_resale_amount=UniqueGiftInfoTestBase.last_resale_amount,
         next_transfer_date=UniqueGiftInfoTestBase.next_transfer_date,
     )
 
@@ -512,6 +515,8 @@ class UniqueGiftInfoTestBase:
     owned_gift_id = "some_id"
     transfer_star_count = 10
     last_resale_star_count = 5
+    last_resale_currency = "XTR"
+    last_resale_amount = 1234
     next_transfer_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
@@ -530,6 +535,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
             "owned_gift_id": self.owned_gift_id,
             "transfer_star_count": self.transfer_star_count,
             "last_resale_star_count": self.last_resale_star_count,
+            "last_resale_currency": self.last_resale_currency,
+            "last_resale_amount": self.last_resale_amount,
             "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
         unique_gift_info = UniqueGiftInfo.de_json(json_dict, offline_bot)
@@ -539,6 +546,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
         assert unique_gift_info.owned_gift_id == self.owned_gift_id
         assert unique_gift_info.transfer_star_count == self.transfer_star_count
         assert unique_gift_info.last_resale_star_count == self.last_resale_star_count
+        assert unique_gift_info.last_resale_currency == self.last_resale_currency
+        assert unique_gift_info.last_resale_amount == self.last_resale_amount
         assert unique_gift_info.next_transfer_date == self.next_transfer_date
 
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
@@ -548,6 +557,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
             "owned_gift_id": self.owned_gift_id,
             "transfer_star_count": self.transfer_star_count,
             "last_resale_star_count": self.last_resale_star_count,
+            "last_resale_currency": self.last_resale_currency,
+            "last_resale_amount": self.last_resale_amount,
             "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
 
@@ -571,7 +582,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
         assert json_dict["origin"] == self.origin
         assert json_dict["owned_gift_id"] == self.owned_gift_id
         assert json_dict["transfer_star_count"] == self.transfer_star_count
-        assert json_dict["last_resale_star_count"] == self.last_resale_star_count
+        assert json_dict["last_resale_currency"] == self.last_resale_currency
+        assert json_dict["last_resale_amount"] == self.last_resale_amount
         assert json_dict["next_transfer_date"] == to_timestamp(self.next_transfer_date)
 
     def test_enum_type_conversion(self, unique_gift_info):
@@ -594,3 +606,21 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_last_resale_star_count_argument_deprecation(self):
+        with pytest.warns(PTBDeprecationWarning, match=r"9\.3.*last_resale_star_count") as record:
+            UniqueGiftInfo(
+                gift=self.gift,
+                origin=UniqueGiftInfo.TRANSFER,
+                last_resale_star_count=self.last_resale_star_count,
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_last_resale_star_count_attribute_deprecation(self, unique_gift_info):
+        with pytest.warns(PTBDeprecationWarning, match=r"9\.3.*last_resale_star_count") as record:
+            assert unique_gift_info.last_resale_star_count == self.last_resale_star_count
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"

@@ -30,6 +30,12 @@ from telegram._utils import enum
 from telegram._utils.argumentparsing import de_json_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
+)
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -448,6 +454,18 @@ class UniqueGiftInfo(TelegramObject):
             paid for the gift.
 
             .. versionadded:: 22.3
+            .. deprecated:: NEXT.VERSION
+                Bot API 9.3 deprecated this field. Use :attr:`last_resale_currency` and
+                :attr:`last_resale_amount` instead.
+        last_resale_currency (:obj:`str`, optional): For gifts bought from other users, the
+            currency in which the payment for the gift was done. Currently, one of ``XTR`` for
+            Telegram Stars or ``TON`` for toncoins.
+
+            .. versionadded:: NEXT.VERSION
+        last_resale_amount (:obj:`int`, optional): For gifts bought from other users, the price
+            paid for the gift in either Telegram Stars or nanotoncoins.
+
+            .. versionadded:: NEXT.VERSION
         next_transfer_date (:obj:`datetime.datetime`, optional): Date when the gift can be
             transferred. If it's in the past, then the gift can be transferred now.
             |datetime_localization|
@@ -470,10 +488,15 @@ class UniqueGiftInfo(TelegramObject):
             bot; only present for gifts received on behalf of business accounts.
         transfer_star_count (:obj:`int`): Optional. Number of Telegram Stars that must be paid
             to transfer the gift; omitted if the bot cannot transfer the gift.
-        last_resale_star_count (:obj:`int`): Optional. For gifts bought from other users, the price
-            paid for the gift.
+        last_resale_currency (:obj:`str`, optional): For gifts bought from other users, the
+            currency in which the payment for the gift was done. Currently, one of ``XTR`` for
+            Telegram Stars or ``TON`` for toncoins.
 
-            .. versionadded:: 22.3
+            .. versionadded:: NEXT.VERSION
+        last_resale_amount (:obj:`int`, optional): For gifts bought from other users, the price
+            paid for the gift in either Telegram Stars or nanotoncoins.
+
+            .. versionadded:: NEXT.VERSION
         next_transfer_date (:obj:`datetime.datetime`): Optional. Date when the gift can be
             transferred. If it's in the past, then the gift can be transferred now.
             |datetime_localization|
@@ -502,8 +525,10 @@ class UniqueGiftInfo(TelegramObject):
     """:const:`telegram.constants.UniqueGiftInfoOrigin.UPGRADE`"""
 
     __slots__ = (
+        "_last_resale_star_count",
         "gift",
-        "last_resale_star_count",
+        "last_resale_amount",
+        "last_resale_currency",
         "next_transfer_date",
         "origin",
         "owned_gift_id",
@@ -516,11 +541,28 @@ class UniqueGiftInfo(TelegramObject):
         origin: str,
         owned_gift_id: str | None = None,
         transfer_star_count: int | None = None,
+        # tags: deprecated NEXT.VERSION; bot api 9.3
         last_resale_star_count: int | None = None,
         next_transfer_date: dtm.datetime | None = None,
+        last_resale_currency: str | None = None,
+        last_resale_amount: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
+        if last_resale_star_count is not None:
+            warn(
+                PTBDeprecationWarning(
+                    version="NEXT.VERSION",
+                    message=build_deprecation_warning_message(
+                        deprecated_name="last_resale_star_count",
+                        new_name="last_resale_currency/amount",
+                        bot_api_version="9.3",
+                        object_type="parameter",
+                    ),
+                ),
+                stacklevel=2,
+            )
+
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.gift: UniqueGift = gift
@@ -528,12 +570,33 @@ class UniqueGiftInfo(TelegramObject):
         # Optional
         self.owned_gift_id: str | None = owned_gift_id
         self.transfer_star_count: int | None = transfer_star_count
-        self.last_resale_star_count: int | None = last_resale_star_count
+        self._last_resale_star_count: int | None = last_resale_star_count
         self.next_transfer_date: dtm.datetime | None = next_transfer_date
+        self.last_resale_currency: str | None = last_resale_currency
+        self.last_resale_amount: int | None = last_resale_amount
 
         self._id_attrs = (self.gift, self.origin)
 
         self._freeze()
+
+    # tags: deprecated NEXT.VERSION; bot api 9.3
+    @property
+    def last_resale_star_count(self) -> int | None:
+        """:obj:`int`: Optional. For gifts bought from other users, the price
+        paid for the gift.
+
+        .. versionadded:: 22.3
+        .. deprecated:: NEXT.VERSION
+            Bot API 9.3 deprecated this field. Use :attr:`last_resale_currency` and
+            :attr:`last_resale_amount` instead.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="last_resale_star_count",
+            new_attr_name="last_resale_currency/amount",
+            bot_api_version="9.3",
+            ptb_version="NEXT.VERSION",
+        )
+        return self._last_resale_star_count
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftInfo":
