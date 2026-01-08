@@ -1271,7 +1271,7 @@ class Message(MaybeInaccessibleMessage):
         reply_to_story: Story | None = None,
         boost_added: ChatBoostAdded | None = None,
         sender_boost_count: int | None = None,
-        business_connection_id: str | None = None,
+        business_connection_id: ODVInput[str] = DEFAULT_NONE,
         sender_business_bot: User | None = None,
         is_from_offline: bool | None = None,
         chat_background_set: ChatBackground | None = None,

@@ -111,12 +111,18 @@ class Defaults:
         do_quote(:obj:`bool`, optional): |reply_quote|
 
             .. versionadded:: 20.8
+        business_connection_id (:obj:`str`, optional): Unique identifier of the business connection
+            on behalf of which the message will be sent. This will be used for all `send_*` methods
+            if not explicitly specified.
+
+            .. versionadded:: 22.6
     """
 
     __slots__ = (
         "_allow_sending_without_reply",
         "_api_defaults",
         "_block",
+        "_business_connection_id",
         "_disable_notification",
         "_do_quote",
         "_link_preview_options",
@@ -135,6 +141,7 @@ class Defaults:
         protect_content: bool | None = None,
         link_preview_options: "LinkPreviewOptions | None" = None,
         do_quote: bool | None = None,
+        business_connection_id: str | None = None,
     ):
         self._parse_mode: str | None = parse_mode
         self._disable_notification: bool | None = disable_notification
@@ -158,6 +165,7 @@ class Defaults:
 
         self._link_preview_options = link_preview_options
         self._do_quote = do_quote
+        self._business_connection_id: str | None = business_connection_id
 
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
@@ -171,6 +179,7 @@ class Defaults:
             "text_parse_mode",
             "protect_content",
             "question_parse_mode",
+            "business_connection_id",
         ):
             value = getattr(self, kwarg)
             if value is not None:
@@ -193,6 +202,7 @@ class Defaults:
                 self._tzinfo,
                 self._block,
                 self._protect_content,
+                self._business_connection_id,
             )
         )
 
@@ -360,3 +370,18 @@ class Defaults:
         .. versionadded:: 20.8
         """
         return self._do_quote
+
+    @property
+    def business_connection_id(self) -> str | None:
+        """:obj:`str`: Optional. Unique identifier of the business connection on behalf of which
+        the message will be sent.
+
+        .. versionadded:: 22.6
+        """
+        return self._business_connection_id
+
+    @business_connection_id.setter
+    def business_connection_id(self, _: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to business_connection_id after initialization."
+        )
