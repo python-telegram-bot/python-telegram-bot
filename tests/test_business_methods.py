@@ -21,6 +21,7 @@ import datetime as dtm
 import pytest
 
 from telegram import (
+    Bot,
     BusinessBotRights,
     BusinessConnection,
     Chat,
@@ -45,7 +46,10 @@ from telegram._reply import ReplyParameters
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.constants import InputProfilePhotoType, InputStoryContentType
+from telegram.ext import ExtBot
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.files import data_file
+from tests.auxil.networking import OfflineRequest
 
 
 class BusinessMethodsTestBase:
@@ -107,7 +111,10 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             assert data.get("exclude_saved") is bool_param
             assert data.get("exclude_unlimited") is bool_param
             assert data.get("exclude_limited") is bool_param
+            assert data.get("exclude_limited_upgradable") is bool_param
+            assert data.get("exclude_limited_non_upgradable") is bool_param
             assert data.get("exclude_unique") is bool_param
+            assert data.get("exclude_from_blockchain") is bool_param
             assert data.get("sort_by_price") is bool_param
             assert data.get("offset") == offset
             assert data.get("limit") == limit
@@ -121,12 +128,35 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             exclude_saved=bool_param,
             exclude_unlimited=bool_param,
             exclude_limited=bool_param,
+            exclude_limited_upgradable=bool_param,
+            exclude_limited_non_upgradable=bool_param,
             exclude_unique=bool_param,
+            exclude_from_blockchain=bool_param,
             sort_by_price=bool_param,
             offset=offset,
             limit=limit,
         )
         assert isinstance(obj, OwnedGifts)
+
+    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
+    async def test_get_business_account_gifts_exclude_limited_deprecation(
+        self, bot_class, monkeypatch
+    ):
+        bot = bot_class(token="123:ABC", request=OfflineRequest())
+
+        async def make_assertion(*args, **kwargs):
+            return {"total_count": 0, "gifts": []}
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+
+        with pytest.warns(PTBDeprecationWarning, match=r"9\.3.*exclude_limited") as record:
+            await bot.get_business_account_gifts(
+                business_connection_id=self.bci,
+                exclude_limited=True,
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
     async def test_get_business_account_star_balance(self, offline_bot, monkeypatch):
         star_amount_json = StarAmount(amount=100, nanostar_amount=356).to_json()

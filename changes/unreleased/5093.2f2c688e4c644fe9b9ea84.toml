@@ -1,0 +1,19 @@
+features = """
+Bot API 9.3 Deprecations Support
+
+- Add :class:`telegram.UniqueGiftColors` class and new attributes to :class:`telegram.UniqueGift`: :attr:`~telegram.UniqueGift.gift_id`, :attr:`~telegram.UniqueGift.is_premium`, :attr:`~telegram.UniqueGift.is_from_blockchain`, :attr:`~telegram.UniqueGift.colors`
+- Add new attributes to :class:`telegram.UniqueGiftInfo`: :attr:`~telegram.UniqueGiftInfo.last_resale_currency`, :attr:`~telegram.UniqueGiftInfo.last_resale_amount`, and new origins :attr:`~telegram.UniqueGiftInfo.GIFTED_UPGRADE`, :attr:`~telegram.UniqueGiftInfo.OFFER`
+- Deprecate :attr:`telegram.UniqueGiftInfo.last_resale_star_count` in favor of :attr:`~telegram.UniqueGiftInfo.last_resale_currency` and :attr:`~telegram.UniqueGiftInfo.last_resale_amount`
+- Add new parameters to :meth:`telegram.Bot.get_business_account_gifts`: ``exclude_limited_upgradable``, ``exclude_limited_non_upgradable``, ``exclude_from_blockchain``
+- Deprecate ``exclude_limited`` parameter of :meth:`telegram.Bot.get_business_account_gifts` in favor of ``exclude_limited_upgradable`` and ``exclude_limited_non_upgradable``
+
+.. warning::
+
+    Bot API 9.3 introduces a now required argument ``gift_id`` to ``UniqueGift``. For backward compatibility, the argument is currently still marked as optional in the signature and its presence is enforced through a runtime check.
+    In future versions, this argument will be made required in the signature as well.
+    Please make sure to update your code accordingly to avoid potential issues in the future. We recommend using keyword arguments when creating ``UniqueGift`` instances to ensure compatibility with future updates.
+"""
+[[pull_requests]]
+uid = "5093"
+author_uids = []
+closes_threads = ["5093"]

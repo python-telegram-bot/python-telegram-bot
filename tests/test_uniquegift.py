@@ -28,18 +28,107 @@ from telegram import (
     UniqueGift,
     UniqueGiftBackdrop,
     UniqueGiftBackdropColors,
+    UniqueGiftColors,
     UniqueGiftInfo,
     UniqueGiftModel,
     UniqueGiftSymbol,
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import UniqueGiftInfoOrigin
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
+
+
+@pytest.fixture
+def unique_gift_colors():
+    return UniqueGiftColors(
+        model_custom_emoji_id=UniqueGiftColorsTestBase.model_custom_emoji_id,
+        symbol_custom_emoji_id=UniqueGiftColorsTestBase.symbol_custom_emoji_id,
+        light_theme_main_color=UniqueGiftColorsTestBase.light_theme_main_color,
+        light_theme_other_colors=UniqueGiftColorsTestBase.light_theme_other_colors,
+        dark_theme_main_color=UniqueGiftColorsTestBase.dark_theme_main_color,
+        dark_theme_other_colors=UniqueGiftColorsTestBase.dark_theme_other_colors,
+    )
+
+
+class UniqueGiftColorsTestBase:
+    model_custom_emoji_id = "model_emoji_id"
+    symbol_custom_emoji_id = "symbol_emoji_id"
+    light_theme_main_color = 0xFFFFFF
+    light_theme_other_colors = [0xAAAAAA, 0xBBBBBB]
+    dark_theme_main_color = 0x000000
+    dark_theme_other_colors = [0x111111, 0x222222]
+
+
+class TestUniqueGiftColorsWithoutRequest(UniqueGiftColorsTestBase):
+    def test_slot_behaviour(self, unique_gift_colors):
+        for attr in unique_gift_colors.__slots__:
+            assert getattr(unique_gift_colors, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(unique_gift_colors)) == len(set(mro_slots(unique_gift_colors))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "model_custom_emoji_id": self.model_custom_emoji_id,
+            "symbol_custom_emoji_id": self.symbol_custom_emoji_id,
+            "light_theme_main_color": self.light_theme_main_color,
+            "light_theme_other_colors": self.light_theme_other_colors,
+            "dark_theme_main_color": self.dark_theme_main_color,
+            "dark_theme_other_colors": self.dark_theme_other_colors,
+        }
+        unique_gift_colors = UniqueGiftColors.de_json(json_dict, offline_bot)
+        assert unique_gift_colors.api_kwargs == {}
+        assert unique_gift_colors.model_custom_emoji_id == self.model_custom_emoji_id
+        assert unique_gift_colors.symbol_custom_emoji_id == self.symbol_custom_emoji_id
+        assert unique_gift_colors.light_theme_main_color == self.light_theme_main_color
+        assert unique_gift_colors.light_theme_other_colors == tuple(self.light_theme_other_colors)
+        assert unique_gift_colors.dark_theme_main_color == self.dark_theme_main_color
+        assert unique_gift_colors.dark_theme_other_colors == tuple(self.dark_theme_other_colors)
+
+    def test_to_dict(self, unique_gift_colors):
+        json_dict = unique_gift_colors.to_dict()
+        assert json_dict["model_custom_emoji_id"] == self.model_custom_emoji_id
+        assert json_dict["symbol_custom_emoji_id"] == self.symbol_custom_emoji_id
+        assert json_dict["light_theme_main_color"] == self.light_theme_main_color
+        assert json_dict["light_theme_other_colors"] == self.light_theme_other_colors
+        assert json_dict["dark_theme_main_color"] == self.dark_theme_main_color
+        assert json_dict["dark_theme_other_colors"] == self.dark_theme_other_colors
+
+    def test_equality(self, unique_gift_colors):
+        a = unique_gift_colors
+        b = UniqueGiftColors(
+            self.model_custom_emoji_id,
+            self.symbol_custom_emoji_id,
+            self.light_theme_main_color,
+            self.light_theme_other_colors,
+            self.dark_theme_main_color,
+            self.dark_theme_other_colors,
+        )
+        c = UniqueGiftColors(
+            "other_model_emoji_id",
+            self.symbol_custom_emoji_id,
+            self.light_theme_main_color,
+            self.light_theme_other_colors,
+            self.dark_theme_main_color,
+            self.dark_theme_other_colors,
+        )
+        d = BotCommand("start", "description")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
 
 
 @pytest.fixture
 def unique_gift():
     return UniqueGift(
+        gift_id=UniqueGiftTestBase.gift_id,
         base_name=UniqueGiftTestBase.base_name,
         name=UniqueGiftTestBase.name,
         number=UniqueGiftTestBase.number,
@@ -47,10 +136,14 @@ def unique_gift():
         symbol=UniqueGiftTestBase.symbol,
         backdrop=UniqueGiftTestBase.backdrop,
         publisher_chat=UniqueGiftTestBase.publisher_chat,
+        is_premium=UniqueGiftTestBase.is_premium,
+        is_from_blockchain=UniqueGiftTestBase.is_from_blockchain,
+        colors=UniqueGiftTestBase.colors,
     )
 
 
 class UniqueGiftTestBase:
+    gift_id = "gift_id"
     base_name = "human_readable"
     name = "unique_name"
     number = 10
@@ -70,6 +163,16 @@ class UniqueGiftTestBase:
         rarity_per_mille=30,
     )
     publisher_chat = Chat(1, Chat.PRIVATE)
+    is_premium = False
+    is_from_blockchain = True
+    colors = UniqueGiftColors(
+        model_custom_emoji_id="M",
+        symbol_custom_emoji_id="S",
+        light_theme_main_color=0xFFFFFF,
+        light_theme_other_colors=[0xAAAAAA],
+        dark_theme_main_color=0x000000,
+        dark_theme_other_colors=[0x111111],
+    )
 
 
 class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
@@ -80,6 +183,7 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
 
     def test_de_json(self, offline_bot):
         json_dict = {
+            "gift_id": self.gift_id,
             "base_name": self.base_name,
             "name": self.name,
             "number": self.number,
@@ -87,10 +191,14 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
             "symbol": self.symbol.to_dict(),
             "backdrop": self.backdrop.to_dict(),
             "publisher_chat": self.publisher_chat.to_dict(),
+            "is_premium": self.is_premium,
+            "is_from_blockchain": self.is_from_blockchain,
+            "colors": self.colors.to_dict(),
         }
         unique_gift = UniqueGift.de_json(json_dict, offline_bot)
         assert unique_gift.api_kwargs == {}
 
+        assert unique_gift.gift_id == self.gift_id
         assert unique_gift.base_name == self.base_name
         assert unique_gift.name == self.name
         assert unique_gift.number == self.number
@@ -98,11 +206,15 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
         assert unique_gift.symbol == self.symbol
         assert unique_gift.backdrop == self.backdrop
         assert unique_gift.publisher_chat == self.publisher_chat
+        assert unique_gift.is_premium == self.is_premium
+        assert unique_gift.is_from_blockchain == self.is_from_blockchain
+        assert unique_gift.colors == self.colors
 
     def test_to_dict(self, unique_gift):
         gift_dict = unique_gift.to_dict()
 
         assert isinstance(gift_dict, dict)
+        assert gift_dict["gift_id"] == self.gift_id
         assert gift_dict["base_name"] == self.base_name
         assert gift_dict["name"] == self.name
         assert gift_dict["number"] == self.number
@@ -110,26 +222,31 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
         assert gift_dict["symbol"] == self.symbol.to_dict()
         assert gift_dict["backdrop"] == self.backdrop.to_dict()
         assert gift_dict["publisher_chat"] == self.publisher_chat.to_dict()
+        assert gift_dict["is_premium"] == self.is_premium
+        assert gift_dict["is_from_blockchain"] == self.is_from_blockchain
+        assert gift_dict["colors"] == self.colors.to_dict()
 
     def test_equality(self, unique_gift):
         a = unique_gift
         b = UniqueGift(
-            self.base_name,
-            self.name,
-            self.number,
-            self.model,
-            self.symbol,
-            self.backdrop,
-            self.publisher_chat,
+            gift_id=self.gift_id,
+            base_name=self.base_name,
+            name=self.name,
+            number=self.number,
+            model=self.model,
+            symbol=self.symbol,
+            backdrop=self.backdrop,
+            publisher_chat=self.publisher_chat,
         )
         c = UniqueGift(
-            "other_base_name",
-            self.name,
-            self.number,
-            self.model,
-            self.symbol,
-            self.backdrop,
-            self.publisher_chat,
+            gift_id=self.gift_id,
+            base_name="other_base_name",
+            name=self.name,
+            number=self.number,
+            model=self.model,
+            symbol=self.symbol,
+            backdrop=self.backdrop,
+            publisher_chat=self.publisher_chat,
         )
         d = BotCommand("start", "description")
 
@@ -141,6 +258,19 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_gift_id_required_workaround(self):
+        # tags: deprecated NEXT.VERSION, bot api 9.3
+        with pytest.raises(TypeError, match="`gift_id` is a required"):
+            UniqueGift(
+                base_name=self.base_name,
+                name=self.name,
+                number=self.number,
+                model=self.model,
+                symbol=self.symbol,
+                backdrop=self.backdrop,
+                publisher_chat=self.publisher_chat,
+            )
 
 
 @pytest.fixture
@@ -396,26 +526,29 @@ def unique_gift_info():
         owned_gift_id=UniqueGiftInfoTestBase.owned_gift_id,
         transfer_star_count=UniqueGiftInfoTestBase.transfer_star_count,
         last_resale_star_count=UniqueGiftInfoTestBase.last_resale_star_count,
+        last_resale_currency=UniqueGiftInfoTestBase.last_resale_currency,
+        last_resale_amount=UniqueGiftInfoTestBase.last_resale_amount,
         next_transfer_date=UniqueGiftInfoTestBase.next_transfer_date,
     )
 
 
 class UniqueGiftInfoTestBase:
     gift = UniqueGift(
-        "human_readable_name",
-        "unique_name",
-        10,
-        UniqueGiftModel(
+        gift_id="gift_id",
+        base_name="human_readable_name",
+        name="unique_name",
+        number=10,
+        model=UniqueGiftModel(
             name="model_name",
             sticker=Sticker("file_id1", "file_unique_id1", 512, 512, False, False, "regular"),
             rarity_per_mille=10,
         ),
-        UniqueGiftSymbol(
+        symbol=UniqueGiftSymbol(
             name="symbol_name",
             sticker=Sticker("file_id2", "file_unique_id2", 512, 512, True, True, "mask"),
             rarity_per_mille=20,
         ),
-        UniqueGiftBackdrop(
+        backdrop=UniqueGiftBackdrop(
             name="backdrop_name",
             colors=UniqueGiftBackdropColors(0x00FF00, 0xEE00FF, 0xAA22BB, 0x20FE8F),
             rarity_per_mille=2,
@@ -425,6 +558,8 @@ class UniqueGiftInfoTestBase:
     owned_gift_id = "some_id"
     transfer_star_count = 10
     last_resale_star_count = 5
+    last_resale_currency = "XTR"
+    last_resale_amount = 1234
     next_transfer_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
@@ -443,6 +578,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
             "owned_gift_id": self.owned_gift_id,
             "transfer_star_count": self.transfer_star_count,
             "last_resale_star_count": self.last_resale_star_count,
+            "last_resale_currency": self.last_resale_currency,
+            "last_resale_amount": self.last_resale_amount,
             "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
         unique_gift_info = UniqueGiftInfo.de_json(json_dict, offline_bot)
@@ -452,6 +589,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
         assert unique_gift_info.owned_gift_id == self.owned_gift_id
         assert unique_gift_info.transfer_star_count == self.transfer_star_count
         assert unique_gift_info.last_resale_star_count == self.last_resale_star_count
+        assert unique_gift_info.last_resale_currency == self.last_resale_currency
+        assert unique_gift_info.last_resale_amount == self.last_resale_amount
         assert unique_gift_info.next_transfer_date == self.next_transfer_date
 
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
@@ -461,6 +600,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
             "owned_gift_id": self.owned_gift_id,
             "transfer_star_count": self.transfer_star_count,
             "last_resale_star_count": self.last_resale_star_count,
+            "last_resale_currency": self.last_resale_currency,
+            "last_resale_amount": self.last_resale_amount,
             "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
 
@@ -484,7 +625,8 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
         assert json_dict["origin"] == self.origin
         assert json_dict["owned_gift_id"] == self.owned_gift_id
         assert json_dict["transfer_star_count"] == self.transfer_star_count
-        assert json_dict["last_resale_star_count"] == self.last_resale_star_count
+        assert json_dict["last_resale_currency"] == self.last_resale_currency
+        assert json_dict["last_resale_amount"] == self.last_resale_amount
         assert json_dict["next_transfer_date"] == to_timestamp(self.next_transfer_date)
 
     def test_enum_type_conversion(self, unique_gift_info):
@@ -507,3 +649,21 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_last_resale_star_count_argument_deprecation(self):
+        with pytest.warns(PTBDeprecationWarning, match=r"9\.3.*last_resale_star_count") as record:
+            UniqueGiftInfo(
+                gift=self.gift,
+                origin=UniqueGiftInfo.TRANSFER,
+                last_resale_star_count=self.last_resale_star_count,
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_last_resale_star_count_attribute_deprecation(self, unique_gift_info):
+        with pytest.warns(PTBDeprecationWarning, match=r"9\.3.*last_resale_star_count") as record:
+            assert unique_gift_info.last_resale_star_count == self.last_resale_star_count
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
