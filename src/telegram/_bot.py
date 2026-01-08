@@ -106,13 +106,14 @@ from telegram._utils.types import (
     TimePeriod,
 )
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import build_deprecation_warning_message
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit, ReactionEmoji
 from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -9943,11 +9944,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         exclude_unsaved: bool | None = None,
         exclude_saved: bool | None = None,
         exclude_unlimited: bool | None = None,
+        # tags: deprecated NEXT.VERSION; bot api 9.3
         exclude_limited: bool | None = None,
         exclude_unique: bool | None = None,
         sort_by_price: bool | None = None,
         offset: str | None = None,
         limit: int | None = None,
+        exclude_limited_upgradable: bool | None = None,
+        exclude_limited_non_upgradable: bool | None = None,
+        exclude_from_blockchain: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -9971,7 +9976,26 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 be purchased an unlimited number of times.
             exclude_limited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
                 purchased a limited number of times.
+
+                .. depercated:: NEXT.VERSION
+                    Bot API 9.3 deprecated this parameter in favor of
+                    :paramref:`exclude_limited_upgradabale` and
+                    :paramref:`exclude_limited_non_upgradable`.
+            exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
+                that can be purchased a limited number of times and can be upgraded to unique.
+
+                .. versionadded:: NEXT.VERSION
+            exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude
+                gifts that can be purchased a limited number of times and can't be upgraded to
+                unique
+
+                .. versionadded:: NEXT.VERSION
             exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts.
+            exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
+                that were assigned from the TON blockchain and can't be resold or transferred in
+                Telegram.
+
+                .. versionadded:: NEXT.VERSION
             sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
                 instead of send date. Sorting is applied before pagination.
             offset (:obj:`str`, optional): Offset of the first entry to return as received from
@@ -9987,13 +10011,29 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
+        if exclude_limited is not None:
+            self._warn(
+                PTBDeprecationWarning(
+                    version="NEXT.VERSION",
+                    message=build_deprecation_warning_message(
+                        deprecated_name="exclude_limited",
+                        new_name="exclude_limited_(non_)upgradable",
+                        bot_api_version="9.3",
+                        object_type="parameter",
+                    ),
+                ),
+                stacklevel=2,
+            )
         data: JSONDict = {
             "business_connection_id": business_connection_id,
             "exclude_unsaved": exclude_unsaved,
             "exclude_saved": exclude_saved,
             "exclude_unlimited": exclude_unlimited,
             "exclude_limited": exclude_limited,
+            "exclude_limited_upgradable": exclude_limited_upgradable,
+            "exclude_limited_non_upgradable": exclude_limited_non_upgradable,
             "exclude_unique": exclude_unique,
+            "exclude_from_blockchain": exclude_from_blockchain,
             "sort_by_price": sort_by_price,
             "offset": offset,
             "limit": limit,
