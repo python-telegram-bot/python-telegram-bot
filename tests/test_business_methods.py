@@ -214,7 +214,7 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
 
     async def test_set_business_account_gift_settings(self, offline_bot, monkeypatch):
         show_gift_button = True
-        accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
+        accepted_gift_types = AcceptedGiftTypes(True, True, True, True, True)
 
         async def make_assertion(*args, **kwargs):
             data = kwargs.get("request_data").json_parameters
