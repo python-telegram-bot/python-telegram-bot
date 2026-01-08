@@ -1978,6 +1978,7 @@ class StatusUpdate:
                 or StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN.check_update(update)
                 or StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN.check_update(update)
                 or StatusUpdate.GIFT.check_update(update)
+                or StatusUpdate.GIFT_UPGRADE_SENT.check_update(update)
                 or StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
                 or StatusUpdate.GIVEAWAY_CREATED.check_update(update)
                 or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
@@ -2186,6 +2187,18 @@ class StatusUpdate:
     """Messages that contain :attr:`telegram.Message.gift`.
 
     .. versionadded:: 22.1
+    """
+
+    class _GiftUpgradeSent(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.gift_upgrade_sent)
+
+    GIFT_UPGRADE_SENT = _GiftUpgradeSent(name="filters.StatusUpdate.GIFT_UPGRADE_SENT")
+    """Messages that contain :attr:`telegram.Message.gift_upgrade_sent`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
     class _GiveawayCreated(MessageFilter):

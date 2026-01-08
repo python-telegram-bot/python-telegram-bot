@@ -214,7 +214,7 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
 
     async def test_set_business_account_gift_settings(self, offline_bot, monkeypatch):
         show_gift_button = True
-        accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
+        accepted_gift_types = AcceptedGiftTypes(True, True, True, True, True)
 
         async def make_assertion(*args, **kwargs):
             data = kwargs.get("request_data").json_parameters
@@ -789,3 +789,55 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             reply_markup=reply_markup,
         )
         assert isinstance(obj, Message)
+
+    async def test_repost_story(self, offline_bot, monkeypatch):
+        """No way to test this without stories"""
+
+        async def make_assertion(url, request_data, *args, **kwargs):
+            for param in (
+                "business_connection_id",
+                "from_chat_id",
+                "from_story_id",
+                "active_period",
+                "post_to_chat_page",
+                "protect_content",
+            ):
+                assert request_data.parameters.get(param) == param
+            return Story(chat=Chat(id=1, type=Chat.PRIVATE), id=42).to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        story = await offline_bot.repost_story(
+            business_connection_id="business_connection_id",
+            from_chat_id="from_chat_id",
+            from_story_id="from_story_id",
+            active_period="active_period",
+            post_to_chat_page="post_to_chat_page",
+            protect_content="protect_content",
+        )
+        assert story.chat.id == 1
+        assert story.id == 42
+
+    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, True), (False, False), (None, None)],
+    )
+    async def test_repost_story_default_protect_content(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("protect_content") == expected_value
+            return Story(chat=Chat(123, "private"), id=123).to_dict()
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "business_connection_id": self.bci,
+            "from_chat_id": 123,
+            "from_story_id": 456,
+            "active_period": dtm.timedelta(seconds=20),
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["protect_content"] = passed_value
+
+        await default_bot.repost_story(**kwargs)

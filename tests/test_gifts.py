@@ -525,6 +525,7 @@ def accepted_gift_types():
         limited_gifts=AcceptedGiftTypesTestBase.limited_gifts,
         unique_gifts=AcceptedGiftTypesTestBase.unique_gifts,
         premium_subscription=AcceptedGiftTypesTestBase.premium_subscription,
+        gifts_from_channels=AcceptedGiftTypesTestBase.gifts_from_channels,
     )
 
 
@@ -533,6 +534,7 @@ class AcceptedGiftTypesTestBase:
     limited_gifts = True
     unique_gifts = True
     premium_subscription = True
+    gifts_from_channels = False
 
 
 class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
@@ -549,6 +551,7 @@ class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
             "limited_gifts": self.limited_gifts,
             "unique_gifts": self.unique_gifts,
             "premium_subscription": self.premium_subscription,
+            "gifts_from_channels": self.gifts_from_channels,
         }
         accepted_gift_types = AcceptedGiftTypes.de_json(json_dict, offline_bot)
         assert accepted_gift_types.api_kwargs == {}
@@ -556,6 +559,7 @@ class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
         assert accepted_gift_types.limited_gifts == self.limited_gifts
         assert accepted_gift_types.unique_gifts == self.unique_gifts
         assert accepted_gift_types.premium_subscription == self.premium_subscription
+        assert accepted_gift_types.gifts_from_channels == self.gifts_from_channels
 
     def test_to_dict(self, accepted_gift_types):
         json_dict = accepted_gift_types.to_dict()
@@ -563,17 +567,23 @@ class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
         assert json_dict["limited_gifts"] == self.limited_gifts
         assert json_dict["unique_gifts"] == self.unique_gifts
         assert json_dict["premium_subscription"] == self.premium_subscription
+        assert json_dict["gifts_from_channels"] == self.gifts_from_channels
 
     def test_equality(self, accepted_gift_types):
         a = accepted_gift_types
         b = AcceptedGiftTypes(
-            self.unlimited_gifts, self.limited_gifts, self.unique_gifts, self.premium_subscription
+            self.unlimited_gifts,
+            self.limited_gifts,
+            self.unique_gifts,
+            self.premium_subscription,
+            self.gifts_from_channels,
         )
         c = AcceptedGiftTypes(
             not self.unlimited_gifts,
             self.limited_gifts,
             self.unique_gifts,
             self.premium_subscription,
+            self.gifts_from_channels,
         )
         d = BotCommand("start", "description")
 
