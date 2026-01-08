@@ -1,8 +1,15 @@
-features = "Full Support for Bot API 9.3"
+features = """
+Full Support for Bot API 9.3
+
+.. warning::
+
+    Bot API 9.3 deprecates the field ``last_resale_star_count`` of ``UniqueGiftInfo`` in favor of the new fields ``last_resale_currency`` and ``last_resale_amount``. The field ``last_resale_star_count`` is still present in PTB for backward compatibility, but it will be removed in future releases. Please update your code accordingly.
+"""
 
 pull_requests = [
   { uid = "5078", author_uid = "aelkheir", closes_threads = ["5077"] },
   { uid = "5079", author_uid = "aelkheir" },
   { uid = "5084", author_uids = ["Bibo-Joshi"] },
   { uid = "5085", author_uids = ["Bibo-Joshi"] },
+  { uid = "5093", author_uids = ["Bibo-Joshi"] },
 ]
