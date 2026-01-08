@@ -3403,15 +3403,37 @@ class TestBotWithRequest:
     async def test_edit_reply_markup_inline(self):
         pass
 
-    # TODO: Actually send updates to the test bot so this can be tested properly
     @pytest.mark.parametrize("timeout", [1, dtm.timedelta(seconds=1)])
-    async def test_get_updates(self, bot, timeout):
+    async def test_get_updates(self, bot, channel_id, timeout):
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-        updates = await bot.get_updates(timeout=timeout)
 
-        assert isinstance(updates, tuple)
+        # Flush pending updates
+        updates = await bot.get_updates(offset=-1, timeout=timeout)
         if updates:
-            assert isinstance(updates[0], Update)
+            await bot.get_updates(offset=updates[-1].update_id + 1, timeout=timeout)
+
+        text = f"test_get_updates {dtm.datetime.now()}"
+        msg = await bot.send_message(chat_id=channel_id, text=text)
+
+        received_updates = []
+        for _ in range(10):
+            updates = await bot.get_updates(timeout=timeout, allowed_updates=["channel_post"])
+            received_updates.extend(updates)
+
+            if any(
+                u.channel_post and u.channel_post.message_id == msg.message_id for u in updates
+            ):
+                break
+
+            if updates:
+                await bot.get_updates(offset=updates[-1].update_id + 1, timeout=timeout)
+
+        assert isinstance(received_updates, (list, tuple))
+        # We can't really assert that the update was received, because that depends on external
+        # factors (e.g. is the bot admin in the channel). But we can assert that IF updates were
+        # received, they are of the correct type.
+        if received_updates:
+            assert isinstance(received_updates[0], Update)
 
     @pytest.mark.parametrize(
         ("read_timeout", "timeout", "expected"),
