@@ -149,26 +149,26 @@ class Gift(TelegramObject):
             published the gift.
 
             .. versionadded:: 22.4
-        personal_total_count (:obj:`int`): optional. The total number of gifts of this type that
+        personal_total_count (:obj:`int`): Optional. The total number of gifts of this type that
             can be sent by the bot; for limited gifts only.
 
             .. versionadded:: NEXT.VERSION
-        personal_remaining_count (:obj:`int`): optional. The number of remaining gifts of this type
+        personal_remaining_count (:obj:`int`): Optional. The number of remaining gifts of this type
             that can be sent by the bot; for limited gifts only.
 
             .. versionadded:: NEXT.VERSION
-        background (:class:`GiftBackground`): optional. Background of the gift.
+        background (:class:`GiftBackground`): Optional. Background of the gift.
 
             .. versionadded:: NEXT.VERSION
-        is_premium (:obj:`bool`): optional. :obj:`True`, if the gift can only be purchased by
+        is_premium (:obj:`bool`): Optional. :obj:`True`, if the gift can only be purchased by
             Telegram Premium subscribers.
 
             .. versionadded:: NEXT.VERSION
-        has_colors (:obj:`bool`): optional. :obj:`True`, if the gift can be used (after being
+        has_colors (:obj:`bool`): Optional. :obj:`True`, if the gift can be used (after being
             upgraded) to customize a user's appearance.
 
             .. versionadded:: NEXT.VERSION
-        unique_gift_variant_count (:obj:`int`): optional. The total number of different unique
+        unique_gift_variant_count (:obj:`int`): Optional. The total number of different unique
             gifts that can be obtained by upgrading the gift.
 
             .. versionadded:: NEXT.VERSION
