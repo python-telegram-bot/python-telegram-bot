@@ -115,7 +115,7 @@ class Defaults:
             on behalf of which the message will be sent. This will be used for all `send_*` methods
             if not explicitly specified.
 
-            .. versionadded:: 22.6
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -376,7 +376,7 @@ class Defaults:
         """:obj:`str`: Optional. Unique identifier of the business connection on behalf of which
         the message will be sent.
 
-        .. versionadded:: 22.6
+        .. versionadded:: NEXT.VERSION
         """
         return self._business_connection_id
 
