@@ -36,7 +36,7 @@ jobs:
           fi
 
       # Create the new fragment
-      - uses: Bibo-Joshi/chango@8a74094f95c9292130e970a44dc5fca802616f48
+      - uses: Bibo-Joshi/chango@090bc4ec062e9071b28cb84a4cfd26c889008bde
         with:
           # passing this custom token has two purposes
           # 1. it allows us to fetch info about issue types
