@@ -761,13 +761,23 @@ class BusinessLimit(IntEnum):
     """
     MIN_GIFT_RESULTS = 1
     """:obj:`int`: Minimum number of gifts to be returned. Relevant for
-    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
-    :meth:`telegram.Bot.get_business_account_gifts`.
+
+    * :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+      :meth:`telegram.Bot.get_business_account_gifts`.
+    * :paramref:`~telegram.Bot.get_chat_gifts.limit` of
+      :meth:`telegram.Bot.get_chat_gifts`.
+    * :paramref:`~telegram.Bot.get_user_gifts.limit` of
+      :meth:`telegram.Bot.get_user_gifts`.
     """
     MAX_GIFT_RESULTS = 100
     """:obj:`int`: Maximum number of gifts to be returned. Relevant for
-    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
-    :meth:`telegram.Bot.get_business_account_gifts`.
+
+    * :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+      :meth:`telegram.Bot.get_business_account_gifts`.
+    * :paramref:`~telegram.Bot.get_chat_gifts.limit` of
+      :meth:`telegram.Bot.get_chat_gifts`.
+    * :paramref:`~telegram.Bot.get_user_gifts.limit` of
+      :meth:`telegram.Bot.get_user_gifts`.
     """
     MIN_STAR_COUNT = 1
     """:obj:`int`: Minimum number of Telegram Stars to be transfered. Relevant for

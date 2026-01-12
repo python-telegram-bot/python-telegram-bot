@@ -485,8 +485,12 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_available_gifts`
       - Used for getting information about gifts available for sending
+    * - :meth:`~telegram.Bot.get_chat_gifts`
+      - Used for getting information about gifts owned and hosted by a chat
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
+    * - :meth:`~telegram.Bot.get_user_gifts`
+      - Used for getting information about gifts owned and hosted by a user
     * - :meth:`~telegram.Bot.save_prepared_inline_message`
       - Used for storing a message to be sent by a user of a Mini App
 
