@@ -11742,7 +11742,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
     ) -> OwnedGifts:
-        """Use this method to get gifts owned by a user.
+        """Returns the gifts owned and hosted by a user.
 
         .. versionadded:: NEXT.VERSION
 
