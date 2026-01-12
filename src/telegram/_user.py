@@ -59,6 +59,7 @@ if TYPE_CHECKING:
         PhotoSize,
         ReplyParameters,
         Sticker,
+        Story,
         SuggestedPostParameters,
         UserChatBoosts,
         UserProfilePhotos,
@@ -1866,6 +1867,7 @@ class User(TelegramObject):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1912,6 +1914,7 @@ class User(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def copy_message(
@@ -1931,6 +1934,7 @@ class User(TelegramObject):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1977,6 +1981,7 @@ class User(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def send_copies(
@@ -2083,6 +2088,7 @@ class User(TelegramObject):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2119,6 +2125,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def forward_to(
@@ -2131,6 +2138,7 @@ class User(TelegramObject):
         video_start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2168,6 +2176,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def forward_messages_from(
@@ -2523,6 +2532,49 @@ class User(TelegramObject):
         """
         return await self.get_bot().remove_user_verification(
             user_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def repost_story(
+        self,
+        business_connection_id: str,
+        from_story_id: int,
+        active_period: int,
+        post_to_chat_page: bool | None = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Story":
+        """Shortcut for::
+
+             await bot.repost_story(
+                from_chat_id=update.effective_user.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.repost_story`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`Story`: On success, :class:`Story` is returned.
+
+        """
+        return await self.get_bot().repost_story(
+            business_connection_id=business_connection_id,
+            from_chat_id=self.id,
+            from_story_id=from_story_id,
+            active_period=active_period,
+            post_to_chat_page=post_to_chat_page,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

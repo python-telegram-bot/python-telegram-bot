@@ -97,6 +97,8 @@ class OwnedGiftTestBase:
     can_be_transferred = True
     transfer_star_count = 300
     next_transfer_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
+    is_upgrade_separate = False
+    unique_gift_number = 37
 
 
 class TestOwnedGiftWithoutRequest(OwnedGiftTestBase):
@@ -184,6 +186,8 @@ def owned_gift_regular():
         was_refunded=TestOwnedGiftRegularWithoutRequest.was_refunded,
         convert_star_count=TestOwnedGiftRegularWithoutRequest.convert_star_count,
         prepaid_upgrade_star_count=TestOwnedGiftRegularWithoutRequest.prepaid_upgrade_star_count,
+        is_upgrade_separate=TestOwnedGiftRegularWithoutRequest.is_upgrade_separate,
+        unique_gift_number=TestOwnedGiftRegularWithoutRequest.unique_gift_number,
     )
 
 
@@ -210,6 +214,8 @@ class TestOwnedGiftRegularWithoutRequest(OwnedGiftTestBase):
             "was_refunded": self.was_refunded,
             "convert_star_count": self.convert_star_count,
             "prepaid_upgrade_star_count": self.prepaid_upgrade_star_count,
+            "is_upgrade_separate": self.is_upgrade_separate,
+            "unique_gift_number": self.unique_gift_number,
         }
         ogr = OwnedGiftRegular.de_json(json_dict, offline_bot)
         assert ogr.gift == self.gift
@@ -224,6 +230,8 @@ class TestOwnedGiftRegularWithoutRequest(OwnedGiftTestBase):
         assert ogr.was_refunded == self.was_refunded
         assert ogr.convert_star_count == self.convert_star_count
         assert ogr.prepaid_upgrade_star_count == self.prepaid_upgrade_star_count
+        assert ogr.is_upgrade_separate == self.is_upgrade_separate
+        assert ogr.unique_gift_number == self.unique_gift_number
         assert ogr.api_kwargs == {}
 
     def test_to_dict(self, owned_gift_regular):
@@ -242,6 +250,8 @@ class TestOwnedGiftRegularWithoutRequest(OwnedGiftTestBase):
         assert json_dict["was_refunded"] == self.was_refunded
         assert json_dict["convert_star_count"] == self.convert_star_count
         assert json_dict["prepaid_upgrade_star_count"] == self.prepaid_upgrade_star_count
+        assert json_dict["is_upgrade_separate"] == self.is_upgrade_separate
+        assert json_dict["unique_gift_number"] == self.unique_gift_number
 
     def test_parse_entity(self, owned_gift_regular):
         entity = MessageEntity(MessageEntity.BOLD, 0, 4)

@@ -421,6 +421,15 @@ def message(bot):
                 send_date=dtm.datetime.utcnow(),
             )
         },
+        {
+            "gift_upgrade_sent": GiftInfo(
+                gift=Gift(
+                    "gift_id",
+                    Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
+                    5,
+                )
+            )
+        },
     ],
     ids=[
         "reply",
@@ -511,6 +520,7 @@ def message(bot):
         "suggested_post_approved",
         "suggested_post_approval_failed",
         "suggested_post_info",
+        "gift_upgrade_sent",
     ],
 )
 def message_params(bot, request):
