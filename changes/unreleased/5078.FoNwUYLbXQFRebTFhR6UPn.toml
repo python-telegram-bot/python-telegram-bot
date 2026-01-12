@@ -1,4 +1,12 @@
-features = "Full Support for Bot API 9.3"
+features = """
+Full Support for Bot API 9.3
+
+.. warning::
+
+    Bot API 9.3 introduces a now required argument ``gift_id`` to ``UniqueGift``. For backward compatibility, the argument is currently still marked as optional in the signature and it's presence is enforced through a runtime check
+    In future versions, this argument will be made required in the signature as well.
+    Please make sure to update your code accordingly to avoid potential issues in the future. We recommend using keyword arguments when creating ``UniqueGift`` instances to ensure compatibility with future updates.
+"""
 
 pull_requests = [
   { uid = "5086", author_uids = ["Bibo-Joshi"] },
@@ -10,4 +18,5 @@ pull_requests = [
   { uid = "5091", author_uids = ["Bibo-Joshi"] },
   { uid = "5090", author_uids = ["Bibo-Joshi"] },
   { uid = "5089", author_uids = ["Bibo-Joshi"] },
+  { uid = "5092", author_uids = ["Bibo-Joshi"] },
 ]
