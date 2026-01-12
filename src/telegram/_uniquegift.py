@@ -381,15 +381,15 @@ class UniqueGift(TelegramObject):
             published the gift.
 
             .. versionadded:: 22.4
-        is_premium (:obj:`bool`): Otional. :obj:`True`, if the original regular gift was
+        is_premium (:obj:`bool`): Optional. :obj:`True`, if the original regular gift was
             exclusively purchaseable by Telegram Premium subscribers.
 
             .. versionadded:: NEXT.VERSION
-        is_from_blockchain (:obj:`bool`): Otional. :obj:`True`, if the gift is assigned from the
+        is_from_blockchain (:obj:`bool`): Optional. :obj:`True`, if the gift is assigned from the
             TON blockchain and can't be resold or transferred in Telegram.
 
             .. versionadded:: NEXT.VERSION
-        colors (:class:`telegram.UniqueGiftColors`): Otional. The color scheme that can be used
+        colors (:class:`telegram.UniqueGiftColors`): Optional. The color scheme that can be used
             by the gift's owner for the chat's name, replies to messages and link previews; for
             business account gifts and gifts that are currently on sale only.
 
