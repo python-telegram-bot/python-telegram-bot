@@ -411,6 +411,8 @@ def gift_info():
         text=GiftInfoTestBase.text,
         entities=GiftInfoTestBase.entities,
         is_private=GiftInfoTestBase.is_private,
+        is_upgrade_separate=GiftInfoTestBase.is_upgrade_separate,
+        unique_gift_number=GiftInfoTestBase.unique_gift_number,
     )
 
 
@@ -433,6 +435,8 @@ class GiftInfoTestBase:
         MessageEntity(MessageEntity.ITALIC, 5, 8),
     )
     is_private = True
+    is_upgrade_separate = False
+    unique_gift_number = 42
 
 
 class TestGiftInfoWithoutRequest(GiftInfoTestBase):
@@ -451,6 +455,8 @@ class TestGiftInfoWithoutRequest(GiftInfoTestBase):
             "text": self.text,
             "entities": [e.to_dict() for e in self.entities],
             "is_private": self.is_private,
+            "is_upgrade_separate": self.is_upgrade_separate,
+            "unique_gift_number": self.unique_gift_number,
         }
         gift_info = GiftInfo.de_json(json_dict, offline_bot)
         assert gift_info.api_kwargs == {}
@@ -462,6 +468,8 @@ class TestGiftInfoWithoutRequest(GiftInfoTestBase):
         assert gift_info.text == self.text
         assert gift_info.entities == self.entities
         assert gift_info.is_private == self.is_private
+        assert gift_info.is_upgrade_separate == self.is_upgrade_separate
+        assert gift_info.unique_gift_number == self.unique_gift_number
 
     def test_to_dict(self, gift_info):
         json_dict = gift_info.to_dict()
@@ -473,6 +481,8 @@ class TestGiftInfoWithoutRequest(GiftInfoTestBase):
         assert json_dict["text"] == self.text
         assert json_dict["entities"] == [e.to_dict() for e in self.entities]
         assert json_dict["is_private"] == self.is_private
+        assert json_dict["is_upgrade_separate"] == self.is_upgrade_separate
+        assert json_dict["unique_gift_number"] == self.unique_gift_number
 
     def test_parse_entity(self, gift_info):
         entity = MessageEntity(MessageEntity.BOLD, 0, 4)

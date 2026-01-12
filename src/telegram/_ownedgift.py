@@ -186,6 +186,14 @@ class OwnedGiftRegular(OwnedGift):
             to Telegram Stars.
         prepaid_upgrade_star_count (:obj:`int`, optional): Number of Telegram Stars that were
             paid by the sender for the ability to upgrade the gift.
+        is_upgrade_separate (:obj:`bool`, optional): :obj:`True`, if the gift's upgrade was
+            purchased after the gift was sent; for gifts received on behalf of business accounts
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift_number (:obj:`int`, optional): Unique number reserved for this gift when
+            upgraded. See the number field in :class:`~telegram.UniqueGift`
+
+            ... versionadded:: NEXT.VERSION
 
     Attributes:
         type (:obj:`str`): Type of the gift, always :attr:`~telegram.OwnedGift.REGULAR`.
@@ -211,6 +219,14 @@ class OwnedGiftRegular(OwnedGift):
             to Telegram Stars.
         prepaid_upgrade_star_count (:obj:`int`): Optional. Number of Telegram Stars that were
             paid by the sender for the ability to upgrade the gift.
+        is_upgrade_separate (:obj:`bool`): Optional. :obj:`True`, if the gift's upgrade was
+            purchased after the gift was sent; for gifts received on behalf of business accounts
+
+            .. versionadded:: NEXT.VERSION
+        unique_gift_number (:obj:`int`): Optional. Unique number reserved for this gift when
+            upgraded. See the number field in :class:`~telegram.UniqueGift`
+
+            ... versionadded:: NEXT.VERSION
 
     """
 
@@ -221,11 +237,13 @@ class OwnedGiftRegular(OwnedGift):
         "gift",
         "is_private",
         "is_saved",
+        "is_upgrade_separate",
         "owned_gift_id",
         "prepaid_upgrade_star_count",
         "send_date",
         "sender_user",
         "text",
+        "unique_gift_number",
         "was_refunded",
     )
 
@@ -243,6 +261,8 @@ class OwnedGiftRegular(OwnedGift):
         was_refunded: bool | None = None,
         convert_star_count: int | None = None,
         prepaid_upgrade_star_count: int | None = None,
+        is_upgrade_separate: bool | None = None,
+        unique_gift_number: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
@@ -261,6 +281,8 @@ class OwnedGiftRegular(OwnedGift):
             self.was_refunded: bool | None = was_refunded
             self.convert_star_count: int | None = convert_star_count
             self.prepaid_upgrade_star_count: int | None = prepaid_upgrade_star_count
+            self.is_upgrade_separate: bool | None = is_upgrade_separate
+            self.unique_gift_number: int | None = unique_gift_number
 
             self._id_attrs = (self.type, self.gift, self.send_date)
 
