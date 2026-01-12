@@ -27,12 +27,86 @@ from telegram._chat import Chat
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional
+from telegram._utils.argumentparsing import de_json_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot
+
+
+class UniqueGiftColors(TelegramObject):
+    """This object contains information about the color scheme for a user's name, message replies
+    and link previews based on a unique gift.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal if their :attr:`model_custom_emoji_id`, :attr:`symbol_custom_emoji_id`,
+    :attr:`light_theme_main_color`, :attr:`light_theme_other_colors`,
+    :attr:`dark_theme_main_color`, and :attr:`dark_theme_other_colors` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        model_custom_emoji_id (:obj:`str`): Custom emoji identifier of the unique gift's model.
+        symbol_custom_emoji_id (:obj:`str`): Custom emoji identifier of the unique gift's symbol.
+        light_theme_main_color (:obj:`int`): Main color used in light themes; RGB format.
+        light_theme_other_colors (Sequence[:obj:`int`]): List of 1-3 additional colors used in
+            light themes; RGB format. |sequenceclassargs|
+        dark_theme_main_color (:obj:`int`): Main color used in dark themes; RGB format.
+        dark_theme_other_colors (Sequence[:obj:`int`]): List of 1-3 additional colors used in dark
+            themes; RGB format. |sequenceclassargs|
+
+    Attributes:
+        model_custom_emoji_id (:obj:`str`): Custom emoji identifier of the unique gift's model.
+        symbol_custom_emoji_id (:obj:`str`): Custom emoji identifier of the unique gift's symbol.
+        light_theme_main_color (:obj:`int`): Main color used in light themes; RGB format.
+        light_theme_other_colors (Tuple[:obj:`int`]): Tuple of 1-3 additional colors used in
+            light themes; RGB format.
+        dark_theme_main_color (:obj:`int`): Main color used in dark themes; RGB format.
+        dark_theme_other_colors (Tuple[:obj:`int`]): Tuple of 1-3 additional colors used in dark
+            themes; RGB format.
+    """
+
+    __slots__ = (
+        "dark_theme_main_color",
+        "dark_theme_other_colors",
+        "light_theme_main_color",
+        "light_theme_other_colors",
+        "model_custom_emoji_id",
+        "symbol_custom_emoji_id",
+    )
+
+    def __init__(
+        self,
+        model_custom_emoji_id: str,
+        symbol_custom_emoji_id: str,
+        light_theme_main_color: int,
+        light_theme_other_colors: list[int],
+        dark_theme_main_color: int,
+        dark_theme_other_colors: list[int],
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.model_custom_emoji_id: str = model_custom_emoji_id
+        self.symbol_custom_emoji_id: str = symbol_custom_emoji_id
+        self.light_theme_main_color: int = light_theme_main_color
+        self.light_theme_other_colors: tuple[int, ...] = parse_sequence_arg(
+            light_theme_other_colors
+        )
+        self.dark_theme_main_color: int = dark_theme_main_color
+        self.dark_theme_other_colors: tuple[int, ...] = parse_sequence_arg(dark_theme_other_colors)
+
+        self._id_attrs = (
+            self.model_custom_emoji_id,
+            self.symbol_custom_emoji_id,
+            self.light_theme_main_color,
+            self.light_theme_other_colors,
+            self.dark_theme_main_color,
+            self.dark_theme_other_colors,
+        )
+
+        self._freeze()
 
 
 class UniqueGiftModel(TelegramObject):
