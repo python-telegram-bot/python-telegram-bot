@@ -65,6 +65,8 @@ class TestDefaults:
         e = User(123, "test_user", False)
         f = Defaults(parse_mode="HTML", block=True)
         g = Defaults(parse_mode="HTML", block=True)
+        h = Defaults(parse_mode="HTML", do_quote=True, gift_premium_subscription_text_parse_mode="Markdown")
+        i = Defaults(parse_mode="HTML", do_quote=True, gift_premium_subscription_text_parse_mode="Markdown")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -81,3 +83,18 @@ class TestDefaults:
 
         assert f == g
         assert hash(f) == hash(g)
+
+        assert h == i
+        assert hash(h) == hash(i)
+
+        assert a != h
+        assert hash(a) != hash(h)
+
+    def test_gift_premium_subscription_text_parse_mode(self):
+        defaults = Defaults()
+        assert defaults.gift_premium_subscription_text_parse_mode is None
+        assert "gift_premium_subscription_text_parse_mode" not in defaults.api_defaults
+
+        defaults = Defaults(gift_premium_subscription_text_parse_mode="HTML")
+        assert defaults.gift_premium_subscription_text_parse_mode == "HTML"
+        assert defaults.api_defaults["gift_premium_subscription_text_parse_mode"] == "HTML"

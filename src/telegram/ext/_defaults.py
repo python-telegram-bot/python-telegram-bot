@@ -111,6 +111,10 @@ class Defaults:
         do_quote(:obj:`bool`, optional): |reply_quote|
 
             .. versionadded:: 20.8
+        gift_premium_subscription_text_parse_mode (:obj:`str`, optional): |parse_mode|
+            for the corresponding parameter of :meth:`telegram.Bot.gift_premium_subscription`.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -119,6 +123,7 @@ class Defaults:
         "_block",
         "_disable_notification",
         "_do_quote",
+        "_gift_premium_subscription_text_parse_mode",
         "_link_preview_options",
         "_parse_mode",
         "_protect_content",
@@ -135,6 +140,7 @@ class Defaults:
         protect_content: bool | None = None,
         link_preview_options: "LinkPreviewOptions | None" = None,
         do_quote: bool | None = None,
+        gift_premium_subscription_text_parse_mode: str | None = None,
     ):
         self._parse_mode: str | None = parse_mode
         self._disable_notification: bool | None = disable_notification
@@ -158,6 +164,7 @@ class Defaults:
 
         self._link_preview_options = link_preview_options
         self._do_quote = do_quote
+        self._gift_premium_subscription_text_parse_mode = gift_premium_subscription_text_parse_mode
 
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
@@ -166,6 +173,7 @@ class Defaults:
             "disable_notification",
             "do_quote",
             "explanation_parse_mode",
+            "gift_premium_subscription_text_parse_mode",
             "link_preview_options",
             "parse_mode",
             "text_parse_mode",
@@ -190,6 +198,7 @@ class Defaults:
                 self._link_preview_options,
                 self._allow_sending_without_reply,
                 self._do_quote,
+                self._gift_premium_subscription_text_parse_mode,
                 self._tzinfo,
                 self._block,
                 self._protect_content,
@@ -278,6 +287,21 @@ class Defaults:
     def question_parse_mode(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to question_parse_mode after initialization."
+        )
+
+    @property
+    def gift_premium_subscription_text_parse_mode(self) -> str | None:
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        the corresponding parameter of :meth:`telegram.Bot.gift_premium_subscription`.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self._gift_premium_subscription_text_parse_mode
+
+    @gift_premium_subscription_text_parse_mode.setter
+    def gift_premium_subscription_text_parse_mode(self, _: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to gift_premium_subscription_text_parse_mode after initialization."
         )
 
     @property
