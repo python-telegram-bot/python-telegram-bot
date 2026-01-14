@@ -300,9 +300,7 @@ class Defaults:
 
     @gift_premium_subscription_text_parse_mode.setter
     def gift_premium_subscription_text_parse_mode(self, _: object) -> NoReturn:
-        raise AttributeError(
-            "Cannot assign new value after initialization."
-        )
+        raise AttributeError("Cannot assign new value after initialization.")
 
     @property
     def disable_notification(self) -> bool | None:

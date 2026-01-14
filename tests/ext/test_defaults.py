@@ -105,6 +105,4 @@ class TestDefaults:
 
         defaults = Defaults(gift_premium_subscription_text_parse_mode="HTML")
         assert defaults.gift_premium_subscription_text_parse_mode == "HTML"
-        assert (
-            defaults.api_defaults["gift_premium_subscription_text_parse_mode"] == "HTML"
-        )
+        assert defaults.api_defaults["gift_premium_subscription_text_parse_mode"] == "HTML"
