@@ -301,7 +301,7 @@ class Defaults:
     @gift_premium_subscription_text_parse_mode.setter
     def gift_premium_subscription_text_parse_mode(self, _: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to gift_premium_subscription_text_parse_mode after initialization."
+            "Cannot assign new value after initialization."
         )
 
     @property
