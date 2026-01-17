@@ -19,4 +19,5 @@ pull_requests = [
   { uid = "5090", author_uids = ["Bibo-Joshi"] },
   { uid = "5089", author_uids = ["Bibo-Joshi"] },
   { uid = "5092", author_uids = ["Bibo-Joshi"] },
+  { uid = "5106", author_uid = ["aelkheir"] },
 ]
