@@ -11662,7 +11662,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         business_connection_id: str,
         from_chat_id: int,
         from_story_id: int,
-        active_period: int,
+        active_period: TimePeriod,
         post_to_chat_page: bool | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
@@ -11686,8 +11686,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             from_chat_id (:obj:`int`): Unique identifier of the chat which posted the story that
                 should be reposted
             from_story_id (:obj:`int`): Unique identifier of the story that should be reposted
-            active_period (:obj:`int`): Period after which the story is moved to the archive, in
-                seconds; must be one of
+            active_period (:obj:`int` | :class:`datetime.timedelta`): Period after which the story
+                is moved to the archive, in seconds; must be one of
                 :tg-const:`telegram.constants.StoryLimit.SIX_HOURS`,
                 :tg-const:`telegram.constants.StoryLimit.TWELVE_HOURS`,
                 :tg-const:`telegram.constants.StoryLimit.ONE_DAY`, or

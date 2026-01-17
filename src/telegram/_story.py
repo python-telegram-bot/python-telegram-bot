@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -82,7 +82,7 @@ class Story(TelegramObject):
     async def repost(
         self,
         business_connection_id: str,
-        active_period: int,
+        active_period: TimePeriod,
         post_to_chat_page: bool | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,

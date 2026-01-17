@@ -20,6 +20,7 @@
 """This module contains classes related to unique gifs."""
 
 import datetime as dtm
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final
 
 from telegram import constants
@@ -81,9 +82,9 @@ class UniqueGiftColors(TelegramObject):
         model_custom_emoji_id: str,
         symbol_custom_emoji_id: str,
         light_theme_main_color: int,
-        light_theme_other_colors: list[int],
+        light_theme_other_colors: Sequence[int],
         dark_theme_main_color: int,
-        dark_theme_other_colors: list[int],
+        dark_theme_other_colors: Sequence[int],
         *,
         api_kwargs: JSONDict | None = None,
     ):

@@ -5317,7 +5317,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str,
         from_chat_id: int,
         from_story_id: int,
-        active_period: int,
+        active_period: TimePeriod,
         post_to_chat_page: bool | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
