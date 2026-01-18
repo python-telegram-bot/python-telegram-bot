@@ -761,13 +761,23 @@ class BusinessLimit(IntEnum):
     """
     MIN_GIFT_RESULTS = 1
     """:obj:`int`: Minimum number of gifts to be returned. Relevant for
-    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
-    :meth:`telegram.Bot.get_business_account_gifts`.
+
+    * :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+      :meth:`telegram.Bot.get_business_account_gifts`.
+    * :paramref:`~telegram.Bot.get_chat_gifts.limit` of
+      :meth:`telegram.Bot.get_chat_gifts`.
+    * :paramref:`~telegram.Bot.get_user_gifts.limit` of
+      :meth:`telegram.Bot.get_user_gifts`.
     """
     MAX_GIFT_RESULTS = 100
     """:obj:`int`: Maximum number of gifts to be returned. Relevant for
-    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
-    :meth:`telegram.Bot.get_business_account_gifts`.
+
+    * :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+      :meth:`telegram.Bot.get_business_account_gifts`.
+    * :paramref:`~telegram.Bot.get_chat_gifts.limit` of
+      :meth:`telegram.Bot.get_chat_gifts`.
+    * :paramref:`~telegram.Bot.get_user_gifts.limit` of
+      :meth:`telegram.Bot.get_user_gifts`.
     """
     MIN_STAR_COUNT = 1
     """:obj:`int`: Minimum number of Telegram Stars to be transfered. Relevant for
@@ -2180,6 +2190,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 22.1
     """
+    GIFT_UPGRADE_SENT = "gift_upgrade_sent"
+    """:obj:`str`: Messages with :attr:`telegram.Message.gift_upgrade_sent`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
 
@@ -3063,7 +3078,7 @@ class StoryAreaTypeType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.StoryAreaTypeUniqueGift`."""
 
 
-class StoryLimit(StringEnum):
+class StoryLimit(IntEnum):
     """This enum contains limitations for :meth:`~telegram.Bot.post_story` and
     :meth:`~telegram.Bot.edit_story`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -3079,17 +3094,17 @@ class StoryLimit(StringEnum):
     :meth:`telegram.Bot.edit_story`.
     """
     ACTIVITY_SIX_HOURS = 6 * 3600
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_TWELVE_HOURS = 12 * 3600
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_ONE_DAY = 86400
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_TWO_DAYS = 2 * 86400
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
 
 
 class SuggestedPost(IntEnum):

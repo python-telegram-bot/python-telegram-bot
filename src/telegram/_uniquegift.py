@@ -340,6 +340,9 @@ class UniqueGift(TelegramObject):
     .. versionadded:: 22.1
 
     Args:
+        gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
+
+            .. versionadded:: NEXT.VERSION
         base_name (:obj:`str`): Human-readable name of the regular gift from which this unique
             gift was upgraded.
         name (:obj:`str`): Unique name of the gift. This name can be used
@@ -353,8 +356,24 @@ class UniqueGift(TelegramObject):
             published the gift.
 
             .. versionadded:: 22.4
+        is_premium (:obj:`bool`, optional): :obj:`True`, if the original regular gift was
+            exclusively purchaseable by Telegram Premium subscribers.
+
+            .. versionadded:: NEXT.VERSION
+        is_from_blockchain (:obj:`bool`, optional): :obj:`True`, if the gift is assigned from the
+            TON blockchain and can't be resold or transferred in Telegram.
+
+            .. versionadded:: NEXT.VERSION
+        colors (:class:`telegram.UniqueGiftColors`, optional): The color scheme that can be used
+            by the gift's owner for the chat's name, replies to messages and link previews; for
+            business account gifts and gifts that are currently on sale only.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
+        gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
+
+            .. versionadded:: NEXT.VERSION
         base_name (:obj:`str`): Human-readable name of the regular gift from which this unique
             gift was upgraded.
         name (:obj:`str`): Unique name of the gift. This name can be used
@@ -368,12 +387,29 @@ class UniqueGift(TelegramObject):
             published the gift.
 
             .. versionadded:: 22.4
+        is_premium (:obj:`bool`): Optional. :obj:`True`, if the original regular gift was
+            exclusively purchaseable by Telegram Premium subscribers.
+
+            .. versionadded:: NEXT.VERSION
+        is_from_blockchain (:obj:`bool`): Optional. :obj:`True`, if the gift is assigned from the
+            TON blockchain and can't be resold or transferred in Telegram.
+
+            .. versionadded:: NEXT.VERSION
+        colors (:class:`telegram.UniqueGiftColors`): Optional. The color scheme that can be used
+            by the gift's owner for the chat's name, replies to messages and link previews; for
+            business account gifts and gifts that are currently on sale only.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
     __slots__ = (
         "backdrop",
         "base_name",
+        "colors",
+        "gift_id",
+        "is_from_blockchain",
+        "is_premium",
         "model",
         "name",
         "number",
@@ -390,10 +426,21 @@ class UniqueGift(TelegramObject):
         symbol: UniqueGiftSymbol,
         backdrop: UniqueGiftBackdrop,
         publisher_chat: Chat | None = None,
+        # tags: deprecated NEXT.VERSION, bot api 9.3
+        # temporarily optional to account for changed signature
+        gift_id: str | None = None,
+        is_from_blockchain: bool | None = None,
+        is_premium: bool | None = None,
+        colors: UniqueGiftColors | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
+        # tags: deprecated NEXT.VERSION, bot api 9.3
+        if gift_id is None:
+            raise TypeError("`gift_id` is a required argument since Bot API 9.3")
+
         super().__init__(api_kwargs=api_kwargs)
+        self.gift_id: str = gift_id
         self.base_name: str = base_name
         self.name: str = name
         self.number: int = number
@@ -401,6 +448,9 @@ class UniqueGift(TelegramObject):
         self.symbol: UniqueGiftSymbol = symbol
         self.backdrop: UniqueGiftBackdrop = backdrop
         self.publisher_chat: Chat | None = publisher_chat
+        self.is_from_blockchain: bool | None = is_from_blockchain
+        self.is_premium: bool | None = is_premium
+        self.colors: UniqueGiftColors | None = colors
 
         self._id_attrs = (
             self.base_name,
@@ -422,6 +472,7 @@ class UniqueGift(TelegramObject):
         data["symbol"] = de_json_optional(data.get("symbol"), UniqueGiftSymbol, bot)
         data["backdrop"] = de_json_optional(data.get("backdrop"), UniqueGiftBackdrop, bot)
         data["publisher_chat"] = de_json_optional(data.get("publisher_chat"), Chat, bot)
+        data["colors"] = de_json_optional(data.get("colors"), UniqueGiftColors, bot)
 
         return super().de_json(data=data, bot=bot)
 
