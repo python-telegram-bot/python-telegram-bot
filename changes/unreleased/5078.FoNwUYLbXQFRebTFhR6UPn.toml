@@ -24,4 +24,5 @@ pull_requests = [
   { uid = "5092", author_uids = ["Bibo-Joshi"] },
   { uid = "5095", author_uids = ["Bibo-Joshi"] },
   { uid = "5094", author_uids = ["Bibo-Joshi"] },
+  { uid = "5106", author_uid = ["aelkheir"] },
 ]
