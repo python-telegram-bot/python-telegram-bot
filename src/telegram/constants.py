@@ -3348,15 +3348,25 @@ class UniqueGiftInfoOrigin(StringEnum):
 
     __slots__ = ()
 
-    UPGRADE = "upgrade"
-    """:obj:`str` gift upgraded"""
-    TRANSFER = "transfer"
-    """:obj:`str` gift transfered"""
+    GIFTED_UPGRADE = "gifted_upgrade"
+    """:obj:`str` upgrades purchased after the gift was sent
+
+    .. versionadded:: NEXT.VERSION
+    """
+    OFFER = "OFFER"
+    """:obj:`str` gift bought or sold through gift purchase offers
+
+    .. versionadded:: NEXT.VERSION
+    """
     RESALE = "resale"
     """:obj:`str` gift bought from other users
 
     .. versionadded:: 22.3
     """
+    TRANSFER = "transfer"
+    """:obj:`str` gift transfered"""
+    UPGRADE = "upgrade"
+    """:obj:`str` gift upgraded"""
 
 
 class UpdateType(StringEnum):
