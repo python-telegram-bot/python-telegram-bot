@@ -539,12 +539,12 @@ class UniqueGiftInfo(TelegramObject):
             bot; only present for gifts received on behalf of business accounts.
         transfer_star_count (:obj:`int`): Optional. Number of Telegram Stars that must be paid
             to transfer the gift; omitted if the bot cannot transfer the gift.
-        last_resale_currency (:obj:`str`, optional): For gifts bought from other users, the
+        last_resale_currency (:obj:`str`): Optional. For gifts bought from other users, the
             currency in which the payment for the gift was done. Currently, one of ``XTR`` for
             Telegram Stars or ``TON`` for toncoins.
 
             .. versionadded:: NEXT.VERSION
-        last_resale_amount (:obj:`int`, optional): For gifts bought from other users, the price
+        last_resale_amount (:obj:`int`): Optional. For gifts bought from other users, the price
             paid for the gift in either Telegram Stars or nanotoncoins.
 
             .. versionadded:: NEXT.VERSION
