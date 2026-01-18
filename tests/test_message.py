@@ -268,20 +268,21 @@ def message(bot):
         {
             "unique_gift": UniqueGiftInfo(
                 gift=UniqueGift(
-                    "human_readable_name",
-                    "unique_name",
-                    2,
-                    UniqueGiftModel(
+                    gift_id="gift_id",
+                    base_name="human_readable_name",
+                    name="unique_name",
+                    number=2,
+                    model=UniqueGiftModel(
                         "model_name",
                         Sticker("file_id1", "file_unique_id1", 512, 512, False, False, "regular"),
                         10,
                     ),
-                    UniqueGiftSymbol(
+                    symbol=UniqueGiftSymbol(
                         "symbol_name",
                         Sticker("file_id2", "file_unique_id2", 512, 512, True, True, "mask"),
                         20,
                     ),
-                    UniqueGiftBackdrop(
+                    backdrop=UniqueGiftBackdrop(
                         "backdrop_name",
                         UniqueGiftBackdropColors(0x00FF00, 0xEE00FF, 0xAA22BB, 0x20FE8F),
                         30,
@@ -420,6 +421,15 @@ def message(bot):
                 send_date=dtm.datetime.utcnow(),
             )
         },
+        {
+            "gift_upgrade_sent": GiftInfo(
+                gift=Gift(
+                    "gift_id",
+                    Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
+                    5,
+                )
+            )
+        },
     ],
     ids=[
         "reply",
@@ -510,6 +520,7 @@ def message(bot):
         "suggested_post_approved",
         "suggested_post_approval_failed",
         "suggested_post_info",
+        "gift_upgrade_sent",
     ],
 )
 def message_params(bot, request):

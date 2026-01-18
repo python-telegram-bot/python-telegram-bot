@@ -761,13 +761,23 @@ class BusinessLimit(IntEnum):
     """
     MIN_GIFT_RESULTS = 1
     """:obj:`int`: Minimum number of gifts to be returned. Relevant for
-    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
-    :meth:`telegram.Bot.get_business_account_gifts`.
+
+    * :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+      :meth:`telegram.Bot.get_business_account_gifts`.
+    * :paramref:`~telegram.Bot.get_chat_gifts.limit` of
+      :meth:`telegram.Bot.get_chat_gifts`.
+    * :paramref:`~telegram.Bot.get_user_gifts.limit` of
+      :meth:`telegram.Bot.get_user_gifts`.
     """
     MAX_GIFT_RESULTS = 100
     """:obj:`int`: Maximum number of gifts to be returned. Relevant for
-    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
-    :meth:`telegram.Bot.get_business_account_gifts`.
+
+    * :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+      :meth:`telegram.Bot.get_business_account_gifts`.
+    * :paramref:`~telegram.Bot.get_chat_gifts.limit` of
+      :meth:`telegram.Bot.get_chat_gifts`.
+    * :paramref:`~telegram.Bot.get_user_gifts.limit` of
+      :meth:`telegram.Bot.get_user_gifts`.
     """
     MIN_STAR_COUNT = 1
     """:obj:`int`: Minimum number of Telegram Stars to be transfered. Relevant for
@@ -2179,6 +2189,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.gift`.
 
     .. versionadded:: 22.1
+    """
+    GIFT_UPGRADE_SENT = "gift_upgrade_sent"
+    """:obj:`str`: Messages with :attr:`telegram.Message.gift_upgrade_sent`.
+
+    .. versionadded:: NEXT.VERSION
     """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.

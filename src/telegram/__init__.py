@@ -111,6 +111,7 @@ __all__ = (
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
     "Gift",
+    "GiftBackground",
     "GiftInfo",
     "Gifts",
     "Giveaway",
@@ -455,7 +456,7 @@ from ._forumtopic import (
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
-from ._gifts import AcceptedGiftTypes, Gift, GiftInfo, Gifts
+from ._gifts import AcceptedGiftTypes, Gift, GiftBackground, GiftInfo, Gifts
 from ._giveaway import Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup

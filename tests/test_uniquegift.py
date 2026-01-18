@@ -127,6 +127,7 @@ class TestUniqueGiftColorsWithoutRequest(UniqueGiftColorsTestBase):
 @pytest.fixture
 def unique_gift():
     return UniqueGift(
+        gift_id=UniqueGiftTestBase.gift_id,
         base_name=UniqueGiftTestBase.base_name,
         name=UniqueGiftTestBase.name,
         number=UniqueGiftTestBase.number,
@@ -134,10 +135,14 @@ def unique_gift():
         symbol=UniqueGiftTestBase.symbol,
         backdrop=UniqueGiftTestBase.backdrop,
         publisher_chat=UniqueGiftTestBase.publisher_chat,
+        is_premium=UniqueGiftTestBase.is_premium,
+        is_from_blockchain=UniqueGiftTestBase.is_from_blockchain,
+        colors=UniqueGiftTestBase.colors,
     )
 
 
 class UniqueGiftTestBase:
+    gift_id = "gift_id"
     base_name = "human_readable"
     name = "unique_name"
     number = 10
@@ -157,6 +162,16 @@ class UniqueGiftTestBase:
         rarity_per_mille=30,
     )
     publisher_chat = Chat(1, Chat.PRIVATE)
+    is_premium = False
+    is_from_blockchain = True
+    colors = UniqueGiftColors(
+        model_custom_emoji_id="M",
+        symbol_custom_emoji_id="S",
+        light_theme_main_color=0xFFFFFF,
+        light_theme_other_colors=[0xAAAAAA],
+        dark_theme_main_color=0x000000,
+        dark_theme_other_colors=[0x111111],
+    )
 
 
 class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
@@ -167,6 +182,7 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
 
     def test_de_json(self, offline_bot):
         json_dict = {
+            "gift_id": self.gift_id,
             "base_name": self.base_name,
             "name": self.name,
             "number": self.number,
@@ -174,6 +190,9 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
             "symbol": self.symbol.to_dict(),
             "backdrop": self.backdrop.to_dict(),
             "publisher_chat": self.publisher_chat.to_dict(),
+            "is_premium": self.is_premium,
+            "is_from_blockchain": self.is_from_blockchain,
+            "colors": self.colors.to_dict(),
         }
         unique_gift = UniqueGift.de_json(json_dict, offline_bot)
         assert unique_gift.api_kwargs == {}
@@ -185,11 +204,15 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
         assert unique_gift.symbol == self.symbol
         assert unique_gift.backdrop == self.backdrop
         assert unique_gift.publisher_chat == self.publisher_chat
+        assert unique_gift.is_premium == self.is_premium
+        assert unique_gift.is_from_blockchain == self.is_from_blockchain
+        assert unique_gift.colors == self.colors
 
     def test_to_dict(self, unique_gift):
         gift_dict = unique_gift.to_dict()
 
         assert isinstance(gift_dict, dict)
+        assert gift_dict["gift_id"] == self.gift_id
         assert gift_dict["base_name"] == self.base_name
         assert gift_dict["name"] == self.name
         assert gift_dict["number"] == self.number
@@ -197,26 +220,31 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
         assert gift_dict["symbol"] == self.symbol.to_dict()
         assert gift_dict["backdrop"] == self.backdrop.to_dict()
         assert gift_dict["publisher_chat"] == self.publisher_chat.to_dict()
+        assert gift_dict["is_premium"] == self.is_premium
+        assert gift_dict["is_from_blockchain"] == self.is_from_blockchain
+        assert gift_dict["colors"] == self.colors.to_dict()
 
     def test_equality(self, unique_gift):
         a = unique_gift
         b = UniqueGift(
-            self.base_name,
-            self.name,
-            self.number,
-            self.model,
-            self.symbol,
-            self.backdrop,
-            self.publisher_chat,
+            gift_id=self.gift_id,
+            base_name=self.base_name,
+            name=self.name,
+            number=self.number,
+            model=self.model,
+            symbol=self.symbol,
+            backdrop=self.backdrop,
+            publisher_chat=self.publisher_chat,
         )
         c = UniqueGift(
-            "other_base_name",
-            self.name,
-            self.number,
-            self.model,
-            self.symbol,
-            self.backdrop,
-            self.publisher_chat,
+            gift_id=self.gift_id,
+            base_name="other_base_name",
+            name=self.name,
+            number=self.number,
+            model=self.model,
+            symbol=self.symbol,
+            backdrop=self.backdrop,
+            publisher_chat=self.publisher_chat,
         )
         d = BotCommand("start", "description")
 
@@ -228,6 +256,19 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_gift_id_required_workaround(self):
+        # tags: deprecated NEXT.VERSION, bot api 9.3
+        with pytest.raises(TypeError, match="`gift_id` is a required"):
+            UniqueGift(
+                base_name=self.base_name,
+                name=self.name,
+                number=self.number,
+                model=self.model,
+                symbol=self.symbol,
+                backdrop=self.backdrop,
+                publisher_chat=self.publisher_chat,
+            )
 
 
 @pytest.fixture
@@ -489,20 +530,21 @@ def unique_gift_info():
 
 class UniqueGiftInfoTestBase:
     gift = UniqueGift(
-        "human_readable_name",
-        "unique_name",
-        10,
-        UniqueGiftModel(
+        gift_id="gift_id",
+        base_name="human_readable_name",
+        name="unique_name",
+        number=10,
+        model=UniqueGiftModel(
             name="model_name",
             sticker=Sticker("file_id1", "file_unique_id1", 512, 512, False, False, "regular"),
             rarity_per_mille=10,
         ),
-        UniqueGiftSymbol(
+        symbol=UniqueGiftSymbol(
             name="symbol_name",
             sticker=Sticker("file_id2", "file_unique_id2", 512, 512, True, True, "mask"),
             rarity_per_mille=20,
         ),
-        UniqueGiftBackdrop(
+        backdrop=UniqueGiftBackdrop(
             name="backdrop_name",
             colors=UniqueGiftBackdropColors(0x00FF00, 0xEE00FF, 0xAA22BB, 0x20FE8F),
             rarity_per_mille=2,
