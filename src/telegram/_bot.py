@@ -11355,7 +11355,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Args:
             gift_id (:obj:`str` | :class:`~telegram.Gift`): Identifier of the gift or a
-                :class:`~telegram.Gift` object
+                :class:`~telegram.Gift` object; limited gifts can't be sent to channel chats
             user_id (:obj:`int`, optional): Required if :paramref:`chat_id` is not specified.
                 Unique identifier of the target user that will receive the gift.
 

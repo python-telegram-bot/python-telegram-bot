@@ -183,9 +183,9 @@ class OwnedGiftRegular(OwnedGift):
             available anymore.
         convert_star_count (:obj:`int`, optional): Number of Telegram Stars that can be
             claimed by the receiver instead of the gift; omitted if the gift cannot be converted
-            to Telegram Stars.
+            to Telegram Stars; for gifts received on behalf of business accounts only.
         prepaid_upgrade_star_count (:obj:`int`, optional): Number of Telegram Stars that were
-            paid by the sender for the ability to upgrade the gift.
+            paid for the ability to upgrade the gift.
         is_upgrade_separate (:obj:`bool`, optional): :obj:`True`, if the gift's upgrade was
             purchased after the gift was sent; for gifts received on behalf of business accounts
 
@@ -216,9 +216,9 @@ class OwnedGiftRegular(OwnedGift):
             available anymore.
         convert_star_count (:obj:`int`): Optional. Number of Telegram Stars that can be
             claimed by the receiver instead of the gift; omitted if the gift cannot be converted
-            to Telegram Stars.
+            to Telegram Stars; for gifts received on behalf of business accounts only.
         prepaid_upgrade_star_count (:obj:`int`): Optional. Number of Telegram Stars that were
-            paid by the sender for the ability to upgrade the gift.
+            paid for the ability to upgrade the gift.
         is_upgrade_separate (:obj:`bool`): Optional. :obj:`True`, if the gift's upgrade was
             purchased after the gift was sent; for gifts received on behalf of business accounts
 
