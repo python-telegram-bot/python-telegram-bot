@@ -144,6 +144,7 @@ def test_check_object(tg_class: TelegramClass) -> None:
 
     checked = set()
     fields_removed_by_ptb = ptb_ignored_params(tg_class.class_name)
+    print("fields_removed_by_ptb: ", fields_removed_by_ptb)
 
     for tg_parameter in tg_class.class_parameters:
         print()
@@ -151,6 +152,7 @@ def test_check_object(tg_class: TelegramClass) -> None:
         field: str = tg_parameter.param_name
 
         if field in fields_removed_by_ptb:
+            print(f"{field} is removed by PTB, skipping")
             continue
 
         if field == "from":
@@ -190,9 +192,15 @@ def test_check_object(tg_class: TelegramClass) -> None:
     expected_additional_args |= ptb_extra_params(tg_class.class_name)
     expected_additional_args |= backwards_compat_kwargs(tg_class.class_name)
 
-    print(sig.parameters.keys() ^ checked)
-    print(expected_additional_args)
-    print((sig.parameters.keys() ^ checked) - expected_additional_args)
+    print("checked: ", checked)
+    print("sig: ", sig.parameters.keys())
+    print("expected_additional_args: ", expected_additional_args)
+
+    print("sig ^ checked: ", sig.parameters.keys() ^ checked)
+    print(
+        "unexpected args: ",
+        (sig.parameters.keys() ^ checked) - expected_additional_args,
+    )
 
     unexpected_args = (sig.parameters.keys() ^ checked) - expected_additional_args
     assert unexpected_args == set(), (
