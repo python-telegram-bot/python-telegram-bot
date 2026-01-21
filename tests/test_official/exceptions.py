@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -194,6 +194,8 @@ PTB_IGNORED_PARAMS = {
     r"OwnedGift\w+": {"type"},
     r"InputStoryContent\w+": {"type"},
     r"StoryAreaType\w+": {"type"},
+    # Official API field not yet implemented in PTB
+    "User": {"has_topics_enabled"},
 }
 
 

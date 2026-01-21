@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,14 @@ import time
 
 import pytest
 
-from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Defaults, Job, JobQueue
+from telegram.ext import (
+    ApplicationBuilder,
+    CallbackContext,
+    ContextTypes,
+    Defaults,
+    Job,
+    JobQueue,
+)
 from tests.auxil.envvars import GITHUB_ACTIONS, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
@@ -186,6 +193,49 @@ class TestJobQueue:
         job_queue.run_once(self.job_run_once_with_data, 0.1, data=5)
         await asyncio.sleep(0.2)
         assert self.result == 5
+
+    def test_callback_name_without_name_attribute(self, app):
+        """Test that callable class instances work as job callbacks (issue #4992)"""
+
+        class CallableJob:
+            async def __call__(self, context: ContextTypes.DEFAULT_TYPE):
+                pass
+
+        jq = JobQueue()
+        jq.set_application(app)
+
+        # This should not raise AttributeError
+        job_instance = CallableJob()
+
+        # Test with run_once
+        job = jq.run_once(job_instance, 10)
+        # The job name should be the class name, not raise AttributeError
+        assert job.name == "CallableJob", f"Expected 'CallableJob', got '{job.name}'"
+
+        # Test with run_repeating (the method from the issue)
+        job2 = jq.run_repeating(job_instance, 0.5)
+        assert job2.name == "CallableJob", f"Expected 'CallableJob', got '{job2.name}'"
+
+        # Test with run_monthly
+        when = dtm.time(12, 0, 0)
+        job3 = jq.run_monthly(job_instance, when, 1)
+        assert job3.name == "CallableJob", f"Expected 'CallableJob', got '{job3.name}'"
+
+        # Test with run_daily
+        job4 = jq.run_daily(job_instance, when)
+        assert job4.name == "CallableJob", f"Expected 'CallableJob', got '{job4.name}'"
+
+        # Test with run_custom
+        job5 = jq.run_custom(
+            job_instance,
+            {"trigger": "date", "run_date": dtm.datetime.now() + dtm.timedelta(seconds=10)},
+        )
+        assert job5.name == "CallableJob", f"Expected 'CallableJob', got '{job5.name}'"
+
+        # Test Job.__repr__ uses the correct name
+        assert "callback=CallableJob" in repr(job), (
+            f"repr should contain 'callback=CallableJob', got: {job!r}"
+        )
 
     async def test_run_repeating(self, job_queue):
         job_queue.run_repeating(self.job_run_once, 0.1)
