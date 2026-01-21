@@ -169,36 +169,40 @@ def ptb_extra_params(object_name: str) -> set[str]:
     return _get_params_base(object_name, PTB_EXTRA_PARAMS)
 
 
+from types import MappingProxyType
+
 # Arguments *removed* from the official API
 # Mostly due to the value being fixed anyway
-PTB_IGNORED_PARAMS = {
-    r"InlineQueryResult\w+": {"type"},
-    r"ChatMember\w+": {"status"},
-    r"PassportElementError\w+": {"source"},
-    "ForceReply": {"force_reply"},
-    "ReplyKeyboardRemove": {"remove_keyboard"},
-    r"BotCommandScope\w+": {"type"},
-    r"MenuButton\w+": {"type"},
-    r"InputMedia\w+": {"type"},
-    "InaccessibleMessage": {"date"},
-    r"MessageOrigin\w+": {"type"},
-    r"ChatBoostSource\w+": {"source"},
-    r"ReactionType\w+": {"type"},
-    r"BackgroundType\w+": {"type"},
-    r"BackgroundFill\w+": {"type"},
-    r"RevenueWithdrawalState\w+": {"type"},
-    r"TransactionPartner\w+": {"type"},
-    r"PaidMedia\w+": {"type"},
-    r"InputPaidMedia\w+": {"type"},
-    r"InputProfilePhoto\w+": {"type"},
-    r"OwnedGift\w+": {"type"},
-    r"InputStoryContent\w+": {"type"},
-    r"StoryAreaType\w+": {"type"},
-}
+PTB_IGNORED_PARAMS = MappingProxyType(
+    {
+        r"InlineQueryResult\w+": {"type"},
+        r"ChatMember\w+": {"status"},
+        r"PassportElementError\w+": {"source"},
+        "ForceReply": {"force_reply"},
+        "ReplyKeyboardRemove": {"remove_keyboard"},
+        r"BotCommandScope\w+": {"type"},
+        r"MenuButton\w+": {"type"},
+        r"InputMedia\w+": {"type"},
+        "InaccessibleMessage": {"date"},
+        r"MessageOrigin\w+": {"type"},
+        r"ChatBoostSource\w+": {"source"},
+        r"ReactionType\w+": {"type"},
+        r"BackgroundType\w+": {"type"},
+        r"BackgroundFill\w+": {"type"},
+        r"RevenueWithdrawalState\w+": {"type"},
+        r"TransactionPartner\w+": {"type"},
+        r"PaidMedia\w+": {"type"},
+        r"InputPaidMedia\w+": {"type"},
+        r"InputProfilePhoto\w+": {"type"},
+        r"OwnedGift\w+": {"type"},
+        r"InputStoryContent\w+": {"type"},
+        r"StoryAreaType\w+": {"type"},
+    }
+)
 
 
 def ptb_ignored_params(object_name: str) -> set[str]:
-    print("counting ignored params for ", object_name)
+    print("computing ignored params for ", object_name)
     print("PTB_IGNORED_PARAMS: ")
     from pprint import pprint
 
