@@ -46,11 +46,14 @@ def _get_params_base(object_name: str, search_dict: dict[str, set[Any]]) -> set[
     """
     out = set()
     for regex, params in search_dict.items():
+        print(f"Checking regex: {regex, params} against object name: {object_name}")
         if re.fullmatch(regex, object_name):
+            print(f"Matched regex: {regex} against object name: {object_name}")
             out.update(params)
         # also check the snake_case version
         snake_case_name = re.sub(r"(?<!^)(?=[A-Z])", "_", object_name).lower()
         if re.fullmatch(regex, snake_case_name):
+            print(f"Matched regex: {regex} against snake_case object name: {snake_case_name}")
             out.update(params)
     return out
 

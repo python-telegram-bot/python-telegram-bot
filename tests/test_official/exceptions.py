@@ -198,6 +198,11 @@ PTB_IGNORED_PARAMS = {
 
 
 def ptb_ignored_params(object_name: str) -> set[str]:
+    print("counting ignored params for ", object_name)
+    print("PTB_IGNORED_PARAMS: ")
+    from pprint import pprint
+
+    pprint(PTB_IGNORED_PARAMS)
     return _get_params_base(object_name, PTB_IGNORED_PARAMS)
 
 
