@@ -5979,7 +5979,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             can_restrict_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
                 can restrict, ban or unban chat members, or access supergroup statistics. For
                 backward compatibility, defaults to :obj:`True` for promotions of channel
-                administrators
+                administrators.
             can_pin_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 pin messages, for supergroups only.
             can_promote_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -9977,7 +9977,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             exclude_limited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
                 purchased a limited number of times.
 
-                .. depercated:: NEXT.VERSION
+                .. deprecated:: NEXT.VERSION
                     Bot API 9.3 deprecated this parameter in favor of
                     :paramref:`exclude_limited_upgradabale` and
                     :paramref:`exclude_limited_non_upgradable`.
