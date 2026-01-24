@@ -51,7 +51,7 @@ class UniqueGiftColors(TelegramObject):
     :attr:`light_theme_main_color`, :attr:`light_theme_other_colors`,
     :attr:`dark_theme_main_color`, and :attr:`dark_theme_other_colors` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
 
     Args:
         model_custom_emoji_id (:obj:`str`): Custom emoji identifier of the unique gift's model.
@@ -343,7 +343,7 @@ class UniqueGift(TelegramObject):
     Args:
         gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         base_name (:obj:`str`): Human-readable name of the regular gift from which this unique
             gift was upgraded.
         name (:obj:`str`): Unique name of the gift. This name can be used
@@ -360,21 +360,21 @@ class UniqueGift(TelegramObject):
         is_premium (:obj:`bool`, optional): :obj:`True`, if the original regular gift was
             exclusively purchaseable by Telegram Premium subscribers.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         is_from_blockchain (:obj:`bool`, optional): :obj:`True`, if the gift is assigned from the
             TON blockchain and can't be resold or transferred in Telegram.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         colors (:class:`telegram.UniqueGiftColors`, optional): The color scheme that can be used
             by the gift's owner for the chat's name, replies to messages and link previews; for
             business account gifts and gifts that are currently on sale only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     Attributes:
         gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         base_name (:obj:`str`): Human-readable name of the regular gift from which this unique
             gift was upgraded.
         name (:obj:`str`): Unique name of the gift. This name can be used
@@ -391,16 +391,16 @@ class UniqueGift(TelegramObject):
         is_premium (:obj:`bool`): Optional. :obj:`True`, if the original regular gift was
             exclusively purchaseable by Telegram Premium subscribers.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         is_from_blockchain (:obj:`bool`): Optional. :obj:`True`, if the gift is assigned from the
             TON blockchain and can't be resold or transferred in Telegram.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         colors (:class:`telegram.UniqueGiftColors`): Optional. The color scheme that can be used
             by the gift's owner for the chat's name, replies to messages and link previews; for
             business account gifts and gifts that are currently on sale only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     """
 
@@ -427,7 +427,7 @@ class UniqueGift(TelegramObject):
         symbol: UniqueGiftSymbol,
         backdrop: UniqueGiftBackdrop,
         publisher_chat: Chat | None = None,
-        # tags: deprecated NEXT.VERSION, bot api 9.3
+        # tags: deprecated 22.6, bot api 9.3
         # temporarily optional to account for changed signature
         gift_id: str | None = None,
         is_from_blockchain: bool | None = None,
@@ -436,7 +436,7 @@ class UniqueGift(TelegramObject):
         *,
         api_kwargs: JSONDict | None = None,
     ):
-        # tags: deprecated NEXT.VERSION, bot api 9.3
+        # tags: deprecated 22.6, bot api 9.3
         if gift_id is None:
             raise TypeError("`gift_id` is a required argument since Bot API 9.3")
 
@@ -496,7 +496,7 @@ class UniqueGiftInfo(TelegramObject):
 
             .. versionchanged:: 22.3
                 The :attr:`RESALE` origin was added.
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.6
                 Bot API 9.3 added the :attr:`GIFTED_UPGRADE` and :attr:`OFFER` origins.
         owned_gift_id (:obj:`str`, optional) Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
@@ -506,18 +506,18 @@ class UniqueGiftInfo(TelegramObject):
             paid for the gift.
 
             .. versionadded:: 22.3
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 22.6
                 Bot API 9.3 deprecated this field. Use :attr:`last_resale_currency` and
                 :attr:`last_resale_amount` instead.
         last_resale_currency (:obj:`str`, optional): For gifts bought from other users, the
             currency in which the payment for the gift was done. Currently, one of ``XTR`` for
             Telegram Stars or ``TON`` for toncoins.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         last_resale_amount (:obj:`int`, optional): For gifts bought from other users, the price
             paid for the gift in either Telegram Stars or nanotoncoins.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         next_transfer_date (:obj:`datetime.datetime`, optional): Date when the gift can be
             transferred. If it's in the past, then the gift can be transferred now.
             |datetime_localization|
@@ -534,7 +534,7 @@ class UniqueGiftInfo(TelegramObject):
 
             .. versionchanged:: 22.3
                 The :attr:`RESALE` origin was added.
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.6
                 Bot API 9.3 added the :attr:`GIFTED_UPGRADE` and :attr:`OFFER` origins.
         owned_gift_id (:obj:`str`) Optional. Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
@@ -544,11 +544,11 @@ class UniqueGiftInfo(TelegramObject):
             currency in which the payment for the gift was done. Currently, one of ``XTR`` for
             Telegram Stars or ``TON`` for toncoins.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         last_resale_amount (:obj:`int`): Optional. For gifts bought from other users, the price
             paid for the gift in either Telegram Stars or nanotoncoins.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         next_transfer_date (:obj:`datetime.datetime`): Optional. Date when the gift can be
             transferred. If it's in the past, then the gift can be transferred now.
             |datetime_localization|
@@ -559,12 +559,12 @@ class UniqueGiftInfo(TelegramObject):
     GIFTED_UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.GIFTED_UPGRADE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.GIFTED_UPGRADE`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
     """
     OFFER: Final[str] = constants.UniqueGiftInfoOrigin.OFFER
     """:const:`telegram.constants.UniqueGiftInfoOrigin.OFFER`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
     """
     RESALE: Final[str] = constants.UniqueGiftInfoOrigin.RESALE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.RESALE`
@@ -593,7 +593,7 @@ class UniqueGiftInfo(TelegramObject):
         origin: str,
         owned_gift_id: str | None = None,
         transfer_star_count: int | None = None,
-        # tags: deprecated NEXT.VERSION; bot api 9.3
+        # tags: deprecated 22.6; bot api 9.3
         last_resale_star_count: int | None = None,
         next_transfer_date: dtm.datetime | None = None,
         last_resale_currency: str | None = None,
@@ -604,7 +604,7 @@ class UniqueGiftInfo(TelegramObject):
         if last_resale_star_count is not None:
             warn(
                 PTBDeprecationWarning(
-                    version="NEXT.VERSION",
+                    version="22.6",
                     message=build_deprecation_warning_message(
                         deprecated_name="last_resale_star_count",
                         new_name="last_resale_currency/amount",
@@ -631,14 +631,14 @@ class UniqueGiftInfo(TelegramObject):
 
         self._freeze()
 
-    # tags: deprecated NEXT.VERSION; bot api 9.3
+    # tags: deprecated 22.6; bot api 9.3
     @property
     def last_resale_star_count(self) -> int | None:
         """:obj:`int`: Optional. For gifts bought from other users, the price
         paid for the gift.
 
         .. versionadded:: 22.3
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 22.6
             Bot API 9.3 deprecated this field. Use :attr:`last_resale_currency` and
             :attr:`last_resale_amount` instead.
         """
@@ -646,7 +646,7 @@ class UniqueGiftInfo(TelegramObject):
             deprecated_attr_name="last_resale_star_count",
             new_attr_name="last_resale_currency/amount",
             bot_api_version="9.3",
-            ptb_version="NEXT.VERSION",
+            ptb_version="22.6",
         )
         return self._last_resale_star_count
 

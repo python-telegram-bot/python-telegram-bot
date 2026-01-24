@@ -41,7 +41,7 @@ class GiftBackground(TelegramObject):
     considered equal if their :attr:`center_color`, :attr:`edge_color` and :attr:`text_color` are
     equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
 
     Args:
         center_color (:obj:`int`): Center color of the background in RGB format.
@@ -111,26 +111,26 @@ class Gift(TelegramObject):
         personal_total_count (:obj:`int`, optional): The total number of gifts of this type that
             can be sent by the bot; for limited gifts only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         personal_remaining_count (:obj:`int`, optional): The number of remaining gifts of this type
             that can be sent by the bot; for limited gifts only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         background (:class:`GiftBackground`, optional): Background of the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         is_premium (:obj:`bool`, optional): :obj:`True`, if the gift can only be purchased by
             Telegram Premium subscribers.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         has_colors (:obj:`bool`, optional): :obj:`True`, if the gift can be used (after being
             upgraded) to customize a user's appearance.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         unique_gift_variant_count (:obj:`int`, optional): The total number of different unique
             gifts that can be obtained by upgrading the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     Attributes:
         id (:obj:`str`): Unique identifier of the gift.
@@ -152,26 +152,26 @@ class Gift(TelegramObject):
         personal_total_count (:obj:`int`): Optional. The total number of gifts of this type that
             can be sent by the bot; for limited gifts only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         personal_remaining_count (:obj:`int`): Optional. The number of remaining gifts of this type
             that can be sent by the bot; for limited gifts only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         background (:class:`GiftBackground`): Optional. Background of the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         is_premium (:obj:`bool`): Optional. :obj:`True`, if the gift can only be purchased by
             Telegram Premium subscribers.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         has_colors (:obj:`bool`): Optional. :obj:`True`, if the gift can be used (after being
             upgraded) to customize a user's appearance.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         unique_gift_variant_count (:obj:`int`): Optional. The total number of different unique
             gifts that can be obtained by upgrading the gift.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     """
 
@@ -306,11 +306,11 @@ class GiftInfo(TelegramObject):
         is_upgrade_separate (:obj:`bool`, optional): :obj:`True`, if the gift's upgrade was
             purchased after the gift was sent.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         unique_gift_number (:obj:`int`, optional): Unique number reserved for this gift when
             upgraded. See the number field in :class:`~telegram.UniqueGift`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     Attributes:
         gift (:class:`Gift`): Information about the gift.
@@ -331,11 +331,11 @@ class GiftInfo(TelegramObject):
         is_upgrade_separate (:obj:`bool`): Optional. :obj:`True`, if the gift's upgrade was
             purchased after the gift was sent.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         unique_gift_number (:obj:`int`): Optional. Unique number reserved for this gift when
             upgraded. See the number field in :class:`~telegram.UniqueGift`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     """
 
@@ -458,7 +458,7 @@ class AcceptedGiftTypes(TelegramObject):
     :attr:`unique_gifts`, :attr:`premium_subscription` and :attr:`gifts_from_channels` are equal.
 
     .. versionadded:: 22.1
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.6
         :attr:`gifts_from_channels` is now considered for equality checks.
 
     Args:
@@ -471,7 +471,7 @@ class AcceptedGiftTypes(TelegramObject):
         gifts_from_channels (:obj:`bool`): :obj:`True`, if transfers of unique gifts from channels
             are accepted
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     Attributes:
         unlimited_gifts (:class:`bool`): :obj:`True`, if unlimited regular gifts are accepted.
@@ -483,7 +483,7 @@ class AcceptedGiftTypes(TelegramObject):
         gifts_from_channels (:obj:`bool`): :obj:`True`, if transfers of unique gifts from channels
             are accepted
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     """
 

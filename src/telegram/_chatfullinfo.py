@@ -237,16 +237,16 @@ class ChatFullInfo(_ChatBase):
         rating (:class:`telegram.UserRating`, optional): For private chats, the rating of the user
             if any.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         unique_gift_colors (:class:`telegram.UniqueGiftColors`, optional): The color scheme based
             on a unique gift that must be used for the chat's name, message replies and link
             previews
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         paid_message_star_count (:obj:`int`, optional): The number of Telegram Stars a general user
             have to pay to send a message to the chat
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -422,16 +422,16 @@ class ChatFullInfo(_ChatBase):
         rating (:class:`telegram.UserRating`): Optional. For private chats, the rating of the user
             if any.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         unique_gift_colors (:class:`telegram.UniqueGiftColors`): Optional. The color scheme based
             on a unique gift that must be used for the chat's name, message replies and link
             previews
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         paid_message_star_count (:obj:`int`): Optional. The number of Telegram Stars a general user
             have to pay to send a message to the chat
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups

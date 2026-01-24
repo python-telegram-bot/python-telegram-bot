@@ -189,11 +189,11 @@ class OwnedGiftRegular(OwnedGift):
         is_upgrade_separate (:obj:`bool`, optional): :obj:`True`, if the gift's upgrade was
             purchased after the gift was sent; for gifts received on behalf of business accounts
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         unique_gift_number (:obj:`int`, optional): Unique number reserved for this gift when
             upgraded. See the number field in :class:`~telegram.UniqueGift`
 
-            ... versionadded:: NEXT.VERSION
+            ... versionadded:: 22.6
 
     Attributes:
         type (:obj:`str`): Type of the gift, always :attr:`~telegram.OwnedGift.REGULAR`.
@@ -222,11 +222,11 @@ class OwnedGiftRegular(OwnedGift):
         is_upgrade_separate (:obj:`bool`): Optional. :obj:`True`, if the gift's upgrade was
             purchased after the gift was sent; for gifts received on behalf of business accounts
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         unique_gift_number (:obj:`int`): Optional. Unique number reserved for this gift when
             upgraded. See the number field in :class:`~telegram.UniqueGift`
 
-            ... versionadded:: NEXT.VERSION
+            ... versionadded:: 22.6
 
     """
 

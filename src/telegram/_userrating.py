@@ -29,7 +29,7 @@ class UserRating(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`level` and :attr:`rating` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
 
     Args:
         level (:obj:`int`): Current level of the user, indicating their reliability when purchasing
