@@ -3925,7 +3925,7 @@ class _ChatBase(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.repost_story`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Returns:
             :class:`Story`: On success, :class:`Story` is returned.
@@ -3971,7 +3971,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_chat_gifts`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Returns:
             :class:`telegram.OwnedGifts`: On success, returns the gifts owned by the chat.

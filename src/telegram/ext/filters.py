@@ -2198,7 +2198,7 @@ class StatusUpdate:
     GIFT_UPGRADE_SENT = _GiftUpgradeSent(name="filters.StatusUpdate.GIFT_UPGRADE_SENT")
     """Messages that contain :attr:`telegram.Message.gift_upgrade_sent`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
     """
 
     class _GiveawayCreated(MessageFilter):

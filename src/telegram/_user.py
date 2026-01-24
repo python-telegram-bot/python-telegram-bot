@@ -117,7 +117,7 @@ class User(TelegramObject):
         has_topics_enabled (:obj:`bool`, optional): :obj:`True`, if the bot has forum topic mode
             enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -152,7 +152,7 @@ class User(TelegramObject):
         has_topics_enabled (:obj:`bool`): Optional. :obj:`True`, if the bot has forum topic mode
             enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -522,7 +522,7 @@ class User(TelegramObject):
         Note:
             |user_chat_id_note|
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -2563,7 +2563,7 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.repost_story`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Returns:
             :class:`Story`: On success, :class:`Story` is returned.
@@ -2607,7 +2607,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_gifts`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Returns:
             :class:`telegram.OwnedGifts`: On success, returns the gifts owned by the user.

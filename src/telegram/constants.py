@@ -2193,7 +2193,7 @@ class MessageType(StringEnum):
     GIFT_UPGRADE_SENT = "gift_upgrade_sent"
     """:obj:`str`: Messages with :attr:`telegram.Message.gift_upgrade_sent`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
     """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
@@ -3351,12 +3351,12 @@ class UniqueGiftInfoOrigin(StringEnum):
     GIFTED_UPGRADE = "gifted_upgrade"
     """:obj:`str` upgrades purchased after the gift was sent
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
     """
     OFFER = "OFFER"
     """:obj:`str` gift bought or sold through gift purchase offers
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.6
     """
     RESALE = "resale"
     """:obj:`str` gift bought from other users
@@ -3548,7 +3548,7 @@ class InvoiceLimit(IntEnum):
     .. versionadded:: 21.6
     .. versionchanged:: 22.1
         Bot API 9.0 changed the value to 10000.
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.6
         Bot API 9.3 changed the value to 25000.
     """
     SUBSCRIPTION_PERIOD = dtm.timedelta(days=30).total_seconds()

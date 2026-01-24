@@ -55,7 +55,7 @@ class ChecklistTask(TelegramObject):
         completed_by_chat (:class:`telegram.Chat`, optional): Chat that completed the task; omitted
             if the task wasn't completed by a chat
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         completion_date (:class:`datetime.datetime`, optional): Point in time when
             the task was completed; :attr:`~telegram.constants.ZERO_DATE` if the task wasn't
             completed
@@ -72,7 +72,7 @@ class ChecklistTask(TelegramObject):
         completed_by_chat (:class:`telegram.Chat`): Optional. Chat that completed the task; omitted
             if the task wasn't completed by a chat
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         completion_date (:class:`datetime.datetime`): Optional. Point in time when
             the task was completed; :attr:`~telegram.constants.ZERO_DATE` if the task wasn't
             completed

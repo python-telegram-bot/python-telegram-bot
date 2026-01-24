@@ -41,7 +41,7 @@ class ForumTopic(TelegramObject):
         is_name_implicit (:obj:`bool`, optional): :obj:`True`, if the name of the topic wasn't
             specified explicitly by its creator and likely needs to be changed by the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     Attributes:
         message_thread_id (:obj:`int`): Unique identifier of the forum topic
@@ -52,7 +52,7 @@ class ForumTopic(TelegramObject):
         is_name_implicit (:obj:`bool`): Optional. :obj:`True`, if the name of the topic wasn't
             specified explicitly by its creator and likely needs to be changed by the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
     """
 
     __slots__ = (
@@ -103,7 +103,7 @@ class ForumTopicCreated(TelegramObject):
         is_name_implicit (:obj:`bool`, optional): :obj:`True`, if the name of the topic wasn't
             specified explicitly by its creator and likely needs to be changed by the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
 
     Attributes:
         name (:obj:`str`): Name of the topic
@@ -113,7 +113,7 @@ class ForumTopicCreated(TelegramObject):
         is_name_implicit (:obj:`bool`): Optional. :obj:`True`, if the name of the topic wasn't
             specified explicitly by its creator and likely needs to be changed by the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
     """
 
     __slots__ = ("icon_color", "icon_custom_emoji_id", "is_name_implicit", "name")

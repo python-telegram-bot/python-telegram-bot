@@ -561,7 +561,7 @@ class Message(MaybeInaccessibleMessage):
         gift_upgrade_sent (:class:`telegram.GiftInfo`, optional): Service message: upgrade of a
             gift was purchased after the gift was sent
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
             scheduled giveaway was created
 
@@ -964,7 +964,7 @@ class Message(MaybeInaccessibleMessage):
         gift_upgrade_sent (:class:`telegram.GiftInfo`): Optional. Service message: upgrade of a
             gift was purchased after the gift was sent
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.6
         giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
             scheduled giveaway was created
 
@@ -2117,7 +2117,7 @@ class Message(MaybeInaccessibleMessage):
         Note:
             |reply_same_thread|
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

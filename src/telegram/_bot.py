@@ -1219,7 +1219,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         """Use this method to stream a partial message to a user while the message is being
         generated; supported only for bots with forum topic mode enabled.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Args:
             chat_id (:obj:`int`): Unique identifier for the target private chat.
@@ -1366,7 +1366,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): Unique identifier of the message effect to be
                 added to the message; only available when forwarding to private chats
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.6
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -8484,7 +8484,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_effect_id (:obj:`str`, optional): Unique identifier of the message effect to be
                 added to the message; only available when copying to private chats
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.6
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -9942,7 +9942,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         exclude_unsaved: bool | None = None,
         exclude_saved: bool | None = None,
         exclude_unlimited: bool | None = None,
-        # tags: deprecated NEXT.VERSION; bot api 9.3
+        # tags: deprecated 22.6; bot api 9.3
         exclude_limited: bool | None = None,
         exclude_unique: bool | None = None,
         sort_by_price: bool | None = None,
@@ -9975,25 +9975,25 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             exclude_limited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
                 purchased a limited number of times.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 22.6
                     Bot API 9.3 deprecated this parameter in favor of
                     :paramref:`exclude_limited_upgradabale` and
                     :paramref:`exclude_limited_non_upgradable`.
             exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
                 that can be purchased a limited number of times and can be upgraded to unique.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.6
             exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude
                 gifts that can be purchased a limited number of times and can't be upgraded to
                 unique
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.6
             exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts.
             exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
                 that were assigned from the TON blockchain and can't be resold or transferred in
                 Telegram.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.6
             sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
                 instead of send date. Sorting is applied before pagination.
             offset (:obj:`str`, optional): Offset of the first entry to return as received from
@@ -10012,7 +10012,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         if exclude_limited is not None:
             self._warn(
                 PTBDeprecationWarning(
-                    version="NEXT.VERSION",
+                    version="22.6",
                     message=build_deprecation_warning_message(
                         deprecated_name="exclude_limited",
                         new_name="exclude_limited_(non_)upgradable",
@@ -11717,7 +11717,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         :attr:`~telegram.BusinessBotRight.can_manage_stories` business bot right for both
         business accounts.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business
@@ -11782,7 +11782,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     ) -> OwnedGifts:
         """Returns the gifts owned and hosted by a user.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         user_id (:obj:`int`): Unique identifier of the user
         exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
@@ -11854,7 +11854,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     ) -> OwnedGifts:
         """Use this method to get gifts owned by a chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.6
 
         Args:
         chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
