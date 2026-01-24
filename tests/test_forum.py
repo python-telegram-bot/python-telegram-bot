@@ -40,13 +40,20 @@ from tests.auxil.slots import mro_slots
 async def forum_topic_object(forum_group_id, emoji_id):
     return ForumTopic(
         message_thread_id=forum_group_id,
-        name=TEST_TOPIC_NAME,
-        icon_color=TEST_TOPIC_ICON_COLOR,
+        name=ForumTopicTestBase.TEST_TOPIC_NAME,
+        icon_color=ForumTopicTestBase.TEST_TOPIC_ICON_COLOR,
         icon_custom_emoji_id=emoji_id,
+        is_name_implicit=ForumTopicTestBase.is_name_implicit,
     )
 
 
-class TestForumTopicWithoutRequest:
+class ForumTopicTestBase:
+    TEST_TOPIC_NAME = TEST_TOPIC_NAME
+    TEST_TOPIC_ICON_COLOR = TEST_TOPIC_ICON_COLOR
+    is_name_implicit = False
+
+
+class TestForumTopicWithoutRequest(ForumTopicTestBase):
     def test_slot_behaviour(self, forum_topic_object):
         inst = forum_topic_object
         for attr in inst.__slots__:
@@ -55,33 +62,37 @@ class TestForumTopicWithoutRequest:
 
     async def test_expected_values(self, emoji_id, forum_group_id, forum_topic_object):
         assert forum_topic_object.message_thread_id == forum_group_id
-        assert forum_topic_object.icon_color == TEST_TOPIC_ICON_COLOR
-        assert forum_topic_object.name == TEST_TOPIC_NAME
+        assert forum_topic_object.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert forum_topic_object.name == self.TEST_TOPIC_NAME
         assert forum_topic_object.icon_custom_emoji_id == emoji_id
+        assert forum_topic_object.is_name_implicit == self.is_name_implicit
 
     def test_de_json(self, offline_bot, emoji_id, forum_group_id):
         json_dict = {
             "message_thread_id": forum_group_id,
-            "name": TEST_TOPIC_NAME,
-            "icon_color": TEST_TOPIC_ICON_COLOR,
+            "name": self.TEST_TOPIC_NAME,
+            "icon_color": self.TEST_TOPIC_ICON_COLOR,
             "icon_custom_emoji_id": emoji_id,
+            "is_name_implicit": self.is_name_implicit,
         }
         topic = ForumTopic.de_json(json_dict, offline_bot)
         assert topic.api_kwargs == {}
 
         assert topic.message_thread_id == forum_group_id
-        assert topic.icon_color == TEST_TOPIC_ICON_COLOR
-        assert topic.name == TEST_TOPIC_NAME
+        assert topic.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert topic.name == self.TEST_TOPIC_NAME
         assert topic.icon_custom_emoji_id == emoji_id
+        assert topic.is_name_implicit == self.is_name_implicit
 
     def test_to_dict(self, emoji_id, forum_group_id, forum_topic_object):
         topic_dict = forum_topic_object.to_dict()
 
         assert isinstance(topic_dict, dict)
         assert topic_dict["message_thread_id"] == forum_group_id
-        assert topic_dict["name"] == TEST_TOPIC_NAME
-        assert topic_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
+        assert topic_dict["name"] == self.TEST_TOPIC_NAME
+        assert topic_dict["icon_color"] == self.TEST_TOPIC_ICON_COLOR
         assert topic_dict["icon_custom_emoji_id"] == emoji_id
+        assert topic_dict["is_name_implicit"] == self.is_name_implicit
 
     def test_equality(self, emoji_id, forum_group_id):
         a = ForumTopic(
@@ -289,10 +300,20 @@ class TestForumMethodsWithRequest:
 
 @pytest.fixture(scope="module")
 def topic_created():
-    return ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
+    return ForumTopicCreated(
+        name=ForumTopicCreatedTestBase.TEST_TOPIC_NAME,
+        icon_color=ForumTopicCreatedTestBase.TEST_TOPIC_ICON_COLOR,
+        is_name_implicit=ForumTopicCreatedTestBase.is_name_implicit,
+    )
 
 
-class TestForumTopicCreatedWithoutRequest:
+class ForumTopicCreatedTestBase:
+    TEST_TOPIC_NAME = TEST_TOPIC_NAME
+    TEST_TOPIC_ICON_COLOR = TEST_TOPIC_ICON_COLOR
+    is_name_implicit = False
+
+
+class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase):
     def test_slot_behaviour(self, topic_created):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -301,23 +322,30 @@ class TestForumTopicCreatedWithoutRequest:
         )
 
     def test_expected_values(self, topic_created):
-        assert topic_created.icon_color == TEST_TOPIC_ICON_COLOR
-        assert topic_created.name == TEST_TOPIC_NAME
+        assert topic_created.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert topic_created.name == self.TEST_TOPIC_NAME
+        assert topic_created.is_name_implicit == self.is_name_implicit
 
     def test_de_json(self, offline_bot):
-        json_dict = {"icon_color": TEST_TOPIC_ICON_COLOR, "name": TEST_TOPIC_NAME}
+        json_dict = {
+            "icon_color": self.TEST_TOPIC_ICON_COLOR,
+            "name": self.TEST_TOPIC_NAME,
+            "is_name_implicit": self.is_name_implicit,
+        }
         action = ForumTopicCreated.de_json(json_dict, offline_bot)
         assert action.api_kwargs == {}
 
-        assert action.icon_color == TEST_TOPIC_ICON_COLOR
-        assert action.name == TEST_TOPIC_NAME
+        assert action.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert action.name == self.TEST_TOPIC_NAME
+        assert action.is_name_implicit == self.is_name_implicit
 
     def test_to_dict(self, topic_created):
         action_dict = topic_created.to_dict()
 
         assert isinstance(action_dict, dict)
-        assert action_dict["name"] == TEST_TOPIC_NAME
-        assert action_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
+        assert action_dict["name"] == self.TEST_TOPIC_NAME
+        assert action_dict["icon_color"] == self.TEST_TOPIC_ICON_COLOR
+        assert action_dict["is_name_implicit"] == self.is_name_implicit
 
     def test_equality(self, emoji_id):
         a = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)

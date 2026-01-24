@@ -176,7 +176,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=2)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=3)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -761,13 +761,23 @@ class BusinessLimit(IntEnum):
     """
     MIN_GIFT_RESULTS = 1
     """:obj:`int`: Minimum number of gifts to be returned. Relevant for
-    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
-    :meth:`telegram.Bot.get_business_account_gifts`.
+
+    * :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+      :meth:`telegram.Bot.get_business_account_gifts`.
+    * :paramref:`~telegram.Bot.get_chat_gifts.limit` of
+      :meth:`telegram.Bot.get_chat_gifts`.
+    * :paramref:`~telegram.Bot.get_user_gifts.limit` of
+      :meth:`telegram.Bot.get_user_gifts`.
     """
     MAX_GIFT_RESULTS = 100
     """:obj:`int`: Maximum number of gifts to be returned. Relevant for
-    :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
-    :meth:`telegram.Bot.get_business_account_gifts`.
+
+    * :paramref:`~telegram.Bot.get_business_account_gifts.limit` of
+      :meth:`telegram.Bot.get_business_account_gifts`.
+    * :paramref:`~telegram.Bot.get_chat_gifts.limit` of
+      :meth:`telegram.Bot.get_chat_gifts`.
+    * :paramref:`~telegram.Bot.get_user_gifts.limit` of
+      :meth:`telegram.Bot.get_user_gifts`.
     """
     MIN_STAR_COUNT = 1
     """:obj:`int`: Minimum number of Telegram Stars to be transfered. Relevant for
@@ -2010,6 +2020,8 @@ class MessageLimit(IntEnum):
     * :paramref:`~telegram.Bot.send_message.text` parameter of :meth:`telegram.Bot.send_message`
     * :paramref:`~telegram.Bot.edit_message_text.text` parameter of
       :meth:`telegram.Bot.edit_message_text`
+    * :paramref:`~telegram.Bot.send_message_draft.text` parameter of
+      :meth:`telegram.Bot.send_message_draft`
     """
     CAPTION_LENGTH = 1024
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as:
@@ -2025,11 +2037,14 @@ class MessageLimit(IntEnum):
     """
     # constants above this line are tested
     MIN_TEXT_LENGTH = 1
-    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
-    :paramref:`~telegram.InputTextMessageContent.message_text` parameter of
-    :class:`telegram.InputTextMessageContent` and the
-    :paramref:`~telegram.Bot.edit_message_text.text` parameter of
-    :meth:`telegram.Bot.edit_message_text`.
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.InputTextMessageContent.message_text` parameter of
+      :class:`telegram.InputTextMessageContent`.
+    * :paramref:`~telegram.Bot.edit_message_text.text` parameter of
+      :meth:`telegram.Bot.edit_message_text`.
+    * :paramref:`~telegram.Bot.send_message_draft.text` parameter of
+      :meth:`telegram.Bot.send_message_draft`.
     """
     DEEP_LINK_LENGTH = 64
     """:obj:`int`: Maximum number of characters for a deep link."""
@@ -2174,6 +2189,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.gift`.
 
     .. versionadded:: 22.1
+    """
+    GIFT_UPGRADE_SENT = "gift_upgrade_sent"
+    """:obj:`str`: Messages with :attr:`telegram.Message.gift_upgrade_sent`.
+
+    .. versionadded:: NEXT.VERSION
     """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
@@ -3058,7 +3078,7 @@ class StoryAreaTypeType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.StoryAreaTypeUniqueGift`."""
 
 
-class StoryLimit(StringEnum):
+class StoryLimit(IntEnum):
     """This enum contains limitations for :meth:`~telegram.Bot.post_story` and
     :meth:`~telegram.Bot.edit_story`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -3074,17 +3094,17 @@ class StoryLimit(StringEnum):
     :meth:`telegram.Bot.edit_story`.
     """
     ACTIVITY_SIX_HOURS = 6 * 3600
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_TWELVE_HOURS = 12 * 3600
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_ONE_DAY = 86400
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
     ACTIVITY_TWO_DAYS = 2 * 86400
-    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.caption`` parameter of
-    :meth:`telegram.Bot.post_story`."""
+    """:obj:`int`: Possible value for :paramref:`~telegram.Bot.post_story.active_period`` parameter
+    of :meth:`telegram.Bot.post_story`."""
 
 
 class SuggestedPost(IntEnum):
@@ -3328,15 +3348,25 @@ class UniqueGiftInfoOrigin(StringEnum):
 
     __slots__ = ()
 
-    UPGRADE = "upgrade"
-    """:obj:`str` gift upgraded"""
-    TRANSFER = "transfer"
-    """:obj:`str` gift transfered"""
+    GIFTED_UPGRADE = "gifted_upgrade"
+    """:obj:`str` upgrades purchased after the gift was sent
+
+    .. versionadded:: NEXT.VERSION
+    """
+    OFFER = "OFFER"
+    """:obj:`str` gift bought or sold through gift purchase offers
+
+    .. versionadded:: NEXT.VERSION
+    """
     RESALE = "resale"
     """:obj:`str` gift bought from other users
 
     .. versionadded:: 22.3
     """
+    TRANSFER = "transfer"
+    """:obj:`str` gift transfered"""
+    UPGRADE = "upgrade"
+    """:obj:`str` gift upgraded"""
 
 
 class UpdateType(StringEnum):
@@ -3510,7 +3540,7 @@ class InvoiceLimit(IntEnum):
 
     .. versionadded:: 21.6
     """
-    MAX_STAR_COUNT = 10000
+    MAX_STAR_COUNT = 25000
     """:obj:`int`: Maximum amount of starts that must be paid to buy access to a paid media
     passed as :paramref:`~telegram.Bot.send_paid_media.star_count` parameter of
     :meth:`telegram.Bot.send_paid_media`.
@@ -3518,6 +3548,8 @@ class InvoiceLimit(IntEnum):
     .. versionadded:: 21.6
     .. versionchanged:: 22.1
         Bot API 9.0 changed the value to 10000.
+    .. versionchanged:: NEXT.VERSION
+        Bot API 9.3 changed the value to 25000.
     """
     SUBSCRIPTION_PERIOD = dtm.timedelta(days=30).total_seconds()
     """:obj:`int`: The period of time for which the subscription is active before

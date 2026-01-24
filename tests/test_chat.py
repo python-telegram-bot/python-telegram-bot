@@ -524,6 +524,21 @@ class TestChatWithoutRequest(ChatTestBase):
         monkeypatch.setattr(chat.get_bot(), "send_message", make_assertion)
         assert await chat.send_message(text="test")
 
+    async def test_instance_method_send_message_draft(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["text"] == "test"
+
+        assert check_shortcut_signature(
+            Chat.send_message_draft, Bot.send_message_draft, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.send_message_draft, chat.get_bot(), "send_message_draft"
+        )
+        assert await check_defaults_handling(chat.send_message_draft, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_message_draft", make_assertion)
+        assert await chat.send_message_draft(draft_id=1, text="test")
+
     async def test_instance_method_send_media_group(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == chat.id and kwargs["media"] == "test_media_group"
@@ -1494,6 +1509,44 @@ class TestChatWithoutRequest(ChatTestBase):
 
         monkeypatch.setattr(chat.get_bot(), "decline_suggested_post", make_assertion)
         assert await chat.decline_suggested_post(message_id="message_id", comment="comment")
+
+    async def test_instance_method_repost_story(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["from_chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.repost_story,
+            Bot.repost_story,
+            [
+                "from_chat_id",
+            ],
+            additional_kwargs=[],
+        )
+        assert await check_shortcut_call(
+            chat.repost_story,
+            chat.get_bot(),
+            "repost_story",
+            shortcut_kwargs=["from_chat_id"],
+        )
+        assert await check_defaults_handling(chat.repost_story, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "repost_story", make_assertion)
+        assert await chat.repost_story(
+            business_connection_id="bcid",
+            from_story_id=123,
+            active_period=3600,
+        )
+
+    async def test_instance_method_get_gifts(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(Chat.get_gifts, Bot.get_chat_gifts, ["chat_id"], [])
+        assert await check_shortcut_call(chat.get_gifts, chat.get_bot(), "get_chat_gifts")
+        assert await check_defaults_handling(chat.get_gifts, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "get_chat_gifts", make_assertion)
+        assert await chat.get_gifts()
 
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")

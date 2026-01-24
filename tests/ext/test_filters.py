@@ -1136,6 +1136,11 @@ class TestFilters:
         assert filters.StatusUpdate.UNIQUE_GIFT.check_update(update)
         update.message.unique_gift = None
 
+        update.message.gift_upgrade_sent = "gift_upgrade_sent"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIFT_UPGRADE_SENT.check_update(update)
+        update.message.gift_upgrade_sent = None
+
         update.message.paid_message_price_changed = "paid_message_price_changed"
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.PAID_MESSAGE_PRICE_CHANGED.check_update(update)

@@ -111,6 +111,7 @@ __all__ = (
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
     "Gift",
+    "GiftBackground",
     "GiftInfo",
     "Gifts",
     "Giveaway",
@@ -287,6 +288,7 @@ __all__ = (
     "UniqueGift",
     "UniqueGiftBackdrop",
     "UniqueGiftBackdropColors",
+    "UniqueGiftColors",
     "UniqueGiftInfo",
     "UniqueGiftModel",
     "UniqueGiftSymbol",
@@ -294,6 +296,7 @@ __all__ = (
     "User",
     "UserChatBoosts",
     "UserProfilePhotos",
+    "UserRating",
     "UsersShared",
     "Venue",
     "Video",
@@ -453,7 +456,7 @@ from ._forumtopic import (
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
-from ._gifts import AcceptedGiftTypes, Gift, GiftInfo, Gifts
+from ._gifts import AcceptedGiftTypes, Gift, GiftBackground, GiftInfo, Gifts
 from ._giveaway import Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -597,6 +600,7 @@ from ._uniquegift import (
     UniqueGift,
     UniqueGiftBackdrop,
     UniqueGiftBackdropColors,
+    UniqueGiftColors,
     UniqueGiftInfo,
     UniqueGiftModel,
     UniqueGiftSymbol,
@@ -604,6 +608,7 @@ from ._uniquegift import (
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
+from ._userrating import UserRating
 from ._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,

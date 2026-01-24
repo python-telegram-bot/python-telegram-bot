@@ -30,7 +30,7 @@
 
 .. |message_thread_id| replace:: Unique identifier for the target message thread of the forum topic.
 
-.. |message_thread_id_arg| replace:: Unique identifier for the target message thread (topic) of the forum; for forum supergroups only.
+.. |message_thread_id_arg| replace:: Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only.
 
 .. |parse_mode| replace:: Mode for parsing entities. See :class:`telegram.constants.ParseMode` and `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for more details.
 

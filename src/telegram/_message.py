@@ -496,12 +496,12 @@ class Message(MaybeInaccessibleMessage):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
             represented as ordinary url buttons.
-        is_topic_message (:obj:`bool`, optional): :obj:`True`, if the message is sent to a forum
-            topic.
+        is_topic_message (:obj:`bool`, optional): :obj:`True`, if the message is sent to a topic
+            in a forum supergroup or a private chat with the bot.
 
             .. versionadded:: 20.0
-        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread to which
-            the message belongs; for supergroups only.
+        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread or forum
+            topic to which the message belongs; for supergroups and private chats only.
 
             .. versionadded:: 20.0
         forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
@@ -558,6 +558,10 @@ class Message(MaybeInaccessibleMessage):
             was sent or received
 
             .. versionadded:: 22.1
+        gift_upgrade_sent (:class:`telegram.GiftInfo`, optional): Service message: upgrade of a
+            gift was purchased after the gift was sent
+
+            .. versionadded:: NEXT.VERSION
         giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
             scheduled giveaway was created
 
@@ -898,12 +902,12 @@ class Message(MaybeInaccessibleMessage):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
             represented as ordinary url buttons.
-        is_topic_message (:obj:`bool`): Optional. :obj:`True`, if the message is sent to a forum
-            topic.
+        is_topic_message (:obj:`bool`): Optional. :obj:`True`, if the message is sent to a topic
+            in a forum supergroup or a private chat with the bot.
 
             .. versionadded:: 20.0
-        message_thread_id (:obj:`int`): Optional. Unique identifier of a message thread to which
-            the message belongs; for supergroups only.
+        message_thread_id (:obj:`int`): Optional. Unique identifier of a message thread or forum
+            topic to which the message belongs; for supergroups and private chats only.
 
             .. versionadded:: 20.0
         forum_topic_created (:class:`telegram.ForumTopicCreated`): Optional. Service message:
@@ -957,6 +961,10 @@ class Message(MaybeInaccessibleMessage):
             was sent or received
 
             .. versionadded:: 22.1
+        gift_upgrade_sent (:class:`telegram.GiftInfo`): Optional. Service message: upgrade of a
+            gift was purchased after the gift was sent
+
+            .. versionadded:: NEXT.VERSION
         giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
             scheduled giveaway was created
 
@@ -1125,6 +1133,7 @@ class Message(MaybeInaccessibleMessage):
         "general_forum_topic_hidden",
         "general_forum_topic_unhidden",
         "gift",
+        "gift_upgrade_sent",
         "giveaway",
         "giveaway_completed",
         "giveaway_created",
@@ -1296,6 +1305,7 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_info: "SuggestedPostInfo | None" = None,
         suggested_post_approved: "SuggestedPostApproved | None" = None,
         suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
+        gift_upgrade_sent: GiftInfo | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1422,6 +1432,7 @@ class Message(MaybeInaccessibleMessage):
             self.suggested_post_approval_failed: SuggestedPostApprovalFailed | None = (
                 suggested_post_approval_failed
             )
+            self.gift_upgrade_sent: GiftInfo | None = gift_upgrade_sent
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1637,6 +1648,7 @@ class Message(MaybeInaccessibleMessage):
         data["suggested_post_approval_failed"] = de_json_optional(
             data.get("suggested_post_approval_failed"), SuggestedPostApprovalFailed, bot
         )
+        data["gift_upgrade_sent"] = de_json_optional(data.get("gift_upgrade_sent"), GiftInfo, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -1982,9 +1994,9 @@ class Message(MaybeInaccessibleMessage):
             return message_thread_id
 
         # self.message_thread_id can be used for send_*.param.message_thread_id only if the
-        # thread is a forum topic. It does not work if the thread is a chain of replies to a
-        # message in a normal group. In that case, self.message_thread_id is just the message_id
-        # of the first message in the chain.
+        # thread is a forum topic (in supergroups or private chats). It does not work if the
+        # thread is a chain of replies to a message in a normal group. In that case,
+        # self.message_thread_id is just the message_id of the first message in the chain.
         if not self.is_topic_message:
             return None
 
@@ -2075,6 +2087,55 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+        )
+
+    async def reply_text_draft(
+        self,
+        draft_id: int,
+        text: str,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        entities: Sequence["MessageEntity"] | None = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.send_message_draft(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 *args,
+                 **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_message_draft`.
+
+        Note:
+            |reply_same_thread|
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        message_thread_id = self._parse_message_thread_id(self.chat_id, message_thread_id)
+        return await self.get_bot().send_message_draft(
+            chat_id=self.chat_id,
+            draft_id=draft_id,
+            text=text,
+            parse_mode=parse_mode,
+            entities=entities,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def reply_markdown(
@@ -3822,6 +3883,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: int | None = None,
         video_start_timestamp: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3868,6 +3930,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            message_effect_id=message_effect_id,
         )
 
     async def copy(
@@ -3885,6 +3948,7 @@ class Message(MaybeInaccessibleMessage):
         allow_paid_broadcast: bool | None = None,
         video_start_timestamp: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3935,6 +3999,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_copy(
@@ -3953,6 +4018,7 @@ class Message(MaybeInaccessibleMessage):
         allow_paid_broadcast: bool | None = None,
         video_start_timestamp: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        message_effect_id: str | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -4017,6 +4083,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_paid_media(

@@ -268,20 +268,21 @@ def message(bot):
         {
             "unique_gift": UniqueGiftInfo(
                 gift=UniqueGift(
-                    "human_readable_name",
-                    "unique_name",
-                    2,
-                    UniqueGiftModel(
+                    gift_id="gift_id",
+                    base_name="human_readable_name",
+                    name="unique_name",
+                    number=2,
+                    model=UniqueGiftModel(
                         "model_name",
                         Sticker("file_id1", "file_unique_id1", 512, 512, False, False, "regular"),
                         10,
                     ),
-                    UniqueGiftSymbol(
+                    symbol=UniqueGiftSymbol(
                         "symbol_name",
                         Sticker("file_id2", "file_unique_id2", 512, 512, True, True, "mask"),
                         20,
                     ),
-                    UniqueGiftBackdrop(
+                    backdrop=UniqueGiftBackdrop(
                         "backdrop_name",
                         UniqueGiftBackdropColors(0x00FF00, 0xEE00FF, 0xAA22BB, 0x20FE8F),
                         30,
@@ -420,6 +421,15 @@ def message(bot):
                 send_date=dtm.datetime.utcnow(),
             )
         },
+        {
+            "gift_upgrade_sent": GiftInfo(
+                gift=Gift(
+                    "gift_id",
+                    Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
+                    5,
+                )
+            )
+        },
     ],
     ids=[
         "reply",
@@ -510,6 +520,7 @@ def message(bot):
         "suggested_post_approved",
         "suggested_post_approval_failed",
         "suggested_post_info",
+        "gift_upgrade_sent",
     ],
 )
 def message_params(bot, request):
@@ -735,7 +746,8 @@ class TestMessageWithoutRequest(MessageTestBase):
             message_thread_id = await method(*args, message_thread_id=None)
             assert message_thread_id is None
 
-            if bot_method_name == "send_chat_action":
+            # These methods do not accept `do_quote` as passed below
+            if bot_method_name in ["send_chat_action", "send_message_draft"]:
                 return
 
             message_thread_id = await method(
@@ -1829,6 +1841,37 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         await self.check_thread_id_parsing(
             message, message.reply_html, "send_message", ["test"], monkeypatch
+        )
+
+    async def test_reply_text_draft(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            id_ = kwargs["chat_id"] == message.chat_id
+            text = kwargs["text"] == "test"
+            return id_ and text
+
+        assert check_shortcut_signature(
+            Message.reply_text_draft,
+            Bot.send_message_draft,
+            ["chat_id"],
+            [],
+            annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
+        )
+        assert await check_shortcut_call(
+            message.reply_text_draft,
+            message.get_bot(),
+            "send_message_draft",
+            skip_params=[""],
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(
+            message.reply_text_draft, message.get_bot(), no_default_kwargs={"message_thread_id"}
+        )
+
+        monkeypatch.setattr(message.get_bot(), "send_message_draft", make_assertion)
+        assert await message.reply_text_draft(draft_id=1, text="test")
+
+        await self.check_thread_id_parsing(
+            message, message.reply_text_draft, "send_message_draft", [1, "test"], monkeypatch
         )
 
     async def test_reply_media_group(self, monkeypatch, message):

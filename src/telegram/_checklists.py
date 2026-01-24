@@ -22,6 +22,7 @@ import datetime as dtm
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Optional
 
+from telegram._chat import Chat
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -51,6 +52,10 @@ class ChecklistTask(TelegramObject):
             entities that appear in the task text.
         completed_by_user (:class:`telegram.User`, optional): User that completed the task; omitted
             if the task wasn't completed
+        completed_by_chat (:class:`telegram.Chat`, optional): Chat that completed the task; omitted
+            if the task wasn't completed by a chat
+
+            .. versionadded:: NEXT.VERSION
         completion_date (:class:`datetime.datetime`, optional): Point in time when
             the task was completed; :attr:`~telegram.constants.ZERO_DATE` if the task wasn't
             completed
@@ -64,6 +69,10 @@ class ChecklistTask(TelegramObject):
             entities that appear in the task text.
         completed_by_user (:class:`telegram.User`): Optional. User that completed the task; omitted
             if the task wasn't completed
+        completed_by_chat (:class:`telegram.Chat`): Optional. Chat that completed the task; omitted
+            if the task wasn't completed by a chat
+
+            .. versionadded:: NEXT.VERSION
         completion_date (:class:`datetime.datetime`): Optional. Point in time when
             the task was completed; :attr:`~telegram.constants.ZERO_DATE` if the task wasn't
             completed
@@ -72,6 +81,7 @@ class ChecklistTask(TelegramObject):
     """
 
     __slots__ = (
+        "completed_by_chat",
         "completed_by_user",
         "completion_date",
         "id",
@@ -86,6 +96,7 @@ class ChecklistTask(TelegramObject):
         text_entities: Sequence[MessageEntity] | None = None,
         completed_by_user: User | None = None,
         completion_date: dtm.datetime | None = None,
+        completed_by_chat: Chat | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -94,6 +105,7 @@ class ChecklistTask(TelegramObject):
         self.text: str = text
         self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
         self.completed_by_user: User | None = completed_by_user
+        self.completed_by_chat: Chat | None = completed_by_chat
         self.completion_date: dtm.datetime | None = completion_date
 
         self._id_attrs = (self.id,)
@@ -114,6 +126,7 @@ class ChecklistTask(TelegramObject):
             data["completion_date"] = from_timestamp(date, tzinfo=loc_tzinfo)
 
         data["completed_by_user"] = de_json_optional(data.get("completed_by_user"), User, bot)
+        data["completed_by_chat"] = de_json_optional(data.get("completed_by_chat"), Chat, bot)
         data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
 
         return super().de_json(data=data, bot=bot)

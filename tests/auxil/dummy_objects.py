@@ -81,7 +81,11 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
         accent_color_id=1,
         max_reaction_count=1,
         accepted_gift_types=AcceptedGiftTypes(
-            unlimited_gifts=True, limited_gifts=True, unique_gifts=True, premium_subscription=True
+            unlimited_gifts=True,
+            limited_gifts=True,
+            unique_gifts=True,
+            premium_subscription=True,
+            gifts_from_channels=True,
         ),
     ),
     "ChatInviteLink": ChatInviteLink(
