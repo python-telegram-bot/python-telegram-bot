@@ -259,7 +259,7 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
         assert hash(a) != hash(d)
 
     def test_gift_id_required_workaround(self):
-        # tags: deprecated NEXT.VERSION, bot api 9.3
+        # tags: deprecated 22.6, bot api 9.3
         with pytest.raises(TypeError, match="`gift_id` is a required"):
             UniqueGift(
                 base_name=self.base_name,
