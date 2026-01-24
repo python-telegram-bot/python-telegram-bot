@@ -1,5 +1,5 @@
-internal = "Update Pylint to v3.3.8"
+internal = "Lock file maintenance"
 [[pull_requests]]
-uid = "4947"
+uid = "4980"
 author_uid = "renovatebot"
 closes_threads = []
