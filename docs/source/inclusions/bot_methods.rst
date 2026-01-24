@@ -35,6 +35,8 @@
           - Used for sending media grouped together
         * - :meth:`~telegram.Bot.send_message`
           - Used for sending text messages
+        * - :meth:`~telegram.Bot.send_message_draft`
+          - Used for streaming partial text messages
         * - :meth:`~telegram.Bot.send_paid_media`
           - Used for sending paid media to channels
         * - :meth:`~telegram.Bot.send_photo`
@@ -443,6 +445,8 @@
       - Used for setting the business accounts profile photo
     * - :meth:`~telegram.Bot.post_story`
       - Used for posting a story on behalf of business account.
+    * - :meth:`~telegram.Bot.repost_story`
+      - Used for reposting an existing story on behalf of business account.
     * - :meth:`~telegram.Bot.edit_story`
       - Used for editing business stories posted by the bot.
     * - :meth:`~telegram.Bot.convert_gift_to_stars`
@@ -481,8 +485,12 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_available_gifts`
       - Used for getting information about gifts available for sending
+    * - :meth:`~telegram.Bot.get_chat_gifts`
+      - Used for getting information about gifts owned and hosted by a chat
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
+    * - :meth:`~telegram.Bot.get_user_gifts`
+      - Used for getting information about gifts owned and hosted by a user
     * - :meth:`~telegram.Bot.save_prepared_inline_message`
       - Used for storing a message to be sent by a user of a Mini App
 

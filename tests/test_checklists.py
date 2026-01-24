@@ -21,6 +21,7 @@ import datetime as dtm
 import pytest
 
 from telegram import (
+    Chat,
     Checklist,
     ChecklistTask,
     ChecklistTasksAdded,
@@ -43,6 +44,7 @@ class ChecklistTaskTestBase:
         MessageEntity(type="italic", offset=5, length=2),
     ]
     completed_by_user = User(id=1, first_name="Test", last_name="User", is_bot=False)
+    completed_by_chat = Chat(id=-100, type=Chat.SUPERGROUP, title="Test Chat")
     completion_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
@@ -53,6 +55,7 @@ def checklist_task():
         text=ChecklistTaskTestBase.text,
         text_entities=ChecklistTaskTestBase.text_entities,
         completed_by_user=ChecklistTaskTestBase.completed_by_user,
+        completed_by_chat=ChecklistTaskTestBase.completed_by_chat,
         completion_date=ChecklistTaskTestBase.completion_date,
     )
 
@@ -72,6 +75,7 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
         assert clt_dict["text"] == self.text
         assert clt_dict["text_entities"] == [entity.to_dict() for entity in self.text_entities]
         assert clt_dict["completed_by_user"] == self.completed_by_user.to_dict()
+        assert clt_dict["completed_by_chat"] == self.completed_by_chat.to_dict()
         assert clt_dict["completion_date"] == to_timestamp(self.completion_date)
 
     def test_de_json(self, offline_bot):
@@ -80,6 +84,7 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
             "text": self.text,
             "text_entities": [entity.to_dict() for entity in self.text_entities],
             "completed_by_user": self.completed_by_user.to_dict(),
+            "completed_by_chat": self.completed_by_chat.to_dict(),
             "completion_date": to_timestamp(self.completion_date),
         }
         clt = ChecklistTask.de_json(json_dict, offline_bot)
@@ -88,6 +93,7 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
         assert clt.text == self.text
         assert clt.text_entities == tuple(self.text_entities)
         assert clt.completed_by_user == self.completed_by_user
+        assert clt.completed_by_chat == self.completed_by_chat
         assert clt.completion_date == self.completion_date
         assert clt.api_kwargs == {}
 

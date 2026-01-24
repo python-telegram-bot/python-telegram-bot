@@ -159,6 +159,9 @@ PTB_EXTRA_PARAMS = {
     "InputStoryContent": {"type"},  # attributes common to all subclasses
     "StoryAreaType": {"type"},  # attributes common to all subclasses
     "InputProfilePhoto": {"type"},  # attributes common to all subclasses
+    # backwards compatibility for api 9.3 changes
+    # tags: deprecated NEXT.VERSION, bot api 9.3
+    "UniqueGiftInfo": {"last_resale_star_count"},
 }
 
 
@@ -206,6 +209,9 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
+    # backwards compatibility for api 9.3 changes
+    # tags: deprecated NEXT.VERSION, bot api 9.3
+    "UniqueGift": {"gift_id"},
 }
 
 
@@ -214,7 +220,10 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
+    # tags: deprecated NEXT.VERSION, bot api 9.3
+    "get_business_account_gifts": {"exclude_limited"},
+}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:

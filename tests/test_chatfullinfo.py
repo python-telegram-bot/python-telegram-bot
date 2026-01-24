@@ -33,6 +33,8 @@ from telegram import (
     Location,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
+    UniqueGiftColors,
+    UserRating,
 )
 from telegram._gifts import AcceptedGiftTypes
 from telegram._utils.datetime import UTC, to_timestamp
@@ -89,6 +91,9 @@ def chat_full_info(bot):
         can_send_paid_media=ChatFullInfoTestBase.can_send_paid_media,
         is_direct_messages=ChatFullInfoTestBase.is_direct_messages,
         parent_chat=ChatFullInfoTestBase.parent_chat,
+        rating=ChatFullInfoTestBase.rating,
+        unique_gift_colors=ChatFullInfoTestBase.unique_gift_colors,
+        paid_message_star_count=ChatFullInfoTestBase.paid_message_star_count,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -147,9 +152,19 @@ class ChatFullInfoTestBase:
     first_name = "first_name"
     last_name = "last_name"
     can_send_paid_media = True
-    accepted_gift_types = AcceptedGiftTypes(True, True, True, True)
+    accepted_gift_types = AcceptedGiftTypes(True, True, True, True, True)
     is_direct_messages = True
     parent_chat = Chat(4, "channel", "channel")
+    rating = UserRating(level=1, rating=2, current_level_rating=3, next_level_rating=4)
+    unique_gift_colors = UniqueGiftColors(
+        model_custom_emoji_id="model_custom_emoji_id",
+        symbol_custom_emoji_id="symbol_custom_emoji_id",
+        light_theme_main_color=0xFF5733,
+        light_theme_other_colors=[0x33FF57, 0x3357FF],
+        dark_theme_main_color=0xC70039,
+        dark_theme_other_colors=[0x900C3F, 0x581845],
+    )
+    paid_message_star_count = 1234
 
 
 class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
@@ -207,6 +222,9 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "can_send_paid_media": self.can_send_paid_media,
             "is_direct_messages": self.is_direct_messages,
             "parent_chat": self.parent_chat.to_dict(),
+            "rating": self.rating.to_dict(),
+            "unique_gift_colors": self.unique_gift_colors.to_dict(),
+            "paid_message_star_count": self.paid_message_star_count,
         }
 
         cfi = ChatFullInfo.de_json(json_dict, offline_bot)
@@ -258,6 +276,9 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi.can_send_paid_media == self.can_send_paid_media
         assert cfi.is_direct_messages == self.is_direct_messages
         assert cfi.parent_chat == self.parent_chat
+        assert cfi.rating == self.rating
+        assert cfi.unique_gift_colors == self.unique_gift_colors
+        assert cfi.paid_message_star_count == self.paid_message_star_count
 
     def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
@@ -341,6 +362,9 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
         assert cfi_dict["is_direct_messages"] == cfi.is_direct_messages
         assert cfi_dict["parent_chat"] == cfi.parent_chat.to_dict()
+        assert cfi_dict["rating"] == cfi.rating.to_dict()
+        assert cfi_dict["unique_gift_colors"] == cfi.unique_gift_colors.to_dict()
+        assert cfi_dict["paid_message_star_count"] == cfi.paid_message_star_count
 
     def test_time_period_properties(self, PTB_TIMEDELTA, chat_full_info):
         cfi = chat_full_info

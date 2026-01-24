@@ -45,7 +45,7 @@ class InputVenueMessageContent(InputMessageContent):
         google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
         google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
             `supported types <https://developers.google.com/maps/documentation/places/web-service\
-            /legacy/supported_types>`_.)
+            /place-types>`_.)
 
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -59,7 +59,7 @@ class InputVenueMessageContent(InputMessageContent):
         google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
         google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See
             `supported types <https://developers.google.com/maps/documentation/places/web-service\
-            /legacy/supported_types>`_.)
+            /place-types>`_.)
 
     """
 

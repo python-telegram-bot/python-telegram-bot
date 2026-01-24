@@ -83,6 +83,7 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
+    telegram.giftbackground
     telegram.giftinfo
     telegram.giveaway
     telegram.giveawaycompleted
@@ -181,6 +182,7 @@ Available Types
     telegram.telegramobject
     telegram.textquote
     telegram.uniquegift
+    telegram.uniquegiftcolors
     telegram.uniquegiftbackdrop
     telegram.uniquegiftbackdropcolors
     telegram.uniquegiftinfo
@@ -190,6 +192,7 @@ Available Types
     telegram.user
     telegram.userchatboosts
     telegram.userprofilephotos
+    telegram.userrating
     telegram.usersshared
     telegram.venue
     telegram.video

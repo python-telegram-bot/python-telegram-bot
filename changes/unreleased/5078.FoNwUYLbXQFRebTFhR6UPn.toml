@@ -1,0 +1,28 @@
+features = """
+Full Support for Bot API 9.3
+
+.. warning::
+
+    - Bot API 9.3 deprecates the field ``last_resale_star_count`` of ``UniqueGiftInfo`` in favor of the new fields ``last_resale_currency`` and ``last_resale_amount``. The field ``last_resale_star_count`` is still present in PTB for backward compatibility, but it will be removed in future releases. Please update your code accordingly.
+
+    - Bot API 9.3 deprecates the argument ``exclude_limited`` of ``Bot.get_business_account_gifts`` in favor of the new arguments ``exclude_limited_upgradable`` and ``exclude_limited_non_upgradable``. The argument ``exclude_limited`` is still present in PTB for backward compatibility, but it will be removed in future releases. Please update your code accordingly.
+
+    - Bot API 9.3 introduces a now required argument ``gift_id`` to ``UniqueGift``. For backward compatibility, the argument is currently still marked as optional in the signature and it's presence is enforced through a runtime check. In future versions, this argument will be made required in the signature as well.
+      Please make sure to update your code accordingly to avoid potential issues in the future. We recommend using keyword arguments to ensure compatibility with future updates.
+"""
+
+pull_requests = [
+  { uid = "5086", author_uids = ["Bibo-Joshi"] },
+  { uid = "5078", author_uid = "aelkheir", closes_threads = ["5077"] },
+  { uid = "5079", author_uid = "aelkheir" },
+  { uid = "5084", author_uids = ["Bibo-Joshi"] },
+  { uid = "5085", author_uids = ["Bibo-Joshi"] },
+  { uid = "5087", author_uids = ["Bibo-Joshi"] },
+  { uid = "5091", author_uids = ["Bibo-Joshi"] },
+  { uid = "5090", author_uids = ["Bibo-Joshi"] },
+  { uid = "5089", author_uids = ["Bibo-Joshi"] },
+  { uid = "5092", author_uids = ["Bibo-Joshi"] },
+  { uid = "5095", author_uids = ["Bibo-Joshi"] },
+  { uid = "5094", author_uids = ["Bibo-Joshi"] },
+  { uid = "5106", author_uid = ["aelkheir"] },
+]

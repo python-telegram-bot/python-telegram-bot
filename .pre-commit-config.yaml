@@ -8,7 +8,7 @@ ci:
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.14.10'
+    rev: 'v0.14.13'
     hooks:
     # Run the linter:
     -   id: ruff-check
@@ -30,7 +30,7 @@ repos:
           - aiolimiter~=1.1,<1.3
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.1
     hooks:
     -   id: mypy
         name: mypy-ptb
