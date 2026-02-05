@@ -1,0 +1,4 @@
+python-telegram-bot
+requests
+yt-dlp
+beautifulsoup4
