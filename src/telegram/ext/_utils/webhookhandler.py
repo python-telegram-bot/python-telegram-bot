@@ -203,7 +203,7 @@ class TelegramHandler(tornado.web.RequestHandler):
                     HTTPStatus.FORBIDDEN, reason="Request did not include the secret token"
                 )
             if token != self.secret_token:
-                _LOGGER.debug("Request had the wrong secret token: %s", token)
+                _LOGGER.debug("Request had the wrong secret token")
                 raise tornado.web.HTTPError(
                     HTTPStatus.FORBIDDEN, reason="Request had the wrong secret token"
                 )
