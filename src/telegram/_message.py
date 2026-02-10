@@ -1462,8 +1462,8 @@ class Message(MaybeInaccessibleMessage):
                 to the corresponding thread view.
         """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
-            # the else block gets rid of leading -100 for supergroups:
-            to_link = self.chat.username if self.chat.username else f"c/{str(self.chat.id)[4:]}"
+            # if username doesn't exist, remove the leading -100 for supergroups in link
+            to_link = self.chat.username or f"c/{str(self.chat.id)[4:]}"
             baselink = f"https://t.me/{to_link}/{self.message_id}"
 
             # adds the thread for topics and replies
