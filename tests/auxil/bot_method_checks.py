@@ -230,9 +230,7 @@ async def check_shortcut_call(
 
     shortcut_signature = inspect.signature(shortcut_method)
     # auto_pagination: Special casing for InlineQuery.answer
-    kwargs = {
-        name: name for name in shortcut_signature.parameters if name not in ["auto_pagination"]
-    }
+    kwargs = {name: name for name in shortcut_signature.parameters if name != "auto_pagination"}
     if "reply_parameters" in kwargs:
         kwargs["reply_parameters"] = ReplyParameters(message_id=1)
 

@@ -101,7 +101,7 @@ def autodoc_process_docstring(
     """
 
     # 1) Insert the Keyword Args and "Shortcuts" admonitions for the Bot methods
-    method_name = name.split(".")[-1]
+    method_name = name.rsplit(".", maxsplit=1)
     if (
         name.startswith("telegram.Bot.")
         and what == "method"

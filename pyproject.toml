@@ -165,7 +165,7 @@ show-fixes = true
 
 [tool.ruff.lint]
 typing-extensions = false
-ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203"]
+ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203", "ASYNC240"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
           "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
           "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB", "DOC", "TRY", 
