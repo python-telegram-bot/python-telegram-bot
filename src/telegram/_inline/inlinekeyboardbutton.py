@@ -40,7 +40,7 @@ class InlineKeyboardButton(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`url`, :attr:`login_url`, :attr:`callback_data`,
     :attr:`switch_inline_query`, :attr:`switch_inline_query_current_chat`, :attr:`callback_game`,
-    :attr:`web_app`, :attr:`style` and :attr:`pay` are equal.
+    :attr:`web_app`, :attr:`pay` and :attr:`style` are equal.
 
     Note:
         * Exactly one of the optional fields must be used to specify type of the button.
@@ -75,6 +75,10 @@ class InlineKeyboardButton(TelegramObject):
 
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
+       equality.
+
+    .. versionchanged:: NEXT.VERSION
+       :attr:`style` is considered as well when comparing objects of this type in terms of
        equality.
 
     Args:
@@ -142,17 +146,17 @@ class InlineKeyboardButton(TelegramObject):
                 This type of button **must** always be the first button in the first row and can
                 only be used in invoice messages.
         style (:obj:`str`, optional): Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients.
-
-            Possible values:
-
-            - ``"primary"`` - Primary button style (usually blue)
-            - ``"success"`` - Success button style (usually green)
-            - ``"danger"`` - Danger/destructive button style (usually red)
+            of the button in supported Telegram clients. Possible values are
+            :tg-const:`telegram.InlineKeyboardButton.STYLE_PRIMARY`,
+            :tg-const:`telegram.InlineKeyboardButton.STYLE_SUCCESS` and
+            :tg-const:`telegram.InlineKeyboardButton.STYLE_DANGER`.
 
             Note:
                 This feature requires Telegram client version 6.5.1 or later. Older clients
                 will display the button without styling.
+
+            .. versionadded:: NEXT.VERSION
+
         switch_inline_query_chosen_chat (:class:`telegram.SwitchInlineQueryChosenChat`, optional):
             If set, pressing the button will prompt the user to select one of their chats of the
             specified type, open that chat and insert the bot's username and the specified inline
@@ -214,8 +218,17 @@ class InlineKeyboardButton(TelegramObject):
             copies the specified text to the clipboard.
 
             .. versionadded:: 21.7
-        style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients.
+        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
+            of the button in supported Telegram clients. Possible values are
+            :tg-const:`telegram.InlineKeyboardButton.STYLE_PRIMARY`,
+            :tg-const:`telegram.InlineKeyboardButton.STYLE_SUCCESS` and
+            :tg-const:`telegram.InlineKeyboardButton.STYLE_DANGER`.
+
+            Note:
+                This feature requires Telegram client version 6.5.1 or later. Older clients
+                will display the button without styling.
+
+            .. versionadded:: NEXT.VERSION
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
             be launched when the user presses the button.
 
@@ -311,6 +324,7 @@ class InlineKeyboardButton(TelegramObject):
             self.switch_inline_query_current_chat,
             self.callback_game,
             self.pay,
+            self.style,
         )
 
     @classmethod
@@ -352,3 +366,20 @@ class InlineKeyboardButton(TelegramObject):
 
     .. versionadded:: 20.0
     """
+    STYLE_PRIMARY: Final[str] = constants.InlineKeyboardButtonStyle.PRIMARY
+    """:const:`telegram.constants.InlineKeyboardButtonStyle.PRIMARY`
+
+    .. versionadded:: NEXT.VERSION
+    """
+    STYLE_SUCCESS: Final[str] = constants.InlineKeyboardButtonStyle.SUCCESS
+    """:const:`telegram.constants.InlineKeyboardButtonStyle.SUCCESS`
+
+    .. versionadded:: NEXT.VERSION
+    """
+    STYLE_DANGER: Final[str] = constants.InlineKeyboardButtonStyle.DANGER
+    """:const:`telegram.constants.InlineKeyboardButtonStyle.DANGER`
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+
