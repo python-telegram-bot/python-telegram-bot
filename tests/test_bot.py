@@ -56,6 +56,7 @@ from telegram import (
     InputMediaPhoto,
     InputMessageContent,
     InputPollOption,
+    InputProfilePhotoStatic,
     InputTextMessageContent,
     LabeledPrice,
     LinkPreviewOptions,
@@ -4818,6 +4819,18 @@ class TestBotWithRequest:
         gifts = await bot.get_chat_gifts(chat_id)
         assert isinstance(gifts, OwnedGifts)
         assert gifts.total_count == 0
+
+    @pytest.mark.dev
+    async def test_my_profile_photo(self, bot):
+        await bot.remove_my_profile_photo()
+        bot_profile_photos = await bot.get_user_profile_photos(bot.id)
+        assert bot_profile_photos.total_count == 0
+        await bot.set_my_profile_photo(
+            InputProfilePhotoStatic(photo=data_file("telegram.jpg").read_bytes())
+        )
+        bot_profile_photos = await bot.get_user_profile_photos(bot.id)
+        print(bot_profile_photos.photos[0])
+        assert bot_profile_photos.total_count == 1
 
     async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
         """Test that requests and bot user are initialized separately and only once."""
