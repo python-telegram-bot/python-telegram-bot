@@ -157,17 +157,17 @@ class KeyboardButton(TelegramObject):
     )
 
     def __init__(
-        self,
-        text: str,
-        request_contact: bool | None = None,
-        request_location: bool | None = None,
-        request_poll: KeyboardButtonPollType | None = None,
-        web_app: WebAppInfo | None = None,
-        request_chat: KeyboardButtonRequestChat | None = None,
-        request_users: KeyboardButtonRequestUsers | None = None,
-        style: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
+            self,
+            text: str,
+            request_contact: bool | None = None,
+            request_location: bool | None = None,
+            request_poll: KeyboardButtonPollType | None = None,
+            web_app: WebAppInfo | None = None,
+            request_chat: KeyboardButtonRequestChat | None = None,
+            request_users: KeyboardButtonRequestUsers | None = None,
+            style: str | None = None,
+            *,
+            api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
