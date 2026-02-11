@@ -45,6 +45,7 @@ def json_dict():
         "can_connect_to_business": UserTestBase.can_connect_to_business,
         "has_main_web_app": UserTestBase.has_main_web_app,
         "has_topics_enabled": UserTestBase.has_topics_enabled,
+        "allows_users_to_create_topics": UserTestBase.allows_users_to_create_topics,
     }
 
 
@@ -86,6 +87,7 @@ class UserTestBase:
     can_connect_to_business = True
     has_main_web_app = False
     has_topics_enabled = False
+    allows_users_to_create_topics = False
 
 
 class TestUserWithoutRequest(UserTestBase):
@@ -112,6 +114,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user.can_connect_to_business == self.can_connect_to_business
         assert user.has_main_web_app == self.has_main_web_app
         assert user.has_topics_enabled == self.has_topics_enabled
+        assert user.allows_users_to_create_topics == self.allows_users_to_create_topics
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -131,6 +134,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user_dict["can_connect_to_business"] == user.can_connect_to_business
         assert user_dict["has_main_web_app"] == user.has_main_web_app
         assert user_dict["has_topics_enabled"] == user.has_topics_enabled
+        assert user_dict["allows_users_to_create_topics"] == user.allows_users_to_create_topics
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)
