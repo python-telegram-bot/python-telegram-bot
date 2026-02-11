@@ -1402,6 +1402,27 @@ class InlineKeyboardButtonLimit(IntEnum):
     """
 
 
+class InlineKeyboardButtonStyle(StringEnum):
+    """This enum contains the available button styles for
+    :class:`telegram.InlineKeyboardButton` and :class:`telegram.KeyboardButton`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PRIMARY = "primary"
+    """:obj:`str`: Primary button style (usually blue).
+    """
+    SUCCESS = "success"
+    """:obj:`str`: Success button style (usually green).
+    """
+    DANGER = "danger"
+    """:obj:`str`: Danger/destructive button style (usually red).
+    """
+
+
 class InlineKeyboardMarkupLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineKeyboardMarkup`/
     :meth:`telegram.Bot.send_message` & friends. The enum
