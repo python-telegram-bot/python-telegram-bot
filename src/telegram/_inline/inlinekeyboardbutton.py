@@ -274,21 +274,21 @@ class InlineKeyboardButton(TelegramObject):
     )
 
     def __init__(
-        self,
-        text: str,
-        url: str | None = None,
-        callback_data: str | object | None = None,
-        switch_inline_query: str | None = None,
-        switch_inline_query_current_chat: str | None = None,
-        callback_game: CallbackGame | None = None,
-        pay: bool | None = None,
-        login_url: LoginUrl | None = None,
-        web_app: WebAppInfo | None = None,
-        switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = None,
-        copy_text: CopyTextButton | None = None,
-        style: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
+            self,
+            text: str,
+            url: str | None = None,
+            callback_data: str | object | None = None,
+            switch_inline_query: str | None = None,
+            switch_inline_query_current_chat: str | None = None,
+            callback_game: CallbackGame | None = None,
+            pay: bool | None = None,
+            login_url: LoginUrl | None = None,
+            web_app: WebAppInfo | None = None,
+            switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = None,
+            copy_text: CopyTextButton | None = None,
+            style: str | None = None,
+            *,
+            api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -381,5 +381,3 @@ class InlineKeyboardButton(TelegramObject):
 
     .. versionadded:: NEXT.VERSION
     """
-
-
