@@ -30,6 +30,8 @@ from telegram import (
     Chat,
     ChatBackground,
     ChatBoostAdded,
+    ChatOwnerChanged,
+    ChatOwnerLeft,
     ChatShared,
     Checklist,
     ChecklistTask,
@@ -430,6 +432,8 @@ def message(bot):
                 )
             )
         },
+        {"chat_owner_changed": ChatOwnerChanged(new_owner=User(4, "Snow", False))},
+        {"chat_owner_left": ChatOwnerLeft(new_owner=User(5, "Crash", False))},
     ],
     ids=[
         "reply",
@@ -521,6 +525,8 @@ def message(bot):
         "suggested_post_approval_failed",
         "suggested_post_info",
         "gift_upgrade_sent",
+        "chat_owner_changed",
+        "chat_owner_left",
     ],
 )
 def message_params(bot, request):
