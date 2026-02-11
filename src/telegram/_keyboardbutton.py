@@ -101,9 +101,10 @@ class KeyboardButton(TelegramObject):
             .. versionadded:: 20.1
         style (:obj:`str`, optional): Style of the button. Determines the visual appearance
             of the button in supported Telegram clients. Possible values are
-            :tg-const:`telegram.KeyboardButton.STYLE_PRIMARY`,
-            :tg-const:`telegram.KeyboardButton.STYLE_SUCCESS` and
-            :tg-const:`telegram.KeyboardButton.STYLE_DANGER`.
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
+            Color aliases (BLUE, GREEN, RED) are also available.
 
             Note:
                 This feature requires Telegram client version 6.5.1 or later. Older clients
@@ -141,6 +142,10 @@ class KeyboardButton(TelegramObject):
             .. versionadded:: 20.1
         style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
             of the button in supported Telegram clients.
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
+            Color aliases (BLUE, GREEN, RED) are also available.
 
             .. versionadded:: NEXT.VERSION
     """
@@ -219,18 +224,18 @@ class KeyboardButton(TelegramObject):
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
-    STYLE_PRIMARY: Final[str] = constants.InlineKeyboardButtonStyle.PRIMARY
-    """:const:`telegram.constants.InlineKeyboardButtonStyle.PRIMARY`
+    PRIMARY: Final[str] = constants.KeyboardButtonStyle.PRIMARY
+    """:const:`telegram.constants.KeyboardButtonStyle.PRIMARY`
 
     .. versionadded:: NEXT.VERSION
     """
-    STYLE_SUCCESS: Final[str] = constants.InlineKeyboardButtonStyle.SUCCESS
-    """:const:`telegram.constants.InlineKeyboardButtonStyle.SUCCESS`
+    SUCCESS: Final[str] = constants.KeyboardButtonStyle.SUCCESS
+    """:const:`telegram.constants.KeyboardButtonStyle.SUCCESS`
 
     .. versionadded:: NEXT.VERSION
     """
-    STYLE_DANGER: Final[str] = constants.InlineKeyboardButtonStyle.DANGER
-    """:const:`telegram.constants.InlineKeyboardButtonStyle.DANGER`
+    DANGER: Final[str] = constants.KeyboardButtonStyle.DANGER
+    """:const:`telegram.constants.KeyboardButtonStyle.DANGER`
 
     .. versionadded:: NEXT.VERSION
     """
