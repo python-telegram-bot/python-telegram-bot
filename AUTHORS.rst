@@ -143,7 +143,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `zeroone2numeral2 <https://github.com/zeroone2numeral2>`_
 - `zeshuaro <https://github.com/zeshuaro>`_
 - `zpavloudis <https://github.com/zpavloudis>`_
-- `欧阳 <https://github.com/ouyooung>`_
+- `OuYoung <https://github.com/ouyooung>`_
 
 
 Please add yourself here alphabetically when you submit your first pull request.
