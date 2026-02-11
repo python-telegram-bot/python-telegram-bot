@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
+from telegram import constants
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
 from telegram._telegramobject import TelegramObject
@@ -39,8 +40,8 @@ class KeyboardButton(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
-    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users` and :attr:`request_chat` are
-    equal.
+    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users`, :attr:`request_chat` and
+    :attr:`style` are equal.
 
     Note:
         * Optional fields are mutually exclusive.
@@ -53,6 +54,8 @@ class KeyboardButton(TelegramObject):
         * :attr:`request_users` and :attr:`request_chat` options will only work in Telegram
           versions released after 3 February, 2023. Older clients will display unsupported
           message.
+        * :attr:`style` option will only work in Telegram versions released after [DATE].
+          Older clients will display buttons without styling.
 
     .. versionchanged:: 21.0
        Removed deprecated argument and attribute ``request_user``.
@@ -62,6 +65,10 @@ class KeyboardButton(TelegramObject):
     .. versionchanged:: 20.5
        :attr:`request_users` and :attr:`request_chat` are considered as well when
        comparing objects of this type in terms of equality.
+
+    .. versionchanged:: NEXT.VERSION
+       :attr:`style` is considered as well when comparing objects of this type in terms of
+       equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -92,6 +99,19 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
+        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
+            of the button in supported Telegram clients. Possible values are
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
+            Color aliases (BLUE, GREEN, RED) are also available.
+
+            Note:
+                This feature requires Telegram client version 6.5.1 or later. Older clients
+                will display the button without styling.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
             sent to the bot as a message when the button is pressed.
@@ -120,6 +140,14 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
+        style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
+            of the button in supported Telegram clients.
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
+            Color aliases (BLUE, GREEN, RED) are also available.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -128,21 +156,23 @@ class KeyboardButton(TelegramObject):
         "request_location",
         "request_poll",
         "request_users",
+        "style",
         "text",
         "web_app",
     )
 
     def __init__(
-        self,
-        text: str,
-        request_contact: bool | None = None,
-        request_location: bool | None = None,
-        request_poll: KeyboardButtonPollType | None = None,
-        web_app: WebAppInfo | None = None,
-        request_chat: KeyboardButtonRequestChat | None = None,
-        request_users: KeyboardButtonRequestUsers | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
+            self,
+            text: str,
+            request_contact: bool | None = None,
+            request_location: bool | None = None,
+            request_poll: KeyboardButtonPollType | None = None,
+            web_app: WebAppInfo | None = None,
+            request_chat: KeyboardButtonRequestChat | None = None,
+            request_users: KeyboardButtonRequestUsers | None = None,
+            style: str | None = None,
+            *,
+            api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -155,6 +185,7 @@ class KeyboardButton(TelegramObject):
         self.web_app: WebAppInfo | None = web_app
         self.request_users: KeyboardButtonRequestUsers | None = request_users
         self.request_chat: KeyboardButtonRequestChat | None = request_chat
+        self.style: str | None = style
 
         self._id_attrs = (
             self.text,
@@ -164,6 +195,7 @@ class KeyboardButton(TelegramObject):
             self.web_app,
             self.request_users,
             self.request_chat,
+            self.style,
         )
 
         self._freeze()
@@ -191,3 +223,19 @@ class KeyboardButton(TelegramObject):
             api_kwargs = {"request_user": request_user}
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
+
+    PRIMARY: Final[str] = constants.KeyboardButtonStyle.PRIMARY
+    """:const:`telegram.constants.KeyboardButtonStyle.PRIMARY`
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SUCCESS: Final[str] = constants.KeyboardButtonStyle.SUCCESS
+    """:const:`telegram.constants.KeyboardButtonStyle.SUCCESS`
+
+    .. versionadded:: NEXT.VERSION
+    """
+    DANGER: Final[str] = constants.KeyboardButtonStyle.DANGER
+    """:const:`telegram.constants.KeyboardButtonStyle.DANGER`
+
+    .. versionadded:: NEXT.VERSION
+    """
