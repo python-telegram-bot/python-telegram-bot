@@ -128,6 +128,7 @@ class KeyboardButton(TelegramObject):
         "request_location",
         "request_poll",
         "request_users",
+        "style",
         "text",
         "web_app",
     )
@@ -141,6 +142,7 @@ class KeyboardButton(TelegramObject):
         web_app: WebAppInfo | None = None,
         request_chat: KeyboardButtonRequestChat | None = None,
         request_users: KeyboardButtonRequestUsers | None = None,
+        style: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -155,6 +157,7 @@ class KeyboardButton(TelegramObject):
         self.web_app: WebAppInfo | None = web_app
         self.request_users: KeyboardButtonRequestUsers | None = request_users
         self.request_chat: KeyboardButtonRequestChat | None = request_chat
+        self.style: str | None = style
 
         self._id_attrs = (
             self.text,
