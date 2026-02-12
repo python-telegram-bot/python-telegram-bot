@@ -11916,6 +11916,75 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         )
         return OwnedGifts.de_json(result, self)
 
+    async def set_my_profile_photo(
+        self,
+        photo: "InputProfilePhoto",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Changes the profile photo of the bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            photo (:class:`telegram.InputProfilePhoto`): The new profile photo to set.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "photo": photo,
+        }
+        return await self._post(
+            "setMyProfilePhoto",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def remove_my_profile_photo(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Removes the profile photo of the bot. Requires no parameters.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+
+        return await self._post(
+            "removeMyProfilePhoto",
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -12248,3 +12317,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_user_gifts`"""
     getChatGifts = get_chat_gifts
     """Alias for :meth:`get_chat_gifts`"""
+    removeMyProfilePhoto = remove_my_profile_photo
+    """Alias for :meth:`remove_my_profile_photo`"""
+    setMyProfilePhoto = set_my_profile_photo
+    """Alias for :meth:`set_my_profile_photo`"""

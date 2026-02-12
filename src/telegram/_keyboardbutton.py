@@ -39,8 +39,8 @@ class KeyboardButton(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
-    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users` and :attr:`request_chat` are
-    equal.
+    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users`, :attr:`request_chat` and
+    :attr:`icon_custom_emoji_id` are equal.
 
     Note:
         * Optional fields are mutually exclusive.
@@ -62,6 +62,9 @@ class KeyboardButton(TelegramObject):
     .. versionchanged:: 20.5
        :attr:`request_users` and :attr:`request_chat` are considered as well when
        comparing objects of this type in terms of equality.
+    .. versionchanged:: NEXT.VERSION
+       :attr:`icon_custom_emoji_id` is considered as well when comparing objects of this type in
+       terms of equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -92,6 +95,13 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
+        icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the custom emoji shown
+            before the text of the button. Can only be used by bots that purchased additional
+            usernames on `Fragment <https://fragment.com/>`_ or in the messages directly sent by
+            the bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
+
+            .. versionadded:: NEXT.VERSION
     Attributes:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
             sent to the bot as a message when the button is pressed.
@@ -120,9 +130,17 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji shown
+            before the text of the button. Can only be used by bots that purchased additional
+            usernames on `Fragment <https://fragment.com/>`_ or in the messages directly sent by
+            the bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
+        "icon_custom_emoji_id",
         "request_chat",
         "request_contact",
         "request_location",
@@ -141,6 +159,7 @@ class KeyboardButton(TelegramObject):
         web_app: WebAppInfo | None = None,
         request_chat: KeyboardButtonRequestChat | None = None,
         request_users: KeyboardButtonRequestUsers | None = None,
+        icon_custom_emoji_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -155,6 +174,7 @@ class KeyboardButton(TelegramObject):
         self.web_app: WebAppInfo | None = web_app
         self.request_users: KeyboardButtonRequestUsers | None = request_users
         self.request_chat: KeyboardButtonRequestChat | None = request_chat
+        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
 
         self._id_attrs = (
             self.text,
@@ -164,6 +184,7 @@ class KeyboardButton(TelegramObject):
             self.web_app,
             self.request_users,
             self.request_chat,
+            self.icon_custom_emoji_id,
         )
 
         self._freeze()

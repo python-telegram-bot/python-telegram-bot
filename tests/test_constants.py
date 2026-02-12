@@ -207,6 +207,8 @@ class TestConstantsWithoutRequest:
             "paid_star_count",
             "is_paid_post",
             "reply_to_checklist_task_id",
+            "chat_owner_changed",
+            "chat_owner_left",
         }
 
     @pytest.mark.parametrize(

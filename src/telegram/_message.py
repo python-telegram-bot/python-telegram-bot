@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING, TypedDict
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
 from telegram._chatboost import ChatBoostAdded
+from telegram._chatowner import ChatOwnerChanged, ChatOwnerLeft
 from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
 from telegram._dice import Dice
 from telegram._directmessagepricechanged import DirectMessagePriceChanged
@@ -676,6 +677,14 @@ class Message(MaybeInaccessibleMessage):
             task that is being replied to.
 
             .. versionadded:: 22.4
+        chat_owner_left (:class:`telegram.ChatOwnerLeft`, optional): Service message: chat owner
+            has left.
+
+            .. versionadded:: NEXT.VERSION
+        chat_owner_changed (:class:`telegram.ChatOwnerChanged`, optional): Service message: chat
+            owner has changed.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1080,6 +1089,14 @@ class Message(MaybeInaccessibleMessage):
             task that is being replied to.
 
             .. versionadded:: 22.4
+        chat_owner_left (:class:`telegram.ChatOwnerLeft`): Optional. Service message: chat owner
+            has left.
+
+            .. versionadded:: NEXT.VERSION
+        chat_owner_changed (:class:`telegram.ChatOwnerChanged`): Optional. Service message: chat
+            owner has changed.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1108,6 +1125,8 @@ class Message(MaybeInaccessibleMessage):
         "caption_entities",
         "channel_chat_created",
         "chat_background_set",
+        "chat_owner_changed",
+        "chat_owner_left",
         "chat_shared",
         "checklist",
         "checklist_tasks_added",
@@ -1306,6 +1325,8 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_approved: "SuggestedPostApproved | None" = None,
         suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
         gift_upgrade_sent: GiftInfo | None = None,
+        chat_owner_changed: ChatOwnerChanged | None = None,
+        chat_owner_left: ChatOwnerLeft | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1433,6 +1454,8 @@ class Message(MaybeInaccessibleMessage):
                 suggested_post_approval_failed
             )
             self.gift_upgrade_sent: GiftInfo | None = gift_upgrade_sent
+            self.chat_owner_changed: ChatOwnerChanged | None = chat_owner_changed
+            self.chat_owner_left: ChatOwnerLeft | None = chat_owner_left
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1649,6 +1672,10 @@ class Message(MaybeInaccessibleMessage):
             data.get("suggested_post_approval_failed"), SuggestedPostApprovalFailed, bot
         )
         data["gift_upgrade_sent"] = de_json_optional(data.get("gift_upgrade_sent"), GiftInfo, bot)
+        data["chat_owner_changed"] = de_json_optional(
+            data.get("chat_owner_changed"), ChatOwnerChanged, bot
+        )
+        data["chat_owner_left"] = de_json_optional(data.get("chat_owner_left"), ChatOwnerLeft, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

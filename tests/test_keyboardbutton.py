@@ -39,6 +39,7 @@ def keyboard_button():
         web_app=KeyboardButtonTestBase.web_app,
         request_chat=KeyboardButtonTestBase.request_chat,
         request_users=KeyboardButtonTestBase.request_users,
+        icon_custom_emoji_id=KeyboardButtonTestBase.icon_custom_emoji_id,
     )
 
 
@@ -50,6 +51,7 @@ class KeyboardButtonTestBase:
     web_app = WebAppInfo(url="https://example.com")
     request_chat = KeyboardButtonRequestChat(1, True)
     request_users = KeyboardButtonRequestUsers(2)
+    icon_custom_emoji_id = "CustomID"
 
 
 class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
@@ -67,6 +69,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button.web_app == self.web_app
         assert keyboard_button.request_chat == self.request_chat
         assert keyboard_button.request_users == self.request_users
+        assert keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
     def test_to_dict(self, keyboard_button):
         keyboard_button_dict = keyboard_button.to_dict()
@@ -79,6 +82,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button_dict["web_app"] == keyboard_button.web_app.to_dict()
         assert keyboard_button_dict["request_chat"] == keyboard_button.request_chat.to_dict()
         assert keyboard_button_dict["request_users"] == keyboard_button.request_users.to_dict()
+        assert keyboard_button_dict["icon_custom_emoji_id"] == keyboard_button.icon_custom_emoji_id
 
     @pytest.mark.parametrize("request_user", [True, False])
     def test_de_json(self, request_user):
@@ -90,6 +94,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
             "web_app": self.web_app.to_dict(),
             "request_chat": self.request_chat.to_dict(),
             "request_users": self.request_users.to_dict(),
+            "icon_custom_emoji_id": self.icon_custom_emoji_id,
         }
         if request_user:
             json_dict["request_user"] = {"request_id": 2}
@@ -107,6 +112,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button.web_app == self.web_app
         assert keyboard_button.request_chat == self.request_chat
         assert keyboard_button.request_users == self.request_users
+        assert keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
     def test_equality(self):
         a = KeyboardButton("test", request_contact=True)
@@ -114,17 +120,20 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         c = KeyboardButton("Test", request_location=True)
         d = KeyboardButton("Test", web_app=WebAppInfo(url="https://ptb.org"))
         e = InlineKeyboardButton("test", callback_data="test")
+        h = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="Custom123")
         f = KeyboardButton(
             "test",
             request_contact=True,
             request_chat=KeyboardButtonRequestChat(1, False),
             request_users=KeyboardButtonRequestUsers(2),
+            icon_custom_emoji_id="Custom123",
         )
         g = KeyboardButton(
             "test",
             request_contact=True,
             request_chat=KeyboardButtonRequestChat(1, False),
             request_users=KeyboardButtonRequestUsers(2),
+            icon_custom_emoji_id="Custom123",
         )
 
         assert a == b
@@ -140,6 +149,9 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert hash(a) != hash(e)
 
         assert a != f
+        assert hash(a) != hash(f)
+
+        assert a != h
         assert hash(a) != hash(f)
 
         assert f == g
