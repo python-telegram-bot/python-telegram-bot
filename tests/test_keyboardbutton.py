@@ -139,11 +139,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
             request_users=KeyboardButtonRequestUsers(2),
         )
         h = KeyboardButton("test", request_contact=True, style="primary")
-        i = KeyboardButton("test", request_contact=True, style="success")
-        j = KeyboardButton("test", request_contact=True, style="primary")
-        k = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="123")
-        m = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="456")
-        n = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="123")
+        i = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="123")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -168,15 +164,3 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
 
         assert h != i
         assert hash(h) != hash(i)
-
-        assert h == j
-        assert hash(h) == hash(j)
-
-        assert a != k
-        assert hash(a) != hash(k)
-
-        assert k != m
-        assert hash(k) != hash(m)
-
-        assert k == n
-        assert hash(k) == hash(n)

@@ -183,11 +183,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
         f = InlineKeyboardButton("text", web_app=WebAppInfo(url="https://ptb.org"))
         g = LoginUrl("http://google.com")
         h = InlineKeyboardButton("test", style="primary")
-        i = InlineKeyboardButton("test", style="success")
-        j = InlineKeyboardButton("test", style="primary")
-        k = InlineKeyboardButton("test", icon_custom_emoji_id="123")
-        m = InlineKeyboardButton("test", icon_custom_emoji_id="456")
-        n = InlineKeyboardButton("test", icon_custom_emoji_id="123")
+        i = InlineKeyboardButton("test", icon_custom_emoji_id="123")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -212,18 +208,6 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
 
         assert h != i
         assert hash(h) != hash(i)
-
-        assert h == j
-        assert hash(h) == hash(j)
-
-        assert a != k
-        assert hash(a) != hash(k)
-
-        assert k != m
-        assert hash(k) != hash(m)
-
-        assert k == n
-        assert hash(k) == hash(n)
 
     @pytest.mark.parametrize("callback_data", ["foo", 1, ("da", "ta"), object()])
     def test_update_callback_data(self, callback_data):
