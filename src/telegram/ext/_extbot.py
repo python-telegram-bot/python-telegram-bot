@@ -5624,3 +5624,5 @@ class ExtBot(Bot, Generic[RLARGS]):
     repostStory = repost_story
     getUserGifts = get_user_gifts
     getChatGifts = get_chat_gifts
+    setMyProfilePhoto = set_my_profile_photo
+    removeMyProfilePhoto = remove_my_profile_photo
