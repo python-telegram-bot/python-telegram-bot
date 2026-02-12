@@ -39,6 +39,8 @@ def keyboard_button():
         web_app=KeyboardButtonTestBase.web_app,
         request_chat=KeyboardButtonTestBase.request_chat,
         request_users=KeyboardButtonTestBase.request_users,
+        style=KeyboardButtonTestBase.style,
+        icon_custom_emoji_id=KeyboardButtonTestBase.icon_custom_emoji_id,
     )
 
 
@@ -50,6 +52,8 @@ class KeyboardButtonTestBase:
     web_app = WebAppInfo(url="https://example.com")
     request_chat = KeyboardButtonRequestChat(1, True)
     request_users = KeyboardButtonRequestUsers(2)
+    style = "primary"
+    icon_custom_emoji_id = "5237829955978547322"
 
 
 class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
@@ -67,6 +71,8 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button.web_app == self.web_app
         assert keyboard_button.request_chat == self.request_chat
         assert keyboard_button.request_users == self.request_users
+        assert keyboard_button.style == self.style
+        assert keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
     def test_to_dict(self, keyboard_button):
         keyboard_button_dict = keyboard_button.to_dict()
@@ -79,6 +85,8 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button_dict["web_app"] == keyboard_button.web_app.to_dict()
         assert keyboard_button_dict["request_chat"] == keyboard_button.request_chat.to_dict()
         assert keyboard_button_dict["request_users"] == keyboard_button.request_users.to_dict()
+        assert keyboard_button_dict["style"] == keyboard_button.style
+        assert keyboard_button_dict["icon_custom_emoji_id"] == keyboard_button.icon_custom_emoji_id
 
     @pytest.mark.parametrize("request_user", [True, False])
     def test_de_json(self, request_user):
@@ -90,6 +98,8 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
             "web_app": self.web_app.to_dict(),
             "request_chat": self.request_chat.to_dict(),
             "request_users": self.request_users.to_dict(),
+            "style": self.style,
+            "icon_custom_emoji_id": self.icon_custom_emoji_id,
         }
         if request_user:
             json_dict["request_user"] = {"request_id": 2}
@@ -107,6 +117,8 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button.web_app == self.web_app
         assert keyboard_button.request_chat == self.request_chat
         assert keyboard_button.request_users == self.request_users
+        assert keyboard_button.style == self.style
+        assert keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
     def test_equality(self):
         a = KeyboardButton("test", request_contact=True)
@@ -126,6 +138,12 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
             request_chat=KeyboardButtonRequestChat(1, False),
             request_users=KeyboardButtonRequestUsers(2),
         )
+        h = KeyboardButton("test", request_contact=True, style="primary")
+        i = KeyboardButton("test", request_contact=True, style="success")
+        j = KeyboardButton("test", request_contact=True, style="primary")
+        k = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="123")
+        m = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="456")
+        n = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="123")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -144,3 +162,21 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
 
         assert f == g
         assert hash(f) == hash(g)
+
+        assert a != h
+        assert hash(a) != hash(h)
+
+        assert h != i
+        assert hash(h) != hash(i)
+
+        assert h == j
+        assert hash(h) == hash(j)
+
+        assert a != k
+        assert hash(a) != hash(k)
+
+        assert k != m
+        assert hash(k) != hash(m)
+
+        assert k == n
+        assert hash(k) == hash(n)

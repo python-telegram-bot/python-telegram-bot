@@ -40,8 +40,8 @@ class KeyboardButton(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
-    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users`, :attr:`request_chat` and
-    :attr:`style` are equal.
+    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users`, :attr:`request_chat`,
+    :attr:`style` and :attr:`icon_custom_emoji_id` are equal.
 
     Note:
         * Optional fields are mutually exclusive.
@@ -54,7 +54,7 @@ class KeyboardButton(TelegramObject):
         * :attr:`request_users` and :attr:`request_chat` options will only work in Telegram
           versions released after 3 February, 2023. Older clients will display unsupported
           message.
-        * :attr:`style` option will only work in Telegram versions released after [DATE].
+        * :attr:`style` option will only work in Telegram versions released after 6.5.1.
           Older clients will display buttons without styling.
 
     .. versionchanged:: 21.0
@@ -67,8 +67,8 @@ class KeyboardButton(TelegramObject):
        comparing objects of this type in terms of equality.
 
     .. versionchanged:: NEXT.VERSION
-       :attr:`style` is considered as well when comparing objects of this type in terms of
-       equality.
+       :attr:`style` and :attr:`icon_custom_emoji_id` are considered as well when
+       comparing objects of this type in terms of equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -99,16 +99,25 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
-        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients. Possible values are
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
-            Color aliases (BLUE, GREEN, RED) are also available.
+        style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
+            of the button in supported Telegram clients. Only three values are supported:
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
 
             Note:
                 This feature requires Telegram client version 6.5.1 or later. Older clients
                 will display the button without styling.
+
+            .. versionadded:: NEXT.VERSION
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
+            custom emoji shown before the text of the button. Can only be used by bots that
+            purchased additional usernames on Fragment or in the messages directly sent by the
+            bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
 
             .. versionadded:: NEXT.VERSION
 
@@ -141,16 +150,26 @@ class KeyboardButton(TelegramObject):
 
             .. versionadded:: 20.1
         style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients.
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
-            Color aliases (BLUE, GREEN, RED) are also available.
+            of the button in supported Telegram clients. Only three values are supported:
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+
+            .. versionadded:: NEXT.VERSION
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
+            custom emoji shown before the text of the button. Can only be used by bots that
+            purchased additional usernames on Fragment or in the messages directly sent by the
+            bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
 
             .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
+        "icon_custom_emoji_id",
         "request_chat",
         "request_contact",
         "request_location",
@@ -171,6 +190,7 @@ class KeyboardButton(TelegramObject):
         request_chat: KeyboardButtonRequestChat | None = None,
         request_users: KeyboardButtonRequestUsers | None = None,
         style: str | None = None,
+        icon_custom_emoji_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -186,6 +206,7 @@ class KeyboardButton(TelegramObject):
         self.request_users: KeyboardButtonRequestUsers | None = request_users
         self.request_chat: KeyboardButtonRequestChat | None = request_chat
         self.style: str | None = style
+        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
 
         self._id_attrs = (
             self.text,
@@ -196,6 +217,7 @@ class KeyboardButton(TelegramObject):
             self.request_users,
             self.request_chat,
             self.style,
+            self.icon_custom_emoji_id,
         )
 
         self._freeze()

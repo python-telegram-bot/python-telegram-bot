@@ -40,7 +40,7 @@ class InlineKeyboardButton(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`url`, :attr:`login_url`, :attr:`callback_data`,
     :attr:`switch_inline_query`, :attr:`switch_inline_query_current_chat`, :attr:`callback_game`,
-    :attr:`web_app`, :attr:`pay` and :attr:`style` are equal.
+    :attr:`web_app`, :attr:`pay`, :attr:`style` and :attr:`icon_custom_emoji_id` are equal.
 
     Note:
         * Exactly one of the optional fields must be used to specify type of the button.
@@ -57,6 +57,9 @@ class InlineKeyboardButton(TelegramObject):
         * Since Bot API 5.5, it's now allowed to mention users by their ID in inline keyboards.
           This will only work in Telegram versions released after December 7, 2021.
           Older clients will display *unsupported message*.
+
+        * :attr:`style` option will only work in Telegram versions released after 6.5.1.
+          Older clients will display buttons without styling.
 
     Warning:
         * If your bot allows your arbitrary callback data, buttons whose callback data is a
@@ -145,19 +148,27 @@ class InlineKeyboardButton(TelegramObject):
             Note:
                 This type of button **must** always be the first button in the first row and can
                 only be used in invoice messages.
-        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients. Possible values are
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
-            Color aliases (BLUE, GREEN, RED) are also available.
+        style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
+            of the button in supported Telegram clients. Only three values are supported:
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
 
             Note:
                 This feature requires Telegram client version 6.5.1 or later. Older clients
                 will display the button without styling.
 
             .. versionadded:: NEXT.VERSION
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
+            custom emoji shown before the text of the button. Can only be used by bots that
+            purchased additional usernames on Fragment or in the messages directly sent by the
+            bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
 
+            .. versionadded:: NEXT.VERSION
         switch_inline_query_chosen_chat (:class:`telegram.SwitchInlineQueryChosenChat`, optional):
             If set, pressing the button will prompt the user to select one of their chats of the
             specified type, open that chat and insert the bot's username and the specified inline
@@ -219,16 +230,25 @@ class InlineKeyboardButton(TelegramObject):
             copies the specified text to the clipboard.
 
             .. versionadded:: 21.7
-        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients. Possible values are
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
-            Color aliases (BLUE, GREEN, RED) are also available.
+        style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
+            of the button in supported Telegram clients. Only three values are supported:
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
 
             Note:
                 This feature requires Telegram client version 6.5.1 or later. Older clients
                 will display the button without styling.
+
+            .. versionadded:: NEXT.VERSION
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
+            custom emoji shown before the text of the button. Can only be used by bots that
+            purchased additional usernames on Fragment or in the messages directly sent by the
+            bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
 
             .. versionadded:: NEXT.VERSION
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
@@ -264,6 +284,7 @@ class InlineKeyboardButton(TelegramObject):
         "callback_data",
         "callback_game",
         "copy_text",
+        "icon_custom_emoji_id",
         "login_url",
         "pay",
         "style",
@@ -289,6 +310,7 @@ class InlineKeyboardButton(TelegramObject):
         switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = None,
         copy_text: CopyTextButton | None = None,
         style: str | None = None,
+        icon_custom_emoji_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -310,6 +332,7 @@ class InlineKeyboardButton(TelegramObject):
         )
         self.copy_text: CopyTextButton | None = copy_text
         self.style: str | None = style
+        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
         self._id_attrs = ()
         self._set_id_attrs()
 
@@ -327,6 +350,7 @@ class InlineKeyboardButton(TelegramObject):
             self.callback_game,
             self.pay,
             self.style,
+            self.icon_custom_emoji_id,
         )
 
     @classmethod

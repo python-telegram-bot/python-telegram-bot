@@ -85,6 +85,7 @@ __all__ = [
     "InputStoryContentType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
+    "KeyboardButtonStyle",
     "LocationLimit",
     "MaskPosition",
     "MediaGroupLimit",
