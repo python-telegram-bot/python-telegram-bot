@@ -108,10 +108,6 @@ class KeyboardButton(TelegramObject):
             :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
             :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
 
-            Note:
-                This feature requires Telegram client version 6.5.1 or later. Older clients
-                will display the button without styling.
-
             .. versionadded:: NEXT.VERSION
         icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
             custom emoji shown before the text of the button. Can only be used by bots that
@@ -157,6 +153,10 @@ class KeyboardButton(TelegramObject):
             Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
             :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
             :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+
+            Note:
+                This feature requires Telegram client version 6.5.1 or later. Older clients
+                will display the button without styling.
 
             .. versionadded:: NEXT.VERSION
         icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
