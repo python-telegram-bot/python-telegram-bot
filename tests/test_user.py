@@ -66,6 +66,7 @@ def user(bot):
         can_connect_to_business=UserTestBase.can_connect_to_business,
         has_main_web_app=UserTestBase.has_main_web_app,
         has_topics_enabled=UserTestBase.has_topics_enabled,
+        allows_users_to_create_topics=UserTestBase.allows_users_to_create_topics,
     )
     user.set_bot(bot)
     user._unfreeze()
