@@ -40,7 +40,7 @@ class InlineKeyboardButton(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`url`, :attr:`login_url`, :attr:`callback_data`,
     :attr:`switch_inline_query`, :attr:`switch_inline_query_current_chat`, :attr:`callback_game`,
-    :attr:`web_app` and :attr:`pay` are equal.
+    :attr:`web_app`, :attr:`pay` and :attr:`style` are equal.
 
     Note:
         * Exactly one of the optional fields must be used to specify type of the button.
@@ -75,6 +75,10 @@ class InlineKeyboardButton(TelegramObject):
 
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
+       equality.
+
+    .. versionchanged:: NEXT.VERSION
+       :attr:`style` is considered as well when comparing objects of this type in terms of
        equality.
 
     Args:
@@ -141,6 +145,19 @@ class InlineKeyboardButton(TelegramObject):
             Note:
                 This type of button **must** always be the first button in the first row and can
                 only be used in invoice messages.
+        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
+            of the button in supported Telegram clients. Possible values are
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
+            Color aliases (BLUE, GREEN, RED) are also available.
+
+            Note:
+                This feature requires Telegram client version 6.5.1 or later. Older clients
+                will display the button without styling.
+
+            .. versionadded:: NEXT.VERSION
+
         switch_inline_query_chosen_chat (:class:`telegram.SwitchInlineQueryChosenChat`, optional):
             If set, pressing the button will prompt the user to select one of their chats of the
             specified type, open that chat and insert the bot's username and the specified inline
@@ -202,6 +219,18 @@ class InlineKeyboardButton(TelegramObject):
             copies the specified text to the clipboard.
 
             .. versionadded:: 21.7
+        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
+            of the button in supported Telegram clients. Possible values are
+            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY`,
+            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` and
+            :tg-const:`telegram.KeyboardButtonStyle.DANGER`.
+            Color aliases (BLUE, GREEN, RED) are also available.
+
+            Note:
+                This feature requires Telegram client version 6.5.1 or later. Older clients
+                will display the button without styling.
+
+            .. versionadded:: NEXT.VERSION
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
             be launched when the user presses the button.
 
@@ -237,6 +266,7 @@ class InlineKeyboardButton(TelegramObject):
         "copy_text",
         "login_url",
         "pay",
+        "style",
         "switch_inline_query",
         "switch_inline_query_chosen_chat",
         "switch_inline_query_current_chat",
@@ -258,6 +288,7 @@ class InlineKeyboardButton(TelegramObject):
         web_app: WebAppInfo | None = None,
         switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = None,
         copy_text: CopyTextButton | None = None,
+        style: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -278,6 +309,7 @@ class InlineKeyboardButton(TelegramObject):
             switch_inline_query_chosen_chat
         )
         self.copy_text: CopyTextButton | None = copy_text
+        self.style: str | None = style
         self._id_attrs = ()
         self._set_id_attrs()
 
@@ -294,6 +326,7 @@ class InlineKeyboardButton(TelegramObject):
             self.switch_inline_query_current_chat,
             self.callback_game,
             self.pay,
+            self.style,
         )
 
     @classmethod
@@ -334,4 +367,19 @@ class InlineKeyboardButton(TelegramObject):
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA`
 
     .. versionadded:: 20.0
+    """
+    PRIMARY: Final[str] = constants.KeyboardButtonStyle.PRIMARY
+    """:const:`telegram.constants.KeyboardButtonStyle.PRIMARY`
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SUCCESS: Final[str] = constants.KeyboardButtonStyle.SUCCESS
+    """:const:`telegram.constants.KeyboardButtonStyle.SUCCESS`
+
+    .. versionadded:: NEXT.VERSION
+    """
+    DANGER: Final[str] = constants.KeyboardButtonStyle.DANGER
+    """:const:`telegram.constants.KeyboardButtonStyle.DANGER`
+
+    .. versionadded:: NEXT.VERSION
     """
