@@ -162,7 +162,7 @@ class InlineKeyboardButton(TelegramObject):
                 will display the button without styling.
 
             .. versionadded:: NEXT.VERSION
-        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
+        icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the
             custom emoji shown before the text of the button. Can only be used by bots that
             purchased additional usernames on Fragment or in the messages directly sent by the
             bot to private, group and supergroup chats if the owner of the bot has a Telegram
