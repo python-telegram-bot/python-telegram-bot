@@ -104,6 +104,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
 - `Oleg Sushchenko <https://github.com/feuillemorte>`_
 - `Or Bin <https://github.com/OrBin>`_
+- `OuYoung <https://github.com/ouyooung>`_
 - `overquota <https://github.com/overquota>`_
 - `Pablo Martinez <https://github.com/elpekenin>`_
 - `Paradox <https://github.com/paradox70>`_
