@@ -81,8 +81,8 @@ class InlineKeyboardButton(TelegramObject):
        equality.
 
     .. versionchanged:: NEXT.VERSION
-       :attr:`style` is considered as well when comparing objects of this type in terms of
-       equality.
+       :attr:`style` and :attr:`icon_custom_emoji_id` are considered as well when
+       comparing objects of this type in terms of equality.
 
     Args:
         text (:obj:`str`): Label text on the button.
@@ -391,19 +391,4 @@ class InlineKeyboardButton(TelegramObject):
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA`
 
     .. versionadded:: 20.0
-    """
-    PRIMARY: Final[str] = constants.KeyboardButtonStyle.PRIMARY
-    """:const:`telegram.constants.KeyboardButtonStyle.PRIMARY`
-
-    .. versionadded:: NEXT.VERSION
-    """
-    SUCCESS: Final[str] = constants.KeyboardButtonStyle.SUCCESS
-    """:const:`telegram.constants.KeyboardButtonStyle.SUCCESS`
-
-    .. versionadded:: NEXT.VERSION
-    """
-    DANGER: Final[str] = constants.KeyboardButtonStyle.DANGER
-    """:const:`telegram.constants.KeyboardButtonStyle.DANGER`
-
-    .. versionadded:: NEXT.VERSION
     """

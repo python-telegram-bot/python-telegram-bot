@@ -245,19 +245,3 @@ class KeyboardButton(TelegramObject):
             api_kwargs = {"request_user": request_user}
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
-
-    PRIMARY: Final[str] = constants.KeyboardButtonStyle.PRIMARY
-    """:const:`telegram.constants.KeyboardButtonStyle.PRIMARY`
-
-    .. versionadded:: NEXT.VERSION
-    """
-    SUCCESS: Final[str] = constants.KeyboardButtonStyle.SUCCESS
-    """:const:`telegram.constants.KeyboardButtonStyle.SUCCESS`
-
-    .. versionadded:: NEXT.VERSION
-    """
-    DANGER: Final[str] = constants.KeyboardButtonStyle.DANGER
-    """:const:`telegram.constants.KeyboardButtonStyle.DANGER`
-
-    .. versionadded:: NEXT.VERSION
-    """

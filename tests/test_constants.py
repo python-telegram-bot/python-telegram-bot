@@ -258,6 +258,9 @@ class TestConstantsWithoutRequest:
         assert constants.KeyboardButtonStyle.PRIMARY == "primary"
         assert constants.KeyboardButtonStyle.SUCCESS == "success"
         assert constants.KeyboardButtonStyle.DANGER == "danger"
+        assert constants.KeyboardButtonStyle.BLUE == "primary"
+        assert constants.KeyboardButtonStyle.GREEN == "success"
+        assert constants.KeyboardButtonStyle.RED == "danger"
 
 
 class TestConstantsWithRequest:
