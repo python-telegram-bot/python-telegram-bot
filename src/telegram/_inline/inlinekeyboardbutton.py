@@ -148,7 +148,7 @@ class InlineKeyboardButton(TelegramObject):
             Note:
                 This type of button **must** always be the first button in the first row and can
                 only be used in invoice messages.
-        style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
+        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
             of the button in supported Telegram clients. Only three values are supported:
             :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
             :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
@@ -234,10 +234,6 @@ class InlineKeyboardButton(TelegramObject):
             Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
             :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
             :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
-
-            Note:
-                This feature requires Telegram client version 6.5.1 or later. Older clients
-                will display the button without styling.
 
             .. versionadded:: NEXT.VERSION
         icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
