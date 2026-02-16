@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -62,9 +62,9 @@ class TestConstantsWithoutRequest:
             )
         }
         actual = set(constants.__all__)
-        assert (
-            actual == expected
-        ), f"Members {expected - actual} were not listed in constants.__all__"
+        assert actual == expected, (
+            f"Members {expected - actual} were not listed in constants.__all__"
+        )
 
     def test_message_attachment_type(self):
         assert all(
@@ -182,6 +182,7 @@ class TestConstantsWithoutRequest:
             "caption",
             "chat",
             "chat_id",
+            "direct_messages_topic",
             "effective_attachment",
             "entities",
             "from_user",
@@ -203,6 +204,9 @@ class TestConstantsWithoutRequest:
             "via_bot",
             "is_from_offline",
             "show_caption_above_media",
+            "paid_star_count",
+            "is_paid_post",
+            "reply_to_checklist_task_id",
         }
 
     @pytest.mark.parametrize(
@@ -225,9 +229,9 @@ class TestConstantsWithoutRequest:
 
     @pytest.mark.parametrize("member", constants.MessageType)
     def test_message_type_completeness_reverse(self, member):
-        assert self.is_type_attribute(
-            member.value
-        ), f"Additional member {member} in MessageType that should not be a message type"
+        assert self.is_type_attribute(member.value), (
+            f"Additional member {member} in MessageType that should not be a message type"
+        )
 
     @pytest.mark.parametrize("member", constants.MessageAttachmentType)
     def test_message_attachment_type_completeness(self, member):

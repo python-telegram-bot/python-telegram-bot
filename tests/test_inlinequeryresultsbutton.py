@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -52,7 +52,6 @@ class TestInlineQueryResultsButtonWithoutRequest(InlineQueryResultsButtonTestBas
         assert inline_query_results_button_dict["web_app"] == self.web_app.to_dict()
 
     def test_de_json(self, offline_bot):
-
         json_dict = {
             "text": self.text,
             "start_parameter": self.start_parameter,

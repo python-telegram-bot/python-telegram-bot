@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2025
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 to link to the correct files & lines on github. Can be simplified once
 https://github.com/sphinx-doc/sphinx/issues/1556 is closed
 """
+
 import subprocess
 from pathlib import Path
 

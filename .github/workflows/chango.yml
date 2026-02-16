@@ -1,0 +1,69 @@
+name: Chango
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions: {}
+
+jobs:
+  create-chango-fragment:
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+    name: Create chango Fragment
+    runs-on: ubuntu-latest
+    outputs:
+      IS_RELEASE_PR: ${{ steps.check_title.outputs.IS_RELEASE_PR }}
+
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          # needed for commit and push step at the end
+          persist-credentials: true
+      - name: Check PR Title
+        id: check_title
+        run: | # zizmor: ignore[template-injection]
+          if [[ "$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')" =~ ^bump\ version\ to\ .* ]]; then
+            echo "COMMIT_AND_PUSH=false" >> $GITHUB_OUTPUT
+            echo "IS_RELEASE_PR=true" >> $GITHUB_OUTPUT
+          else
+            echo "COMMIT_AND_PUSH=true" >> $GITHUB_OUTPUT
+            echo "IS_RELEASE_PR=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Create the new fragment
+      - uses: Bibo-Joshi/chango@bc58df46ef3ba8f15b8d744929998b7ae8a222d4 # 0.6.1
+        with:
+          # passing this custom token has two purposes
+          # 1. it allows us to fetch info about issue types
+          # 2. it ensures that the push will also re-trigger workflows
+          github-token: ${{ secrets.CHANGO_PAT }}
+          query-issue-types: true
+          commit-and-push: ${{ steps.check_title.outputs.COMMIT_AND_PUSH }}
+
+      # Run `chango release` if applicable - needs some additional setup.
+      - name: Set up Python
+        if: steps.check_title.outputs.IS_RELEASE_PR == 'true'
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.x"
+
+      - name: Do Release
+        if: steps.check_title.outputs.IS_RELEASE_PR == 'true'
+        run: |
+          cd ./target-repo
+          git add changes/unreleased/*
+          pip install . --group docs
+          VERSION_TAG=$(python -c "from telegram import __version__; print(f'{__version__}')")
+          chango release --uid $VERSION_TAG
+
+      - name: Commit & Push
+        if: steps.check_title.outputs.IS_RELEASE_PR == 'true'
+        uses: stefanzweifel/git-auto-commit-action@28e16e81777b558cc906c8750092100bbb34c5e3 # v7.0.0
+        with:
+          commit_message: "Do chango Release"
+          repository: ./target-repo

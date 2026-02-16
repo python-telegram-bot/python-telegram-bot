@@ -13,6 +13,7 @@ Set bot Token, URL, admin CHAT_ID and PORT after the imports.
 You may also need to change the `listen` value in the uvicorn configuration to match your setup.
 Press Ctrl-C on the command line or send a signal to the process to stop the bot.
 """
+
 import asyncio
 import html
 import logging
@@ -117,13 +118,13 @@ async def main() -> None:
     # Set up webserver
     flask_app = Flask(__name__)
 
-    @flask_app.post("/telegram")  # type: ignore[misc]
+    @flask_app.post("/telegram")  # type: ignore[untyped-decorator]
     async def telegram() -> Response:
         """Handle incoming Telegram updates by putting them into the `update_queue`"""
         await application.update_queue.put(Update.de_json(data=request.json, bot=application.bot))
         return Response(status=HTTPStatus.OK)
 
-    @flask_app.route("/submitpayload", methods=["GET", "POST"])  # type: ignore[misc]
+    @flask_app.route("/submitpayload", methods=["GET", "POST"])  # type: ignore[untyped-decorator]
     async def custom_updates() -> Response:
         """
         Handle incoming webhook updates by also putting them into the `update_queue` if
@@ -143,7 +144,7 @@ async def main() -> None:
         await application.update_queue.put(WebhookUpdate(user_id=user_id, payload=payload))
         return Response(status=HTTPStatus.OK)
 
-    @flask_app.get("/healthcheck")  # type: ignore[misc]
+    @flask_app.get("/healthcheck")  # type: ignore[untyped-decorator]
     async def health() -> Response:
         """For the health endpoint, reply with a simple plain text message."""
         response = make_response("The bot is still running fine :)", HTTPStatus.OK)

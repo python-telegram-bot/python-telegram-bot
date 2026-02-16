@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -146,9 +146,9 @@ class TestTelegramObject:
         if cls is TelegramObject:
             # TelegramObject doesn't have a super class
             return
-        assert "api_kwargs=api_kwargs" in inspect.getsource(
-            cls.__init__
-        ), f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
+        assert "api_kwargs=api_kwargs" in inspect.getsource(cls.__init__), (
+            f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
+        )
 
     def test_de_json_arbitrary_exceptions(self, bot):
         class SubClass(TelegramObject):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -44,9 +44,9 @@ class TestKeyboardButtonRequestUsersWithoutRequest(KeyboardButtonRequestUsersTes
     def test_slot_behaviour(self, request_users):
         for attr in request_users.__slots__:
             assert getattr(request_users, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(request_users)) == len(
-            set(mro_slots(request_users))
-        ), "duplicate slot"
+        assert len(mro_slots(request_users)) == len(set(mro_slots(request_users))), (
+            "duplicate slot"
+        )
 
     def test_to_dict(self, request_users):
         request_users_dict = request_users.to_dict()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -73,19 +73,19 @@ def test_check_method(tg_method: TelegramMethod) -> None:
     for tg_parameter in tg_method.method_parameters:
         # Check if parameter is present in our method
         ptb_param = sig.parameters.get(tg_parameter.param_name)
-        assert (
-            ptb_param is not None
-        ), f"Parameter {tg_parameter.param_name} not found in {ptb_method.__name__}"
+        assert ptb_param is not None, (
+            f"Parameter {tg_parameter.param_name} not found in {ptb_method.__name__}"
+        )
 
         # Now check if the parameter is required or not
-        assert check_required_param(
-            tg_parameter, ptb_param, ptb_method.__name__
-        ), f"Param {ptb_param.name!r} of {ptb_method.__name__!r} requirement mismatch"
+        assert check_required_param(tg_parameter, ptb_param, ptb_method.__name__), (
+            f"Param {ptb_param.name!r} of {ptb_method.__name__!r} requirement mismatch"
+        )
 
         # Check if type annotation is present
-        assert (
-            ptb_param.annotation is not inspect.Parameter.empty
-        ), f"Param {ptb_param.name!r} of {ptb_method.__name__!r} should have a type annotation!"
+        assert ptb_param.annotation is not inspect.Parameter.empty, (
+            f"Param {ptb_param.name!r} of {ptb_method.__name__!r} should have a type annotation!"
+        )
         # Check if type annotation is correct
         correct_type_hint, expected_type_hint = check_param_type(
             ptb_param,
@@ -100,9 +100,9 @@ def test_check_method(tg_method: TelegramMethod) -> None:
         # Now we will check that we don't pass default values if the parameter is not required.
         if ptb_param.default is not inspect.Parameter.empty:  # If there is a default argument...
             default_arg_none = check_defaults_type(ptb_param)  # check if it's None
-            assert (
-                default_arg_none
-            ), f"Param {ptb_param.name!r} of {ptb_method.__name__!r} should be `None`"
+            assert default_arg_none, (
+                f"Param {ptb_param.name!r} of {ptb_method.__name__!r} should be `None`"
+            )
         checked.append(tg_parameter.param_name)
 
     expected_additional_args = GLOBALLY_IGNORED_PARAMETERS.copy()
@@ -110,9 +110,9 @@ def test_check_method(tg_method: TelegramMethod) -> None:
     expected_additional_args |= backwards_compat_kwargs(tg_method.method_name)
 
     unexpected_args = (sig.parameters.keys() ^ checked) - expected_additional_args
-    assert (
-        unexpected_args == set()
-    ), f"In {ptb_method.__qualname__}, unexpected args were found: {unexpected_args}."
+    assert unexpected_args == set(), (
+        f"In {ptb_method.__qualname__}, unexpected args were found: {unexpected_args}."
+    )
 
     kw_or_positional_args = [
         p.name for p in sig.parameters.values() if p.kind != inspect.Parameter.KEYWORD_ONLY
@@ -138,11 +138,6 @@ def test_check_object(tg_class: TelegramClass) -> None:
     - No unexpected parameters
     """
     obj = getattr(telegram, tg_class.class_name)
-    if tg_class.class_name not in (
-        "PassportElementErrorFiles",
-        "PassportElementErrorTranslationFiles",
-    ):
-        return
 
     # Check arguments based on source. Makes sure to only check __init__'s signature & nothing else
     sig = inspect.signature(obj.__init__, follow_wrapped=True)
@@ -163,14 +158,14 @@ def test_check_object(tg_class: TelegramClass) -> None:
         assert ptb_param is not None, f"Attribute {field} not found in {obj.__name__}"
 
         # Now check if the parameter is required or not
-        assert check_required_param(
-            tg_parameter, ptb_param, obj.__name__
-        ), f"Param {ptb_param.name!r} of {obj.__name__!r} requirement mismatch"
+        assert check_required_param(tg_parameter, ptb_param, obj.__name__), (
+            f"Param {ptb_param.name!r} of {obj.__name__!r} requirement mismatch"
+        )
 
         # Check if type annotation is present
-        assert (
-            ptb_param.annotation is not inspect.Parameter.empty
-        ), f"Param {ptb_param.name!r} of {obj.__name__!r} should have a type annotation"
+        assert ptb_param.annotation is not inspect.Parameter.empty, (
+            f"Param {ptb_param.name!r} of {obj.__name__!r} should have a type annotation"
+        )
 
         # Check if type annotation is correct
         correct_type_hint, expected_type_hint = check_param_type(ptb_param, tg_parameter, obj)
@@ -182,9 +177,9 @@ def test_check_object(tg_class: TelegramClass) -> None:
         # Now we will check that we don't pass default values if the parameter is not required.
         if ptb_param.default is not inspect.Parameter.empty:  # If there is a default argument...
             default_arg_none = check_defaults_type(ptb_param)  # check if its None
-            assert (
-                default_arg_none
-            ), f"Param {ptb_param.name!r} of {obj.__name__!r} should be `None`"
+            assert default_arg_none, (
+                f"Param {ptb_param.name!r} of {obj.__name__!r} should be `None`"
+            )
 
         checked.add(field)
 
@@ -193,6 +188,6 @@ def test_check_object(tg_class: TelegramClass) -> None:
     expected_additional_args |= backwards_compat_kwargs(tg_class.class_name)
 
     unexpected_args = (sig.parameters.keys() ^ checked) - expected_additional_args
-    assert (
-        unexpected_args == set()
-    ), f"In {tg_class.class_name}, unexpected args were found: {unexpected_args}."
+    assert unexpected_args == set(), (
+        f"In {tg_class.class_name}, unexpected args were found: {unexpected_args}."
+    )

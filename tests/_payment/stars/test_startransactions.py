@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -63,6 +63,7 @@ class StarTransactionTestBase:
     nanostar_amount = 365
     date = to_timestamp(dtm.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC))
     source = TransactionPartnerUser(
+        transaction_type="premium_purchase",
         user=User(
             id=2,
             is_bot=False,
@@ -144,6 +145,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
             amount=3,
             date=to_timestamp(dtm.datetime.utcnow()),
             source=TransactionPartnerUser(
+                transaction_type="other_type",
                 user=User(
                     id=3,
                     is_bot=False,

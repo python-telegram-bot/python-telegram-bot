@@ -8,7 +8,7 @@ dynamic = ["version"]
 name = "python-telegram-bot"
 description = "We have made you a wrapper you can't refuse"
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "LGPL-3.0-only"
 license-files = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"]
 authors = [
@@ -31,14 +31,15 @@ classifiers = [
     "Topic :: Internet",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "httpx ~= 0.27",
+    "httpx >=0.27,<0.29",
+    "httpcore >=1.0.9; python_version >= '3.14'"  # httpx doesn't pin this as of 0.28.1
 ]
 
 [project.urls]
@@ -51,14 +52,12 @@ dependencies = [
 "Support" = "https://t.me/pythontelegrambotgroup"
 
 [project.optional-dependencies]
-# Make sure to install those as additional_dependencies in the
-# pre-commit hooks for pylint & mypy
-# Also update the readme accordingly
+# Make sure to install those as additional_dependencies in the pre-commit hooks
 #
 # When dependencies release new versions and tests succeed, we should try to expand the allowed
 # versions and only increase the lower bound if necessary
 #
-# When adding new groups, make sure to update `ext` and `all` accordingly
+# When adding new extras, make sure to update `ext` and `all` accordingly
 
 # Optional dependencies for production
 all = [
@@ -66,7 +65,7 @@ all = [
 ]
 callback-data = [
     # Cachetools doesn't have a strict stability policy. Let's be cautious for now.
-    "cachetools>=5.3.3,<5.6.0",
+    "cachetools>=7.0.0,<8.0.0",
 ]
 ext = [
     "python-telegram-bot[callback-data,job-queue,rate-limiter,webhooks]",
@@ -91,33 +90,73 @@ socks = [
 ]
 webhooks = [
     # tornado is rather stable, but let's not allow the next major release without prior testing
-    "tornado~=6.4",
+    "tornado~=6.5",
 ]
 
+[dependency-groups]
+tests = [
+    # required for building the wheels for releases
+    "build",
+    # For the test suite
+    "pytest==9.0.2",
+    # needed because pytest doesn't come with native support for coroutines as tests
+    "pytest-asyncio==0.21.2",
+    # xdist runs tests in parallel
+    "pytest-xdist==3.8.0",
+    # Used for flaky tests (flaky decorator)
+    "flaky>=3.8.1",
+    # used in test_official for parsing tg docs
+    "beautifulsoup4",
+    # For testing with timezones. Might not be needed on all systems, but to ensure that unit tests
+    # run correctly on all systems, we include it here.
+    "tzdata",
+    # We've deprecated support pytz, but we still need it for testing that it works with the library.
+    "pytz",
+    # Install coverage:
+    "pytest-cov"
+]
+docs = [
+    "chango~=0.6.0; python_version >= '3.12'",
+    "sphinx==8.2.3; python_version >= '3.11'",
+    "furo==2025.9.25",
+    "sphinx-paramlinks==0.6.0",
+    "sphinxcontrib-mermaid==1.0.0",
+    "sphinx-copybutton==0.5.2",
+    "sphinx-inline-tabs==2023.4.21",
+    # Temporary. See #4387
+    "sphinx-build-compatibility @ git+https://github.com/readthedocs/sphinx-build-compatibility.git@58aabc5f207c6c2421f23d3578adc0b14af57047",
+    # For python 3.14 support, we need a version of pydantic-core >= 2.35.0, since it upgrades the
+    # rust toolchain, required for building the project.
+    # This should ideally be done in `chango`'s dependencies. We can remove this once a new
+    # stable pydantic version is released.
+    "pydantic >= 2.12.0a1 ; python_version >= '3.14'"
+]
+linting = [
+    "pre-commit",
+    "ruff==0.15.1",
+    "mypy==1.18.2",
+    "pylint==4.0.4"
+]
+all = [{ include-group = "tests" }, { include-group = "docs" }, { include-group = "linting"}]
 
 # HATCH
 [tool.hatch.version]
 # dynamically evaluates the `__version__` variable in that file
 source = "code"
-path = "telegram/_version.py"
-search-paths = ["telegram"]
+path = "src/telegram/_version.py"
 
-[tool.hatch.build]
-packages = ["telegram"]
+# See also https://github.com/pypa/hatch/issues/1230 for discussion
+# the source distribution will include most of the files in the root directory
+[tool.hatch.build.targets.sdist]
+exclude = [".venv*", "venv*", ".github", "uv.lock"]
+# the wheel will only include the src/telegram package
+[tool.hatch.build.targets.wheel]
+packages = ["src/telegram"]
 
 # CHANGO
 [tool.chango]
 sys_path = "changes"
 chango_instance = { name= "chango_instance", module = "config" }
-
-# BLACK:
-[tool.black]
-line-length = 99
-
-# ISORT:
-[tool.isort]  # black config
-profile = "black"
-line_length = 99
 
 # RUFF:
 [tool.ruff]
@@ -125,9 +164,8 @@ line-length = 99
 show-fixes = true
 
 [tool.ruff.lint]
-preview = true
-explicit-preview-rules = true  # TODO: Drop this when RUF022 and RUF023 are out of preview
-ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203"]
+typing-extensions = false
+ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203", "ASYNC240"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
           "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
           "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB", "DOC", "TRY", 
@@ -137,9 +175,9 @@ select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["B018"]
 "tests/**.py" = ["RUF012", "ASYNC230", "DTZ", "ARG", "T201", "ASYNC109", "D", "S", "TRY"]
-"telegram/**.py" = ["TRY003"]
-"telegram/ext/_applicationbuilder.py" = ["TRY004"]
-"telegram/ext/filters.py" = ["D102"]
+"src/telegram/**.py" = ["TRY003"]
+"src/telegram/ext/_applicationbuilder.py" = ["TRY004"]
+"src/telegram/ext/filters.py" = ["D102"]
 "docs/**.py" = ["INP001", "ARG", "D", "TRY003", "S"]
 "examples/**.py" = ["ARG", "D", "S105", "TRY003"]
 
@@ -160,6 +198,7 @@ disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods",
 #  run pylint across multiple cpu cores to speed it up-
 # https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
 jobs = 0
+py-version = "3.10"
 
 [tool.pylint.classes]
 exclude-protected = ["_unfrozen"]
@@ -167,6 +206,7 @@ exclude-protected = ["_unfrozen"]
 # PYTEST:
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 addopts = "--no-success-flaky-report -rX"
 filterwarnings = [
     "error",
@@ -189,13 +229,14 @@ log_cli_format = "%(funcName)s - Line %(lineno)d - %(message)s"
 
 # MYPY:
 [tool.mypy]
+mypy_path = "src"
 warn_unused_ignores = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 disallow_untyped_decorators = true
 show_error_codes = true
-python_version = "3.9"
+python_version = "3.10"
 
 # For some files, it's easier to just disable strict-optional all together instead of
 # cluttering the code with `# type: ignore`s or stuff like
@@ -231,12 +272,12 @@ ignore_missing_imports = true
 # COVERAGE:
 [tool.coverage.run]
 branch = true
-source = ["telegram"]
+source = ["src/telegram"]
 parallel = true
 concurrency = ["thread", "multiprocessing"]
 omit = [
     "tests/",
-    "telegram/__main__.py"
+    "src/telegram/__main__.py"
 ]
 
 [tool.coverage.report]

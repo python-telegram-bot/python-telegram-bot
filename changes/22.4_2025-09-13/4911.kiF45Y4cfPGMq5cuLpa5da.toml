@@ -1,0 +1,14 @@
+features = "Full Support for Bot API 9.2"
+
+pull_requests = [
+    { uid = "4911", author_uid = "aelkheir", closes_threads = ["4910"] },
+    { uid = "4918", author_uid = "Poolitzer" },
+    { uid = "4917", author_uid = "Poolitzer" },
+    { uid = "4914", author_uid = "harshil21"},
+    { uid = "4916", author_uid = "harshil21"},
+    { uid = "4912", author_uid = "aelkheir" },
+    { uid = "4921", author_uid = "aelkheir" },
+    { uid = "4936", author_uid = "Bibo-Joshi" },
+    { uid = "4935", author_uid = "Bibo-Joshi" },
+    { uid = "4931", author_uid = "aelkheir" },
+]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ class TestDefaults:
 
     @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
     def test_pytz_deprecation(self, recwarn):
-        import pytz
+        import pytz  # noqa: PLC0415
 
         with pytest.warns(PTBDeprecationWarning, match="pytz") as record:
             Defaults(tzinfo=pytz.timezone("Europe/Berlin"))

@@ -2,9 +2,11 @@
 # pylint: disable=import-error
 """Configuration for the chango changelog tool"""
 
+import re
 from collections.abc import Collection
-from typing import Optional
+from pathlib import Path
 
+from chango import Version
 from chango.concrete import DirectoryChanGo, DirectoryVersionScanner, HeaderVersionHistory
 from chango.concrete.sections import GitHubSectionChangeNote, Section, SectionVersionNote
 
@@ -36,7 +38,7 @@ class ChangoSectionChangeNote(
     def get_sections(
         cls,
         labels: Collection[str],
-        issue_types: Optional[Collection[str]],
+        issue_types: Collection[str] | None,
     ) -> set[str]:
         """Override get_sections to have customized auto-detection of relevant sections based on
         the pull request and linked issues. Certainly not perfect in all cases, but should be a
@@ -70,7 +72,31 @@ class ChangoSectionChangeNote(
         return found or {"other"}
 
 
-chango_instance = DirectoryChanGo(
+class CustomChango(DirectoryChanGo):
+    """Custom ChanGo class for overriding release"""
+
+    def release(self, version: Version) -> bool:
+        """replace "14.5" with version.uid except in the contrib guide
+        then call super
+        """
+        root = Path(__file__).parent.parent / "src"
+        python_files = root.rglob("*.py")
+        pattern = re.compile(r"NEXT\.VERSION")
+        excluded_paths = {root / "docs/source/contribute.rst"}
+        for file_path in python_files:
+            if str(file_path) in excluded_paths:
+                continue
+
+            content = file_path.read_text(encoding="utf-8")
+            modified = pattern.sub(version.uid, content)
+
+            if content != modified:
+                file_path.write_text(modified, encoding="utf-8")
+
+        return super().release(version)
+
+
+chango_instance = CustomChango(
     change_note_type=ChangoSectionChangeNote,
     version_note_type=SectionVersionNote,
     version_history_type=HeaderVersionHistory,

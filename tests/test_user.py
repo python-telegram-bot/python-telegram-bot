@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -44,6 +44,7 @@ def json_dict():
         "added_to_attachment_menu": UserTestBase.added_to_attachment_menu,
         "can_connect_to_business": UserTestBase.can_connect_to_business,
         "has_main_web_app": UserTestBase.has_main_web_app,
+        "has_topics_enabled": UserTestBase.has_topics_enabled,
     }
 
 
@@ -63,6 +64,7 @@ def user(bot):
         added_to_attachment_menu=UserTestBase.added_to_attachment_menu,
         can_connect_to_business=UserTestBase.can_connect_to_business,
         has_main_web_app=UserTestBase.has_main_web_app,
+        has_topics_enabled=UserTestBase.has_topics_enabled,
     )
     user.set_bot(bot)
     user._unfreeze()
@@ -83,6 +85,7 @@ class UserTestBase:
     added_to_attachment_menu = False
     can_connect_to_business = True
     has_main_web_app = False
+    has_topics_enabled = False
 
 
 class TestUserWithoutRequest(UserTestBase):
@@ -108,6 +111,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user.added_to_attachment_menu == self.added_to_attachment_menu
         assert user.can_connect_to_business == self.can_connect_to_business
         assert user.has_main_web_app == self.has_main_web_app
+        assert user.has_topics_enabled == self.has_topics_enabled
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -126,6 +130,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user_dict["added_to_attachment_menu"] == user.added_to_attachment_menu
         assert user_dict["can_connect_to_business"] == user.can_connect_to_business
         assert user_dict["has_main_web_app"] == user.has_main_web_app
+        assert user_dict["has_topics_enabled"] == user.has_topics_enabled
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)
@@ -230,6 +235,25 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "send_message", make_assertion)
         assert await user.send_message("test")
+
+    async def test_instance_method_send_message_draft(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == user.id
+                and kwargs["draft_id"] == 123
+                and kwargs["text"] == "test"
+            )
+
+        assert check_shortcut_signature(
+            User.send_message_draft, Bot.send_message_draft, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            user.send_message_draft, user.get_bot(), "send_message_draft"
+        )
+        assert await check_defaults_handling(user.send_message_draft, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "send_message_draft", make_assertion)
+        assert await user.send_message_draft(123, "test")
 
     async def test_instance_method_send_photo(self, monkeypatch, user):
         async def make_assertion(*_, **kwargs):
@@ -731,15 +755,7 @@ class TestUserWithoutRequest(UserTestBase):
                 and kwargs["text_entities"] == "text_entities"
             )
 
-        # TODO discuss if better way exists
-        # tags: deprecated 21.11
-        with pytest.raises(
-            Exception,
-            match="Default for argument gift_id does not match the default of the Bot method.",
-        ):
-            assert check_shortcut_signature(
-                user.send_gift, Bot.send_gift, ["user_id", "chat_id"], []
-            )
+        assert check_shortcut_signature(user.send_gift, Bot.send_gift, ["user_id", "chat_id"], [])
         assert await check_shortcut_call(
             user.send_gift, user.get_bot(), "send_gift", ["chat_id", "user_id"]
         )
@@ -748,6 +764,36 @@ class TestUserWithoutRequest(UserTestBase):
         monkeypatch.setattr(user.get_bot(), "send_gift", make_assertion)
         assert await user.send_gift(
             gift_id="gift_id",
+            text="text",
+            text_parse_mode="text_parse_mode",
+            text_entities="text_entities",
+        )
+
+    async def test_instance_method_gift_premium_subscription(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["month_count"] == 3
+                and kwargs["star_count"] == 1000
+                and kwargs["text"] == "text"
+                and kwargs["text_parse_mode"] == "text_parse_mode"
+                and kwargs["text_entities"] == "text_entities"
+            )
+
+        assert check_shortcut_signature(
+            user.gift_premium_subscription, Bot.gift_premium_subscription, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.gift_premium_subscription,
+            user.get_bot(),
+            "gift_premium_subscription",
+        )
+        assert await check_defaults_handling(user.gift_premium_subscription, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "gift_premium_subscription", make_assertion)
+        assert await user.gift_premium_subscription(
+            month_count=3,
+            star_count=1000,
             text="text",
             text_parse_mode="text_parse_mode",
             text_entities="text_entities",
@@ -783,3 +829,41 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "remove_user_verification", make_assertion)
         assert await user.remove_verification()
+
+    async def test_instance_method_repost_story(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["from_chat_id"] == user.id
+
+        assert check_shortcut_signature(
+            User.repost_story,
+            Bot.repost_story,
+            [
+                "from_chat_id",
+            ],
+            additional_kwargs=[],
+        )
+        assert await check_shortcut_call(
+            user.repost_story,
+            user.get_bot(),
+            "repost_story",
+            shortcut_kwargs=["from_chat_id"],
+        )
+        assert await check_defaults_handling(user.repost_story, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "repost_story", make_assertion)
+        assert await user.repost_story(
+            business_connection_id="bcid",
+            from_story_id=123,
+            active_period=3600,
+        )
+
+    async def test_instance_method_get_gifts(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id
+
+        assert check_shortcut_signature(user.get_gifts, Bot.get_user_gifts, ["user_id"], [])
+        assert await check_shortcut_call(user.get_gifts, user.get_bot(), "get_user_gifts")
+        assert await check_defaults_handling(user.get_gifts, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "get_user_gifts", make_assertion)
+        assert await user.get_gifts()

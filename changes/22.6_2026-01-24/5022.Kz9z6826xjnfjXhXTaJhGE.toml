@@ -1,0 +1,5 @@
+internal = "Update dependency astral-sh/uv to v0.9.5"
+[[pull_requests]]
+uid = "5022"
+author_uids = ["renovatebot"]
+closes_threads = []

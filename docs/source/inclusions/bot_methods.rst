@@ -35,6 +35,8 @@
           - Used for sending media grouped together
         * - :meth:`~telegram.Bot.send_message`
           - Used for sending text messages
+        * - :meth:`~telegram.Bot.send_message_draft`
+          - Used for streaming partial text messages
         * - :meth:`~telegram.Bot.send_paid_media`
           - Used for sending paid media to channels
         * - :meth:`~telegram.Bot.send_photo`
@@ -121,6 +123,10 @@
       - Used for approving a chat join request
     * - :meth:`~telegram.Bot.decline_chat_join_request`
       - Used for declining a chat join request
+    * - :meth:`~telegram.Bot.approve_suggested_post`
+      - Used for approving a suggested post
+    * - :meth:`~telegram.Bot.decline_suggested_post`
+      - Used for declining a suggested post
     * - :meth:`~telegram.Bot.ban_chat_member`
       - Used for banning a member from the chat
     * - :meth:`~telegram.Bot.unban_chat_member`
@@ -161,8 +167,6 @@
       - Used for unpinning a message
     * - :meth:`~telegram.Bot.unpin_all_chat_messages`
       - Used for unpinning all pinned chat messages
-    * - :meth:`~telegram.Bot.get_business_connection`
-      - Used for getting information about the business account.
     * - :meth:`~telegram.Bot.get_user_profile_photos`
       - Used for obtaining user's profile pictures
     * - :meth:`~telegram.Bot.get_chat`
@@ -392,10 +396,72 @@
       - Used to generate an HTTP link for an invoice
     * - :meth:`~telegram.Bot.edit_user_star_subscription`
       - Used for editing a user's star subscription
+    * - :meth:`~telegram.Bot.get_my_star_balance`
+      - Used for obtaining the bot's Telegram Stars balance
     * - :meth:`~telegram.Bot.get_star_transactions`
       - Used for obtaining the bot's Telegram Stars transactions
     * - :meth:`~telegram.Bot.refund_star_payment`
       - Used for refunding a payment in Telegram Stars
+    * - :meth:`~telegram.Bot.gift_premium_subscription`
+      - Used for gifting Telegram Premium to another user.
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
+   <summary>Business Related Methods</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
+    * - :meth:`~telegram.Bot.get_business_connection`
+      - Used for getting information about the business account.
+    * - :meth:`~telegram.Bot.get_business_account_gifts`
+      - Used for getting gifts owned by the business account.
+    * - :meth:`~telegram.Bot.get_business_account_star_balance`
+      - Used for getting the amount of Stars owned by the business account.
+    * - :meth:`~telegram.Bot.read_business_message`
+      - Used for marking a message as read.
+    * - :meth:`~telegram.Bot.delete_story`
+      - Used for deleting business stories posted by the bot.
+    * - :meth:`~telegram.Bot.delete_business_messages`
+      - Used for deleting business messages.
+    * - :meth:`~telegram.Bot.remove_business_account_profile_photo`
+      - Used for removing the business accounts profile photo
+    * - :meth:`~telegram.Bot.set_business_account_name`
+      - Used for setting the business account name.
+    * - :meth:`~telegram.Bot.set_business_account_username`
+      - Used for setting the business account username.
+    * - :meth:`~telegram.Bot.set_business_account_bio`
+      - Used for setting the business account bio.
+    * - :meth:`~telegram.Bot.set_business_account_gift_settings`
+      - Used for setting the business account gift settings.
+    * - :meth:`~telegram.Bot.set_business_account_profile_photo`
+      - Used for setting the business accounts profile photo
+    * - :meth:`~telegram.Bot.post_story`
+      - Used for posting a story on behalf of business account.
+    * - :meth:`~telegram.Bot.repost_story`
+      - Used for reposting an existing story on behalf of business account.
+    * - :meth:`~telegram.Bot.edit_story`
+      - Used for editing business stories posted by the bot.
+    * - :meth:`~telegram.Bot.convert_gift_to_stars`
+      - Used for converting owned reqular gifts to stars.
+    * - :meth:`~telegram.Bot.upgrade_gift`
+      - Used for upgrading owned regular gifts to unique ones.
+    * - :meth:`~telegram.Bot.transfer_gift`
+      - Used for transferring owned unique gifts to another user.
+    * - :meth:`~telegram.Bot.transfer_business_account_stars`
+      - Used for transfering Stars from the business account balance to the bot's balance.
+    * - :meth:`~telegram.Bot.send_checklist`
+      - Used for sending a checklist on behalf of the business account.
+    * - :meth:`~telegram.Bot.edit_message_checklist`
+      - Used for editing a checklist on behalf of the business account.
+
 
 .. raw:: html
 
@@ -419,8 +485,12 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_available_gifts`
       - Used for getting information about gifts available for sending
+    * - :meth:`~telegram.Bot.get_chat_gifts`
+      - Used for getting information about gifts owned and hosted by a chat
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
+    * - :meth:`~telegram.Bot.get_user_gifts`
+      - Used for getting information about gifts owned and hosted by a user
     * - :meth:`~telegram.Bot.save_prepared_inline_message`
       - Used for storing a message to be sent by a user of a Mini App
 

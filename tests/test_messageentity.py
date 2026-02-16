@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -96,7 +96,7 @@ class TestMessageEntityWithoutRequest(MessageEntityTestBase):
             for _input, _ in inputs_outputs
         ]
         utf_16_entities = MessageEntity.adjust_message_entities_to_utf_16(text, unicode_entities)
-        for out_entity, input_output in zip(utf_16_entities, inputs_outputs):
+        for out_entity, input_output in zip(utf_16_entities, inputs_outputs, strict=False):
             _, output = input_output
             offset, length = output
             assert out_entity.offset == offset
@@ -144,7 +144,9 @@ class TestMessageEntityWithoutRequest(MessageEntityTestBase):
 
         assert new_text == "prefix 𝛙𝌢𑁍 | text 𝛙𝌢𑁍 | suffix 𝛙𝌢𑁍"
         assert [entity.offset for entity in new_entities] == [0, 16, 30]
-        for old, new in zip([first_entity, second_entity, third_entity], new_entities):
+        for old, new in zip(
+            [first_entity, second_entity, third_entity], new_entities, strict=False
+        ):
             assert new is not old
             assert new.type == old.type
             for key, value in kwargs.items():

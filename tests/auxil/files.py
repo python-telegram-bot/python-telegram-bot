@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2025
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 from pathlib import Path
 
 PROJECT_ROOT_PATH = Path(__file__).parent.parent.parent.resolve()
+SOURCE_ROOT_PATH = PROJECT_ROOT_PATH / "src" / "telegram"
 TEST_DATA_PATH = PROJECT_ROOT_PATH / "tests" / "data"
 
 

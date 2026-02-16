@@ -14,6 +14,7 @@ Note:
 To use Telegram Passport, you must install PTB via
 `pip install "python-telegram-bot[passport]"`
 """
+
 import logging
 from pathlib import Path
 

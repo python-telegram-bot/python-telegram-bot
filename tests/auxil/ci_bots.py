@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2025
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Provide a bot to tests"""
+
 import base64
 import json
 import os
@@ -30,7 +31,7 @@ from .envvars import GITHUB_ACTIONS
 # These bots are only able to talk in our test chats, so they are quite useless for other
 # purposes than testing.
 FALLBACKS = (
-    "W3sidG9rZW4iOiAiNTc5Njk0NzE0OkFBRnBLOHc2emtrVXJENHhTZVl3RjNNTzhlLTRHcm1jeTdjIiwgInBheW1lbnRfc"
+    "W3sidG9rZW4iOiAiNTc5Njk0NzE0OkFBRmdqXzhmNFVlV1hrb3VVUnpUZThhRUY0UGNFQkRxdlY0IiwgInBheW1lbnRfc"
     "HJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TmpRME5qWmxOekk1WWpKaSIsICJjaGF0X2lkIjogIjY3NTY2Nj"
     "IyNCIsICJzdXBlcl9ncm91cF9pZCI6ICItMTAwMTMxMDkxMTEzNSIsICJmb3J1bV9ncm91cF9pZCI6ICItMTAwMTgzODA"
     "wNDU3NyIsICJjaGFubmVsX2lkIjogIkBweXRob250ZWxlZ3JhbWJvdHRlc3RzIiwgIm5hbWUiOiAiUFRCIHRlc3RzIGZh"
@@ -49,9 +50,7 @@ if GITHUB_ACTIONS and BOTS is not None and JOB_INDEX is not None:
     BOTS = json.loads(base64.b64decode(BOTS).decode(TextEncoding.UTF_8))
     JOB_INDEX = int(JOB_INDEX)
 
-FALLBACKS = json.loads(
-    base64.b64decode(FALLBACKS).decode(TextEncoding.UTF_8)
-)  # type: list[dict[str, str]]
+FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode(TextEncoding.UTF_8))  # type: list[dict[str, str]]
 
 
 class BotInfoProvider:

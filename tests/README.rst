@@ -6,6 +6,12 @@ PTB uses `pytest`_ for testing. To run the tests, you need to
 have pytest installed along with a few other dependencies. You can find the list of dependencies
 in the ``pyproject.toml`` file in the root of the repository.
 
+Since PTB uses a src-based layout, make sure you have installed the package in development mode before running the tests:
+
+.. code-block:: bash
+
+   $ pip install -e .
+
 Running tests
 =============
 
@@ -36,7 +42,7 @@ such that tests marked with ``@pytest.mark.xdist_group("name")`` are run on the 
 
 .. code-block:: bash
 
-    $ pytest -n auto --dist=loadgroup
+    $ pytest -n auto --dist=worksteal
 
 This will result in a significant speedup, but may cause some tests to fail. If you want to run
 the failed tests in isolation, you can use the ``--lf`` flag:
@@ -88,7 +94,7 @@ Debugging tests
 Writing tests can be challenging, and fixing failing tests can be even more so. To help with this,
 PTB has started to adopt the use of ``logging`` in the test suite. You can insert debug logging 
 statements in your tests to help you understand what's going on. To enable these logs, you can set 
-``log_level = DEBUG`` in ``setup.cfg`` or use the ``--log-level=INFO`` flag when running the tests.
+``log_level = DEBUG`` in ``pyproject.toml`` or use the ``--log-level=INFO`` flag when running the tests.
 If a test is large and complicated, it is recommended to leave the debug logs for others to use as 
 well.
 

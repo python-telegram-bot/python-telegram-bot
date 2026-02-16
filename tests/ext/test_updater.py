@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import logging
 import platform
 from collections import defaultdict
@@ -294,7 +295,7 @@ class TestUpdater:
         tracking_flag = False
         received_kwargs = {}
         expected_kwargs = {
-            "timeout": 0,
+            "timeout": dtm.timedelta(seconds=0),
             "allowed_updates": "allowed_updates",
         }
 
@@ -373,7 +374,6 @@ class TestUpdater:
         assert log_found
 
     async def test_polling_mark_updates_as_read_failure(self, monkeypatch, updater, caplog):
-
         monkeypatch.setattr(updater.bot, "get_updates", empty_get_updates)
 
         async with updater:
@@ -398,7 +398,6 @@ class TestUpdater:
         assert log_found
 
     async def test_start_polling_already_running(self, updater, monkeypatch):
-
         monkeypatch.setattr(updater.bot, "get_updates", empty_get_updates)
 
         async with updater:
@@ -416,7 +415,7 @@ class TestUpdater:
         on_stop_flag = False
 
         expected = {
-            "timeout": 10,
+            "timeout": dtm.timedelta(seconds=10),
             "allowed_updates": None,
             "api_kwargs": None,
         }
@@ -456,14 +455,14 @@ class TestUpdater:
             on_stop_flag = False
 
             expected = {
-                "timeout": 42,
+                "timeout": dtm.timedelta(seconds=42),
                 "allowed_updates": ["message"],
                 "api_kwargs": None,
             }
 
             await update_queue.put(Update(update_id=2))
             await updater.start_polling(
-                timeout=42,
+                timeout=dtm.timedelta(seconds=42),
                 allowed_updates=["message"],
             )
             await update_queue.join()
@@ -850,7 +849,7 @@ class TestUpdater:
     )
     async def test_no_unix(self, updater):
         async with updater:
-            with pytest.raises(RuntimeError, match="binding unix sockets."):
+            with pytest.raises(RuntimeError, match="binding unix sockets\\."):
                 await updater.start_webhook(unix="DoesntMatter", webhook_url="TOKEN")
 
     async def test_start_webhook_already_running(self, updater, monkeypatch):
@@ -955,7 +954,6 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, "set_webhook", return_true)
 
         try:
-
             ip = "127.0.0.1"
             port = randrange(1024, 49152)  # Select random port
 
@@ -997,7 +995,6 @@ class TestUpdater:
             updater.bot.callback_data_cache.clear_callback_queries()
 
     async def test_webhook_invalid_ssl(self, monkeypatch, updater):
-
         ip = "127.0.0.1"
         port = randrange(1024, 49152)  # Select random port
         async with updater:
@@ -1069,7 +1066,6 @@ class TestUpdater:
                     )
 
     async def test_webhook_invalid_posts(self, updater, monkeypatch):
-
         ip = "127.0.0.1"
         port = randrange(1024, 49152)
 
@@ -1145,3 +1141,52 @@ class TestUpdater:
 
             await updater.stop()
             assert not updater.running
+
+    @pytest.mark.parametrize("method_name", ["start_polling", "start_webhook"])
+    async def test_infinite_bootstrap_retries(self, updater, monkeypatch, method_name):
+        """Here we simply test that setting `bootstrap_retries=-1` does not lead to the wrong
+        infinite-loop behavior reported in #4966. Raising an exception on the first call to
+        `set/delete_webhook` ensures that a retry actually happens.
+        """
+
+        original_delete_webhook = updater.bot.delete_webhook
+        original_set_webhook = updater.bot.set_webhook
+        counts = {"delete": 0, "set": 0}
+
+        def patch_builder(func, name):
+            async def wrapped(*args, **kwargs):
+                if counts[name] >= 3:
+                    pytest.fail("Should be called only once. Test failed.")
+                counts[name] += 1
+                if counts[name] == 1:
+                    raise TelegramError("1")
+                return await func(*args, **kwargs)
+
+            return wrapped
+
+        async def get_updates(*args, **kwargs):
+            return []
+
+        monkeypatch.setattr(
+            updater.bot, "delete_webhook", patch_builder(original_delete_webhook, "delete")
+        )
+        monkeypatch.setattr(updater.bot, "set_webhook", patch_builder(original_set_webhook, "set"))
+        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+
+        kwargs = {"bootstrap_retries": -1}
+        if method_name == "start_webhook":
+            kwargs.update(
+                {
+                    "listen": "127.0.0.1",
+                    "port": randrange(1024, 49152),
+                }
+            )
+
+        async with updater:
+            task = asyncio.create_task(getattr(updater, method_name)(**kwargs))
+            try:
+                await asyncio.wait_for(task, timeout=10)
+            except TimeoutError:
+                pytest.fail(f"{method_name} did not succeed within the timeout. Aborting.")
+            finally:
+                await updater.stop()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import zoneinfo
 import pytest
 
 from telegram._utils import datetime as tg_dtm
+from telegram._utils.datetime import get_zone_info
 from telegram.ext import Defaults
 
 # sample time specification values categorised into absolute / delta / time-of-day
@@ -65,7 +66,7 @@ class TestDatetime:
     @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
     def test_localize_pytz(self):
         dt = dtm.datetime(2023, 1, 1, 12, 0, 0)
-        import pytz
+        import pytz  # noqa: PLC0415
 
         tzinfo = pytz.timezone("Europe/Berlin")
         localized_dt = tg_dtm.localize(dt, tzinfo)
@@ -118,9 +119,9 @@ class TestDatetime:
         reference_t = 0
         for i in DELTA_TIME_SPECS:
             delta = i.total_seconds() if hasattr(i, "total_seconds") else i
-            assert (
-                tg_dtm.to_float_timestamp(i, reference_t) == reference_t + delta
-            ), f"failed for {i}"
+            assert tg_dtm.to_float_timestamp(i, reference_t) == reference_t + delta, (
+                f"failed for {i}"
+            )
 
     def test_to_float_timestamp_time_of_day(self):
         """Conversion from time-of-day specification to timestamp"""
@@ -138,7 +139,10 @@ class TestDatetime:
         # of an xpass when the test is run in a timezone with the same UTC offset
         ref_datetime = dtm.datetime(1970, 1, 1, 12)
         utc_offset = timezone.utcoffset(ref_datetime)
-        ref_t, time_of_day = tg_dtm._datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
+        ref_t, time_of_day = (
+            tg_dtm._datetime_to_float_timestamp(ref_datetime),
+            ref_datetime.time(),
+        )
         aware_time_of_day = tg_dtm.localize(ref_datetime, timezone).timetz()
 
         # first test that naive time is assumed to be utc:
@@ -168,7 +172,7 @@ class TestDatetime:
             assert tg_dtm.to_timestamp(i) == int(tg_dtm.to_float_timestamp(i)), f"Failed for {i}"
 
     def test_to_timestamp_none(self):
-        # this 'convenience' behaviour has been left left for backwards compatibility
+        # this 'convenience' behaviour has been left for backwards compatibility
         assert tg_dtm.to_timestamp(None) is None
 
     def test_from_timestamp_none(self):
@@ -192,3 +196,35 @@ class TestDatetime:
         assert tg_dtm.extract_tzinfo_from_defaults(tz_bot) == tz_bot.defaults.tzinfo
         assert tg_dtm.extract_tzinfo_from_defaults(bot) is None
         assert tg_dtm.extract_tzinfo_from_defaults(raw_bot) is None
+
+    def test_get_zone_info_with_valid_timezone_string(self):
+        """Test with a valid timezone string."""
+        tz = "Asia/Tokyo"
+        result = get_zone_info(tz)
+        assert isinstance(result, zoneinfo.ZoneInfo)
+        assert str(result) == "Asia/Tokyo"
+
+    def test_get_zone_info_with_invalid_timezone_string(self):
+        """Test with an invalid timezone string."""
+        with pytest.raises(
+            zoneinfo.ZoneInfoNotFoundError,
+            match=r"No time zone found.*Invalid/Timezone.*install the tzdata",
+        ):
+            get_zone_info("Invalid/Timezone")
+
+    @pytest.mark.parametrize(
+        ("arg", "timedelta_result", "number_result"),
+        [
+            (None, None, None),
+            (dtm.timedelta(seconds=10), dtm.timedelta(seconds=10), 10),
+            (dtm.timedelta(seconds=10.5), dtm.timedelta(seconds=10.5), 10.5),
+        ],
+    )
+    def test_get_timedelta_value(self, PTB_TIMEDELTA, arg, timedelta_result, number_result):
+        result = tg_dtm.get_timedelta_value(arg, attribute="")
+
+        if PTB_TIMEDELTA:
+            assert result == timedelta_result
+        else:
+            assert result == number_result
+            assert type(result) is type(number_result)

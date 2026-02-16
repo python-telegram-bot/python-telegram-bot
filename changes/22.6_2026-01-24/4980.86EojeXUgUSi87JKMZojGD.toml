@@ -1,0 +1,5 @@
+internal = "Lock file maintenance"
+[[pull_requests]]
+uid = "4980"
+author_uid = "renovatebot"
+closes_threads = []

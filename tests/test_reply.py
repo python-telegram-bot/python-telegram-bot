@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,8 @@ import pytest
 from telegram import (
     BotCommand,
     Chat,
+    Checklist,
+    ChecklistTask,
     ExternalReplyInfo,
     Giveaway,
     LinkPreviewOptions,
@@ -47,6 +49,7 @@ def external_reply_info():
         link_preview_options=ExternalReplyInfoTestBase.link_preview_options,
         giveaway=ExternalReplyInfoTestBase.giveaway,
         paid_media=ExternalReplyInfoTestBase.paid_media,
+        checklist=ExternalReplyInfoTestBase.checklist,
     )
 
 
@@ -63,15 +66,22 @@ class ExternalReplyInfoTestBase:
         1,
     )
     paid_media = PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])
+    checklist = Checklist(
+        title="Checklist Title",
+        tasks=[
+            ChecklistTask(text="Item 1", id=1),
+            ChecklistTask(text="Item 2", id=2),
+        ],
+    )
 
 
 class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
     def test_slot_behaviour(self, external_reply_info):
         for attr in external_reply_info.__slots__:
             assert getattr(external_reply_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(external_reply_info)) == len(
-            set(mro_slots(external_reply_info))
-        ), "duplicate slot"
+        assert len(mro_slots(external_reply_info)) == len(set(mro_slots(external_reply_info))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -81,6 +91,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
             "link_preview_options": self.link_preview_options.to_dict(),
             "giveaway": self.giveaway.to_dict(),
             "paid_media": self.paid_media.to_dict(),
+            "checklist": self.checklist.to_dict(),
         }
 
         external_reply_info = ExternalReplyInfo.de_json(json_dict, offline_bot)
@@ -92,6 +103,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert external_reply_info.link_preview_options == self.link_preview_options
         assert external_reply_info.giveaway == self.giveaway
         assert external_reply_info.paid_media == self.paid_media
+        assert external_reply_info.checklist == self.checklist
 
     def test_to_dict(self, external_reply_info):
         ext_reply_info_dict = external_reply_info.to_dict()
@@ -103,6 +115,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert ext_reply_info_dict["link_preview_options"] == self.link_preview_options.to_dict()
         assert ext_reply_info_dict["giveaway"] == self.giveaway.to_dict()
         assert ext_reply_info_dict["paid_media"] == self.paid_media.to_dict()
+        assert ext_reply_info_dict["checklist"] == self.checklist.to_dict()
 
     def test_equality(self, external_reply_info):
         a = external_reply_info
@@ -205,6 +218,7 @@ def reply_parameters():
         quote_parse_mode=ReplyParametersTestBase.quote_parse_mode,
         quote_entities=ReplyParametersTestBase.quote_entities,
         quote_position=ReplyParametersTestBase.quote_position,
+        checklist_task_id=ReplyParametersTestBase.checklist_task_id,
     )
 
 
@@ -219,15 +233,16 @@ class ReplyParametersTestBase:
         MessageEntity(MessageEntity.EMAIL, 3, 4),
     ]
     quote_position = 5
+    checklist_task_id = 9
 
 
 class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
     def test_slot_behaviour(self, reply_parameters):
         for attr in reply_parameters.__slots__:
             assert getattr(reply_parameters, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(reply_parameters)) == len(
-            set(mro_slots(reply_parameters))
-        ), "duplicate slot"
+        assert len(mro_slots(reply_parameters)) == len(set(mro_slots(reply_parameters))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -238,6 +253,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
             "quote_parse_mode": self.quote_parse_mode,
             "quote_entities": [entity.to_dict() for entity in self.quote_entities],
             "quote_position": self.quote_position,
+            "checklist_task_id": self.checklist_task_id,
         }
 
         reply_parameters = ReplyParameters.de_json(json_dict, offline_bot)
@@ -250,6 +266,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
         assert reply_parameters.quote_parse_mode == self.quote_parse_mode
         assert reply_parameters.quote_entities == tuple(self.quote_entities)
         assert reply_parameters.quote_position == self.quote_position
+        assert reply_parameters.checklist_task_id == self.checklist_task_id
 
     def test_to_dict(self, reply_parameters):
         reply_parameters_dict = reply_parameters.to_dict()
@@ -267,6 +284,7 @@ class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
             entity.to_dict() for entity in self.quote_entities
         ]
         assert reply_parameters_dict["quote_position"] == self.quote_position
+        assert reply_parameters_dict["checklist_task_id"] == self.checklist_task_id
 
     def test_equality(self, reply_parameters):
         a = reply_parameters

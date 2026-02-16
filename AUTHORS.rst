@@ -7,10 +7,8 @@ The current development team includes
 
 - `Hinrich Mahler <https://github.com/Bibo-Joshi>`_ (maintainer)
 - `Poolitzer <https://github.com/Poolitzer>`_ (community liaison)
-- `Shivam <https://github.com/Starry69>`_
 - `Harshil <https://github.com/harshil21>`_
-- `Dmitry Kolomatskiy <https://github.com/lemontree210>`_
-- `Aditya <https://github.com/clot27>`_
+- `Abdelrahman <https://github.com/aelkheir>`_
 
 Emeritus maintainers include
 `Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram),
@@ -21,7 +19,7 @@ Contributors
 
 The following wonderful people contributed directly or indirectly to this project:
 
-- `Abdelrahman <https://github.com/aelkheir>`_
+- `Aditya <https://github.com/clot27>`_
 - `Abshar <https://github.com/abxhr>`_
 - `Abubakar Alaya <https://github.com/Ecode2>`_
 - `Alateas <https://github.com/alateas>`_
@@ -42,6 +40,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
 - `D David Livingston <https://github.com/daviddl9>`_
+- `Dmitry Kolomatskiy <https://github.com/lemontree210>`_
 - `DonalDuck004 <https://github.com/DonalDuck004>`_
 - `Eana Hufwe <https://github.com/blueset>`_
 - `Ehsan Online <https://github.com/ehsanonline>`_
@@ -81,6 +80,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Kirill Vasin <https://github.com/vasinkd>`_
 - `Kjwon15 <https://github.com/kjwon15>`_
 - `Li-aung Yip <https://github.com/LiaungYip>`_
+- `locobott <https://github.com/locobott>`_
 - `Loo Zheng Yuan <https://github.com/loozhengyuan>`_
 - `LRezende <https://github.com/lrezende>`_
 - `Luca Bellanti <https://github.com/Trifase>`_
@@ -110,6 +110,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_
 - `Pawan <https://github.com/pawanrai9999>`_
+- `Philipp Isachenko <https://github.com/Aweryc>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Piraty <https://github.com/piraty>`_
 - `Poolitzer <https://github.com/Poolitzer>`_
@@ -122,6 +123,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Sam Mosleh <https://github.com/sam-mosleh>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
+- `Shivam <https://github.com/Starry69>`_
 - `Shivam Saini <https://github.com/shivamsn97>`_
 - `Siloé Garcez <https://github.com/roast-lord>`_
 - `Simon Schürrle <https://github.com/SitiSchu>`_

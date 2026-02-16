@@ -1,0 +1,5 @@
+internal = "Update astral-sh/setup-uv action to v7.2.1"
+[[pull_requests]]
+uid = "5116"
+author_uids = ["renovate[bot]"]
+closes_threads = []

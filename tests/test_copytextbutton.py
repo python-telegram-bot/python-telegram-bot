@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,9 +36,9 @@ class TestCopyTextButtonWithoutRequest(CopyTextButtonTestBase):
     def test_slot_behaviour(self, copy_text_button):
         for attr in copy_text_button.__slots__:
             assert getattr(copy_text_button, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(copy_text_button)) == len(
-            set(mro_slots(copy_text_button))
-        ), "duplicate slot"
+        assert len(mro_slots(copy_text_button)) == len(set(mro_slots(copy_text_button))), (
+            "duplicate slot"
+        )
 
     def test_de_json(self, offline_bot):
         json_dict = {"text": self.text}

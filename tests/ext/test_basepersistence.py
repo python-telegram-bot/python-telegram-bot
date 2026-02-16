@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,12 +21,13 @@ import collections
 import copy
 import enum
 import functools
+import itertools
 import logging
 import sys
 import time
 from http import HTTPStatus
 from pathlib import Path
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 import pytest
 
@@ -73,7 +74,7 @@ class TrackingPersistence(BasePersistence):
 
     def __init__(
         self,
-        store_data: Optional[PersistenceInput] = None,
+        store_data: PersistenceInput | None = None,
         update_interval: float = 60,
         fill_data: bool = False,
     ):
@@ -222,20 +223,20 @@ class TrackingConversationHandler(ConversationHandler):
 
 
 class PappInput(NamedTuple):
-    bot_data: Optional[bool] = None
-    chat_data: Optional[bool] = None
-    user_data: Optional[bool] = None
-    callback_data: Optional[bool] = None
+    bot_data: bool | None = None
+    chat_data: bool | None = None
+    user_data: bool | None = None
+    callback_data: bool | None = None
     conversations: bool = True
     update_interval: float = None
     fill_data: bool = False
 
 
 def build_papp(
-    bot_info: Optional[dict] = None,
-    token: Optional[str] = None,
-    store_data: Optional[dict] = None,
-    update_interval: Optional[float] = None,
+    bot_info: dict | None = None,
+    token: str | None = None,
+    store_data: dict | None = None,
+    update_interval: float | None = None,
     fill_data: bool = False,
 ) -> Application:
     store_data = PersistenceInput(**(store_data or {}))
@@ -319,7 +320,7 @@ class TestBasePersistence:
     """Tests basic behavior of BasePersistence and (most importantly) the integration of
     persistence into the Application."""
 
-    def job_callback(self, chat_id: Optional[int] = None):
+    def job_callback(self, chat_id: int | None = None):
         async def callback(context):
             if context.user_data:
                 context.user_data["key"] = "value"
@@ -338,7 +339,7 @@ class TestBasePersistence:
 
         return callback
 
-    def handler_callback(self, chat_id: Optional[int] = None, sleep: Optional[float] = None):
+    def handler_callback(self, chat_id: int | None = None, sleep: float | None = None):
         async def callback(update, context):
             if sleep:
                 await asyncio.sleep(sleep)
@@ -404,7 +405,7 @@ class TestBasePersistence:
 
     @default_papp
     def test_set_bot_error(self, papp):
-        with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
+        with pytest.raises(TypeError, match="when using telegram\\.ext\\.ExtBot"):
             papp.persistence.set_bot(Bot(papp.bot.token))
 
         # just making sure that setting an ExtBoxt without callback_data_cache doesn't raise an
@@ -419,7 +420,7 @@ class TestBasePersistence:
                 self.store_data = PersistenceInput(False, False, False, False)
 
         with pytest.raises(
-            TypeError, match="persistence must be based on telegram.ext.BasePersistence"
+            TypeError, match="persistence must be based on telegram\\.ext\\.BasePersistence"
         ):
             ApplicationBuilder().bot(bot).persistence(MyPersistence()).build()
 
@@ -639,7 +640,7 @@ class TestBasePersistence:
             await papp.stop()
 
             # Make assertions before calling shutdown, as that calls update_persistence again!
-            diffs = [j - i for i, j in zip(call_times[:-1], call_times[1:])]
+            diffs = [j - i for i, j in itertools.pairwise(call_times)]
             assert sum(diffs) / len(diffs) == pytest.approx(
                 papp.persistence.update_interval, rel=1e-1
             )

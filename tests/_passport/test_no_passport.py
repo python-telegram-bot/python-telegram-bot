@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ Because imports in pytest are intricate, we just run
 
 with the TEST_WITH_OPT_DEPS environment variable set to False in addition to the regular test suite
 """
+
 import pytest
 
 import telegram

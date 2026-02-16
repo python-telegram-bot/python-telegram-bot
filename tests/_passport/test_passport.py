@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # flake8: noqa: E501
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -418,7 +418,10 @@ class TestPassportWithoutRequest(PassportTestBase):
         with pytest.raises(TypeError):
             Bot(offline_bot.token, private_key="Invalid key!")
 
-        with pytest.raises(ValueError, match="Could not deserialize key data"):
+        # Different error messages for different cryptography versions
+        with pytest.raises(
+            ValueError, match=r"(Could not deserialize key data)|(Unable to load PEM file)"
+        ):
             Bot(offline_bot.token, private_key=b"Invalid key!")
 
     def test_all_types(self, passport_data, offline_bot, all_passport_data):

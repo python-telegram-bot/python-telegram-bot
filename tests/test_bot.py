@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,6 @@ from telegram import (
     BotDescription,
     BotName,
     BotShortDescription,
-    BusinessConnection,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -66,6 +65,7 @@ from telegram import (
     MenuButtonWebApp,
     Message,
     MessageEntity,
+    OwnedGifts,
     Poll,
     PollOption,
     PreparedInlineMessage,
@@ -76,10 +76,13 @@ from telegram import (
     ShippingOption,
     StarTransaction,
     StarTransactions,
+    SuggestedPostParameters,
+    SuggestedPostPrice,
     Update,
     User,
     WebAppInfo,
 )
+from telegram._payment.stars.staramount import StarAmount
 from telegram._utils.datetime import UTC, from_timestamp, localize, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import to_camel_case
@@ -91,7 +94,7 @@ from telegram.constants import (
     ParseMode,
     ReactionEmoji,
 )
-from telegram.error import BadRequest, EndPointNotFound, InvalidToken
+from telegram.error import BadRequest, EndPointNotFound, InvalidToken, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
@@ -371,6 +374,59 @@ class TestBotWithoutRequest:
         assert self.received["init"] == 2
         assert self.received["shutdown"] == 2
 
+    async def test_initialize_with_get_me_failure_then_success(self, offline_bot, monkeypatch):
+        """Test that bot can recover from get_me failure during initialization."""
+        get_me_call_count = 0
+        request_init_count = 0
+
+        test_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
+        original_get_me = test_bot.get_me
+        original_request_init = test_bot.request.initialize
+
+        async def failing_then_succeeding_get_me(*args, **kwargs):
+            nonlocal get_me_call_count
+            get_me_call_count += 1
+            if get_me_call_count == 1:
+                # First call fails
+                raise TimedOut("Test timeout")
+            # Subsequent calls succeed
+            return await original_get_me(*args, **kwargs)
+
+        async def counting_request_init(*args, **kwargs):
+            nonlocal request_init_count
+            request_init_count += 1
+            await original_request_init(*args, **kwargs)
+
+        monkeypatch.setattr(test_bot, "get_me", failing_then_succeeding_get_me)
+        monkeypatch.setattr(test_bot.request, "initialize", counting_request_init)
+
+        try:
+            # First initialize attempt should fail due to get_me timeout
+            with pytest.raises(TimedOut):
+                await test_bot.initialize()
+
+            # Request initialization should have been called (once per initialize call)
+            assert request_init_count == 1
+            # get_me should have been called once and failed
+            assert get_me_call_count == 1
+
+            # Second initialize attempt should succeed
+            await test_bot.initialize()
+            # Request initialization should not be called again (still 1)
+            assert request_init_count == 1
+            # get_me should have been called a second time and succeeded
+            assert get_me_call_count == 2
+            # Verify bot is now accessible
+            assert test_bot.bot.id == offline_bot.id
+
+            # Third initialize attempt should be a no-op (both flags already True)
+            await test_bot.initialize()
+            # Neither should be called again
+            assert request_init_count == 1
+            assert get_me_call_count == 2
+        finally:
+            await test_bot.shutdown()
+
     async def test_context_manager(self, monkeypatch, offline_bot):
         async def initialize():
             self.test_flag = ["initialize"]
@@ -399,6 +455,21 @@ class TestBotWithoutRequest:
         with pytest.raises(RuntimeError, match="initialize"):
             async with offline_bot:
                 pass
+
+        assert self.test_flag == "stop"
+
+    async def test_shutdown_at_error_in_request_in_init(self, monkeypatch, offline_bot):
+        async def get_me_error():
+            raise httpx.HTTPError("BadRequest wrong token sry :(")
+
+        async def shutdown(*args):
+            self.test_flag = "stop"
+
+        monkeypatch.setattr(offline_bot, "get_me", get_me_error)
+        monkeypatch.setattr(offline_bot, "shutdown", shutdown)
+
+        async with offline_bot:
+            pass
 
         assert self.test_flag == "stop"
 
@@ -528,7 +599,7 @@ class TestBotWithoutRequest:
         if bot_method_name.replace("_", "").lower() != "getupdates" and bot_class is ExtBot:
             assert rate_arg in param_names, f"{bot_method} is missing the parameter `{rate_arg}`"
 
-    @bot_methods(ext_bot=False)
+    @bot_methods()
     async def test_defaults_handling(
         self,
         bot_class,
@@ -581,9 +652,9 @@ class TestBotWithoutRequest:
         signature = inspect.signature(method)
         ext_signature = inspect.signature(getattr(ExtBot, name))
 
-        assert (
-            ext_signature.return_annotation == signature.return_annotation
-        ), f"Wrong return annotation for method {name}"
+        assert ext_signature.return_annotation == signature.return_annotation, (
+            f"Wrong return annotation for method {name}"
+        )
         assert (
             set(signature.parameters)
             == set(ext_signature.parameters) - global_extra_args - extra_args_per_method[name]
@@ -591,15 +662,15 @@ class TestBotWithoutRequest:
         for param_name, param in signature.parameters.items():
             if param_name in different_hints_per_method[name]:
                 continue
-            assert (
-                param.annotation == ext_signature.parameters[param_name].annotation
-            ), f"Wrong annotation for parameter {param_name} of method {name}"
-            assert (
-                param.default == ext_signature.parameters[param_name].default
-            ), f"Wrong default value for parameter {param_name} of method {name}"
-            assert (
-                param.kind == ext_signature.parameters[param_name].kind
-            ), f"Wrong parameter kind for parameter {param_name} of method {name}"
+            assert param.annotation == ext_signature.parameters[param_name].annotation, (
+                f"Wrong annotation for parameter {param_name} of method {name}"
+            )
+            assert param.default == ext_signature.parameters[param_name].default, (
+                f"Wrong default value for parameter {param_name} of method {name}"
+            )
+            assert param.kind == ext_signature.parameters[param_name].kind, (
+                f"Wrong parameter kind for parameter {param_name} of method {name}"
+            )
 
     async def test_unknown_kwargs(self, offline_bot, monkeypatch):
         async def post(url, request_data: RequestData, *args, **kwargs):
@@ -1406,6 +1477,61 @@ class TestBotWithoutRequest:
             True,
             "SoSecretToken",
         )
+
+    async def test_send_message_draft(self, offline_bot, monkeypatch):
+        entities = [
+            MessageEntity(MessageEntity.BOLD, 0, 3),
+            MessageEntity(MessageEntity.ITALIC, 5, 8),
+        ]
+
+        async def make_assertions(*args, **kwargs):
+            params = kwargs.get("request_data").parameters
+            assert params.get("chat_id") == 123
+            assert params.get("draft_id") == 1
+            assert params.get("text") == "test test"
+            assert params.get("message_thread_id") == 9
+            assert params.get("parse_mode") == "markdown"
+            assert params.get("entities") == [e.to_dict() for e in entities]
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertions)
+        assert await offline_bot.send_message_draft(
+            chat_id=123,
+            draft_id=1,
+            text="test test",
+            message_thread_id=9,
+            parse_mode="markdown",
+            entities=entities,
+        )
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, "Markdown"), ("HTML", "HTML"), (None, None)],
+    )
+    async def test_send_message_draft_default_parse_mode(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("parse_mode") == expected_value
+            return True
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "chat_id": 123,
+            "draft_id": 1,
+            "text": "test test",
+            "message_thread_id": 9,
+            "entities": [
+                MessageEntity(MessageEntity.BOLD, 0, 3),
+                MessageEntity(MessageEntity.ITALIC, 5, 8),
+            ],
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["parse_mode"] = passed_value
+
+        await default_bot.send_message_draft(**kwargs)
 
     # TODO: Needs improvement. Need incoming shipping queries to test
     async def test_answer_shipping_query_ok(self, monkeypatch, offline_bot):
@@ -2358,25 +2484,31 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.send_message(2, "text", allow_paid_broadcast=42)
 
-    async def test_get_business_connection(self, offline_bot, monkeypatch):
-        bci = "42"
-        user = User(1, "first", False)
-        user_chat_id = 1
-        date = dtm.datetime.utcnow()
-        can_reply = True
-        is_enabled = True
-        bc = BusinessConnection(bci, user, user_chat_id, date, can_reply, is_enabled).to_json()
+    async def test_direct_messages_topic_id_argument(self, offline_bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
 
-        async def do_request(*args, **kwargs):
-            data = kwargs.get("request_data")
-            obj = data.parameters.get("business_connection_id")
-            if obj == bci:
-                return 200, f'{{"ok": true, "result": {bc}}}'.encode()
-            return 400, b'{"ok": false, "result": []}'
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("direct_messages_topic_id") == 42
 
-        monkeypatch.setattr(offline_bot.request, "do_request", do_request)
-        obj = await offline_bot.get_business_connection(business_connection_id=bci)
-        assert isinstance(obj, BusinessConnection)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_message(2, "text", direct_messages_topic_id=42)
+
+    async def test_suggested_post_parameters_argument(self, offline_bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
+        suggested_post_parameters = SuggestedPostParameters(price=SuggestedPostPrice("TON", 10))
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return (
+                request_data.parameters.get("suggested_post_parameters")
+                == suggested_post_parameters.to_dict()
+            )
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_message(
+            2, "text", suggested_post_parameters=suggested_post_parameters
+        )
 
     async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
         async def make_assertion(*args, **_):
@@ -2390,6 +2522,61 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.send_chat_action(chat_id, "action", 1, 3)
+
+    async def test_gift_premium_subscription_all_args(self, bot, monkeypatch):
+        # can't make actual request so we just test that the correct data is passed
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs.get("user_id") == 12
+                and kwargs.get("month_count") == 3
+                and kwargs.get("star_count") == 1000
+                and kwargs.get("text") == "test text"
+                and kwargs.get("text_parse_mode") == "Markdown"
+                and kwargs.get("text_entities")
+                == [
+                    MessageEntity(MessageEntity.BOLD, 0, 3),
+                    MessageEntity(MessageEntity.ITALIC, 5, 11),
+                ]
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        assert await bot.gift_premium_subscription(
+            user_id=12,
+            month_count=3,
+            star_count=1000,
+            text="test text",
+            text_parse_mode="Markdown",
+            text_entities=[
+                MessageEntity(MessageEntity.BOLD, 0, 3),
+                MessageEntity(MessageEntity.ITALIC, 5, 11),
+            ],
+        )
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        ("passed_value", "expected_value"),
+        [(DEFAULT_NONE, "Markdown"), ("HTML", "HTML"), (None, None)],
+    )
+    async def test_gift_premium_subscription_default_parse_mode(
+        self, default_bot, monkeypatch, passed_value, expected_value
+    ):
+        # can't make actual request so we just test that the correct data is passed
+        async def make_assertion(url, request_data, *args, **kwargs):
+            assert request_data.parameters.get("text_parse_mode") == expected_value
+            return True
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        kwargs = {
+            "user_id": 123,
+            "month_count": 3,
+            "star_count": 1000,
+            "text": "text",
+        }
+        if passed_value is not DEFAULT_NONE:
+            kwargs["text_parse_mode"] = passed_value
+
+        assert await default_bot.gift_premium_subscription(**kwargs)
 
     async def test_refund_star_payment(self, offline_bot, monkeypatch):
         # can't make actual request so we just test that the correct data is passed
@@ -2525,6 +2712,128 @@ class TestBotWithoutRequest:
 
         await offline_bot.remove_chat_verification(1234)
 
+    async def test_get_my_star_balance(self, offline_bot, monkeypatch):
+        sa = StarAmount(1000).to_json()
+
+        async def do_request(url, request_data: RequestData, *args, **kwargs):
+            assert not request_data.parameters
+            return 200, f'{{"ok": true, "result": {sa}}}'.encode()
+
+        monkeypatch.setattr(offline_bot.request, "do_request", do_request)
+        obj = await offline_bot.get_my_star_balance()
+        assert isinstance(obj, StarAmount)
+
+    async def test_approve_suggested_post(self, offline_bot, monkeypatch):
+        "No way to test this without receiving suggested posts"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.json_parameters
+            chat_id = data.get("chat_id") == "1234"
+            message_id = data.get("message_id") == "5678"
+            send_date = data.get("send_date", "1577887200") == "1577887200"
+            return chat_id and message_id and send_date
+
+        until = from_timestamp(1577887200)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        assert await offline_bot.approve_suggested_post(1234, 5678, 1577887200)
+        assert await offline_bot.approve_suggested_post(1234, 5678, until)
+
+    async def test_approve_suggested_post_with_tz(self, monkeypatch, tz_bot):
+        until = dtm.datetime(2020, 1, 11, 16, 13)
+        until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.parameters
+            chat_id = data["chat_id"] == 2
+            message_id = data["message_id"] == 32
+            until_date = data.get("until_date", until_timestamp) == until_timestamp
+            return chat_id and message_id and until_date
+
+        monkeypatch.setattr(tz_bot.request, "post", make_assertion)
+
+        assert await tz_bot.approve_suggested_post(2, 32)
+        assert await tz_bot.approve_suggested_post(2, 32, send_date=until)
+        assert await tz_bot.approve_suggested_post(2, 32, send_date=until_timestamp)
+
+    async def test_decline_suggested_post(self, offline_bot, monkeypatch):
+        "No way to test this without receiving suggested posts"
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("message_id") == 5678
+            assert request_data.parameters.get("comment") == "declined"
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.decline_suggested_post(1234, 5678, "declined")
+
+    async def test_get_user_gifts_parameter_passing(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            for param in (
+                "user_id",
+                "exclude_unlimited",
+                "exclude_limited_upgradable",
+                "exclude_limited_non_upgradable",
+                "exclude_from_blockchain",
+                "exclude_unique",
+                "sort_by_price",
+                "offset",
+                "limit",
+            ):
+                assert request_data.parameters.get(param) == param
+
+            return OwnedGifts(0, [], "null").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.get_user_gifts(
+            user_id="user_id",
+            exclude_unlimited="exclude_unlimited",
+            exclude_limited_upgradable="exclude_limited_upgradable",
+            exclude_limited_non_upgradable="exclude_limited_non_upgradable",
+            exclude_from_blockchain="exclude_from_blockchain",
+            exclude_unique="exclude_unique",
+            sort_by_price="sort_by_price",
+            offset="offset",
+            limit="limit",
+        )
+
+    async def test_get_chat_gifts_parameter_passing(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            for param in (
+                "chat_id",
+                "exclude_saved",
+                "exclude_unsaved",
+                "exclude_unlimited",
+                "exclude_limited_upgradable",
+                "exclude_limited_non_upgradable",
+                "exclude_from_blockchain",
+                "exclude_unique",
+                "sort_by_price",
+                "offset",
+                "limit",
+            ):
+                assert request_data.parameters.get(param) == param
+
+            return OwnedGifts(0, [], "null").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.get_chat_gifts(
+            chat_id="chat_id",
+            exclude_saved="exclude_saved",
+            exclude_unsaved="exclude_unsaved",
+            exclude_unlimited="exclude_unlimited",
+            exclude_limited_upgradable="exclude_limited_upgradable",
+            exclude_limited_non_upgradable="exclude_limited_non_upgradable",
+            exclude_from_blockchain="exclude_from_blockchain",
+            exclude_unique="exclude_unique",
+            sort_by_price="sort_by_price",
+            offset="offset",
+            limit="limit",
+        )
+
 
 class TestBotWithRequest:
     """
@@ -2538,7 +2847,7 @@ class TestBotWithRequest:
     # No need to duplicate here.
 
     async def test_invalid_token_server_response(self):
-        with pytest.raises(InvalidToken, match="The token `12` was rejected by the server."):
+        with pytest.raises(InvalidToken, match="The token `12` was rejected by the server\\."):
             async with ExtBot(token="12"):
                 pass
 
@@ -3217,9 +3526,10 @@ class TestBotWithRequest:
         pass
 
     # TODO: Actually send updates to the test bot so this can be tested properly
-    async def test_get_updates(self, bot):
+    @pytest.mark.parametrize("timeout", [1, dtm.timedelta(seconds=1)])
+    async def test_get_updates(self, bot, timeout):
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-        updates = await bot.get_updates(timeout=1)
+        updates = await bot.get_updates(timeout=timeout)
 
         assert isinstance(updates, tuple)
         if updates:
@@ -3231,9 +3541,12 @@ class TestBotWithRequest:
             (None, None, 0),
             (1, None, 1),
             (None, 1, 1),
+            (None, dtm.timedelta(seconds=1), 1),
             (DEFAULT_NONE, None, 10),
             (DEFAULT_NONE, 1, 11),
+            (DEFAULT_NONE, dtm.timedelta(seconds=1), 11),
             (1, 2, 3),
+            (1, dtm.timedelta(seconds=2), 3),
         ],
     )
     async def test_get_updates_read_timeout_value_passing(
@@ -3487,6 +3800,7 @@ class TestBotWithRequest:
                 can_post_stories=True,
                 can_edit_stories=True,
                 can_delete_stories=True,
+                can_manage_direct_messages=True,
             )
 
         # Test that we pass the correct params to TG
@@ -3510,6 +3824,7 @@ class TestBotWithRequest:
                 and data.get("can_post_stories") == 13
                 and data.get("can_edit_stories") == 14
                 and data.get("can_delete_stories") == 15
+                and data.get("can_manage_direct_messages") == 16
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -3531,6 +3846,7 @@ class TestBotWithRequest:
             can_post_stories=13,
             can_edit_stories=14,
             can_delete_stories=15,
+            can_manage_direct_messages=16,
         )
 
     async def test_export_chat_invite_link(self, bot, channel_id):
@@ -3694,7 +4010,7 @@ class TestBotWithRequest:
         #
         # The error message Hide_requester_missing started showing up instead of
         # User_already_participant. Don't know why …
-        with pytest.raises(BadRequest, match="User_already_participant|Hide_requester_missing"):
+        with pytest.raises(BadRequest, match=r"User_already_participant|Hide_requester_missing"):
             await bot.decline_chat_join_request(chat_id=channel_id, user_id=chat_id)
 
     async def test_set_chat_photo(self, bot, channel_id):
@@ -4448,7 +4764,7 @@ class TestBotWithRequest:
                 assert isinstance(entry, dict)
             result = Message.de_list(result, bot)
 
-        for message, file_name in zip(result, ("text_file.txt", "local_file.txt")):
+        for message, file_name in zip(result, ("text_file.txt", "local_file.txt"), strict=False):
             assert isinstance(message, Message)
             assert message.chat_id == int(chat_id)
             out = BytesIO()
@@ -4487,3 +4803,94 @@ class TestBotWithRequest:
         assert edited_link.name == "sub_name_2"
         assert sub_link.subscription_period == 2592000
         assert sub_link.subscription_price == 13
+
+    async def test_get_my_star_balance(self, bot):
+        balance = await bot.get_my_star_balance()
+        assert isinstance(balance, StarAmount)
+        assert balance.amount == 0
+
+    async def test_get_user_gifts_basic(self, bot):
+        gifts = await bot.get_user_gifts(bot.bot.id)
+        assert isinstance(gifts, OwnedGifts)
+        assert gifts.total_count == 0
+
+    async def test_get_chat_gifts_basic(self, bot, chat_id):
+        gifts = await bot.get_chat_gifts(chat_id)
+        assert isinstance(gifts, OwnedGifts)
+        assert gifts.total_count == 0
+
+    async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
+        """Test that requests and bot user are initialized separately and only once."""
+        request_init_count = 0
+        get_me_call_count = 0
+
+        async def counting_request_init(*args, **kwargs):
+            nonlocal request_init_count
+            request_init_count += 1
+
+        original_get_me = offline_bot.get_me
+
+        async def counting_get_me(*args, **kwargs):
+            nonlocal get_me_call_count
+            get_me_call_count += 1
+            return await original_get_me(*args, **kwargs)
+
+        test_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
+        monkeypatch.setattr(test_bot.request, "initialize", counting_request_init)
+        monkeypatch.setattr(test_bot, "get_me", counting_get_me)
+
+        try:
+            # First initialization
+            await test_bot.initialize()
+            assert request_init_count == 1
+            assert get_me_call_count == 1
+
+            # Second initialization should not call either again
+            await test_bot.initialize()
+            assert request_init_count == 1
+            assert get_me_call_count == 1
+        finally:
+            await test_bot.shutdown()
+
+    async def test_shutdown_allows_reinitialization(self, offline_bot, monkeypatch):
+        """Test that after shutdown, bot can be reinitialized."""
+        request_init_count = 0
+        request_shutdown_count = 0
+        get_me_call_count = 0
+
+        async def counting_request_init(*args, **kwargs):
+            nonlocal request_init_count
+            request_init_count += 1
+
+        async def counting_request_shutdown(*args, **kwargs):
+            nonlocal request_shutdown_count
+            request_shutdown_count += 1
+
+        original_get_me = offline_bot.get_me
+
+        async def counting_get_me(*args, **kwargs):
+            nonlocal get_me_call_count
+            get_me_call_count += 1
+            return await original_get_me(*args, **kwargs)
+
+        test_bot = PytestBot(token=offline_bot.token, request=OfflineRequest())
+        monkeypatch.setattr(test_bot.request, "initialize", counting_request_init)
+        monkeypatch.setattr(test_bot.request, "shutdown", counting_request_shutdown)
+        monkeypatch.setattr(test_bot, "get_me", counting_get_me)
+
+        try:
+            # First initialization
+            await test_bot.initialize()
+            assert request_init_count == 1
+            assert get_me_call_count == 1
+
+            # Shutdown
+            await test_bot.shutdown()
+            assert request_shutdown_count == 1
+
+            # Re-initialize should call everything again
+            await test_bot.initialize()
+            assert request_init_count == 2
+            assert get_me_call_count == 2
+        finally:
+            await test_bot.shutdown()

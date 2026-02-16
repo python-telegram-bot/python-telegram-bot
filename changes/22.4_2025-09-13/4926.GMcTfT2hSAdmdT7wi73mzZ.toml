@@ -1,0 +1,5 @@
+internal = "Bump codecov/codecov-action from 5.4.3 to 5.5.0"
+[[pull_requests]]
+uid = "4926"
+author_uid = "dependabot"
+closes_threads = []

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -200,12 +200,12 @@ class TestCallbackContext:
 
         callback_context = CallbackContext.from_update(update, app)
 
-        with pytest.raises(RuntimeError, match="This telegram.ext.ExtBot instance does not"):
+        with pytest.raises(RuntimeError, match="This telegram\\.ext\\.ExtBot instance does not"):
             callback_context.drop_callback_data(None)
 
         try:
             app.bot = raw_bot
-            with pytest.raises(RuntimeError, match="telegram.Bot does not allow for"):
+            with pytest.raises(RuntimeError, match="telegram\\.Bot does not allow for"):
                 callback_context.drop_callback_data(None)
         finally:
             app.bot = bot

@@ -1,83 +1,60 @@
-# Make sure that the additional_dependencies here match pyproject.toml
-
 ci:
     autofix_prs: false
+    # We use Renovate to update this file now, but we can't disable automatic pre-commit updates
+    # when using the `pre-commit` GitHub Action, so we set the schedule to quarterly to avoid
+    # frequent updates.
     autoupdate_schedule: quarterly
     autoupdate_commit_msg: 'Bump `pre-commit` Hooks to Latest Versions'
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.8.6'
+    rev: 'v0.15.1'
     hooks:
-    -   id: ruff
-        name: ruff
-        additional_dependencies:
-          - httpx~=0.27
-          - tornado~=6.4
-          - APScheduler~=3.10.4
-          - cachetools>=5.3.3,<5.5.0
-          - aiolimiter~=1.1,<1.3
--   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.10.0
-    hooks:
-    -   id: black
-        args:
-        - --diff
-        - --check
--   repo: https://github.com/PyCQA/flake8
-    rev: 7.1.1
-    hooks:
-    -   id: flake8
+    # Run the linter:
+    -   id: ruff-check
+        name: ruff check
+    # Run the formatter:
+    -   id: ruff-format
+        name: ruff format
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.3.3
+    rev: v4.0.4
     hooks:
     -   id: pylint
         files: ^(?!(tests|docs)).*\.py$
+        language: python
         additional_dependencies:
           - httpx~=0.27
           - tornado~=6.4
-          - APScheduler~=3.10.4
-          - cachetools>=5.3.3,<5.5.0
+          - APScheduler>=3.10.4,<3.12.0
+          - cachetools>=7.0.0,<8.0.0
           - aiolimiter~=1.1,<1.3
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+    rev: v1.19.1
     hooks:
     -   id: mypy
         name: mypy-ptb
         files: ^(?!(tests|examples|docs)).*\.py$
+        language: python
         additional_dependencies:
           - types-pytz
           - types-cryptography
           - types-cachetools
           - httpx~=0.27
           - tornado~=6.4
-          - APScheduler~=3.10.4
-          - cachetools>=5.3.3,<5.5.0
+          - APScheduler>=3.10.4,<3.12.0
+          - cachetools>=7.0.0,<8.0.0
           - aiolimiter~=1.1,<1.3
           - . # this basically does `pip install -e .`
     - id: mypy
       name: mypy-examples
       files: ^examples/.*\.py$
+      language: python
       args:
         - --no-strict-optional
         - --follow-imports=silent
       additional_dependencies:
         - tornado~=6.4
-        - APScheduler~=3.10.4
-        - cachetools>=5.3.3,<5.5.0
+        - APScheduler>=3.10.4,<3.12.0
+        - cachetools>=7.0.0,<8.0.0
         - . # this basically does `pip install -e .`
--   repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.1
-    hooks:
-    -   id: pyupgrade
-        args:
-          - --py39-plus
--   repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-    -   id: isort
-        name: isort
-        args:
-        - --diff
-        - --check

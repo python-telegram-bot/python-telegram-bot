@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -68,9 +68,9 @@ class TestKeyboardData:
         keyboard_data = _KeyboardData("uuid")
         for attr in keyboard_data.__slots__:
             assert getattr(keyboard_data, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(keyboard_data)) == len(
-            set(mro_slots(keyboard_data))
-        ), "duplicate slot"
+        assert len(mro_slots(keyboard_data)) == len(set(mro_slots(keyboard_data))), (
+            "duplicate slot"
+        )
 
 
 @pytest.mark.skipif(
@@ -86,9 +86,9 @@ class TestCallbackDataCache:
                 else attr
             )
             assert getattr(callback_data_cache, at, "err") != "err", f"got extra slot '{at}'"
-        assert len(mro_slots(callback_data_cache)) == len(
-            set(mro_slots(callback_data_cache))
-        ), "duplicate slot"
+        assert len(mro_slots(callback_data_cache)) == len(set(mro_slots(callback_data_cache))), (
+            "duplicate slot"
+        )
 
     @pytest.mark.parametrize("maxsize", [1, 5, 2048])
     def test_init_maxsize(self, maxsize, bot):
@@ -320,7 +320,7 @@ class TestCallbackDataCache:
             data=out.inline_keyboard[0][1].callback_data,
         )
 
-        with pytest.raises(KeyError, match="CallbackQuery was not found in cache."):
+        with pytest.raises(KeyError, match="CallbackQuery was not found in cache\\."):
             callback_data_cache.drop_data(callback_query)
 
         callback_data_cache.process_callback_query(callback_query)

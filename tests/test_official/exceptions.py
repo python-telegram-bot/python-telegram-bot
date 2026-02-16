@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,9 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
-import datetime as dtm
 
-from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
+from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -47,20 +46,13 @@ class ParamTypeCheckingExceptions:
             "animation": Animation,
             "voice": Voice,
             "sticker": Sticker,
-            # TODO: Deprecated and will be corrected (and readded) in next major bot API release:
-            # "gift_id": Gift,
+            "gift_id": Gift,
         },
         "(delete|set)_sticker.*": {
             "sticker$": Sticker,
         },
         "replace_sticker_in_set": {
             "old_sticker$": Sticker,
-        },
-        # The underscore will match any method
-        r"\w+_[\w_]+": {
-            "duration": dtm.timedelta,
-            r"\w+_period": dtm.timedelta,
-            "cache_time": dtm.timedelta,
         },
     }
 
@@ -98,12 +90,22 @@ class ParamTypeCheckingExceptions:
             "thumbnail": str,  # actual: Union[str, FileInput]
             "cover": str,  # actual: Union[str, FileInput]
         },
+        "InputProfilePhotoStatic": {
+            "photo": str,  # actual: Union[str, FileInput]
+        },
+        "InputProfilePhotoAnimated": {
+            "animation": str,  # actual: Union[str, FileInput]
+        },
+        "InputSticker": {
+            "sticker": str,  # actual: Union[str, FileInput]
+        },
+        "InputStoryContent.*": {
+            "photo": str,  # actual: Union[str, FileInput]
+            "video": str,  # actual: Union[str, FileInput]
+        },
         "EncryptedPassportElement": {
             "data": str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
         },
-        # TODO: Deprecated and will be corrected (and removed) in next major PTB
-        #  version:
-        "send_gift": {"gift_id": str},  # actual: Non optional
     }
 
     # param names ignored in the param type checking in classes for the `tg.Defaults` case.
@@ -148,11 +150,18 @@ PTB_EXTRA_PARAMS = {
     "ReactionType": {"type"},  # attributes common to all subclasses
     "BackgroundType": {"type"},  # attributes common to all subclasses
     "BackgroundFill": {"type"},  # attributes common to all subclasses
+    "OwnedGift": {"type"},  # attributes common to all subclasses
     "InputTextMessageContent": {"disable_web_page_preview"},  # convenience arg, here for bw compat
     "RevenueWithdrawalState": {"type"},  # attributes common to all subclasses
     "TransactionPartner": {"type"},  # attributes common to all subclasses
     "PaidMedia": {"type"},  # attributes common to all subclasses
     "InputPaidMedia": {"type", "media"},  # attributes common to all subclasses
+    "InputStoryContent": {"type"},  # attributes common to all subclasses
+    "StoryAreaType": {"type"},  # attributes common to all subclasses
+    "InputProfilePhoto": {"type"},  # attributes common to all subclasses
+    # backwards compatibility for api 9.3 changes
+    # tags: deprecated 22.6, bot api 9.3
+    "UniqueGiftInfo": {"last_resale_star_count"},
 }
 
 
@@ -181,6 +190,10 @@ PTB_IGNORED_PARAMS = {
     r"TransactionPartner\w+": {"type"},
     r"PaidMedia\w+": {"type"},
     r"InputPaidMedia\w+": {"type"},
+    r"InputProfilePhoto\w+": {"type"},
+    r"OwnedGift\w+": {"type"},
+    r"InputStoryContent\w+": {"type"},
+    r"StoryAreaType\w+": {"type"},
 }
 
 
@@ -196,8 +209,9 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
-    # here for backwards compatibility. Todo: remove on next bot api release
-    "send_gift": {"gift_id"},
+    # backwards compatibility for api 9.3 changes
+    # tags: deprecated 22.6, bot api 9.3
+    "UniqueGift": {"gift_id"},
 }
 
 
@@ -206,7 +220,10 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
+    # tags: deprecated 22.6, bot api 9.3
+    "get_business_account_gifts": {"exclude_limited"},
+}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:

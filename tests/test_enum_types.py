@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,13 @@ telegram_root = Path(__file__).parent.parent / "telegram"
 telegram_ext_root = telegram_root / "ext"
 exclude_dirs = {
     # We touch passport stuff only if strictly necessary.
-    telegram_root
-    / "_passport",
+    telegram_root / "_passport",
 }
 
 exclude_patterns = {
     re.compile(re.escape("self.type: ReactionType = type")),
     re.compile(re.escape("self.type: BackgroundType = type")),
+    re.compile(re.escape("self.type: StoryAreaType = type")),
 }
 
 

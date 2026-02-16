@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import logging
+import os
 import sys
 import zoneinfo
 from pathlib import Path
@@ -40,22 +40,13 @@ from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE, make_message
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
-from tests.auxil.envvars import GITHUB_ACTIONS, RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTIONS, TEST_WITH_OPT_DEPS, env_var_2_bool
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestBot, make_bot
 
 if TEST_WITH_OPT_DEPS:
     import pytz
-
-
-# Don't collect `test_official.py` on Python 3.10- since it uses newer features like X | Y syntax.
-# Docs: https://docs.pytest.org/en/7.1.x/example/pythoncollection.html#customizing-test-collection
-collect_ignore = []
-if sys.version_info < (3, 10):
-    if RUN_TEST_OFFICIAL:
-        logging.warning("Skipping test_official.py since it requires Python 3.10+")
-    collect_ignore_glob = ["test_official/*.py"]
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
@@ -127,6 +118,18 @@ if GITHUB_ACTIONS and JOB_INDEX == 0:
                 f"Test function {request.function} in test class {name} should not have a `bot` "
                 f"fixture. Use `offline_bot` instead."
             )
+
+
+@pytest.fixture(scope="module", params=["true", "1", "false", "gibberish", None])
+def PTB_TIMEDELTA(request):
+    # Here we manually use monkeypatch to give this fixture module scope
+    monkeypatch = pytest.MonkeyPatch()
+    if request.param is not None:
+        monkeypatch.setenv("PTB_TIMEDELTA", request.param)
+    else:
+        monkeypatch.delenv("PTB_TIMEDELTA", raising=False)
+    yield env_var_2_bool(os.getenv("PTB_TIMEDELTA"))
+    monkeypatch.undo()
 
 
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be

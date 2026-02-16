@@ -1,0 +1,5 @@
+internal = "Update dependency chango to ~=0.6.0"
+[[pull_requests]]
+uid = "5014"
+author_uids = ["renovatebot"]
+closes_threads = []

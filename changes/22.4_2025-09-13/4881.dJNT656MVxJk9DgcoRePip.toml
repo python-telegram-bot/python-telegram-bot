@@ -1,0 +1,6 @@
+features = "Add convenience properties for ``firstname``, ``lastname``, and ``username`` to ``SharedUser`` and ``ChatShared``"
+internal = "Introduce utility module ``_utils.usernames`` refactoring convenience properties around Telegram Objects' ``firstname``, ``lastname``, and ``username``"
+pull_requests = [
+  { uid = "4881", author_uid = "aelkheir" },
+  { uid = "4713", author_uid = "david-shiko" },
+]

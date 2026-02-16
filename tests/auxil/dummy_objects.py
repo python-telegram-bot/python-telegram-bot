@@ -1,12 +1,14 @@
 import datetime as dtm
 from collections.abc import Sequence
-from typing import Union
+from typing import TypeAlias
 
 from telegram import (
+    AcceptedGiftTypes,
     BotCommand,
     BotDescription,
     BotName,
     BotShortDescription,
+    BusinessBotRights,
     BusinessConnection,
     Chat,
     ChatAdministratorRights,
@@ -22,14 +24,18 @@ from telegram import (
     Gifts,
     MenuButton,
     MessageId,
+    OwnedGiftRegular,
+    OwnedGifts,
     Poll,
     PollOption,
     PreparedInlineMessage,
     SentWebAppMessage,
+    StarAmount,
     StarTransaction,
     StarTransactions,
     Sticker,
     StickerSet,
+    Story,
     TelegramObject,
     Update,
     User,
@@ -64,8 +70,8 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
         id="123",
         user_chat_id=123456,
         date=_DUMMY_DATE,
-        can_reply=True,
         is_enabled=True,
+        rights=BusinessBotRights(can_reply=True),
     ),
     "Chat": Chat(id=123456, type="dummy_type"),
     "ChatAdministratorRights": ChatAdministratorRights.all_rights(),
@@ -74,6 +80,13 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
         type="dummy_type",
         accent_color_id=1,
         max_reaction_count=1,
+        accepted_gift_types=AcceptedGiftTypes(
+            unlimited_gifts=True,
+            limited_gifts=True,
+            unique_gifts=True,
+            premium_subscription=True,
+            gifts_from_channels=True,
+        ),
     ),
     "ChatInviteLink": ChatInviteLink(
         "dummy_invite_link",
@@ -90,7 +103,25 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     "int": 123456,
     "MenuButton": MenuButton(type="dummy_type"),
     "Message": make_message("dummy_text"),
+    # Bad hack to get tests passing (we should not be using annotations as a key here)
+    "Message | bool": make_message("dummy_text"),
     "MessageId": MessageId(123456),
+    "OwnedGifts": OwnedGifts(
+        total_count=1,
+        gifts=[
+            OwnedGiftRegular(
+                gift=Gift(
+                    id="id1",
+                    sticker=Sticker(
+                        "file_id", "file_unique_id", 512, 512, False, False, "regular"
+                    ),
+                    star_count=5,
+                ),
+                send_date=_DUMMY_DATE,
+                owned_gift_id="some_id_1",
+            )
+        ],
+    ),
     "Poll": Poll(
         id="dummy_id",
         question="dummy_question",
@@ -103,6 +134,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     ),
     "PreparedInlineMessage": PreparedInlineMessage(id="dummy_id", expiration_date=_DUMMY_DATE),
     "SentWebAppMessage": SentWebAppMessage(inline_message_id="dummy_inline_message_id"),
+    "StarAmount": StarAmount(amount=100, nanostar_amount=356),
     "StarTransactions": StarTransactions(
         transactions=[StarTransaction(id="dummy_id", amount=1, date=_DUMMY_DATE)]
     ),
@@ -113,6 +145,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
         stickers=[_DUMMY_STICKER],
         sticker_type="dummy_type",
     ),
+    "Story": Story(chat=Chat(123, "prive"), id=123),
     "str": "dummy_string",
     "Update": Update(update_id=123456),
     "User": _DUMMY_USER,
@@ -135,7 +168,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
 }
 
 
-def get_dummy_object(obj_type: Union[type, str], as_tuple: bool = False) -> object:
+def get_dummy_object(obj_type: type | str, as_tuple: bool = False) -> object:
     obj_type_name = obj_type.__name__ if isinstance(obj_type, type) else obj_type
     if (return_value := _PREPARED_DUMMY_OBJECTS.get(obj_type_name)) is None:
         raise ValueError(
@@ -147,14 +180,14 @@ def get_dummy_object(obj_type: Union[type, str], as_tuple: bool = False) -> obje
     return return_value
 
 
-_RETURN_TYPES = Union[bool, int, str, dict[str, object]]
-_RETURN_TYPE = Union[_RETURN_TYPES, tuple[_RETURN_TYPES, ...]]
+_RETURN_TYPES: TypeAlias = bool | int | str | dict[str, object]
+_RETURN_TYPE: TypeAlias = _RETURN_TYPES | tuple[_RETURN_TYPES, ...]
 
 
 def _serialize_dummy_object(obj: object) -> _RETURN_TYPE:
     if isinstance(obj, Sequence) and not isinstance(obj, str):
         return tuple(_serialize_dummy_object(item) for item in obj)
-    if isinstance(obj, (str, int, bool)):
+    if isinstance(obj, str | int | bool):
         return obj
     if isinstance(obj, TelegramObject):
         return obj.to_dict()
@@ -162,5 +195,5 @@ def _serialize_dummy_object(obj: object) -> _RETURN_TYPE:
     raise ValueError(f"Serialization of object of type '{type(obj)}' is not supported yet.")
 
 
-def get_dummy_object_json_dict(obj_type: Union[type, str], as_tuple: bool = False) -> _RETURN_TYPE:
+def get_dummy_object_json_dict(obj_type: type | str, as_tuple: bool = False) -> _RETURN_TYPE:
     return _serialize_dummy_object(get_dummy_object(obj_type, as_tuple=as_tuple))

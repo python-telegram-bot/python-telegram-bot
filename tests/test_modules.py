@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,13 +19,16 @@
 """This tests whether our submodules have __all__ or not.
 Additionally also tests if all public submodules are included in __all__ for __init__'s.
 """
+
 import importlib
 import os
 from pathlib import Path
 
+from tests.auxil.files import SOURCE_ROOT_PATH
+
 
 def test_public_submodules_dunder_all():
-    modules_to_search = list(Path("telegram").rglob("*.py"))
+    modules_to_search = list(SOURCE_ROOT_PATH.rglob("*.py"))
 
     if not modules_to_search:
         raise AssertionError("No modules found to search through, please modify this test.")
@@ -52,6 +55,7 @@ def test_public_submodules_dunder_all():
 
 
 def load_module(path: Path):
+    path = path.relative_to(SOURCE_ROOT_PATH.parent)
     if path.name == "__init__.py":
         mod_name = str(path.parent).replace(os.sep, ".")  # telegram(.ext) format
     else:

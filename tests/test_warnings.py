@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import pytest
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning, PTBRuntimeWarning, PTBUserWarning
-from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.files import SOURCE_ROOT_PATH
 from tests.auxil.slots import mro_slots
 
 
@@ -66,7 +66,7 @@ class TestWarnings:
         make_assertion(PTBUserWarning)
 
     def test_warn(self, recwarn):
-        expected_file = PROJECT_ROOT_PATH / "telegram" / "_utils" / "warnings.py"
+        expected_file = SOURCE_ROOT_PATH / "_utils" / "warnings.py"
 
         warn("test message")
         assert len(recwarn) == 1

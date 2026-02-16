@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,10 @@
 We mostly test on directly on AIORateLimiter here, b/c BaseRateLimiter doesn't contain anything
 notable
 """
+
 import asyncio
 import datetime as dtm
+import itertools
 import json
 import platform
 import time
@@ -53,7 +55,7 @@ class TestBaseRateLimiter:
     request_received = None
 
     async def test_no_rate_limiter(self, bot):
-        with pytest.raises(ValueError, match="if a `ExtBot.rate_limiter` is set"):
+        with pytest.raises(ValueError, match="if a `ExtBot\\.rate_limiter` is set"):
             await bot.send_message(chat_id=42, text="test", rate_limit_args="something")
 
     async def test_argument_passing(self, bot_info, monkeypatch, bot):
@@ -233,7 +235,7 @@ class TestAIORateLimiter:
         times = TestAIORateLimiter.call_times
         if len(times) <= 1:
             return
-        delays = [j - i for i, j in zip(times[:-1], times[1:])]
+        delays = [j - i for i, j in itertools.pairwise(times)]
         assert delays == pytest.approx([1.1 for _ in range(max_retries)], rel=0.05)
 
     async def test_delay_all_pending_on_retry(self, bot):

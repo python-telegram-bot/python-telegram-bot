@@ -1,0 +1,5 @@
+internal = "Update stefanzweifel/git-auto-commit-action action to v7"
+[[pull_requests]]
+uid = "5001"
+author_uids = ["renovatebot"]
+closes_threads = []

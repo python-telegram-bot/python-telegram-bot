@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -151,6 +151,28 @@ class TestInlineQueryHandler:
             assert not handler.check_update(update)
             update.inline_query.query = "not_a_match"
             assert not handler.check_update(update)
+
+    @pytest.mark.parametrize(
+        ("query", "expected_result"),
+        [
+            pytest.param("", True, id="empty string"),
+            pytest.param("not empty", False, id="non_empty_string"),
+        ],
+    )
+    async def test_empty_inline_query_pattern(self, app, query, expected_result):
+        handler = InlineQueryHandler(self.callback, pattern=r"^$")
+        app.add_handler(handler)
+
+        update = Update(
+            update_id=0,
+            inline_query=InlineQuery(
+                id="id", from_user=User(1, "test", False), query=query, offset=""
+            ),
+        )
+
+        async with app:
+            await app.process_update(update)
+        assert self.test_flag == expected_result
 
     @pytest.mark.parametrize("chat_types", [[Chat.SENDER], [Chat.SENDER, Chat.SUPERGROUP], []])
     @pytest.mark.parametrize(

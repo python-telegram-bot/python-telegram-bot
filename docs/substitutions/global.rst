@@ -30,7 +30,7 @@
 
 .. |message_thread_id| replace:: Unique identifier for the target message thread of the forum topic.
 
-.. |message_thread_id_arg| replace:: Unique identifier for the target message thread (topic) of the forum; for forum supergroups only.
+.. |message_thread_id_arg| replace:: Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only.
 
 .. |parse_mode| replace:: Mode for parsing entities. See :class:`telegram.constants.ParseMode` and `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for more details.
 
@@ -80,7 +80,7 @@
 
 .. |reply_quote| replace:: If set to :obj:`True`, the reply is sent as an actual reply to this message. If ``reply_to_message_id`` is passed, this parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
 
-.. |do_quote| replace:: If set to :obj:`True`, the replied message is quoted. For a dict, it must be the output of :meth:`~telegram.Message.build_reply_arguments` to specify exact ``reply_parameters``. If ``reply_to_message_id`` or ``reply_parameters`` are passed, this parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+.. |do_quote| replace:: If set to :obj:`True`, the replied message is quoted. For a dict, it must be the output of :meth:`~telegram.Message.build_reply_arguments` to specify exact ``reply_parameters``. If ``reply_to_message_id`` or ``reply_parameters`` are passed, this parameter will be ignored. When passing dict-valued input, ``do_quote`` is mutually exclusive with ``allow_sending_without_reply``. Default: :obj:`True` in group chats and :obj:`False` in private chats.
 
 .. |non_optional_story_argument| replace:: As of this version, this argument is now required. In accordance with our `stability policy <https://docs.python-telegram-bot.org/en/stable/stability_policy.html>`__, the signature will be kept as optional for now, though they are mandatory and an error will be raised if you don't pass it.
 
@@ -96,8 +96,14 @@
 
 .. |allow_paid_broadcast| replace:: Pass True to allow up to :tg-const:`telegram.constants.FloodLimit.PAID_MESSAGES_PER_SECOND` messages per second, ignoring `broadcasting limits <https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once>`__ for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance.
 
+.. |direct_messages_topic_id| replace:: Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat.
+
+.. |suggested_post_parameters| replace:: An object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
+
 .. |tz-naive-dtms| replace:: For timezone naive :obj:`datetime.datetime` objects, the default timezone of the bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
 
 .. |org-verify| replace:: `on behalf of the organization <https://telegram.org/verify#third-party-verification>`__
 
 .. |time-period-input| replace:: :class:`datetime.timedelta` objects are accepted in addition to plain :obj:`int` values.
+
+.. |time-period-int-deprecated| replace:: In a future major version this attribute will be of type :obj:`datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true`  or ``PTB_TIMEDELTA=1`` as an environment variable.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -210,7 +210,7 @@ class TestMessageReactionHandler:
     )
     async def test_username_with_anonymous_reaction(self, app, allowed_types, kwargs):
         with pytest.raises(
-            ValueError, match="You can not filter for users and include anonymous reactions."
+            ValueError, match="You can not filter for users and include anonymous reactions\\."
         ):
             MessageReactionHandler(self.callback, message_reaction_types=allowed_types, **kwargs)
 

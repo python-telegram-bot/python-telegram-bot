@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2025
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
 import inspect
+import platform
 import re
 
 import pytest
@@ -157,9 +158,9 @@ class TestFilters:
             )
         }
         actual = set(filters.__all__)
-        assert (
-            actual == expected
-        ), f"Members {expected - actual} were not listed in constants.__all__"
+        assert actual == expected, (
+            f"Members {expected - actual} were not listed in constants.__all__"
+        )
 
     def test_filters_all(self, update):
         assert filters.ALL.check_update(update)
@@ -711,7 +712,9 @@ class TestFilters:
         assert not filters.Document.WAV.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "audio/x-wav"
+        update.message.document.mime_type = (
+            "audio/x-wav" if int(platform.python_version_tuple()[1]) < 14 else "audio/vnd.wave"
+        )
         assert filters.Document.WAV.check_update(update)
         assert filters.Document.AUDIO.check_update(update)
         assert not filters.Document.XML.check_update(update)
@@ -1098,7 +1101,67 @@ class TestFilters:
         assert filters.StatusUpdate.REFUNDED_PAYMENT.check_update(update)
         update.message.refunded_payment = None
 
-    def test_filters_forwarded(self, update, message_origin_user):
+        update.message.suggested_post_approval_failed = "suggested_post_approval_failed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_APPROVAL_FAILED.check_update(update)
+        update.message.suggested_post_approval_failed = None
+
+        update.message.suggested_post_approved = "suggested_post_approved"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_APPROVED.check_update(update)
+        update.message.suggested_post_approved = None
+
+        update.message.suggested_post_declined = "suggested_post_declined"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_DECLINED.check_update(update)
+        update.message.suggested_post_declined = None
+
+        update.message.suggested_post_paid = "suggested_post_paid"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_PAID.check_update(update)
+        update.message.suggested_post_paid = None
+
+        update.message.suggested_post_refunded = "suggested_post_refunded"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.SUGGESTED_POST_REFUNDED.check_update(update)
+        update.message.suggested_post_refunded = None
+
+        update.message.gift = "gift"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIFT.check_update(update)
+        update.message.gift = None
+
+        update.message.unique_gift = "unique_gift"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.UNIQUE_GIFT.check_update(update)
+        update.message.unique_gift = None
+
+        update.message.gift_upgrade_sent = "gift_upgrade_sent"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIFT_UPGRADE_SENT.check_update(update)
+        update.message.gift_upgrade_sent = None
+
+        update.message.paid_message_price_changed = "paid_message_price_changed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.PAID_MESSAGE_PRICE_CHANGED.check_update(update)
+        update.message.paid_message_price_changed = None
+
+        update.message.direct_message_price_changed = "direct_message_price_changed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.DIRECT_MESSAGE_PRICE_CHANGED.check_update(update)
+        update.message.direct_message_price_changed = None
+
+        update.message.checklist_tasks_added = "checklist_tasks_added"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.CHECKLIST_TASKS_ADDED.check_update(update)
+        update.message.checklist_tasks_added = None
+
+        update.message.checklist_tasks_done = "checklist_tasks_done"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.CHECKLIST_TASKS_DONE.check_update(update)
+        update.message.checklist_tasks_done = None
+
+    def test_filters_forwarded(self, update):
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = MessageOriginHiddenUser(dtm.datetime.utcnow(), 1)
         assert filters.FORWARDED.check_update(update)
@@ -1462,6 +1525,11 @@ class TestFilters:
 
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"
+
+    def test_filters_forum(self, update):
+        assert not filters.FORUM.check_update(update)
+        update.message.chat.is_forum = True
+        assert filters.FORUM.check_update(update)
 
     def test_filters_forwarded_from_init(self):
         with pytest.raises(RuntimeError, match="in conjunction with"):
@@ -2074,6 +2142,11 @@ class TestFilters:
         assert not filters.SUCCESSFUL_PAYMENT.check_update(update)
         update.message.successful_payment = "test"
         assert filters.SUCCESSFUL_PAYMENT.check_update(update)
+
+    def test_filters_suggested_post_info(self, update):
+        assert not filters.SUGGESTED_POST_INFO.check_update(update)
+        update.message.suggested_post_info = "test"
+        assert filters.SUGGESTED_POST_INFO.check_update(update)
 
     def test_filters_successful_payment_payloads(self, update):
         assert not filters.SuccessfulPayment(("custom-payload",)).check_update(update)
@@ -2774,3 +2847,17 @@ class TestFilters:
         update.message.sender_boost_count = "test"
         assert filters.SENDER_BOOST_COUNT.check_update(update)
         assert str(filters.SENDER_BOOST_COUNT) == "filters.SENDER_BOOST_COUNT"
+
+    def test_filters_checklist(self, update):
+        assert not filters.CHECKLIST.check_update(update)
+
+        update.message.checklist = "test"
+        assert filters.CHECKLIST.check_update(update)
+        assert str(filters.CHECKLIST) == "filters.CHECKLIST"
+
+    def test_filters_direct_messages(self, update):
+        assert not filters.DIRECT_MESSAGES.check_update(update)
+
+        update.message.chat.is_direct_messages = True
+        assert filters.DIRECT_MESSAGES.check_update(update)
+        assert str(filters.DIRECT_MESSAGES) == "filters.DIRECT_MESSAGES"
