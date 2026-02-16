@@ -26,6 +26,7 @@ from telegram import (
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
+from telegram.constants import KeyboardButtonStyle
 from tests.auxil.slots import mro_slots
 
 
@@ -247,7 +248,7 @@ class TestInlineKeyborardMarkupWithRequest(InlineKeyboardMarkupTestBase):
                     InlineKeyboardButton(
                         text="Colored Button",
                         callback_data="data1",
-                        style="red",
+                        style=KeyboardButtonStyle.DANGER,
                     )
                 ]
             ]
@@ -259,4 +260,4 @@ class TestInlineKeyborardMarkupWithRequest(InlineKeyboardMarkupTestBase):
         )
         assert message.text == "Testing colored InlineKeyboardButton"
         button = message.reply_markup.inline_keyboard[0][0]
-        assert button.color == "red"
+        assert button.color == "danger"
