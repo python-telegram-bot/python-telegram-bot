@@ -260,4 +260,4 @@ class TestInlineKeyborardMarkupWithRequest(InlineKeyboardMarkupTestBase):
         )
         assert message.text == "Testing colored InlineKeyboardButton"
         button = message.reply_markup.inline_keyboard[0][0]
-        assert button.color == "danger"
+        assert button.style == "danger"
