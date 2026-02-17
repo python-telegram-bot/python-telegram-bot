@@ -53,10 +53,11 @@ class InlineKeyboardButton(TelegramObject):
           associated with the button was already deleted.
 
           .. versionadded:: 13.6
-
         * Since Bot API 5.5, it's now allowed to mention users by their ID in inline keyboards.
           This will only work in Telegram versions released after December 7, 2021.
           Older clients will display *unsupported message*.
+        * :attr:`style` option will only work in Telegram versions released after February 9, 2026
+          Older clients will display buttons without styling.
 
     Warning:
         * If your bot allows your arbitrary callback data, buttons whose callback data is a

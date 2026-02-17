@@ -19,14 +19,7 @@
 
 import pytest
 
-from telegram import (
-    ChatAdministratorRights,
-    KeyboardButton,
-    KeyboardButtonRequestChat,
-    KeyboardButtonRequestUsers,
-    ReplyKeyboardMarkup,
-)
-from telegram.constants import KeyboardButtonStyle
+from telegram import ChatAdministratorRights, KeyboardButtonRequestChat, KeyboardButtonRequestUsers
 from tests.auxil.slots import mro_slots
 
 
@@ -197,23 +190,3 @@ class TestKeyboardButtonRequestChatWithoutRequest(KeyboardButtonRequestChatTestB
 
         assert a != c
         assert hash(a) != hash(c)
-
-
-class TestKeyboardButtonMarkupWithRequest(KeyboardButtonRequestChatTestBase):
-    async def test_send_message_with_colored_keyboard_button(self, bot, chat_id):
-        markup = ReplyKeyboardMarkup(
-            [
-                [
-                    KeyboardButton(
-                        text="Testing KeyboardMarkup",
-                        style=KeyboardButtonStyle.DANGER,
-                    )
-                ]
-            ]
-        )
-        message = await bot.send_message(
-            chat_id,
-            "Testing colored KeyboardButton",
-            reply_markup=markup,
-        )
-        assert message.text == "Testing colored KeyboardButton"

@@ -53,6 +53,8 @@ class KeyboardButton(TelegramObject):
         * :attr:`request_users` and :attr:`request_chat` options will only work in Telegram
           versions released after 3 February, 2023. Older clients will display unsupported
           message.
+        * :attr:`style` option will only work in Telegram versions released after February 9, 2026
+          Older clients will display buttons without styling.
 
     .. versionchanged:: 21.0
        Removed deprecated argument and attribute ``request_user``.
