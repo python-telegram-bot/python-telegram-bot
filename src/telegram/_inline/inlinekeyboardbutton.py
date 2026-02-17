@@ -58,9 +58,6 @@ class InlineKeyboardButton(TelegramObject):
           This will only work in Telegram versions released after December 7, 2021.
           Older clients will display *unsupported message*.
 
-        * :attr:`style` option will only work in Telegram versions released after 6.5.1.
-          Older clients will display buttons without styling.
-
     Warning:
         * If your bot allows your arbitrary callback data, buttons whose callback data is a
           non-hashable object will become unhashable. Trying to evaluate ``hash(button)`` will
