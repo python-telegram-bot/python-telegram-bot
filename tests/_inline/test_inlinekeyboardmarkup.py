@@ -26,6 +26,7 @@ from telegram import (
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
+from telegram.constants import KeyboardButtonStyle
 from tests.auxil.slots import mro_slots
 
 
@@ -239,3 +240,24 @@ class TestInlineKeyborardMarkupWithRequest(InlineKeyboardMarkupTestBase):
         )
 
         assert message.text == "Testing InlineKeyboardMarkup"
+
+    async def test_send_message_with_colored_inline_keyboard_button(self, bot, chat_id):
+        markup = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        text="Colored Button",
+                        callback_data="data1",
+                        style=KeyboardButtonStyle.DANGER,
+                    )
+                ]
+            ]
+        )
+        message = await bot.send_message(
+            chat_id,
+            "Testing colored InlineKeyboardButton",
+            reply_markup=markup,
+        )
+        assert message.text == "Testing colored InlineKeyboardButton"
+        button = message.reply_markup.inline_keyboard[0][0]
+        assert button.style == "danger"
