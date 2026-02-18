@@ -58,6 +58,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `gamgi <https://github.com/gamgi>`_
 - `Gauthamram Ravichandran <https://github.com/GauthamramRavichandran>`_
 - `Harshil <https://github.com/harshil21>`_
+- `Henok Tesfamikael <https://github.com/hethon>`
 - `Henry Galue <https://github.com/henryg311>`
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
