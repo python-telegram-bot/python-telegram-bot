@@ -305,6 +305,7 @@ __all__ = (
     "VideoChatScheduled",
     "VideoChatStarted",
     "VideoNote",
+    "VideoQuality",
     "Voice",
     "WebAppData",
     "WebAppInfo",
@@ -442,6 +443,7 @@ from ._files.sticker import MaskPosition, Sticker, StickerSet
 from ._files.venue import Venue
 from ._files.video import Video
 from ._files.videonote import VideoNote
+from ._files.videoquality import VideoQuality
 from ._files.voice import Voice
 from ._forcereply import ForceReply
 from ._forumtopic import (
