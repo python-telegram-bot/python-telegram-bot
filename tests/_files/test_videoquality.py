@@ -43,7 +43,6 @@ def videoquality(videoquality_list):
 
 class VideoQualityTestBase:
     # These values are tied to the forwarded video and must remain unchanged
-    # Test depends on the forwarded video having exactly one video quality
     width = 464
     height = 848
     codec = "h264"
@@ -53,7 +52,9 @@ class VideoQualityTestBase:
 class TestVideoQualityWithoutRequest(VideoQualityTestBase):
     def test_qualities_available(self, videoquality_list):
         assert isinstance(videoquality_list, tuple)
-        assert len(videoquality_list) > 0
+        # Subsequent tests relie on the forwarded video
+        # having exactly one video quality.
+        assert len(videoquality_list) == 1
 
     def test_slot_behaviour(self, videoquality):
         for attr in videoquality.__slots__:
