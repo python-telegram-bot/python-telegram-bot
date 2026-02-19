@@ -23,8 +23,8 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def videoquality_message_id():
-    # A video message with qualities available
-    # Source: https://t.me/pythontelegrambottests/375821
+    # A video message with exactly one available video quality:
+    # https://t.me/pythontelegrambottests/375821
     # See discussion: https://t.me/pythontelegrambotdev/1782
     return 375821
 
@@ -42,26 +42,12 @@ def videoquality(videoquality_list):
 
 
 class VideoQualityTestBase:
-    widths = [464]
-    heights = [848]
-    codecs = ["h264"]
-    file_sizes = [405540]
-
-    @property
-    def width(self):
-        return self.widths[-1]
-
-    @property
-    def height(self):
-        return self.heights[-1]
-
-    @property
-    def codec(self):
-        return self.codecs[-1]
-
-    @property
-    def file_size(self):
-        return self.file_sizes[-1]
+    # These values are tied to the forwarded video and must remain unchanged
+    # Test depends on the forwarded video having exactly one video quality
+    width = 464
+    height = 848
+    codec = "h264"
+    file_size = 405540
 
 
 class TestVideoQualityWithoutRequest(VideoQualityTestBase):
@@ -82,10 +68,10 @@ class TestVideoQualityWithoutRequest(VideoQualityTestBase):
         assert videoquality.file_unique_id
 
     def test_expected_values(self, videoquality):
-        assert videoquality.width in self.widths
-        assert videoquality.height in self.heights
-        assert videoquality.codec in self.codecs
-        assert videoquality.file_size in self.file_sizes
+        assert videoquality.width == self.width
+        assert videoquality.height == self.height
+        assert videoquality.codec == self.codec
+        assert videoquality.file_size == self.file_size
 
     def test_de_json(self, offline_bot, videoquality):
         json_dict = {
@@ -163,5 +149,6 @@ class TestVideoWithRequest(VideoQualityTestBase):
 
     async def test_resend(self, bot, chat_id, videoquality):
         message = await bot.send_video(chat_id, videoquality.file_id)
-        # Sending via file_id does not retain `qualities`.
-        assert not message.video.qualities
+
+        assert message.video.file_id == videoquality.file_id
+        assert message.video.file_unique_id == videoquality.file_unique_id
