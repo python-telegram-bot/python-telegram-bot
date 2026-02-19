@@ -132,7 +132,7 @@ docs = [
     "pydantic >= 2.12.0a1 ; python_version >= '3.14'"
 ]
 linting = [
-    "pre-commit",
+    "prek",
     "ruff==0.15.1",
     "mypy==1.18.2",
     "pylint==4.0.4"
