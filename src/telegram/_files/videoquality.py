@@ -62,7 +62,6 @@ class VideoQuality(_BaseMedium):
             so a signed 64-bit integer or double-precision float type are
             safe for storing this value.
 
-
     """
 
     __slots__ = ("codec", "height", "width")
