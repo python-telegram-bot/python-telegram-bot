@@ -23,8 +23,9 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def videoquality_message_id():
-    # a video message with qualities available
-    # https://t.me/<channel_id>/375821
+    # A video message with qualities available
+    # Source: https://t.me/pythontelegrambottests/375821
+    # See discussion: https://t.me/pythontelegrambotdev/1782
     return 375821
 
 
