@@ -1,0 +1,16 @@
+name: Prek checks
+
+on:
+  pull_request:
+    branches:
+      - '**'  # Matches all branch names, for PRs
+  push:
+    branches:
+      - 'master'  # Run tests on master branch
+
+jobs:
+  prek:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: j178/prek-action@v1
