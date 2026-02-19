@@ -1,0 +1,6 @@
+breaking = "Remove Functionality Deprecated in Bot API 9.3"
+features = "Remove Functionality Deprecated in Bot API 9.3"
+[[pull_requests]]
+uid = "5143"
+author_uids = ["harshil21"]
+closes_threads = ["5093"]
