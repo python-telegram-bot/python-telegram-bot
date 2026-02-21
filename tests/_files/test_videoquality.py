@@ -22,7 +22,7 @@ from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
-def videoquality_message_id():
+def video_quality_message_id():
     # A video message with exactly one available video quality:
     # https://t.me/pythontelegrambottests/375821
     # See discussion: https://t.me/pythontelegrambotdev/1782
@@ -30,15 +30,15 @@ def videoquality_message_id():
 
 
 @pytest.fixture(scope="module")
-async def videoquality_list(bot, chat_id, channel_id, videoquality_message_id):
+async def video_quality_list(bot, chat_id, channel_id, video_quality_message_id):
     return (
-        await bot.forward_message(chat_id, channel_id, videoquality_message_id, read_timeout=50)
+        await bot.forward_message(chat_id, channel_id, video_quality_message_id, read_timeout=50)
     ).video.qualities
 
 
 @pytest.fixture(scope="module")
-def videoquality(videoquality_list):
-    return videoquality_list[-1]
+def video_quality(video_quality_list):
+    return video_quality_list[-1]
 
 
 class VideoQualityTestBase:
@@ -50,34 +50,36 @@ class VideoQualityTestBase:
 
 
 class TestVideoQualityWithoutRequest(VideoQualityTestBase):
-    def test_qualities_available(self, videoquality_list):
-        assert isinstance(videoquality_list, tuple)
+    def test_qualities_available(self, video_quality_list):
+        assert isinstance(video_quality_list, tuple)
         # Subsequent tests relie on the forwarded video
         # having exactly one video quality.
-        assert len(videoquality_list) == 1
+        assert len(video_quality_list) == 1
 
-    def test_slot_behaviour(self, videoquality):
-        for attr in videoquality.__slots__:
-            assert getattr(videoquality, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(videoquality)) == len(set(mro_slots(videoquality))), "duplicate slot"
+    def test_slot_behaviour(self, video_quality):
+        for attr in video_quality.__slots__:
+            assert getattr(video_quality, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(video_quality)) == len(set(mro_slots(video_quality))), (
+            "duplicate slot"
+        )
 
-    def test_creation(self, videoquality):
-        assert isinstance(videoquality, VideoQuality)
-        assert isinstance(videoquality.file_id, str)
-        assert isinstance(videoquality.file_unique_id, str)
-        assert videoquality.file_id
-        assert videoquality.file_unique_id
+    def test_creation(self, video_quality):
+        assert isinstance(video_quality, VideoQuality)
+        assert isinstance(video_quality.file_id, str)
+        assert isinstance(video_quality.file_unique_id, str)
+        assert video_quality.file_id
+        assert video_quality.file_unique_id
 
-    def test_expected_values(self, videoquality):
-        assert videoquality.width == self.width
-        assert videoquality.height == self.height
-        assert videoquality.codec == self.codec
-        assert videoquality.file_size == self.file_size
+    def test_expected_values(self, video_quality):
+        assert video_quality.width == self.width
+        assert video_quality.height == self.height
+        assert video_quality.codec == self.codec
+        assert video_quality.file_size == self.file_size
 
-    def test_de_json(self, offline_bot, videoquality):
+    def test_de_json(self, offline_bot, video_quality):
         json_dict = {
-            "file_id": videoquality.file_id,
-            "file_unique_id": videoquality.file_unique_id,
+            "file_id": video_quality.file_id,
+            "file_unique_id": video_quality.file_unique_id,
             "width": self.width,
             "height": self.height,
             "codec": self.codec,
@@ -86,38 +88,38 @@ class TestVideoQualityWithoutRequest(VideoQualityTestBase):
         json_videoquality = VideoQuality.de_json(json_dict, offline_bot)
         assert json_videoquality.api_kwargs == {}
 
-        assert json_videoquality.file_id == videoquality.file_id
-        assert json_videoquality.file_unique_id == videoquality.file_unique_id
+        assert json_videoquality.file_id == video_quality.file_id
+        assert json_videoquality.file_unique_id == video_quality.file_unique_id
         assert json_videoquality.width == self.width
         assert json_videoquality.height == self.height
         assert json_videoquality.codec == self.codec
         assert json_videoquality.file_size == self.file_size
 
-    def test_to_dict(self, videoquality):
-        videoquality_dict = videoquality.to_dict()
+    def test_to_dict(self, video_quality):
+        videoquality_dict = video_quality.to_dict()
 
         assert isinstance(videoquality_dict, dict)
-        assert videoquality_dict["file_id"] == videoquality.file_id
-        assert videoquality_dict["file_unique_id"] == videoquality.file_unique_id
-        assert videoquality_dict["width"] == videoquality.width
-        assert videoquality_dict["height"] == videoquality.height
-        assert videoquality_dict["codec"] == videoquality.codec
-        assert videoquality_dict["file_size"] == videoquality.file_size
+        assert videoquality_dict["file_id"] == video_quality.file_id
+        assert videoquality_dict["file_unique_id"] == video_quality.file_unique_id
+        assert videoquality_dict["width"] == video_quality.width
+        assert videoquality_dict["height"] == video_quality.height
+        assert videoquality_dict["codec"] == video_quality.codec
+        assert videoquality_dict["file_size"] == video_quality.file_size
 
-    def test_equality(self, videoquality):
+    def test_equality(self, video_quality):
         a = VideoQuality(
-            videoquality.file_id,
-            videoquality.file_unique_id,
+            video_quality.file_id,
+            video_quality.file_unique_id,
             self.width,
             self.height,
             self.codec,
         )
-        b = VideoQuality("", videoquality.file_unique_id, self.width, self.height, self.codec)
-        c = VideoQuality(videoquality.file_id, videoquality.file_unique_id, 0, 0, self.codec)
+        b = VideoQuality("", video_quality.file_unique_id, self.width, self.height, self.codec)
+        c = VideoQuality(video_quality.file_id, video_quality.file_unique_id, 0, 0, self.codec)
         d = VideoQuality("", "", self.width, self.height, self.codec)
         e = PhotoSize(
-            videoquality.file_id,
-            videoquality.file_unique_id,
+            video_quality.file_id,
+            video_quality.file_unique_id,
             self.width,
             self.height,
         )
@@ -137,19 +139,19 @@ class TestVideoQualityWithoutRequest(VideoQualityTestBase):
 
 
 class TestVideoWithRequest(VideoQualityTestBase):
-    async def test_get_and_download(self, bot, videoquality, tmp_file):
-        new_file = await bot.get_file(videoquality.file_id)
+    async def test_get_and_download(self, bot, video_quality, tmp_file):
+        new_file = await bot.get_file(video_quality.file_id)
 
-        assert new_file.file_size == videoquality.file_size
-        assert new_file.file_unique_id == videoquality.file_unique_id
+        assert new_file.file_size == video_quality.file_size
+        assert new_file.file_unique_id == video_quality.file_unique_id
         assert new_file.file_path.startswith("https://")
 
         await new_file.download_to_drive(tmp_file)
 
         assert tmp_file.is_file()
 
-    async def test_resend(self, bot, chat_id, videoquality):
-        message = await bot.send_video(chat_id, videoquality.file_id)
+    async def test_resend(self, bot, chat_id, video_quality):
+        message = await bot.send_video(chat_id, video_quality.file_id)
 
-        assert message.video.file_id == videoquality.file_id
-        assert message.video.file_unique_id == videoquality.file_unique_id
+        assert message.video.file_id == video_quality.file_id
+        assert message.video.file_unique_id == video_quality.file_unique_id
