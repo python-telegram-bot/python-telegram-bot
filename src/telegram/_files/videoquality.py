@@ -51,7 +51,7 @@ class VideoQuality(_BaseMedium):
         width (:obj:`int`): Video width.
         height (:obj:`int`): Video height.
         codec (:obj:`str`): Codec that was used to encode the video,
-            for example, “h264”, “h265”, or “av01”
+            for example, ``h264``, ``h265``, or ``av01``
         file_size (:obj:`int`): Optional. File size in bytes.
 
     """
