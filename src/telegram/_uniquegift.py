@@ -334,6 +334,9 @@ class UniqueGift(TelegramObject):
 
     .. versionadded:: 22.1
 
+    .. versionchanged:: NEXT.VERSION
+        :attr:`gift_id` is now a positional argument.
+
     Args:
         gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
 

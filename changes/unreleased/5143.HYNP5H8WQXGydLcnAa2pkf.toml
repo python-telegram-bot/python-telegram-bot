@@ -1,5 +1,9 @@
-breaking = "Remove Functionality Deprecated in Bot API 9.3"
-features = "Remove Functionality Deprecated in Bot API 9.3"
+breaking = """Remove Functionality Deprecated in Bot API 9.3
+
+* Remove deprecated argument and attribute ``UniqueGiftInfo.last_resale_star_count``.
+* Remove deprecated argument and attribute ``Bot.get_business_account_gifts.exclude_limited``.
+* :attr:`telegram.UniqueGift.gift_id` is now a positional argument.
+"""
 [[pull_requests]]
 uid = "5143"
 author_uids = ["harshil21"]
