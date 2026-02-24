@@ -124,7 +124,9 @@ __all__ = [
     "TransactionPartnerType",
     "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
+    "UniqueGiftModelRarity",
     "UpdateType",
+    "UserProfileAudiosLimit",
     "UserProfilePhotosLimit",
     "VerifyLimit",
     "WebhookLimit",
@@ -3417,6 +3419,25 @@ class UniqueGiftInfoOrigin(StringEnum):
     """:obj:`str` gift upgraded"""
 
 
+class UniqueGiftModelRarity(StringEnum):
+    """This enum contains the available rarities for :class:`telegram.UniqueGiftModel`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    UNCOMMON = "uncommon"
+    """:obj:`str` uncommon rarity"""
+    RARE = "rare"
+    """:obj:`str` rare rarity"""
+    EPIC = "epic"
+    """:obj:`str` epic rarity"""
+    LEGENDARY = "legendary"
+    """:obj:`str` legendary rarity"""
+
+
 class UpdateType(StringEnum):
     """This enum contains the available types of :class:`telegram.Update`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -3634,6 +3655,27 @@ class UserProfilePhotosLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for
     :paramref:`~telegram.Bot.get_user_profile_photos.limit` parameter of
     :meth:`telegram.Bot.get_user_profile_photos`.
+    """
+
+
+class UserProfileAudiosLimit(IntEnum):
+    """This enum contains limitations for :paramref:`telegram.Bot.get_user_profile_audios.limit`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.Bot.get_user_profile_audios.limit` parameter of
+    :meth:`telegram.Bot.get_user_profile_audios`.
+    """
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum value allowed for
+    :paramref:`~telegram.Bot.get_user_profile_audios.limit` parameter of
+    :meth:`telegram.Bot.get_user_profile_audios`.
     """
 
 

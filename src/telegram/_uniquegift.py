@@ -129,17 +129,31 @@ class UniqueGiftModel(TelegramObject):
         sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
         rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
             model for every ``1000`` gifts upgraded.
+        rarity (:obj:`str`, optional): Rarity of the model if it is a crafted model.
+            Currently, can be :tg-const:`telegram.constants.UniqueGiftModelRarity.UNCOMMON`,
+            :tg-const:`telegram.constants.UniqueGiftModelRarity.RARE`,
+            :tg-const:`telegram.constants.UniqueGiftModelRarity.EPIC`,
+            or :tg-const:`telegram.constants.UniqueGiftModelRarity.LEGENDARY`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         name (:obj:`str`): Name of the model.
         sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
         rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
             model for every ``1000`` gifts upgraded.
+        rarity (:obj:`str`): Optional. Rarity of the model if it is a crafted model.
+            Currently, can be :tg-const:`telegram.constants.UniqueGiftModelRarity.UNCOMMON`,
+            :tg-const:`telegram.constants.UniqueGiftModelRarity.RARE`,
+            :tg-const:`telegram.constants.UniqueGiftModelRarity.EPIC`,
+            or :tg-const:`telegram.constants.UniqueGiftModelRarity.LEGENDARY`.
 
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
         "name",
+        "rarity",
         "rarity_per_mille",
         "sticker",
     )
@@ -149,13 +163,17 @@ class UniqueGiftModel(TelegramObject):
         name: str,
         sticker: Sticker,
         rarity_per_mille: int,
+        rarity: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+        # Required
         self.name: str = name
         self.sticker: Sticker = sticker
         self.rarity_per_mille: int = rarity_per_mille
+        # Optional
+        self.rarity = enum.get_member(constants.UniqueGiftModelRarity, rarity, rarity)
 
         self._id_attrs = (self.name, self.sticker, self.rarity_per_mille)
 
@@ -370,6 +388,10 @@ class UniqueGift(TelegramObject):
             business account gifts and gifts that are currently on sale only.
 
             .. versionadded:: 22.6
+        is_burned (:obj:`bool, optional): :obj:`True`, if the gift was used to craft another
+            gift and isn't available anymore.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
@@ -401,7 +423,10 @@ class UniqueGift(TelegramObject):
             business account gifts and gifts that are currently on sale only.
 
             .. versionadded:: 22.6
+        is_burned (:obj:`bool): Optional. :obj:`True`, if the gift was used to craft another
+            gift and isn't available anymore.
 
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -409,6 +434,7 @@ class UniqueGift(TelegramObject):
         "base_name",
         "colors",
         "gift_id",
+        "is_burned",
         "is_from_blockchain",
         "is_premium",
         "model",
@@ -433,6 +459,7 @@ class UniqueGift(TelegramObject):
         is_from_blockchain: bool | None = None,
         is_premium: bool | None = None,
         colors: UniqueGiftColors | None = None,
+        is_burned: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -452,6 +479,7 @@ class UniqueGift(TelegramObject):
         self.is_from_blockchain: bool | None = is_from_blockchain
         self.is_premium: bool | None = is_premium
         self.colors: UniqueGiftColors | None = colors
+        self.is_burned: bool | None = is_burned
 
         self._id_attrs = (
             self.base_name,
