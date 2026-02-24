@@ -1,11 +1,3 @@
-ci:
-    autofix_prs: false
-    # We use Renovate to update this file now, but we can't disable automatic pre-commit updates
-    # when using the `pre-commit` GitHub Action, so we set the schedule to quarterly to avoid
-    # frequent updates.
-    autoupdate_schedule: quarterly
-    autoupdate_commit_msg: 'Bump `pre-commit` Hooks to Latest Versions'
-
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: 'v0.15.2'
@@ -29,6 +21,7 @@ repos:
           - cachetools>=7.0.0,<8.0.0
           - aiolimiter~=1.1,<1.3
           - . # this basically does `pip install -e .`
+        priority: 10
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
     hooks:
@@ -46,6 +39,7 @@ repos:
           - cachetools>=7.0.0,<8.0.0
           - aiolimiter~=1.1,<1.3
           - . # this basically does `pip install -e .`
+        priority: 10
     - id: mypy
       name: mypy-examples
       files: ^examples/.*\.py$
@@ -58,3 +52,4 @@ repos:
         - APScheduler>=3.10.4,<3.12.0
         - cachetools>=7.0.0,<8.0.0
         - . # this basically does `pip install -e .`
+      priority: 10
