@@ -1,6 +1,6 @@
 name: Prek checks
 permissions:
-  content: read
+  contents: read  # Needed to see what files to run pre-commit on
 
 on:
   pull_request:
