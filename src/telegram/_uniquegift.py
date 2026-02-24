@@ -167,7 +167,7 @@ class UniqueGiftModel(TelegramObject):
         self.sticker: Sticker = sticker
         self.rarity_per_mille: int = rarity_per_mille
         # Optional
-        self.rarity = enum.get_member(constants.UniqueGiftModelRarity, rarity, rarity)
+        self.rarity: str | None = enum.get_member(constants.UniqueGiftModelRarity, rarity, rarity)
 
         self._id_attrs = (self.name, self.sticker, self.rarity_per_mille)
 
