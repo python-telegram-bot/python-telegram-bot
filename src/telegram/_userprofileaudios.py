@@ -59,8 +59,8 @@ class UserProfileAudios(TelegramObject):
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.total_count = total_count
-        self.audios = tuple(audios)
+        self.total_count: int = total_count
+        self.audios: tuple[Audio, ...] = tuple(audios)
 
         self._id_attrs = (self.total_count, self.audios)
 
