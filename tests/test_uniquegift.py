@@ -34,7 +34,7 @@ from telegram import (
     UniqueGiftSymbol,
 )
 from telegram._utils.datetime import UTC, to_timestamp
-from telegram.constants import UniqueGiftInfoOrigin
+from telegram.constants import UniqueGiftInfoOrigin, UniqueGiftModelRarity
 from tests.auxil.slots import mro_slots
 
 
@@ -138,6 +138,7 @@ def unique_gift():
         is_premium=UniqueGiftTestBase.is_premium,
         is_from_blockchain=UniqueGiftTestBase.is_from_blockchain,
         colors=UniqueGiftTestBase.colors,
+        is_burned=UniqueGiftTestBase.is_burned,
     )
 
 
@@ -172,6 +173,7 @@ class UniqueGiftTestBase:
         dark_theme_main_color=0x000000,
         dark_theme_other_colors=[0x111111],
     )
+    is_burned = True
 
 
 class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
@@ -193,6 +195,7 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
             "is_premium": self.is_premium,
             "is_from_blockchain": self.is_from_blockchain,
             "colors": self.colors.to_dict(),
+            "is_burned": self.is_burned,
         }
         unique_gift = UniqueGift.de_json(json_dict, offline_bot)
         assert unique_gift.api_kwargs == {}
@@ -207,6 +210,7 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
         assert unique_gift.is_premium == self.is_premium
         assert unique_gift.is_from_blockchain == self.is_from_blockchain
         assert unique_gift.colors == self.colors
+        assert unique_gift.is_burned == self.is_burned
 
     def test_to_dict(self, unique_gift):
         gift_dict = unique_gift.to_dict()
@@ -223,6 +227,7 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
         assert gift_dict["is_premium"] == self.is_premium
         assert gift_dict["is_from_blockchain"] == self.is_from_blockchain
         assert gift_dict["colors"] == self.colors.to_dict()
+        assert gift_dict["is_burned"] == self.is_burned
 
     def test_equality(self, unique_gift):
         a = unique_gift
@@ -235,6 +240,7 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
             symbol=self.symbol,
             backdrop=self.backdrop,
             publisher_chat=self.publisher_chat,
+            is_burned=self.is_burned,
         )
         c = UniqueGift(
             gift_id=self.gift_id,
@@ -264,6 +270,7 @@ def unique_gift_model():
         name=UniqueGiftModelTestBase.name,
         sticker=UniqueGiftModelTestBase.sticker,
         rarity_per_mille=UniqueGiftModelTestBase.rarity_per_mille,
+        rarity=UniqueGiftModelTestBase.rarity,
     )
 
 
@@ -271,6 +278,7 @@ class UniqueGiftModelTestBase:
     name = "model_name"
     sticker = Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular")
     rarity_per_mille = 10
+    rarity = UniqueGiftModelRarity.UNCOMMON
 
 
 class TestUniqueGiftModelWithoutRequest(UniqueGiftModelTestBase):
@@ -286,18 +294,25 @@ class TestUniqueGiftModelWithoutRequest(UniqueGiftModelTestBase):
             "name": self.name,
             "sticker": self.sticker.to_dict(),
             "rarity_per_mille": self.rarity_per_mille,
+            "rarity": self.rarity,
         }
         unique_gift_model = UniqueGiftModel.de_json(json_dict, offline_bot)
         assert unique_gift_model.api_kwargs == {}
         assert unique_gift_model.name == self.name
         assert unique_gift_model.sticker == self.sticker
         assert unique_gift_model.rarity_per_mille == self.rarity_per_mille
+        assert unique_gift_model.rarity == self.rarity
 
     def test_to_dict(self, unique_gift_model):
         json_dict = unique_gift_model.to_dict()
         assert json_dict["name"] == self.name
         assert json_dict["sticker"] == self.sticker.to_dict()
         assert json_dict["rarity_per_mille"] == self.rarity_per_mille
+        assert json_dict["rarity"] == self.rarity.value
+
+    def test_enum_type_conversion(self, unique_gift_model):
+        assert type(unique_gift_model.rarity) is UniqueGiftModelRarity
+        assert unique_gift_model.rarity == UniqueGiftModelRarity.UNCOMMON
 
     def test_equality(self, unique_gift_model):
         a = unique_gift_model

@@ -35,6 +35,8 @@ from typing import (
     no_type_check,
 )
 
+from telegram._userprofileaudios import UserProfileAudios
+
 try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
@@ -45,7 +47,7 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-from telegram._botcommand import BotCommand
+from telegram._botcommand import BotCommand  # pylint: disable=ungrouped-imports
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
 from telegram._botname import BotName
@@ -11897,6 +11899,57 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         )
         return OwnedGifts.de_json(result, self)
 
+    async def get_user_profile_audios(
+        self,
+        user_id: int,
+        offset: int | None = None,
+        limit: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> UserProfileAudios:
+        """
+        Use this method to get a list of profile audios for a user.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user.
+            offset (:obj:`int`, optional): Sequential number of the first audio to be returned.
+                By default, all audios are returned.
+            limit (:obj:`int`, optional): Limits the number of audios to be retrieved. Values
+                between :tg-const:`telegram.constants.UserProfileAudiosLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.UserProfileAudiosLimit.MAX_LIMIT` are accepted.
+                Defaults to :tg-const:`telegram.constants.UserProfileAudiosLimit.MAX_LIMIT`.
+
+        Returns:
+            :class:`telegram.UserProfileAudios`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+
+        data = {
+            "user_id": user_id,
+            "offset": offset,
+            "limit": limit,
+        }
+
+        result = await self._post(
+            "getUserProfileAudios",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return UserProfileAudios.de_json(result, self)
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -12229,3 +12282,5 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_user_gifts`"""
     getChatGifts = get_chat_gifts
     """Alias for :meth:`get_chat_gifts`"""
+    getUserProfileAudios = get_user_profile_audios
+    """Alias for :meth:`get_user_profile_audios`"""

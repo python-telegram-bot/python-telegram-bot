@@ -27,6 +27,7 @@ from telegram._birthdate import Birthdate
 from telegram._chat import Chat, _ChatBase
 from telegram._chatlocation import ChatLocation
 from telegram._chatpermissions import ChatPermissions
+from telegram._files.audio import Audio
 from telegram._files.chatphoto import ChatPhoto
 from telegram._gifts import AcceptedGiftTypes
 from telegram._reaction import ReactionType
@@ -247,6 +248,11 @@ class ChatFullInfo(_ChatBase):
             have to pay to send a message to the chat
 
             .. versionadded:: 22.6
+        first_profile_audio (:obj:`telegram.Audio`, optional): For private chats, the first audio
+            added to the profile of the user.
+
+            .. versionadded:: NEXT.VERSION
+
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -432,6 +438,10 @@ class ChatFullInfo(_ChatBase):
             have to pay to send a message to the chat
 
             .. versionadded:: 22.6
+        first_profile_audio (:obj:`telegram.Audio`): Optional. For private chats, the first audio
+            added to the profile of the user.
+
+            .. versionadded:: NEXT.VERSION
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
@@ -456,6 +466,7 @@ class ChatFullInfo(_ChatBase):
         "description",
         "emoji_status_custom_emoji_id",
         "emoji_status_expiration_date",
+        "first_profile_audio",
         "has_aggressive_anti_spam_enabled",
         "has_hidden_members",
         "has_private_forwards",
@@ -534,6 +545,7 @@ class ChatFullInfo(_ChatBase):
         rating: UserRating | None = None,
         unique_gift_colors: UniqueGiftColors | None = None,
         paid_message_star_count: int | None = None,
+        first_profile_audio: Audio | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -600,6 +612,7 @@ class ChatFullInfo(_ChatBase):
             self.rating: UserRating | None = rating
             self.unique_gift_colors: UniqueGiftColors | None = unique_gift_colors
             self.paid_message_star_count: int | None = paid_message_star_count
+            self.first_profile_audio: Audio | None = first_profile_audio
 
     @property
     def slow_mode_delay(self) -> int | dtm.timedelta | None:
@@ -656,5 +669,6 @@ class ChatFullInfo(_ChatBase):
         data["unique_gift_colors"] = de_json_optional(
             data.get("unique_gift_colors"), UniqueGiftColors, bot
         )
+        data["first_profile_audio"] = de_json_optional(data.get("first_profile_audio"), Audio, bot)
 
         return super().de_json(data=data, bot=bot)
