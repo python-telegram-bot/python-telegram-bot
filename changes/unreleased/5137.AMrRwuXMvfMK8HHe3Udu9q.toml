@@ -3,6 +3,6 @@ features = "Full Support for Bot API 9.4"
 pull_requests = [
   { uid = "5137", author_uid = "harshil21" },
   { uid = "5133", author_uid = "ouyooung"},
-  { uid = "5141", author_uid = "hethon" }
+  { uid = "5141", author_uid = "hethon" },
   { uid = "5148", author_uid = "harshil21" }
 ]
