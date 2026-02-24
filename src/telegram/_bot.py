@@ -108,14 +108,13 @@ from telegram._utils.types import (
     TimePeriod,
 )
 from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import build_deprecation_warning_message
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit, ReactionEmoji
 from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -9944,8 +9943,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         exclude_unsaved: bool | None = None,
         exclude_saved: bool | None = None,
         exclude_unlimited: bool | None = None,
-        # tags: deprecated 22.6; bot api 9.3
-        exclude_limited: bool | None = None,
         exclude_unique: bool | None = None,
         sort_by_price: bool | None = None,
         offset: str | None = None,
@@ -9966,6 +9963,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. versionadded:: 22.1
 
+        .. versionremoved:: NEXT.VERSION
+              Bot API 9.3 removed the :paramref:`exclude_limited` parameter. Use
+              :paramref:`exclude_limited_upgradable` and :paramref:`exclude_limited_non_upgradable`
+              instead.
+
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
             exclude_unsaved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that aren't
@@ -9974,13 +9976,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 to the account's profile page.
             exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can
                 be purchased an unlimited number of times.
-            exclude_limited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
-                purchased a limited number of times.
-
-                .. deprecated:: 22.6
-                    Bot API 9.3 deprecated this parameter in favor of
-                    :paramref:`exclude_limited_upgradabale` and
-                    :paramref:`exclude_limited_non_upgradable`.
             exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
                 that can be purchased a limited number of times and can be upgraded to unique.
 
@@ -10011,25 +10006,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        if exclude_limited is not None:
-            self._warn(
-                PTBDeprecationWarning(
-                    version="22.6",
-                    message=build_deprecation_warning_message(
-                        deprecated_name="exclude_limited",
-                        new_name="exclude_limited_(non_)upgradable",
-                        bot_api_version="9.3",
-                        object_type="parameter",
-                    ),
-                ),
-                stacklevel=2,
-            )
         data: JSONDict = {
             "business_connection_id": business_connection_id,
             "exclude_unsaved": exclude_unsaved,
             "exclude_saved": exclude_saved,
             "exclude_unlimited": exclude_unlimited,
-            "exclude_limited": exclude_limited,
             "exclude_limited_upgradable": exclude_limited_upgradable,
             "exclude_limited_non_upgradable": exclude_limited_non_upgradable,
             "exclude_unique": exclude_unique,
