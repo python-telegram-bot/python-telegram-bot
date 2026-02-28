@@ -5958,7 +5958,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 administrator privilege.
 
                 .. versionadded:: 13.4
-
             can_manage_video_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
                 can manage video chats.
 
@@ -5994,7 +5993,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 20.6
             can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 edit stories posted by other users, post stories to the chat page, pin chat
-                stories, and access the chat's story archive
+                stories, and access the chat's story archive.
 
                 .. versionadded:: 20.6
             can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -6003,7 +6002,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 20.6
             can_manage_direct_messages (:obj:`bool`, optional): Pass :obj:`True`, if the
                 administrator can manage direct messages within the channel and decline suggested
-                posts; for channels only
+                posts; for channels only.
 
                 .. versionadded:: 22.4
 
