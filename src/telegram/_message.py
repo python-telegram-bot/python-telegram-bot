@@ -329,8 +329,8 @@ class Message(MaybeInaccessibleMessage):
             or as a scheduled message.
 
             .. versionadded:: 21.1
-        media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
-            message belongs to.
+        media_group_id (:obj:`str`, optional): The unique identifier inside this chat of a media
+            message group this message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         entities (Sequence[:class:`telegram.MessageEntity`], optional): For text messages, special
@@ -676,6 +676,10 @@ class Message(MaybeInaccessibleMessage):
             task that is being replied to.
 
             .. versionadded:: 22.4
+        sender_tag (:obj:`str`, optional): Tag or custom title of the sender of the message; for
+            supergroups only
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -717,8 +721,8 @@ class Message(MaybeInaccessibleMessage):
             or as a scheduled message.
 
             .. versionadded:: 21.1
-        media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
-            message belongs to.
+        media_group_id (:obj:`str`): Optional. The unique identifier inside this chat of a media
+            message group this message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         entities (tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
@@ -1080,6 +1084,10 @@ class Message(MaybeInaccessibleMessage):
             task that is being replied to.
 
             .. versionadded:: 22.4
+        sender_tag (:obj:`str`): Optional. Tag or custom title of the sender of the message; for
+            supergroups only
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1174,6 +1182,7 @@ class Message(MaybeInaccessibleMessage):
         "sender_boost_count",
         "sender_business_bot",
         "sender_chat",
+        "sender_tag",
         "show_caption_above_media",
         "sticker",
         "story",
@@ -1306,6 +1315,7 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_approved: "SuggestedPostApproved | None" = None,
         suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
         gift_upgrade_sent: GiftInfo | None = None,
+        sender_tag: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1433,6 +1443,7 @@ class Message(MaybeInaccessibleMessage):
                 suggested_post_approval_failed
             )
             self.gift_upgrade_sent: GiftInfo | None = gift_upgrade_sent
+            self.sender_tag: str | None = sender_tag
 
             self._effective_attachment = DEFAULT_NONE
 
