@@ -1216,9 +1216,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Use this method to stream a partial message to a user while the message is being
-        generated; supported only for bots with forum topic mode enabled.
+        generated
 
         .. versionadded:: 22.6
+
+        .. versionchanged:: NEXT.VERSION
+            Now all bots can use this method.
+
 
         Args:
             chat_id (:obj:`int`): Unique identifier for the target private chat.
