@@ -40,6 +40,7 @@ def chat_permissions():
         can_send_videos=True,
         can_send_video_notes=True,
         can_send_voice_notes=True,
+        can_edit_tag=True,
     )
 
 
@@ -58,6 +59,7 @@ class ChatPermissionsTestBase:
     can_send_videos = True
     can_send_video_notes = False
     can_send_voice_notes = None
+    can_edit_tag = None
 
 
 class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
@@ -83,6 +85,7 @@ class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
             "can_send_videos": self.can_send_videos,
             "can_send_video_notes": self.can_send_video_notes,
             "can_send_voice_notes": self.can_send_voice_notes,
+            "can_edit_tag": self.can_edit_tag,
         }
         permissions = ChatPermissions.de_json(json_dict, offline_bot)
         assert permissions.api_kwargs == {"can_send_media_messages": "can_send_media_messages"}
@@ -101,6 +104,7 @@ class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
         assert permissions.can_send_videos == self.can_send_videos
         assert permissions.can_send_video_notes == self.can_send_video_notes
         assert permissions.can_send_voice_notes == self.can_send_voice_notes
+        assert permissions.can_edit_tag == self.can_edit_tag
 
     def test_to_dict(self, chat_permissions):
         permissions_dict = chat_permissions.to_dict()
@@ -125,6 +129,7 @@ class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
         assert permissions_dict["can_send_videos"] == chat_permissions.can_send_videos
         assert permissions_dict["can_send_video_notes"] == chat_permissions.can_send_video_notes
         assert permissions_dict["can_send_voice_notes"] == chat_permissions.can_send_voice_notes
+        assert permissions_dict["can_edit_tag"] == chat_permissions.can_edit_tag
 
     def test_equality(self):
         a = ChatPermissions(
@@ -153,6 +158,7 @@ class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
             can_send_videos=True,
             can_send_video_notes=True,
             can_send_voice_notes=True,
+            can_edit_tag=True,
         )
         f = ChatPermissions(
             can_send_messages=True,
@@ -164,6 +170,7 @@ class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
             can_send_videos=True,
             can_send_video_notes=True,
             can_send_voice_notes=True,
+            can_edit_tag=True,
         )
 
         assert a == b

@@ -35,8 +35,8 @@ class ChatPermissions(TelegramObject):
     :attr:`can_send_polls`, :attr:`can_send_other_messages`, :attr:`can_add_web_page_previews`,
     :attr:`can_change_info`, :attr:`can_invite_users`, :attr:`can_pin_messages`,
     :attr:`can_send_audios`, :attr:`can_send_documents`, :attr:`can_send_photos`,
-    :attr:`can_send_videos`, :attr:`can_send_video_notes`, :attr:`can_send_voice_notes`, and
-    :attr:`can_manage_topics` are equal.
+    :attr:`can_send_videos`, :attr:`can_send_video_notes`, :attr:`can_send_voice_notes`,
+    :attr:`can_manage_topics` and :attr:`can_edit_tag` are equal.
 
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
@@ -47,6 +47,9 @@ class ChatPermissions(TelegramObject):
           :attr:`can_send_videos`, :attr:`can_send_video_notes` and :attr:`can_send_voice_notes`
           are considered as well when comparing objects of this type in terms of equality.
         * Removed deprecated argument and attribute ``can_send_media_messages``.
+    .. versionchanged:: 20.0
+        :attr:`can_edit_tag` is considered as well when comparing objects of
+        this type in terms of equality.
 
 
     Note:
@@ -93,6 +96,10 @@ class ChatPermissions(TelegramObject):
             notes.
 
             .. versionadded:: 20.1
+        can_edit_tag (:obj:`bool`, optional): :obj:`True`, if the user is allowed to edit their own
+            tag.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send text
@@ -134,12 +141,17 @@ class ChatPermissions(TelegramObject):
             notes.
 
             .. versionadded:: 20.1
+        can_edit_tag (:obj:`bool`): Optionsl. :obj:`True`, if the user is allowed to edit their own
+            tag.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
     __slots__ = (
         "can_add_web_page_previews",
         "can_change_info",
+        "can_edit_tag",
         "can_invite_users",
         "can_manage_topics",
         "can_pin_messages",
@@ -170,6 +182,7 @@ class ChatPermissions(TelegramObject):
         can_send_videos: bool | None = None,
         can_send_video_notes: bool | None = None,
         can_send_voice_notes: bool | None = None,
+        can_edit_tag: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -189,6 +202,7 @@ class ChatPermissions(TelegramObject):
         self.can_send_videos: bool | None = can_send_videos
         self.can_send_video_notes: bool | None = can_send_video_notes
         self.can_send_voice_notes: bool | None = can_send_voice_notes
+        self.can_edit_tag: bool | None = can_edit_tag
 
         self._id_attrs = (
             self.can_send_messages,
@@ -205,6 +219,7 @@ class ChatPermissions(TelegramObject):
             self.can_send_videos,
             self.can_send_video_notes,
             self.can_send_voice_notes,
+            self.can_edit_tag,
         )
 
         self._freeze()
@@ -219,7 +234,7 @@ class ChatPermissions(TelegramObject):
         .. versionadded:: 20.0
 
         """
-        return cls(*(14 * (True,)))
+        return cls(*(15 * (True,)))
 
     @classmethod
     def no_permissions(cls) -> "ChatPermissions":
@@ -229,7 +244,7 @@ class ChatPermissions(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(*(14 * (False,)))
+        return cls(*(15 * (False,)))
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatPermissions":
