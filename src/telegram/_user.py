@@ -2628,3 +2628,38 @@ class User(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
+
+    async def set_chat_member_tag(
+        self,
+        chat_id: int | str,
+        tag: str | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+             await bot.set_chat_member_tag(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_member_tag`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_chat_member_tag(
+            user_id=self.id,
+            chat_id=chat_id,
+            tag=tag,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )

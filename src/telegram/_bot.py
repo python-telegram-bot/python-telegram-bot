@@ -11907,6 +11907,55 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         )
         return OwnedGifts.de_json(result, self)
 
+    async def set_chat_member_tag(
+        self,
+        chat_id: int | str,
+        user_id: int,
+        tag: str | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Use this method to set a tag for a regular member in a group or a supergroup. The bot must
+        be an administrator in the chat for this to work and must have the
+        :attr:`~telegram.ChatMemberAdministrator.can_manage_tags` administrator right.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
+                of the target supergroup (in the format ``@supergroupusername``).
+            user_id (:obj:`int`): Unique identifier of the target user.
+            comment (:obj:`str`, optional): New tag for the member;
+            0-:tg-const:`telegram.constants.TagLimit.MAX_TAG_LENGTH` characters, emoji are not
+            allowed.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "user_id": user_id,
+            "tag": tag,
+        }
+
+        return await self._post(
+            "setChatMemberTag",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -12239,3 +12288,5 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_user_gifts`"""
     getChatGifts = get_chat_gifts
     """Alias for :meth:`get_chat_gifts`"""
+    setChatMemberTag = set_chat_member_tag
+    """Alias for :meth:`set_chat_member_tag`"""

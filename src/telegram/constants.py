@@ -121,6 +121,7 @@ __all__ = [
     "SuggestedPost",
     "SuggestedPostInfoState",
     "SuggestedPostRefunded",
+    "TagLimit",
     "TransactionPartnerType",
     "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
@@ -3911,4 +3912,19 @@ class VerifyLimit(IntEnum):
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.verify_chat.custom_description` or
     :paramref:`~telegram.Bot.verify_user.custom_description` parameter.
+    """
+
+
+class TagLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.set_chat_member_tag`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_TAG_LENGTH = 16
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_member_tag.tag` parameter.
     """

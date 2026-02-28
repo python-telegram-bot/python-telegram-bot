@@ -619,6 +619,7 @@ class _ChatBase(TelegramObject):
         can_edit_stories: bool | None = None,
         can_delete_stories: bool | None = None,
         can_manage_direct_messages: bool | None = None,
+        can_manage_tags: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -670,6 +671,7 @@ class _ChatBase(TelegramObject):
             can_edit_stories=can_edit_stories,
             can_delete_stories=can_delete_stories,
             can_manage_direct_messages=can_manage_direct_messages,
+            can_manage_tags=can_manage_tags,
         )
 
     async def restrict_member(
@@ -3988,6 +3990,41 @@ class _ChatBase(TelegramObject):
             sort_by_price=sort_by_price,
             offset=offset,
             limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_chat_member_tag(
+        self,
+        user_id: int,
+        tag: str | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+             await bot.set_chat_member_tag(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_member_tag`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_chat_member_tag(
+            chat_id=self.id,
+            user_id=user_id,
+            tag=tag,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
