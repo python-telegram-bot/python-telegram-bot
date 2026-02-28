@@ -317,7 +317,7 @@ class ChatMemberAdministrator(ChatMember):
 
             .. versionadded:: 20.0
         custom_title (:obj:`str`): Optional. Custom title for this user.
-        can_manage_direct_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can
+        can_manage_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can
             manage direct messages of the channel and decline suggested posts; for channels only.
 
             .. versionadded:: 22.4

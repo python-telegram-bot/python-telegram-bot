@@ -5,13 +5,12 @@ Credits
 `Leandro Toledo <https://github.com/leandrotoledo>`_.
 The current development team includes
 
-- `Hinrich Mahler <https://github.com/Bibo-Joshi>`_ (maintainer)
-- `Poolitzer <https://github.com/Poolitzer>`_ (community liaison)
-- `Harshil <https://github.com/harshil21>`_
+- `Poolitzer <https://github.com/Poolitzer>`_ (maintainer)
+- `Harshil <https://github.com/harshil21>`_ (maintainer)
 - `Abdelrahman <https://github.com/aelkheir>`_
 
 Emeritus maintainers include
-`Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram),
+`Hinrich Mahler <https://github.com/Bibo-Joshi>`_, `Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram),
 `Noam Meltzer <https://github.com/tsnoam>`_, `Pieter Schutz <https://github.com/eldinnie>`_ and `Jasmin Bom <https://github.com/jsmnbom>`_.
 
 Contributors
