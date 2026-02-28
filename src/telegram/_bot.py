@@ -5934,6 +5934,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         can_edit_stories: bool | None = None,
         can_delete_stories: bool | None = None,
         can_manage_direct_messages: bool | None = None,
+        can_manage_tags: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6009,6 +6010,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 posts; for channels only
 
                 .. versionadded:: 22.4
+            can_manage_tags (:obj:`bool`, optional): Pass :obj:`True`if the administrator can edit
+                the tags of regular members; for groups and supergroups only.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6036,6 +6041,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "can_edit_stories": can_edit_stories,
             "can_delete_stories": can_delete_stories,
             "can_manage_direct_messages": can_manage_direct_messages,
+            "can_manage_tags": can_manage_tags,
         }
 
         return await self._post(
