@@ -257,6 +257,11 @@ class ChatMemberAdministrator(ChatMember):
             manage direct messages of the channel and decline suggested posts; for channels only.
 
             .. versionadded:: 22.4
+        can_manage_tags (:obj:`bool`, optional): :obj:`True`, if the administrator can edit the
+            tags of regular members; for groups and supergroups only. If omitted defaults to the
+            value of :attr:`can_pin_messages`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -321,6 +326,11 @@ class ChatMemberAdministrator(ChatMember):
             manage direct messages of the channel and decline suggested posts; for channels only.
 
             .. versionadded:: 22.4
+        can_manage_tags (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit the
+            tags of regular members; for groups and supergroups only. If omitted defaults to the
+            value of :attr:`can_pin_messages`.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -333,6 +343,7 @@ class ChatMemberAdministrator(ChatMember):
         "can_invite_users",
         "can_manage_chat",
         "can_manage_direct_messages",
+        "can_manage_tags",
         "can_manage_topics",
         "can_manage_video_chats",
         "can_pin_messages",
@@ -365,6 +376,7 @@ class ChatMemberAdministrator(ChatMember):
         can_manage_topics: bool | None = None,
         custom_title: str | None = None,
         can_manage_direct_messages: bool | None = None,
+        can_manage_tags: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -389,6 +401,7 @@ class ChatMemberAdministrator(ChatMember):
             self.can_manage_topics: bool | None = can_manage_topics
             self.custom_title: str | None = custom_title
             self.can_manage_direct_messages: bool | None = can_manage_direct_messages
+            self.can_manage_tags: bool | None = can_manage_tags
 
 
 class ChatMemberMember(ChatMember):
@@ -404,6 +417,9 @@ class ChatMemberMember(ChatMember):
             expire.
 
             .. versionadded:: 21.5
+        tag (:obj:`str`, optional): Tag of the member.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -413,21 +429,29 @@ class ChatMemberMember(ChatMember):
             expire.
 
             .. versionadded:: 21.5
+        tag (:obj:`str`): Optional. Tag of the member.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("until_date",)
+    __slots__ = (
+        "tag",
+        "until_date",
+    )
 
     def __init__(
         self,
         user: User,
         until_date: dtm.datetime | None = None,
+        tag: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.until_date: dtm.datetime | None = until_date
+            self.tag: str | None = tag
 
 
 class ChatMemberRestricted(ChatMember):
@@ -490,6 +514,12 @@ class ChatMemberRestricted(ChatMember):
             notes.
 
             .. versionadded:: 20.1
+        can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
+
+            .. versionadded:: NEXT.VERSION
+        tag (:obj:`str`, optional): Tag of the member.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -540,12 +570,19 @@ class ChatMemberRestricted(ChatMember):
             notes.
 
             .. versionadded:: 20.1
+        can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
+
+            .. versionadded:: NEXT.VERSION
+        tag (:obj:`str`): Optional. Tag of the member.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
     __slots__ = (
         "can_add_web_page_previews",
         "can_change_info",
+        "can_edit_tag",
         "can_invite_users",
         "can_manage_topics",
         "can_pin_messages",
@@ -559,6 +596,7 @@ class ChatMemberRestricted(ChatMember):
         "can_send_videos",
         "can_send_voice_notes",
         "is_member",
+        "tag",
         "until_date",
     )
 
@@ -581,6 +619,8 @@ class ChatMemberRestricted(ChatMember):
         can_send_videos: bool,
         can_send_video_notes: bool,
         can_send_voice_notes: bool,
+        can_edit_tag: bool,
+        tag: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -602,6 +642,8 @@ class ChatMemberRestricted(ChatMember):
             self.can_send_videos: bool = can_send_videos
             self.can_send_video_notes: bool = can_send_video_notes
             self.can_send_voice_notes: bool = can_send_voice_notes
+            self.can_edit_tag: bool = can_edit_tag
+            self.tag: str | None = tag
 
 
 class ChatMemberLeft(ChatMember):
