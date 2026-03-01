@@ -2109,15 +2109,25 @@ class MessageType(StringEnum):
     """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
-    CHAT_SHARED = "chat_shared"
-    """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
-
-    .. versionadded:: 20.8
-    """
     CHAT_BACKGROUND_SET = "chat_background_set"
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_background_set`.
 
     .. versionadded:: 21.2
+    """
+    CHAT_OWNER_CHANGED = "chat_owner_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_owner_changed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CHAT_OWNER_LEFT = "chat_owner_left"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_owner_left`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CHAT_SHARED = "chat_shared"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
+
+    .. versionadded:: 20.8
     """
     CHECKLIST = "checklist"
     """:obj:`str`: Messages with :attr:`telegram.Message.checklist`.
