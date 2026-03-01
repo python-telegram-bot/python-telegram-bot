@@ -203,6 +203,7 @@ Available Types
     telegram.videochatscheduled
     telegram.videochatstarted
     telegram.videonote
+    telegram.videoquality
     telegram.voice
     telegram.webappdata
     telegram.webappinfo

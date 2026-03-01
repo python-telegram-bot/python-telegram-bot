@@ -48,6 +48,7 @@ def inline_keyboard_button():
             InlineKeyboardButtonTestBase.switch_inline_query_chosen_chat
         ),
         copy_text=InlineKeyboardButtonTestBase.copy_text,
+        style=InlineKeyboardButtonTestBase.style,
         icon_custom_emoji_id=InlineKeyboardButtonTestBase.icon_custom_emoji_id,
     )
 
@@ -64,7 +65,8 @@ class InlineKeyboardButtonTestBase:
     web_app = WebAppInfo(url="https://example.com")
     switch_inline_query_chosen_chat = SwitchInlineQueryChosenChat("a_bot", True, False, True, True)
     copy_text = CopyTextButton("python-telegram-bot")
-    icon_custom_emoji_id = "CustomID"
+    style = "danger"
+    icon_custom_emoji_id = "5237829955978547322"
 
 
 class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
@@ -92,6 +94,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             == self.switch_inline_query_chosen_chat
         )
         assert inline_keyboard_button.copy_text == self.copy_text
+        assert inline_keyboard_button.style == self.style
         assert inline_keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
     def test_to_dict(self, inline_keyboard_button):
@@ -125,6 +128,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
         assert (
             inline_keyboard_button_dict["copy_text"] == inline_keyboard_button.copy_text.to_dict()
         )
+        assert inline_keyboard_button_dict["style"] == inline_keyboard_button.style
         assert (
             inline_keyboard_button_dict["icon_custom_emoji_id"]
             == inline_keyboard_button.icon_custom_emoji_id
@@ -143,6 +147,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             "pay": self.pay,
             "switch_inline_query_chosen_chat": self.switch_inline_query_chosen_chat.to_dict(),
             "copy_text": self.copy_text.to_dict(),
+            "style": self.style,
             "icon_custom_emoji_id": self.icon_custom_emoji_id,
         }
 
@@ -166,6 +171,7 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             == self.switch_inline_query_chosen_chat
         )
         assert inline_keyboard_button.copy_text == self.copy_text
+        assert inline_keyboard_button.style == self.style
         assert inline_keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
     def test_equality(self):
@@ -176,7 +182,8 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
         e = InlineKeyboardButton("text", url="http://google.com")
         f = InlineKeyboardButton("text", web_app=WebAppInfo(url="https://ptb.org"))
         g = LoginUrl("http://google.com")
-        h = InlineKeyboardButton("text", callback_data="data", icon_custom_emoji_id="Custom")
+        h = InlineKeyboardButton("test", style="primary")
+        i = InlineKeyboardButton("test", icon_custom_emoji_id="123")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -198,6 +205,9 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
 
         assert a != h
         assert hash(a) != hash(h)
+
+        assert h != i
+        assert hash(h) != hash(i)
 
     @pytest.mark.parametrize("callback_data", ["foo", 1, ("da", "ta"), object()])
     def test_update_callback_data(self, callback_data):

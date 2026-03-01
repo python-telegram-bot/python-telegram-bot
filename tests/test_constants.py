@@ -254,6 +254,14 @@ class TestConstantsWithoutRequest:
             except ValueError:
                 pytest.fail(f"Missing MessageAttachmentType for {match.group(1)}")
 
+    def test_keyboard_button_style(self):
+        assert constants.KeyboardButtonStyle.PRIMARY == "primary"
+        assert constants.KeyboardButtonStyle.SUCCESS == "success"
+        assert constants.KeyboardButtonStyle.DANGER == "danger"
+        assert constants.KeyboardButtonStyle.BLUE == "primary"
+        assert constants.KeyboardButtonStyle.GREEN == "success"
+        assert constants.KeyboardButtonStyle.RED == "danger"
+
 
 class TestConstantsWithRequest:
     async def test_max_message_length(self, bot, chat_id):

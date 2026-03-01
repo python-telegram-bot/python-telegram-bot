@@ -85,6 +85,7 @@ __all__ = [
     "InputStoryContentType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
+    "KeyboardButtonStyle",
     "LocationLimit",
     "MaskPosition",
     "MediaGroupLimit",
@@ -176,7 +177,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=3)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=4)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1399,6 +1400,53 @@ class InlineKeyboardButtonLimit(IntEnum):
     MAX_COPY_TEXT = 256
     """:obj:`int`: Maximum length allowed for
     :paramref:`~telegram.CopyTextButton.text` parameter of :class:`telegram.CopyTextButton`
+    """
+
+
+class KeyboardButtonStyle(StringEnum):
+    """This enum contains the available button styles for
+    :class:`telegram.InlineKeyboardButton` and :class:`telegram.KeyboardButton`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PRIMARY = "primary"
+    """:obj:`str`: Primary button style (usually blue) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    SUCCESS = "success"
+    """:obj:`str`: Success button style (usually green) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    DANGER = "danger"
+    """:obj:`str`: Danger/destructive button style (usually red) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    BLUE = "primary"
+    """:obj:`str`: Alias for :attr:`PRIMARY`. Blue button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    GREEN = "success"
+    """:obj:`str`: Alias for :attr:`SUCCESS`. Green button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    RED = "danger"
+    """:obj:`str`: Alias for :attr:`DANGER`. Red button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
     """
 
 
