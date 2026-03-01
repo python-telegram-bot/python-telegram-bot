@@ -1965,9 +1965,9 @@ class StatusUpdate:
                 # keep this alphabetically sorted for easier maintenance
                 StatusUpdate.CHAT_BACKGROUND_SET.check_update(update)
                 or StatusUpdate.CHAT_CREATED.check_update(update)
-                or StatusUpdate.CHAT_SHARED.check_update(update)
                 or StatusUpdate.CHAT_OWNER_CHANGED.check_update(update)
                 or StatusUpdate.CHAT_OWNER_LEFT.check_update(update)
+                or StatusUpdate.CHAT_SHARED.check_update(update)
                 or StatusUpdate.CHECKLIST_TASKS_ADDED.check_update(update)
                 or StatusUpdate.CHECKLIST_TASKS_DONE.check_update(update)
                 or StatusUpdate.CONNECTED_WEBSITE.check_update(update)
