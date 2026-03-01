@@ -181,6 +181,8 @@
       - Used for getting the list of boosts added to a chat
     * - :meth:`~telegram.Bot.leave_chat`
       - Used for leaving a chat
+    * - :meth:`~telegram.Bot.set_chat_member_tag`
+      - Used for setting the tag of a chat member
 
 .. raw:: html
 

@@ -76,6 +76,9 @@ class ChatMemberTestBase:
     can_send_messages = True
     is_member = True
     can_manage_direct_messages = True
+    can_manage_tags = True
+    can_edit_tag = True
+    tag = "test_tag"
 
 
 class TestChatMemberWithoutRequest(ChatMemberTestBase):
@@ -172,6 +175,7 @@ def chat_member_administrator():
         TestChatMemberAdministratorWithoutRequest.custom_title,
         TestChatMemberAdministratorWithoutRequest.is_anonymous,
         TestChatMemberAdministratorWithoutRequest.can_manage_direct_messages,
+        TestChatMemberAdministratorWithoutRequest.can_manage_tags,
     )
 
 
@@ -205,6 +209,7 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
             "custom_title": self.custom_title,
             "is_anonymous": self.is_anonymous,
             "can_manage_direct_messages": self.can_manage_direct_messages,
+            "can_manage_tags": self.can_manage_tags,
         }
         chat_member = ChatMemberAdministrator.de_json(data, offline_bot)
 
@@ -230,6 +235,7 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
         assert chat_member.custom_title == self.custom_title
         assert chat_member.is_anonymous == self.is_anonymous
         assert chat_member.can_manage_direct_messages == self.can_manage_direct_messages
+        assert chat_member.can_manage_tags == self.can_manage_tags
 
     def test_to_dict(self, chat_member_administrator):
         assert chat_member_administrator.to_dict() == {
@@ -253,6 +259,7 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
             "custom_title": chat_member_administrator.custom_title,
             "is_anonymous": chat_member_administrator.is_anonymous,
             "can_manage_direct_messages": chat_member_administrator.can_manage_direct_messages,
+            "can_manage_tags": chat_member_administrator.can_manage_tags,
         }
 
     def test_equality(self, chat_member_administrator):
@@ -272,9 +279,11 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
             True,
             True,
             True,
+            True,
         )
         c = ChatMemberAdministrator(
             User(1, "test_user", is_bot=False),
+            False,
             False,
             False,
             False,
@@ -566,6 +575,8 @@ def chat_member_restricted():
         can_send_voice_notes=TestChatMemberRestrictedWithoutRequest.can_send_voice_notes,
         is_member=TestChatMemberRestrictedWithoutRequest.is_member,
         until_date=TestChatMemberRestrictedWithoutRequest.until_date,
+        can_edit_tag=TestChatMemberRestrictedWithoutRequest.can_edit_tag,
+        tag=TestChatMemberRestrictedWithoutRequest.tag,
     )
 
 
@@ -597,6 +608,8 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             "can_send_voice_notes": self.can_send_voice_notes,
             "is_member": self.is_member,
             "until_date": to_timestamp(self.until_date),
+            "can_edit_tag": self.can_edit_tag,
+            "tag": self.tag,
             # legacy argument
             "can_send_media_messages": False,
         }
@@ -622,6 +635,8 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
         assert chat_member.can_send_voice_notes == self.can_send_voice_notes
         assert chat_member.is_member == self.is_member
         assert chat_member.until_date == self.until_date
+        assert chat_member.can_edit_tag == self.can_edit_tag
+        assert chat_member.tag == self.tag
 
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, chat_member_restricted):
         json_dict = chat_member_restricted.to_dict()
@@ -660,6 +675,8 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             "can_send_voice_notes": chat_member_restricted.can_send_voice_notes,
             "is_member": chat_member_restricted.is_member,
             "until_date": to_timestamp(chat_member_restricted.until_date),
+            "can_edit_tag": chat_member_restricted.can_edit_tag,
+            "tag": chat_member_restricted.tag,
         }
 
     def test_equality(self, chat_member_restricted):
@@ -683,6 +700,8 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             False,
             False,
             False,
+            False,
+            "tag",
         )
         d = Dice(5, "test")
 

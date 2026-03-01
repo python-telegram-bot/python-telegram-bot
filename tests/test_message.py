@@ -430,6 +430,7 @@ def message(bot):
                 )
             )
         },
+        {"sender_tag": "This is a tag"},
     ],
     ids=[
         "reply",
@@ -521,6 +522,7 @@ def message(bot):
         "suggested_post_approval_failed",
         "suggested_post_info",
         "gift_upgrade_sent",
+        "sender_tag",
     ],
 )
 def message_params(bot, request):

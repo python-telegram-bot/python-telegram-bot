@@ -2834,6 +2834,18 @@ class TestBotWithoutRequest:
             limit="limit",
         )
 
+    # TODO if we have a group member id in every group we could test this
+    async def test_set_chat_member_tag(self, offline_bot, monkeypatch):
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("user_id") == 5678
+            assert request_data.parameters.get("tag") == "This is a tag"
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.set_chat_member_tag(1234, 5678, "This is a tag")
+
 
 class TestBotWithRequest:
     """
@@ -3801,6 +3813,7 @@ class TestBotWithRequest:
                 can_edit_stories=True,
                 can_delete_stories=True,
                 can_manage_direct_messages=True,
+                can_manage_tags=True,
             )
 
         # Test that we pass the correct params to TG
@@ -3825,6 +3838,7 @@ class TestBotWithRequest:
                 and data.get("can_edit_stories") == 14
                 and data.get("can_delete_stories") == 15
                 and data.get("can_manage_direct_messages") == 16
+                and data.get("can_manage_tags") == 17
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -3847,6 +3861,7 @@ class TestBotWithRequest:
             can_edit_stories=14,
             can_delete_stories=15,
             can_manage_direct_messages=16,
+            can_manage_tags=17,
         )
 
     async def test_export_chat_invite_link(self, bot, channel_id):

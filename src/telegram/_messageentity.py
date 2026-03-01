@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram MessageEntity."""
 
 import copy
+import datetime as dtm
 import itertools
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final
@@ -28,6 +29,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import de_json_optional
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
 
@@ -55,13 +57,17 @@ class MessageEntity(TelegramObject):
             (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
             :attr:`BLOCKQUOTE` (block quotation), :attr:`CODE` (monowidth string), :attr:`PRE`
             (monowidth block), :attr:`TEXT_LINK` (for clickable text URLs), :attr:`TEXT_MENTION`
-            (for users without usernames), :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
+            (for users without usernames), :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers)
+            or :attr:`DATE_TIME`(for formatted date and time).
 
             .. versionadded:: 20.0
                 Added inline custom emoji
 
             .. versionadded:: 20.8
                 Added block quotation
+
+            .. versionadded:: NEXT.VERSION
+                Added date_time
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`, optional): For :attr:`TEXT_LINK` only, url that will be opened after
@@ -75,6 +81,17 @@ class MessageEntity(TelegramObject):
             information about the sticker.
 
             .. versionadded:: 20.0
+        date_time_format (:obj:`str`, optional): For :attr`DATE_TIME` only, the string that defines
+            the formatting of the date and time. See `date-time entity formatting
+            <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details and
+            :tg-const:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
+
+            .. versionadded:: NEXT.VERSION
+        unix_time (:class:`datetime.datetime`, optional): For :attr:`DATE_TIME` only, the time
+            associated with the entity.
+            |datetime_localization|
+
+            .. versionadded:: NEXT.VERSION
     Attributes:
         type (:obj:`str`): Type of the entity.  Can be :attr:`MENTION` (``@username``),
             :attr:`HASHTAG` (``#hashtag`` or ``#hashtag@chatusername``), :attr:`CASHTAG` (``$USD``
@@ -105,10 +122,31 @@ class MessageEntity(TelegramObject):
             information about the sticker.
 
             .. versionadded:: 20.0
+        date_time_format (:obj:`str`): Optional. For :attr`DATE_TIME` only, the string that defines
+            the formatting of the date and time. See `date-time entity formatting
+            <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details and
+            :tg-const:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
+
+            .. versionadded:: NEXT.VERSION
+        unix_time (:class:`datetime.datetime`): Optional. For :attr:`DATE_TIME` only, the time
+            associated with the entity.
+            |datetime_localization|
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("custom_emoji_id", "language", "length", "offset", "type", "url", "user")
+    __slots__ = (
+        "custom_emoji_id",
+        "date_time_format",
+        "language",
+        "length",
+        "offset",
+        "type",
+        "unix_time",
+        "url",
+        "user",
+    )
 
     def __init__(
         self,
@@ -119,6 +157,8 @@ class MessageEntity(TelegramObject):
         user: User | None = None,
         language: str | None = None,
         custom_emoji_id: str | None = None,
+        date_time_format: str | None = None,
+        unix_time: dtm.datetime | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -132,6 +172,8 @@ class MessageEntity(TelegramObject):
         self.user: User | None = user
         self.language: str | None = language
         self.custom_emoji_id: str | None = custom_emoji_id
+        self.date_time_format: str | None = date_time_format
+        self.unix_time: dtm.datetime | None = unix_time
 
         self._id_attrs = (self.type, self.offset, self.length)
 
@@ -143,6 +185,10 @@ class MessageEntity(TelegramObject):
         data = cls._parse_data(data)
 
         data["user"] = de_json_optional(data.get("user"), User, bot)
+
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+        data["unix_time"] = from_timestamp(data.get("unix_time"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 
@@ -375,6 +421,11 @@ class MessageEntity(TelegramObject):
     """:const:`telegram.constants.MessageEntityType.CUSTOM_EMOJI`
 
     .. versionadded:: 20.0
+    """
+    DATE_TIME: Final[str] = constants.MessageEntityType.DATE_TIME
+    """:const:`telegram.constants.MessageEntityType.DATE_TIME`
+
+    .. versionadded:: NEXT.VERSION
     """
     EMAIL: Final[str] = constants.MessageEntityType.EMAIL
     """:const:`telegram.constants.MessageEntityType.EMAIL`"""

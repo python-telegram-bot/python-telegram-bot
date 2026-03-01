@@ -73,7 +73,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._uniquegift import UniqueGiftInfo
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
@@ -329,8 +329,8 @@ class Message(MaybeInaccessibleMessage):
             or as a scheduled message.
 
             .. versionadded:: 21.1
-        media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
-            message belongs to.
+        media_group_id (:obj:`str`, optional): The unique identifier inside this chat of a media
+            message group this message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         entities (Sequence[:class:`telegram.MessageEntity`], optional): For text messages, special
@@ -676,6 +676,10 @@ class Message(MaybeInaccessibleMessage):
             task that is being replied to.
 
             .. versionadded:: 22.4
+        sender_tag (:obj:`str`, optional): Tag or custom title of the sender of the message; for
+            supergroups only
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -717,8 +721,8 @@ class Message(MaybeInaccessibleMessage):
             or as a scheduled message.
 
             .. versionadded:: 21.1
-        media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
-            message belongs to.
+        media_group_id (:obj:`str`): Optional. The unique identifier inside this chat of a media
+            message group this message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         entities (tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
@@ -1080,6 +1084,10 @@ class Message(MaybeInaccessibleMessage):
             task that is being replied to.
 
             .. versionadded:: 22.4
+        sender_tag (:obj:`str`): Optional. Tag or custom title of the sender of the message; for
+            supergroups only
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1174,6 +1182,7 @@ class Message(MaybeInaccessibleMessage):
         "sender_boost_count",
         "sender_business_bot",
         "sender_chat",
+        "sender_tag",
         "show_caption_above_media",
         "sticker",
         "story",
@@ -1306,6 +1315,7 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_approved: "SuggestedPostApproved | None" = None,
         suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
         gift_upgrade_sent: GiftInfo | None = None,
+        sender_tag: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1433,6 +1443,7 @@ class Message(MaybeInaccessibleMessage):
                 suggested_post_approval_failed
             )
             self.gift_upgrade_sent: GiftInfo | None = gift_upgrade_sent
+            self.sender_tag: str | None = sender_tag
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -5277,6 +5288,10 @@ class Message(MaybeInaccessibleMessage):
                 insert = f'<span class="tg-spoiler">{escaped_text}</span>'
             elif entity.type == MessageEntity.CUSTOM_EMOJI:
                 insert = f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
+            elif entity.type == MessageEntity.DATE_TIME:
+                insert = f'<tg-time unix="{to_timestamp(entity.unix_time)}" format="{
+                    entity.date_time_format
+                }">{escaped_text}</tg-emoji>'
             else:
                 insert = escaped_text
 
@@ -5416,6 +5431,7 @@ class Message(MaybeInaccessibleMessage):
                 MessageEntity.SPOILER,
                 MessageEntity.STRIKETHROUGH,
                 MessageEntity.UNDERLINE,
+                MessageEntity.DATE_TIME,
             ):
                 if any(entity.type == entity_type for entity in entities):
                     name = entity_type.name.title().replace("_", " ")  # type:ignore[attr-defined]
@@ -5508,6 +5524,10 @@ class Message(MaybeInaccessibleMessage):
                     entity_type=MessageEntity.CUSTOM_EMOJI,
                 )
                 insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            elif entity.type == MessageEntity.DATE_TIME:
+                insert = f"![{escaped_text}](tg://time?unix={
+                    to_timestamp(entity.unix_time)
+                }&format={entity.date_time_format})"
             else:
                 insert = escaped_text
 

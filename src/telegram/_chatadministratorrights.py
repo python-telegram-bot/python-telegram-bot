@@ -31,7 +31,8 @@ class ChatAdministratorRights(TelegramObject):
     :attr:`can_promote_members`, :attr:`can_change_info`, :attr:`can_invite_users`,
     :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages`,
     :attr:`can_manage_topics`, :attr:`can_post_stories`, :attr:`can_delete_stories`,
-    :attr:`can_edit_stories` and :attr:`can_manage_direct_messages` are equal.
+    :attr:`can_edit_stories`, :attr:`can_manage_direct_messages` and  :attr:`can_manage_tags` are
+    equal.
 
     .. versionadded:: 20.0
 
@@ -51,6 +52,10 @@ class ChatAdministratorRights(TelegramObject):
     .. versionchanged:: 22.4
         :attr:`can_manage_direct_messages` is considered as well when comparing objects of
         this type in terms of equality.
+
+    .. versionchanged:: NEXT.VERSION
+        :attr:`can_manage_tags` is considered as well when comparing objects of this type in terms
+        of equality.
 
     Args:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -104,6 +109,11 @@ class ChatAdministratorRights(TelegramObject):
             manage direct messages of the channel and decline suggested posts; for channels only.
 
             .. versionadded:: 22.4
+        can_manage_tags (:obj:`bool`, optional): :obj:`True`, if the administrator can edit the
+            tags of regular members; for groups and supergroups only. If omitted defaults to the
+            value of :attr:`can_pin_messages`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -157,6 +167,11 @@ class ChatAdministratorRights(TelegramObject):
             manage direct messages of the channel and decline suggested posts; for channels only.
 
             .. versionadded:: 22.4
+        can_manage_tags (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit the
+            tags of regular members; for groups and supergroups only. If omitted defaults to the
+            value of :attr:`can_pin_messages`.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -168,6 +183,7 @@ class ChatAdministratorRights(TelegramObject):
         "can_invite_users",
         "can_manage_chat",
         "can_manage_direct_messages",
+        "can_manage_tags",
         "can_manage_topics",
         "can_manage_video_chats",
         "can_pin_messages",
@@ -196,6 +212,7 @@ class ChatAdministratorRights(TelegramObject):
         can_pin_messages: bool | None = None,
         can_manage_topics: bool | None = None,
         can_manage_direct_messages: bool | None = None,
+        can_manage_tags: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
@@ -218,6 +235,7 @@ class ChatAdministratorRights(TelegramObject):
         self.can_pin_messages: bool | None = can_pin_messages
         self.can_manage_topics: bool | None = can_manage_topics
         self.can_manage_direct_messages: bool | None = can_manage_direct_messages
+        self.can_manage_tags: bool | None = can_manage_tags
 
         self._id_attrs = (
             self.is_anonymous,
@@ -236,6 +254,7 @@ class ChatAdministratorRights(TelegramObject):
             self.can_edit_stories,
             self.can_delete_stories,
             self.can_manage_direct_messages,
+            self.can_manage_tags,
         )
 
         self._freeze()

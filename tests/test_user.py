@@ -867,3 +867,22 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "get_user_gifts", make_assertion)
         assert await user.get_gifts()
+
+    async def test_instance_method_set_chat_member_tag(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["chat_id"] == "chat_id"
+                and kwargs["tag"] == "tag"
+            )
+
+        assert check_shortcut_signature(
+            user.set_chat_member_tag, Bot.set_chat_member_tag, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.set_chat_member_tag, user.get_bot(), "set_chat_member_tag"
+        )
+        assert await check_defaults_handling(user.set_chat_member_tag, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "set_chat_member_tag", make_assertion)
+        assert await user.set_chat_member_tag(chat_id="chat_id", tag="tag")
