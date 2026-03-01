@@ -188,7 +188,7 @@ class MessageEntity(TelegramObject):
 
         # Get the local timezone from the bot if it has defaults
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["date_time_format"] = from_timestamp(data.get("date_time_format"), tzinfo=loc_tzinfo)
+        data["unix_time"] = from_timestamp(data.get("unix_time"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 

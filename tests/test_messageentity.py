@@ -16,11 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
 import random
 
 import pytest
 
 from telegram import MessageEntity, User
+from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import MessageEntityType
 from tests.auxil.slots import mro_slots
 
@@ -37,7 +39,25 @@ def message_entity(request):
     language = None
     if type_ == MessageEntity.PRE:
         language = "python"
-    return MessageEntity(type_, 1, 3, url=url, user=user, language=language)
+    custom_emoji_id = None
+    if type_ == MessageEntity.CUSTOM_EMOJI:
+        custom_emoji_id = "emoji_id"
+    date_time_format = None
+    unix_time = None
+    if type_ == MessageEntity.DATE_TIME:
+        date_time_format = "wDT"
+        unix_time = dtm.datetime.now(tz=UTC)
+    return MessageEntity(
+        type_,
+        1,
+        3,
+        url=url,
+        user=user,
+        language=language,
+        custom_emoji_id=custom_emoji_id,
+        date_time_format=date_time_format,
+        unix_time=unix_time,
+    )
 
 
 class MessageEntityTestBase:
@@ -76,6 +96,11 @@ class TestMessageEntityWithoutRequest(MessageEntityTestBase):
             assert entity_dict["user"] == message_entity.user.to_dict()
         if message_entity.language:
             assert entity_dict["language"] == message_entity.language
+        if message_entity.custom_emoji_id:
+            assert entity_dict["custom_emoji_id"] == message_entity.custom_emoji_id
+        if message_entity.date_time_format:
+            assert entity_dict["date_time_format"] == message_entity.date_time_format
+            assert entity_dict["unix_time"] == to_timestamp(message_entity.unix_time)
 
     def test_enum_init(self):
         entity = MessageEntity(type="foo", offset=0, length=1)

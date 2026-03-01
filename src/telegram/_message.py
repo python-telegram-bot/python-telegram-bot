@@ -73,7 +73,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._uniquegift import UniqueGiftInfo
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
@@ -5288,6 +5288,10 @@ class Message(MaybeInaccessibleMessage):
                 insert = f'<span class="tg-spoiler">{escaped_text}</span>'
             elif entity.type == MessageEntity.CUSTOM_EMOJI:
                 insert = f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
+            elif entity.type == MessageEntity.DATE_TIME:
+                insert = f'<tg-time unix="{to_timestamp(entity.unix_time)}" format="{
+                    entity.date_time_format
+                }">{escaped_text}</tg-emoji>'
             else:
                 insert = escaped_text
 
@@ -5427,6 +5431,7 @@ class Message(MaybeInaccessibleMessage):
                 MessageEntity.SPOILER,
                 MessageEntity.STRIKETHROUGH,
                 MessageEntity.UNDERLINE,
+                MessageEntity.DATE_TIME,
             ):
                 if any(entity.type == entity_type for entity in entities):
                     name = entity_type.name.title().replace("_", " ")  # type:ignore[attr-defined]
@@ -5519,6 +5524,10 @@ class Message(MaybeInaccessibleMessage):
                     entity_type=MessageEntity.CUSTOM_EMOJI,
                 )
                 insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            elif entity.type == MessageEntity.DATE_TIME:
+                insert = f"![{escaped_text}](tg://time?unix={
+                    to_timestamp(entity.unix_time)
+                }&format={entity.date_time_format})"
             else:
                 insert = escaped_text
 
