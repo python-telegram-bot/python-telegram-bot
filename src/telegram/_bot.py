@@ -1216,7 +1216,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Use this method to stream a partial message to a user while the message is being
-        generated
+        generated.
 
         .. versionadded:: 22.6
 
