@@ -2053,8 +2053,8 @@ class StatusUpdate:
         def filter(self, message: Message) -> bool:
             return bool(message.chat_owner_left)
 
-    CHAT_OWNER_LEFT = _ChatOwnerLeft(name="filters.StatusUpdate.CHAT_LEFT")
-    """Messages that contain :attr:`telegram.Message.chat_owner_LEFT`.
+    CHAT_OWNER_LEFT = _ChatOwnerLeft(name="filters.StatusUpdate.CHAT_OWNER_LEFT")
+    """Messages that contain :attr:`telegram.Message.chat_owner_left`.
 
     .. versionadded:: NEXT.VERSION
     """

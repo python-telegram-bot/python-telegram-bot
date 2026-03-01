@@ -247,6 +247,9 @@
       - Used for obtaining the name of the bot
     * - :meth:`~telegram.Bot.set_my_profile_photo`
       - Used for setting the profile photo of the bot
+    * - :meth:`~telegram.Bot.remove_my_profile_photo`
+      - Used for removing the profile photo of the bot
+
 
 .. raw:: html
 

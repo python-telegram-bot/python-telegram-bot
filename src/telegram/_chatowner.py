@@ -37,7 +37,7 @@ class ChatOwnerChanged(TelegramObject):
 
     Args:
         new_owner (:class:`telegram.User`): The user which will be the new owner of the chat if
-        the previous owner does not return to the chat
+            the previous owner does not return to the chat
 
     Attributes:
         new_owner (:class:`telegram.User`): The user which will be the new owner of the chat if
