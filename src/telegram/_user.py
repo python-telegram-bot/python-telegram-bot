@@ -118,6 +118,11 @@ class User(TelegramObject):
             enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 22.6
+        allows_users_to_create_topics (:obj:`bool`, optional): :obj:`True`, if the bot allows
+            users to create and delete topics in private chats. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -153,6 +158,11 @@ class User(TelegramObject):
             enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 22.6
+        allows_users_to_create_topics (:obj:`bool`): Optional. :obj:`True`, if the bot allows
+            users to create and delete topics in private chats. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -161,6 +171,7 @@ class User(TelegramObject):
 
     __slots__ = (
         "added_to_attachment_menu",
+        "allows_users_to_create_topics",
         "can_connect_to_business",
         "can_join_groups",
         "can_read_all_group_messages",
@@ -192,6 +203,7 @@ class User(TelegramObject):
         can_connect_to_business: bool | None = None,
         has_main_web_app: bool | None = None,
         has_topics_enabled: bool | None = None,
+        allows_users_to_create_topics: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -212,6 +224,7 @@ class User(TelegramObject):
         self.can_connect_to_business: bool | None = can_connect_to_business
         self.has_main_web_app: bool | None = has_main_web_app
         self.has_topics_enabled: bool | None = has_topics_enabled
+        self.allows_users_to_create_topics: bool | None = allows_users_to_create_topics
 
         self._id_attrs = (self.id,)
 

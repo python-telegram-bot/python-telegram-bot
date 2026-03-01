@@ -65,6 +65,8 @@ Available Types
     telegram.chatmemberowner
     telegram.chatmemberrestricted
     telegram.chatmemberupdated
+    telegram.chatownerchanged
+    telegram.chatownerleft
     telegram.chatpermissions
     telegram.chatphoto
     telegram.chatshared

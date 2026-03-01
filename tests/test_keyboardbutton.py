@@ -126,17 +126,20 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         c = KeyboardButton("Test", request_location=True)
         d = KeyboardButton("Test", web_app=WebAppInfo(url="https://ptb.org"))
         e = InlineKeyboardButton("test", callback_data="test")
+        h = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="Custom123")
         f = KeyboardButton(
             "test",
             request_contact=True,
             request_chat=KeyboardButtonRequestChat(1, False),
             request_users=KeyboardButtonRequestUsers(2),
+            icon_custom_emoji_id="Custom123",
         )
         g = KeyboardButton(
             "test",
             request_contact=True,
             request_chat=KeyboardButtonRequestChat(1, False),
             request_users=KeyboardButtonRequestUsers(2),
+            icon_custom_emoji_id="Custom123",
         )
         h = KeyboardButton("test", request_contact=True, style="primary")
         i = KeyboardButton("test", request_contact=True, icon_custom_emoji_id="123")
@@ -154,6 +157,9 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert hash(a) != hash(e)
 
         assert a != f
+        assert hash(a) != hash(f)
+
+        assert a != h
         assert hash(a) != hash(f)
 
         assert f == g

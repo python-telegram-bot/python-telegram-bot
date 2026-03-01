@@ -79,6 +79,8 @@ __all__ = (
     "ChatMemberOwner",
     "ChatMemberRestricted",
     "ChatMemberUpdated",
+    "ChatOwnerChanged",
+    "ChatOwnerLeft",
     "ChatPermissions",
     "ChatPhoto",
     "ChatShared",
@@ -401,6 +403,7 @@ from ._chatmember import (
     ChatMemberRestricted,
 )
 from ._chatmemberupdated import ChatMemberUpdated
+from ._chatowner import ChatOwnerChanged, ChatOwnerLeft
 from ._chatpermissions import ChatPermissions
 from ._checklists import Checklist, ChecklistTask, ChecklistTasksAdded, ChecklistTasksDone
 from ._choseninlineresult import ChosenInlineResult

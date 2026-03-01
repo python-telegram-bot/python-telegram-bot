@@ -64,6 +64,9 @@ class KeyboardButton(TelegramObject):
     .. versionchanged:: 20.5
        :attr:`request_users` and :attr:`request_chat` are considered as well when
        comparing objects of this type in terms of equality.
+    .. versionchanged:: NEXT.VERSION
+       :attr:`icon_custom_emoji_id` is considered as well when comparing objects of this type in
+       terms of equality.
 
     .. versionchanged:: NEXT.VERSION
        :attr:`style` and :attr:`icon_custom_emoji_id` are considered as well when
