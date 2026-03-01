@@ -34,7 +34,7 @@ jobs:
         uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
         with:
           # Install a specific version of uv.
-          version: "0.9.28"
+          version: "0.10.7"
           # Install 3.13:
           python-version: 3.13
 
