@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
+from telegram._files.videoquality import VideoQuality
 from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
@@ -70,6 +71,10 @@ class Video(_BaseThumbedMedium):
 
             .. versionchanged:: v22.2
                 |time-period-input|
+        qualities (Sequence[:class:`telegram.VideoQuality`], optional): List of available qualities
+            of the video
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -100,6 +105,10 @@ class Video(_BaseThumbedMedium):
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
+        qualities (Sequence[:class:`telegram.VideoQuality`]): Optional. List of available qualities
+            of the video
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -109,6 +118,7 @@ class Video(_BaseThumbedMedium):
         "file_name",
         "height",
         "mime_type",
+        "qualities",
         "width",
     )
 
@@ -125,6 +135,7 @@ class Video(_BaseThumbedMedium):
         thumbnail: PhotoSize | None = None,
         cover: Sequence[PhotoSize] | None = None,
         start_timestamp: TimePeriod | None = None,
+        qualities: Sequence[VideoQuality] | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -145,6 +156,7 @@ class Video(_BaseThumbedMedium):
             self.file_name: str | None = file_name
             self.cover: Sequence[PhotoSize] | None = parse_sequence_arg(cover)
             self._start_timestamp: dtm.timedelta | None = to_timedelta(start_timestamp)
+            self.qualities: Sequence[VideoQuality] | None = parse_sequence_arg(qualities)
 
     @property
     def duration(self) -> int | dtm.timedelta:
@@ -162,5 +174,6 @@ class Video(_BaseThumbedMedium):
         data = cls._parse_data(data)
 
         data["cover"] = de_list_optional(data.get("cover"), PhotoSize, bot)
+        data["qualities"] = de_list_optional(data.get("qualities"), VideoQuality, bot)
 
         return super().de_json(data=data, bot=bot)
