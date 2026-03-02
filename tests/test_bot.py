@@ -4820,7 +4820,6 @@ class TestBotWithRequest:
         assert isinstance(gifts, OwnedGifts)
         assert gifts.total_count == 0
 
-    @pytest.mark.dev
     async def test_my_profile_photo(self, bot):
         await bot.remove_my_profile_photo()
         bot_profile_photos = await bot.get_user_profile_photos(bot.id)
