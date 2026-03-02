@@ -297,6 +297,7 @@ __all__ = (
     "Update",
     "User",
     "UserChatBoosts",
+    "UserProfileAudios",
     "UserProfilePhotos",
     "UserRating",
     "UsersShared",
@@ -612,6 +613,7 @@ from ._uniquegift import (
 )
 from ._update import Update
 from ._user import User
+from ._userprofileaudios import UserProfileAudios
 from ._userprofilephotos import UserProfilePhotos
 from ._userrating import UserRating
 from ._videochat import (

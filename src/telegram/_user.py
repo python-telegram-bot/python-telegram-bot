@@ -63,6 +63,7 @@ if TYPE_CHECKING:
         Story,
         SuggestedPostParameters,
         UserChatBoosts,
+        UserProfileAudios,
         UserProfilePhotos,
         Venue,
         Video,
@@ -2633,6 +2634,41 @@ class User(TelegramObject):
             exclude_from_blockchain=exclude_from_blockchain,
             exclude_unique=exclude_unique,
             sort_by_price=sort_by_price,
+            offset=offset,
+            limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_profile_audios(
+        self,
+        offset: int | None = None,
+        limit: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "UserProfileAudios":
+        """Shortcut for::
+
+             await bot.get_user_profile_audios(update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_user_profile_audios`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.UserProfileAudios`
+
+        """
+        return await self.get_bot().get_user_profile_audios(
+            user_id=self.id,
             offset=offset,
             limit=limit,
             read_timeout=read_timeout,
