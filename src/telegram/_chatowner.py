@@ -36,12 +36,10 @@ class ChatOwnerChanged(TelegramObject):
     considered equal, if their :attr:`new_owner` is equal.
 
     Args:
-        new_owner (:class:`telegram.User`): The user which will be the new owner of the chat if
-            the previous owner does not return to the chat
+        new_owner (:class:`telegram.User`): The new owner of the chat
 
     Attributes:
-        new_owner (:class:`telegram.User`): The user which will be the new owner of the chat if
-            the previous owner does not return to the chat
+        new_owner (:class:`telegram.User`): The new owner of the chat
 
     """
 
