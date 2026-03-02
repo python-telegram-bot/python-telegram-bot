@@ -21,6 +21,7 @@ import datetime as dtm
 import pytest
 
 from telegram import (
+    Audio,
     Birthdate,
     BusinessIntro,
     BusinessLocation,
@@ -94,6 +95,7 @@ def chat_full_info(bot):
         rating=ChatFullInfoTestBase.rating,
         unique_gift_colors=ChatFullInfoTestBase.unique_gift_colors,
         paid_message_star_count=ChatFullInfoTestBase.paid_message_star_count,
+        first_profile_audio=ChatFullInfoTestBase.first_profile_audio,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -165,6 +167,11 @@ class ChatFullInfoTestBase:
         dark_theme_other_colors=[0x900C3F, 0x581845],
     )
     paid_message_star_count = 1234
+    first_profile_audio = Audio(
+        file_id="file_id",
+        file_unique_id="file_unique_id",
+        duration=30,
+    )
 
 
 class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
@@ -225,6 +232,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "rating": self.rating.to_dict(),
             "unique_gift_colors": self.unique_gift_colors.to_dict(),
             "paid_message_star_count": self.paid_message_star_count,
+            "first_profile_audio": self.first_profile_audio.to_dict(),
         }
 
         cfi = ChatFullInfo.de_json(json_dict, offline_bot)
@@ -279,6 +287,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi.rating == self.rating
         assert cfi.unique_gift_colors == self.unique_gift_colors
         assert cfi.paid_message_star_count == self.paid_message_star_count
+        assert cfi.first_profile_audio == self.first_profile_audio
 
     def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
         json_dict = {
@@ -365,6 +374,7 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi_dict["rating"] == cfi.rating.to_dict()
         assert cfi_dict["unique_gift_colors"] == cfi.unique_gift_colors.to_dict()
         assert cfi_dict["paid_message_star_count"] == cfi.paid_message_star_count
+        assert cfi_dict["first_profile_audio"] == cfi.first_profile_audio.to_dict()
 
     def test_time_period_properties(self, PTB_TIMEDELTA, chat_full_info):
         cfi = chat_full_info

@@ -186,6 +186,21 @@ class TestUserWithoutRequest(UserTestBase):
         monkeypatch.setattr(user.get_bot(), "get_user_profile_photos", make_assertion)
         assert await user.get_profile_photos()
 
+    async def test_instance_method_get_profile_audios(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id
+
+        assert check_shortcut_signature(
+            User.get_profile_audios, Bot.get_user_profile_audios, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.get_profile_audios, user.get_bot(), "get_user_profile_audios"
+        )
+        assert await check_defaults_handling(user.get_profile_audios, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "get_user_profile_audios", make_assertion)
+        assert await user.get_profile_audios()
+
     async def test_instance_method_pin_message(self, monkeypatch, user):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == user.id

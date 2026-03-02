@@ -191,6 +191,7 @@ Available Types
     telegram.update
     telegram.user
     telegram.userchatboosts
+    telegram.userprofileaudios
     telegram.userprofilephotos
     telegram.userrating
     telegram.usersshared

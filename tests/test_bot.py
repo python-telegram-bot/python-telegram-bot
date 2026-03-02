@@ -3353,6 +3353,12 @@ class TestBotWithRequest:
         out = await bot.save_prepared_inline_message(chat_id, result, True, False, True, False)
         assert isinstance(out, PreparedInlineMessage)
 
+    async def test_get_user_profile_audios(self, bot, chat_id):
+        user_profile_audios = await bot.get_user_profile_audios(chat_id)
+        assert user_profile_audios.total_count == 0
+        # Can't test with an actual audio file since that's a premium feature
+        assert user_profile_audios.audios == ()
+
     async def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = await bot.get_user_profile_photos(chat_id)
         assert user_profile_photos.photos[0][0].file_size == 5403
