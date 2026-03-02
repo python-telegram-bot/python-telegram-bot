@@ -4828,7 +4828,6 @@ class TestBotWithRequest:
             InputProfilePhotoStatic(photo=data_file("telegram.jpg").read_bytes())
         )
         bot_profile_photos = await bot.get_user_profile_photos(bot.id)
-        print(bot_profile_photos.photos[0])
         assert bot_profile_photos.total_count == 1
 
     async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
