@@ -5316,10 +5316,16 @@ class Message(MaybeInaccessibleMessage):
             elif entity.type == MessageEntity.CUSTOM_EMOJI:
                 insert = f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
             elif entity.type == MessageEntity.DATE_TIME:
-                insert = (
-                    f'<tg-time unix="{to_timestamp(entity.unix_time)}" '
-                    f'format="{entity.date_time_format}">{escaped_text}</tg-time>'
-                )
+                if entity.date_time_format:
+                    insert = (
+                        f'<tg-time unix="{to_timestamp(entity.unix_time)}" '
+                        f'format="{entity.date_time_format}">{escaped_text}</tg-time>'
+                    )
+                else:
+                    insert = (
+                        f'<tg-time unix="{to_timestamp(entity.unix_time)}">'
+                        f"{escaped_text}</tg-time>"
+                    )
             else:
                 insert = escaped_text
 
@@ -5553,10 +5559,13 @@ class Message(MaybeInaccessibleMessage):
                 )
                 insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
             elif entity.type == MessageEntity.DATE_TIME:
-                insert = (
-                    f"![{escaped_text}](tg://time?unix={to_timestamp(entity.unix_time)}"
-                    f"&format={entity.date_time_format})"
-                )
+                if entity.date_time_format:
+                    insert = (
+                        f"![{escaped_text}](tg://time?unix={to_timestamp(entity.unix_time)}"
+                        f"&format={entity.date_time_format})"
+                    )
+                else:
+                    insert = f"![{escaped_text}](tg://time?unix={to_timestamp(entity.unix_time)})"
             else:
                 insert = escaped_text
 
