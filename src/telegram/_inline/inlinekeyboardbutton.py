@@ -178,6 +178,13 @@ class InlineKeyboardButton(TelegramObject):
             Caution:
                 The PTB team has discovered that this field works correctly only if your Telegram
                 client is released after April 20th 2023.
+        icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the custom emoji shown
+            before the text of the button. Can only be used by bots that purchased additional
+            usernames on `Fragment <https://fragment.com/>`_ or in the messages directly sent by
+            the bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         text (:obj:`str`): Label text on the button.
@@ -268,6 +275,13 @@ class InlineKeyboardButton(TelegramObject):
             Caution:
                 The PTB team has discovered that this field works correctly only if your Telegram
                 client is released after April 20th 2023.
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji shown
+            before the text of the button. Can only be used by bots that purchased additional
+            usernames on `Fragment <https://fragment.com/>`_ or in the messages directly sent by
+            the bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
