@@ -5318,7 +5318,7 @@ class Message(MaybeInaccessibleMessage):
             elif entity.type == MessageEntity.DATE_TIME:
                 insert = (
                     f'<tg-time unix="{to_timestamp(entity.unix_time)}" '
-                    f'format="{entity.date_time_format}">{escaped_text}</tg-emoji>'
+                    f'format="{entity.date_time_format}">{escaped_text}</tg-time>'
                 )
             else:
                 insert = escaped_text
