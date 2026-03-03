@@ -5553,9 +5553,10 @@ class Message(MaybeInaccessibleMessage):
                 )
                 insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
             elif entity.type == MessageEntity.DATE_TIME:
-                insert = f"![{escaped_text}](tg://time?unix={
-                    to_timestamp(entity.unix_time)
-                }&format={entity.date_time_format})"
+                insert = (
+                    f"![{escaped_text}](tg://time?unix={to_timestamp(entity.unix_time)}"
+                    f"&format={entity.date_time_format})"
+                )
             else:
                 insert = escaped_text
 
