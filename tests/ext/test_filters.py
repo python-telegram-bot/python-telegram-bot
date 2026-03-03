@@ -1161,6 +1161,16 @@ class TestFilters:
         assert filters.StatusUpdate.CHECKLIST_TASKS_DONE.check_update(update)
         update.message.checklist_tasks_done = None
 
+        update.message.chat_owner_changed = "chat_owner_changed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.CHAT_OWNER_CHANGED.check_update(update)
+        update.message.chat_owner_changed = None
+
+        update.message.chat_owner_left = "chat_owner_left"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.CHAT_OWNER_LEFT.check_update(update)
+        update.message.chat_owner_left = None
+
     def test_filters_forwarded(self, update):
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = MessageOriginHiddenUser(dtm.datetime.utcnow(), 1)
