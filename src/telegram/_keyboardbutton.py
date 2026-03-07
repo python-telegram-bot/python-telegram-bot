@@ -34,7 +34,8 @@ if TYPE_CHECKING:
 class KeyboardButton(TelegramObject):
     """
     This object represents one button of the reply keyboard. At most one of the optional fields
-    must be used to specify type of the button. For simple text buttons, :obj:`str`
+    other than :attr:`text`, :attr:`icon_custom_emoji_id`, and :attr:`style` must be used to
+    specify the type of the button. For simple text buttons, :obj:`str`
     can be used instead of this object to specify text of the button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -73,8 +74,9 @@ class KeyboardButton(TelegramObject):
        comparing objects of this type in terms of equality.
 
     Args:
-        text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
-            sent to the bot as a message when the button is pressed.
+        text (:obj:`str`): Text of the button. If none of the fields other than :attr:`text`,
+            :attr:`icon_custom_emoji_id`, and :attr:`style` are used, it will be sent as a
+            message when the button is pressed.
         request_contact (:obj:`bool`, optional): If :obj:`True`, the user's phone number will be
             sent as a contact when the button is pressed. Available in private chats only.
         request_location (:obj:`bool`, optional): If :obj:`True`, the user's current location will
@@ -101,14 +103,14 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
-        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients. Only three values are supported:
+        style (:obj:`str`, optional): Style of the button. Must be one of
             :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
             :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
             :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
             Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
             :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
             :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            If omitted, then an app-specific style is used.
 
             .. versionadded:: NEXT.VERSION
         icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the
@@ -120,8 +122,9 @@ class KeyboardButton(TelegramObject):
             .. versionadded:: NEXT.VERSION
 
     Attributes:
-        text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
-            sent to the bot as a message when the button is pressed.
+        text (:obj:`str`): Text of the button. If none of the fields other than :attr:`text`,
+            :attr:`icon_custom_emoji_id`, and :attr:`style` are used, it will be sent as a
+            message when the button is pressed.
         request_contact (:obj:`bool`): Optional. If :obj:`True`, the user's phone number will be
             sent as a contact when the button is pressed. Available in private chats only.
         request_location (:obj:`bool`): Optional. If :obj:`True`, the user's current location will
@@ -147,14 +150,14 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
-        style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients. Only three values are supported:
+        style (:obj:`str`): Optional. Style of the button. Must be one of
             :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
             :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
             :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
             Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
             :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
             :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            If omitted, then an app-specific style is used.
 
             .. versionadded:: NEXT.VERSION
         icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the

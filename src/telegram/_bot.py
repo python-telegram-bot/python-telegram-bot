@@ -8923,8 +8923,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: JSONDict | None = None,
     ) -> ForumTopic:
         """
-        Use this method to create a topic in a forum supergroup chat. The bot must be
-        an administrator in the chat for this to work and must have
+        Use this method to create a topic in a forum supergroup chat or a private chat with a user.
+        The bot must be an administrator in the chat for this to work and must have
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
         .. versionadded:: 20.0
