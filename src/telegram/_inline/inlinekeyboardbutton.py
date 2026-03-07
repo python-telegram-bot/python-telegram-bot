@@ -43,7 +43,8 @@ class InlineKeyboardButton(TelegramObject):
     :attr:`web_app`, :attr:`pay`, :attr:`style` and :attr:`icon_custom_emoji_id` are equal.
 
     Note:
-        * Exactly one of the optional fields must be used to specify type of the button.
+        * Exactly one of the fields other than :attr:`text`, :attr:`icon_custom_emoji_id`, and
+          :attr:`style` must be used to specify type of the button.
         * Mind that :attr:`callback_game` is not
           working as expected. Putting a game short name in it might, but is not guaranteed to
           work.
@@ -146,14 +147,14 @@ class InlineKeyboardButton(TelegramObject):
             Note:
                 This type of button **must** always be the first button in the first row and can
                 only be used in invoice messages.
-        style (:obj:`str`, optional): Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients. Only three values are supported:
+        style (:obj:`str`, optional): Style of the button. Must be one of
             :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
             :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
             :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
             Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
             :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
             :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            If omitted, then an app-specific style is used.
 
             .. versionadded:: NEXT.VERSION
         icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the
@@ -231,14 +232,14 @@ class InlineKeyboardButton(TelegramObject):
             copies the specified text to the clipboard.
 
             .. versionadded:: 21.7
-        style (:obj:`str`): Optional. Style of the button. Determines the visual appearance
-            of the button in supported Telegram clients. Only three values are supported:
+        style (:obj:`str`): Optional. Style of the button. Must be one of
             :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
             :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
             :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
             Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
             :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
             :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            If omitted, then an app-specific style is used.
 
             .. versionadded:: NEXT.VERSION
         icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the

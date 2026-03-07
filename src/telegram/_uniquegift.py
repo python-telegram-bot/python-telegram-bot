@@ -122,7 +122,7 @@ class UniqueGiftModel(TelegramObject):
         name (:obj:`str`): Name of the model.
         sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
         rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
-            model for every ``1000`` gifts upgraded.
+            model for every ``1000`` gifts upgraded. Always ``0`` for crafted gifts.
         rarity (:obj:`str`, optional): Rarity of the model if it is a crafted model.
             Currently, can be :tg-const:`telegram.constants.UniqueGiftModelRarity.UNCOMMON`,
             :tg-const:`telegram.constants.UniqueGiftModelRarity.RARE`,
@@ -135,7 +135,7 @@ class UniqueGiftModel(TelegramObject):
         name (:obj:`str`): Name of the model.
         sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
         rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
-            model for every ``1000`` gifts upgraded.
+            model for every ``1000`` gifts upgraded. Always ``0`` for crafted gifts.
         rarity (:obj:`str`): Optional. Rarity of the model if it is a crafted model.
             Currently, can be :tg-const:`telegram.constants.UniqueGiftModelRarity.UNCOMMON`,
             :tg-const:`telegram.constants.UniqueGiftModelRarity.RARE`,
