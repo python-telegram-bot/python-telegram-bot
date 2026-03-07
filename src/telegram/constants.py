@@ -2015,14 +2015,14 @@ class MessageEntityType(StringEnum):
     CODE = "code"
     """:obj:`str`: Message entities representing monowidth string."""
     CUSTOM_EMOJI = "custom_emoji"
-    """:obj:`str`: Message entities representing ormatted date and time.
-
-    .. versionadded:: NEXT.VERSION
-    """
-    DATE_TIME = "date_time"
     """:obj:`str`: Message entities representing inline custom emoji stickers.
 
     .. versionadded:: 20.0
+    """
+    DATE_TIME = "date_time"
+    """:obj:`str`: Message entities representing formatted date and time.
+
+    .. versionadded:: NEXT.VERSION
     """
     EMAIL = "email"
     """:obj:`str`: Message entities representing a email."""
@@ -2071,13 +2071,13 @@ class MessageEntityDateTimeFormats(StringEnum):
     LOCALIZED_WEEKDAY = "w"
     """:obj:`str`: Displays the day of the week in the user's localized language."""
     SHORT_DATE = "d"
-    """:obj:`str`: Displays the date in short form (e.g., “17.03.22”)."""
+    """:obj:`str`: Displays the date in short form (e.g., "17.03.22")."""
     LONG_DATE = "D"
-    """:obj:`str`: Displays the date in long form (e.g., “March 17, 2022”)."""
+    """:obj:`str`: Displays the date in long form (e.g., "March 17, 2022")."""
     SHORT_TIME = "t"
-    """:obj:`str`: Displays the time in short form (e.g., “22:45”)."""
+    """:obj:`str`: Displays the time in short form (e.g., "22:45")."""
     LONG_TIME = "T"
-    """:obj:`str`: Displays the time in long form (e.g., “22:45:00”)."""
+    """:obj:`str`: Displays the time in long form (e.g., "22:45:00")."""
     LOCALIZED_WEEKDAY_SHORT_DATE = "wd"
     """:obj:`str`: Displays the day of the week in the user's localized language and the date in
     short form."""

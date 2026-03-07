@@ -6012,7 +6012,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 posts; for channels only
 
                 .. versionadded:: 22.4
-            can_manage_tags (:obj:`bool`, optional): Pass :obj:`True`if the administrator can edit
+            can_manage_tags (:obj:`bool`, optional): Pass :obj:`True` if the administrator can edit
                 the tags of regular members; for groups and supergroups only.
 
                 .. versionadded:: NEXT.VERSION
@@ -12052,7 +12052,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
                 of the target supergroup (in the format ``@supergroupusername``).
             user_id (:obj:`int`): Unique identifier of the target user.
-            comment (:obj:`str`, optional): New tag for the member;
+            tag (:obj:`str`, optional): New tag for the member;
             0-:tg-const:`telegram.constants.TagLimit.MAX_TAG_LENGTH` characters, emoji are not
             allowed.
 
