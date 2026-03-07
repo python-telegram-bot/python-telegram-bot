@@ -43,10 +43,6 @@
    :target: https://app.codacy.com/gh/python-telegram-bot/python-telegram-bot/dashboard
    :alt: Code quality: Codacy
 
-.. image:: https://results.pre-commit.ci/badge/github/python-telegram-bot/python-telegram-bot/master.svg
-   :target: https://results.pre-commit.ci/latest/github/python-telegram-bot/python-telegram-bot/master
-   :alt: pre-commit.ci status
-
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
    :alt: Code Style: Black
