@@ -1965,6 +1965,8 @@ class StatusUpdate:
                 # keep this alphabetically sorted for easier maintenance
                 StatusUpdate.CHAT_BACKGROUND_SET.check_update(update)
                 or StatusUpdate.CHAT_CREATED.check_update(update)
+                or StatusUpdate.CHAT_OWNER_CHANGED.check_update(update)
+                or StatusUpdate.CHAT_OWNER_LEFT.check_update(update)
                 or StatusUpdate.CHAT_SHARED.check_update(update)
                 or StatusUpdate.CHECKLIST_TASKS_ADDED.check_update(update)
                 or StatusUpdate.CHECKLIST_TASKS_DONE.check_update(update)
@@ -2032,6 +2034,30 @@ class StatusUpdate:
     """Messages that contain :attr:`telegram.Message.group_chat_created`,
         :attr:`telegram.Message.supergroup_chat_created` or
         :attr:`telegram.Message.channel_chat_created`."""
+
+    class _ChatOwnerChanged(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.chat_owner_changed)
+
+    CHAT_OWNER_CHANGED = _ChatOwnerChanged(name="filters.StatusUpdate.CHAT_OWNER_CHANGED")
+    """Messages that contain :attr:`telegram.Message.chat_owner_changed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _ChatOwnerLeft(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.chat_owner_left)
+
+    CHAT_OWNER_LEFT = _ChatOwnerLeft(name="filters.StatusUpdate.CHAT_OWNER_LEFT")
+    """Messages that contain :attr:`telegram.Message.chat_owner_left`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
     class _ChatShared(MessageFilter):
         __slots__ = ()

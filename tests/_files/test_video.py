@@ -23,7 +23,16 @@ from pathlib import Path
 
 import pytest
 
-from telegram import Bot, InputFile, MessageEntity, PhotoSize, ReplyParameters, Video, Voice
+from telegram import (
+    Bot,
+    InputFile,
+    MessageEntity,
+    PhotoSize,
+    ReplyParameters,
+    Video,
+    VideoQuality,
+    Voice,
+)
 from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
@@ -42,6 +51,9 @@ from tests.auxil.slots import mro_slots
 # Override `video` fixture to provide start_timestamp
 @pytest.fixture(scope="module")
 async def video(bot, chat_id):
+    # The `video` object returned here does not have the `qualities` attribute.
+    # Tests using actual VideoQuality objects from real Telegram responses
+    # are implemented separately in `test_videoquality`.
     with data_file("telegram.mp4").open("rb") as f:
         return (
             await bot.send_video(
@@ -60,6 +72,7 @@ class VideoTestBase:
     file_name = "telegram.mp4"
     start_timestamp = dtm.timedelta(seconds=3)
     cover = (PhotoSize("file_id", "unique_id", 640, 360, file_size=0),)
+    qualities = (VideoQuality("video_file_id", "video_unique_id", 640, 360, "h264", file_size=0),)
     thumb_width = 180
     thumb_height = 320
     thumb_file_size = 1767
@@ -109,6 +122,7 @@ class TestVideoWithoutRequest(VideoTestBase):
             "file_name": self.file_name,
             "start_timestamp": int(self.start_timestamp.total_seconds()),
             "cover": [photo_size.to_dict() for photo_size in self.cover],
+            "qualities": [video_quality.to_dict() for video_quality in self.qualities],
         }
         json_video = Video.de_json(json_dict, offline_bot)
         assert json_video.api_kwargs == {}
@@ -123,6 +137,7 @@ class TestVideoWithoutRequest(VideoTestBase):
         assert json_video.file_name == self.file_name
         assert json_video._start_timestamp == self.start_timestamp
         assert json_video.cover == self.cover
+        assert json_video.qualities == self.qualities
 
     def test_to_dict(self, video):
         video_dict = video.to_dict()

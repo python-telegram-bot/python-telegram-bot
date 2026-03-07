@@ -58,6 +58,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `gamgi <https://github.com/gamgi>`_
 - `Gauthamram Ravichandran <https://github.com/GauthamramRavichandran>`_
 - `Harshil <https://github.com/harshil21>`_
+- `Henok Tesfamikael <https://github.com/hethon>`
 - `Henry Galue <https://github.com/henryg311>`
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
@@ -104,6 +105,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
 - `Oleg Sushchenko <https://github.com/feuillemorte>`_
 - `Or Bin <https://github.com/OrBin>`_
+- `OuYoung <https://github.com/ouyooung>`_
 - `overquota <https://github.com/overquota>`_
 - `Pablo Martinez <https://github.com/elpekenin>`_
 - `Paradox <https://github.com/paradox70>`_

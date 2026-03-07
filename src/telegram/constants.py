@@ -85,6 +85,7 @@ __all__ = [
     "InputStoryContentType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
+    "KeyboardButtonStyle",
     "LocationLimit",
     "MaskPosition",
     "MediaGroupLimit",
@@ -123,7 +124,9 @@ __all__ = [
     "TransactionPartnerType",
     "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
+    "UniqueGiftModelRarity",
     "UpdateType",
+    "UserProfileAudiosLimit",
     "UserProfilePhotosLimit",
     "VerifyLimit",
     "WebhookLimit",
@@ -176,7 +179,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=3)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=4)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1402,6 +1405,53 @@ class InlineKeyboardButtonLimit(IntEnum):
     """
 
 
+class KeyboardButtonStyle(StringEnum):
+    """This enum contains the available button styles for
+    :class:`telegram.InlineKeyboardButton` and :class:`telegram.KeyboardButton`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PRIMARY = "primary"
+    """:obj:`str`: Primary button style (usually blue) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    SUCCESS = "success"
+    """:obj:`str`: Success button style (usually green) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    DANGER = "danger"
+    """:obj:`str`: Danger/destructive button style (usually red) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    BLUE = "primary"
+    """:obj:`str`: Alias for :attr:`PRIMARY`. Blue button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    GREEN = "success"
+    """:obj:`str`: Alias for :attr:`SUCCESS`. Green button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    RED = "danger"
+    """:obj:`str`: Alias for :attr:`DANGER`. Red button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+
 class InlineKeyboardMarkupLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineKeyboardMarkup`/
     :meth:`telegram.Bot.send_message` & friends. The enum
@@ -2109,15 +2159,25 @@ class MessageType(StringEnum):
     """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
-    CHAT_SHARED = "chat_shared"
-    """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
-
-    .. versionadded:: 20.8
-    """
     CHAT_BACKGROUND_SET = "chat_background_set"
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_background_set`.
 
     .. versionadded:: 21.2
+    """
+    CHAT_OWNER_CHANGED = "chat_owner_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_owner_changed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CHAT_OWNER_LEFT = "chat_owner_left"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_owner_left`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CHAT_SHARED = "chat_shared"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
+
+    .. versionadded:: 20.8
     """
     CHECKLIST = "checklist"
     """:obj:`str`: Messages with :attr:`telegram.Message.checklist`.
@@ -3369,6 +3429,25 @@ class UniqueGiftInfoOrigin(StringEnum):
     """:obj:`str` gift upgraded"""
 
 
+class UniqueGiftModelRarity(StringEnum):
+    """This enum contains the available rarities for :class:`telegram.UniqueGiftModel`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    UNCOMMON = "uncommon"
+    """:obj:`str` uncommon rarity"""
+    RARE = "rare"
+    """:obj:`str` rare rarity"""
+    EPIC = "epic"
+    """:obj:`str` epic rarity"""
+    LEGENDARY = "legendary"
+    """:obj:`str` legendary rarity"""
+
+
 class UpdateType(StringEnum):
     """This enum contains the available types of :class:`telegram.Update`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -3586,6 +3665,27 @@ class UserProfilePhotosLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for
     :paramref:`~telegram.Bot.get_user_profile_photos.limit` parameter of
     :meth:`telegram.Bot.get_user_profile_photos`.
+    """
+
+
+class UserProfileAudiosLimit(IntEnum):
+    """This enum contains limitations for :paramref:`telegram.Bot.get_user_profile_audios.limit`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.Bot.get_user_profile_audios.limit` parameter of
+    :meth:`telegram.Bot.get_user_profile_audios`.
+    """
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum value allowed for
+    :paramref:`~telegram.Bot.get_user_profile_audios.limit` parameter of
+    :meth:`telegram.Bot.get_user_profile_audios`.
     """
 
 
