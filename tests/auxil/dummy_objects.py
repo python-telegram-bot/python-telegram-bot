@@ -40,6 +40,7 @@ from telegram import (
     Update,
     User,
     UserChatBoosts,
+    UserProfileAudios,
     UserProfilePhotos,
     WebhookInfo,
 )
@@ -159,6 +160,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
             )
         ]
     ),
+    "UserProfileAudios": UserProfileAudios(total_count=1, audios=[]),
     "UserProfilePhotos": UserProfilePhotos(total_count=1, photos=[[]]),
     "WebhookInfo": WebhookInfo(
         url="dummy_url",

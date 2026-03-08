@@ -56,6 +56,7 @@ from telegram import (
     InputMediaPhoto,
     InputMessageContent,
     InputPollOption,
+    InputProfilePhotoStatic,
     InputTextMessageContent,
     LabeledPrice,
     LinkPreviewOptions,
@@ -3353,6 +3354,12 @@ class TestBotWithRequest:
         out = await bot.save_prepared_inline_message(chat_id, result, True, False, True, False)
         assert isinstance(out, PreparedInlineMessage)
 
+    async def test_get_user_profile_audios(self, bot, chat_id):
+        user_profile_audios = await bot.get_user_profile_audios(chat_id)
+        assert user_profile_audios.total_count == 0
+        # Can't test with an actual audio file since that's a premium feature
+        assert user_profile_audios.audios == ()
+
     async def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = await bot.get_user_profile_photos(chat_id)
         assert user_profile_photos.photos[0][0].file_size == 5403
@@ -4818,6 +4825,16 @@ class TestBotWithRequest:
         gifts = await bot.get_chat_gifts(chat_id)
         assert isinstance(gifts, OwnedGifts)
         assert gifts.total_count == 0
+
+    async def test_my_profile_photo(self, bot):
+        await bot.remove_my_profile_photo()
+        bot_profile_photos = await bot.get_user_profile_photos(bot.id)
+        assert bot_profile_photos.total_count == 0
+        await bot.set_my_profile_photo(
+            InputProfilePhotoStatic(photo=data_file("telegram.jpg").read_bytes())
+        )
+        bot_profile_photos = await bot.get_user_profile_photos(bot.id)
+        assert bot_profile_photos.total_count == 1
 
     async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
         """Test that requests and bot user are initialized separately and only once."""

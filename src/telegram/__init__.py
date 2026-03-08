@@ -79,6 +79,8 @@ __all__ = (
     "ChatMemberOwner",
     "ChatMemberRestricted",
     "ChatMemberUpdated",
+    "ChatOwnerChanged",
+    "ChatOwnerLeft",
     "ChatPermissions",
     "ChatPhoto",
     "ChatShared",
@@ -295,6 +297,7 @@ __all__ = (
     "Update",
     "User",
     "UserChatBoosts",
+    "UserProfileAudios",
     "UserProfilePhotos",
     "UserRating",
     "UsersShared",
@@ -305,6 +308,7 @@ __all__ = (
     "VideoChatScheduled",
     "VideoChatStarted",
     "VideoNote",
+    "VideoQuality",
     "Voice",
     "WebAppData",
     "WebAppInfo",
@@ -400,6 +404,7 @@ from ._chatmember import (
     ChatMemberRestricted,
 )
 from ._chatmemberupdated import ChatMemberUpdated
+from ._chatowner import ChatOwnerChanged, ChatOwnerLeft
 from ._chatpermissions import ChatPermissions
 from ._checklists import Checklist, ChecklistTask, ChecklistTasksAdded, ChecklistTasksDone
 from ._choseninlineresult import ChosenInlineResult
@@ -442,6 +447,7 @@ from ._files.sticker import MaskPosition, Sticker, StickerSet
 from ._files.venue import Venue
 from ._files.video import Video
 from ._files.videonote import VideoNote
+from ._files.videoquality import VideoQuality
 from ._files.voice import Voice
 from ._forcereply import ForceReply
 from ._forumtopic import (
@@ -607,6 +613,7 @@ from ._uniquegift import (
 )
 from ._update import Update
 from ._user import User
+from ._userprofileaudios import UserProfileAudios
 from ._userprofilephotos import UserProfilePhotos
 from ._userrating import UserRating
 from ._videochat import (
