@@ -493,6 +493,7 @@ class StickerSetTestBase:
     name = "NOTAREALNAME"
     sticker_type = Sticker.REGULAR
     contains_masks = True
+    thumbnail = PhotoSize("thumb_file_id", "thumb_file_un_id", 100, 100, False)
 
 
 class TestStickerSetWithoutRequest(StickerSetTestBase):
@@ -521,7 +522,14 @@ class TestStickerSetWithoutRequest(StickerSetTestBase):
         assert sticker_set.sticker_type == self.sticker_type
         assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}
 
-    def test_sticker_set_to_dict(self, sticker_set):
+    def test_sticker_set_to_dict(self):
+        sticker_set = StickerSet(
+            self.name,
+            self.title,
+            self.stickers,
+            self.sticker_type,
+            thumbnail=self.thumbnail,
+        )
         sticker_set_dict = sticker_set.to_dict()
 
         assert isinstance(sticker_set_dict, dict)
