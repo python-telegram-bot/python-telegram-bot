@@ -21,7 +21,7 @@
 import datetime as dtm
 import time
 from collections.abc import MutableMapping
-from copy import deepcopy
+from copy import copy
 from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
@@ -244,11 +244,12 @@ class CallbackDataCache:
                 if btn.callback_data:
                     # We create a new button instead of replacing callback_data in case the
                     # same object is used elsewhere
-                    btn_copy = deepcopy(btn)
+                    btn_copy = copy(btn)
                     with btn_copy._unfrozen():
                         btn_copy.callback_data = self.__put_button(
                             btn.callback_data, keyboard_data
                         )
+                        # Reset _id_attrs after changing the callback_data to update the reference
                         btn_copy._set_id_attrs()  # pylint: disable=protected-access
                     cols.append(btn_copy)
                 else:
