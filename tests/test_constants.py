@@ -198,6 +198,7 @@ class TestConstantsWithoutRequest:
             "reply_markup",
             "reply_to_message",
             "sender_chat",
+            "sender_tag",
             "is_accessible",
             "quote",
             "external_reply",
