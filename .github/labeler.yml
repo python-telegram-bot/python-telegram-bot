@@ -1,9 +1,0 @@
-# Config file for workflows/labelling.yml
-
-version: 1
-
-labels:
-- label: "⚙️ dependencies"
-  authors: ["dependabot[bot]", "pre-commit-ci[bot]"]
-- label: "🛠 code-quality"
-  authors: ["pre-commit-ci[bot]"]
