@@ -1,0 +1,5 @@
+internal = "Replace `pre-commit` with `prek`"
+[[pull_requests]]
+uid = "5142"
+author_uids = ["harshil21"]
+closes_threads = ["5138"]
