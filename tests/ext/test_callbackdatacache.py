@@ -113,7 +113,9 @@ class TestCallbackDataCache:
         assert cdc.persistence_data == persistent_data
 
     def test_process_keyboard(self, callback_data_cache):
-        changing_button_1 = InlineKeyboardButton("changing", callback_data="some data 1")
+        changing_button_1 = InlineKeyboardButton(
+            "changing", callback_data="some data 1", api_kwargs={"foo": "bar"}
+        )
         changing_button_2 = InlineKeyboardButton("changing", callback_data="some data 2")
         non_changing_button = InlineKeyboardButton("non-changing", url="https://ptb.org")
         reply_markup = InlineKeyboardMarkup.from_row(
@@ -124,6 +126,10 @@ class TestCallbackDataCache:
         assert out.inline_keyboard[0][0] is non_changing_button
         assert out.inline_keyboard[0][1] != changing_button_1
         assert out.inline_keyboard[0][2] != changing_button_2
+        # Assert that other attributes are preserved:
+        assert out.inline_keyboard[0][1].text == changing_button_1.text
+        assert out.inline_keyboard[0][1].api_kwargs == changing_button_1.api_kwargs
+        assert out.inline_keyboard[0][2].url == changing_button_2.url
 
         keyboard_1, button_1 = callback_data_cache.extract_uuids(
             out.inline_keyboard[0][1].callback_data
