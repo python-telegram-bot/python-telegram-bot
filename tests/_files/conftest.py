@@ -51,20 +51,6 @@ def animated_sticker_file():
         yield f
 
 
-@pytest.fixture
-async def animated_sticker_set(bot):
-    ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
-    if len(ss.stickers) > 100:
-        try:
-            for i in range(1, 50):
-                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest as e:
-            if e.message == "Stickerset_not_modified":
-                return ss
-            raise Exception("stickerset is growing too large.") from None
-    return ss
-
-
 @pytest.fixture(scope="session")
 async def audio(bot, chat_id):
     with data_file("telegram.mp3").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
@@ -174,17 +160,3 @@ def video_sticker_file():
 def video_sticker(bot, chat_id):
     with data_file("telegram_video_sticker.webm").open("rb") as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
-
-
-@pytest.fixture
-async def video_sticker_set(bot):
-    ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
-    if len(ss.stickers) > 100:
-        try:
-            for i in range(1, 50):
-                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest as e:
-            if e.message == "Stickerset_not_modified":
-                return ss
-            raise Exception("stickerset is growing too large.") from None
-    return ss
