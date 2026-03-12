@@ -241,16 +241,13 @@ class CallbackDataCache:
         for column in reply_markup.inline_keyboard:
             cols = []
             for btn in column:
-                if btn.callback_data:
+                if btn.callback_data is not None:
                     # We create a new button instead of replacing callback_data in case the
                     # same object is used elsewhere
                     btn_copy = copy(btn)
-                    with btn_copy._unfrozen():
-                        btn_copy.callback_data = self.__put_button(
-                            btn.callback_data, keyboard_data
-                        )
-                        # Reset _id_attrs after changing the callback_data to update the reference
-                        btn_copy._set_id_attrs()  # pylint: disable=protected-access
+                    btn_copy.update_callback_data(
+                        self.__put_button(btn.callback_data, keyboard_data)
+                    )
                     cols.append(btn_copy)
                 else:
                     cols.append(btn)
