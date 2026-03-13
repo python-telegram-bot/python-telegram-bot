@@ -141,7 +141,7 @@ class ChatPermissions(TelegramObject):
             notes.
 
             .. versionadded:: 20.1
-        can_edit_tag (:obj:`bool`): Optionsl. :obj:`True`, if the user is allowed to edit their own
+        can_edit_tag (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to edit their own
             tag.
 
             .. versionadded:: NEXT.VERSION
