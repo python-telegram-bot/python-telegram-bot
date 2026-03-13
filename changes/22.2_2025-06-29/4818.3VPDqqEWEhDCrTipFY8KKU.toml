@@ -1,0 +1,12 @@
+bugfixes = """
+Correctly parse parameter ``allow_sending_without_reply`` in ``Message.reply_*`` when used in combination with ``do_quote=True``.
+
+.. hint::
+
+   Using ``dict`` valued input for ``do_quote`` along with passing ``allow_sending_without_reply`` is not supported and will raise an error.
+"""
+
+[[pull_requests]]
+uid = "4818"
+author_uid = "Bibo-Joshi"
+closes_threads = ["4807"]

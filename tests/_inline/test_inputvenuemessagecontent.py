@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,18 +25,18 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def input_venue_message_content():
     return InputVenueMessageContent(
-        TestInputVenueMessageContentBase.latitude,
-        TestInputVenueMessageContentBase.longitude,
-        TestInputVenueMessageContentBase.title,
-        TestInputVenueMessageContentBase.address,
-        foursquare_id=TestInputVenueMessageContentBase.foursquare_id,
-        foursquare_type=TestInputVenueMessageContentBase.foursquare_type,
-        google_place_id=TestInputVenueMessageContentBase.google_place_id,
-        google_place_type=TestInputVenueMessageContentBase.google_place_type,
+        InputVenueMessageContentTestBase.latitude,
+        InputVenueMessageContentTestBase.longitude,
+        InputVenueMessageContentTestBase.title,
+        InputVenueMessageContentTestBase.address,
+        foursquare_id=InputVenueMessageContentTestBase.foursquare_id,
+        foursquare_type=InputVenueMessageContentTestBase.foursquare_type,
+        google_place_id=InputVenueMessageContentTestBase.google_place_id,
+        google_place_type=InputVenueMessageContentTestBase.google_place_type,
     )
 
 
-class TestInputVenueMessageContentBase:
+class InputVenueMessageContentTestBase:
     latitude = 1.0
     longitude = 2.0
     title = "title"
@@ -47,7 +47,7 @@ class TestInputVenueMessageContentBase:
     google_place_type = "google place type"
 
 
-class TestInputVenueMessageContentWithoutRequest(TestInputVenueMessageContentBase):
+class TestInputVenueMessageContentWithoutRequest(InputVenueMessageContentTestBase):
     def test_slot_behaviour(self, input_venue_message_content):
         inst = input_venue_message_content
         for attr in inst.__slots__:

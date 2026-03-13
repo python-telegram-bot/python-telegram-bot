@@ -1,0 +1,5 @@
+internal = "Bump ``pytest-xdist`` from 3.6.1 to 3.8.0"
+[[pull_requests]]
+uid = "4893"
+author_uid = "dependabot"
+closes_threads = []

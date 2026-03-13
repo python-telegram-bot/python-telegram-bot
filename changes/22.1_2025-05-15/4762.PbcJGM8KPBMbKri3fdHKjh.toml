@@ -1,0 +1,5 @@
+documentation = "Clarify Documentation and Type Hints of ``InputMedia`` and ``InputPaidMedia``. Note that the ``media`` parameter accepts only objects of type ``str`` and ``InputFile``. The respective subclasses of ``Input(Paid)Media`` each accept a broader range of input type for the ``media`` parameter."
+[[pull_requests]]
+uid = "4762"
+author_uid = "Bibo-Joshi"
+closes_threads = []

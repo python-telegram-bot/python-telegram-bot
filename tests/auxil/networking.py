@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2023
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -16,15 +16,16 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-from typing import Optional
+from pathlib import Path
 
 import pytest
-from httpx import AsyncClient, Response
+from httpx import AsyncClient, AsyncHTTPTransport, Response
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.strings import TextEncoding
 from telegram._utils.types import ODVInput
 from telegram.error import BadRequest, RetryAfter, TimedOut
-from telegram.request import HTTPXRequest, RequestData
+from telegram.request import BaseRequest, HTTPXRequest, RequestData
 
 
 class NonchalantHttpxRequest(HTTPXRequest):
@@ -36,7 +37,7 @@ class NonchalantHttpxRequest(HTTPXRequest):
         self,
         method: str,
         url: str,
-        request_data: Optional[RequestData] = None,
+        request_data: RequestData | None = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -56,6 +57,37 @@ class NonchalantHttpxRequest(HTTPXRequest):
             pytest.xfail(f"Not waiting for flood control: {e}")
         except TimedOut as e:
             pytest.xfail(f"Ignoring TimedOut error: {e}")
+
+
+class OfflineRequest(BaseRequest):
+    """This Request class disallows making requests to Telegram's servers.
+    Use this in tests that should not depend on the network.
+    """
+
+    async def initialize(self) -> None:
+        pass
+
+    async def shutdown(self) -> None:
+        pass
+
+    @property
+    def read_timeout(self):
+        return 1
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    async def do_request(
+        self,
+        url: str,
+        method: str,
+        request_data: RequestData | None = None,
+        read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+        write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+    ) -> tuple[int, bytes]:
+        pytest.fail("OfflineRequest: Network access disallowed in this test")
 
 
 async def expect_bad_request(func, message, reason):
@@ -84,12 +116,13 @@ async def expect_bad_request(func, message, reason):
 async def send_webhook_message(
     ip: str,
     port: int,
-    payload_str: Optional[str],
+    payload_str: str | None,
     url_path: str = "",
     content_len: int = -1,
     content_type: str = "application/json",
-    get_method: Optional[str] = None,
-    secret_token: Optional[str] = None,
+    get_method: str | None = None,
+    secret_token: str | None = None,
+    unix: Path | None = None,
 ) -> Response:
     headers = {
         "content-type": content_type,
@@ -101,7 +134,7 @@ async def send_webhook_message(
         content_len = None
         payload = None
     else:
-        payload = bytes(payload_str, encoding="utf-8")
+        payload = bytes(payload_str, encoding=TextEncoding.UTF_8)
 
     if content_len == -1:
         content_len = len(payload)
@@ -111,7 +144,9 @@ async def send_webhook_message(
 
     url = f"http://{ip}:{port}/{url_path}"
 
-    async with AsyncClient() as client:
+    transport = AsyncHTTPTransport(uds=unix) if unix else None
+
+    async with AsyncClient(transport=transport) as client:
         return await client.request(
             url=url, method=get_method or "POST", data=payload, headers=headers
         )

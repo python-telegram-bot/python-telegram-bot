@@ -1,0 +1,4 @@
+internal = "Temporarily disable ``actions/stale`` due to a bug with ``only-issue-types``."
+[[pull_requests]]
+uid = "5008"
+author_uids = ["Bibo-Joshi"]

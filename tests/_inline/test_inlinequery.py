@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -31,17 +31,17 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query(bot):
     ilq = InlineQuery(
-        TestInlineQueryBase.id_,
-        TestInlineQueryBase.from_user,
-        TestInlineQueryBase.query,
-        TestInlineQueryBase.offset,
-        location=TestInlineQueryBase.location,
+        InlineQueryTestBase.id_,
+        InlineQueryTestBase.from_user,
+        InlineQueryTestBase.query,
+        InlineQueryTestBase.offset,
+        location=InlineQueryTestBase.location,
     )
     ilq.set_bot(bot)
     return ilq
 
 
-class TestInlineQueryBase:
+class InlineQueryTestBase:
     id_ = 1234
     from_user = User(1, "First name", False)
     query = "query text"
@@ -49,13 +49,13 @@ class TestInlineQueryBase:
     location = Location(8.8, 53.1)
 
 
-class TestInlineQueryWithoutRequest(TestInlineQueryBase):
+class TestInlineQueryWithoutRequest(InlineQueryTestBase):
     def test_slot_behaviour(self, inline_query):
         for attr in inline_query.__slots__:
             assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inline_query)) == len(set(mro_slots(inline_query))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "from": self.from_user.to_dict(),
@@ -63,7 +63,7 @@ class TestInlineQueryWithoutRequest(TestInlineQueryBase):
             "offset": self.offset,
             "location": self.location.to_dict(),
         }
-        inline_query_json = InlineQuery.de_json(json_dict, bot)
+        inline_query_json = InlineQuery.de_json(json_dict, offline_bot)
         assert inline_query_json.api_kwargs == {}
 
         assert inline_query_json.id == self.id_

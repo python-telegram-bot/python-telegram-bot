@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,28 +17,28 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import os
 from pathlib import Path
 
 import pytest
 
-from telegram import Bot, InputFile, PhotoSize, VideoNote, Voice
+from telegram import Bot, InputFile, PhotoSize, ReplyParameters, VideoNote, Voice
+from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import (
-    check_thumb_deprecation_warning_for_method_args,
-    check_thumb_deprecation_warnings_for_args_and_attrs,
-)
+from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def video_note_file():
     with data_file("telegram2.mp4").open("rb") as f:
         yield f
@@ -50,9 +50,9 @@ async def video_note(bot, chat_id):
         return (await bot.send_video_note(chat_id, video_note=f, read_timeout=50)).video_note
 
 
-class TestVideoNoteBase:
+class VideoNoteTestBase:
     length = 240
-    duration = 3
+    duration = dtm.timedelta(seconds=3)
     file_size = 132084
     thumb_width = 240
     thumb_height = 240
@@ -62,7 +62,7 @@ class TestVideoNoteBase:
     videonote_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVideoNoteWithoutRequest(TestVideoNoteBase):
+class TestVideoNoteWithoutRequest(VideoNoteTestBase):
     def test_slot_behaviour(self, video_note):
         for attr in video_note.__slots__:
             assert getattr(video_note, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -82,33 +82,21 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert video_note.thumbnail.file_id
         assert video_note.thumbnail.file_unique_id
 
-    def test_expected_values(self, video_note):
-        assert video_note.length == self.length
-        assert video_note.duration == self.duration
-        assert video_note.file_size == self.file_size
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        video_note = VideoNote(
-            file_id="id", file_unique_id="unique_id", length=1, duration=1, thumb=object()
-        )
-        assert video_note.thumb is video_note.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
-
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.videonote_file_id,
             "file_unique_id": self.videonote_file_unique_id,
             "length": self.length,
-            "duration": self.duration,
+            "duration": int(self.duration.total_seconds()),
             "file_size": self.file_size,
         }
-        json_video_note = VideoNote.de_json(json_dict, bot)
+        json_video_note = VideoNote.de_json(json_dict, offline_bot)
         assert json_video_note.api_kwargs == {}
 
         assert json_video_note.file_id == self.videonote_file_id
         assert json_video_note.file_unique_id == self.videonote_file_unique_id
         assert json_video_note.length == self.length
-        assert json_video_note.duration == self.duration
+        assert json_video_note._duration == self.duration
         assert json_video_note.file_size == self.file_size
 
     def test_to_dict(self, video_note):
@@ -118,8 +106,27 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert video_note_dict["file_id"] == video_note.file_id
         assert video_note_dict["file_unique_id"] == video_note.file_unique_id
         assert video_note_dict["length"] == video_note.length
-        assert video_note_dict["duration"] == video_note.duration
+        assert video_note_dict["duration"] == int(self.duration.total_seconds())
+        assert isinstance(video_note_dict["duration"], int)
         assert video_note_dict["file_size"] == video_note.file_size
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, video_note):
+        if PTB_TIMEDELTA:
+            assert video_note.duration == self.duration
+            assert isinstance(video_note.duration, dtm.timedelta)
+        else:
+            assert video_note.duration == int(self.duration.total_seconds())
+            assert isinstance(video_note.duration, int)
+
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, video_note):
+        video_note.duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self, video_note):
         a = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)
@@ -141,45 +148,36 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_error_without_required_args(self, bot, chat_id):
+    async def test_error_without_required_args(self, offline_bot, chat_id):
         with pytest.raises(TypeError):
-            await bot.send_video_note(chat_id=chat_id)
+            await offline_bot.send_video_note(chat_id=chat_id)
 
-    async def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
+    async def test_send_with_video_note(self, monkeypatch, offline_bot, chat_id, video_note):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["video_note"] == video_note.file_id
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_video_note(chat_id, video_note=video_note)
-
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_send_video_note_thumb_deprecation_warning(
-        self, recwarn, monkeypatch, bot_class, bot, raw_bot, chat_id, video_note
-    ):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return True
-
-        bot = raw_bot if bot_class == "Bot" else bot
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        await bot.send_video_note(chat_id, video_note, thumb="thumb")
-        check_thumb_deprecation_warning_for_method_args(recwarn, __file__)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_video_note(chat_id, video_note=video_note)
 
     async def test_send_video_note_custom_filename(
-        self, bot, chat_id, video_note_file, monkeypatch
+        self, offline_bot, chat_id, video_note_file, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+            return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        assert await bot.send_video_note(chat_id, video_note_file, filename="custom_filename")
+        assert await offline_bot.send_video_note(
+            chat_id, video_note_file, filename="custom_filename"
+        )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_video_note_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_send_video_note_local_files(
+        self, monkeypatch, offline_bot, chat_id, local_mode, dummy_message_dict
+    ):
         try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
+            offline_bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local Bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
             expected = file.as_uri()
@@ -194,21 +192,13 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
                     test_flag = isinstance(data.get("video_note"), InputFile) and isinstance(
                         data.get("thumbnail"), InputFile
                     )
+                return dummy_message_dict
 
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_video_note(chat_id, file, thumbnail=file)
+            monkeypatch.setattr(offline_bot, "_post", make_assertion)
+            await offline_bot.send_video_note(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
-            bot._local_mode = False
-
-    async def test_send_videonote_local_files_throws_exception_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.send_video_note(chat_id, file, thumbnail=file, thumb=different_file)
+            offline_bot._local_mode = False
 
     async def test_get_file_instance_method(self, monkeypatch, video_note):
         async def make_assertion(*_, **kwargs):
@@ -221,13 +211,43 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         monkeypatch.setattr(video_note.get_bot(), "get_file", make_assertion)
         assert await video_note.get_file()
 
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_video_note_default_quote_parse_mode(
+        self, default_bot, chat_id, video_note, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
 
-class TestVideoNoteWithRequest(TestVideoNoteBase):
-    async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_video_note(
+            chat_id, video_note, reply_parameters=ReplyParameters(**kwargs)
+        )
+
+
+class TestVideoNoteWithRequest(VideoNoteTestBase):
+    @pytest.mark.parametrize("duration", [3, dtm.timedelta(seconds=3)])
+    async def test_send_all_args(
+        self, bot, chat_id, video_note_file, video_note, thumb_file, duration
+    ):
         message = await bot.send_video_note(
             chat_id,
             video_note_file,
-            duration=self.duration,
+            duration=duration,
             length=self.length,
             disable_notification=False,
             protect_content=True,
@@ -248,20 +268,16 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert message.video_note.thumbnail.height == self.thumb_height
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, video_note, chat_id):
-        path = Path("telegram2.mp4")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, video_note, tmp_file):
         new_file = await bot.get_file(video_note.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_unique_id == video_note.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram2.mp4")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_resend(self, bot, chat_id, video_note):
         message = await bot.send_video_note(chat_id, video_note.file_id)
@@ -295,7 +311,7 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_video_note(
                     chat_id, video_note, reply_to_message_id=reply_to_message.message_id
                 )

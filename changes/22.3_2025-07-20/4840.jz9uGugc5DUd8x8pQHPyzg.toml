@@ -1,0 +1,5 @@
+internal = "Bump stefanzweifel/git-auto-commit-action from 5.2.0 to 6.0.1"
+[[pull_requests]]
+uid = "4840"
+author_uid = "dependabot"
+closes_threads = []

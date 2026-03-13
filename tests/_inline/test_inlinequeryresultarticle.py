@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,45 +22,44 @@ import pytest
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    InlineQueryResult,
     InlineQueryResultArticle,
     InlineQueryResultAudio,
     InputTextMessageContent,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
+from telegram.constants import InlineQueryResultType
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
 def inline_query_result_article():
     return InlineQueryResultArticle(
-        TestInlineQueryResultArticleBase.id_,
-        TestInlineQueryResultArticleBase.title,
-        input_message_content=TestInlineQueryResultArticleBase.input_message_content,
-        reply_markup=TestInlineQueryResultArticleBase.reply_markup,
-        url=TestInlineQueryResultArticleBase.url,
-        hide_url=TestInlineQueryResultArticleBase.hide_url,
-        description=TestInlineQueryResultArticleBase.description,
-        thumbnail_url=TestInlineQueryResultArticleBase.thumbnail_url,
-        thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
-        thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
+        InlineQueryResultArticleTestBase.id_,
+        InlineQueryResultArticleTestBase.title,
+        input_message_content=InlineQueryResultArticleTestBase.input_message_content,
+        reply_markup=InlineQueryResultArticleTestBase.reply_markup,
+        url=InlineQueryResultArticleTestBase.url,
+        description=InlineQueryResultArticleTestBase.description,
+        thumbnail_url=InlineQueryResultArticleTestBase.thumbnail_url,
+        thumbnail_height=InlineQueryResultArticleTestBase.thumbnail_height,
+        thumbnail_width=InlineQueryResultArticleTestBase.thumbnail_width,
     )
 
 
-class TestInlineQueryResultArticleBase:
+class InlineQueryResultArticleTestBase:
     id_ = "id"
     type_ = "article"
     title = "title"
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
     url = "url"
-    hide_url = True
     description = "description"
     thumbnail_url = "thumb url"
     thumbnail_height = 10
     thumbnail_width = 15
 
 
-class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBase):
+class TestInlineQueryResultArticleWithoutRequest(InlineQueryResultArticleTestBase):
     def test_slot_behaviour(self, inline_query_result_article):
         inst = inline_query_result_article
         for attr in inst.__slots__:
@@ -77,125 +76,10 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
         )
         assert inline_query_result_article.reply_markup.to_dict() == self.reply_markup.to_dict()
         assert inline_query_result_article.url == self.url
-        assert inline_query_result_article.hide_url == self.hide_url
         assert inline_query_result_article.description == self.description
         assert inline_query_result_article.thumbnail_url == self.thumbnail_url
         assert inline_query_result_article.thumbnail_height == self.thumbnail_height
         assert inline_query_result_article.thumbnail_width == self.thumbnail_width
-
-    def test_thumb_url_property_deprecation_warning(self, recwarn):
-        inline_query_result_article = InlineQueryResultArticle(
-            TestInlineQueryResultArticleBase.id_,
-            TestInlineQueryResultArticleBase.title,
-            input_message_content=TestInlineQueryResultArticleBase.input_message_content,
-            reply_markup=TestInlineQueryResultArticleBase.reply_markup,
-            url=TestInlineQueryResultArticleBase.url,
-            hide_url=TestInlineQueryResultArticleBase.hide_url,
-            description=TestInlineQueryResultArticleBase.description,
-            thumb_url=TestInlineQueryResultArticleBase.thumbnail_url,  # deprecated arg
-            thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
-            thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
-        )
-        assert inline_query_result_article.thumb_url == inline_query_result_article.thumbnail_url
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
-        )
-
-    def test_thumb_height_property_deprecation_warning(self, recwarn):
-        inline_query_result_article = InlineQueryResultArticle(
-            TestInlineQueryResultArticleBase.id_,
-            TestInlineQueryResultArticleBase.title,
-            input_message_content=TestInlineQueryResultArticleBase.input_message_content,
-            reply_markup=TestInlineQueryResultArticleBase.reply_markup,
-            url=TestInlineQueryResultArticleBase.url,
-            hide_url=TestInlineQueryResultArticleBase.hide_url,
-            description=TestInlineQueryResultArticleBase.description,
-            thumbnail_url=TestInlineQueryResultArticleBase.thumbnail_url,
-            thumb_height=TestInlineQueryResultArticleBase.thumbnail_height,  # deprecated arg
-            thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
-        )
-        assert (
-            inline_query_result_article.thumb_height
-            == inline_query_result_article.thumbnail_height
-        )
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
-        )
-
-    def test_thumb_width_property_deprecation_warning(self, recwarn):
-        inline_query_result_article = InlineQueryResultArticle(
-            TestInlineQueryResultArticleBase.id_,
-            TestInlineQueryResultArticleBase.title,
-            input_message_content=TestInlineQueryResultArticleBase.input_message_content,
-            reply_markup=TestInlineQueryResultArticleBase.reply_markup,
-            url=TestInlineQueryResultArticleBase.url,
-            hide_url=TestInlineQueryResultArticleBase.hide_url,
-            description=TestInlineQueryResultArticleBase.description,
-            thumbnail_url=TestInlineQueryResultArticleBase.thumbnail_url,
-            thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
-            thumb_width=TestInlineQueryResultArticleBase.thumbnail_width,  # deprecated arg
-        )
-        assert (
-            inline_query_result_article.thumb_width == inline_query_result_article.thumbnail_width
-        )
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
-        )
-
-    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
-        with pytest.raises(
-            ValueError,
-            match="different entities as 'thumb_url' and 'thumbnail_url'",
-        ):
-            InlineQueryResultArticle(
-                TestInlineQueryResultArticleBase.id_,
-                TestInlineQueryResultArticleBase.title,
-                input_message_content=TestInlineQueryResultArticleBase.input_message_content,
-                reply_markup=TestInlineQueryResultArticleBase.reply_markup,
-                url=TestInlineQueryResultArticleBase.url,
-                hide_url=TestInlineQueryResultArticleBase.hide_url,
-                description=TestInlineQueryResultArticleBase.description,
-                thumbnail_url=TestInlineQueryResultArticleBase.thumbnail_url,
-                thumb_url="some other url",
-                thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
-                thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
-            )
-
-    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_height(self):
-        with pytest.raises(
-            ValueError,
-            match="different entities as 'thumb_height' and 'thumbnail_height'",
-        ):
-            InlineQueryResultArticle(
-                TestInlineQueryResultArticleBase.id_,
-                TestInlineQueryResultArticleBase.title,
-                input_message_content=TestInlineQueryResultArticleBase.input_message_content,
-                reply_markup=TestInlineQueryResultArticleBase.reply_markup,
-                url=TestInlineQueryResultArticleBase.url,
-                hide_url=TestInlineQueryResultArticleBase.hide_url,
-                description=TestInlineQueryResultArticleBase.description,
-                thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
-                thumb_height=TestInlineQueryResultArticleBase.thumbnail_height + 1,
-                thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
-            )
-
-    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_width(self):
-        with pytest.raises(
-            ValueError,
-            match="different entities as 'thumb_width' and 'thumbnail_width'",
-        ):
-            InlineQueryResultArticle(
-                TestInlineQueryResultArticleBase.id_,
-                TestInlineQueryResultArticleBase.title,
-                input_message_content=TestInlineQueryResultArticleBase.input_message_content,
-                reply_markup=TestInlineQueryResultArticleBase.reply_markup,
-                url=TestInlineQueryResultArticleBase.url,
-                hide_url=TestInlineQueryResultArticleBase.hide_url,
-                description=TestInlineQueryResultArticleBase.description,
-                thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
-                thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
-                thumb_width=TestInlineQueryResultArticleBase.thumbnail_width + 1,
-            )
 
     def test_to_dict(self, inline_query_result_article):
         inline_query_result_article_dict = inline_query_result_article.to_dict()
@@ -213,7 +97,6 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
             == inline_query_result_article.reply_markup.to_dict()
         )
         assert inline_query_result_article_dict["url"] == inline_query_result_article.url
-        assert inline_query_result_article_dict["hide_url"] == inline_query_result_article.hide_url
         assert (
             inline_query_result_article_dict["description"]
             == inline_query_result_article.description
@@ -229,6 +112,26 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
         assert (
             inline_query_result_article_dict["thumbnail_width"]
             == inline_query_result_article.thumbnail_width
+        )
+
+    def test_type_enum_conversion(self):
+        # Since we have a lot of different test files for all the result types, we test this
+        # conversion only here. It is independent of the specific class
+        assert (
+            type(
+                InlineQueryResult(
+                    id="id",
+                    type="article",
+                ).type
+            )
+            is InlineQueryResultType
+        )
+        assert (
+            InlineQueryResult(
+                id="id",
+                type="unknown",
+            ).type
+            == "unknown"
         )
 
     def test_equality(self):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,30 +26,32 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def input_invoice_message_content():
     return InputInvoiceMessageContent(
-        title=TestInputInvoiceMessageContentBase.title,
-        description=TestInputInvoiceMessageContentBase.description,
-        payload=TestInputInvoiceMessageContentBase.payload,
-        provider_token=TestInputInvoiceMessageContentBase.provider_token,
-        currency=TestInputInvoiceMessageContentBase.currency,
-        prices=TestInputInvoiceMessageContentBase.prices,
-        max_tip_amount=TestInputInvoiceMessageContentBase.max_tip_amount,
-        suggested_tip_amounts=TestInputInvoiceMessageContentBase.suggested_tip_amounts,
-        provider_data=TestInputInvoiceMessageContentBase.provider_data,
-        photo_url=TestInputInvoiceMessageContentBase.photo_url,
-        photo_size=TestInputInvoiceMessageContentBase.photo_size,
-        photo_width=TestInputInvoiceMessageContentBase.photo_width,
-        photo_height=TestInputInvoiceMessageContentBase.photo_height,
-        need_name=TestInputInvoiceMessageContentBase.need_name,
-        need_phone_number=TestInputInvoiceMessageContentBase.need_phone_number,
-        need_email=TestInputInvoiceMessageContentBase.need_email,
-        need_shipping_address=TestInputInvoiceMessageContentBase.need_shipping_address,
-        send_phone_number_to_provider=TestInputInvoiceMessageContentBase.send_phone_number_to_provider,  # noqa: E501
-        send_email_to_provider=TestInputInvoiceMessageContentBase.send_email_to_provider,
-        is_flexible=TestInputInvoiceMessageContentBase.is_flexible,
+        title=InputInvoiceMessageContentTestBase.title,
+        description=InputInvoiceMessageContentTestBase.description,
+        payload=InputInvoiceMessageContentTestBase.payload,
+        provider_token=InputInvoiceMessageContentTestBase.provider_token,
+        currency=InputInvoiceMessageContentTestBase.currency,
+        prices=InputInvoiceMessageContentTestBase.prices,
+        max_tip_amount=InputInvoiceMessageContentTestBase.max_tip_amount,
+        suggested_tip_amounts=InputInvoiceMessageContentTestBase.suggested_tip_amounts,
+        provider_data=InputInvoiceMessageContentTestBase.provider_data,
+        photo_url=InputInvoiceMessageContentTestBase.photo_url,
+        photo_size=InputInvoiceMessageContentTestBase.photo_size,
+        photo_width=InputInvoiceMessageContentTestBase.photo_width,
+        photo_height=InputInvoiceMessageContentTestBase.photo_height,
+        need_name=InputInvoiceMessageContentTestBase.need_name,
+        need_phone_number=InputInvoiceMessageContentTestBase.need_phone_number,
+        need_email=InputInvoiceMessageContentTestBase.need_email,
+        need_shipping_address=InputInvoiceMessageContentTestBase.need_shipping_address,
+        send_phone_number_to_provider=(
+            InputInvoiceMessageContentTestBase.send_phone_number_to_provider
+        ),
+        send_email_to_provider=InputInvoiceMessageContentTestBase.send_email_to_provider,
+        is_flexible=InputInvoiceMessageContentTestBase.is_flexible,
     )
 
 
-class TestInputInvoiceMessageContentBase:
+class InputInvoiceMessageContentTestBase:
     title = "invoice title"
     description = "invoice description"
     payload = "invoice payload"
@@ -72,7 +74,7 @@ class TestInputInvoiceMessageContentBase:
     is_flexible = True
 
 
-class TestInputInvoiceMessageContentWithoutRequest(TestInputInvoiceMessageContentBase):
+class TestInputInvoiceMessageContentWithoutRequest(InputInvoiceMessageContentTestBase):
     def test_slot_behaviour(self, input_invoice_message_content):
         inst = input_invoice_message_content
         for attr in inst.__slots__:
@@ -201,9 +203,7 @@ class TestInputInvoiceMessageContentWithoutRequest(TestInputInvoiceMessageConten
             == input_invoice_message_content.is_flexible
         )
 
-    def test_de_json(self, bot):
-        assert InputInvoiceMessageContent.de_json({}, bot=bot) is None
-
+    def test_de_json(self, offline_bot):
         json_dict = {
             "title": self.title,
             "description": self.description,
@@ -227,7 +227,9 @@ class TestInputInvoiceMessageContentWithoutRequest(TestInputInvoiceMessageConten
             "is_flexible": self.is_flexible,
         }
 
-        input_invoice_message_content = InputInvoiceMessageContent.de_json(json_dict, bot=bot)
+        input_invoice_message_content = InputInvoiceMessageContent.de_json(
+            json_dict, bot=offline_bot
+        )
         assert input_invoice_message_content.api_kwargs == {}
 
         assert input_invoice_message_content.title == self.title
@@ -279,10 +281,10 @@ class TestInputInvoiceMessageContentWithoutRequest(TestInputInvoiceMessageConten
             self.title,
             self.description,
             self.payload,
-            self.provider_token,
             self.currency,
             # the first prices amount & the second lebal changed
             [LabeledPrice("label1", 24), LabeledPrice("label22", 314)],
+            self.provider_token,
         )
         d = InputInvoiceMessageContent(
             self.title,

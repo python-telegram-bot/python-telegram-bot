@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,15 +24,15 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def labeled_price():
-    return LabeledPrice(TestLabeledPriceBase.label, TestLabeledPriceBase.amount)
+    return LabeledPrice(LabeledPriceTestBase.label, LabeledPriceTestBase.amount)
 
 
-class TestLabeledPriceBase:
+class LabeledPriceTestBase:
     label = "label"
     amount = 100
 
 
-class TestLabeledPriceWithoutRequest(TestLabeledPriceBase):
+class TestLabeledPriceWithoutRequest(LabeledPriceTestBase):
     def test_slot_behaviour(self, labeled_price):
         inst = labeled_price
         for attr in inst.__slots__:

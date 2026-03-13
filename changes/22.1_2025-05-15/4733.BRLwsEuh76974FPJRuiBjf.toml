@@ -1,0 +1,5 @@
+bugfixes = "Ensure execution of ``Bot.shutdown()`` even if ``Bot.get_me()`` fails in ``Bot.initialize()``"
+[[pull_requests]]
+uid = "4733"
+author_uid = "Poolitzer"
+closes_threads = []

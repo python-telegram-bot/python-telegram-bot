@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,22 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
-from typing import Sequence
+import datetime as dtm
+from collections.abc import Sequence
 
 import pytest
 
-from telegram import InputFile, InputMediaPhoto, InputMediaVideo, InputSticker, MessageEntity
+from telegram import (
+    InputFile,
+    InputMediaPhoto,
+    InputMediaVideo,
+    InputProfilePhotoAnimated,
+    InputProfilePhotoStatic,
+    InputSticker,
+    InputStoryContentPhoto,
+    InputStoryContentVideo,
+    MessageEntity,
+)
 from telegram.constants import ChatType
 from telegram.request._requestparameter import RequestParameter
 from tests.auxil.files import data_file
@@ -82,14 +92,15 @@ class TestRequestParameterWithoutRequest:
             ({1: 1.0}, {1: 1.0}),
             (ChatType.PRIVATE, "private"),
             (MessageEntity("type", 1, 1), {"type": "type", "offset": 1, "length": 1}),
-            (datetime.datetime(2019, 11, 11, 0, 26, 16, 10**5), 1573431976),
+            (dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5), 1573431976),
+            (dtm.timedelta(days=42), 42 * 24 * 60 * 60),
             (
                 [
                     True,
                     "str",
                     MessageEntity("type", 1, 1),
                     ChatType.PRIVATE,
-                    datetime.datetime(2019, 11, 11, 0, 26, 16, 10**5),
+                    dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5),
                 ],
                 [True, "str", {"type": "type", "offset": 1, "length": 1}, "private", 1573431976],
             ),
@@ -99,6 +110,19 @@ class TestRequestParameterWithoutRequest:
         request_parameter = RequestParameter.from_input("key", value)
         assert request_parameter.value == expected_value
         assert request_parameter.input_files is None
+
+    @pytest.mark.parametrize(
+        ("value", "expected_type", "expected_value"),
+        [
+            (dtm.timedelta(seconds=1), int, 1),
+            (dtm.timedelta(milliseconds=1), float, 0.001),
+        ],
+    )
+    def test_from_input_timedelta(self, value, expected_type, expected_value):
+        request_parameter = RequestParameter.from_input("key", value)
+        assert request_parameter.value == expected_value
+        assert request_parameter.input_files is None
+        assert isinstance(request_parameter.value, expected_type)
 
     def test_from_input_inputfile(self):
         inputfile_1 = InputFile("data1", filename="inputfile_1", attach=True)
@@ -162,13 +186,79 @@ class TestRequestParameterWithoutRequest:
         assert request_parameter.value == {"type": "video"}
         assert request_parameter.input_files == [input_media.media, input_media.thumbnail]
 
+    def test_from_input_profile_photo_static(self):
+        input_profile_photo = InputProfilePhotoStatic(data_file("telegram.jpg").read_bytes())
+        expected = input_profile_photo.to_dict()
+        expected.update({"photo": input_profile_photo.photo.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_profile_photo)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_profile_photo.photo]
+
+    def test_from_input_profile_photo_animated(self):
+        input_profile_photo = InputProfilePhotoAnimated(
+            data_file("telegram2.mp4").read_bytes(),
+            main_frame_timestamp=dtm.timedelta(seconds=42, milliseconds=43),
+        )
+        expected = input_profile_photo.to_dict()
+        expected.update({"animation": input_profile_photo.animation.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_profile_photo)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_profile_photo.animation]
+
+    @pytest.mark.parametrize(
+        ("cls", "args"),
+        [
+            (InputProfilePhotoStatic, (data_file("telegram.jpg"),)),
+            (
+                InputProfilePhotoAnimated,
+                (data_file("telegram2.mp4"), dtm.timedelta(seconds=42, milliseconds=43)),
+            ),
+        ],
+    )
+    def test_from_input_profile_photo_local_files(self, cls, args):
+        input_profile_photo = cls(*args)
+        expected = input_profile_photo.to_dict()
+        requested = RequestParameter.from_input("key", input_profile_photo)
+        assert requested.value == expected
+        assert requested.input_files is None
+
     def test_from_input_inputsticker(self):
-        input_sticker = InputSticker(data_file("telegram.png").read_bytes(), ["emoji"])
+        input_sticker = InputSticker(data_file("telegram.png").read_bytes(), ["emoji"], "static")
         expected = input_sticker.to_dict()
         expected.update({"sticker": input_sticker.sticker.attach_uri})
         request_parameter = RequestParameter.from_input("key", input_sticker)
         assert request_parameter.value == expected
         assert request_parameter.input_files == [input_sticker.sticker]
+
+    def test_from_input_story_content_photo(self):
+        input_story_content_photo = InputStoryContentPhoto(data_file("telegram.jpg").read_bytes())
+        expected = input_story_content_photo.to_dict()
+        expected.update({"photo": input_story_content_photo.photo.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_story_content_photo)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_story_content_photo.photo]
+
+    def test_from_input_story_content_video(self):
+        input_story_content_video = InputStoryContentVideo(data_file("telegram2.mp4").read_bytes())
+        expected = input_story_content_video.to_dict()
+        expected.update({"video": input_story_content_video.video.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_story_content_video)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_story_content_video.video]
+
+    @pytest.mark.parametrize(
+        ("cls", "arg"),
+        [
+            (InputStoryContentPhoto, data_file("telegram.jpg")),
+            (InputStoryContentVideo, data_file("telegram2.mp4")),
+        ],
+    )
+    def test_from_input_story_content_local_files(self, cls, arg):
+        input_story_content = cls(arg)
+        expected = input_story_content.to_dict()
+        requested = RequestParameter.from_input("key", input_story_content)
+        assert requested.value == expected
+        assert requested.input_files is None
 
     def test_from_input_str_and_bytes(self):
         input_str = "test_input"

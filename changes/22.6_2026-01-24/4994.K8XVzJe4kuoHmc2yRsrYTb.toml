@@ -1,0 +1,5 @@
+internal = "Update github/codeql-action action to v3.30.8"
+[[pull_requests]]
+uid = "4994"
+author_uids = ["renovatebot"]
+closes_threads = []

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,8 @@ from pathlib import Path
 
 import pytest
 
-from telegram import Bot, InputFile, MessageEntity, PhotoSize, Sticker
+from telegram import Bot, InputFile, MessageEntity, PhotoSize, ReplyParameters, Sticker
+from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
@@ -31,49 +32,22 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
-def photo_file():
-    with data_file("telegram.jpg").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def photolist(bot, chat_id):
-    async def func():
-        with data_file("telegram.jpg").open("rb") as f:
-            return (await bot.send_photo(chat_id, photo=f, read_timeout=50)).photo
-
-    return await expect_bad_request(
-        func, "Type of file mismatch", "Telegram did not accept the file."
-    )
-
-
-@pytest.fixture(scope="module")
-def thumb(photolist):
-    return photolist[0]
-
-
-@pytest.fixture(scope="module")
-def photo(photolist):
-    return photolist[-1]
-
-
-class TestPhotoBase:
+class PhotoTestBase:
     width = 800
     height = 800
     caption = "<b>PhotoTest</b> - *Caption*"
     photo_file_url = "https://python-telegram-bot.org/static/testfiles/telegram_new.jpg"
     # For some reason the file size is not the same after switching to httpx
     # so we accept three different sizes here. Shouldn't be too much
-    file_size = [29176, 27662]
+    file_size = [29176, 27662, 27330]
 
 
-class TestPhotoWithoutRequest(TestPhotoBase):
+class TestPhotoWithoutRequest(PhotoTestBase):
     def test_slot_behaviour(self, photo):
         for attr in photo.__slots__:
             assert getattr(photo, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -99,9 +73,11 @@ class TestPhotoWithoutRequest(TestPhotoBase):
         assert photo.file_size in self.file_size
         assert thumb.width == 90
         assert thumb.height == 90
-        assert thumb.file_size == 1477
+        # File sizes don't seem to be consistent, so we use the values that we have observed
+        # so far
+        assert thumb.file_size in [1475, 1477]
 
-    def test_de_json(self, bot, photo):
+    def test_de_json(self, offline_bot, photo):
         json_dict = {
             "file_id": photo.file_id,
             "file_unique_id": photo.file_unique_id,
@@ -109,7 +85,7 @@ class TestPhotoWithoutRequest(TestPhotoBase):
             "height": self.height,
             "file_size": self.file_size,
         }
-        json_photo = PhotoSize.de_json(json_dict, bot)
+        json_photo = PhotoSize.de_json(json_dict, offline_bot)
         assert json_photo.api_kwargs == {}
 
         assert json_photo.file_id == photo.file_id
@@ -156,22 +132,24 @@ class TestPhotoWithoutRequest(TestPhotoBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_error_without_required_args(self, bot, chat_id):
+    async def test_error_without_required_args(self, offline_bot, chat_id):
         with pytest.raises(TypeError):
-            await bot.send_photo(chat_id=chat_id)
+            await offline_bot.send_photo(chat_id=chat_id)
 
-    async def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):
+    async def test_send_photo_custom_filename(self, offline_bot, chat_id, photo_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+            return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_photo(chat_id, photo_file, filename="custom_filename")
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_photo(chat_id, photo_file, filename="custom_filename")
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_photo_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_send_photo_local_files(
+        self, dummy_message_dict, monkeypatch, offline_bot, chat_id, local_mode
+    ):
         try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
+            offline_bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local Bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
             expected = file.as_uri()
@@ -182,19 +160,20 @@ class TestPhotoWithoutRequest(TestPhotoBase):
                     test_flag = data.get("photo") == expected
                 else:
                     test_flag = isinstance(data.get("photo"), InputFile)
+                return dummy_message_dict
 
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_photo(chat_id, file)
+            monkeypatch.setattr(offline_bot, "_post", make_assertion)
+            await offline_bot.send_photo(chat_id, file)
             assert test_flag
         finally:
-            bot._local_mode = False
+            offline_bot._local_mode = False
 
-    async def test_send_with_photosize(self, monkeypatch, bot, chat_id, photo):
+    async def test_send_with_photosize(self, monkeypatch, offline_bot, chat_id, photo):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["photo"] == photo.file_id
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_photo(photo=photo, chat_id=chat_id)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_photo(photo=photo, chat_id=chat_id)
 
     async def test_get_file_instance_method(self, monkeypatch, photo):
         async def make_assertion(*_, **kwargs):
@@ -207,8 +186,33 @@ class TestPhotoWithoutRequest(TestPhotoBase):
         monkeypatch.setattr(photo.get_bot(), "get_file", make_assertion)
         assert await photo.get_file()
 
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_photo_default_quote_parse_mode(
+        self, default_bot, chat_id, photo, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
 
-class TestPhotoWithRequest(TestPhotoBase):
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_photo(chat_id, photo, reply_parameters=ReplyParameters(**kwargs))
+
+
+class TestPhotoWithRequest(PhotoTestBase):
     async def test_send_photo_all_args(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
             chat_id,
@@ -218,6 +222,7 @@ class TestPhotoWithRequest(TestPhotoBase):
             protect_content=True,
             parse_mode="Markdown",
             has_spoiler=True,
+            show_caption_above_media=True,
         )
 
         assert isinstance(message.photo[-2], PhotoSize)
@@ -235,6 +240,7 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert message.caption == self.caption.replace("*", "")
         assert message.has_protected_content
         assert message.has_media_spoiler
+        assert message.show_caption_above_media
 
     async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
@@ -355,25 +361,21 @@ class TestPhotoWithRequest(TestPhotoBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_photo(
                     chat_id, photo_file, reply_to_message_id=reply_to_message.message_id
                 )
 
-    async def test_get_and_download(self, bot, photo):
-        path = Path("telegram.jpg")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, photo, tmp_file):
         new_file = await bot.getFile(photo.file_id)
 
         assert new_file.file_size == photo.file_size
         assert new_file.file_unique_id == photo.file_unique_id
         assert new_file.file_path.startswith("https://") is True
 
-        await new_file.download_to_drive("telegram.jpg")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_send_url_jpg_file(self, bot, chat_id):
         message = await bot.send_photo(chat_id, photo=self.photo_file_url)

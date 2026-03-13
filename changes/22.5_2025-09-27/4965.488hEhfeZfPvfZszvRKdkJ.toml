@@ -1,0 +1,5 @@
+internal = "Properly Pin Dependency to ``astral/setup-uv`` in Copilot Setup Steps"
+[[pull_requests]]
+uid = "4965"
+author_uids = ["Bibo-Joshi"]
+closes_threads = []

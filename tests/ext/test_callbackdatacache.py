@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
 import time
 from copy import deepcopy
-from datetime import datetime
 from uuid import uuid4
 
 import pytest
@@ -31,7 +31,7 @@ from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def callback_data_cache(bot):
     return CallbackDataCache(bot)
 
@@ -68,9 +68,9 @@ class TestKeyboardData:
         keyboard_data = _KeyboardData("uuid")
         for attr in keyboard_data.__slots__:
             assert getattr(keyboard_data, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(keyboard_data)) == len(
-            set(mro_slots(keyboard_data))
-        ), "duplicate slot"
+        assert len(mro_slots(keyboard_data)) == len(set(mro_slots(keyboard_data))), (
+            "duplicate slot"
+        )
 
 
 @pytest.mark.skipif(
@@ -86,9 +86,9 @@ class TestCallbackDataCache:
                 else attr
             )
             assert getattr(callback_data_cache, at, "err") != "err", f"got extra slot '{at}'"
-        assert len(mro_slots(callback_data_cache)) == len(
-            set(mro_slots(callback_data_cache))
-        ), "duplicate slot"
+        assert len(mro_slots(callback_data_cache)) == len(set(mro_slots(callback_data_cache))), (
+            "duplicate slot"
+        )
 
     @pytest.mark.parametrize("maxsize", [1, 5, 2048])
     def test_init_maxsize(self, maxsize, bot):
@@ -159,8 +159,8 @@ class TestCallbackDataCache:
         out2 = cdc.process_keyboard(reply_markup)
         assert len(cdc.persistence_data[0]) == 1
 
-        keyboard_1, button_1 = cdc.extract_uuids(out1.inline_keyboard[0][1].callback_data)
-        keyboard_2, button_2 = cdc.extract_uuids(out2.inline_keyboard[0][2].callback_data)
+        keyboard_1, _ = cdc.extract_uuids(out1.inline_keyboard[0][1].callback_data)
+        keyboard_2, _ = cdc.extract_uuids(out2.inline_keyboard[0][2].callback_data)
         assert cdc.persistence_data[0][0][0] != keyboard_1
         assert cdc.persistence_data[0][0][0] == keyboard_2
 
@@ -181,7 +181,9 @@ class TestCallbackDataCache:
             callback_data_cache.clear_callback_data()
 
         chat = Chat(1, "private")
-        effective_message = Message(message_id=1, date=datetime.now(), chat=chat, reply_markup=out)
+        effective_message = Message(
+            message_id=1, date=dtm.datetime.now(), chat=chat, reply_markup=out
+        )
         effective_message._unfreeze()
         effective_message.reply_to_message = deepcopy(effective_message)
         effective_message.pinned_message = deepcopy(effective_message)
@@ -202,9 +204,8 @@ class TestCallbackDataCache:
                 assert callback_query.data == "some data 1"
                 # make sure that we stored the mapping CallbackQuery.id -> keyboard_uuid correctly
                 assert len(callback_data_cache._keyboard_data) == 1
-                assert (
-                    callback_data_cache._callback_queries[cq_id]
-                    == list(callback_data_cache._keyboard_data.keys())[0]
+                assert callback_data_cache._callback_queries[cq_id] == next(
+                    iter(callback_data_cache._keyboard_data.keys())
                 )
             else:
                 assert callback_query.data is None
@@ -319,7 +320,7 @@ class TestCallbackDataCache:
             data=out.inline_keyboard[0][1].callback_data,
         )
 
-        with pytest.raises(KeyError, match="CallbackQuery was not found in cache."):
+        with pytest.raises(KeyError, match="CallbackQuery was not found in cache\\."):
             callback_data_cache.drop_data(callback_query)
 
         callback_data_cache.process_callback_query(callback_query)
@@ -375,9 +376,9 @@ class TestCallbackDataCache:
         if time_method == "time":
             cutoff = time.time()
         elif time_method == "datetime":
-            cutoff = datetime.now(UTC)
+            cutoff = dtm.datetime.now(UTC)
         else:
-            cutoff = datetime.now(tz_bot.defaults.tzinfo).replace(tzinfo=None)
+            cutoff = dtm.datetime.now(tz_bot.defaults.tzinfo).replace(tzinfo=None)
             callback_data_cache.bot = tz_bot
         time.sleep(0.1)
 
@@ -399,6 +400,6 @@ class TestCallbackDataCache:
         assert len(callback_data_cache.persistence_data[0]) == 50
         assert len(callback_data_cache.persistence_data[1]) == 100
         callback_data = [
-            list(data[2].values())[0] for data in callback_data_cache.persistence_data[0]
+            next(iter(data[2].values())) for data in callback_data_cache.persistence_data[0]
         ]
         assert callback_data == [str(i) for i in range(50, 100)]

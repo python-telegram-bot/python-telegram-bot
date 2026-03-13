@@ -1,0 +1,5 @@
+internal = "Bump sigstore/gh-action-sigstore-python from 3.0.0 to 3.0.1"
+[[pull_requests]]
+uid = "4843"
+author_uid = "dependabot"
+closes_threads = []

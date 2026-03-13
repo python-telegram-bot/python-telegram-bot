@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,14 +24,14 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def bot_name(bot):
-    return BotName(TestBotNameBase.name)
+    return BotName(BotNameTestBase.name)
 
 
-class TestBotNameBase:
+class BotNameTestBase:
     name = "This is a test name"
 
 
-class TestBotNameWithoutRequest(TestBotNameBase):
+class TestBotNameWithoutRequest(BotNameTestBase):
     def test_slot_behaviour(self, bot_name):
         for attr in bot_name.__slots__:
             assert getattr(bot_name, attr, "err") != "err", f"got extra slot '{attr}'"

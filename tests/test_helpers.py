@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -137,9 +137,8 @@ class TestHelpers:
         assert helpers.effective_message_type(empty_update) is None
 
     def test_effective_message_type_wrong_type(self):
-        entity = {}
         with pytest.raises(
-            TypeError, match=re.escape(f"neither Message nor Update (got: {type(entity)})")
+            TypeError, match=re.escape(f"neither Message nor Update (got: {type(entity := {})})")
         ):
             helpers.effective_message_type(entity)
 

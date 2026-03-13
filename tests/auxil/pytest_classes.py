@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2023
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -20,12 +20,13 @@
 modify behavior of the respective parent classes in order to make them easier to use in the
 pytest framework. A common change is to allow monkeypatching of the class members by not
 enforcing slots in the subclasses."""
-from telegram import Bot, User
-from telegram.ext import Application, ExtBot
+
+from telegram import Bot, Message, User
+from telegram.ext import Application, ExtBot, Updater
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
-from tests.auxil.networking import NonchalantHttpxRequest
+from tests.auxil.networking import NonchalantHttpxRequest, OfflineRequest
 
 
 def _get_bot_user(token: str) -> User:
@@ -35,7 +36,7 @@ def _get_bot_user(token: str) -> User:
     # generate the correct user_id from the token (token from bot_info is random each test run).
     # This is important in e.g. bot equality tests. The other parameters like first_name don't
     # matter as much. In the future we may provide a way to get all the correct info from the token
-    user_id = int(token.split(":")[0])
+    user_id = int(token.split(":", maxsplit=1)[0])
     first_name = bot_info.get(
         "name",
     )
@@ -66,7 +67,7 @@ class PytestExtBot(ExtBot):
         self._unfreeze()
 
     # Here we override get_me for caching because we don't want to call the API repeatedly in tests
-    async def get_me(self, *args, **kwargs):
+    async def get_me(self, *args, **kwargs) -> User:
         return await _mocked_get_me(self)
 
 
@@ -77,7 +78,7 @@ class PytestBot(Bot):
         self._unfreeze()
 
     # Here we override get_me for caching because we don't want to call the API repeatedly in tests
-    async def get_me(self, *args, **kwargs):
+    async def get_me(self, *args, **kwargs) -> User:
         return await _mocked_get_me(self)
 
 
@@ -85,17 +86,28 @@ class PytestApplication(Application):
     pass
 
 
-def make_bot(bot_info=None, **kwargs):
+class PytestMessage(Message):
+    pass
+
+
+class PytestUpdater(Updater):
+    pass
+
+
+def make_bot(bot_info=None, offline: bool = True, **kwargs):
     """
     Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """
     token = kwargs.pop("token", (bot_info or {}).get("token"))
     private_key = kwargs.pop("private_key", PRIVATE_KEY)
     kwargs.pop("token", None)
+
+    request_class = OfflineRequest if offline else NonchalantHttpxRequest
+
     return PytestExtBot(
         token=token,
         private_key=private_key if TEST_WITH_OPT_DEPS else None,
-        request=NonchalantHttpxRequest(8),
-        get_updates_request=NonchalantHttpxRequest(1),
+        request=request_class(8),
+        get_updates_request=request_class(1),
         **kwargs,
     )

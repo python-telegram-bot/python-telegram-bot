@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,51 +21,53 @@ import asyncio
 
 import pytest
 
-from telegram import Contact, Voice
+from telegram import Contact, ReplyParameters, Voice
+from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
 def contact():
     return Contact(
-        TestContactBase.phone_number,
-        TestContactBase.first_name,
-        TestContactBase.last_name,
-        TestContactBase.user_id,
+        ContactTestBase.phone_number,
+        ContactTestBase.first_name,
+        ContactTestBase.last_name,
+        ContactTestBase.user_id,
     )
 
 
-class TestContactBase:
+class ContactTestBase:
     phone_number = "+11234567890"
     first_name = "Leandro"
     last_name = "Toledo"
     user_id = 23
 
 
-class TestContactWithoutRequest(TestContactBase):
+class TestContactWithoutRequest(ContactTestBase):
     def test_slot_behaviour(self, contact):
         for attr in contact.__slots__:
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"
 
-    def test_de_json_required(self, bot):
+    def test_de_json_required(self, offline_bot):
         json_dict = {"phone_number": self.phone_number, "first_name": self.first_name}
-        contact = Contact.de_json(json_dict, bot)
+        contact = Contact.de_json(json_dict, offline_bot)
         assert contact.api_kwargs == {}
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name
 
-    def test_de_json_all(self, bot):
+    def test_de_json_all(self, offline_bot):
         json_dict = {
             "phone_number": self.phone_number,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "user_id": self.user_id,
         }
-        contact = Contact.de_json(json_dict, bot)
+        contact = Contact.de_json(json_dict, offline_bot)
         assert contact.api_kwargs == {}
 
         assert contact.phone_number == self.phone_number
@@ -102,20 +104,20 @@ class TestContactWithoutRequest(TestContactBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_send_contact_without_required(self, bot, chat_id):
+    async def test_send_contact_without_required(self, offline_bot, chat_id):
         with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
-            await bot.send_contact(chat_id=chat_id)
+            await offline_bot.send_contact(chat_id=chat_id)
 
-    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
+    async def test_send_mutually_exclusive(self, offline_bot, chat_id, contact):
         with pytest.raises(ValueError, match="Not both"):
-            await bot.send_contact(
+            await offline_bot.send_contact(
                 chat_id=chat_id,
                 contact=contact,
                 phone_number=contact.phone_number,
                 first_name=contact.first_name,
             )
 
-    async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
+    async def test_send_with_contact(self, monkeypatch, offline_bot, chat_id, contact):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
             phone = data["phone_number"] == contact.phone_number
@@ -123,11 +125,38 @@ class TestContactWithoutRequest(TestContactBase):
             last = data["last_name"] == contact.last_name
             return phone and first and last
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_contact(contact=contact, chat_id=chat_id)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_contact(contact=contact, chat_id=chat_id)
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_contact_default_quote_parse_mode(
+        self, default_bot, chat_id, contact, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_contact(
+            chat_id, contact=contact, reply_parameters=ReplyParameters(**kwargs)
+        )
 
 
-class TestContactWithRequest(TestContactBase):
+class TestContactWithRequest(ContactTestBase):
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
         [
@@ -156,7 +185,7 @@ class TestContactWithRequest(TestContactBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_contact(
                     chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
                 )

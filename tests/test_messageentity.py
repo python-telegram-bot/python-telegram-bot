@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import random
+
 import pytest
 
 from telegram import MessageEntity, User
@@ -38,23 +40,23 @@ def message_entity(request):
     return MessageEntity(type_, 1, 3, url=url, user=user, language=language)
 
 
-class TestMessageEntityBase:
+class MessageEntityTestBase:
     type_ = "url"
     offset = 1
     length = 2
     url = "url"
 
 
-class TestMessageEntityWithoutRequest(TestMessageEntityBase):
+class TestMessageEntityWithoutRequest(MessageEntityTestBase):
     def test_slot_behaviour(self, message_entity):
         inst = message_entity
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {"type": self.type_, "offset": self.offset, "length": self.length}
-        entity = MessageEntity.de_json(json_dict, bot)
+        entity = MessageEntity.de_json(json_dict, offline_bot)
         assert entity.api_kwargs == {}
 
         assert entity.type == self.type_
@@ -80,6 +82,75 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
         assert entity.type == "foo"
         entity = MessageEntity(type="url", offset=0, length=1)
         assert entity.type is MessageEntityType.URL
+
+    def test_fix_utf16(self):
+        text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
+        inputs_outputs: list[tuple[tuple[int, int, str], tuple[int, int]]] = [
+            ((2, 4, MessageEntity.BOLD), (3, 4)),
+            ((9, 6, MessageEntity.ITALIC), (11, 6)),
+            ((28, 3, MessageEntity.UNDERLINE), (30, 6)),
+        ]
+        random.shuffle(inputs_outputs)
+        unicode_entities = [
+            MessageEntity(offset=_input[0], length=_input[1], type=_input[2])
+            for _input, _ in inputs_outputs
+        ]
+        utf_16_entities = MessageEntity.adjust_message_entities_to_utf_16(text, unicode_entities)
+        for out_entity, input_output in zip(utf_16_entities, inputs_outputs, strict=False):
+            _, output = input_output
+            offset, length = output
+            assert out_entity.offset == offset
+            assert out_entity.length == length
+
+    @pytest.mark.parametrize("by", [6, "prefix", "𝛙𝌢𑁍"])
+    def test_shift_entities(self, by):
+        kwargs = {
+            "url": "url",
+            "user": 42,
+            "language": "python",
+            "custom_emoji_id": "custom_emoji_id",
+        }
+        entities = [
+            MessageEntity(MessageEntity.BOLD, 2, 3, **kwargs),
+            MessageEntity(MessageEntity.BOLD, 5, 6, **kwargs),
+        ]
+        shifted = MessageEntity.shift_entities(by, entities)
+        assert shifted[0].offset == 8
+        assert shifted[1].offset == 11
+
+        assert shifted[0] is not entities[0]
+        assert shifted[1] is not entities[1]
+
+        for entity in shifted:
+            for key, value in kwargs.items():
+                assert getattr(entity, key) == value
+
+    def test_concatenate(self):
+        kwargs = {
+            "url": "url",
+            "user": 42,
+            "language": "python",
+            "custom_emoji_id": "custom_emoji_id",
+        }
+        first_entity = MessageEntity(MessageEntity.BOLD, 0, 6, **kwargs)
+        second_entity = MessageEntity(MessageEntity.ITALIC, 0, 4, **kwargs)
+        third_entity = MessageEntity(MessageEntity.UNDERLINE, 3, 6, **kwargs)
+
+        first = ("prefix 𝛙𝌢𑁍 | ", [first_entity], True)
+        second = ("text 𝛙𝌢𑁍", [second_entity], False)
+        third = (" | suffix 𝛙𝌢𑁍", [third_entity])
+
+        new_text, new_entities = MessageEntity.concatenate(first, second, third)
+
+        assert new_text == "prefix 𝛙𝌢𑁍 | text 𝛙𝌢𑁍 | suffix 𝛙𝌢𑁍"
+        assert [entity.offset for entity in new_entities] == [0, 16, 30]
+        for old, new in zip(
+            [first_entity, second_entity, third_entity], new_entities, strict=False
+        ):
+            assert new is not old
+            assert new.type == old.type
+            for key, value in kwargs.items():
+                assert getattr(new, key) == value
 
     def test_equality(self):
         a = MessageEntity(MessageEntity.BOLD, 2, 3)

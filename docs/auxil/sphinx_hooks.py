@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2023
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,12 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-import collections.abc
+import contextlib
 import inspect
 import re
 import typing
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from sphinx.application import Sphinx
 
@@ -29,13 +30,16 @@ from docs.auxil.admonition_inserter import AdmonitionInserter
 from docs.auxil.kwargs_insertion import (
     check_timeout_and_api_kwargs_presence,
     find_insert_pos_for_kwargs,
-    is_write_timeout_20,
+    get_updates_read_timeout_addition,
     keyword_args,
-    read_timeout_sub,
-    read_timeout_type,
-    write_timeout_sub,
+    media_write_timeout_change,
+    media_write_timeout_change_methods,
 )
 from docs.auxil.link_code import LINE_NUMBERS
+
+if TYPE_CHECKING:
+    import collections.abc
+
 
 ADMONITION_INSERTER = AdmonitionInserter()
 
@@ -47,9 +51,12 @@ PRIVATE_BASE_CLASSES = {
     "_BaseThumbedMedium": "TelegramObject",
     "_BaseMedium": "TelegramObject",
     "_CredentialsBase": "TelegramObject",
+    "_ChatBase": "TelegramObject",
 }
 
 
+# Resolves to the parent directory of `telegram/`, depending on installation setup,
+# could either be `<absolute_path>/src` or `<absolute_path>/site-packages`
 FILE_ROOT = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
 
 
@@ -68,9 +75,9 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
                     return True
                 break
 
-    if name == "filter" and obj.__module__ == "telegram.ext.filters":
-        if not included_in_obj:
-            return True  # return True to exclude from docs.
+    if name == "filter" and obj.__module__ == "telegram.ext.filters" and not included_in_obj:
+        return True  # return True to exclude from docs.
+    return None
 
 
 def autodoc_process_docstring(
@@ -94,7 +101,7 @@ def autodoc_process_docstring(
     """
 
     # 1) Insert the Keyword Args and "Shortcuts" admonitions for the Bot methods
-    method_name = name.split(".")[-1]
+    method_name = name.rsplit(".", maxsplit=1)[0]
     if (
         name.startswith("telegram.Bot.")
         and what == "method"
@@ -107,22 +114,27 @@ def autodoc_process_docstring(
                 f"Couldn't find the correct position to insert the keyword args for {obj}."
             )
 
-        long_write_timeout = is_write_timeout_20(obj)
-        get_updates_sub = 1 if (method_name == "get_updates") else 0
+        get_updates: bool = method_name == "get_updates"
         # The below can be done in 1 line with itertools.chain, but this must be modified in-place
+        insert_idx = insert_index
         for i in range(insert_index, insert_index + len(keyword_args)):
-            lines.insert(
-                i,
-                keyword_args[i - insert_index].format(
-                    method=method_name,
-                    write_timeout=write_timeout_sub[long_write_timeout],
-                    read_timeout=read_timeout_sub[get_updates_sub],
-                    read_timeout_type=read_timeout_type[get_updates_sub],
-                ),
-            )
+            to_insert = keyword_args[i - insert_index]
+
+            if (
+                "post.write_timeout`. Defaults to" in to_insert
+                and method_name in media_write_timeout_change_methods
+            ):
+                effective_insert: list[str] = media_write_timeout_change
+            elif get_updates and to_insert.lstrip().startswith("read_timeout"):
+                effective_insert = [to_insert, *get_updates_read_timeout_addition]
+            else:
+                effective_insert = [to_insert]
+
+            lines[insert_idx:insert_idx] = effective_insert
+            insert_idx += len(effective_insert)
 
         ADMONITION_INSERTER.insert_admonitions(
-            obj=typing.cast(collections.abc.Callable, obj),
+            obj=typing.cast("collections.abc.Callable", obj),
             docstring_lines=lines,
         )
 
@@ -130,7 +142,7 @@ def autodoc_process_docstring(
     # (where applicable)
     if what == "class":
         ADMONITION_INSERTER.insert_admonitions(
-            obj=typing.cast(type, obj),  # since "what" == class, we know it's not just object
+            obj=typing.cast("type", obj),  # since "what" == class, we know it's not just object
             docstring_lines=lines,
         )
 
@@ -148,13 +160,11 @@ def autodoc_process_docstring(
     if isinstance(obj, telegram.ext.filters.BaseFilter):
         obj = obj.__class__
 
-    try:
+    with contextlib.suppress(Exception):
         source_lines, start_line = inspect.getsourcelines(obj)
         end_line = start_line + len(source_lines)
-        file = Path(inspect.getsourcefile(obj)).relative_to(FILE_ROOT)
+        file = Path("src") / Path(inspect.getsourcefile(obj)).relative_to(FILE_ROOT)
         LINE_NUMBERS[name] = (file, start_line, end_line)
-    except Exception:
-        pass
 
     # Since we don't document the `__init__`, we call this manually to have it available for
     # attributes -- see the note above
@@ -162,11 +172,11 @@ def autodoc_process_docstring(
         autodoc_process_docstring(app, "method", f"{name}.__init__", obj.__init__, options, lines)
 
 
-def autodoc_process_bases(app, name, obj, option, bases: list):
+def autodoc_process_bases(app, name, obj, option, bases: list) -> None:
     """Here we fine tune how the base class's classes are displayed."""
-    for idx, base in enumerate(bases):
+    for idx, raw_base in enumerate(bases):
         # let's use a string representation of the object
-        base = str(base)
+        base = str(raw_base)
 
         # Special case for abstract context managers which are wrongly resoled for some reason
         if base.startswith("typing.AbstractAsyncContextManager"):
@@ -183,14 +193,21 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
             bases[idx] = ":class:`enum.IntEnum`"
             continue
 
+        if "FloatEnum" in base:
+            bases[idx] = ":class:`enum.Enum`"
+            bases.insert(0, ":class:`float`")
+            continue
+
         # Drop generics (at least for now)
         if base.endswith("]"):
             base = base.split("[", maxsplit=1)[0]
             bases[idx] = f":class:`{base}`"
 
         # Now convert `telegram._message.Message` to `telegram.Message` etc
-        match = re.search(pattern=r"(telegram(\.ext|))\.[_\w\.]+", string=base)
-        if not match or "_utils" in base:
+        if (
+            not (match := re.search(pattern=r"(telegram(\.ext|))\.[_\w\.]+", string=base))
+            or "_utils" in base
+        ):
             continue
 
         parts = match.group(0).split(".")

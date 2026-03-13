@@ -1,0 +1,5 @@
+internal = "Remove ``black``, ``isort``, ``flake8``, and ``pyupgrade`` in favor of ``ruff``"
+[[pull_requests]]
+uid = "4886"
+author_uid = "harshil21"
+closes_threads = []

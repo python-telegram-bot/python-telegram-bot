@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import Bot, File, PassportElementError, PassportFile
+from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -30,23 +33,23 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="class")
 def passport_file(bot):
     pf = PassportFile(
-        file_id=TestPassportFileBase.file_id,
-        file_unique_id=TestPassportFileBase.file_unique_id,
-        file_size=TestPassportFileBase.file_size,
-        file_date=TestPassportFileBase.file_date,
+        file_id=PassportFileTestBase.file_id,
+        file_unique_id=PassportFileTestBase.file_unique_id,
+        file_size=PassportFileTestBase.file_size,
+        file_date=PassportFileTestBase.file_date,
     )
     pf.set_bot(bot)
     return pf
 
 
-class TestPassportFileBase:
+class PassportFileTestBase:
     file_id = "data"
     file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_size = 50
-    file_date = 1532879128
+    file_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
-class TestPassportFileWithoutRequest(TestPassportFileBase):
+class TestPassportFileWithoutRequest(PassportFileTestBase):
     def test_slot_behaviour(self, passport_file):
         inst = passport_file
         for attr in inst.__slots__:
@@ -66,7 +69,27 @@ class TestPassportFileWithoutRequest(TestPassportFileBase):
         assert passport_file_dict["file_id"] == passport_file.file_id
         assert passport_file_dict["file_unique_id"] == passport_file.file_unique_id
         assert passport_file_dict["file_size"] == passport_file.file_size
-        assert passport_file_dict["file_date"] == passport_file.file_date
+        assert passport_file_dict["file_date"] == to_timestamp(passport_file.file_date)
+
+    def test_de_json_localization(self, passport_file, tz_bot, offline_bot, raw_bot):
+        json_dict = {
+            "file_id": self.file_id,
+            "file_unique_id": self.file_unique_id,
+            "file_size": self.file_size,
+            "file_date": to_timestamp(self.file_date),
+        }
+
+        pf = PassportFile.de_json(json_dict, offline_bot)
+        pf_raw = PassportFile.de_json(json_dict, raw_bot)
+        pf_tz = PassportFile.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        date_offset = pf_tz.file_date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(pf_tz.file_date.replace(tzinfo=None))
+
+        assert pf_raw.file_date.tzinfo == UTC
+        assert pf.file_date.tzinfo == UTC
+        assert date_offset == tz_bot_offset
 
     def test_equality(self):
         a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,19 +32,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_video():
     return InlineQueryResultCachedVideo(
-        TestInlineQueryResultCachedVideoBase.id_,
-        TestInlineQueryResultCachedVideoBase.video_file_id,
-        TestInlineQueryResultCachedVideoBase.title,
-        caption=TestInlineQueryResultCachedVideoBase.caption,
-        parse_mode=TestInlineQueryResultCachedVideoBase.parse_mode,
-        caption_entities=TestInlineQueryResultCachedVideoBase.caption_entities,
-        description=TestInlineQueryResultCachedVideoBase.description,
-        input_message_content=TestInlineQueryResultCachedVideoBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedVideoBase.reply_markup,
+        InlineQueryResultCachedVideoTestBase.id_,
+        InlineQueryResultCachedVideoTestBase.video_file_id,
+        InlineQueryResultCachedVideoTestBase.title,
+        caption=InlineQueryResultCachedVideoTestBase.caption,
+        parse_mode=InlineQueryResultCachedVideoTestBase.parse_mode,
+        caption_entities=InlineQueryResultCachedVideoTestBase.caption_entities,
+        description=InlineQueryResultCachedVideoTestBase.description,
+        input_message_content=InlineQueryResultCachedVideoTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedVideoTestBase.reply_markup,
+        show_caption_above_media=InlineQueryResultCachedVideoTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultCachedVideoBase:
+class InlineQueryResultCachedVideoTestBase:
     id_ = "id"
     type_ = "video"
     video_file_id = "video file id"
@@ -55,9 +56,10 @@ class TestInlineQueryResultCachedVideoBase:
     description = "description"
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
-class TestInlineQueryResultCachedVideoWithoutRequest(TestInlineQueryResultCachedVideoBase):
+class TestInlineQueryResultCachedVideoWithoutRequest(InlineQueryResultCachedVideoTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_video):
         inst = inline_query_result_cached_video
         for attr in inst.__slots__:
@@ -79,6 +81,10 @@ class TestInlineQueryResultCachedVideoWithoutRequest(TestInlineQueryResultCached
         )
         assert (
             inline_query_result_cached_video.reply_markup.to_dict() == self.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_video.show_caption_above_media
+            == self.show_caption_above_media
         )
 
     def test_caption_entities_always_tuple(self):
@@ -124,6 +130,10 @@ class TestInlineQueryResultCachedVideoWithoutRequest(TestInlineQueryResultCached
         assert (
             inline_query_result_cached_video_dict["reply_markup"]
             == inline_query_result_cached_video.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_video_dict["show_caption_above_media"]
+            == inline_query_result_cached_video.show_caption_above_media
         )
 
     def test_equality(self):

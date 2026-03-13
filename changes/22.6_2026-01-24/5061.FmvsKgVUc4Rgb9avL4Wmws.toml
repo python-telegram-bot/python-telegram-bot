@@ -1,0 +1,5 @@
+internal = "Update dependency pytest to v9.0.1"
+[[pull_requests]]
+uid = "5061"
+author_uids = ["renovatebot"]
+closes_threads = []

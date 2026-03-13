@@ -1,0 +1,6 @@
+bugfixes = "Fix Handling of ``Defaults`` for ``InputPaidMedia``"
+
+[[pull_requests]]
+uid = "4761"
+author_uid = "ngrogolev"
+closes_threads = ["4753"]

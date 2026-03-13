@@ -1,0 +1,5 @@
+internal = "Bump ``pytest`` from 8.4.0 to 8.4.1"
+[[pull_requests]]
+uid = "4892"
+author_uid = "dependabot"
+closes_threads = []

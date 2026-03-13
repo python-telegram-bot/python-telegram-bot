@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,13 @@ import collections
 import copy
 import enum
 import functools
+import itertools
 import logging
+import sys
 import time
+from http import HTTPStatus
 from pathlib import Path
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 import pytest
 
@@ -42,8 +45,9 @@ from telegram.ext import (
     PersistenceInput,
     filters,
 )
+from telegram.request import HTTPXRequest
 from telegram.warnings import PTBUserWarning
-from tests.auxil.build_messages import make_message_update
+from tests.auxil.build_messages import make_message, make_message_update
 from tests.auxil.pytest_classes import PytestApplication, make_bot
 from tests.auxil.slots import mro_slots
 
@@ -70,7 +74,7 @@ class TrackingPersistence(BasePersistence):
 
     def __init__(
         self,
-        store_data: Optional[PersistenceInput] = None,
+        store_data: PersistenceInput | None = None,
         update_interval: float = 60,
         fill_data: bool = False,
     ):
@@ -219,20 +223,20 @@ class TrackingConversationHandler(ConversationHandler):
 
 
 class PappInput(NamedTuple):
-    bot_data: Optional[bool] = None
-    chat_data: Optional[bool] = None
-    user_data: Optional[bool] = None
-    callback_data: Optional[bool] = None
+    bot_data: bool | None = None
+    chat_data: bool | None = None
+    user_data: bool | None = None
+    callback_data: bool | None = None
     conversations: bool = True
     update_interval: float = None
     fill_data: bool = False
 
 
 def build_papp(
-    bot_info: Optional[dict] = None,
-    token: Optional[str] = None,
-    store_data: Optional[dict] = None,
-    update_interval: Optional[float] = None,
+    bot_info: dict | None = None,
+    token: str | None = None,
+    store_data: dict | None = None,
+    update_interval: float | None = None,
     fill_data: bool = False,
 ) -> Application:
     store_data = PersistenceInput(**(store_data or {}))
@@ -244,9 +248,9 @@ def build_papp(
         persistence = TrackingPersistence(store_data=store_data, fill_data=fill_data)
 
     if bot_info is not None:
-        bot = make_bot(bot_info, arbitrary_callback_data=True)
+        bot = make_bot(bot_info, arbitrary_callback_data=True, offline=False)
     else:
-        bot = make_bot(token=token, arbitrary_callback_data=True)
+        bot = make_bot(token=token, arbitrary_callback_data=True, offline=False)
     return (
         ApplicationBuilder()
         .bot(bot)
@@ -260,8 +264,8 @@ def build_conversation_handler(name: str, persistent: bool = True) -> BaseHandle
     return TrackingConversationHandler(name=name, persistent=persistent)
 
 
-@pytest.fixture()
-def papp(request, bot_info) -> Application:
+@pytest.fixture
+def papp(request, bot_info, monkeypatch) -> Application:
     papp_input = request.param
     store_data = {}
     if papp_input.bot_data is not None:
@@ -272,6 +276,11 @@ def papp(request, bot_info) -> Application:
         store_data["user_data"] = papp_input.user_data
     if papp_input.callback_data is not None:
         store_data["callback_data"] = papp_input.callback_data
+
+    async def do_request(*args, **kwargs):
+        return HTTPStatus.OK, make_message(text="text")
+
+    monkeypatch.setattr(HTTPXRequest, "do_request", do_request)
 
     app = build_papp(
         bot_info=bot_info,
@@ -311,7 +320,7 @@ class TestBasePersistence:
     """Tests basic behavior of BasePersistence and (most importantly) the integration of
     persistence into the Application."""
 
-    def job_callback(self, chat_id: Optional[int] = None):
+    def job_callback(self, chat_id: int | None = None):
         async def callback(context):
             if context.user_data:
                 context.user_data["key"] = "value"
@@ -330,7 +339,7 @@ class TestBasePersistence:
 
         return callback
 
-    def handler_callback(self, chat_id: Optional[int] = None, sleep: Optional[float] = None):
+    def handler_callback(self, chat_id: int | None = None, sleep: float | None = None):
         async def callback(update, context):
             if sleep:
                 await asyncio.sleep(sleep)
@@ -377,14 +386,14 @@ class TestBasePersistence:
         assert persistence.store_data.callback_data == callback_data
 
     def test_abstract_methods(self):
+        methods = list(BasePersistence.__abstractmethods__)
+        methods.sort()
         with pytest.raises(
             TypeError,
             match=(
-                "drop_chat_data, drop_user_data, flush, get_bot_data, get_callback_data, "
-                "get_chat_data, get_conversations, "
-                "get_user_data, refresh_bot_data, refresh_chat_data, "
-                "refresh_user_data, update_bot_data, update_callback_data, "
-                "update_chat_data, update_conversation, update_user_data"
+                ", ".join(methods)
+                if sys.version_info < (3, 12)
+                else ", ".join(f"'{i}'" for i in methods)
             ),
         ):
             BasePersistence()
@@ -396,7 +405,7 @@ class TestBasePersistence:
 
     @default_papp
     def test_set_bot_error(self, papp):
-        with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
+        with pytest.raises(TypeError, match="when using telegram\\.ext\\.ExtBot"):
             papp.persistence.set_bot(Bot(papp.bot.token))
 
         # just making sure that setting an ExtBoxt without callback_data_cache doesn't raise an
@@ -411,7 +420,7 @@ class TestBasePersistence:
                 self.store_data = PersistenceInput(False, False, False, False)
 
         with pytest.raises(
-            TypeError, match="persistence must be based on telegram.ext.BasePersistence"
+            TypeError, match="persistence must be based on telegram\\.ext\\.BasePersistence"
         ):
             ApplicationBuilder().bot(bot).persistence(MyPersistence()).build()
 
@@ -552,6 +561,8 @@ class TestBasePersistence:
             papp.add_handler(conversation)
 
             assert len(recwarn) >= 1
+            tasks = asyncio.all_tasks()
+            assert any("conversation_handler_after_init" in t.get_name() for t in tasks)
             found = False
             for warning in recwarn:
                 if "after `Application.initialize` was called" in str(warning.message):
@@ -584,6 +595,28 @@ class TestBasePersistence:
         with pytest.raises(ValueError, match="when handler is unnamed"):
             papp.add_handler(build_conversation_handler(name=None, persistent=True))
 
+    @pytest.mark.parametrize(
+        "papp",
+        [
+            PappInput(update_interval=0.0),
+        ],
+        indirect=True,
+    )
+    async def test_update_persistence_called(self, papp: Application, monkeypatch):
+        """Tests if Application.update_persistence is called from app.start()"""
+        called = asyncio.Event()
+
+        async def update_persistence(*args, **kwargs):
+            called.set()
+
+        monkeypatch.setattr(papp, "update_persistence", update_persistence)
+        async with papp:
+            await papp.start()
+            tasks = asyncio.all_tasks()
+            assert any(":persistence_updater" in task.get_name() for task in tasks)
+            assert await called.wait()
+            await papp.stop()
+
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "papp",
@@ -607,7 +640,7 @@ class TestBasePersistence:
             await papp.stop()
 
             # Make assertions before calling shutdown, as that calls update_persistence again!
-            diffs = [j - i for i, j in zip(call_times[:-1], call_times[1:])]
+            diffs = [j - i for i, j in itertools.pairwise(call_times)]
             assert sum(diffs) / len(diffs) == pytest.approx(
                 papp.persistence.update_interval, rel=1e-1
             )
@@ -1233,7 +1266,7 @@ class TestBasePersistence:
                 await papp.update_persistence()
                 await asyncio.sleep(0.01)
                 # Conversation should have been updated with the current state, i.e. None
-                assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+                assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
                 assert papp.persistence.conversations == {"conv": {(1, 1): None}}
 
             # Ensure that we warn the user about this!
@@ -1303,7 +1336,7 @@ class TestBasePersistence:
 
             await papp.update_persistence()
             await asyncio.sleep(0.05)
-            assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
             # The result of the pending state wasn't retrieved by the CH yet, so we must be in
             # state `None`
             assert papp.persistence.conversations == {"conv": {(1, 1): None}}
@@ -1413,9 +1446,62 @@ class TestBasePersistence:
             assert papp.persistence.updated_conversations == {}
 
             await papp.update_persistence()
-            assert papp.persistence.updated_conversations == {"conv_1": ({(1, 1): 1})}
+            assert papp.persistence.updated_conversations == {"conv_1": {(1, 1): 1}}
             # This is the important part: the persistence is updated with `None` when the conv ends
             assert papp.persistence.conversations == {"conv_1": {(1, 1): None}}
+
+    async def test_non_blocking_conversation_ends(self, bot):
+        papp = build_papp(token=bot.token, update_interval=100)
+        event = asyncio.Event()
+
+        async def callback(_, __):
+            await event.wait()
+            return HandlerStates.END
+
+        conversation = ConversationHandler(
+            entry_points=[
+                TrackingConversationHandler.build_handler(HandlerStates.END, callback=callback)
+            ],
+            states={},
+            fallbacks=[],
+            persistent=True,
+            name="conv",
+            block=False,
+        )
+        papp.add_handler(conversation)
+
+        async with papp:
+            await papp.start()
+            assert papp.persistence.updated_conversations == {}
+
+            await papp.process_update(
+                TrackingConversationHandler.build_update(HandlerStates.END, 1)
+            )
+            assert papp.persistence.updated_conversations == {}
+
+            papp.persistence.reset_tracking()
+            event.set()
+            await asyncio.sleep(0.01)
+            await papp.update_persistence()
+
+            # On shutdown, persisted data should include the END state b/c that's what the
+            # pending state is being resolved to
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
+            assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.END}}
+
+            await papp.stop()
+
+        async with papp:
+            # On the next restart/persistence loading the ConversationHandler should resolve
+            # the stored END state to None …
+            assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.END}}
+            # … and the update should be accepted by the entry point again
+            assert conversation.check_update(
+                TrackingConversationHandler.build_update(HandlerStates.END, 1)
+            )
+
+            await papp.update_persistence()
+            assert papp.persistence.conversations == {"conv": {(1, 1): None}}
 
     async def test_conversation_timeout(self, bot):
         # high update_interval so that we can instead manually call it
@@ -1445,7 +1531,7 @@ class TestBasePersistence:
             )
             assert papp.persistence.updated_conversations == {}
             await papp.update_persistence()
-            assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
             assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.STATE_1}}
 
             papp.persistence.reset_tracking()

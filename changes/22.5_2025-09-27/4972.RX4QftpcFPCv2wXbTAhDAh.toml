@@ -1,0 +1,10 @@
+breaking = """Move param ``ReplyParameters.checklist_task_id`` to last position.
+
+.. hint::
+   This change addresses a breaking change accidentally introduced in version 22.4 where the introduction of the new parameter was not done in a backward compatible way.
+   Existing code using keyword arguments is unaffected. Only code using positional arguments (and based on version 22.4) may need updates.
+"""
+[[pull_requests]]
+uid = "4972"
+author_uids = ["aelkheir"]
+closes_threads = []

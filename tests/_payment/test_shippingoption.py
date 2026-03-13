@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,17 +25,17 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def shipping_option():
     return ShippingOption(
-        TestShippingOptionBase.id_, TestShippingOptionBase.title, TestShippingOptionBase.prices
+        ShippingOptionTestBase.id_, ShippingOptionTestBase.title, ShippingOptionTestBase.prices
     )
 
 
-class TestShippingOptionBase:
+class ShippingOptionTestBase:
     id_ = "id"
     title = "title"
     prices = [LabeledPrice("Fish Container", 100), LabeledPrice("Premium Fish Container", 1000)]
 
 
-class TestShippingOptionWithoutRequest(TestShippingOptionBase):
+class TestShippingOptionWithoutRequest(ShippingOptionTestBase):
     def test_slot_behaviour(self, shipping_option):
         inst = shipping_option
         for attr in inst.__slots__:

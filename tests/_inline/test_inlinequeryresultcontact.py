@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,26 +25,25 @@ from telegram import (
     InlineQueryResultVoice,
     InputTextMessageContent,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
 def inline_query_result_contact():
     return InlineQueryResultContact(
-        TestInlineQueryResultContactBase.id_,
-        TestInlineQueryResultContactBase.phone_number,
-        TestInlineQueryResultContactBase.first_name,
-        last_name=TestInlineQueryResultContactBase.last_name,
-        thumbnail_url=TestInlineQueryResultContactBase.thumbnail_url,
-        thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
-        thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
-        input_message_content=TestInlineQueryResultContactBase.input_message_content,
-        reply_markup=TestInlineQueryResultContactBase.reply_markup,
+        InlineQueryResultContactTestBase.id_,
+        InlineQueryResultContactTestBase.phone_number,
+        InlineQueryResultContactTestBase.first_name,
+        last_name=InlineQueryResultContactTestBase.last_name,
+        thumbnail_url=InlineQueryResultContactTestBase.thumbnail_url,
+        thumbnail_width=InlineQueryResultContactTestBase.thumbnail_width,
+        thumbnail_height=InlineQueryResultContactTestBase.thumbnail_height,
+        input_message_content=InlineQueryResultContactTestBase.input_message_content,
+        reply_markup=InlineQueryResultContactTestBase.reply_markup,
     )
 
 
-class TestInlineQueryResultContactBase:
+class InlineQueryResultContactTestBase:
     id_ = "id"
     type_ = "contact"
     phone_number = "phone_number"
@@ -57,7 +56,7 @@ class TestInlineQueryResultContactBase:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBase):
+class TestInlineQueryResultContactWithoutRequest(InlineQueryResultContactTestBase):
     def test_slot_behaviour(self, inline_query_result_contact):
         inst = inline_query_result_contact
         for attr in inst.__slots__:
@@ -78,116 +77,6 @@ class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBas
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_contact.reply_markup.to_dict() == self.reply_markup.to_dict()
-
-    def test_thumb_url_property_deprecation_warning(self, recwarn):
-        inline_query_result_contact = InlineQueryResultContact(
-            TestInlineQueryResultContactBase.id_,
-            TestInlineQueryResultContactBase.phone_number,
-            TestInlineQueryResultContactBase.first_name,
-            last_name=TestInlineQueryResultContactBase.last_name,
-            input_message_content=TestInlineQueryResultContactBase.input_message_content,
-            reply_markup=TestInlineQueryResultContactBase.reply_markup,
-            thumb_url=TestInlineQueryResultContactBase.thumbnail_url,  # deprecated arg
-            thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
-            thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
-        )
-        assert inline_query_result_contact.thumb_url == inline_query_result_contact.thumbnail_url
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
-        )
-
-    def test_thumb_height_property_deprecation_warning(self, recwarn):
-        inline_query_result_contact = InlineQueryResultContact(
-            TestInlineQueryResultContactBase.id_,
-            TestInlineQueryResultContactBase.phone_number,
-            TestInlineQueryResultContactBase.first_name,
-            last_name=TestInlineQueryResultContactBase.last_name,
-            input_message_content=TestInlineQueryResultContactBase.input_message_content,
-            reply_markup=TestInlineQueryResultContactBase.reply_markup,
-            thumbnail_url=TestInlineQueryResultContactBase.thumbnail_url,
-            thumb_height=TestInlineQueryResultContactBase.thumbnail_height,  # deprecated arg
-            thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
-        )
-        assert (
-            inline_query_result_contact.thumb_height
-            == inline_query_result_contact.thumbnail_height
-        )
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
-        )
-
-    def test_thumb_width_property_deprecation_warning(self, recwarn):
-        inline_query_result_contact = InlineQueryResultContact(
-            TestInlineQueryResultContactBase.id_,
-            TestInlineQueryResultContactBase.phone_number,
-            TestInlineQueryResultContactBase.first_name,
-            last_name=TestInlineQueryResultContactBase.last_name,
-            input_message_content=TestInlineQueryResultContactBase.input_message_content,
-            reply_markup=TestInlineQueryResultContactBase.reply_markup,
-            thumbnail_url=TestInlineQueryResultContactBase.thumbnail_url,
-            thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
-            thumb_width=TestInlineQueryResultContactBase.thumbnail_width,  # deprecated arg
-        )
-        assert (
-            inline_query_result_contact.thumb_width == inline_query_result_contact.thumbnail_width
-        )
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
-        )
-
-    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
-        with pytest.raises(
-            ValueError,
-            match="different entities as 'thumb_url' and 'thumbnail_url'",
-        ):
-            InlineQueryResultContact(
-                TestInlineQueryResultContactBase.id_,
-                TestInlineQueryResultContactBase.phone_number,
-                TestInlineQueryResultContactBase.first_name,
-                last_name=TestInlineQueryResultContactBase.last_name,
-                input_message_content=TestInlineQueryResultContactBase.input_message_content,
-                reply_markup=TestInlineQueryResultContactBase.reply_markup,
-                thumbnail_url=TestInlineQueryResultContactBase.thumbnail_url,
-                thumb_url="some other url",
-                thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
-                thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
-            )
-
-    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_height(self):
-        with pytest.raises(
-            ValueError,
-            match="different entities as 'thumb_height' and 'thumbnail_height'",
-        ):
-            InlineQueryResultContact(
-                TestInlineQueryResultContactBase.id_,
-                TestInlineQueryResultContactBase.phone_number,
-                TestInlineQueryResultContactBase.first_name,
-                last_name=TestInlineQueryResultContactBase.last_name,
-                input_message_content=TestInlineQueryResultContactBase.input_message_content,
-                reply_markup=TestInlineQueryResultContactBase.reply_markup,
-                thumbnail_url=TestInlineQueryResultContactBase.thumbnail_url,
-                thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
-                thumb_height=TestInlineQueryResultContactBase.thumbnail_height + 1,
-                thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
-            )
-
-    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_width(self):
-        with pytest.raises(
-            ValueError,
-            match="different entities as 'thumb_width' and 'thumbnail_width'",
-        ):
-            InlineQueryResultContact(
-                TestInlineQueryResultContactBase.id_,
-                TestInlineQueryResultContactBase.phone_number,
-                TestInlineQueryResultContactBase.first_name,
-                last_name=TestInlineQueryResultContactBase.last_name,
-                input_message_content=TestInlineQueryResultContactBase.input_message_content,
-                reply_markup=TestInlineQueryResultContactBase.reply_markup,
-                thumbnail_url=TestInlineQueryResultContactBase.thumbnail_url,
-                thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
-                thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
-                thumb_width=TestInlineQueryResultContactBase.thumbnail_width + 1,
-            )
 
     def test_to_dict(self, inline_query_result_contact):
         inline_query_result_contact_dict = inline_query_result_contact.to_dict()

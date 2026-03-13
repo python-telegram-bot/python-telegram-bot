@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import datetime
+import datetime as dtm
 
 import pytest
 
@@ -32,48 +32,28 @@ from telegram import (
     Sticker,
 )
 from telegram.error import BadRequest
+from tests.auxil.constants import TEST_MSG_TEXT, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.slots import mro_slots
-
-TEST_MSG_TEXT = "Topics are forever"
-TEST_TOPIC_ICON_COLOR = 0x6FB9F0
-TEST_TOPIC_NAME = "Sad bot true: real stories"
-
-
-@pytest.fixture(scope="module")
-async def emoji_id(bot):
-    emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
-    first_sticker = emoji_sticker_list[0]
-    return first_sticker.custom_emoji_id
 
 
 @pytest.fixture(scope="module")
 async def forum_topic_object(forum_group_id, emoji_id):
     return ForumTopic(
         message_thread_id=forum_group_id,
-        name=TEST_TOPIC_NAME,
-        icon_color=TEST_TOPIC_ICON_COLOR,
+        name=ForumTopicTestBase.TEST_TOPIC_NAME,
+        icon_color=ForumTopicTestBase.TEST_TOPIC_ICON_COLOR,
         icon_custom_emoji_id=emoji_id,
+        is_name_implicit=ForumTopicTestBase.is_name_implicit,
     )
 
 
-@pytest.fixture()
-async def real_topic(bot, emoji_id, forum_group_id):
-    result = await bot.create_forum_topic(
-        chat_id=forum_group_id,
-        name=TEST_TOPIC_NAME,
-        icon_color=TEST_TOPIC_ICON_COLOR,
-        icon_custom_emoji_id=emoji_id,
-    )
-
-    yield result
-
-    result = await bot.delete_forum_topic(
-        chat_id=forum_group_id, message_thread_id=result.message_thread_id
-    )
-    assert result is True, "Topic was not deleted"
+class ForumTopicTestBase:
+    TEST_TOPIC_NAME = TEST_TOPIC_NAME
+    TEST_TOPIC_ICON_COLOR = TEST_TOPIC_ICON_COLOR
+    is_name_implicit = False
 
 
-class TestForumTopicWithoutRequest:
+class TestForumTopicWithoutRequest(ForumTopicTestBase):
     def test_slot_behaviour(self, forum_topic_object):
         inst = forum_topic_object
         for attr in inst.__slots__:
@@ -82,35 +62,37 @@ class TestForumTopicWithoutRequest:
 
     async def test_expected_values(self, emoji_id, forum_group_id, forum_topic_object):
         assert forum_topic_object.message_thread_id == forum_group_id
-        assert forum_topic_object.icon_color == TEST_TOPIC_ICON_COLOR
-        assert forum_topic_object.name == TEST_TOPIC_NAME
+        assert forum_topic_object.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert forum_topic_object.name == self.TEST_TOPIC_NAME
         assert forum_topic_object.icon_custom_emoji_id == emoji_id
+        assert forum_topic_object.is_name_implicit == self.is_name_implicit
 
-    def test_de_json(self, bot, emoji_id, forum_group_id):
-        assert ForumTopic.de_json(None, bot=bot) is None
-
+    def test_de_json(self, offline_bot, emoji_id, forum_group_id):
         json_dict = {
             "message_thread_id": forum_group_id,
-            "name": TEST_TOPIC_NAME,
-            "icon_color": TEST_TOPIC_ICON_COLOR,
+            "name": self.TEST_TOPIC_NAME,
+            "icon_color": self.TEST_TOPIC_ICON_COLOR,
             "icon_custom_emoji_id": emoji_id,
+            "is_name_implicit": self.is_name_implicit,
         }
-        topic = ForumTopic.de_json(json_dict, bot)
+        topic = ForumTopic.de_json(json_dict, offline_bot)
         assert topic.api_kwargs == {}
 
         assert topic.message_thread_id == forum_group_id
-        assert topic.icon_color == TEST_TOPIC_ICON_COLOR
-        assert topic.name == TEST_TOPIC_NAME
+        assert topic.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert topic.name == self.TEST_TOPIC_NAME
         assert topic.icon_custom_emoji_id == emoji_id
+        assert topic.is_name_implicit == self.is_name_implicit
 
     def test_to_dict(self, emoji_id, forum_group_id, forum_topic_object):
         topic_dict = forum_topic_object.to_dict()
 
         assert isinstance(topic_dict, dict)
         assert topic_dict["message_thread_id"] == forum_group_id
-        assert topic_dict["name"] == TEST_TOPIC_NAME
-        assert topic_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
+        assert topic_dict["name"] == self.TEST_TOPIC_NAME
+        assert topic_dict["icon_color"] == self.TEST_TOPIC_ICON_COLOR
         assert topic_dict["icon_custom_emoji_id"] == emoji_id
+        assert topic_dict["is_name_implicit"] == self.is_name_implicit
 
     def test_equality(self, emoji_id, forum_group_id):
         a = ForumTopic(
@@ -186,15 +168,15 @@ class TestForumMethodsWithRequest:
         assert not first_sticker.is_video
         assert first_sticker.set_name == "Topics"
         assert first_sticker.type == Sticker.CUSTOM_EMOJI
-        assert first_sticker.thumb.width == 128
-        assert first_sticker.thumb.height == 128
+        assert first_sticker.thumbnail.width == 128
+        assert first_sticker.thumbnail.height == 128
 
         # The following data of first item returned has changed in the past already,
         # so check sizes loosely and ID's only by length of string
-        assert first_sticker.thumb.file_size in range(2000, 7000)
+        assert first_sticker.thumbnail.file_size in range(2000, 7000)
         assert first_sticker.file_size in range(20000, 70000)
         assert len(first_sticker.custom_emoji_id) == 19
-        assert len(first_sticker.thumb.file_unique_id) == 16
+        assert len(first_sticker.thumbnail.file_unique_id) == 16
         assert len(first_sticker.file_unique_id) == 15
 
     async def test_edit_forum_topic(self, emoji_id, forum_group_id, bot, real_topic):
@@ -236,6 +218,7 @@ class TestForumMethodsWithRequest:
         assert result is True, "Failed to reopen forum topic"
 
     async def test_unpin_all_forum_topic_messages(self, bot, forum_group_id, real_topic):
+        # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
         message_thread_id = real_topic.message_thread_id
         pin_msg_tasks = set()
 
@@ -249,14 +232,27 @@ class TestForumMethodsWithRequest:
 
         assert all([await task for task in pin_msg_tasks]) is True, "Message(s) were not pinned"
 
-        # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
         result = await bot.unpin_all_forum_topic_messages(forum_group_id, message_thread_id)
+        assert result is True, "Failed to unpin all the messages in forum topic"
+
+    async def test_unpin_all_general_forum_topic_messages(self, bot, forum_group_id):
+        # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
+        pin_msg_tasks = set()
+
+        awaitables = {bot.send_message(forum_group_id, TEST_MSG_TEXT) for _ in range(2)}
+        for coro in asyncio.as_completed(awaitables):
+            msg = await coro
+            pin_msg_tasks.add(asyncio.create_task(msg.pin()))
+
+        assert all([await task for task in pin_msg_tasks]) is True, "Message(s) were not pinned"
+
+        result = await bot.unpin_all_general_forum_topic_messages(forum_group_id)
         assert result is True, "Failed to unpin all the messages in forum topic"
 
     async def test_edit_general_forum_topic(self, bot, forum_group_id):
         result = await bot.edit_general_forum_topic(
             chat_id=forum_group_id,
-            name=f"GENERAL_{datetime.datetime.now().timestamp()}",
+            name=f"GENERAL_{dtm.datetime.now().timestamp()}",
         )
         assert result is True, "Failed to edit general forum topic"
         # no way of checking the edited name, just the boolean result
@@ -304,37 +300,52 @@ class TestForumMethodsWithRequest:
 
 @pytest.fixture(scope="module")
 def topic_created():
-    return ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
+    return ForumTopicCreated(
+        name=ForumTopicCreatedTestBase.TEST_TOPIC_NAME,
+        icon_color=ForumTopicCreatedTestBase.TEST_TOPIC_ICON_COLOR,
+        is_name_implicit=ForumTopicCreatedTestBase.is_name_implicit,
+    )
 
 
-class TestForumTopicCreatedWithoutRequest:
+class ForumTopicCreatedTestBase:
+    TEST_TOPIC_NAME = TEST_TOPIC_NAME
+    TEST_TOPIC_ICON_COLOR = TEST_TOPIC_ICON_COLOR
+    is_name_implicit = False
+
+
+class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase):
     def test_slot_behaviour(self, topic_created):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(topic_created)) == len(
-            set(mro_slots(topic_created))
-        ), "duplicate slot"
+        assert len(mro_slots(topic_created)) == len(set(mro_slots(topic_created))), (
+            "duplicate slot"
+        )
 
     def test_expected_values(self, topic_created):
-        assert topic_created.icon_color == TEST_TOPIC_ICON_COLOR
-        assert topic_created.name == TEST_TOPIC_NAME
+        assert topic_created.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert topic_created.name == self.TEST_TOPIC_NAME
+        assert topic_created.is_name_implicit == self.is_name_implicit
 
-    def test_de_json(self, bot):
-        assert ForumTopicCreated.de_json(None, bot=bot) is None
-
-        json_dict = {"icon_color": TEST_TOPIC_ICON_COLOR, "name": TEST_TOPIC_NAME}
-        action = ForumTopicCreated.de_json(json_dict, bot)
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "icon_color": self.TEST_TOPIC_ICON_COLOR,
+            "name": self.TEST_TOPIC_NAME,
+            "is_name_implicit": self.is_name_implicit,
+        }
+        action = ForumTopicCreated.de_json(json_dict, offline_bot)
         assert action.api_kwargs == {}
 
-        assert action.icon_color == TEST_TOPIC_ICON_COLOR
-        assert action.name == TEST_TOPIC_NAME
+        assert action.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert action.name == self.TEST_TOPIC_NAME
+        assert action.is_name_implicit == self.is_name_implicit
 
     def test_to_dict(self, topic_created):
         action_dict = topic_created.to_dict()
 
         assert isinstance(action_dict, dict)
-        assert action_dict["name"] == TEST_TOPIC_NAME
-        assert action_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
+        assert action_dict["name"] == self.TEST_TOPIC_NAME
+        assert action_dict["icon_color"] == self.TEST_TOPIC_ICON_COLOR
+        assert action_dict["is_name_implicit"] == self.is_name_implicit
 
     def test_equality(self, emoji_id):
         a = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
@@ -408,8 +419,6 @@ class TestForumTopicEdited:
         assert topic_edited.icon_custom_emoji_id == emoji_id
 
     def test_de_json(self, bot, emoji_id):
-        assert ForumTopicEdited.de_json(None, bot=bot) is None
-
         json_dict = {"name": TEST_TOPIC_NAME, "icon_custom_emoji_id": emoji_id}
         action = ForumTopicEdited.de_json(json_dict, bot)
         assert action.api_kwargs == {}

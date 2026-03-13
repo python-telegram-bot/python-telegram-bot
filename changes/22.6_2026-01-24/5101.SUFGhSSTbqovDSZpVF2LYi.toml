@@ -1,0 +1,5 @@
+internal = "Bump ``chango`` to 0.6.1"
+[[pull_requests]]
+uid = "5101"
+author_uids = ["Bibo-Joshi"]
+closes_threads = []

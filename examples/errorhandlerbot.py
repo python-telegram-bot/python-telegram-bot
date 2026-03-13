@@ -1,26 +1,14 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, wrong-import-position
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """This is a very simple example on how one could implement a custom error handler."""
+
 import html
 import json
 import logging
 import traceback
 
-from telegram import __version__ as TG_VER
-
-try:
-    from telegram import __version_info__
-except ImportError:
-    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
-
-if __version_info__ < (20, 0, 0, "alpha", 1):
-    raise RuntimeError(
-        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
-        f"{TG_VER} version of this example, "
-        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
-    )
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -29,6 +17,9 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 # This can be your own ID, or one for a developer group/channel.
@@ -50,7 +41,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
     # You might need to add some logic to deal with messages longer than the 4096 character limit.
     update_str = update.to_dict() if isinstance(update, Update) else str(update)
     message = (
-        f"An exception was raised while handling an update\n"
+        "An exception was raised while handling an update\n"
         f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}"
         "</pre>\n\n"
         f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>\n\n"

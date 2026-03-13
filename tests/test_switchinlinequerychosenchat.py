@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,15 +26,15 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def switch_inline_query_chosen_chat():
     return SwitchInlineQueryChosenChat(
-        query=TestSwitchInlineQueryChosenChatBase.query,
-        allow_user_chats=TestSwitchInlineQueryChosenChatBase.allow_user_chats,
-        allow_bot_chats=TestSwitchInlineQueryChosenChatBase.allow_bot_chats,
-        allow_channel_chats=TestSwitchInlineQueryChosenChatBase.allow_channel_chats,
-        allow_group_chats=TestSwitchInlineQueryChosenChatBase.allow_group_chats,
+        query=SwitchInlineQueryChosenChatTestBase.query,
+        allow_user_chats=SwitchInlineQueryChosenChatTestBase.allow_user_chats,
+        allow_bot_chats=SwitchInlineQueryChosenChatTestBase.allow_bot_chats,
+        allow_channel_chats=SwitchInlineQueryChosenChatTestBase.allow_channel_chats,
+        allow_group_chats=SwitchInlineQueryChosenChatTestBase.allow_group_chats,
     )
 
 
-class TestSwitchInlineQueryChosenChatBase:
+class SwitchInlineQueryChosenChatTestBase:
     query = "query"
     allow_user_chats = True
     allow_bot_chats = True
@@ -42,7 +42,7 @@ class TestSwitchInlineQueryChosenChatBase:
     allow_group_chats = True
 
 
-class TestSwitchInlineQueryChosenChat(TestSwitchInlineQueryChosenChatBase):
+class TestSwitchInlineQueryChosenChat(SwitchInlineQueryChosenChatTestBase):
     def test_slot_behaviour(self, switch_inline_query_chosen_chat):
         inst = switch_inline_query_chosen_chat
         for attr in inst.__slots__:

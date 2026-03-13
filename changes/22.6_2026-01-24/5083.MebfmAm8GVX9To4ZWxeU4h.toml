@@ -1,0 +1,4 @@
+internal = "Bump ``pre-commit`` Hooks to Latest VErsion"
+[[pull_requests]]
+uid = "5083"
+author_uids = ["pre-commit-ci", "Bibo-Joshi"]

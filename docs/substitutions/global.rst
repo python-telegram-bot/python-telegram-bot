@@ -14,11 +14,9 @@
 
 .. |thumbdocstringnopath| replace:: |thumbdocstringbase| |uploadinputnopath|
 
-.. |thumbargumentdeprecation| replace:: As of Bot API 6.6 this argument is deprecated in favor of
-
-.. |thumbattributedeprecation| replace:: As of Bot API 6.6 this attribute is deprecated in favor of
-
 .. |editreplymarkup| replace:: It is currently only possible to edit messages without :attr:`telegram.Message.reply_markup` or with inline keyboards.
+
+.. |bcid_edit_time| replace:: Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within *48 hours* from the time they were sent.
 
 .. |toapikwargsbase| replace:: These arguments are also considered by :meth:`~telegram.TelegramObject.to_dict` and :meth:`~telegram.TelegramObject.to_json`, i.e. when passing objects to Telegram. Passing them to Telegram is however not guaranteed to work for all kinds of objects, e.g. this will fail for objects that can not directly be JSON serialized.
 
@@ -32,7 +30,7 @@
 
 .. |message_thread_id| replace:: Unique identifier for the target message thread of the forum topic.
 
-.. |message_thread_id_arg| replace:: Unique identifier for the target message thread (topic) of the forum; for forum supergroups only.
+.. |message_thread_id_arg| replace:: Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only.
 
 .. |parse_mode| replace:: Mode for parsing entities. See :class:`telegram.constants.ParseMode` and `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for more details.
 
@@ -57,3 +55,55 @@
 .. |captionentitiesattr| replace:: Tuple of special entities that appear in the caption, which can be specified instead of ``parse_mode``.
 
 .. |datetime_localization| replace:: The default timezone of the bot is used for localization, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+
+.. |post_methods_note| replace:: If you implement custom logic that implies that you will **not** be using :class:`~telegram.ext.Application`'s methods :meth:`~telegram.ext.Application.run_polling` or :meth:`~telegram.ext.Application.run_webhook` to run your application (like it's done in `Custom Webhook Bot Example <https://docs.python-telegram-bot.org/en/stable/examples.customwebhookbot.html>`__), the callback you set in this method **will not be called automatically**. So instead of setting a callback with this method, you have to explicitly ``await`` the function that you want to run at this stage of your application's life (in the `example mentioned above <https://docs.python-telegram-bot.org/en/stable/examples.customwebhookbot.html>`__, that would be in ``async with application`` context manager).
+
+.. |removed_thumb_note| replace:: Removed the deprecated argument and attribute ``thumb``.
+
+.. |removed_thumb_url_note| replace:: Removed the deprecated argument and attribute ``thumb_url`` which made thumbnail_url mandatory.
+
+.. |removed_thumb_wildcard_note| replace:: Removed the deprecated arguments and attributes ``thumb_*``.
+
+.. |thumbnail_url_mandatory| replace:: Removal of the deprecated argument ``thumb_url`` made ``thumbnail_url`` mandatory.
+
+.. |async_context_manager| replace:: Asynchronous context manager which
+
+.. |reply_parameters| replace:: Description of the message to reply to.
+
+.. |rtm_aswr_deprecated| replace:: replacing this argument. PTB will automatically convert this argument to that one, but you should update your code to use the new argument.
+
+.. |keyword_only_arg| replace:: This argument is now a keyword-only argument.
+
+.. |text_html| replace:: The return value of this property is a best-effort approach. Unfortunately, it can not be guaranteed that sending a message with the returned string will render in the same way as the original message produces the same :attr:`~telegram.Message.entities`/:attr:`~telegram.Message.caption_entities` as the original message. For example, Telegram recommends that entities of type :attr:`~telegram.MessageEntity.BLOCKQUOTE` and :attr:`~telegram.MessageEntity.PRE` *should* start and end on a new line, but does not enforce this and leaves rendering decisions up to the clients.
+
+.. |text_markdown| replace:: |text_html| Moreover, markdown formatting is inherently less expressive than HTML, so some edge cases may not be coverable at all. For example, markdown formatting can not specify two consecutive block quotes without a blank line in between, but HTML can.
+
+.. |reply_quote| replace:: If set to :obj:`True`, the reply is sent as an actual reply to this message. If ``reply_to_message_id`` is passed, this parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+
+.. |do_quote| replace:: If set to :obj:`True`, the replied message is quoted. For a dict, it must be the output of :meth:`~telegram.Message.build_reply_arguments` to specify exact ``reply_parameters``. If ``reply_to_message_id`` or ``reply_parameters`` are passed, this parameter will be ignored. When passing dict-valued input, ``do_quote`` is mutually exclusive with ``allow_sending_without_reply``. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+
+.. |non_optional_story_argument| replace:: As of this version, this argument is now required. In accordance with our `stability policy <https://docs.python-telegram-bot.org/en/stable/stability_policy.html>`__, the signature will be kept as optional for now, though they are mandatory and an error will be raised if you don't pass it.
+
+.. |business_id_str| replace:: Unique identifier of the business connection on behalf of which the message will be sent.
+
+.. |business_id_str_edit| replace:: Unique identifier of the business connection on behalf of which the message to be edited was sent
+
+.. |message_effect_id| replace:: Unique identifier of the message effect to be added to the message; for private chats only.
+
+.. |show_cap_above_med| replace:: :obj:`True`, if the caption must be shown above the message media.
+
+.. |tg_stars| replace:: `Telegram Stars <https://t.me/BotNews/90>`__
+
+.. |allow_paid_broadcast| replace:: Pass True to allow up to :tg-const:`telegram.constants.FloodLimit.PAID_MESSAGES_PER_SECOND` messages per second, ignoring `broadcasting limits <https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once>`__ for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance.
+
+.. |direct_messages_topic_id| replace:: Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat.
+
+.. |suggested_post_parameters| replace:: An object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
+
+.. |tz-naive-dtms| replace:: For timezone naive :obj:`datetime.datetime` objects, the default timezone of the bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+
+.. |org-verify| replace:: `on behalf of the organization <https://telegram.org/verify#third-party-verification>`__
+
+.. |time-period-input| replace:: :class:`datetime.timedelta` objects are accepted in addition to plain :obj:`int` values.
+
+.. |time-period-int-deprecated| replace:: In a future major version this attribute will be of type :obj:`datetime.timedelta`. You can opt-in early by setting `PTB_TIMEDELTA=true`  or ``PTB_TIMEDELTA=1`` as an environment variable.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,18 +32,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_gif():
     return InlineQueryResultCachedGif(
-        TestInlineQueryResultCachedGifBase.id_,
-        TestInlineQueryResultCachedGifBase.gif_file_id,
-        title=TestInlineQueryResultCachedGifBase.title,
-        caption=TestInlineQueryResultCachedGifBase.caption,
-        parse_mode=TestInlineQueryResultCachedGifBase.parse_mode,
-        caption_entities=TestInlineQueryResultCachedGifBase.caption_entities,
-        input_message_content=TestInlineQueryResultCachedGifBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedGifBase.reply_markup,
+        InlineQueryResultCachedGifTestBase.id_,
+        InlineQueryResultCachedGifTestBase.gif_file_id,
+        title=InlineQueryResultCachedGifTestBase.title,
+        caption=InlineQueryResultCachedGifTestBase.caption,
+        parse_mode=InlineQueryResultCachedGifTestBase.parse_mode,
+        caption_entities=InlineQueryResultCachedGifTestBase.caption_entities,
+        input_message_content=InlineQueryResultCachedGifTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedGifTestBase.reply_markup,
+        show_caption_above_media=InlineQueryResultCachedGifTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultCachedGifBase:
+class InlineQueryResultCachedGifTestBase:
     id_ = "id"
     type_ = "gif"
     gif_file_id = "gif file id"
@@ -53,9 +54,10 @@ class TestInlineQueryResultCachedGifBase:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
-class TestInlineQueryResultCachedGifWithoutRequest(TestInlineQueryResultCachedGifBase):
+class TestInlineQueryResultCachedGifWithoutRequest(InlineQueryResultCachedGifTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_gif):
         inst = inline_query_result_cached_gif
         for attr in inst.__slots__:
@@ -75,6 +77,10 @@ class TestInlineQueryResultCachedGifWithoutRequest(TestInlineQueryResultCachedGi
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_cached_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert (
+            inline_query_result_cached_gif.show_caption_above_media
+            == self.show_caption_above_media
+        )
 
     def test_caption_entities_always_tuple(self):
         result = InlineQueryResultCachedGif(self.id_, self.gif_file_id)
@@ -109,6 +115,10 @@ class TestInlineQueryResultCachedGifWithoutRequest(TestInlineQueryResultCachedGi
         assert (
             inline_query_result_cached_gif_dict["reply_markup"]
             == inline_query_result_cached_gif.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_gif_dict["show_caption_above_media"]
+            == inline_query_result_cached_gif.show_caption_above_media
         )
 
     def test_equality(self):

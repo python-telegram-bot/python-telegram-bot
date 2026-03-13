@@ -6,4 +6,4 @@ Video
 .. autoclass:: telegram.Video
     :members:
     :show-inheritance:
-    :inherited-members: TelegramObject
+    :inherited-members: TelegramObject, object

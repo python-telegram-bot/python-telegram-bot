@@ -1,0 +1,5 @@
+dependencies = "Bump ``httpx`` from ~=0.27 to >=0.27,<0.29"
+[[pull_requests]]
+uid = "4820"
+author_uid = "Bibo-Joshi"
+closes_threads = ["4819"]

@@ -1,0 +1,19 @@
+breaking = """This release removes all functionality that was deprecated in v20.x. This is in line with our :ref:`stability policy <stability-policy>`.
+This includes the following changes:
+
+- Removed ``filters.CHAT`` (all messages have an associated chat) and ``filters.StatusUpdate.USER_SHARED`` (use ``filters.StatusUpdate.USERS_SHARED`` instead).
+- Removed ``Defaults.disable_web_page_preview`` and ``Defaults.quote``. Use ``Defaults.link_preview_options`` and ``Defaults.do_quote`` instead.
+- Removed ``ApplicationBuilder.(get_updates_)proxy_url`` and ``HTTPXRequest.proxy_url``. Use ``ApplicationBuilder.(get_updates_)proxy`` and ``HTTPXRequest.proxy`` instead.
+- Removed the ``*_timeout`` arguments of ``Application.run_polling`` and ``Updater.start_webhook``. Instead, specify the values via ``ApplicationBuilder.get_updates_*_timeout``.
+- Removed ``constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH``. Use ``constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`` instead.
+- Removed the argument ``quote`` of ``Message.reply_*``. Use ``do_quote`` instead.
+- Removed the superfluous ``EncryptedPassportElement.credentials`` without replacement.
+- Changed attribute value of ``PassportFile.file_date`` from :obj:`int` to :class:`datetime.datetime`. Make sure to adjust your code accordingly.
+- Changed the attribute value of ``PassportElementErrors.file_hashes`` from :obj:`list` to :obj:`tuple`. Make sure to adjust your code accordingly.
+- Make ``BaseRequest.read_timeout`` an abstract property. If you subclass ``BaseRequest``, you need to implement this property.
+- The default value for ``write_timeout`` now defaults to ``DEFAULT_NONE`` also for bot methods that send media. Previously, it was ``20``. If you subclass ``BaseRequest``, make sure to use your desired write timeout if ``RequestData.multipart_data`` is set.
+"""
+[[pull_requests]]
+uid = "4671"
+author_uid = "Bibo-Joshi"
+closes_threads = ["4659"]

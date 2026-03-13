@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,21 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-from datetime import datetime
+import datetime as dtm
 
 import pytest
 
-from telegram import Audio, Bot, CallbackQuery, Chat, Message, User
+from telegram import (
+    Audio,
+    Bot,
+    CallbackQuery,
+    Chat,
+    InaccessibleMessage,
+    InputChecklist,
+    InputChecklistTask,
+    Message,
+    User,
+)
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -30,41 +40,48 @@ from tests.auxil.bot_method_checks import (
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(params=["message", "inline"])
+@pytest.fixture(params=["message", "inline", "inaccessible_message"])
 def callback_query(bot, request):
     cbq = CallbackQuery(
-        TestCallbackQueryBase.id_,
-        TestCallbackQueryBase.from_user,
-        TestCallbackQueryBase.chat_instance,
-        data=TestCallbackQueryBase.data,
-        game_short_name=TestCallbackQueryBase.game_short_name,
+        CallbackQueryTestBase.id_,
+        CallbackQueryTestBase.from_user,
+        CallbackQueryTestBase.chat_instance,
+        data=CallbackQueryTestBase.data,
+        game_short_name=CallbackQueryTestBase.game_short_name,
     )
     cbq.set_bot(bot)
     cbq._unfreeze()
     if request.param == "message":
-        cbq.message = TestCallbackQueryBase.message
+        cbq.message = CallbackQueryTestBase.message
         cbq.message.set_bot(bot)
-    else:
-        cbq.inline_message_id = TestCallbackQueryBase.inline_message_id
+    elif request.param == "inline":
+        cbq.inline_message_id = CallbackQueryTestBase.inline_message_id
+    elif request.param == "inaccessible_message":
+        cbq.message = InaccessibleMessage(
+            chat=CallbackQueryTestBase.message.chat,
+            message_id=CallbackQueryTestBase.message.message_id,
+        )
     return cbq
 
 
-class TestCallbackQueryBase:
+class CallbackQueryTestBase:
     id_ = "id"
     from_user = User(1, "test_user", False)
     chat_instance = "chat_instance"
-    message = Message(3, datetime.utcnow(), Chat(4, "private"), from_user=User(5, "bot", False))
+    message = Message(
+        3, dtm.datetime.utcnow(), Chat(4, "private"), from_user=User(5, "bot", False)
+    )
     data = "data"
     inline_message_id = "inline_message_id"
     game_short_name = "the_game"
 
 
-class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
+class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
     @staticmethod
     def skip_params(callback_query: CallbackQuery):
         if callback_query.inline_message_id:
-            return {"message_id", "chat_id"}
-        return {"inline_message_id"}
+            return {"message_id", "chat_id", "business_connection_id"}
+        return {"inline_message_id", "business_connection_id"}
 
     @staticmethod
     def shortcut_kwargs(callback_query: CallbackQuery):
@@ -89,7 +106,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
             assert getattr(callback_query, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,
             "from": self.from_user.to_dict(),
@@ -99,7 +116,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
             "inline_message_id": self.inline_message_id,
             "game_short_name": self.game_short_name,
         }
-        callback_query = CallbackQuery.de_json(json_dict, bot)
+        callback_query = CallbackQuery.de_json(json_dict, offline_bot)
         assert callback_query.api_kwargs == {}
 
         assert callback_query.id == self.id_
@@ -117,9 +134,9 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert callback_query_dict["id"] == callback_query.id
         assert callback_query_dict["from"] == callback_query.from_user.to_dict()
         assert callback_query_dict["chat_instance"] == callback_query.chat_instance
-        if callback_query.message:
+        if callback_query.message is not None:
             assert callback_query_dict["message"] == callback_query.message.to_dict()
-        else:
+        elif callback_query.inline_message_id:
             assert callback_query_dict["inline_message_id"] == callback_query.inline_message_id
         assert callback_query_dict["data"] == callback_query.data
         assert callback_query_dict["game_short_name"] == callback_query.game_short_name
@@ -160,6 +177,11 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.answer()
 
     async def test_edit_message_text(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.edit_message_text("test")
+            return
+
         async def make_assertion(*_, **kwargs):
             text = kwargs["text"] == "test"
             ids = self.check_passed_ids(callback_query, kwargs)
@@ -168,7 +190,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_text,
             Bot.edit_message_text,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -187,6 +209,11 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.edit_message_text("test")
 
     async def test_edit_message_caption(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.edit_message_caption("test")
+            return
+
         async def make_assertion(*_, **kwargs):
             caption = kwargs["caption"] == "new caption"
             ids = self.check_passed_ids(callback_query, kwargs)
@@ -195,7 +222,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_caption,
             Bot.edit_message_caption,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -213,7 +240,49 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.edit_message_caption(caption="new caption")
         assert await callback_query.edit_message_caption("new caption")
 
+    async def test_edit_message_checklist(self, monkeypatch, callback_query):
+        checklist = InputChecklist(title="My Checklist", tasks=[InputChecklistTask(1, "Task 1")])
+
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.edit_message_checklist(checklist)
+            return
+
+        if callback_query.inline_message_id:
+            pytest.skip("Can't edit inline messages")
+
+        async def make_assertion(*_, **kwargs):
+            chat_id = kwargs["chat_id"] == callback_query.message.chat_id
+            message_id = kwargs["message_id"] == callback_query.message.message_id
+            caption = kwargs["checklist"] == checklist
+            return chat_id and message_id and caption
+
+        assert check_shortcut_signature(
+            CallbackQuery.edit_message_checklist,
+            Bot.edit_message_checklist,
+            ["chat_id", "message_id", "business_connection_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            callback_query.edit_message_checklist,
+            callback_query.get_bot(),
+            "edit_message_checklist",
+            shortcut_kwargs=["chat_id", "message_id", "business_connection_id"],
+        )
+        assert await check_defaults_handling(
+            callback_query.edit_message_checklist, callback_query.get_bot()
+        )
+
+        monkeypatch.setattr(callback_query.get_bot(), "edit_message_checklist", make_assertion)
+        assert await callback_query.edit_message_checklist(checklist=checklist)
+        assert await callback_query.edit_message_checklist(checklist)
+
     async def test_edit_message_reply_markup(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.edit_message_reply_markup("test")
+            return
+
         async def make_assertion(*_, **kwargs):
             reply_markup = kwargs["reply_markup"] == [["1", "2"]]
             ids = self.check_passed_ids(callback_query, kwargs)
@@ -222,7 +291,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_reply_markup,
             Bot.edit_message_reply_markup,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -241,6 +310,11 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.edit_message_reply_markup([["1", "2"]])
 
     async def test_edit_message_media(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.edit_message_media("test")
+            return
+
         async def make_assertion(*_, **kwargs):
             message_media = kwargs.get("media") == [["1", "2"]]
             ids = self.check_passed_ids(callback_query, kwargs)
@@ -249,7 +323,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.edit_message_media,
             Bot.edit_message_media,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -268,16 +342,22 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.edit_message_media([["1", "2"]])
 
     async def test_edit_message_live_location(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.edit_message_live_location("test")
+            return
+
         async def make_assertion(*_, **kwargs):
             latitude = kwargs.get("latitude") == 1
             longitude = kwargs.get("longitude") == 2
+            live = kwargs.get("live_period") == 900
             ids = self.check_passed_ids(callback_query, kwargs)
-            return ids and latitude and longitude
+            return ids and latitude and longitude and live
 
         assert check_shortcut_signature(
             CallbackQuery.edit_message_live_location,
             Bot.edit_message_live_location,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -292,17 +372,24 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         )
 
         monkeypatch.setattr(callback_query.get_bot(), "edit_message_live_location", make_assertion)
-        assert await callback_query.edit_message_live_location(latitude=1, longitude=2)
-        assert await callback_query.edit_message_live_location(1, 2)
+        assert await callback_query.edit_message_live_location(
+            latitude=1, longitude=2, live_period=900
+        )
+        assert await callback_query.edit_message_live_location(1, 2, live_period=900)
 
     async def test_stop_message_live_location(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.stop_message_live_location("test")
+            return
+
         async def make_assertion(*_, **kwargs):
             return self.check_passed_ids(callback_query, kwargs)
 
         assert check_shortcut_signature(
             CallbackQuery.stop_message_live_location,
             Bot.stop_message_live_location,
-            ["inline_message_id", "message_id", "chat_id"],
+            ["inline_message_id", "message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
@@ -320,6 +407,11 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.stop_message_live_location()
 
     async def test_set_game_score(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.set_game_score(user_id=1, score=2)
+            return
+
         async def make_assertion(*_, **kwargs):
             user_id = kwargs.get("user_id") == 1
             score = kwargs.get("score") == 2
@@ -348,6 +440,11 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.set_game_score(1, 2)
 
     async def test_get_game_high_scores(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.get_game_high_scores("test")
+            return
+
         async def make_assertion(*_, **kwargs):
             user_id = kwargs.get("user_id") == 1
             ids = self.check_passed_ids(callback_query, kwargs)
@@ -375,6 +472,10 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.get_game_high_scores(1)
 
     async def test_delete_message(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.delete_message()
+            return
         if callback_query.inline_message_id:
             pytest.skip("Can't delete inline messages")
 
@@ -400,6 +501,10 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.delete_message()
 
     async def test_pin_message(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.pin_message()
+            return
         if callback_query.inline_message_id:
             pytest.skip("Can't pin inline messages")
 
@@ -409,11 +514,14 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.pin_message,
             Bot.pin_chat_message,
-            ["message_id", "chat_id"],
+            ["message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
-            callback_query.pin_message, callback_query.get_bot(), "pin_chat_message"
+            callback_query.pin_message,
+            callback_query.get_bot(),
+            "pin_chat_message",
+            ["business_connection_id"],
         )
         assert await check_defaults_handling(callback_query.pin_message, callback_query.get_bot())
 
@@ -421,6 +529,10 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.pin_message()
 
     async def test_unpin_message(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.unpin_message()
+            return
         if callback_query.inline_message_id:
             pytest.skip("Can't unpin inline messages")
 
@@ -430,14 +542,15 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.unpin_message,
             Bot.unpin_chat_message,
-            ["message_id", "chat_id"],
+            ["message_id", "chat_id", "business_connection_id"],
             [],
         )
         assert await check_shortcut_call(
             callback_query.unpin_message,
             callback_query.get_bot(),
             "unpin_chat_message",
-            shortcut_kwargs=["message_id", "chat_id"],
+            shortcut_kwargs=["message_id"],
+            skip_params=["business_connection_id"],
         )
         assert await check_defaults_handling(
             callback_query.unpin_message, callback_query.get_bot()
@@ -447,6 +560,10 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert await callback_query.unpin_message()
 
     async def test_copy_message(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.copy_message(1)
+            return
         if callback_query.inline_message_id:
             pytest.skip("Can't copy inline messages")
 
@@ -459,11 +576,14 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         assert check_shortcut_signature(
             CallbackQuery.copy_message,
             Bot.copy_message,
-            ["message_id", "from_chat_id"],
+            ["message_id", "from_chat_id", "direct_messages_topic_id"],
             [],
         )
         assert await check_shortcut_call(
-            callback_query.copy_message, callback_query.get_bot(), "copy_message"
+            callback_query.copy_message,
+            callback_query.get_bot(),
+            "copy_message",
+            shortcut_kwargs=["direct_messages_topic_id"],
         )
         assert await check_defaults_handling(callback_query.copy_message, callback_query.get_bot())
 

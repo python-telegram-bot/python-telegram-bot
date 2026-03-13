@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,14 +23,14 @@ from telegram.ext._utils.trackingdict import TrackingDict
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
+@pytest.fixture
 def td() -> TrackingDict:
     td = TrackingDict()
     td.update_no_track({1: 1})
     return td
 
 
-@pytest.fixture()
+@pytest.fixture
 def data() -> dict:
     return {1: 1}
 

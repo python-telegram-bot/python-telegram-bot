@@ -22,18 +22,22 @@ Setting things up
 
       $ git remote add upstream https://github.com/python-telegram-bot/python-telegram-bot
 
-4. Install dependencies:
+4. Install the package in development mode as well as optional dependencies and development dependencies.
+   Note that the `--group` argument requires `pip` 25.1 or later.
+   
+   Alternatively, you can use your preferred package manager (such as uv, hatch, poetry, etc.) instead of pip.
 
    .. code-block:: bash
 
-      $ pip install -r requirements-all.txt
+      $ pip install -e .[all] --group all
 
+   Installing the package itself is necessary because python-telegram-bot uses a src-based layout where the package code is located in the ``src/`` directory.
 
 5. Install pre-commit hooks:
 
    .. code-block:: bash
 
-      $ pre-commit install
+      $ prek install -f
 
 Finding something to do
 =======================
@@ -83,7 +87,7 @@ Here's how to make a one-off code change.
 
      - Documenting types of global variables and complex types of class members can be done using the Sphinx docstring convention.
 
-   -  In addition, PTB uses some formatting/styling and linting tools in the pre-commit setup. Some of those tools also have command line tools that can help to run these tools outside of the pre-commit step. If you'd like to leverage that, please have a look at the `pre-commit config file`_ for an overview of which tools (and which versions of them) are used. For example, we use `Black`_ for code formatting. Plugins for Black exist for some `popular editors`_. You can use those instead of manually formatting everything.
+   -  In addition, PTB uses some formatting/styling and linting tools in the pre-commit setup. Some of those tools also have command line tools that can help to run these tools outside of the pre-commit step. If you'd like to leverage that, please have a look at the `pre-commit config file`_ for an overview of which tools (and which versions of them) are used. For example, we use `Ruff`_ for linting and formatting.
 
    - Please ensure that the code you write is well-tested and that all automated tests still pass. We
      have dedicated an `testing page`_ to help you with that.
@@ -96,7 +100,7 @@ Here's how to make a one-off code change.
 
      .. code-block:: bash
 
-        $ pre-commit run -a
+        $ prek run -a
 
    - To actually make the commit (this will trigger tests style & type checks automatically):
 
@@ -157,44 +161,47 @@ Check-list for PRs
 This checklist is a non-exhaustive reminder of things that should be done before a PR is merged, both for you as contributor and for the maintainers.
 Feel free to copy (parts of) the checklist to the PR description to remind you or the maintainers of open points or if you have questions on anything.
 
-- Added ``.. versionadded:: NEXT.VERSION``, ``.. versionchanged:: NEXT.VERSION`` or ``.. deprecated:: NEXT.VERSION`` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
-- Created new or adapted existing unit tests
-- Documented code changes according to the `CSI standard <https://standards.mousepawmedia.com/en/stable/csi.html>`__
-- Added myself alphabetically to ``AUTHORS.rst`` (optional)
-- Added new classes & modules to the docs and all suitable ``__all__`` s
-- Checked the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_ in case of deprecations or changes to documented behavior
+.. code-block:: markdown
 
-**If the PR contains API changes (otherwise, you can ignore this passage)**
+    ## Check-list for PRs
 
-- Checked the Bot API specific sections of the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_
+    - [ ] Added `.. versionadded:: NEXT.VERSION`, ``.. versionchanged:: NEXT.VERSION``, ``.. deprecated:: NEXT.VERSION`` or ``.. versionremoved:: NEXT.VERSION` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
+    - [ ] Created new or adapted existing unit tests
+    - [ ] Documented code changes according to the [CSI standard](https://standards.mousepawmedia.com/en/stable/csi.html)
+    - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
+    - [ ] Added new classes & modules to the docs and all suitable ``__all__`` s
+    - [ ] Checked the [Stability Policy](https://docs.python-telegram-bot.org/stability_policy.html) in case of deprecations or changes to documented behavior
 
--  New classes:
+    **If the PR contains API changes (otherwise, you can ignore this passage)**
 
-   - Added ``self._id_attrs`` and corresponding documentation
-   - ``__init__`` accepts ``api_kwargs`` as kw-only
+    - [ ] Checked the Bot API specific sections of the [Stability Policy](https://docs.python-telegram-bot.org/stability_policy.html)
+    - [ ] Created a PR to remove functionality deprecated in the previous Bot API release ([see here](https://docs.python-telegram-bot.org/en/stable/stability_policy.html#case-2))
 
--  Added new shortcuts:
+    - New Classes
 
-   - In :class:`~telegram.Chat` & :class:`~telegram.User` for all methods that accept ``chat/user_id``
-   - In :class:`~telegram.Message` for all methods that accept ``chat_id`` and ``message_id``
-   - For new :class:`~telegram.Message` shortcuts: Added ``quote`` argument if methods accepts ``reply_to_message_id``
-   - In :class:`~telegram.CallbackQuery` for all methods that accept either ``chat_id`` and ``message_id`` or ``inline_message_id``
+        - [ ] Added `self._id_attrs` and corresponding documentation
+        - [ ] `__init__` accepts `api_kwargs` as keyword-only
 
--  If relevant:
+    - Added New Shortcuts
 
-   - Added new constants at :mod:`telegram.constants` and shortcuts to them as class variables
-   - Link new and existing constants in docstrings instead of hard-coded numbers and strings
-   - Add new message types to :attr:`telegram.Message.effective_attachment`
-   - Added new handlers for new update types
+        - [ ] In [`telegram.Chat`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.chat.html) \& [`telegram.User`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.user.html) for all methods that accept `chat/user_id`
+        - [ ] In [`telegram.Message`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.message.html) for all methods that accept `chat_id` and `message_id`
+        - [ ] For new `telegram.Message` shortcuts: Added `quote` argument if methods accept `reply_to_message_id`
+        - [ ] In [`telegram.CallbackQuery`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.callbackquery.html) for all methods that accept either `chat_id` and `message_id` or `inline_message_id`
 
-     - Add the handlers to the warning loop in the :class:`~telegram.ext.ConversationHandler`
+    - If Relevant
 
-   - Added new filters for new message (sub)types
-   - Added or updated documentation for the changed class(es) and/or method(s)
-   - Added the new method(s) to ``_extbot.py``
-   - Added or updated ``bot_methods.rst``
-   - Updated the Bot API version number in all places: ``README.rst`` and ``README_RAW.rst`` (including the badge), as well as ``telegram.constants.BOT_API_VERSION_INFO``
-   - Added logic for arbitrary callback data in :class:`telegram.ext.ExtBot` for new methods that either accept a ``reply_markup`` in some form or have a return type that is/contains :class:`~telegram.Message`
+        - [ ] Added new constants at `telegram.constants` and shortcuts to them as class variables
+        - [ ] Linked new and existing constants in docstrings instead of hard-coded numbers and strings
+        - [ ] Added new message types to `telegram.Message.effective_attachment`
+        - [ ] Added new handlers for new update types
+            - [ ] Added the handlers to the warning loop in the [`telegram.ext.ConversationHandler`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.conversationhandler.html)
+        - [ ] Added new filters for new message (sub)types
+        - [ ] Added or updated documentation for the changed class(es) and/or method(s)
+        - [ ] Added the new method(s) to `_extbot.py`
+        - [ ] Added or updated `bot_methods.rst`
+        - [ ] Updated the Bot API version number in all places: `README.rst` (including the badge) and `telegram.constants.BOT_API_VERSION_INFO`
+        - [ ] Added logic for arbitrary callback data in `telegram.ext.ExtBot` for new methods that either accept a `reply_markup` in some form or have a return type that is/contains [`telegram.Message`](https://python-telegram-bot.readthedocs.io/en/stable/telegram.message.html)
 
 Documenting
 ===========
@@ -209,13 +216,8 @@ doc strings don't have a separate documentation site they generate, instead, the
 
 User facing documentation
 -------------------------
-We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.9 or above and have the required dependencies:
-
-.. code-block:: bash
-
-   $ pip install -r docs/requirements-docs.txt
-
-then run the following from the PTB root directory:
+We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.10 or above and have the required dependencies installed as explained above.
+Then, run the following from the PTB root directory:
 
 .. code-block:: bash
 
@@ -274,27 +276,8 @@ callable we prefer that the call also uses keyword arg syntax. For example:
 This gives us the flexibility to re-order arguments and more importantly
 to add new required arguments. It's also more explicit and easier to read.
 
-Properly defining optional arguments
-------------------------------------
 
-It's always good to not initialize optional arguments at class creation,
-instead use ``**kwargs`` to get them. It's well known Telegram API can
-change without notice, in that case if a new argument is added it won't
-break the API classes. For example:
-
-.. code-block:: python
-
-    # GOOD
-    def __init__(self, id, name, last_name=None, **kwargs):
-        self.last_name = last_name
-
-
-    # BAD
-    def __init__(self, id, name, last_name=None):
-        self.last_name = last_name
-
-
-.. _`Code of Conduct`: https://www.python.org/psf/conduct/
+.. _`Code of Conduct`: https://policies.python.org/python.org/code-of-conduct/
 .. _`issue tracker`: https://github.com/python-telegram-bot/python-telegram-bot/issues
 .. _`Telegram group`: https://telegram.me/pythontelegrambotgroup
 .. _`PEP 8 Style Guide`: https://peps.python.org/pep-0008/
@@ -305,8 +288,7 @@ break the API classes. For example:
 .. _`MyPy`: https://mypy.readthedocs.io/en/stable/index.html
 .. _`here`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
 .. _`pre-commit config file`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.pre-commit-config.yaml
-.. _`Black`: https://black.readthedocs.io/en/stable/index.html
-.. _`popular editors`: https://black.readthedocs.io/en/stable/integrations/editors.html
+.. _`Ruff`: https://docs.astral.sh/ruff/
 .. _`RTD`: https://docs.python-telegram-bot.org/
 .. _`RTD build`: https://docs.python-telegram-bot.org/en/doc-fixes
 .. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html

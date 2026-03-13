@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,13 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def passport_element_error_translation_file():
     return PassportElementErrorTranslationFile(
-        TestPassportElementErrorTranslationFileBase.type_,
-        TestPassportElementErrorTranslationFileBase.file_hash,
-        TestPassportElementErrorTranslationFileBase.message,
+        PassportElementErrorTranslationFileTestBase.type_,
+        PassportElementErrorTranslationFileTestBase.file_hash,
+        PassportElementErrorTranslationFileTestBase.message,
     )
 
 
-class TestPassportElementErrorTranslationFileBase:
+class PassportElementErrorTranslationFileTestBase:
     source = "translation_file"
     type_ = "test_type"
     file_hash = "file_hash"
@@ -39,7 +39,7 @@ class TestPassportElementErrorTranslationFileBase:
 
 
 class TestPassportElementErrorTranslationFileWithoutRequest(
-    TestPassportElementErrorTranslationFileBase
+    PassportElementErrorTranslationFileTestBase
 ):
     def test_slot_behaviour(self, passport_element_error_translation_file):
         inst = passport_element_error_translation_file

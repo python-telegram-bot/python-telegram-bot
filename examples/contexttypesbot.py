@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, wrong-import-position
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -12,21 +12,7 @@ bot.
 
 import logging
 from collections import defaultdict
-from typing import DefaultDict, Optional, Set
 
-from telegram import __version__ as TG_VER
-
-try:
-    from telegram import __version_info__
-except ImportError:
-    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
-
-if __version_info__ < (20, 0, 0, "alpha", 1):
-    raise RuntimeError(
-        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
-        f"{TG_VER} version of this example, "
-        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
-    )
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -43,6 +29,9 @@ from telegram.ext import (
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 
@@ -50,7 +39,7 @@ class ChatData:
     """Custom class for chat_data. Here we store data per message."""
 
     def __init__(self) -> None:
-        self.clicks_per_message: DefaultDict[int, int] = defaultdict(int)
+        self.clicks_per_message: defaultdict[int, int] = defaultdict(int)
 
 
 # The [ExtBot, dict, ChatData, dict] is for type checkers like mypy
@@ -60,19 +49,19 @@ class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
     def __init__(
         self,
         application: Application,
-        chat_id: Optional[int] = None,
-        user_id: Optional[int] = None,
+        chat_id: int | None = None,
+        user_id: int | None = None,
     ):
         super().__init__(application=application, chat_id=chat_id, user_id=user_id)
-        self._message_id: Optional[int] = None
+        self._message_id: int | None = None
 
     @property
-    def bot_user_ids(self) -> Set[int]:
+    def bot_user_ids(self) -> set[int]:
         """Custom shortcut to access a value stored in the bot_data dict"""
         return self.bot_data.setdefault("user_ids", set())
 
     @property
-    def message_clicks(self) -> Optional[int]:
+    def message_clicks(self) -> int | None:
         """Access the number of clicks for the message this context object was built for."""
         if self._message_id:
             return self.chat_data.clicks_per_message[self._message_id]
@@ -125,8 +114,7 @@ async def count_click(update: Update, context: CustomContext) -> None:
 async def print_users(update: Update, context: CustomContext) -> None:
     """Show which users have been using this bot."""
     await update.message.reply_text(
-        "The following user IDs have used this bot: "
-        f'{", ".join(map(str, context.bot_user_ids))}'
+        f"The following user IDs have used this bot: {', '.join(map(str, context.bot_user_ids))}"
     )
 
 

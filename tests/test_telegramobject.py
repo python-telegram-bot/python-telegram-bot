@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import inspect
 import pickle
 import re
@@ -27,6 +27,7 @@ from types import MappingProxyType
 import pytest
 
 from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
+from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram.ext import PicklePersistence
 from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
@@ -89,6 +90,11 @@ class TestTelegramObject:
         assert to.api_kwargs == {"foo": "bar"}
         assert to.get_bot() is bot
 
+    def test_de_json_optional_bot(self):
+        to = TelegramObject.de_json(data={})
+        with pytest.raises(RuntimeError, match="no bot associated with it"):
+            to.get_bot()
+
     def test_de_list(self, bot):
         class SubClass(TelegramObject):
             def __init__(self, arg: int, **kwargs):
@@ -97,7 +103,7 @@ class TestTelegramObject:
 
                 self._id_attrs = (self.arg,)
 
-        assert SubClass.de_list([{"arg": 1}, None, {"arg": 2}, None], bot) == (
+        assert SubClass.de_list([{"arg": 1}, {"arg": 2}], bot) == (
             SubClass(1),
             SubClass(2),
         )
@@ -140,9 +146,9 @@ class TestTelegramObject:
         if cls is TelegramObject:
             # TelegramObject doesn't have a super class
             return
-        assert "api_kwargs=api_kwargs" in inspect.getsource(
-            cls.__init__
-        ), f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
+        assert "api_kwargs=api_kwargs" in inspect.getsource(cls.__init__), (
+            f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
+        )
 
     def test_de_json_arbitrary_exceptions(self, bot):
         class SubClass(TelegramObject):
@@ -155,7 +161,7 @@ class TestTelegramObject:
 
     def test_to_dict_private_attribute(self):
         class TelegramObjectSubclass(TelegramObject):
-            __slots__ = ("a", "_b")  # Added slots so that the attrs are converted to dict
+            __slots__ = ("_b", "a")  # Added slots so that the attrs are converted to dict
 
             def __init__(self):
                 super().__init__()
@@ -170,9 +176,7 @@ class TestTelegramObject:
         assert to.to_dict() == {"foo": "bar"}
 
     def test_to_dict_missing_attribute(self):
-        message = Message(
-            1, datetime.datetime.now(), Chat(1, "private"), from_user=User(1, "", False)
-        )
+        message = Message(1, dtm.datetime.now(), Chat(1, "private"), from_user=User(1, "", False))
         message._unfreeze()
         del message.chat
 
@@ -205,6 +209,18 @@ class TestTelegramObject:
         assert to_dict_recurse
         assert isinstance(to_dict_recurse["subclass"], dict)
         assert to_dict_recurse["subclass"]["recursive"] == "recursive"
+
+    def test_to_dict_default_value(self):
+        class SubClass(TelegramObject):
+            def __init__(self):
+                super().__init__()
+                self.default_none = DEFAULT_NONE
+                self.default_false = DEFAULT_FALSE
+
+        to = SubClass()
+        to_dict = to.to_dict()
+        assert "default_none" not in to_dict
+        assert to_dict["default_false"] is False
 
     def test_slot_behaviour(self):
         inst = TelegramObject()
@@ -270,7 +286,7 @@ class TestTelegramObject:
     def test_pickle(self, bot):
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
-        date = datetime.datetime.now()
+        date = dtm.datetime.now()
         photo = PhotoSize("file_id", "unique", 21, 21)
         photo.set_bot(bot)
         msg = Message(
@@ -280,6 +296,7 @@ class TestTelegramObject:
             from_user=user,
             text="foobar",
             photo=[photo],
+            animation=DEFAULT_NONE,
             api_kwargs={"api": "kwargs"},
         )
         msg.set_bot(bot)
@@ -295,6 +312,8 @@ class TestTelegramObject:
         assert unpickled.from_user == user
         assert unpickled.date == date, f"{unpickled.date} != {date}"
         assert unpickled.photo[0] == photo
+        assert isinstance(unpickled.animation, DefaultValue)
+        assert unpickled.animation.value is None
         assert isinstance(unpickled.api_kwargs, MappingProxyType)
         assert unpickled.api_kwargs == {"api": "kwargs"}
 
@@ -326,10 +345,14 @@ class TestTelegramObject:
         chat = (await pp.get_chat_data())[1]
         assert chat.id == 1
         assert chat.type == Chat.PRIVATE
-        assert chat.api_kwargs == {
+        api_kwargs_expected = {
             "all_members_are_administrators": True,
             "something": "Manually inserted",
         }
+        # There are older attrs in Chat's api_kwargs which are present but we don't care about them
+        for k, v in api_kwargs_expected.items():
+            assert chat.api_kwargs[k] == v
+
         with pytest.raises(AttributeError):
             # removed attribute should not be available as attribute, only though api_kwargs
             chat.all_members_are_administrators
@@ -342,10 +365,72 @@ class TestTelegramObject:
         chat.id = 7
         assert chat.id == 7
 
+    def test_pickle_handle_properties(self):
+        # Very hard to properly test, can't use a pickle file since newer versions of the library
+        # will stop having the property.
+        # The code below uses exec statements to simulate library changes. There is no other way
+        # to test this.
+        # Original class:
+        v1 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ("forward_from", "to_be_removed", "forward_date")
+    def __init__(self, forward_from=None, forward_date=None, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+        self.forward_from = forward_from
+        self.forward_date = forward_date
+        self.to_be_removed = "to_be_removed"
+"""
+        exec(v1, globals(), None)
+        old = PicklePropertyTest("old_val", "date", api_kwargs={"new_attr": 1})  # noqa: F821
+        pickled_v1 = pickle.dumps(old)
+
+        # After some API changes:
+        v2 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ("_forward_from", "_date", "_new_attr")
+    def __init__(self, forward_from=None, f_date=None, new_attr=None, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+        self._forward_from = forward_from
+        self.f_date = f_date
+        self._new_attr = new_attr
+    @property
+    def forward_from(self):
+        return self._forward_from
+    @property
+    def forward_date(self):
+        return self.f_date
+    @property
+    def new_attr(self):
+        return self._new_attr
+        """
+        exec(v2, globals(), None)
+        v2_unpickle = pickle.loads(pickled_v1)
+        assert v2_unpickle.forward_from == "old_val" == v2_unpickle._forward_from
+        with pytest.raises(AttributeError):
+            # New attribute should not be available either as is always the case for pickle
+            v2_unpickle.forward_date
+        assert v2_unpickle.new_attr == 1 == v2_unpickle._new_attr
+        assert not hasattr(v2_unpickle, "to_be_removed")
+        assert v2_unpickle.api_kwargs == {"to_be_removed": "to_be_removed"}
+        pickled_v2 = pickle.dumps(v2_unpickle)
+
+        # After PTB removes the property and the attribute:
+        v3 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ()
+    def __init__(self, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+"""
+        exec(v3, globals(), None)
+        v3_unpickle = pickle.loads(pickled_v2)
+        assert v3_unpickle.api_kwargs == {"to_be_removed": "to_be_removed"}
+        assert not hasattr(v3_unpickle, "_forward_from")
+        assert not hasattr(v3_unpickle, "_new_attr")
+
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
-        date = datetime.datetime.now()
+        date = dtm.datetime.now()
         photo = PhotoSize("file_id", "unique", 21, 21)
         photo.set_bot(bot)
         msg = Message(
@@ -460,7 +545,7 @@ class TestTelegramObject:
                 "and can therefore not be frozen correctly"
             )
 
-        source_lines, first_line = inspect.getsourcelines(cls.__init__)
+        source_lines, _ = inspect.getsourcelines(cls.__init__)
 
         # We use regex matching since a simple "if self._freeze() in source_lines[-1]" would also
         # allo commented lines.

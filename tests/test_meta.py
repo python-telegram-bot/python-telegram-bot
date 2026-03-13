@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,9 +35,4 @@ def _change_test_dir(request, monkeypatch):
 
 @skip_disabled
 def test_build():
-    assert os.system("python setup.py bdist_dumb") == 0  # pragma: no cover
-
-
-@skip_disabled
-def test_build_raw():
-    assert os.system("python setup-raw.py bdist_dumb") == 0  # pragma: no cover
+    assert os.system("python -m build") == 0  # pragma: no cover

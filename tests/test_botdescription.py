@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,26 +24,26 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def bot_description(bot):
-    return BotDescription(TestBotDescriptionBase.description)
+    return BotDescription(BotDescriptionTestBase.description)
 
 
 @pytest.fixture(scope="module")
 def bot_short_description(bot):
-    return BotShortDescription(TestBotDescriptionBase.short_description)
+    return BotShortDescription(BotDescriptionTestBase.short_description)
 
 
-class TestBotDescriptionBase:
+class BotDescriptionTestBase:
     description = "This is a test description"
     short_description = "This is a test short description"
 
 
-class TestBotDescriptionWithoutRequest(TestBotDescriptionBase):
+class TestBotDescriptionWithoutRequest(BotDescriptionTestBase):
     def test_slot_behaviour(self, bot_description):
         for attr in bot_description.__slots__:
             assert getattr(bot_description, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(bot_description)) == len(
-            set(mro_slots(bot_description))
-        ), "duplicate slot"
+        assert len(mro_slots(bot_description)) == len(set(mro_slots(bot_description))), (
+            "duplicate slot"
+        )
 
     def test_to_dict(self, bot_description):
         bot_description_dict = bot_description.to_dict()
@@ -64,7 +64,7 @@ class TestBotDescriptionWithoutRequest(TestBotDescriptionBase):
         assert hash(a) != hash(c)
 
 
-class TestBotShortDescriptionWithoutRequest(TestBotDescriptionBase):
+class TestBotShortDescriptionWithoutRequest(BotDescriptionTestBase):
     def test_slot_behaviour(self, bot_short_description):
         for attr in bot_short_description.__slots__:
             assert getattr(bot_short_description, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -1,0 +1,5 @@
+internal = "Bump ``astral-sh/setup-uv`` from 6.3.1 to 6.4.3"
+[[pull_requests]]
+uid = "4895"
+author_uid = "dependabot"
+closes_threads = []

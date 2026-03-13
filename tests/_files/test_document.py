@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,8 @@ from pathlib import Path
 
 import pytest
 
-from telegram import Bot, Document, InputFile, MessageEntity, PhotoSize, Voice
+from telegram import Bot, Document, InputFile, MessageEntity, PhotoSize, ReplyParameters, Voice
+from telegram.constants import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
@@ -31,27 +32,12 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import (
-    check_thumb_deprecation_warning_for_method_args,
-    check_thumb_deprecation_warnings_for_args_and_attrs,
-)
+from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
-def document_file():
-    with data_file("telegram.png").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def document(bot, chat_id):
-    with data_file("telegram.png").open("rb") as f:
-        return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
-
-
-class TestDocumentBase:
+class DocumentTestBase:
     caption = "DocumentTest - *Caption*"
     document_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.gif"
     file_size = 12948
@@ -64,7 +50,7 @@ class TestDocumentBase:
     document_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestDocumentWithoutRequest(TestDocumentBase):
+class TestDocumentWithoutRequest(DocumentTestBase):
     def test_slot_behaviour(self, document):
         for attr in document.__slots__:
             assert getattr(document, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -81,16 +67,11 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert document.file_size == self.file_size
         assert document.mime_type == self.mime_type
         assert document.file_name == self.file_name
-        assert document.thumbnail.file_size == self.thumb_file_size
+        assert document.thumbnail.file_size in [self.thumb_file_size, 7980]
         assert document.thumbnail.width == self.thumb_width
         assert document.thumbnail.height == self.thumb_height
 
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        document = Document(file_id="file_id", file_unique_id="file_unique_id", thumb=object())
-        assert document.thumb is document.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
-
-    def test_de_json(self, bot, document):
+    def test_de_json(self, offline_bot, document):
         json_dict = {
             "file_id": self.document_file_id,
             "file_unique_id": self.document_file_unique_id,
@@ -99,7 +80,7 @@ class TestDocumentWithoutRequest(TestDocumentBase):
             "mime_type": self.mime_type,
             "file_size": self.file_size,
         }
-        test_document = Document.de_json(json_dict, bot)
+        test_document = Document.de_json(json_dict, offline_bot)
         assert test_document.api_kwargs == {}
 
         assert test_document.file_id == self.document_file_id
@@ -135,13 +116,13 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_error_send_without_required_args(self, bot, chat_id):
+    async def test_error_send_without_required_args(self, offline_bot, chat_id):
         with pytest.raises(TypeError):
-            await bot.send_document(chat_id=chat_id)
+            await offline_bot.send_document(chat_id=chat_id)
 
     @pytest.mark.parametrize("disable_content_type_detection", [True, False, None])
     async def test_send_with_document(
-        self, monkeypatch, bot, chat_id, document, disable_content_type_detection
+        self, monkeypatch, offline_bot, chat_id, document, disable_content_type_detection
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.parameters
@@ -150,9 +131,9 @@ class TestDocumentWithoutRequest(TestDocumentBase):
             )
             return data["document"] == document.file_id and type_detection
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        message = await bot.send_document(
+        message = await offline_bot.send_document(
             document=document,
             chat_id=chat_id,
             disable_content_type_detection=disable_content_type_detection,
@@ -160,24 +141,40 @@ class TestDocumentWithoutRequest(TestDocumentBase):
 
         assert message
 
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_send_document_thumb_deprecation_warning(
-        self, recwarn, monkeypatch, bot_class, bot, raw_bot, chat_id, document
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_document_default_quote_parse_mode(
+        self, default_bot, chat_id, document, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return True
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
 
-        bot = raw_bot if bot_class == "Bot" else bot
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        await bot.send_document(chat_id, document, thumb="thumb")
-        check_thumb_deprecation_warning_for_method_args(recwarn, __file__)
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_document(
+            chat_id, document, reply_parameters=ReplyParameters(**kwargs)
+        )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_document_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_send_document_local_files(
+        self, dummy_message_dict, monkeypatch, offline_bot, chat_id, local_mode
+    ):
         try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
+            offline_bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local Bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
             expected = file.as_uri()
@@ -192,21 +189,13 @@ class TestDocumentWithoutRequest(TestDocumentBase):
                     test_flag = isinstance(data.get("document"), InputFile) and isinstance(
                         data.get("thumbnail"), InputFile
                     )
+                return dummy_message_dict
 
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_document(chat_id, file, thumbnail=file)
+            monkeypatch.setattr(offline_bot, "_post", make_assertion)
+            await offline_bot.send_document(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
-            bot._local_mode = False
-
-    async def test_send_document_with_local_files_throws_error_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.send_document(chat_id, file, thumbnail=file, thumb=different_file)
+            offline_bot._local_mode = False
 
     async def test_get_file_instance_method(self, monkeypatch, document):
         async def make_assertion(*_, **kwargs):
@@ -220,7 +209,7 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert await document.get_file()
 
 
-class TestDocumentWithRequest(TestDocumentBase):
+class TestDocumentWithRequest(DocumentTestBase):
     async def test_error_send_empty_file(self, bot, chat_id):
         with Path(os.devnull).open("rb") as f, pytest.raises(TelegramError):
             await bot.send_document(chat_id=chat_id, document=f)
@@ -229,20 +218,16 @@ class TestDocumentWithRequest(TestDocumentBase):
         with pytest.raises(TelegramError):
             await bot.send_document(chat_id=chat_id, document="")
 
-    async def test_get_and_download(self, bot, document, chat_id):
-        path = Path("telegram.png")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, document, chat_id, tmp_file):
         new_file = await bot.get_file(document.file_id)
 
         assert new_file.file_size == document.file_size
         assert new_file.file_unique_id == document.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.png")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_send_resend(self, bot, chat_id, document):
         message = await bot.send_document(chat_id=chat_id, document=document.file_id)
@@ -370,7 +355,7 @@ class TestDocumentWithRequest(TestDocumentBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_document(
                     chat_id, document, reply_to_message_id=reply_to_message.message_id
                 )

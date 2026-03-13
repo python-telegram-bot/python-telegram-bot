@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ import pytest
 
 from telegram import (
     CallbackGame,
+    CopyTextButton,
     InlineKeyboardButton,
     LoginUrl,
     SwitchInlineQueryChosenChat,
@@ -32,20 +33,27 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_keyboard_button():
     return InlineKeyboardButton(
-        TestInlineKeyboardButtonBase.text,
-        url=TestInlineKeyboardButtonBase.url,
-        callback_data=TestInlineKeyboardButtonBase.callback_data,
-        switch_inline_query=TestInlineKeyboardButtonBase.switch_inline_query,
-        switch_inline_query_current_chat=TestInlineKeyboardButtonBase.switch_inline_query_current_chat,  # noqa: E501
-        callback_game=TestInlineKeyboardButtonBase.callback_game,
-        pay=TestInlineKeyboardButtonBase.pay,
-        login_url=TestInlineKeyboardButtonBase.login_url,
-        web_app=TestInlineKeyboardButtonBase.web_app,
-        switch_inline_query_chosen_chat=TestInlineKeyboardButtonBase.switch_inline_query_chosen_chat,  # noqa: E501
+        InlineKeyboardButtonTestBase.text,
+        url=InlineKeyboardButtonTestBase.url,
+        callback_data=InlineKeyboardButtonTestBase.callback_data,
+        switch_inline_query=InlineKeyboardButtonTestBase.switch_inline_query,
+        switch_inline_query_current_chat=(
+            InlineKeyboardButtonTestBase.switch_inline_query_current_chat
+        ),
+        callback_game=InlineKeyboardButtonTestBase.callback_game,
+        pay=InlineKeyboardButtonTestBase.pay,
+        login_url=InlineKeyboardButtonTestBase.login_url,
+        web_app=InlineKeyboardButtonTestBase.web_app,
+        switch_inline_query_chosen_chat=(
+            InlineKeyboardButtonTestBase.switch_inline_query_chosen_chat
+        ),
+        copy_text=InlineKeyboardButtonTestBase.copy_text,
+        style=InlineKeyboardButtonTestBase.style,
+        icon_custom_emoji_id=InlineKeyboardButtonTestBase.icon_custom_emoji_id,
     )
 
 
-class TestInlineKeyboardButtonBase:
+class InlineKeyboardButtonTestBase:
     text = "text"
     url = "url"
     callback_data = "callback data"
@@ -56,9 +64,12 @@ class TestInlineKeyboardButtonBase:
     login_url = LoginUrl("http://google.com")
     web_app = WebAppInfo(url="https://example.com")
     switch_inline_query_chosen_chat = SwitchInlineQueryChosenChat("a_bot", True, False, True, True)
+    copy_text = CopyTextButton("python-telegram-bot")
+    style = "danger"
+    icon_custom_emoji_id = "5237829955978547322"
 
 
-class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
+class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
     def test_slot_behaviour(self, inline_keyboard_button):
         inst = inline_keyboard_button
         for attr in inst.__slots__:
@@ -82,6 +93,9 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
             inline_keyboard_button.switch_inline_query_chosen_chat
             == self.switch_inline_query_chosen_chat
         )
+        assert inline_keyboard_button.copy_text == self.copy_text
+        assert inline_keyboard_button.style == self.style
+        assert inline_keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
     def test_to_dict(self, inline_keyboard_button):
         inline_keyboard_button_dict = inline_keyboard_button.to_dict()
@@ -111,8 +125,16 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
             inline_keyboard_button_dict["switch_inline_query_chosen_chat"]
             == inline_keyboard_button.switch_inline_query_chosen_chat.to_dict()
         )
+        assert (
+            inline_keyboard_button_dict["copy_text"] == inline_keyboard_button.copy_text.to_dict()
+        )
+        assert inline_keyboard_button_dict["style"] == inline_keyboard_button.style
+        assert (
+            inline_keyboard_button_dict["icon_custom_emoji_id"]
+            == inline_keyboard_button.icon_custom_emoji_id
+        )
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "text": self.text,
             "url": self.url,
@@ -124,6 +146,9 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
             "login_url": self.login_url.to_dict(),
             "pay": self.pay,
             "switch_inline_query_chosen_chat": self.switch_inline_query_chosen_chat.to_dict(),
+            "copy_text": self.copy_text.to_dict(),
+            "style": self.style,
+            "icon_custom_emoji_id": self.icon_custom_emoji_id,
         }
 
         inline_keyboard_button = InlineKeyboardButton.de_json(json_dict, None)
@@ -145,9 +170,9 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
             inline_keyboard_button.switch_inline_query_chosen_chat
             == self.switch_inline_query_chosen_chat
         )
-
-        none = InlineKeyboardButton.de_json({}, bot)
-        assert none is None
+        assert inline_keyboard_button.copy_text == self.copy_text
+        assert inline_keyboard_button.style == self.style
+        assert inline_keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
     def test_equality(self):
         a = InlineKeyboardButton("text", callback_data="data")
@@ -157,6 +182,8 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
         e = InlineKeyboardButton("text", url="http://google.com")
         f = InlineKeyboardButton("text", web_app=WebAppInfo(url="https://ptb.org"))
         g = LoginUrl("http://google.com")
+        h = InlineKeyboardButton("test", style="primary")
+        i = InlineKeyboardButton("test", icon_custom_emoji_id="123")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -175,6 +202,12 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
 
         assert a != g
         assert hash(a) != hash(g)
+
+        assert a != h
+        assert hash(a) != hash(h)
+
+        assert h != i
+        assert hash(h) != hash(i)
 
     @pytest.mark.parametrize("callback_data", ["foo", 1, ("da", "ta"), object()])
     def test_update_callback_data(self, callback_data):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
+
 import pytest
 
 from telegram import (
@@ -26,36 +28,37 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
 def inline_query_result_mpeg4_gif():
     return InlineQueryResultMpeg4Gif(
-        TestInlineQueryResultMpeg4GifBase.id_,
-        TestInlineQueryResultMpeg4GifBase.mpeg4_url,
-        TestInlineQueryResultMpeg4GifBase.thumbnail_url,
-        mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
-        mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
-        mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
-        title=TestInlineQueryResultMpeg4GifBase.title,
-        caption=TestInlineQueryResultMpeg4GifBase.caption,
-        parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
-        caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
-        input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
-        reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
-        thumbnail_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
+        InlineQueryResultMpeg4GifTestBase.id_,
+        InlineQueryResultMpeg4GifTestBase.mpeg4_url,
+        InlineQueryResultMpeg4GifTestBase.thumbnail_url,
+        mpeg4_width=InlineQueryResultMpeg4GifTestBase.mpeg4_width,
+        mpeg4_height=InlineQueryResultMpeg4GifTestBase.mpeg4_height,
+        mpeg4_duration=InlineQueryResultMpeg4GifTestBase.mpeg4_duration,
+        title=InlineQueryResultMpeg4GifTestBase.title,
+        caption=InlineQueryResultMpeg4GifTestBase.caption,
+        parse_mode=InlineQueryResultMpeg4GifTestBase.parse_mode,
+        caption_entities=InlineQueryResultMpeg4GifTestBase.caption_entities,
+        input_message_content=InlineQueryResultMpeg4GifTestBase.input_message_content,
+        reply_markup=InlineQueryResultMpeg4GifTestBase.reply_markup,
+        thumbnail_mime_type=InlineQueryResultMpeg4GifTestBase.thumbnail_mime_type,
+        show_caption_above_media=InlineQueryResultMpeg4GifTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultMpeg4GifBase:
+class InlineQueryResultMpeg4GifTestBase:
     id_ = "id"
     type_ = "mpeg4_gif"
     mpeg4_url = "mpeg4 url"
     mpeg4_width = 10
     mpeg4_height = 15
-    mpeg4_duration = 1
+    mpeg4_duration = dtm.timedelta(seconds=1)
     thumbnail_url = "thumb url"
     thumbnail_mime_type = "image/jpeg"
     title = "title"
@@ -64,9 +67,10 @@ class TestInlineQueryResultMpeg4GifBase:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
-class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifBase):
+class TestInlineQueryResultMpeg4GifWithoutRequest(InlineQueryResultMpeg4GifTestBase):
     def test_slot_behaviour(self, inline_query_result_mpeg4_gif):
         inst = inline_query_result_mpeg4_gif
         for attr in inst.__slots__:
@@ -79,7 +83,7 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
         assert inline_query_result_mpeg4_gif.mpeg4_url == self.mpeg4_url
         assert inline_query_result_mpeg4_gif.mpeg4_width == self.mpeg4_width
         assert inline_query_result_mpeg4_gif.mpeg4_height == self.mpeg4_height
-        assert inline_query_result_mpeg4_gif.mpeg4_duration == self.mpeg4_duration
+        assert inline_query_result_mpeg4_gif._mpeg4_duration == self.mpeg4_duration
         assert inline_query_result_mpeg4_gif.thumbnail_url == self.thumbnail_url
         assert inline_query_result_mpeg4_gif.thumbnail_mime_type == self.thumbnail_mime_type
         assert inline_query_result_mpeg4_gif.title == self.title
@@ -91,150 +95,13 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_mpeg4_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert (
+            inline_query_result_mpeg4_gif.show_caption_above_media == self.show_caption_above_media
+        )
 
     def test_caption_entities_always_tuple(self):
         result = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumbnail_url)
         assert result.caption_entities == ()
-
-    def test_thumb_url_property_deprecation_warning(self, recwarn):
-        inline_query_result_mpeg4_gif = InlineQueryResultMpeg4Gif(
-            TestInlineQueryResultMpeg4GifBase.id_,
-            TestInlineQueryResultMpeg4GifBase.mpeg4_url,
-            TestInlineQueryResultMpeg4GifBase.thumbnail_url,
-            mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
-            mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
-            mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
-            title=TestInlineQueryResultMpeg4GifBase.title,
-            caption=TestInlineQueryResultMpeg4GifBase.caption,
-            parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
-            caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
-            input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
-            reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
-            thumbnail_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
-            thumb_url=TestInlineQueryResultMpeg4GifBase.thumbnail_url,  # deprecated arg
-        )
-        assert (
-            inline_query_result_mpeg4_gif.thumb_url == inline_query_result_mpeg4_gif.thumbnail_url
-        )
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn,
-            __file__,
-            deprecated_name="thumb_url",
-            new_name="thumbnail_url",
-        )
-
-    def test_thumb_mime_type_property_deprecation_warning(self, recwarn):
-        inline_query_result_mpeg4_gif = InlineQueryResultMpeg4Gif(
-            TestInlineQueryResultMpeg4GifBase.id_,
-            TestInlineQueryResultMpeg4GifBase.mpeg4_url,
-            TestInlineQueryResultMpeg4GifBase.thumbnail_url,
-            mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
-            mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
-            mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
-            title=TestInlineQueryResultMpeg4GifBase.title,
-            caption=TestInlineQueryResultMpeg4GifBase.caption,
-            parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
-            caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
-            input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
-            reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
-            thumb_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,  # deprecated
-        )
-        assert (
-            inline_query_result_mpeg4_gif.thumb_mime_type
-            == inline_query_result_mpeg4_gif.thumbnail_mime_type
-        )
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn, __file__, deprecated_name="thumb_mime_type", new_name="thumbnail_mime_type"
-        )
-
-    def test_thumb_url_issues_warning_and_works_without_positional_arg(self, recwarn):
-        inline_query_result_mpeg4_gif = InlineQueryResultMpeg4Gif(
-            TestInlineQueryResultMpeg4GifBase.id_,
-            TestInlineQueryResultMpeg4GifBase.mpeg4_url,
-            # positional argument thumbnail_url should be here, but it's not
-            mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
-            mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
-            mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
-            title=TestInlineQueryResultMpeg4GifBase.title,
-            caption=TestInlineQueryResultMpeg4GifBase.caption,
-            parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
-            caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
-            input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
-            reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
-            thumbnail_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
-            thumb_url=TestInlineQueryResultMpeg4GifBase.thumbnail_url,  # deprecated arg
-        )
-
-        assert (
-            inline_query_result_mpeg4_gif.thumb_url == inline_query_result_mpeg4_gif.thumbnail_url
-        )
-        check_thumb_deprecation_warnings_for_args_and_attrs(
-            recwarn,
-            __file__,
-            deprecated_name="thumb_url",
-            new_name="thumbnail_url",
-        )
-
-    def test_init_throws_error_without_thumbnail_url_and_thumb_url(self):
-        with pytest.raises(ValueError, match="You must pass either"):
-            InlineQueryResultMpeg4Gif(
-                TestInlineQueryResultMpeg4GifBase.id_,
-                TestInlineQueryResultMpeg4GifBase.mpeg4_url,
-                # no thumbnail_url or thumb_url
-                mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
-                mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
-                mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
-                title=TestInlineQueryResultMpeg4GifBase.title,
-                caption=TestInlineQueryResultMpeg4GifBase.caption,
-                parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
-                caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
-                input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
-                reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
-                thumb_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
-            )
-
-    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
-        with pytest.raises(
-            ValueError, match="different entities as 'thumb_url' and 'thumbnail_url'"
-        ):
-            InlineQueryResultMpeg4Gif(
-                TestInlineQueryResultMpeg4GifBase.id_,
-                TestInlineQueryResultMpeg4GifBase.mpeg4_url,
-                TestInlineQueryResultMpeg4GifBase.thumbnail_url,
-                mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
-                mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
-                mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
-                title=TestInlineQueryResultMpeg4GifBase.title,
-                caption=TestInlineQueryResultMpeg4GifBase.caption,
-                parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
-                caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
-                input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
-                reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
-                thumbnail_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
-                thumb_url="some other URL",
-            )
-
-    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_mime_type(self):
-        with pytest.raises(
-            ValueError,
-            match="different entities as 'thumb_mime_type' and 'thumbnail_mime_type'",
-        ):
-            InlineQueryResultMpeg4Gif(
-                TestInlineQueryResultMpeg4GifBase.id_,
-                TestInlineQueryResultMpeg4GifBase.mpeg4_url,
-                TestInlineQueryResultMpeg4GifBase.thumbnail_url,
-                mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
-                mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
-                mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
-                title=TestInlineQueryResultMpeg4GifBase.title,
-                caption=TestInlineQueryResultMpeg4GifBase.caption,
-                parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
-                caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
-                input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
-                reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
-                thumbnail_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
-                thumb_mime_type="video/mp4",
-            )
 
     def test_to_dict(self, inline_query_result_mpeg4_gif):
         inline_query_result_mpeg4_gif_dict = inline_query_result_mpeg4_gif.to_dict()
@@ -254,10 +121,10 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             inline_query_result_mpeg4_gif_dict["mpeg4_height"]
             == inline_query_result_mpeg4_gif.mpeg4_height
         )
-        assert (
-            inline_query_result_mpeg4_gif_dict["mpeg4_duration"]
-            == inline_query_result_mpeg4_gif.mpeg4_duration
+        assert inline_query_result_mpeg4_gif_dict["mpeg4_duration"] == int(
+            self.mpeg4_duration.total_seconds()
         )
+        assert isinstance(inline_query_result_mpeg4_gif_dict["mpeg4_duration"], int)
         assert (
             inline_query_result_mpeg4_gif_dict["thumbnail_url"]
             == inline_query_result_mpeg4_gif.thumbnail_url
@@ -285,6 +152,34 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             inline_query_result_mpeg4_gif_dict["reply_markup"]
             == inline_query_result_mpeg4_gif.reply_markup.to_dict()
         )
+        assert (
+            inline_query_result_mpeg4_gif_dict["show_caption_above_media"]
+            == inline_query_result_mpeg4_gif.show_caption_above_media
+        )
+
+    def test_time_period_properties(self, PTB_TIMEDELTA, inline_query_result_mpeg4_gif):
+        mpeg4_duration = inline_query_result_mpeg4_gif.mpeg4_duration
+
+        if PTB_TIMEDELTA:
+            assert mpeg4_duration == self.mpeg4_duration
+            assert isinstance(mpeg4_duration, dtm.timedelta)
+        else:
+            assert mpeg4_duration == int(self.mpeg4_duration.total_seconds())
+            assert isinstance(mpeg4_duration, int)
+
+    def test_time_period_int_deprecated(
+        self, recwarn, PTB_TIMEDELTA, inline_query_result_mpeg4_gif
+    ):
+        inline_query_result_mpeg4_gif.mpeg4_duration
+
+        if PTB_TIMEDELTA:
+            assert len(recwarn) == 0
+        else:
+            assert len(recwarn) == 1
+            assert "`mpeg4_duration` will be of type `datetime.timedelta`" in str(
+                recwarn[0].message
+            )
+            assert recwarn[0].category is PTBDeprecationWarning
 
     def test_equality(self):
         a = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumbnail_url)

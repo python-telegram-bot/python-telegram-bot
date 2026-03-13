@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,25 +28,24 @@ def dice(request):
     return Dice(value=5, emoji=request.param)
 
 
-class TestDiceBase:
+class DiceTestBase:
     value = 4
 
 
-class TestDiceWithoutRequest(TestDiceBase):
+class TestDiceWithoutRequest(DiceTestBase):
     def test_slot_behaviour(self, dice):
         for attr in dice.__slots__:
             assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(dice)) == len(set(mro_slots(dice))), "duplicate slot"
 
     @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI)
-    def test_de_json(self, bot, emoji):
+    def test_de_json(self, offline_bot, emoji):
         json_dict = {"value": self.value, "emoji": emoji}
-        dice = Dice.de_json(json_dict, bot)
+        dice = Dice.de_json(json_dict, offline_bot)
         assert dice.api_kwargs == {}
 
         assert dice.value == self.value
         assert dice.emoji == emoji
-        assert Dice.de_json(None, bot) is None
 
     def test_to_dict(self, dice):
         dice_dict = dice.to_dict()

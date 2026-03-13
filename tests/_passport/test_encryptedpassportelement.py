@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,19 +26,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def encrypted_passport_element():
     return EncryptedPassportElement(
-        TestEncryptedPassportElementBase.type_,
+        EncryptedPassportElementTestBase.type_,
         "this is a hash",
-        data=TestEncryptedPassportElementBase.data,
-        phone_number=TestEncryptedPassportElementBase.phone_number,
-        email=TestEncryptedPassportElementBase.email,
-        files=TestEncryptedPassportElementBase.files,
-        front_side=TestEncryptedPassportElementBase.front_side,
-        reverse_side=TestEncryptedPassportElementBase.reverse_side,
-        selfie=TestEncryptedPassportElementBase.selfie,
+        data=EncryptedPassportElementTestBase.data,
+        phone_number=EncryptedPassportElementTestBase.phone_number,
+        email=EncryptedPassportElementTestBase.email,
+        files=EncryptedPassportElementTestBase.files,
+        front_side=EncryptedPassportElementTestBase.front_side,
+        reverse_side=EncryptedPassportElementTestBase.reverse_side,
+        selfie=EncryptedPassportElementTestBase.selfie,
     )
 
 
-class TestEncryptedPassportElementBase:
+class EncryptedPassportElementTestBase:
     type_ = "type"
     hash = "this is a hash"
     data = "data"
@@ -50,7 +50,7 @@ class TestEncryptedPassportElementBase:
     selfie = PassportFile("file_id", 50, 0, 25)
 
 
-class TestEncryptedPassportElementWithoutRequest(TestEncryptedPassportElementBase):
+class TestEncryptedPassportElementWithoutRequest(EncryptedPassportElementTestBase):
     def test_slot_behaviour(self, encrypted_passport_element):
         inst = encrypted_passport_element
         for attr in inst.__slots__:

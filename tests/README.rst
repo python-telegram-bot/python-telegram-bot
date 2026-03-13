@@ -4,7 +4,13 @@ Testing in PTB
 
 PTB uses `pytest`_ for testing. To run the tests, you need to
 have pytest installed along with a few other dependencies. You can find the list of dependencies
-in the ``requirements-dev.txt`` file in the root of the repository.
+in the ``pyproject.toml`` file in the root of the repository.
+
+Since PTB uses a src-based layout, make sure you have installed the package in development mode before running the tests:
+
+.. code-block:: bash
+
+   $ pip install -e .
 
 Running tests
 =============
@@ -36,7 +42,7 @@ such that tests marked with ``@pytest.mark.xdist_group("name")`` are run on the 
 
 .. code-block:: bash
 
-    $ pytest -n auto --dist=loadgroup
+    $ pytest -n auto --dist=worksteal
 
 This will result in a significant speedup, but may cause some tests to fail. If you want to run
 the failed tests in isolation, you can use the ``--lf`` flag:
@@ -72,7 +78,7 @@ complete and correct. To run it, export an environment variable first:
 
     $ export TEST_OFFICIAL=true
 
-and then run ``pytest tests/test_official.py``.
+and then run ``pytest tests/test_official/test_official.py``. Note: You need py 3.10+ to run this test.
 
 We also have another marker, ``@pytest.mark.dev``, which you can add to tests that you want to run selectively.
 Use as follows:
@@ -82,17 +88,24 @@ Use as follows:
     $ pytest -m dev
 
 
+Debugging tests
+===============
+
+Writing tests can be challenging, and fixing failing tests can be even more so. To help with this,
+PTB has started to adopt the use of ``logging`` in the test suite. You can insert debug logging 
+statements in your tests to help you understand what's going on. To enable these logs, you can set 
+``log_level = DEBUG`` in ``pyproject.toml`` or use the ``--log-level=INFO`` flag when running the tests.
+If a test is large and complicated, it is recommended to leave the debug logs for others to use as 
+well.
+
+
 Bots used in tests
 ==================
 
 If you run the tests locally, the test setup will use one of the two public bots available. Which
 bot of the two gets chosen for the test session is random. Whereas when the tests on the
-Github Actions CI are run, the test setup allocates a different, but same bot for every combination of Python version and
-OS.
-
-Thus, number of bots used for testing locally is 2 (called as fallback bots), and on the CI,
-its [3.7, 3.8, 3.9, 3.10, 3.11] x [ubuntu-latest, macos-latest, windows-latest] = 15. Bringing the
-total number of bots used for testing to 17.
+Github Actions CI are run, the test setup allocates a different, but the same bot is allocated for every combination of Python version and
+OS. The operating systems and Python versions the CI runs the tests on can be viewed in the `corresponding workflow`_.
 
 
 That's it! If you have any questions, feel free to ask them in the `PTB dev
@@ -101,3 +114,4 @@ group`_.
 .. _pytest: https://docs.pytest.org/en/stable/
 .. _pytest-xdist: https://pypi.org/project/pytest-xdist/
 .. _PTB dev group: https://t.me/pythontelegrambotgroup
+.. _corresponding workflow: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/workflows/unit_tests.yml

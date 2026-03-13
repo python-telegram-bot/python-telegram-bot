@@ -1,0 +1,5 @@
+dependencies = "Implement PEP 735 Dependency Groups for Development Dependencies"
+[[pull_requests]]
+uid = "4800"
+author_uid = "harshil21"
+closes_threads = ["4795"]

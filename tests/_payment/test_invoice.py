@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,27 +17,30 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 
 import pytest
 
-from telegram import Invoice, LabeledPrice
+from telegram import Invoice, LabeledPrice, ReplyParameters
+from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
 def invoice():
     return Invoice(
-        TestInvoiceBase.title,
-        TestInvoiceBase.description,
-        TestInvoiceBase.start_parameter,
-        TestInvoiceBase.currency,
-        TestInvoiceBase.total_amount,
+        InvoiceTestBase.title,
+        InvoiceTestBase.description,
+        InvoiceTestBase.start_parameter,
+        InvoiceTestBase.currency,
+        InvoiceTestBase.total_amount,
     )
 
 
-class TestInvoiceBase:
+class InvoiceTestBase:
     payload = "payload"
     prices = [LabeledPrice("Fish", 100), LabeledPrice("Fish Tax", 1000)]
     provider_data = """{"test":"test"}"""
@@ -50,13 +53,13 @@ class TestInvoiceBase:
     suggested_tip_amounts = [13, 42]
 
 
-class TestInvoiceWithoutRequest(TestInvoiceBase):
+class TestInvoiceWithoutRequest(InvoiceTestBase):
     def test_slot_behaviour(self, invoice):
         for attr in invoice.__slots__:
             assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invoice)) == len(set(mro_slots(invoice))), "duplicate slot"
 
-    def test_de_json(self, bot):
+    def test_de_json(self, offline_bot):
         invoice_json = Invoice.de_json(
             {
                 "title": self.title,
@@ -65,7 +68,7 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
                 "currency": self.currency,
                 "total_amount": self.total_amount,
             },
-            bot,
+            offline_bot,
         )
         assert invoice_json.api_kwargs == {}
 
@@ -85,15 +88,15 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
         assert invoice_dict["currency"] == invoice.currency
         assert invoice_dict["total_amount"] == invoice.total_amount
 
-    async def test_send_invoice_all_args_mock(self, bot, monkeypatch):
+    async def test_send_invoice_all_args_mock(self, offline_bot, monkeypatch):
         # We do this one as safety guard to make sure that we pass all of the optional
         # parameters correctly because #2526 went unnoticed for 3 years …
         async def make_assertion(*args, **_):
             kwargs = args[1]
             return all(kwargs[key] == key for key in kwargs)
 
-        monkeypatch.setattr(bot, "_send_message", make_assertion)
-        assert await bot.send_invoice(
+        monkeypatch.setattr(offline_bot, "_send_message", make_assertion)
+        assert await offline_bot.send_invoice(
             chat_id="chat_id",
             title="title",
             description="description",
@@ -120,13 +123,17 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
             protect_content=True,
         )
 
-    async def test_send_all_args_create_invoice_link(self, bot, monkeypatch):
-        async def make_assertion(*args, **_):
-            kwargs = args[1]
-            return all(kwargs[i] == i for i in kwargs)
+    @pytest.mark.parametrize("subscription_period", [42, dtm.timedelta(seconds=42)])
+    async def test_send_all_args_create_invoice_link(
+        self, offline_bot, monkeypatch, subscription_period
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            kwargs = request_data.parameters
+            sp = kwargs.pop("subscription_period") == 42
+            return all(kwargs[i] == i for i in kwargs) and sp
 
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        assert await bot.create_invoice_link(
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.create_invoice_link(
             title="title",
             description="description",
             payload="payload",
@@ -147,15 +154,19 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
             send_phone_number_to_provider="send_phone_number_to_provider",
             send_email_to_provider="send_email_to_provider",
             is_flexible="is_flexible",
+            business_connection_id="business_connection_id",
+            subscription_period=subscription_period,
         )
 
-    async def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
+    async def test_send_object_as_provider_data(
+        self, monkeypatch, offline_bot, chat_id, provider_token
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters["provider_data"] == '{"test_data": 123456789}'
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
-        assert await bot.send_invoice(
+        assert await offline_bot.send_invoice(
             chat_id,
             self.title,
             self.description,
@@ -165,6 +176,40 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
             self.prices,
             provider_data={"test_data": 123456789},
             start_parameter=self.start_parameter,
+        )
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_invoice_default_quote_parse_mode(
+        self, default_bot, chat_id, invoice, custom, monkeypatch, provider_token
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_invoice(
+            chat_id,
+            self.title,
+            self.description,
+            self.payload,
+            provider_token,
+            self.currency,
+            self.prices,
+            reply_parameters=ReplyParameters(**kwargs),
         )
 
     def test_equality(self):
@@ -183,7 +228,7 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
         assert hash(a) != hash(d)
 
 
-class TestInvoiceWithRequest(TestInvoiceBase):
+class TestInvoiceWithRequest(InvoiceTestBase):
     async def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = await bot.send_invoice(
             chat_id=chat_id,
@@ -224,9 +269,9 @@ class TestInvoiceWithRequest(TestInvoiceBase):
                     self.title,
                     self.description,
                     self.payload,
-                    provider_token,
                     self.currency,
                     self.prices,
+                    provider_token,
                     **kwargs,
                 )
                 for kwargs in ({}, {"protect_content": False})
@@ -256,35 +301,35 @@ class TestInvoiceWithRequest(TestInvoiceBase):
                 self.title,
                 self.description,
                 self.payload,
-                provider_token,
-                self.currency,
-                self.prices,
+                "XTR",
+                [self.prices[0]],
                 allow_sending_without_reply=custom,
                 reply_to_message_id=reply_to_message.message_id,
             )
             assert message.reply_to_message is None
+            assert message.invoice.currency == "XTR"
         elif default_bot.defaults.allow_sending_without_reply:
             message = await default_bot.send_invoice(
                 chat_id,
                 self.title,
                 self.description,
                 self.payload,
-                provider_token,
                 self.currency,
                 self.prices,
+                provider_token,
                 reply_to_message_id=reply_to_message.message_id,
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_invoice(
                     chat_id,
                     self.title,
                     self.description,
                     self.payload,
-                    provider_token,
                     self.currency,
                     self.prices,
+                    provider_token,
                     reply_to_message_id=reply_to_message.message_id,
                 )
 
@@ -294,15 +339,17 @@ class TestInvoiceWithRequest(TestInvoiceBase):
             self.title,
             self.description,
             self.payload,
-            provider_token,
             self.currency,
             self.prices,
+            provider_token=provider_token,
             max_tip_amount=self.max_tip_amount,
             suggested_tip_amounts=self.suggested_tip_amounts,
             start_parameter=self.start_parameter,
             provider_data=self.provider_data,
-            photo_url="https://raw.githubusercontent.com/"
-            "python-telegram-bot/logos/master/logo/png/ptb-logo_240.png",
+            photo_url=(
+                "https://raw.githubusercontent.com/"
+                "python-telegram-bot/logos/master/logo/png/ptb-logo_240.png"
+            ),
             photo_size=240,
             photo_width=240,
             photo_height=240,

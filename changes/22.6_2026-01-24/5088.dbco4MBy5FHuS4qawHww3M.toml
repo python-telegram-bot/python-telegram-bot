@@ -1,0 +1,6 @@
+features = "Add Fallback Name Support for Job Callbacks without ``__name__``"
+[[pull_requests]]
+uid = "5088"
+author_uids = ["SmartDever02"]
+closes_threads = ["4992"]
+

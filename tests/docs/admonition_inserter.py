@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-# This module is intentionally named without "test_" prefix.
-# These tests are supposed to be run on GitHub when building docs.
-# The tests require Python 3.9+ (just like AdmonitionInserter being tested),
-# so they cannot be included in the main suite while older versions of Python are supported.
+"""
+This module is intentionally named without "test_" prefix.
+These tests are supposed to be run on GitHub when building docs.
+The tests require Python 3.10+ (just like AdmonitionInserter being tested),
+so they cannot be included in the main suite while older versions of Python are supported.
+"""
 
 import collections.abc
 
@@ -96,12 +98,32 @@ class TestAdmonitionInserter:
             (
                 "available_in",
                 telegram.Sticker,
-                ":attr:`telegram.StickerSet.stickers`",  # Tuple[telegram.Sticker]
+                ":attr:`telegram.StickerSet.stickers`",  # tuple[telegram.Sticker]
             ),
             (
                 "available_in",
                 telegram.ResidentialAddress,  # mentioned on the second line of docstring of .data
                 ":attr:`telegram.EncryptedPassportElement.data`",
+            ),
+            (
+                "available_in",
+                telegram.ext.JobQueue,
+                ":attr:`telegram.ext.CallbackContext.job_queue`",
+            ),
+            (
+                "available_in",
+                telegram.ext.Application,
+                ":attr:`telegram.ext.CallbackContext.application`",
+            ),
+            (
+                "available_in",
+                telegram.Bot,
+                ":attr:`telegram.ext.CallbackContext.bot`",
+            ),
+            (
+                "available_in",
+                telegram.Bot,
+                ":attr:`telegram.ext.Application.bot`",
             ),
             (
                 "returned_in",
@@ -112,6 +134,11 @@ class TestAdmonitionInserter:
                 "returned_in",
                 telegram.ChatMember,
                 ":meth:`telegram.Bot.get_chat_member`",
+            ),
+            (
+                "returned_in",
+                telegram.GameHighScore,
+                ":meth:`telegram.Bot.get_game_high_scores`",
             ),
             (
                 "returned_in",
@@ -136,6 +163,18 @@ class TestAdmonitionInserter:
                 ":meth:`telegram.CallbackQuery.edit_message_caption`",
             ),
             (
+                "shortcuts",
+                telegram.Bot.ban_chat_member,
+                # ban_member is defined on the private parent class _ChatBase
+                ":meth:`telegram.Chat.ban_member`",
+            ),
+            (
+                "shortcuts",
+                telegram.Bot.ban_chat_member,
+                # ban_member is defined on the private parent class _ChatBase
+                ":meth:`telegram.ChatFullInfo.ban_member`",
+            ),
+            (
                 "use_in",
                 telegram.InlineQueryResult,
                 ":meth:`telegram.Bot.answer_web_app_query`",  # ForwardRef
@@ -147,8 +186,8 @@ class TestAdmonitionInserter:
             ),
             (
                 "use_in",
-                telegram.MaskPosition,
-                ":meth:`telegram.Bot.add_sticker_to_set`",  # optional
+                telegram.InlineKeyboardMarkup,
+                ":meth:`telegram.Bot.send_message`",  # optional
             ),
             (
                 "use_in",
@@ -205,8 +244,15 @@ class TestAdmonitionInserter:
                 "returned_in",
                 telegram.ext.CallbackContext,
                 # -> Application[BT, CCT, UD, CD, BD, JQ].
-                # In this case classes inside square brackets must not be parsed
+                # The type vars are not really part of the return value, so we don't expect them
                 ":meth:`telegram.ext.ApplicationBuilder.build`",
+            ),
+            (
+                "returned_in",
+                telegram.Bot,
+                # -> Application[BT, CCT, UD, CD, BD, JQ].
+                # The type vars are not really part of the return value, so we don't expect them
+                ":meth:`telegram.ext.ApplicationBuilder.bot`",
             ),
         ],
     )

@@ -1,0 +1,51 @@
+features = "Full Support for Bot API 9.0"
+deprecations = """This release comes with several deprecations, in line with our :ref:`stability policy <stability-policy>`.
+This includes the following:
+
+- Deprecated ``telegram.constants.StarTransactionsLimit.NANOSTAR_MIN_AMOUNT`` and ``telegram.constants.StarTransactionsLimit.NANOSTAR_MAX_AMOUNT``. These members will be replaced by ``telegram.constants.NanostarLimit.MIN_AMOUNT`` and ``telegram.constants.NanostarLimit.MAX_AMOUNT``.
+- Deprecated the class ``telegram.constants.StarTransactions``. Its only member ``telegram.constants.StarTransactions.NANOSTAR_VALUE`` will be replaced by ``telegram.constants.Nanostar.VALUE``.
+- Bot API 9.0 deprecated ``BusinessConnection.can_reply`` in favor of ``BusinessConnection.rights``
+- Bot API 9.0 deprecated ``ChatFullInfo.can_send_gift`` in favor of ``ChatFullInfo.accepted_gift_types``.
+- Bot API 9.0 introduced these new required fields to existing classes:
+  - ``TransactionPartnerUser.transaction_type``
+  - ``ChatFullInfo.accepted_gift_types``
+
+  Passing these values as positional arguments is deprecated. We encourage you to use keyword arguments instead, as the the signature will be updated in a future release.
+
+These deprecations are backward compatible, but we strongly recommend to update your code to use the new members.
+"""
+[[pull_requests]]
+uid = "4756"
+author_uid = "Bibo-Joshi"
+closes_threads = ["4754"]
+[[pull_requests]]
+uid = "4757"
+author_uid = "Bibo-Joshi"
+closes_threads = []
+[[pull_requests]]
+uid = "4759"
+author_uid = "Bibo-Joshi"
+closes_threads = []
+[[pull_requests]]
+uid = "4763"
+author_uid = "aelkheir"
+closes_threads = []
+[[pull_requests]]
+uid = "4766"
+author_uid = "Bibo-Joshi"
+[[pull_requests]]
+uid = "4769"
+author_uid = "aelkheir"
+closes_threads = []
+[[pull_requests]]
+uid = "4773"
+author_uid = "aelkheir"
+closes_threads = []
+[[pull_requests]]
+uid = "4781"
+author_uid = "aelkheir"
+closes_threads = []
+[[pull_requests]]
+uid = "4782"
+author_uid = "Bibo-Joshi"
+closes_threads = []

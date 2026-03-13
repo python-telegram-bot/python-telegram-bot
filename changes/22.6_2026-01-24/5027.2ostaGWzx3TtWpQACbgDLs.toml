@@ -1,0 +1,5 @@
+internal = "Update GitHub Artifact Actions (major)"
+[[pull_requests]]
+uid = "5027"
+author_uids = ["renovatebot"]
+closes_threads = []

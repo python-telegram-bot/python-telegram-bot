@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,15 +26,16 @@ from telegram import (
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
+from telegram.constants import KeyboardButtonStyle
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
 def inline_keyboard_markup():
-    return InlineKeyboardMarkup(TestInlineKeyboardMarkupBase.inline_keyboard)
+    return InlineKeyboardMarkup(InlineKeyboardMarkupTestBase.inline_keyboard)
 
 
-class TestInlineKeyboardMarkupBase:
+class InlineKeyboardMarkupTestBase:
     inline_keyboard = [
         [
             InlineKeyboardButton(text="button1", callback_data="data1"),
@@ -43,7 +44,7 @@ class TestInlineKeyboardMarkupBase:
     ]
 
 
-class TestInlineKeyboardMarkupWithoutRequest(TestInlineKeyboardMarkupBase):
+class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
     def test_slot_behaviour(self, inline_keyboard_markup):
         inst = inline_keyboard_markup
         for attr in inst.__slots__:
@@ -192,7 +193,9 @@ class TestInlineKeyboardMarkupWithoutRequest(TestInlineKeyboardMarkupBase):
         with pytest.raises(ValueError, match="should be a sequence of sequences"):
             InlineKeyboardMarkup([[[InlineKeyboardButton("only_2d_array_is_allowed", "1")]]])
 
-    async def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
+    async def test_expected_values_empty_switch(
+        self, inline_keyboard_markup, offline_bot, monkeypatch
+    ):
         async def make_assertion(
             url,
             data,
@@ -224,11 +227,11 @@ class TestInlineKeyboardMarkupWithoutRequest(TestInlineKeyboardMarkupBase):
         inline_keyboard_markup.inline_keyboard[0][1].callback_data = None
         inline_keyboard_markup.inline_keyboard[0][1].switch_inline_query_current_chat = ""
 
-        monkeypatch.setattr(bot, "_send_message", make_assertion)
-        await bot.send_message(123, "test", reply_markup=inline_keyboard_markup)
+        monkeypatch.setattr(offline_bot, "_send_message", make_assertion)
+        await offline_bot.send_message(123, "test", reply_markup=inline_keyboard_markup)
 
 
-class TestInlineKeyborardMarkupWithRequest(TestInlineKeyboardMarkupBase):
+class TestInlineKeyborardMarkupWithRequest(InlineKeyboardMarkupTestBase):
     async def test_send_message_with_inline_keyboard_markup(
         self, bot, chat_id, inline_keyboard_markup
     ):
@@ -237,3 +240,24 @@ class TestInlineKeyborardMarkupWithRequest(TestInlineKeyboardMarkupBase):
         )
 
         assert message.text == "Testing InlineKeyboardMarkup"
+
+    async def test_send_message_with_colored_inline_keyboard_button(self, bot, chat_id):
+        markup = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        text="Colored Button",
+                        callback_data="data1",
+                        style=KeyboardButtonStyle.DANGER,
+                    )
+                ]
+            ]
+        )
+        message = await bot.send_message(
+            chat_id,
+            "Testing colored InlineKeyboardButton",
+            reply_markup=markup,
+        )
+        assert message.text == "Testing colored InlineKeyboardButton"
+        button = message.reply_markup.inline_keyboard[0][0]
+        assert button.style == "danger"

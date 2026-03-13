@@ -1,0 +1,5 @@
+internal = "Bump Bibo-Joshi/chango from 0.3.1 to 0.3.2"
+[[pull_requests]]
+uid = "4700"
+author_uid = "dependabot"
+closes_threads = []

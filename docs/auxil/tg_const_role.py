@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2023
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
 from enum import Enum
 
 from docutils.nodes import Element
@@ -72,15 +73,21 @@ class TGConstXRefRole(PyXRefRole):
                 "telegram.constants.BOT_API_VERSION_INFO",
                 "telegram.__version_info__",
             ):
+                return str(value), target
+            if (
+                isinstance(value, dtm.datetime)
+                and value == telegram.constants.ZERO_DATE
+                and target == "telegram.constants.ZERO_DATE"
+            ):
                 return repr(value), target
             sphinx_logger.warning(
-                f"%s:%d: WARNING: Did not convert reference %s. :{CONSTANTS_ROLE}: is not supposed"
+                "%s:%d: WARNING: Did not convert reference %s. :%s: is not supposed"
                 " to be used with this type of target.",
                 refnode.source,
                 refnode.line,
                 refnode.rawsource,
+                CONSTANTS_ROLE,
             )
-            return title, target
         except Exception as exc:
             sphinx_logger.exception(
                 "%s:%d: WARNING: Did not convert reference %s due to an exception.",
@@ -89,4 +96,6 @@ class TGConstXRefRole(PyXRefRole):
                 refnode.rawsource,
                 exc_info=exc,
             )
+            return title, target
+        else:
             return title, target

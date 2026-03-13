@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,19 +32,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_photo():
     return InlineQueryResultCachedPhoto(
-        TestInlineQueryResultCachedPhotoBase.id_,
-        TestInlineQueryResultCachedPhotoBase.photo_file_id,
-        title=TestInlineQueryResultCachedPhotoBase.title,
-        description=TestInlineQueryResultCachedPhotoBase.description,
-        caption=TestInlineQueryResultCachedPhotoBase.caption,
-        parse_mode=TestInlineQueryResultCachedPhotoBase.parse_mode,
-        caption_entities=TestInlineQueryResultCachedPhotoBase.caption_entities,
-        input_message_content=TestInlineQueryResultCachedPhotoBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedPhotoBase.reply_markup,
+        InlineQueryResultCachedPhotoTestBase.id_,
+        InlineQueryResultCachedPhotoTestBase.photo_file_id,
+        title=InlineQueryResultCachedPhotoTestBase.title,
+        description=InlineQueryResultCachedPhotoTestBase.description,
+        caption=InlineQueryResultCachedPhotoTestBase.caption,
+        parse_mode=InlineQueryResultCachedPhotoTestBase.parse_mode,
+        caption_entities=InlineQueryResultCachedPhotoTestBase.caption_entities,
+        input_message_content=InlineQueryResultCachedPhotoTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedPhotoTestBase.reply_markup,
+        show_caption_above_media=InlineQueryResultCachedPhotoTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultCachedPhotoBase:
+class InlineQueryResultCachedPhotoTestBase:
     id_ = "id"
     type_ = "photo"
     photo_file_id = "photo file id"
@@ -55,9 +56,10 @@ class TestInlineQueryResultCachedPhotoBase:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
-class TestInlineQueryResultCachedPhotoWithoutRequest(TestInlineQueryResultCachedPhotoBase):
+class TestInlineQueryResultCachedPhotoWithoutRequest(InlineQueryResultCachedPhotoTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_photo):
         inst = inline_query_result_cached_photo
         for attr in inst.__slots__:
@@ -79,6 +81,10 @@ class TestInlineQueryResultCachedPhotoWithoutRequest(TestInlineQueryResultCached
         )
         assert (
             inline_query_result_cached_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_photo.show_caption_above_media
+            == self.show_caption_above_media
         )
 
     def test_caption_entities_always_tuple(self):
@@ -123,6 +129,10 @@ class TestInlineQueryResultCachedPhotoWithoutRequest(TestInlineQueryResultCached
         assert (
             inline_query_result_cached_photo_dict["reply_markup"]
             == inline_query_result_cached_photo.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_photo_dict["show_caption_above_media"]
+            == inline_query_result_cached_photo.show_caption_above_media
         )
 
     def test_equality(self):

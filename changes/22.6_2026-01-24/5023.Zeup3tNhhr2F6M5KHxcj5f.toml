@@ -1,0 +1,5 @@
+internal = "Update Pylint to v4.0.2"
+[[pull_requests]]
+uid = "5023"
+author_uids = ["renovatebot"]
+closes_threads = []

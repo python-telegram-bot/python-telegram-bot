@@ -1,0 +1,5 @@
+dependencies = "Update cachetools requirement from <5.6.0,>=5.3.3 to >=5.3.3,<6.1.0"
+[[pull_requests]]
+uid = "4801"
+author_uid = "dependabot"
+closes_threads = []

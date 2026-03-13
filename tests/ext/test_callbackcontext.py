@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import (
-    Bot,
     CallbackQuery,
     Chat,
     InlineKeyboardButton,
@@ -32,6 +31,7 @@ from telegram import (
 from telegram.error import TelegramError
 from telegram.ext import ApplicationBuilder, CallbackContext, Job
 from telegram.warnings import PTBUserWarning
+from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
 
 """
@@ -63,7 +63,7 @@ class TestCallbackContext:
     def test_job_queue(self, bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-            "`pip install python-telegram-bot[job-queue]`."
+            '`pip install "python-telegram-bot[job-queue]"`.'
         )
 
         callback_context = CallbackContext(app)
@@ -193,26 +193,26 @@ class TestCallbackContext:
         callback_context = CallbackContext(app)
         assert callback_context.application is app
 
-    def test_drop_callback_data_exception(self, bot, app):
-        non_ext_bot = Bot(bot.token)
+    def test_drop_callback_data_exception(self, bot, app, raw_bot):
         update = Update(
             0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
         )
 
         callback_context = CallbackContext.from_update(update, app)
 
-        with pytest.raises(RuntimeError, match="This telegram.ext.ExtBot instance does not"):
+        with pytest.raises(RuntimeError, match="This telegram\\.ext\\.ExtBot instance does not"):
             callback_context.drop_callback_data(None)
 
         try:
-            app.bot = non_ext_bot
-            with pytest.raises(RuntimeError, match="telegram.Bot does not allow for"):
+            app.bot = raw_bot
+            with pytest.raises(RuntimeError, match="telegram\\.Bot does not allow for"):
                 callback_context.drop_callback_data(None)
         finally:
             app.bot = bot
 
-    async def test_drop_callback_data(self, bot, monkeypatch, chat_id):
-        app = ApplicationBuilder().token(bot.token).arbitrary_callback_data(True).build()
+    async def test_drop_callback_data(self, bot, chat_id):
+        new_bot = make_bot(token=bot.token, arbitrary_callback_data=True, offline=False)
+        app = ApplicationBuilder().bot(new_bot).build()
 
         update = Update(
             0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
@@ -228,7 +228,7 @@ class TestCallbackContext:
                 ),
             )
         keyboard_uuid = app.bot.callback_data_cache.persistence_data[0][0][0]
-        button_uuid = list(app.bot.callback_data_cache.persistence_data[0][0][2])[0]
+        button_uuid = next(iter(app.bot.callback_data_cache.persistence_data[0][0][2]))
         callback_data = keyboard_uuid + button_uuid
         callback_query = CallbackQuery(
             id="1",

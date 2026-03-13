@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, wrong-import-position
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -15,21 +15,7 @@ bot.
 """
 
 import logging
-from typing import Dict
 
-from telegram import __version__ as TG_VER
-
-try:
-    from telegram import __version_info__
-except ImportError:
-    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
-
-if __version_info__ < (20, 0, 0, "alpha", 1):
-    raise RuntimeError(
-        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
-        f"{TG_VER} version of this example, "
-        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
-    )
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     Application,
@@ -44,6 +30,9 @@ from telegram.ext import (
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 CHOOSING, TYPING_REPLY, TYPING_CHOICE = range(3)
@@ -56,7 +45,7 @@ reply_keyboard = [
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
-def facts_to_str(user_data: Dict[str, str]) -> str:
+def facts_to_str(user_data: dict[str, str]) -> str:
     """Helper function for formatting the gathered user info."""
     facts = [f"{key} - {value}" for key, value in user_data.items()]
     return "\n".join(facts).join(["\n", "\n"])

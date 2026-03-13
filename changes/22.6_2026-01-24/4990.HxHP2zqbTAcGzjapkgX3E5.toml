@@ -1,0 +1,5 @@
+internal = "Update configuration of actions/stale to use issue types instead of labels"
+
+[[pull_requests]]
+uid = "4990"
+author_uids = ["Bibo-Joshi"]

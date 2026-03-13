@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2023
+#  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -18,49 +18,78 @@
 import inspect
 
 keyword_args = [
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: Value to pass to "
-    ":paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to {read_timeout}.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: {read_timeout_type}, optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: Value to pass to "
-    ":paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to {write_timeout}.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: :obj:`float` | :obj:`None`, "
-    "optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: Value to pass to "
-    ":paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to "
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: :obj:`float` | "
-    ":obj:`None`, optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: Value to pass to "
-    ":paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to "
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: :obj:`float` | :obj:`None`, "
-    "optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: Arbitrary keyword arguments "
-    "to be passed to the Telegram API.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: :obj:`dict`, optional",
+    "Keyword Arguments:",
+    (
+        "    read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
+        "        :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to "
+        "        :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`. "
+    ),
+    (
+        "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
+        "        :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to "
+        "        :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`."
+    ),
+    (
+        "    connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
+        "        :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to "
+        "        :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`."
+    ),
+    (
+        "    pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
+        "        :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to "
+        "        :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`."
+    ),
+    (
+        "    api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments"
+        "        to be passed to the Telegram API. See :meth:`~telegram.Bot.do_api_request` for"
+        "        limitations."
+    ),
     "",
 ]
-write_timeout_sub = [":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`", "``20``"]
-read_timeout_sub = [
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
-    "``2``. :paramref:`timeout` will be added to this value",
+
+media_write_timeout_change_methods = [
+    "add_sticker_to_set",
+    "create_new_sticker_set",
+    "send_animation",
+    "send_audio",
+    "send_document",
+    "send_media_group",
+    "send_photo",
+    "send_sticker",
+    "send_video",
+    "send_video_note",
+    "send_voice",
+    "set_chat_photo",
+    "upload_sticker_file",
 ]
-read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
+media_write_timeout_change = [
+    "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
+    "        :paramref:`telegram.request.BaseRequest.post.write_timeout`. By default, ``20`` "
+    "        seconds are used as write timeout."
+    "",
+    "",
+    "       .. versionchanged:: 22.0",
+    "           The default value changed to "
+    "           :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
+    "",
+    "",
+]
+get_updates_read_timeout_addition = [
+    "        :paramref:`timeout` will be added to this value.",
+    "",
+    "",
+    "        .. versionchanged:: 20.7",
+    "           Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of ",
+    "           ``2``.",
+]
 
 
 def find_insert_pos_for_kwargs(lines: list[str]) -> int:
     """Finds the correct position to insert the keyword arguments and returns the index."""
     for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
-        if value.startswith(":returns:"):
+        if value.startswith("Returns"):
             return idx
-    else:
-        return False
-
-
-def is_write_timeout_20(obj: object) -> int:
-    """inspects the default value of write_timeout parameter of the bot method."""
-    sig = inspect.signature(obj)
-    return 1 if (sig.parameters["write_timeout"].default == 20) else 0
+    return False
 
 
 def check_timeout_and_api_kwargs_presence(obj: object) -> int:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,16 +18,24 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import calendar
+import contextlib
 import datetime as dtm
 import logging
 import platform
+import re
 import time
 
 import pytest
 
-from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
-from telegram.warnings import PTBUserWarning
-from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
+from telegram.ext import (
+    ApplicationBuilder,
+    CallbackContext,
+    ContextTypes,
+    Defaults,
+    Job,
+    JobQueue,
+)
+from tests.auxil.envvars import GITHUB_ACTIONS, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
 
@@ -36,16 +44,14 @@ if TEST_WITH_OPT_DEPS:
 
     UTC = pytz.utc
 else:
-    import datetime
-
-    UTC = datetime.timezone.utc
+    UTC = dtm.timezone.utc
 
 
 class CustomContext(CallbackContext):
     pass
 
 
-@pytest.fixture()
+@pytest.fixture
 async def job_queue(app):
     jq = JobQueue()
     jq.set_application(app)
@@ -71,7 +77,7 @@ class TestNoJobQueue:
     not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
 @pytest.mark.skipif(
-    bool(GITHUB_ACTION and platform.system() in ["Windows", "Darwin"]),
+    GITHUB_ACTIONS and platform.system() in ["Windows", "Darwin"],
     reason="On Windows & MacOS precise timings are not accurate.",
 )
 @pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
@@ -80,16 +86,42 @@ class TestJobQueue:
     job_time = 0
     received_error = None
 
-    expected_warning = (
-        "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
-        " We recommend double checking if the passed value is correct."
-    )
+    @staticmethod
+    def normalize(datetime: dtm.datetime, timezone: dtm.tzinfo) -> dtm.datetime:
+        with contextlib.suppress(AttributeError):
+            return timezone.normalize(datetime)
+
+        return datetime
+
+    async def test_repr(self, app):
+        jq = JobQueue()
+        jq.set_application(app)
+        assert repr(jq) == f"JobQueue[application={app!r}]"
+
+        when = dtm.datetime.utcnow() + dtm.timedelta(days=1)
+        callback = self.job_run_once
+        job = jq.run_once(callback, when, name="name2")
+        assert repr(job) == (
+            f"Job[id={job.job.id}, name={job.name}, callback=job_run_once, "
+            f"trigger=date["
+            f"{when.strftime('%Y-%m-%d %H:%M:%S UTC')}"
+            f"]]"
+        )
 
     @pytest.fixture(autouse=True)
     def _reset(self):
         self.result = 0
         self.job_time = 0
         self.received_error = None
+
+    def test_scheduler_configuration(self, job_queue, timezone, bot):
+        # Unfortunately, we can't really test the executor setting explicitly without relying
+        # on protected attributes. However, this should be tested enough implicitly via all the
+        # other tests in here
+        assert job_queue.scheduler_configuration["timezone"] is dtm.timezone.utc
+
+        tz_app = ApplicationBuilder().defaults(Defaults(tzinfo=timezone)).token(bot.token).build()
+        assert tz_app.job_queue.scheduler_configuration["timezone"] is timezone
 
     async def job_run_once(self, context):
         if (
@@ -161,6 +193,49 @@ class TestJobQueue:
         job_queue.run_once(self.job_run_once_with_data, 0.1, data=5)
         await asyncio.sleep(0.2)
         assert self.result == 5
+
+    def test_callback_name_without_name_attribute(self, app):
+        """Test that callable class instances work as job callbacks (issue #4992)"""
+
+        class CallableJob:
+            async def __call__(self, context: ContextTypes.DEFAULT_TYPE):
+                pass
+
+        jq = JobQueue()
+        jq.set_application(app)
+
+        # This should not raise AttributeError
+        job_instance = CallableJob()
+
+        # Test with run_once
+        job = jq.run_once(job_instance, 10)
+        # The job name should be the class name, not raise AttributeError
+        assert job.name == "CallableJob", f"Expected 'CallableJob', got '{job.name}'"
+
+        # Test with run_repeating (the method from the issue)
+        job2 = jq.run_repeating(job_instance, 0.5)
+        assert job2.name == "CallableJob", f"Expected 'CallableJob', got '{job2.name}'"
+
+        # Test with run_monthly
+        when = dtm.time(12, 0, 0)
+        job3 = jq.run_monthly(job_instance, when, 1)
+        assert job3.name == "CallableJob", f"Expected 'CallableJob', got '{job3.name}'"
+
+        # Test with run_daily
+        job4 = jq.run_daily(job_instance, when)
+        assert job4.name == "CallableJob", f"Expected 'CallableJob', got '{job4.name}'"
+
+        # Test with run_custom
+        job5 = jq.run_custom(
+            job_instance,
+            {"trigger": "date", "run_date": dtm.datetime.now() + dtm.timedelta(seconds=10)},
+        )
+        assert job5.name == "CallableJob", f"Expected 'CallableJob', got '{job5.name}'"
+
+        # Test Job.__repr__ uses the correct name
+        assert "callback=CallableJob" in repr(job), (
+            f"repr should contain 'callback=CallableJob', got: {job!r}"
+        )
 
     async def test_run_repeating(self, job_queue):
         job_queue.run_repeating(self.job_run_once, 0.1)
@@ -340,6 +415,17 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_time)
 
+    async def test_time_unit_dt_aware_time(self, job_queue, timezone):
+        # Testing running at a specific tz-aware time today
+        delta, now = 0.5, dtm.datetime.now(timezone)
+        expected_time = now + dtm.timedelta(seconds=delta)
+        when = expected_time.timetz()
+        expected_time = expected_time.timestamp()
+
+        job_queue.run_once(self.job_datetime_tests, when)
+        await asyncio.sleep(0.6)
+        assert self.job_time == pytest.approx(expected_time)
+
     async def test_run_daily(self, job_queue):
         delta, now = 1, dtm.datetime.now(UTC)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
@@ -351,20 +437,8 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 
-    async def test_run_daily_warning(self, job_queue, recwarn):
-        delta, now = 1, dtm.datetime.now(UTC)
-        time_of_day = (now + dtm.timedelta(seconds=delta)).time()
-
-        job_queue.run_daily(self.job_run_once, time_of_day)
-        assert len(recwarn) == 0
-        job_queue.run_daily(self.job_run_once, time_of_day, days=(0, 1, 2, 3))
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == self.expected_warning
-        assert recwarn[0].category is PTBUserWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
-
     @pytest.mark.parametrize("weekday", [0, 1, 2, 3, 4, 5, 6])
-    async def test_run_daily_days_of_week(self, job_queue, recwarn, weekday):
+    async def test_run_daily_days_of_week(self, job_queue, weekday):
         delta, now = 1, dtm.datetime.now(UTC)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
         # offset in days until next weekday
@@ -376,10 +450,6 @@ class TestJobQueue:
         await asyncio.sleep(delta + 0.1)
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == self.expected_warning
-        assert recwarn[0].category is PTBUserWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     async def test_run_monthly(self, job_queue, timezone):
         delta, now = 1, dtm.datetime.now(timezone)
@@ -397,7 +467,7 @@ class TestJobQueue:
         if day > next_months_days:
             expected_reschedule_time += dtm.timedelta(next_months_days)
 
-        expected_reschedule_time = timezone.normalize(expected_reschedule_time)
+        expected_reschedule_time = self.normalize(expected_reschedule_time, timezone)
         # Adjust the hour for the special case that between now and next month a DST switch happens
         expected_reschedule_time += dtm.timedelta(
             hours=time_of_day.hour - expected_reschedule_time.hour
@@ -419,7 +489,7 @@ class TestJobQueue:
             calendar.monthrange(now.year, now.month)[1]
         ) - dtm.timedelta(days=now.day)
         # Adjust the hour for the special case that between now & end of month a DST switch happens
-        expected_reschedule_time = timezone.normalize(expected_reschedule_time)
+        expected_reschedule_time = self.normalize(expected_reschedule_time, timezone)
         expected_reschedule_time += dtm.timedelta(
             hours=time_of_day.hour - expected_reschedule_time.hour
         )
@@ -443,19 +513,34 @@ class TestJobQueue:
 
         await jq.stop()
 
-    async def test_get_jobs(self, job_queue):
+    @pytest.mark.parametrize(
+        "pattern", [None, "not", re.compile("not")], ids=["None", "str", "re.Pattern"]
+    )
+    async def test_get_jobs(self, job_queue, pattern):
         callback = self.job_run_once
 
-        job1 = job_queue.run_once(callback, 10, name="name1")
+        job1 = job_queue.run_once(callback, 10, name="is|a|match")
         await asyncio.sleep(0.03)  # To stablize tests on windows
-        job2 = job_queue.run_once(callback, 10, name="name1")
+        job2 = job_queue.run_once(callback, 10, name="is|a|match")
         await asyncio.sleep(0.03)
-        job3 = job_queue.run_once(callback, 10, name="name2")
+        job3 = job_queue.run_once(callback, 10, name="not|is|a|match")
+        await asyncio.sleep(0.03)
+        job4 = job_queue.run_once(callback, 10, name="is|a|match|not")
+        await asyncio.sleep(0.03)
+        job5 = job_queue.run_once(callback, 10, name="something_else")
+        await asyncio.sleep(0.03)
+        # name-less job
+        job6 = job_queue.run_once(callback, 10)
         await asyncio.sleep(0.03)
 
-        assert job_queue.jobs() == (job1, job2, job3)
-        assert job_queue.get_jobs_by_name("name1") == (job1, job2)
-        assert job_queue.get_jobs_by_name("name2") == (job3,)
+        if pattern is None:
+            assert job_queue.jobs(pattern) == (job1, job2, job3, job4, job5, job6)
+        else:
+            assert job_queue.jobs(pattern) == (job3, job4)
+
+        assert job_queue.jobs() == (job1, job2, job3, job4, job5, job6)
+        assert job_queue.get_jobs_by_name("is|a|match") == (job1, job2)
+        assert job_queue.get_jobs_by_name("something_else") == (job5,)
 
     async def test_job_run(self, app):
         job = app.job_queue.run_repeating(self.job_run_once, 0.02)
@@ -492,7 +577,7 @@ class TestJobQueue:
         job_2 = job_queue.run_repeating(self.job_run_once, 0.2)
         job_3 = Job(self.job_run_once, 0.2)
         job_3._job = job.job
-        assert job == job
+        assert job == job  # noqa: PLR0124
         assert job != job_queue
         assert job != job_2
         assert job == job_3
@@ -563,7 +648,7 @@ class TestJobQueue:
         assert rec.name == "telegram.ext.Application"
         assert "No error handlers are registered" in rec.getMessage()
 
-    async def test_custom_context(self, bot, job_queue):
+    async def test_custom_context(self, bot):
         application = (
             ApplicationBuilder()
             .token(bot.token)
@@ -574,6 +659,7 @@ class TestJobQueue:
             )
             .build()
         )
+        job_queue = JobQueue()
         job_queue.set_application(application)
 
         async def callback(context):
@@ -584,14 +670,16 @@ class TestJobQueue:
                 type(context.bot_data),
             )
 
+        await job_queue.start()
         job_queue.run_once(callback, 0.1)
         await asyncio.sleep(0.15)
         assert self.result == (CustomContext, None, None, int)
+        await job_queue.stop()
 
     async def test_attribute_error(self):
         job = Job(self.job_run_once)
         with pytest.raises(
-            AttributeError, match="nor 'apscheduler.job.Job' has attribute 'error'"
+            AttributeError, match="nor 'apscheduler\\.job\\.Job' has attribute 'error'"
         ):
             job.error
 
@@ -641,3 +729,44 @@ class TestJobQueue:
         tg_job = Job.from_aps_job(aps_job)
         assert tg_job is job
         assert tg_job.job is aps_job
+
+    async def test_run_job_exception_in_building_context(
+        self, monkeypatch, job_queue, caplog, app
+    ):
+        # Makes sure that exceptions in building the context don't stop the application
+        exception = ValueError("TestException")
+        original_from_job = CallbackContext.from_job
+
+        def raise_exception(job, application):
+            if job.data == 1:
+                raise exception
+            return original_from_job(job, application)
+
+        monkeypatch.setattr(CallbackContext, "from_job", raise_exception)
+
+        received_jobs = set()
+
+        async def job_callback(context):
+            received_jobs.add(context.job.data)
+
+        with caplog.at_level(logging.CRITICAL):
+            job_queue.run_once(job_callback, 0.1, data=1)
+            await asyncio.sleep(0.2)
+
+        assert received_jobs == set()
+        assert len(caplog.records) == 1
+        record = caplog.records[0]
+        assert record.name == "telegram.ext.JobQueue"
+        assert record.getMessage().startswith(
+            "Error while building CallbackContext for job job_callback"
+        )
+        assert record.levelno == logging.CRITICAL
+
+        # Let's also check that no critical log is produced when the exception is not raised
+        caplog.clear()
+        with caplog.at_level(logging.CRITICAL):
+            job_queue.run_once(job_callback, 0.1, data=2)
+            await asyncio.sleep(0.2)
+
+        assert received_jobs == {2}
+        assert len(caplog.records) == 0

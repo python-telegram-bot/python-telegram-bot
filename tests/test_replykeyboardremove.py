@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,15 +24,15 @@ from tests.auxil.slots import mro_slots
 
 @pytest.fixture(scope="module")
 def reply_keyboard_remove():
-    return ReplyKeyboardRemove(selective=TestReplyKeyboardRemoveBase.selective)
+    return ReplyKeyboardRemove(selective=ReplyKeyboardRemoveTestBase.selective)
 
 
-class TestReplyKeyboardRemoveBase:
+class ReplyKeyboardRemoveTestBase:
     remove_keyboard = True
     selective = True
 
 
-class TestReplyKeyboardRemoveWithoutRequest(TestReplyKeyboardRemoveBase):
+class TestReplyKeyboardRemoveWithoutRequest(ReplyKeyboardRemoveTestBase):
     def test_slot_behaviour(self, reply_keyboard_remove):
         inst = reply_keyboard_remove
         for attr in inst.__slots__:
@@ -52,7 +52,7 @@ class TestReplyKeyboardRemoveWithoutRequest(TestReplyKeyboardRemoveBase):
         assert reply_keyboard_remove_dict["selective"] == reply_keyboard_remove.selective
 
 
-class TestReplyKeyboardRemoveWithRequest(TestReplyKeyboardRemoveBase):
+class TestReplyKeyboardRemoveWithRequest(ReplyKeyboardRemoveTestBase):
     async def test_send_message_with_reply_keyboard_remove(
         self, bot, chat_id, reply_keyboard_remove
     ):

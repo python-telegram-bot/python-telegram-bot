@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,18 +32,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def inline_query_result_cached_mpeg4_gif():
     return InlineQueryResultCachedMpeg4Gif(
-        TestInlineQueryResultCachedMpeg4GifBase.id_,
-        TestInlineQueryResultCachedMpeg4GifBase.mpeg4_file_id,
-        title=TestInlineQueryResultCachedMpeg4GifBase.title,
-        caption=TestInlineQueryResultCachedMpeg4GifBase.caption,
-        parse_mode=TestInlineQueryResultCachedMpeg4GifBase.parse_mode,
-        caption_entities=TestInlineQueryResultCachedMpeg4GifBase.caption_entities,
-        input_message_content=TestInlineQueryResultCachedMpeg4GifBase.input_message_content,
-        reply_markup=TestInlineQueryResultCachedMpeg4GifBase.reply_markup,
+        InlineQueryResultCachedMpeg4GifTestBase.id_,
+        InlineQueryResultCachedMpeg4GifTestBase.mpeg4_file_id,
+        title=InlineQueryResultCachedMpeg4GifTestBase.title,
+        caption=InlineQueryResultCachedMpeg4GifTestBase.caption,
+        parse_mode=InlineQueryResultCachedMpeg4GifTestBase.parse_mode,
+        caption_entities=InlineQueryResultCachedMpeg4GifTestBase.caption_entities,
+        input_message_content=InlineQueryResultCachedMpeg4GifTestBase.input_message_content,
+        reply_markup=InlineQueryResultCachedMpeg4GifTestBase.reply_markup,
+        show_caption_above_media=InlineQueryResultCachedMpeg4GifTestBase.show_caption_above_media,
     )
 
 
-class TestInlineQueryResultCachedMpeg4GifBase:
+class InlineQueryResultCachedMpeg4GifTestBase:
     id_ = "id"
     type_ = "mpeg4_gif"
     mpeg4_file_id = "mpeg4 file id"
@@ -53,9 +54,10 @@ class TestInlineQueryResultCachedMpeg4GifBase:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
-class TestInlineQueryResultCachedMpeg4GifWithoutRequest(TestInlineQueryResultCachedMpeg4GifBase):
+class TestInlineQueryResultCachedMpeg4GifWithoutRequest(InlineQueryResultCachedMpeg4GifTestBase):
     def test_slot_behaviour(self, inline_query_result_cached_mpeg4_gif):
         inst = inline_query_result_cached_mpeg4_gif
         for attr in inst.__slots__:
@@ -79,6 +81,10 @@ class TestInlineQueryResultCachedMpeg4GifWithoutRequest(TestInlineQueryResultCac
         assert (
             inline_query_result_cached_mpeg4_gif.reply_markup.to_dict()
             == self.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_mpeg4_gif.show_caption_above_media
+            == self.show_caption_above_media
         )
 
     def test_caption_entities_always_tuple(self):
@@ -123,6 +129,10 @@ class TestInlineQueryResultCachedMpeg4GifWithoutRequest(TestInlineQueryResultCac
         assert (
             inline_query_result_cached_mpeg4_gif_dict["reply_markup"]
             == inline_query_result_cached_mpeg4_gif.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_mpeg4_gif_dict["show_caption_above_media"]
+            == inline_query_result_cached_mpeg4_gif.show_caption_above_media
         )
 
     def test_equality(self):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,20 +25,20 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def passport_element_error_front_side():
     return PassportElementErrorFrontSide(
-        TestPassportElementErrorFrontSideBase.type_,
-        TestPassportElementErrorFrontSideBase.file_hash,
-        TestPassportElementErrorFrontSideBase.message,
+        PassportElementErrorFrontSideTestBase.type_,
+        PassportElementErrorFrontSideTestBase.file_hash,
+        PassportElementErrorFrontSideTestBase.message,
     )
 
 
-class TestPassportElementErrorFrontSideBase:
+class PassportElementErrorFrontSideTestBase:
     source = "front_side"
     type_ = "test_type"
     file_hash = "file_hash"
     message = "Error message"
 
 
-class TestPassportElementErrorFrontSideWithoutRequest(TestPassportElementErrorFrontSideBase):
+class TestPassportElementErrorFrontSideWithoutRequest(PassportElementErrorFrontSideTestBase):
     def test_slot_behaviour(self, passport_element_error_front_side):
         inst = passport_element_error_front_side
         for attr in inst.__slots__:

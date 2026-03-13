@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, wrong-import-position
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """Bot that explains Telegram's "Deep Linking Parameters" functionality.
@@ -20,20 +20,13 @@ bot.
 
 import logging
 
-from telegram import __version__ as TG_VER
-
-try:
-    from telegram import __version_info__
-except ImportError:
-    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
-
-if __version_info__ < (20, 0, 0, "alpha", 1):
-    raise RuntimeError(
-        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
-        f"{TG_VER} version of this example, "
-        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
-    )
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, helpers
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    LinkPreviewOptions,
+    Update,
+    helpers,
+)
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, filters
 
@@ -41,6 +34,9 @@ from telegram.ext import Application, CallbackQueryHandler, CommandHandler, Cont
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +63,7 @@ async def deep_linked_level_1(update: Update, context: ContextTypes.DEFAULT_TYPE
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, SO_COOL)
     text = (
-        "Awesome, you just accessed hidden functionality! "
-        "Now let's get back to the private chat."
+        "Awesome, you just accessed hidden functionality! Now let's get back to the private chat."
     )
     keyboard = InlineKeyboardMarkup.from_button(
         InlineKeyboardButton(text="Continue here!", url=url)
@@ -81,7 +76,9 @@ async def deep_linked_level_2(update: Update, context: ContextTypes.DEFAULT_TYPE
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_ENTITIES)
     text = f'You can also mask the deep-linked URLs as links: <a href="{url}">▶️ CLICK HERE</a>.'
-    await update.message.reply_text(text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+    await update.message.reply_text(
+        text, parse_mode=ParseMode.HTML, link_preview_options=LinkPreviewOptions(is_disabled=True)
+    )
 
 
 async def deep_linked_level_3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

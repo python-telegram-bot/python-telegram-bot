@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2026
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,16 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""The integration of persistence into the application is tested in test_basepersistence.
-"""
+"""The integration of persistence into the application is tested in test_basepersistence."""
+
 import asyncio
+import functools
 import inspect
 import logging
 import os
 import platform
 import signal
+import sys
 import threading
 import time
 from collections import defaultdict
@@ -31,12 +33,11 @@ from pathlib import Path
 from queue import Queue
 from random import randrange
 from threading import Thread
-from typing import Optional
 
 import pytest
 
 from telegram import Bot, Chat, Message, MessageEntity, User
-from telegram.error import TelegramError
+from telegram.error import InvalidToken, TelegramError
 from telegram.ext import (
     Application,
     ApplicationBuilder,
@@ -54,12 +55,13 @@ from telegram.ext import (
     Updater,
     filters,
 )
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.asyncio_helpers import call_after
 from tests.auxil.build_messages import make_message_update
-from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.files import SOURCE_ROOT_PATH
+from tests.auxil.monkeypatch import empty_get_updates, return_true
 from tests.auxil.networking import send_webhook_message
-from tests.auxil.pytest_classes import make_bot
+from tests.auxil.pytest_classes import PytestApplication, PytestUpdater, make_bot
 from tests.auxil.slots import mro_slots
 
 
@@ -93,7 +95,7 @@ class TestApplication:
     async def callback_increase_count(self, update, context):
         self.count += 1
 
-    def callback_set_count(self, count, sleep: Optional[float] = None):
+    def callback_set_count(self, count, sleep: float | None = None):
         async def callback(update, context):
             if sleep:
                 await asyncio.sleep(sleep)
@@ -200,10 +202,13 @@ class TestApplication:
         assert isinstance(app.chat_data[1], dict)
         assert isinstance(app.user_data[1], dict)
 
+    async def test_repr(self, app):
+        assert repr(app) == f"PytestApplication[bot={app.bot!r}]"
+
     def test_job_queue(self, one_time_bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-            "`pip install python-telegram-bot[job-queue]`."
+            '`pip install "python-telegram-bot[job-queue]"`.'
         )
         assert app.job_queue is app._job_queue
         application = ApplicationBuilder().bot(one_time_bot).job_queue(None).build()
@@ -296,15 +301,19 @@ class TestApplication:
         )
 
         if updater:
-            async with ApplicationBuilder().bot(one_time_bot).concurrent_updates(
-                update_processor
-            ).build():
+            async with (
+                ApplicationBuilder().bot(one_time_bot).concurrent_updates(update_processor).build()
+            ):
                 pass
             assert self.test_flag == {"bot", "update_processor", "updater"}
         else:
-            async with ApplicationBuilder().bot(one_time_bot).updater(None).concurrent_updates(
-                update_processor
-            ).build():
+            async with (
+                ApplicationBuilder()
+                .bot(one_time_bot)
+                .updater(None)
+                .concurrent_updates(update_processor)
+                .build()
+            ):
                 pass
             assert self.test_flag == {"bot", "update_processor"}
 
@@ -427,7 +436,7 @@ class TestApplication:
 
     @pytest.mark.parametrize("job_queue", [True, False])
     @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
-    async def test_start_stop_processing_updates(self, one_time_bot, job_queue):
+    async def test_start_stop_processing_updates(self, one_time_bot, job_queue, monkeypatch):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
         if job_queue:
             app = ApplicationBuilder().bot(one_time_bot).build()
@@ -436,6 +445,9 @@ class TestApplication:
 
         async def callback(u, c):
             self.received = u
+
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         assert not app.running
         assert not app.updater.running
@@ -453,6 +465,8 @@ class TestApplication:
         async with app:
             await app.start()
             assert app.running
+            tasks = asyncio.all_tasks()
+            assert any(":update_fetcher" in task.get_name() for task in tasks)
             if job_queue:
                 assert app.job_queue.scheduler.running
             else:
@@ -551,7 +565,6 @@ class TestApplication:
             app.remove_handler(handler)
         app.remove_handler(handler, group=2)
 
-    #
     async def test_handler_order_in_group(self, app):
         app.add_handler(MessageHandler(filters.PHOTO, self.callback_set_count(1)))
         app.add_handler(MessageHandler(filters.ALL, self.callback_set_count(2)))
@@ -633,11 +646,11 @@ class TestApplication:
             assert len(app.handlers[-1]) == 1
 
             # Now lets test the errors which can be produced-
-            with pytest.raises(ValueError, match="The `group` argument"):
+            with pytest.raises(TypeError, match="The `group` argument"):
                 app.add_handlers({2: [msg_handler_set_count]}, group=0)
-            with pytest.raises(ValueError, match="Handlers for group 3"):
+            with pytest.raises(TypeError, match="Handlers for group 3"):
                 app.add_handlers({3: msg_handler_set_count})
-            with pytest.raises(ValueError, match="The `handlers` argument must be a sequence"):
+            with pytest.raises(TypeError, match="The `handlers` argument must be a sequence"):
                 app.add_handlers({msg_handler_set_count})
 
             await app.stop()
@@ -964,6 +977,8 @@ class TestApplication:
             await app.update_queue.put(1)
             task = asyncio.create_task(app.stop())
             await asyncio.sleep(0.05)
+            tasks = asyncio.all_tasks()
+            assert any(":process_update_non_blocking" in t.get_name() for t in tasks)
             assert self.count == 1
             # Make sure that app stops only once all non blocking callbacks are done
             assert not task.done()
@@ -990,9 +1005,9 @@ class TestApplication:
             str(recwarn[0].message)
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
-        assert (
-            Path(recwarn[0].filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_application.py"
-        ), "incorrect stacklevel!"
+        assert Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py", (
+            "incorrect stacklevel!"
+        )
 
     async def test_non_blocking_no_error_handler(self, app, caplog):
         app.add_handler(TypeHandler(object, self.callback_raise_error("Test error"), block=False))
@@ -1029,6 +1044,8 @@ class TestApplication:
             await app.update_queue.put(self.message_update)
             task = asyncio.create_task(app.stop())
             await asyncio.sleep(0.05)
+            tasks = asyncio.all_tasks()
+            assert any(":process_error:non_blocking" in t.get_name() for t in tasks)
             assert self.count == 42
             assert self.received is None
             event.set()
@@ -1061,9 +1078,9 @@ class TestApplication:
             str(recwarn[0].message)
             == "ApplicationHandlerStop is not supported with handlers running non-blocking."
         )
-        assert (
-            Path(recwarn[0].filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_application.py"
-        ), "incorrect stacklevel!"
+        assert Path(recwarn[0].filename) == SOURCE_ROOT_PATH / "ext" / "_application.py", (
+            "incorrect stacklevel!"
+        )
 
     @pytest.mark.parametrize(("block", "expected_output"), [(False, 0), (True, 5)])
     async def test_default_block_error_handler(self, bot_info, block, expected_output):
@@ -1196,7 +1213,8 @@ class TestApplication:
             self.count = 42
             return 43
 
-        task = app.create_task(callback())
+        task = app.create_task(callback(), name="test_task")
+        assert task.get_name() == "test_task"
         await asyncio.sleep(0.01)
         assert not task.done()
         out = await task
@@ -1313,7 +1331,8 @@ class TestApplication:
         out = await app.create_task(asyncio.gather(callback()))
         assert out == [42]
 
-    async def test_create_task_awaiting_generator(self, app):
+    @pytest.mark.skipif(sys.version_info >= (3, 12), reason="generator coroutines are deprecated")
+    async def test_create_task_awaiting_generator(self, app, recwarn):
         event = asyncio.Event()
 
         def gen():
@@ -1322,6 +1341,9 @@ class TestApplication:
 
         await app.create_task(gen())
         assert event.is_set()
+        assert len(recwarn) == 2  # 1st warning is: tasks not being awaited when app isn't running
+        assert recwarn[1].category is PTBDeprecationWarning
+        assert "Generator-based coroutines are deprecated" in str(recwarn[1].message)
 
     async def test_no_update_processor(self, app):
         queue = asyncio.Queue()
@@ -1377,6 +1399,8 @@ class TestApplication:
                 assert not events[i].is_set()
 
             await asyncio.sleep(0.9)
+            tasks = asyncio.all_tasks()
+            assert any(":process_concurrent_update" in task.get_name() for task in tasks)
             for i in range(app.update_processor.max_concurrent_updates):
                 assert events[i].is_set()
             for i in range(
@@ -1414,8 +1438,9 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_polling_basic(self, app, monkeypatch):
+    def test_run_polling_basic(self, app, monkeypatch, caplog):
         exception_event = threading.Event()
+        exception_testing_done = threading.Event()
         update_event = threading.Event()
         exception = TelegramError("This is a test error")
         assertions = {}
@@ -1423,8 +1448,14 @@ class TestApplication:
         async def get_updates(*args, **kwargs):
             if exception_event.is_set():
                 raise exception
+
             # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
+            if exception_testing_done.is_set() and app.updater.running:
+                # the longer sleep makes sure that we can exit also while get_updates is running
+                await asyncio.sleep(20)
+            else:
+                await asyncio.sleep(0.01)
+
             update_event.set()
             return [self.message_update]
 
@@ -1450,7 +1481,12 @@ class TestApplication:
             exception_event.set()
             time.sleep(0.05)
             assertions["exception_handling"] = self.received == exception.message
+            exception_testing_done.set()
 
+            # So that the get_updates call on shutdown doesn't fail
+            exception_event.clear()
+
+            time.sleep(1)
             os.kill(os.getpid(), signal.SIGINT)
             time.sleep(0.1)
 
@@ -1465,12 +1501,19 @@ class TestApplication:
 
         thread = Thread(target=thread_target)
         thread.start()
-        app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        with caplog.at_level(logging.DEBUG):
+            app.run_polling(drop_pending_updates=True, close_loop=False)
+            thread.join(timeout=10)
 
         assert len(assertions) == 8
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+        found_log = False
+        for record in caplog.records:
+            if "received stop signal" in record.getMessage() and record.levelno == logging.DEBUG:
+                found_log = True
+        assert found_log
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
@@ -1478,11 +1521,6 @@ class TestApplication:
     )
     def test_run_polling_post_init(self, one_time_bot, monkeypatch):
         events = []
-
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
 
         def thread_target():
             waited = 0
@@ -1497,9 +1535,15 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
-        app = Application.builder().bot(one_time_bot).post_init(post_init).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_init(post_init)
+            .build()
+        )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(
             app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
         )
@@ -1508,11 +1552,12 @@ class TestApplication:
             "start_polling",
             call_after(app.updater.start_polling, lambda _: events.append("start_polling")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == ["init", "post_init", "start_polling"], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
@@ -1521,11 +1566,6 @@ class TestApplication:
     )
     def test_run_polling_post_shutdown(self, one_time_bot, monkeypatch):
         events = []
-
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
 
         def thread_target():
             waited = 0
@@ -1540,9 +1580,15 @@ class TestApplication:
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
 
-        app = Application.builder().bot(one_time_bot).post_shutdown(post_shutdown).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_shutdown(post_shutdown)
+            .build()
+        )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(
             app, "shutdown", call_after(app.shutdown, lambda _: events.append("shutdown"))
         )
@@ -1551,11 +1597,12 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.shutdown",
             "shutdown",
@@ -1566,13 +1613,8 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_polling_post_stop(self, bot, monkeypatch):
+    def test_run_polling_post_stop(self, one_time_bot, monkeypatch):
         events = []
-
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
 
         def thread_target():
             waited = 0
@@ -1587,9 +1629,15 @@ class TestApplication:
         async def post_stop(app: Application) -> None:
             events.append("post_stop")
 
-        app = Application.builder().token(bot.token).post_stop(post_stop).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_stop(post_stop)
+            .build()
+        )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(app, "stop", call_after(app.stop, lambda _: events.append("stop")))
         monkeypatch.setattr(
             app.updater,
@@ -1601,11 +1649,12 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.stop",
             "stop",
@@ -1654,7 +1703,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys())
         for name, param in updater_signature.parameters.items():
@@ -1666,10 +1715,11 @@ class TestApplication:
         expected = {
             name: name for name in updater_signature.parameters if name != "error_callback"
         }
+        expected["bootstrap_retries"] = 42
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(close_loop=False, **expected)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys())
         assert self.received.pop("error_callback", None)
@@ -1679,14 +1729,8 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_webhook_basic(self, app, monkeypatch):
+    def test_run_webhook_basic(self, app, monkeypatch, caplog):
         assertions = {}
-
-        async def delete_webhook(*args, **kwargs):
-            return True
-
-        async def set_webhook(*args, **kwargs):
-            return True
 
         def thread_target():
             waited = 0
@@ -1718,8 +1762,6 @@ class TestApplication:
             assertions["updater_not_running"] = not app.updater.running
             assertions["job_queue_not_running"] = not app.job_queue.scheduler.running
 
-        monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
         app.add_handler(TypeHandler(object, self.callback_set_count(42)))
 
         thread = Thread(target=thread_target)
@@ -1728,18 +1770,25 @@ class TestApplication:
         ip = "127.0.0.1"
         port = randrange(1024, 49152)
 
-        app.run_webhook(
-            ip_address=ip,
-            port=port,
-            url_path="TOKEN",
-            drop_pending_updates=True,
-            close_loop=False,
-        )
-        thread.join()
+        with caplog.at_level(logging.DEBUG):
+            app.run_webhook(
+                ip_address=ip,
+                port=port,
+                url_path="TOKEN",
+                drop_pending_updates=True,
+                close_loop=False,
+            )
+            thread.join(timeout=10)
 
         assert len(assertions) == 7
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+        found_log = False
+        for record in caplog.records:
+            if "received stop signal" in record.getMessage() and record.levelno == logging.DEBUG:
+                found_log = True
+        assert found_log
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
@@ -1747,17 +1796,6 @@ class TestApplication:
     )
     def test_run_webhook_post_init(self, one_time_bot, monkeypatch):
         events = []
-
-        async def delete_webhook(*args, **kwargs):
-            return True
-
-        async def set_webhook(*args, **kwargs):
-            return True
-
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
 
         def thread_target():
             waited = 0
@@ -1772,10 +1810,15 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
-        app = Application.builder().bot(one_time_bot).post_init(post_init).build()
+        app = (
+            Application.builder()
+            .post_init(post_init)
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .build()
+        )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+
         monkeypatch.setattr(
             app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
         )
@@ -1784,6 +1827,8 @@ class TestApplication:
             "start_webhook",
             call_after(app.updater.start_webhook, lambda _: events.append("start_webhook")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+        monkeypatch.setattr(app.bot, "set_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1798,7 +1843,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == ["init", "post_init", "start_webhook"], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
@@ -1807,17 +1852,6 @@ class TestApplication:
     )
     def test_run_webhook_post_shutdown(self, one_time_bot, monkeypatch):
         events = []
-
-        async def delete_webhook(*args, **kwargs):
-            return True
-
-        async def set_webhook(*args, **kwargs):
-            return True
-
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
 
         def thread_target():
             waited = 0
@@ -1832,10 +1866,15 @@ class TestApplication:
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
 
-        app = Application.builder().bot(one_time_bot).post_shutdown(post_shutdown).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_shutdown(post_shutdown)
+            .build()
+        )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+
         monkeypatch.setattr(
             app, "shutdown", call_after(app.shutdown, lambda _: events.append("shutdown"))
         )
@@ -1844,6 +1883,8 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+        monkeypatch.setattr(app.bot, "set_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1858,7 +1899,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.shutdown",
             "shutdown",
@@ -1869,19 +1910,8 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_webhook_post_stop(self, bot, monkeypatch):
+    def test_run_webhook_post_stop(self, one_time_bot, monkeypatch):
         events = []
-
-        async def delete_webhook(*args, **kwargs):
-            return True
-
-        async def set_webhook(*args, **kwargs):
-            return True
-
-        async def get_updates(*args, **kwargs):
-            # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
-            return []
 
         def thread_target():
             waited = 0
@@ -1896,10 +1926,15 @@ class TestApplication:
         async def post_stop(app: Application) -> None:
             events.append("post_stop")
 
-        app = Application.builder().token(bot.token).post_stop(post_stop).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_stop(post_stop)
+            .build()
+        )
         app.bot._unfreeze()
-        monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
-        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+
         monkeypatch.setattr(app, "stop", call_after(app.stop, lambda _: events.append("stop")))
         monkeypatch.setattr(
             app.updater,
@@ -1911,6 +1946,8 @@ class TestApplication:
             "shutdown",
             call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
         )
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+        monkeypatch.setattr(app.bot, "set_webhook", return_true)
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1925,7 +1962,7 @@ class TestApplication:
             drop_pending_updates=True,
             close_loop=False,
         )
-        thread.join()
+        thread.join(timeout=10)
         assert events == [
             "updater.stop",
             "stop",
@@ -1976,7 +2013,7 @@ class TestApplication:
         thread = Thread(target=thread_target)
         thread.start()
         app.run_webhook(close_loop=False)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys()) - {"self"}
         for name, param in updater_signature.parameters.items():
@@ -1985,83 +2022,180 @@ class TestApplication:
             assert self.received[name] == param.default
 
         expected = {name: name for name in updater_signature.parameters if name != "self"}
+        expected["bootstrap_retries"] = 42
         thread = Thread(target=thread_target)
         thread.start()
         app.run_webhook(close_loop=False, **expected)
-        thread.join()
+        thread.join(timeout=10)
 
         assert set(self.received.keys()) == set(expected.keys())
         assert self.received == expected
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Can't send signals without stopping whole process on windows",
-    )
-    async def test_cancellation_error_does_not_stop_polling(
-        self, one_time_bot, monkeypatch, caplog
+    @pytest.mark.parametrize("exception", [SystemExit, KeyboardInterrupt])
+    def test_raise_system_exit_keyboard_interrupt_post_init(
+        self, one_time_bot, monkeypatch, exception
     ):
-        """
-        Ensures that hitting CTRL+C while polling *without* run_polling doesn't kill
-        the update_fetcher loop such that a shutdown is still possible.
-        This test is far from perfect, but it's the closest we can come with sane effort.
-        """
+        async def post_init(application):
+            raise exception
 
-        async def get_updates(*args, **kwargs):
-            await asyncio.sleep(0)
-            return [None]
+        called_callbacks = set()
 
-        monkeypatch.setattr(one_time_bot, "get_updates", get_updates)
-        app = ApplicationBuilder().bot(one_time_bot).build()
+        async def callback(*args, **kwargs):
+            called_callbacks.add(kwargs["name"])
 
-        original_get = app.update_queue.get
-        raise_cancelled_error = threading.Event()
+        for cls, method, entry in [
+            (Application, "initialize", "app_initialize"),
+            (Application, "start", "app_start"),
+            (Application, "stop", "app_stop"),
+            (Application, "shutdown", "app_shutdown"),
+            (Updater, "initialize", "updater_initialize"),
+            (Updater, "shutdown", "updater_shutdown"),
+            (Updater, "stop", "updater_stop"),
+            (Updater, "start_polling", "updater_start_polling"),
+        ]:
 
-        async def get(*arg, **kwargs):
-            await asyncio.sleep(0.05)
-            if raise_cancelled_error.is_set():
-                raise_cancelled_error.clear()
-                raise asyncio.CancelledError("Mocked CancelledError")
-            return await original_get(*arg, **kwargs)
+            def after(_, name):
+                called_callbacks.add(name)
 
-        monkeypatch.setattr(app.update_queue, "get", get)
+            monkeypatch.setattr(
+                cls,
+                method,
+                call_after(getattr(cls, method), functools.partial(after, name=entry)),
+            )
 
-        def thread_target():
-            waited = 0
-            while not app.running:
-                time.sleep(0.05)
-                waited += 0.05
-                if waited > 5:
-                    pytest.fail("App apparently won't start")
-
-            time.sleep(0.1)
-            raise_cancelled_error.set()
-
-        async with app:
-            with caplog.at_level(logging.WARNING):
-                thread = Thread(target=thread_target)
-                await app.start()
-                thread.start()
-                assert thread.is_alive()
-                raise_cancelled_error.wait()
-
-                # The exit should have been caught and the app should still be running
-                assert not thread.is_alive()
-                assert app.running
-
-                # Explicit shutdown is required
-                await app.stop()
-                thread.join()
-
-        assert not thread.is_alive()
-        assert not app.running
-
-        # Make sure that we were warned about the necessity of a manual shutdown
-        assert len(caplog.records) == 1
-        record = caplog.records[0]
-        assert record.name == "telegram.ext.Application"
-        assert record.getMessage().startswith(
-            "Fetching updates got a asyncio.CancelledError. Ignoring"
+        app = (
+            ApplicationBuilder()
+            .bot(one_time_bot)
+            .post_init(post_init)
+            .post_stop(functools.partial(callback, name="post_stop"))
+            .post_shutdown(functools.partial(callback, name="post_shutdown"))
+            .build()
         )
+
+        app.run_polling(close_loop=False)
+
+        # This checks two things:
+        # 1. start/stop are *not* called!
+        # 2. we do have a graceful shutdown
+        assert called_callbacks == {
+            "app_initialize",
+            "updater_initialize",
+            "app_shutdown",
+            "post_shutdown",
+            "updater_shutdown",
+        }
+
+    @pytest.mark.parametrize("exception", [SystemExit("PTBTest"), KeyboardInterrupt("PTBTest")])
+    @pytest.mark.parametrize("kind", ["handler", "error_handler", "job"])
+    # @pytest.mark.parametrize("block", [True, False])
+    # Testing with block=False would be nice but that doesn't work well with pytest for some reason
+    # in any case, block=False is the simpler behavior since it is roughly similar to what happens
+    # when you hit CTRL+C in the commandline.
+    def test_raise_system_exit_keyboard_jobs_handlers(
+        self, one_time_bot, monkeypatch, exception, kind, caplog
+    ):
+        async def queue_and_raise(application):
+            await application.update_queue.put("will_not_be_processed")
+            raise exception
+
+        async def handler_callback(update, context):
+            if kind == "handler":
+                await queue_and_raise(context.application)
+            elif kind == "error_handler":
+                raise TelegramError("Triggering error callback")
+
+        async def error_callback(update, context):
+            await queue_and_raise(context.application)
+
+        async def job_callback(context):
+            await queue_and_raise(context.application)
+
+        async def enqueue_update():
+            await asyncio.sleep(0.5)
+            await app.update_queue.put(1)
+
+        async def post_init(application):
+            if kind == "job":
+                application.job_queue.run_once(when=0.5, callback=job_callback)
+            else:
+                app.create_task(enqueue_update())
+
+        async def update_logger_callback(update, context):
+            context.bot_data.setdefault("processed_updates", set()).add(update)
+
+        called_callbacks = set()
+
+        async def callback(*args, **kwargs):
+            called_callbacks.add(kwargs["name"])
+
+        for cls, method, entry in [
+            (Application, "initialize", "app_initialize"),
+            (Application, "start", "app_start"),
+            (Application, "stop", "app_stop"),
+            (Application, "shutdown", "app_shutdown"),
+            (Updater, "initialize", "updater_initialize"),
+            (Updater, "shutdown", "updater_shutdown"),
+            (Updater, "stop", "updater_stop"),
+            (Updater, "start_polling", "updater_start_polling"),
+        ]:
+
+            def after(_, name):
+                called_callbacks.add(name)
+
+            monkeypatch.setattr(
+                cls,
+                method,
+                call_after(getattr(cls, method), functools.partial(after, name=entry)),
+            )
+
+        app = (
+            ApplicationBuilder()
+            .bot(one_time_bot)
+            .post_init(post_init)
+            .post_stop(functools.partial(callback, name="post_stop"))
+            .post_shutdown(functools.partial(callback, name="post_shutdown"))
+            .build()
+        )
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+
+        app.add_handler(TypeHandler(object, update_logger_callback), group=-10)
+        app.add_handler(TypeHandler(object, handler_callback))
+        app.add_error_handler(error_callback)
+        with caplog.at_level(logging.DEBUG):
+            app.run_polling(close_loop=False)
+
+        # This checks that we have a clean shutdown even when the user raises SystemExit
+        # or KeyboardInterrupt in a handler/error handler/job callback
+        assert called_callbacks == {
+            "app_initialize",
+            "app_shutdown",
+            "app_start",
+            "app_stop",
+            "post_shutdown",
+            "post_stop",
+            "updater_initialize",
+            "updater_shutdown",
+            "updater_start_polling",
+            "updater_stop",
+        }
+
+        # These next checks make sure that the update queue is properly cleaned even if there are
+        # still pending updates in the queue
+        # Unfortunately this is apparently extremely hard to get right with jobs, so we're
+        # skipping that case for the sake of simplicity
+        if kind == "job":
+            return
+
+        found = False
+        for record in caplog.records:
+            if record.getMessage() != "Dropping pending update: will_not_be_processed":
+                continue
+            assert record.name == "telegram.ext.Application"
+            assert record.levelno == logging.DEBUG
+            found = True
+        assert found, "`Dropping pending updates` message not found in logs!"
+        assert "will_not_be_processed" not in app.bot_data.get("processed_updates", set())
 
     def test_run_without_updater(self, one_time_bot):
         app = ApplicationBuilder().bot(one_time_bot).updater(None).build()
@@ -2096,6 +2230,9 @@ class TestApplication:
             Updater, "shutdown", call_after(Updater.shutdown, after_shutdown("updater"))
         )
         app = ApplicationBuilder().bot(one_time_bot).build()
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+
         with pytest.raises(RuntimeError, match="Test Exception"):
             app.run_polling(close_loop=False)
 
@@ -2177,10 +2314,103 @@ class TestApplication:
             else:
                 app.run_webhook(close_loop=False, stop_signals=None)
 
-        assert len(recwarn) == 0
+        for record in recwarn:
+            assert not str(record.message).startswith("Could not add signal handlers for the stop")
 
-    @pytest.mark.flaky(3, 1)  # loop.call_later will error the test when a flood error is received
-    def test_signal_handlers(self, app, monkeypatch):
+    @pytest.mark.parametrize("exception_class", [InvalidToken, TelegramError])
+    @pytest.mark.parametrize("retries", [3, 0])
+    @pytest.mark.parametrize("method_name", ["run_polling", "run_webhook"])
+    async def test_run_polling_webhook_bootstrap_retries(
+        self, monkeypatch, exception_class, retries, offline_bot, method_name
+    ):
+        """This doesn't test all of the internals of the network retry loop. We do that quite
+        intensively for the `Updater` and here we just want to make sure that the `Application`
+        does do the retries.
+        """
+
+        def thread_target():
+            asyncio.set_event_loop(asyncio.new_event_loop())
+            app = (
+                ApplicationBuilder().bot(offline_bot).application_class(PytestApplication).build()
+            )
+
+            async def initialize(*args, **kwargs):
+                self.count += 1
+                raise exception_class(str(self.count))
+
+            monkeypatch.setattr(app, "initialize", initialize)
+            method = functools.partial(
+                getattr(app, method_name),
+                bootstrap_retries=retries,
+                close_loop=False,
+                stop_signals=None,
+            )
+
+            if exception_class == InvalidToken:
+                with pytest.raises(InvalidToken, match="1"):
+                    method()
+            else:
+                with pytest.raises(TelegramError, match=str(retries + 1)):
+                    method()
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        thread.join(timeout=10)
+        assert not thread.is_alive(), "Test took to long to run. Aborting"
+
+    @pytest.mark.parametrize("method_name", ["run_polling", "run_webhook"])
+    async def test_run_polling_webhook_infinite_bootstrap_retries(
+        self, monkeypatch, offline_bot, method_name
+    ):
+        """Here we simply test that setting `bootstrap_retries=-1` does not lead to the wrong
+        infinite-loop behavior reported in #4966. Raising an exception on the first call to
+        `initialize` ensures that a retry actually happens.
+        """
+
+        def thread_target():
+            asyncio.set_event_loop(asyncio.new_event_loop())
+
+            async def post_init(application):
+                application.stop_running()
+
+            app = (
+                ApplicationBuilder()
+                .bot(offline_bot)
+                .application_class(PytestApplication)
+                .post_init(post_init)
+                .build()
+            )
+
+            async def do_pass(*args, **kwargs):
+                pass
+
+            monkeypatch.setattr(app.bot, "initialize", do_pass)
+            monkeypatch.setattr(app.bot, "delete_webhook", do_pass)
+
+            original_initialize = app.initialize
+
+            async def initialize(*args, **kwargs):
+                if self.count >= 3:
+                    pytest.fail("Should be called only once. Test failed.")
+
+                self.count += 1
+                if self.count == 1:
+                    raise TelegramError("Test Exception")
+                await original_initialize(*args, **kwargs)
+
+            monkeypatch.setattr(app, "initialize", initialize)
+            getattr(app, method_name)(
+                bootstrap_retries=-1,
+                close_loop=False,
+                stop_signals=None,
+            )
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        thread.join(timeout=10)
+        assert not thread.is_alive(), "Test took to long to run. Aborting"
+
+    def test_signal_handlers(self, offline_bot, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
 
@@ -2188,17 +2418,30 @@ class TestApplication:
 
         def signal_handler_test(*args, **kwargs):
             # args[0] is the signal, [1] the callback
-            received_signals.append(args[0])
+            received_signals.append(args[1])
+
+        app = ApplicationBuilder().bot(offline_bot).application_class(PytestApplication).build()
+
+        # Mock the necessary methods to avoid network calls
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
 
         loop = asyncio.get_event_loop()
-        monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test)
 
-        def abort_app():
-            raise SystemExit
+        monkeypatch.setattr(loop.__class__, "add_signal_handler", signal_handler_test)
 
-        loop.call_later(0.6, abort_app)
+        # Mock initialize to exit quickly after testing signal handler setup
+        original_initialize = app.initialize
 
-        app.run_polling(close_loop=False)
+        async def quick_initialize(*args, **kwargs):
+            await original_initialize(*args, **kwargs)
+            # Exit quickly by raising an exception after successful initialization
+            raise TelegramError("Test completed successfully")
+
+        monkeypatch.setattr(app, "initialize", quick_initialize)
+
+        with pytest.raises(TelegramError, match="Test completed successfully"):
+            app.run_polling(close_loop=False)
 
         if platform.system() == "Windows":
             assert received_signals == []
@@ -2206,10 +2449,393 @@ class TestApplication:
             assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
 
         received_signals.clear()
-        loop.call_later(0.6, abort_app)
-        app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
+        with pytest.raises(TelegramError, match="Test completed successfully"):
+            app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
         if platform.system() == "Windows":
             assert received_signals == []
         else:
             assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
+
+    def test_stop_running_not_running(self, app, caplog):
+        with caplog.at_level(logging.DEBUG):
+            app.stop_running()
+
+        assert len(caplog.records) == 1
+        assert caplog.records[-1].name == "telegram.ext.Application"
+        assert caplog.records[-1].getMessage().endswith("`stop_running()` likely has no effect.")
+
+    def test_stop_running_post_init(self, app, monkeypatch, caplog, one_time_bot):
+        async def post_init(app):
+            app.stop_running()
+
+        called_callbacks = []
+
+        async def callback(*args, **kwargs):
+            called_callbacks.append(kwargs["name"])
+
+        monkeypatch.setattr(Application, "start", functools.partial(callback, name="start"))
+        monkeypatch.setattr(
+            Updater, "start_polling", functools.partialmethod(callback, name="start_polling")
+        )
+
+        app = (
+            ApplicationBuilder()
+            .bot(one_time_bot)
+            .post_init(post_init)
+            .post_stop(functools.partial(callback, name="post_stop"))
+            .post_shutdown(functools.partial(callback, name="post_shutdown"))
+            .build()
+        )
+
+        with caplog.at_level(logging.INFO):
+            app.run_polling(close_loop=False)
+
+        # The important part here is that start(_polling) are *not* called!
+        # post_stop must not be called either, since we never called stop()
+        assert called_callbacks == ["post_shutdown"]
+
+        assert len(caplog.records) == 1
+        assert caplog.records[-1].name == "telegram.ext.Application"
+        assert (
+            "Application received stop signal via `stop_running`"
+            in caplog.records[-1].getMessage()
+        )
+
+    @pytest.mark.parametrize("method", ["polling", "webhook"])
+    def test_stop_running(self, one_time_bot, monkeypatch, method):
+        # asyncio.Event() seems to be hard to use across different threads (awaiting in main
+        # thread, setting in another thread), so we use threading.Event() instead.
+        # This requires the use of run_in_executor, but that's fine.
+        put_update_event = threading.Event()
+        callback_done_event = threading.Event()
+        called_stop_running = threading.Event()
+        assertions = {}
+
+        async def post_init(app):
+            # Simply calling app.update_queue.put_nowait(method) in the thread_target doesn't work
+            # for some reason (probably threading magic), so we use an event from the thread_target
+            # to put the update into the queue in the main thread.
+            async def task(app):
+                await asyncio.get_running_loop().run_in_executor(None, put_update_event.wait)
+                await app.update_queue.put(method)
+
+            app.create_task(task(app))
+
+        app = (
+            ApplicationBuilder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_init(post_init)
+            .build()
+        )
+        monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+
+        events = []
+        monkeypatch.setattr(
+            app.updater,
+            "stop",
+            call_after(app.updater.stop, lambda _: events.append("updater.stop")),
+        )
+        monkeypatch.setattr(
+            app,
+            "stop",
+            call_after(app.stop, lambda _: events.append("app.stop")),
+        )
+        monkeypatch.setattr(
+            app,
+            "shutdown",
+            call_after(app.shutdown, lambda _: events.append("app.shutdown")),
+        )
+        monkeypatch.setattr(app.bot, "set_webhook", return_true)
+        monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+
+        def thread_target():
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
+            time.sleep(0.1)
+            assertions["called_stop_running_not_set"] = not called_stop_running.is_set()
+
+            put_update_event.set()
+            time.sleep(0.1)
+
+            assertions["called_stop_running_set"] = called_stop_running.is_set()
+
+            # App should have entered `stop` now but not finished it yet because the callback
+            # is still running
+            assertions["updater.stop_event"] = events == ["updater.stop"]
+            assertions["app.running_False"] = not app.running
+
+            callback_done_event.set()
+            time.sleep(0.1)
+
+            # Now that the update is fully handled, we expect the full shutdown
+            assertions["events"] = events == ["updater.stop", "app.stop", "app.shutdown"]
+
+        async def callback(update, context):
+            context.application.stop_running()
+            called_stop_running.set()
+            await asyncio.get_running_loop().run_in_executor(None, callback_done_event.wait)
+
+        app.add_handler(TypeHandler(object, callback))
+
+        thread = Thread(target=thread_target)
+        thread.start()
+
+        if method == "polling":
+            app.run_polling(close_loop=False, drop_pending_updates=True)
+        else:
+            ip = "127.0.0.1"
+            port = randrange(1024, 49152)
+
+            app.run_webhook(
+                ip_address=ip,
+                port=port,
+                url_path="TOKEN",
+                drop_pending_updates=False,
+                close_loop=False,
+            )
+
+        thread.join(timeout=10)
+
+        assert len(assertions) == 5
+        for key, value in assertions.items():
+            assert value, f"assertion '{key}' failed!"
+
+    async def test_process_update_exception_in_building_context(self, monkeypatch, caplog, app):
+        # Makes sure that exceptions in building the context don't stop the application
+        exception = ValueError("TestException")
+        original_from_update = CallbackContext.from_update
+
+        def raise_exception(update, application):
+            if update == 1:
+                raise exception
+            return original_from_update(update, application)
+
+        monkeypatch.setattr(CallbackContext, "from_update", raise_exception)
+
+        received_updates = set()
+
+        async def callback(update, context):
+            received_updates.add(update)
+
+        app.add_handler(TypeHandler(int, callback))
+
+        async with app:
+            with caplog.at_level(logging.CRITICAL):
+                await app.process_update(1)
+
+            assert received_updates == set()
+            assert len(caplog.records) == 1
+            record = caplog.records[0]
+            assert record.name == "telegram.ext.Application"
+            assert record.getMessage().startswith(
+                "Error while building CallbackContext for update 1"
+            )
+            assert record.levelno == logging.CRITICAL
+
+            # Let's also check that no critical log is produced when the exception is not raised
+            caplog.clear()
+            with caplog.at_level(logging.CRITICAL):
+                await app.process_update(2)
+
+            assert received_updates == {2}
+            assert len(caplog.records) == 0
+
+    @pytest.mark.parametrize("change_type", ["remove", "add"])
+    async def test_process_update_handler_change_groups_during_iteration(self, app, change_type):
+        run_groups = set()
+
+        async def dummy_callback(_, __, g: int):
+            run_groups.add(g)
+
+        for group in range(10, 20):
+            handler = TypeHandler(int, functools.partial(dummy_callback, g=group))
+            app.add_handler(handler, group=group)
+
+        async def wait_callback(_, context):
+            # Trigger a change of the app.handlers dict during the iteration
+            if change_type == "remove":
+                context.application.remove_handler(handler, group)
+            else:
+                context.application.add_handler(
+                    TypeHandler(int, functools.partial(dummy_callback, g=42)), group=42
+                )
+
+        app.add_handler(TypeHandler(int, wait_callback))
+
+        async with app:
+            await app.process_update(1)
+
+        # check that exactly those handlers were called that were configured when
+        # process_update was called
+        assert run_groups == set(range(10, 20))
+
+    async def test_process_update_handler_change_group_during_iteration(self, app):
+        async def dummy_callback(_, __):
+            pass
+
+        checked_handlers = set()
+
+        class TrackHandler(TypeHandler):
+            def __init__(self, name: str, *args, **kwargs):
+                self.name = name
+                super().__init__(*args, **kwargs)
+
+            def check_update(self, update: object) -> bool:
+                checked_handlers.add(self.name)
+                return super().check_update(update)
+
+        remove_handler = TrackHandler("remove", int, dummy_callback)
+        add_handler = TrackHandler("add", int, dummy_callback)
+
+        class TriggerHandler(TypeHandler):
+            def check_update(self, update: object) -> bool:
+                # Trigger a change of the app.handlers *in the same group* during the iteration
+                app.remove_handler(remove_handler)
+                app.add_handler(add_handler)
+                # return False to ensure that additional handlers in the same group are checked
+                return False
+
+        app.add_handler(TriggerHandler(str, dummy_callback))
+        app.add_handler(remove_handler)
+        async with app:
+            await app.process_update("string update")
+
+        # check that exactly those handlers were checked that were configured when
+        # process_update was called
+        assert checked_handlers == {"remove"}
+
+    async def test_process_error_exception_in_building_context(self, monkeypatch, caplog, app):
+        # Makes sure that exceptions in building the context don't stop the application
+        exception = ValueError("TestException")
+        original_from_error = CallbackContext.from_error
+
+        def raise_exception(update, error, application, *args, **kwargs):
+            if error == 1:
+                raise exception
+            return original_from_error(update, error, application, *args, **kwargs)
+
+        monkeypatch.setattr(CallbackContext, "from_error", raise_exception)
+
+        received_errors = set()
+
+        async def callback(update, context):
+            received_errors.add(context.error)
+
+        app.add_error_handler(callback)
+
+        async with app:
+            with caplog.at_level(logging.CRITICAL):
+                await app.process_error(update=None, error=1)
+
+            assert received_errors == set()
+            assert len(caplog.records) == 1
+            record = caplog.records[0]
+            assert record.name == "telegram.ext.Application"
+            assert record.getMessage().startswith(
+                "Error while building CallbackContext for exception 1"
+            )
+            assert record.levelno == logging.CRITICAL
+
+            # Let's also check that no critical log is produced when the exception is not raised
+            caplog.clear()
+            with caplog.at_level(logging.CRITICAL):
+                await app.process_error(update=None, error=2)
+
+            assert received_errors == {2}
+            assert len(caplog.records) == 0
+
+    @pytest.mark.parametrize("change_type", ["remove", "add"])
+    async def test_process_error_change_during_iteration(self, app, change_type):
+        called_handlers = set()
+
+        async def dummy_process_error(name: str, *_, **__):
+            called_handlers.add(name)
+
+        add_error_handler = functools.partial(dummy_process_error, "add_handler")
+        remove_error_handler = functools.partial(dummy_process_error, "remove_handler")
+
+        async def trigger_change(*_, **__):
+            if change_type == "remove":
+                app.remove_error_handler(remove_error_handler)
+            else:
+                app.add_error_handler(add_error_handler)
+
+        app.add_error_handler(trigger_change)
+        app.add_error_handler(remove_error_handler)
+        async with app:
+            await app.process_error(update=None, error=None)
+
+        # check that exactly those handlers were checked that were configured when
+        # add_error_handler was called
+        assert called_handlers == {"remove_handler"}
+
+    @pytest.mark.skipif(
+        sys.version_info < (3, 14),
+        reason="Only relevant for Python 3.14+ where get_event_loop() raises RuntimeError",
+    )
+    def test_run_polling_no_event_loop_python314(self, offline_bot, monkeypatch):
+        """Test that run_polling works when no event loop exists (Python 3.14+ scenario).
+
+        This simulates the Python 3.14+ behavior where get_event_loop() raises RuntimeError
+        when there's no current event loop in the main thread. The fix should create a new
+        event loop in this case.
+        """
+        # Track if our test ran and whether any exceptions occurred
+        exception_captured = None
+
+        def thread_target():
+            nonlocal exception_captured
+            try:
+                # Intentionally DON'T set an event loop to simulate Python 3.14 scenario
+                # Note: the existing test_run_polling_webhook_bootstrap_retries DOES set one
+
+                app = (
+                    ApplicationBuilder()
+                    .bot(offline_bot)
+                    .application_class(PytestApplication)
+                    .build()
+                )
+
+                # Mock the necessary methods to avoid network calls
+                monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
+                monkeypatch.setattr(app.bot, "delete_webhook", return_true)
+
+                # Mock initialize to exit quickly after testing event loop creation
+                original_initialize = app.initialize
+
+                async def quick_initialize(*args, **kwargs):
+                    await original_initialize(*args, **kwargs)
+                    # Exit quickly by raising an exception after successful initialization
+                    raise TelegramError("Test completed successfully")
+
+                monkeypatch.setattr(app, "initialize", quick_initialize)
+
+                # This should work - the key is that it creates an event loop and doesn't
+                # raise RuntimeError about no current event loop (Python 3.14+ issue)
+                with pytest.raises(TelegramError, match="Test completed successfully"):
+                    app.run_polling(
+                        bootstrap_retries=0,
+                        close_loop=True,
+                        stop_signals=None,  # Can't use signals in threads
+                        drop_pending_updates=True,
+                    )
+                # If we get here, the event loop was created successfully
+            except Exception as e:
+                exception_captured = e
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        thread.join(timeout=10)
+
+        assert not thread.is_alive(), "Test took too long to run"
+
+        # If there was an unexpected exception, fail the test
+        if exception_captured:
+            raise exception_captured
