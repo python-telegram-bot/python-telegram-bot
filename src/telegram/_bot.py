@@ -12053,8 +12053,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             user_id (:obj:`int`): Unique identifier of the target user.
             tag (:obj:`str`, optional): New tag for the member;
-            0-:tg-const:`telegram.constants.TagLimit.MAX_TAG_LENGTH` characters, emoji are not
-            allowed.
+                0-:tg-const:`telegram.constants.TagLimit.MAX_TAG_LENGTH` characters, emoji are not
+                allowed.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
