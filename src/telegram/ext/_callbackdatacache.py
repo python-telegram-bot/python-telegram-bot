@@ -21,6 +21,7 @@
 import datetime as dtm
 import time
 from collections.abc import MutableMapping
+from copy import copy
 from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
@@ -34,7 +35,7 @@ except ImportError:
 
 import contextlib
 
-from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
+from telegram import CallbackQuery, InlineKeyboardMarkup, Message, User
 from telegram._utils.datetime import to_float_timestamp
 from telegram.error import TelegramError
 from telegram.ext._utils.types import CDCData
@@ -235,22 +236,22 @@ class CallbackDataCache:
         keyboard_data = _KeyboardData(keyboard_uuid)
 
         # Built a new nested list of buttons by replacing the callback data if needed
-        buttons = [
-            [
-                (
+        buttons = []
+
+        for column in reply_markup.inline_keyboard:
+            cols = []
+            for btn in column:
+                if btn.callback_data is not None:
                     # We create a new button instead of replacing callback_data in case the
                     # same object is used elsewhere
-                    InlineKeyboardButton(
-                        btn.text,
-                        callback_data=self.__put_button(btn.callback_data, keyboard_data),
+                    btn_copy = copy(btn)
+                    btn_copy.update_callback_data(
+                        self.__put_button(btn.callback_data, keyboard_data)
                     )
-                    if btn.callback_data
-                    else btn
-                )
-                for btn in column
-            ]
-            for column in reply_markup.inline_keyboard
-        ]
+                    cols.append(btn_copy)
+                else:
+                    cols.append(btn)
+            buttons.append(cols)
 
         if not keyboard_data.button_data:
             # If we arrive here, no data had to be replaced and we can return the input
