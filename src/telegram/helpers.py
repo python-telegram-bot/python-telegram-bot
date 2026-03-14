@@ -29,15 +29,12 @@ __all__ = (
     "escape_markdown",
     "mention_html",
     "mention_markdown",
-    "to_unix_timestamp",
 )
 
-import datetime as dtm
 import re
 from html import escape
 from typing import TYPE_CHECKING
 
-from telegram._utils.datetime import to_timestamp
 from telegram._utils.types import MarkdownVersion
 from telegram.constants import MessageLimit, MessageType
 
@@ -205,13 +202,3 @@ def create_deep_linked_url(
     key = "startgroup" if group else "start"
 
     return f"{base_url}?{key}={payload}"
-
-
-def to_unix_timestamp(datetime_obj: float | dtm.timedelta | dtm.datetime | dtm.time) -> str:
-    """
-    Helper to calculate unix timestamps to use in the
-    :const:`telegram.constants.MessageEntityType.DATE_TIME` string formatting.
-
-    .. versionadded:: NEXT.VERSION
-    """
-    return str(to_timestamp(datetime_obj))
