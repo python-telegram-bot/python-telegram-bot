@@ -12049,7 +12049,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         .. versionadded:: NEXT.VERSION
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             user_id (:obj:`int`): Unique identifier of the target user.
             tag (:obj:`str`, optional): New tag for the member;
