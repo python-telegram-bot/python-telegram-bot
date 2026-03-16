@@ -47,7 +47,7 @@ class ChatPermissions(TelegramObject):
           :attr:`can_send_videos`, :attr:`can_send_video_notes` and :attr:`can_send_voice_notes`
           are considered as well when comparing objects of this type in terms of equality.
         * Removed deprecated argument and attribute ``can_send_media_messages``.
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.7
         :attr:`can_edit_tag` is considered as well when comparing objects of
         this type in terms of equality.
 
@@ -99,7 +99,7 @@ class ChatPermissions(TelegramObject):
         can_edit_tag (:obj:`bool`, optional): :obj:`True`, if the user is allowed to edit their own
             tag.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send text
@@ -144,7 +144,7 @@ class ChatPermissions(TelegramObject):
         can_edit_tag (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to edit their own
             tag.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     """
 

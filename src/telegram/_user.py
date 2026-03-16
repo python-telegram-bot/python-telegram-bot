@@ -123,7 +123,7 @@ class User(TelegramObject):
             users to create and delete topics in private chats. Returned only in
             :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -163,7 +163,7 @@ class User(TelegramObject):
             users to create and delete topics in private chats. Returned only in
             :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -2661,7 +2661,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_profile_audios`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.7
 
         Returns:
             :class:`telegram.UserProfileAudios`
@@ -2697,7 +2697,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_member_tag`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.7
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

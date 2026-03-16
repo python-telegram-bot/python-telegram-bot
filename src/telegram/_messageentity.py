@@ -66,7 +66,7 @@ class MessageEntity(TelegramObject):
             .. versionadded:: 20.8
                 Added block quotation
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
                 Added date_time
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
@@ -86,12 +86,12 @@ class MessageEntity(TelegramObject):
             <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details and
             :class:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         unix_time (:class:`datetime.datetime`, optional): For :attr:`DATE_TIME` only, the time
             associated with the entity.
             |datetime_localization|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
     Attributes:
         type (:obj:`str`): Type of the entity.  Can be :attr:`MENTION` (``@username``),
             :attr:`HASHTAG` (``#hashtag`` or ``#hashtag@chatusername``), :attr:`CASHTAG` (``$USD``
@@ -111,7 +111,7 @@ class MessageEntity(TelegramObject):
             .. versionadded:: 20.8
                 Added block quotation
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
                 Added date_time
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
@@ -131,12 +131,12 @@ class MessageEntity(TelegramObject):
             <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details and
             :class:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         unix_time (:class:`datetime.datetime`): Optional. For :attr:`DATE_TIME` only, the time
             associated with the entity.
             |datetime_localization|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     """
 
@@ -429,7 +429,7 @@ class MessageEntity(TelegramObject):
     DATE_TIME: Final[str] = constants.MessageEntityType.DATE_TIME
     """:const:`telegram.constants.MessageEntityType.DATE_TIME`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
     EMAIL: Final[str] = constants.MessageEntityType.EMAIL
     """:const:`telegram.constants.MessageEntityType.EMAIL`"""

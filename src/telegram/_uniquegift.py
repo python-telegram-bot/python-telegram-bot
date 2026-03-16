@@ -129,7 +129,7 @@ class UniqueGiftModel(TelegramObject):
             :tg-const:`telegram.constants.UniqueGiftModelRarity.EPIC`,
             or :tg-const:`telegram.constants.UniqueGiftModelRarity.LEGENDARY`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         name (:obj:`str`): Name of the model.
@@ -142,7 +142,7 @@ class UniqueGiftModel(TelegramObject):
             :tg-const:`telegram.constants.UniqueGiftModelRarity.EPIC`,
             or :tg-const:`telegram.constants.UniqueGiftModelRarity.LEGENDARY`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
     """
 
     __slots__ = (
@@ -352,7 +352,7 @@ class UniqueGift(TelegramObject):
 
     .. versionadded:: 22.1
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.7
         :attr:`gift_id` is now a positional argument.
 
     Args:
@@ -388,7 +388,7 @@ class UniqueGift(TelegramObject):
         is_burned (:obj:`bool`, optional): :obj:`True`, if the gift was used to craft another
             gift and isn't available anymore.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
@@ -423,7 +423,7 @@ class UniqueGift(TelegramObject):
         is_burned (:obj:`bool`): Optional. :obj:`True`, if the gift was used to craft another
             gift and isn't available anymore.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
     """
 
     __slots__ = (
@@ -505,7 +505,7 @@ class UniqueGiftInfo(TelegramObject):
 
     .. versionadded:: 22.1
 
-    .. versionremoved:: NEXT.VERSION
+    .. versionremoved:: 22.7
         Removed argument and attribute ``last_resale_star_count`` deprecated since Bot API 9.3.
 
     Args:

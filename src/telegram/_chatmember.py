@@ -261,7 +261,7 @@ class ChatMemberAdministrator(ChatMember):
             tags of regular members; for groups and supergroups only. If omitted defaults to the
             value of :attr:`can_pin_messages`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -330,7 +330,7 @@ class ChatMemberAdministrator(ChatMember):
             tags of regular members; for groups and supergroups only. If omitted defaults to the
             value of :attr:`can_pin_messages`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
     """
 
     __slots__ = (
@@ -419,7 +419,7 @@ class ChatMemberMember(ChatMember):
             .. versionadded:: 21.5
         tag (:obj:`str`, optional): Tag of the member.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -431,7 +431,7 @@ class ChatMemberMember(ChatMember):
             .. versionadded:: 21.5
         tag (:obj:`str`): Optional. Tag of the member.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     """
 
@@ -516,10 +516,10 @@ class ChatMemberRestricted(ChatMember):
             .. versionadded:: 20.1
         can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         tag (:obj:`str`, optional): Tag of the member.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -572,10 +572,10 @@ class ChatMemberRestricted(ChatMember):
             .. versionadded:: 20.1
         can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         tag (:obj:`str`): Optional. Tag of the member.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     """
 

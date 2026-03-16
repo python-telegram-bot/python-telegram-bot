@@ -1222,7 +1222,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         .. versionadded:: 22.6
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.7
             Now all bots can use this method.
 
 
@@ -6014,7 +6014,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             can_manage_tags (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 edit the tags of regular members; for groups and supergroups only.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.7
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -9972,7 +9972,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. versionadded:: 22.1
 
-        .. versionremoved:: NEXT.VERSION
+        .. versionremoved:: 22.7
               Bot API 9.3 removed the :paramref:`exclude_limited` parameter. Use
               :paramref:`exclude_limited_upgradable` and :paramref:`exclude_limited_non_upgradable`
               instead.
@@ -11926,7 +11926,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Changes the profile photo of the bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.7
 
         Args:
             photo (:class:`telegram.InputProfilePhoto`): The new profile photo to set.
@@ -11963,7 +11963,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Removes the profile photo of the bot. Requires no parameters.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.7
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -11997,7 +11997,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to get a list of profile audios for a user.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.7
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.
@@ -12050,7 +12050,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         be an administrator in the chat for this to work and must have the
         :attr:`~telegram.ChatMemberAdministrator.can_manage_tags` administrator right.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.7
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
