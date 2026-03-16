@@ -104,12 +104,12 @@ class KeyboardButton(TelegramObject):
 
             .. versionadded:: 20.1
         style (:obj:`str`, optional): Style of the button. Must be one of
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
-            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
-            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
-            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
             If omitted, then an app-specific style is used.
 
             .. versionadded:: NEXT.VERSION
@@ -151,12 +151,12 @@ class KeyboardButton(TelegramObject):
 
             .. versionadded:: 20.1
         style (:obj:`str`): Optional. Style of the button. Must be one of
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
-            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
-            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
-            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
             If omitted, then an app-specific style is used.
 
             .. versionadded:: NEXT.VERSION
