@@ -86,7 +86,7 @@ jobs:
               sha1sum $file > $file.sha1
           done
       - name: Sign the dists with Sigstore
-        uses: sigstore/gh-action-sigstore-python@f832326173235dcb00dd5d92cd3f353de3188e6c # v3.1.0
+        uses: sigstore/gh-action-sigstore-python@a5caf349bc536fbef3668a10ed7f5cd309a4b53d # v3.2.0
         with:
           inputs: >-
             ./dist/*.tar.gz
