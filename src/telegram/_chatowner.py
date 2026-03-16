@@ -35,7 +35,7 @@ class ChatOwnerChanged(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`new_owner` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
 
     Args:
         new_owner (:class:`telegram.User`): The new owner of the chat
@@ -76,7 +76,7 @@ class ChatOwnerLeft(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`new_owner` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
 
     Args:
         new_owner (:class:`telegram.User`, optional): The user which will be the new owner of the

@@ -1412,7 +1412,7 @@ class KeyboardButtonStyle(StringEnum):
     :class:`telegram.InlineKeyboardButton` and :class:`telegram.KeyboardButton`.
     The enum members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
 
     __slots__ = ()
@@ -2022,7 +2022,7 @@ class MessageEntityType(StringEnum):
     DATE_TIME = "date_time"
     """:obj:`str`: Message entities representing formatted date and time.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
     EMAIL = "email"
     """:obj:`str`: Message entities representing a email."""
@@ -2061,7 +2061,7 @@ class MessageEntityDateTimeFormats(StringEnum):
     <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
 
     __slots__ = ()
@@ -2231,12 +2231,12 @@ class MessageType(StringEnum):
     CHAT_OWNER_CHANGED = "chat_owner_changed"
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_owner_changed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
     CHAT_OWNER_LEFT = "chat_owner_left"
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_owner_left`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
     CHAT_SHARED = "chat_shared"
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
@@ -3497,7 +3497,7 @@ class UniqueGiftModelRarity(StringEnum):
     """This enum contains the available rarities for :class:`telegram.UniqueGiftModel`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
 
     __slots__ = ()
@@ -3736,7 +3736,7 @@ class UserProfileAudiosLimit(IntEnum):
     """This enum contains limitations for :paramref:`telegram.Bot.get_user_profile_audios.limit`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
 
     __slots__ = ()
@@ -4034,7 +4034,7 @@ class TagLimit(IntEnum):
     """This enum contains limitations for :meth:`~telegram.Bot.set_chat_member_tag`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
 
     __slots__ = ()

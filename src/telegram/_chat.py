@@ -4016,7 +4016,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_member_tag`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.7
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

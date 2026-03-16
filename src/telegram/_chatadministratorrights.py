@@ -53,7 +53,7 @@ class ChatAdministratorRights(TelegramObject):
         :attr:`can_manage_direct_messages` is considered as well when comparing objects of
         this type in terms of equality.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.7
         :attr:`can_manage_tags` is considered as well when comparing objects of this type in terms
         of equality.
 
@@ -113,7 +113,7 @@ class ChatAdministratorRights(TelegramObject):
             tags of regular members; for groups and supergroups only. If omitted defaults to the
             value of :attr:`can_pin_messages`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -171,7 +171,7 @@ class ChatAdministratorRights(TelegramObject):
             tags of regular members; for groups and supergroups only. If omitted defaults to the
             value of :attr:`can_pin_messages`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
     """
 
     __slots__ = (

@@ -680,15 +680,15 @@ class Message(MaybeInaccessibleMessage):
         chat_owner_left (:class:`telegram.ChatOwnerLeft`, optional): Service message: chat owner
             has left.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         chat_owner_changed (:class:`telegram.ChatOwnerChanged`, optional): Service message: chat
             owner has changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         sender_tag (:obj:`str`, optional): Tag or custom title of the sender of the message; for
             supergroups only
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1096,15 +1096,15 @@ class Message(MaybeInaccessibleMessage):
         chat_owner_left (:class:`telegram.ChatOwnerLeft`): Optional. Service message: chat owner
             has left.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         chat_owner_changed (:class:`telegram.ChatOwnerChanged`): Optional. Service message: chat
             owner has changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         sender_tag (:obj:`str`): Optional. Tag or custom title of the sender of the message; for
             supergroups only
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a

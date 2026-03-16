@@ -74,7 +74,7 @@ class Video(_BaseThumbedMedium):
         qualities (Sequence[:class:`telegram.VideoQuality`], optional): List of available qualities
             of the video
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -108,7 +108,7 @@ class Video(_BaseThumbedMedium):
         qualities (Sequence[:class:`telegram.VideoQuality`]): Optional. List of available qualities
             of the video
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
     """
 
     __slots__ = (
