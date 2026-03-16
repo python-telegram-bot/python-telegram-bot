@@ -1,5 +1,3 @@
-dependencies = "Bump Sphinx Related Dependencies, Fix `uv` and Docs Build"
-documentation = "Bump Sphinx Related Dependencies, Fix `uv` and Docs Build"
 internal = "Bump Sphinx Related Dependencies, Fix `uv` and Docs Build"
 [[pull_requests]]
 uid = "5168"
