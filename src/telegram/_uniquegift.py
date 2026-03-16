@@ -385,7 +385,7 @@ class UniqueGift(TelegramObject):
             business account gifts and gifts that are currently on sale only.
 
             .. versionadded:: 22.6
-        is_burned (:obj:`bool, optional): :obj:`True`, if the gift was used to craft another
+        is_burned (:obj:`bool`, optional): :obj:`True`, if the gift was used to craft another
             gift and isn't available anymore.
 
             .. versionadded:: NEXT.VERSION
@@ -420,7 +420,7 @@ class UniqueGift(TelegramObject):
             business account gifts and gifts that are currently on sale only.
 
             .. versionadded:: 22.6
-        is_burned (:obj:`bool): Optional. :obj:`True`, if the gift was used to craft another
+        is_burned (:obj:`bool`): Optional. :obj:`True`, if the gift was used to craft another
             gift and isn't available anymore.
 
             .. versionadded:: NEXT.VERSION

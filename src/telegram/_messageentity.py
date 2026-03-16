@@ -58,7 +58,7 @@ class MessageEntity(TelegramObject):
             :attr:`BLOCKQUOTE` (block quotation), :attr:`CODE` (monowidth string), :attr:`PRE`
             (monowidth block), :attr:`TEXT_LINK` (for clickable text URLs), :attr:`TEXT_MENTION`
             (for users without usernames), :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers)
-            or :attr:`DATE_TIME`(for formatted date and time).
+            or :attr:`DATE_TIME` (for formatted date and time).
 
             .. versionadded:: 20.0
                 Added inline custom emoji
@@ -81,10 +81,10 @@ class MessageEntity(TelegramObject):
             information about the sticker.
 
             .. versionadded:: 20.0
-        date_time_format (:obj:`str`, optional): For :attr`DATE_TIME` only, the string that defines
-            the formatting of the date and time. See `date-time entity formatting
+        date_time_format (:obj:`str`, optional): For :attr:`DATE_TIME` only, the string that
+            defines the formatting of the date and time. See `date-time entity formatting
             <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details and
-            :tg-const:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
+            :class:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
 
             .. versionadded:: NEXT.VERSION
         unix_time (:class:`datetime.datetime`, optional): For :attr:`DATE_TIME` only, the time
@@ -102,13 +102,17 @@ class MessageEntity(TelegramObject):
             (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
             :attr:`BLOCKQUOTE` (block quotation), :attr:`CODE` (monowidth string), :attr:`PRE`
             (monowidth block), :attr:`TEXT_LINK` (for clickable text URLs), :attr:`TEXT_MENTION`
-            (for users without usernames), :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
+            (for users without usernames), :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers)
+            or :attr:`DATE_TIME` (for formatted date and time).
 
             .. versionadded:: 20.0
                 Added inline custom emoji
 
             .. versionadded:: 20.8
                 Added block quotation
+
+            .. versionadded:: NEXT.VERSION
+                Added date_time
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`): Optional. For :attr:`TEXT_LINK` only, url that will be opened after
@@ -122,10 +126,10 @@ class MessageEntity(TelegramObject):
             information about the sticker.
 
             .. versionadded:: 20.0
-        date_time_format (:obj:`str`): Optional. For :attr`DATE_TIME` only, the string that defines
-            the formatting of the date and time. See `date-time entity formatting
+        date_time_format (:obj:`str`): Optional. For :attr:`DATE_TIME` only, the string that
+            defines the formatting of the date and time. See `date-time entity formatting
             <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details and
-            :tg-const:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
+            :class:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
 
             .. versionadded:: NEXT.VERSION
         unix_time (:class:`datetime.datetime`): Optional. For :attr:`DATE_TIME` only, the time

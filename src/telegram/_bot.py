@@ -11707,7 +11707,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Reposts a story on behalf of a business account from another business account.
         Both business accounts must be managed by the same bot, and the story on the source account
         must have been posted (or reposted) by the bot. Requires the
-        :attr:`~telegram.BusinessBotRight.can_manage_stories` business bot right for both
+        :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right for both
         business accounts.
 
         .. versionadded:: 22.6
@@ -11719,10 +11719,10 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             from_story_id (:obj:`int`): Unique identifier of the story that should be reposted
             active_period (:obj:`int` | :class:`datetime.timedelta`): Period after which the story
                 is moved to the archive, in seconds; must be one of
-                :tg-const:`telegram.constants.StoryLimit.SIX_HOURS`,
-                :tg-const:`telegram.constants.StoryLimit.TWELVE_HOURS`,
-                :tg-const:`telegram.constants.StoryLimit.ONE_DAY`, or
-                :tg-const:`telegram.constants.StoryLimit.TWO_DAYS`.
+                :tg-const:`telegram.constants.StoryLimit.ACTIVITY_SIX_HOURS`,
+                :tg-const:`telegram.constants.StoryLimit.ACTIVITY_TWELVE_HOURS`,
+                :tg-const:`telegram.constants.StoryLimit.ACTIVITY_ONE_DAY`, or
+                :tg-const:`telegram.constants.StoryLimit.ACTIVITY_TWO_DAYS`.
             post_to_chat_page (:obj:`bool`, optional): Pass :obj:`True` to keep the story
                 accessible after it expires.
             protect_content (:obj:`bool`, optional): Pass :obj:`True` if the content of the story
@@ -11777,24 +11777,27 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         .. versionadded:: 22.6
 
-        user_id (:obj:`int`): Unique identifier of the user
-        exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
-            purchased an unlimited number of times
-        exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
-            can be purchased a limited number of times and can be upgraded to unique
-        exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
-            that can be purchased a limited number of times and can't be upgraded to unique
-        exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
-            were assigned from the TON blockchain and can't be resold or transferred in Telegram
-        exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts
-        sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
-            instead of send date. Sorting is applied before pagination.
-        offset (:obj:`str`, optional): Offset of the first entry to return as received from the
-            previous request; use an empty string to get the first chunk of results
-        limit (:obj:`int`, optional): The maximum number of gifts to be returned;
-            :tg-const:`~telegram.constants.BusinessLimit.MIN_GIFT_RESULTS` -
-            :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESLUTS`.
-            Defaults to :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESLUTS`
+        Args:
+            user_id (:obj:`int`): Unique identifier of the user
+            exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can
+                be purchased an unlimited number of times
+            exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
+                that can be purchased a limited number of times and can be upgraded to unique
+            exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude
+                gifts that can be purchased a limited number of times and can't be upgraded to
+                unique.
+            exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
+                were assigned from the TON blockchain and can't be resold or transferred in
+                Telegram.
+            exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts
+            sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
+                instead of send date. Sorting is applied before pagination.
+            offset (:obj:`str`, optional): Offset of the first entry to return as received from the
+                previous request; use an empty string to get the first chunk of results
+            limit (:obj:`int`, optional): The maximum number of gifts to be returned;
+                :tg-const:`~telegram.constants.BusinessLimit.MIN_GIFT_RESULTS` -
+                :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`.
+                Defaults to :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`
 
         Returns:
             :class:`telegram.OwnedGifts`: The owned gifts for the user.
@@ -11850,32 +11853,34 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         .. versionadded:: 22.6
 
         Args:
-        chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-        exclude_unsaved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that aren't
-            saved to the chat's profile page. Always :obj:`True`, unless the bot has the
-            :attr:`~telegram.ChatAdministratorRights..can_post_messages` administrator right in the
-                channel.
-        exclude_saved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that are saved to
-            the chat's profile page. Always :obj:`False`, unless the bot has the
-            :attr:`~telegram.ChatAdministratorRights..can_post_messages` administrator right in the
-                channel.
-        exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
-            purchased an unlimited number of times
-        exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
-            can be purchased a limited number of times and can be upgraded to unique
-        exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
-            that can be purchased a limited number of times and can't be upgraded to unique
-        exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
-            were assigned from the TON blockchain and can't be resold or transferred in Telegram
-        exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts
-        sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
-            instead of send date. Sorting is applied before pagination.
-        offset (:obj:`str`, optional): Offset of the first entry to return as received from the
-            previous request; use an empty string to get the first chunk of results
-        limit (:obj:`int`, optional): The maximum number of gifts to be returned;
-            :tg-const:`~telegram.constants.BusinessLimit.MIN_GIFT_RESULTS` -
-            :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESLUTS`.
-            Defaults to :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESLUTS`
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            exclude_unsaved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that aren't
+                saved to the chat's profile page. Always :obj:`True`, unless the bot has the
+                :attr:`~telegram.ChatAdministratorRights.can_post_messages` administrator right in
+                the channel.
+            exclude_saved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that are saved
+                to the chat's profile page. Always :obj:`False`, unless the bot has the
+                :attr:`~telegram.ChatAdministratorRights.can_post_messages` administrator right in
+                the channel.
+            exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can
+                be purchased an unlimited number of times
+            exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
+                that can be purchased a limited number of times and can be upgraded to unique
+            exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude
+                gifts that can be purchased a limited number of times and can't be upgraded to
+                unique.
+            exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
+                were assigned from the TON blockchain and can't be resold or transferred in
+                Telegram.
+            exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts
+            sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
+                instead of send date. Sorting is applied before pagination.
+            offset (:obj:`str`, optional): Offset of the first entry to return as received from the
+                previous request; use an empty string to get the first chunk of results
+            limit (:obj:`int`, optional): The maximum number of gifts to be returned;
+                :tg-const:`~telegram.constants.BusinessLimit.MIN_GIFT_RESULTS` -
+                :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`.
+                Defaults to :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`
 
         Returns:
             :class:`telegram.OwnedGifts`: The owned gifts for the chat.
