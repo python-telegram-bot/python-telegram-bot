@@ -1,6 +1,7 @@
 name: Unit Tests
 on:
   pull_request:
+    types: [synchronize, reopened, ready_for_review]
     paths:
       - src/telegram/**
       - tests/**
