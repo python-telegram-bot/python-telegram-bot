@@ -91,7 +91,6 @@ for file in Path.cwd().glob("../substitutions/*.rst"):
 # -- Extension settings ------------------------------------------------
 napoleon_use_admonition_for_examples = True
 
-autodoc_use_legacy_class_based = True
 # Don't show type hints in the signature - that just makes it hardly readable
 # and we document the types anyway
 autodoc_typehints = "none"
