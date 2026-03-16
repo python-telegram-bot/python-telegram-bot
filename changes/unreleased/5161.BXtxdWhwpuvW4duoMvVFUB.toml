@@ -1,0 +1,5 @@
+internal = "Refactor `TestStickerSetWithRequest` tests"
+[[pull_requests]]
+uid = "5161"
+author_uids = ["harshil21"]
+closes_threads = ["4514"]

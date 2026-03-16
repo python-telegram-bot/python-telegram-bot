@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING, TypedDict
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
 from telegram._chatboost import ChatBoostAdded
+from telegram._chatowner import ChatOwnerChanged, ChatOwnerLeft
 from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
 from telegram._dice import Dice
 from telegram._directmessagepricechanged import DirectMessagePriceChanged
@@ -73,7 +74,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._uniquegift import UniqueGiftInfo
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
@@ -329,8 +330,8 @@ class Message(MaybeInaccessibleMessage):
             or as a scheduled message.
 
             .. versionadded:: 21.1
-        media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
-            message belongs to.
+        media_group_id (:obj:`str`, optional): The unique identifier inside this chat of a media
+            message group this message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         entities (Sequence[:class:`telegram.MessageEntity`], optional): For text messages, special
@@ -676,6 +677,18 @@ class Message(MaybeInaccessibleMessage):
             task that is being replied to.
 
             .. versionadded:: 22.4
+        chat_owner_left (:class:`telegram.ChatOwnerLeft`, optional): Service message: chat owner
+            has left.
+
+            .. versionadded:: NEXT.VERSION
+        chat_owner_changed (:class:`telegram.ChatOwnerChanged`, optional): Service message: chat
+            owner has changed.
+
+            .. versionadded:: NEXT.VERSION
+        sender_tag (:obj:`str`, optional): Tag or custom title of the sender of the message; for
+            supergroups only
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -717,8 +730,8 @@ class Message(MaybeInaccessibleMessage):
             or as a scheduled message.
 
             .. versionadded:: 21.1
-        media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
-            message belongs to.
+        media_group_id (:obj:`str`): Optional. The unique identifier inside this chat of a media
+            message group this message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         entities (tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
@@ -1080,6 +1093,18 @@ class Message(MaybeInaccessibleMessage):
             task that is being replied to.
 
             .. versionadded:: 22.4
+        chat_owner_left (:class:`telegram.ChatOwnerLeft`): Optional. Service message: chat owner
+            has left.
+
+            .. versionadded:: NEXT.VERSION
+        chat_owner_changed (:class:`telegram.ChatOwnerChanged`): Optional. Service message: chat
+            owner has changed.
+
+            .. versionadded:: NEXT.VERSION
+        sender_tag (:obj:`str`): Optional. Tag or custom title of the sender of the message; for
+            supergroups only
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1108,6 +1133,8 @@ class Message(MaybeInaccessibleMessage):
         "caption_entities",
         "channel_chat_created",
         "chat_background_set",
+        "chat_owner_changed",
+        "chat_owner_left",
         "chat_shared",
         "checklist",
         "checklist_tasks_added",
@@ -1174,6 +1201,7 @@ class Message(MaybeInaccessibleMessage):
         "sender_boost_count",
         "sender_business_bot",
         "sender_chat",
+        "sender_tag",
         "show_caption_above_media",
         "sticker",
         "story",
@@ -1306,6 +1334,9 @@ class Message(MaybeInaccessibleMessage):
         suggested_post_approved: "SuggestedPostApproved | None" = None,
         suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
         gift_upgrade_sent: GiftInfo | None = None,
+        chat_owner_changed: ChatOwnerChanged | None = None,
+        chat_owner_left: ChatOwnerLeft | None = None,
+        sender_tag: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1433,6 +1464,9 @@ class Message(MaybeInaccessibleMessage):
                 suggested_post_approval_failed
             )
             self.gift_upgrade_sent: GiftInfo | None = gift_upgrade_sent
+            self.chat_owner_changed: ChatOwnerChanged | None = chat_owner_changed
+            self.chat_owner_left: ChatOwnerLeft | None = chat_owner_left
+            self.sender_tag: str | None = sender_tag
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1462,8 +1496,8 @@ class Message(MaybeInaccessibleMessage):
                 to the corresponding thread view.
         """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
-            # the else block gets rid of leading -100 for supergroups:
-            to_link = self.chat.username if self.chat.username else f"c/{str(self.chat.id)[4:]}"
+            # if username doesn't exist, remove the leading -100 for supergroups in link
+            to_link = self.chat.username or f"c/{str(self.chat.id)[4:]}"
             baselink = f"https://t.me/{to_link}/{self.message_id}"
 
             # adds the thread for topics and replies
@@ -1649,6 +1683,10 @@ class Message(MaybeInaccessibleMessage):
             data.get("suggested_post_approval_failed"), SuggestedPostApprovalFailed, bot
         )
         data["gift_upgrade_sent"] = de_json_optional(data.get("gift_upgrade_sent"), GiftInfo, bot)
+        data["chat_owner_changed"] = de_json_optional(
+            data.get("chat_owner_changed"), ChatOwnerChanged, bot
+        )
+        data["chat_owner_left"] = de_json_optional(data.get("chat_owner_left"), ChatOwnerLeft, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -5277,6 +5315,17 @@ class Message(MaybeInaccessibleMessage):
                 insert = f'<span class="tg-spoiler">{escaped_text}</span>'
             elif entity.type == MessageEntity.CUSTOM_EMOJI:
                 insert = f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
+            elif entity.type == MessageEntity.DATE_TIME:
+                if entity.date_time_format:
+                    insert = (
+                        f'<tg-time unix="{to_timestamp(entity.unix_time)}" '
+                        f'format="{entity.date_time_format}">{escaped_text}</tg-time>'
+                    )
+                else:
+                    insert = (
+                        f'<tg-time unix="{to_timestamp(entity.unix_time)}">'
+                        f"{escaped_text}</tg-time>"
+                    )
             else:
                 insert = escaped_text
 
@@ -5416,6 +5465,7 @@ class Message(MaybeInaccessibleMessage):
                 MessageEntity.SPOILER,
                 MessageEntity.STRIKETHROUGH,
                 MessageEntity.UNDERLINE,
+                MessageEntity.DATE_TIME,
             ):
                 if any(entity.type == entity_type for entity in entities):
                     name = entity_type.name.title().replace("_", " ")  # type:ignore[attr-defined]
@@ -5508,6 +5558,14 @@ class Message(MaybeInaccessibleMessage):
                     entity_type=MessageEntity.CUSTOM_EMOJI,
                 )
                 insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            elif entity.type == MessageEntity.DATE_TIME:
+                if entity.date_time_format:
+                    insert = (
+                        f"![{escaped_text}](tg://time?unix={to_timestamp(entity.unix_time)}"
+                        f"&format={entity.date_time_format})"
+                    )
+                else:
+                    insert = f"![{escaped_text}](tg://time?unix={to_timestamp(entity.unix_time)})"
             else:
                 insert = escaped_text
 

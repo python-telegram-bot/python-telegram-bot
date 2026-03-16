@@ -77,7 +77,7 @@ class TGConstXRefRole(PyXRefRole):
             if (
                 isinstance(value, dtm.datetime)
                 and value == telegram.constants.ZERO_DATE
-                and target in ("telegram.constants.ZERO_DATE",)
+                and target == "telegram.constants.ZERO_DATE"
             ):
                 return repr(value), target
             sphinx_logger.warning(

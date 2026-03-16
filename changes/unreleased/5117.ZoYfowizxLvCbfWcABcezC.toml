@@ -1,0 +1,5 @@
+internal = "Update pre-commit hook cachetools to v7"
+[[pull_requests]]
+uid = "5117"
+author_uids = ["renovate[bot]"]
+closes_threads = []

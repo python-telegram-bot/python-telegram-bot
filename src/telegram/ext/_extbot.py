@@ -84,6 +84,7 @@ from telegram import (
     Update,
     User,
     UserChatBoosts,
+    UserProfileAudios,
     UserProfilePhotos,
     Video,
     VideoNote,
@@ -2366,6 +2367,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         can_edit_stories: bool | None = None,
         can_delete_stories: bool | None = None,
         can_manage_direct_messages: bool | None = None,
+        can_manage_tags: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2393,6 +2395,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             can_edit_stories=can_edit_stories,
             can_delete_stories=can_delete_stories,
             can_manage_direct_messages=can_manage_direct_messages,
+            can_manage_tags=can_manage_tags,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4492,7 +4495,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         exclude_unsaved: bool | None = None,
         exclude_saved: bool | None = None,
         exclude_unlimited: bool | None = None,
-        exclude_limited: bool | None = None,
         exclude_unique: bool | None = None,
         sort_by_price: bool | None = None,
         offset: str | None = None,
@@ -4513,7 +4515,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             exclude_unsaved=exclude_unsaved,
             exclude_saved=exclude_saved,
             exclude_unlimited=exclude_unlimited,
-            exclude_limited=exclude_limited,
             exclude_limited_upgradable=exclude_limited_upgradable,
             exclude_limited_non_upgradable=exclude_limited_non_upgradable,
             exclude_unique=exclude_unique,
@@ -5424,6 +5425,92 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_my_profile_photo(
+        self,
+        photo: "InputProfilePhoto",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().set_my_profile_photo(
+            photo=photo,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def remove_my_profile_photo(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().remove_my_profile_photo(
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_user_profile_audios(
+        self,
+        user_id: int,
+        offset: int | None = None,
+        limit: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> UserProfileAudios:
+        return await super().get_user_profile_audios(
+            user_id=user_id,
+            offset=offset,
+            limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_chat_member_tag(
+        self,
+        chat_id: int | str,
+        user_id: int,
+        tag: str | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().set_chat_member_tag(
+            chat_id=chat_id,
+            user_id=user_id,
+            tag=tag,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -5586,3 +5673,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     repostStory = repost_story
     getUserGifts = get_user_gifts
     getChatGifts = get_chat_gifts
+    setMyProfilePhoto = set_my_profile_photo
+    removeMyProfilePhoto = remove_my_profile_photo
+    getUserProfileAudios = get_user_profile_audios
+    setChatMemberTag = set_chat_member_tag

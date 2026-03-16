@@ -56,6 +56,7 @@ from telegram import (
     InputMediaPhoto,
     InputMessageContent,
     InputPollOption,
+    InputProfilePhotoStatic,
     InputTextMessageContent,
     LabeledPrice,
     LinkPreviewOptions,
@@ -2834,6 +2835,18 @@ class TestBotWithoutRequest:
             limit="limit",
         )
 
+    # TODO if we have a group member id in every group we could test this
+    async def test_set_chat_member_tag(self, offline_bot, monkeypatch):
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("user_id") == 5678
+            assert request_data.parameters.get("tag") == "This is a tag"
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        await offline_bot.set_chat_member_tag(1234, 5678, "This is a tag")
+
 
 class TestBotWithRequest:
     """
@@ -3353,6 +3366,12 @@ class TestBotWithRequest:
         out = await bot.save_prepared_inline_message(chat_id, result, True, False, True, False)
         assert isinstance(out, PreparedInlineMessage)
 
+    async def test_get_user_profile_audios(self, bot, chat_id):
+        user_profile_audios = await bot.get_user_profile_audios(chat_id)
+        assert user_profile_audios.total_count == 0
+        # Can't test with an actual audio file since that's a premium feature
+        assert user_profile_audios.audios == ()
+
     async def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = await bot.get_user_profile_photos(chat_id)
         assert user_profile_photos.photos[0][0].file_size == 5403
@@ -3801,6 +3820,7 @@ class TestBotWithRequest:
                 can_edit_stories=True,
                 can_delete_stories=True,
                 can_manage_direct_messages=True,
+                can_manage_tags=True,
             )
 
         # Test that we pass the correct params to TG
@@ -3825,6 +3845,7 @@ class TestBotWithRequest:
                 and data.get("can_edit_stories") == 14
                 and data.get("can_delete_stories") == 15
                 and data.get("can_manage_direct_messages") == 16
+                and data.get("can_manage_tags") == 17
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -3847,6 +3868,7 @@ class TestBotWithRequest:
             can_edit_stories=14,
             can_delete_stories=15,
             can_manage_direct_messages=16,
+            can_manage_tags=17,
         )
 
     async def test_export_chat_invite_link(self, bot, channel_id):
@@ -4818,6 +4840,16 @@ class TestBotWithRequest:
         gifts = await bot.get_chat_gifts(chat_id)
         assert isinstance(gifts, OwnedGifts)
         assert gifts.total_count == 0
+
+    async def test_my_profile_photo(self, bot):
+        await bot.remove_my_profile_photo()
+        bot_profile_photos = await bot.get_user_profile_photos(bot.id)
+        assert bot_profile_photos.total_count == 0
+        await bot.set_my_profile_photo(
+            InputProfilePhotoStatic(photo=data_file("telegram.jpg").read_bytes())
+        )
+        bot_profile_photos = await bot.get_user_profile_photos(bot.id)
+        assert bot_profile_photos.total_count == 1
 
     async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
         """Test that requests and bot user are initialized separately and only once."""

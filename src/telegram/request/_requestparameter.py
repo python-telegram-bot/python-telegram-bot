@@ -201,11 +201,7 @@ class RequestParameter:
                 if param_value is not None:
                     param_values.append(param_value)
                 input_files.extend(input_file)
-            return RequestParameter(
-                name=key, value=param_values, input_files=input_files if input_files else None
-            )
+            return RequestParameter(name=key, value=param_values, input_files=input_files or None)
 
         param_value, input_files = cls._value_and_input_files_from_input(value)
-        return RequestParameter(
-            name=key, value=param_value, input_files=input_files if input_files else None
-        )
+        return RequestParameter(name=key, value=param_value, input_files=input_files or None)

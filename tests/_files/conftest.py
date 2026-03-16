@@ -20,7 +20,6 @@
 
 import pytest
 
-from telegram.error import BadRequest
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 
@@ -49,20 +48,6 @@ async def animated_sticker(bot, chat_id):
 def animated_sticker_file():
     with data_file("telegram_animated_sticker.tgs").open("rb") as f:
         yield f
-
-
-@pytest.fixture
-async def animated_sticker_set(bot):
-    ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
-    if len(ss.stickers) > 100:
-        try:
-            for i in range(1, 50):
-                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest as e:
-            if e.message == "Stickerset_not_modified":
-                return ss
-            raise Exception("stickerset is growing too large.") from None
-    return ss
 
 
 @pytest.fixture(scope="session")
@@ -128,20 +113,6 @@ def sticker_file():
 
 
 @pytest.fixture
-async def sticker_set(bot):
-    ss = await bot.get_sticker_set(f"test_by_{bot.username}")
-    if len(ss.stickers) > 100:
-        try:
-            for i in range(1, 50):
-                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest as e:
-            if e.message == "Stickerset_not_modified":
-                return ss
-            raise Exception("stickerset is growing too large.") from None
-    return ss
-
-
-@pytest.fixture
 def sticker_set_thumb_file():
     with data_file("sticker_set_thumb.png").open("rb") as file:
         yield file
@@ -174,17 +145,3 @@ def video_sticker_file():
 def video_sticker(bot, chat_id):
     with data_file("telegram_video_sticker.webm").open("rb") as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
-
-
-@pytest.fixture
-async def video_sticker_set(bot):
-    ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
-    if len(ss.stickers) > 100:
-        try:
-            for i in range(1, 50):
-                await bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest as e:
-            if e.message == "Stickerset_not_modified":
-                return ss
-            raise Exception("stickerset is growing too large.") from None
-    return ss
