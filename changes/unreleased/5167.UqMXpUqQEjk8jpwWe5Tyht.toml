@@ -1,0 +1,5 @@
+internal = "Update dependency sphinx to v9"
+[[pull_requests]]
+uid = "5167"
+author_uids = ["renovate[bot]"]
+closes_threads = []
