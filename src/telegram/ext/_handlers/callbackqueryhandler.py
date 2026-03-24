@@ -20,6 +20,7 @@
 
 import asyncio
 import re
+from collections import deque
 from collections.abc import Callable
 from re import Match, Pattern
 from typing import TYPE_CHECKING, Any, TypeVar, cast
@@ -125,7 +126,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
 
     """
 
-    __slots__ = ("game_pattern", "pattern")
+    __slots__ = ("game_pattern", "pattern", "_processed_ids")
 
     def __init__(
         self: "CallbackQueryHandler[CCT, RT]",
@@ -147,6 +148,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
             game_pattern = re.compile(game_pattern)
         self.pattern: str | Pattern[str] | type | Callable[[object], bool] | None = pattern
         self.game_pattern: str | Pattern[str] | None = game_pattern
+        self._processed_ids: deque[str] = deque(maxlen=100)
 
     def check_update(self, update: object) -> bool | object | None:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -162,10 +164,16 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
         if not (isinstance(update, Update) and update.callback_query):
             return None
 
+        # Check if this callback_query.id has already been processed
+        callback_query_id = update.callback_query.id
+        if callback_query_id in self._processed_ids:
+            return False
+
         callback_data = update.callback_query.data
         game_short_name = update.callback_query.game_short_name
 
         if not any([self.pattern, self.game_pattern]):
+            self._processed_ids.append(callback_query_id)
             return True
 
         # we check for .data or .game_short_name from update to filter based on whats coming
@@ -174,20 +182,29 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
             if not self.pattern:
                 return False
             if isinstance(self.pattern, type):
-                return isinstance(callback_data, self.pattern)
+                if isinstance(callback_data, self.pattern):
+                    self._processed_ids.append(callback_query_id)
+                    return True
+                return False
             if callable(self.pattern):
-                return self.pattern(callback_data)
+                if self.pattern(callback_data):
+                    self._processed_ids.append(callback_query_id)
+                    return True
+                return False
             if not isinstance(callback_data, str):
                 return False
             if match := re.match(self.pattern, callback_data):
+                self._processed_ids.append(callback_query_id)
                 return match
 
         elif game_short_name:
             if not self.game_pattern:
                 return False
             if match := re.match(self.game_pattern, game_short_name):
+                self._processed_ids.append(callback_query_id)
                 return match
         else:
+            self._processed_ids.append(callback_query_id)
             return True
         return False
 
