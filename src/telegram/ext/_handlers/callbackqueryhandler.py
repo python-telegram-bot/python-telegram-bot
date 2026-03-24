@@ -20,6 +20,7 @@
 
 import asyncio
 import re
+from collections import deque
 from collections.abc import Callable
 from re import Match, Pattern
 from typing import TYPE_CHECKING, Any, TypeVar, cast
@@ -125,7 +126,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
 
     """
 
-    __slots__ = ("game_pattern", "pattern")
+    __slots__ = ("_processed_ids", "_processed_ids_maxlen", "game_pattern", "pattern")
 
     def __init__(
         self: "CallbackQueryHandler[CCT, RT]",
@@ -147,6 +148,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
             game_pattern = re.compile(game_pattern)
         self.pattern: str | Pattern[str] | type | Callable[[object], bool] | None = pattern
         self.game_pattern: str | Pattern[str] | None = game_pattern
+        self._processed_ids_maxlen: int = 100
+        self._processed_ids: deque[str] = deque(maxlen=self._processed_ids_maxlen)
 
     def check_update(self, update: object) -> bool | object | None:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -160,6 +163,9 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
         """
         # pylint: disable=too-many-return-statements
         if not (isinstance(update, Update) and update.callback_query):
+            return None
+
+        if update.callback_query.id in self._processed_ids:
             return None
 
         callback_data = update.callback_query.data
@@ -190,6 +196,16 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
         else:
             return True
         return False
+
+    async def handle_update(
+        self,
+        update: Update,
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
+        check_result: object,
+        context: CCT,
+    ) -> RT:
+        self._processed_ids.append(update.callback_query.id)
+        return await super().handle_update(update, application, check_result, context)
 
     def collect_additional_context(
         self,
