@@ -153,16 +153,6 @@ class CallbackQuery(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "CallbackQuery":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
-        data["message"] = de_json_optional(data.get("message"), Message, bot)
-
-        return super().de_json(data=data, bot=bot)
-
     async def answer(
         self,
         text: str | None = None,

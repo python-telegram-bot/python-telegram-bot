@@ -20,16 +20,18 @@
 
 import contextlib
 import datetime as dtm
+import importlib
 import inspect
 import json
-from collections.abc import Iterator, Mapping, Sized
+import types as _types
+from collections.abc import Iterator, Mapping, Sequence, Sized
 from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast, get_args, get_origin
 
-from telegram._utils.datetime import to_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -39,6 +41,20 @@ if TYPE_CHECKING:
 
 Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
 Tele = TypeVar("Tele", bound="TelegramObject")
+
+
+def _telegram_ns() -> dict[str, object]:
+    """Return the full ``telegram`` package namespace for annotation resolution."""
+    return vars(importlib.import_module("telegram"))
+
+
+def _unwrap_optional(ann: object) -> object:
+    """``X | None``  →  ``X``.  Any other annotation is returned unchanged."""
+    if isinstance(ann, _types.UnionType):
+        non_none = [a for a in ann.__args__ if a is not type(None)]
+        if len(non_none) == 1:
+            return non_none[0]
+    return ann
 
 
 class TelegramObject:
@@ -87,6 +103,23 @@ class TelegramObject:
     # just check if `__INIT_PARAMS is None`, since subclasses use the parent class' __INIT_PARAMS
     # unless it's overridden
     __INIT_PARAMS_CHECK: type["TelegramObject"] | None = None
+
+    # Per-class declarative de_json plan (built lazily on first de_json call).
+    # Maps parameter name → transform callable.  Each subclass gets its own
+    # plan via _build_plan(); the ``cls.__dict__`` check in de_json ensures
+    # inherited plans are never confused with the class's own plan.
+    __DE_JSON_PLAN__: ClassVar[dict[str, Any]] = {}
+
+    # Subclasses may declare field names that Telegram still returns for backwards
+    # compatibility but that are no longer part of the PTB model.  Those fields will
+    # be intercepted by de_json and forwarded into api_kwargs before construction.
+    __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset()
+
+    # def __init_subclass__(cls, **kwargs) -> None:
+    #     super().__init_subclass__(**kwargs)
+
+    #     print("Building de_json plan for", cls.__name__)
+    #     cls.__DE_JSON_PLAN__ = cls._build_plan()
 
     def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         # Setting _frozen to `False` here means that classes without arguments still need to
@@ -386,6 +419,75 @@ class TelegramObject:
         return data.copy()
 
     @classmethod
+    def _build_plan(cls) -> dict[str, Any]:
+        """Build the de_json transformation plan from ``__init__`` type annotations.
+
+        Called once per class on the first :meth:`de_json` invocation. By that time
+        every module is fully loaded so forward-reference resolution always succeeds.
+
+        The resulting ``dict`` maps parameter names (e.g. ``"from_user"``,
+        ``"date"``, ``"entities"``) to a lambda ``(value, bot) → converted_value``.
+        Three kinds of transforms are recognised:
+
+        * ``datetime`` fields  → :func:`~telegram._utils.datetime.from_timestamp`
+        * ``TelegramObject`` fields  → ``TargetCls.de_json(...)``
+        * ``Sequence[TelegramObject]`` fields  → ``TargetCls.de_list(...)``
+        """
+        init_fn = cls.__dict__.get("__init__")
+        if init_fn is None:
+            # No own __init__: inherit the nearest ancestor's plan. This is true for e.g. _ChatBase
+            parent = cls.__mro__[1]
+            print("No __init__ for", cls.__name__, "inheriting from", parent.__name__)
+            if "__DE_JSON_PLAN__" not in parent.__dict__:
+                parent._build_plan()
+            cls.__DE_JSON_PLAN__ = parent.__DE_JSON_PLAN__
+            return cls.__DE_JSON_PLAN__
+
+        plan: dict[str, Any] = {}
+        globalns: dict[str, object] = getattr(init_fn, "__globals__", {})
+        tg_ns = _telegram_ns()
+
+        for name, param in inspect.signature(
+            init_fn, eval_str=True, globals=globalns, locals=tg_ns
+        ).parameters.items():
+            if name in ("self", "api_kwargs") or param.kind in (
+                param.VAR_POSITIONAL,
+                param.VAR_KEYWORD,
+            ):
+                continue
+
+            ann = param.annotation
+            inner = _unwrap_optional(ann)
+            origin = get_origin(inner)
+            # Possible optimization: extract tzinfo here once by making this accept `bot` argument.
+
+            if inner is dtm.datetime:
+                plan[name] = lambda value, bot: (
+                    value
+                    if isinstance(value, dtm.datetime)
+                    else from_timestamp(value, tzinfo=extract_tzinfo_from_defaults(bot))
+                )
+            elif isinstance(inner, type) and issubclass(inner, TelegramObject):
+                plan[name] = lambda v, b, _c=inner: _c.de_json(v, b) if isinstance(v, dict) else v
+            elif origin is Sequence:
+                args = get_args(inner)
+                # args: tuple[object, ...] = getattr(inner, "__args__", ())
+                if not args:
+                    continue
+                item_type: object = args[0]
+                # if isinstance(item_type, str):
+                #     print(f"Resolving forward reference for {cls.__name__}.{name}: {item_type}")
+                #     with contextlib.suppress(Exception):
+                #         item_type = eval(item_type, globalns, tg_ns)  # noqa: S307
+                if isinstance(item_type, type) and issubclass(item_type, TelegramObject):
+                    plan[name] = lambda v, b, _c=item_type: (
+                        _c.de_list(v, b) if isinstance(v, list) else v
+                    )
+
+        cls.__DE_JSON_PLAN__ = plan
+        return plan
+
+    @classmethod
     def _de_json(
         cls: type[Tele_co],
         data: JSONDict,
@@ -430,7 +532,42 @@ class TelegramObject:
             The Telegram object.
 
         """
-        return cls._de_json(data=data, bot=bot)
+        data = cls._parse_data(data)
+
+        # Move removed/legacy API fields into api_kwargs
+        api_kwargs: JSONDict | None = None
+        if cls.__REMOVED_API_FIELDS__:
+            print(f"checking for removed API fields for {cls.__name__}")
+            removed = {f: data.pop(f) for f in cls.__REMOVED_API_FIELDS__ if f in data}
+            if removed:
+                api_kwargs = removed
+
+        # Make the plan for de_json. This is done only on the first call to de_json for each class.
+        if "__DE_JSON_PLAN__" not in cls.__dict__:
+            print(f"building plan for {cls.__name__}")
+            cls._build_plan()
+        plan = cls.__DE_JSON_PLAN__
+
+        # Rename "from" → "from_user" before the transform loop so we can
+        # iterate data keys without adding/removing entries inside the loop.
+        if "from_user" in plan:  # membership checks are O(1)
+            if "from" in data:
+                data["from_user"] = data.pop("from")
+            elif "from_user" not in data:
+                data["from_user"] = None
+
+        # Only for classes with a plan. We avoid looping through the data keys for no plan classes.
+        if plan:
+            # This is O(M). This part is unavoidable.
+            print(f"Data length: {len(data)}, plan length: {len(plan)}")
+            for key in data:
+                if key in plan and data[key] is not None:
+                    print("executing plan for", key)
+                    if data[key] is None:
+                        print(f"skipping {key} because value is None")
+                    data[key] = plan[key](data[key], bot)
+
+        return cls._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
     @classmethod
     def de_list(
