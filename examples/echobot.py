@@ -1,71 +1,46 @@
-#!/usr/bin/env python
-# pylint: disable=unused-argument
-# This program is dedicated to the public domain under the CC0 license.
+import os
+import telebot
+import google.generativeai as genai
 
-"""
-Simple Bot to reply to Telegram messages.
+# SOZLAMALAR
+TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
-First, a few handler functions are defined. Then, those functions are passed to
-the Application and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
+if not TELEGRAM_TOKEN or not GEMINI_API_KEY:
+    print("XATO: TELEGRAM_TOKEN yoki GEMINI_API_KEY topilmadi!")
+    exit()
 
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
+# GOOGLE GEMINI SOZLASI
+genai.configure(api_key=GEMINI_API_KEY)
+# Pro modeli ishlatiladi
+model = genai.GenerativeModel('gemini-1.0-pro')
 
-import logging
+# TELEGRAM BOT SOZLASI
+bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
-from telegram import ForceReply, Update
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+# BOT LOGIKASI
+@bot.message_handler(commands=['start', 'help'])
+def send_welcome(message):
+    bot.reply_to(message, "Assalomu alaykum! Men Asadbek Norboyev tomonidan yaratilgan aqlli yordamchi botman. Savolingizni yozing, men yechib beraman.")
 
-# Enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
-# set higher logging level for httpx to avoid all GET and POST requests being logged
-logging.getLogger("httpx").setLevel(logging.WARNING)
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    user_question = message.text
+    chat_id = message.chat.id
+    
+    wait_message = bot.send_message(chat_id, "O'ylayapman... Bir soniya kutib turing...")
 
-logger = logging.getLogger(__name__)
+    try:
+        # AI uchun maxsus topshiriq (prompt)
+        prompt = f"Sen Asadbek Norboyev tomonidan yaratilgan aqlli yordamchi botsan. Savollarga o'zbek tilida, aniq va tushunarli javob ber. Foydalanuvchi savoli: {user_question}"
+        
+        response = model.generate_content(prompt)
+        ai_answer = response.text
+        bot.edit_message_text(ai_answer, chat_id, wait_message.message_id)
+    except Exception as e:
+        bot.edit_message_text(f"Xatolik yuz berdi: {str(e)}", chat_id, wait_message.message_id)
 
+if __name__ == '__main__':
+    print("Bot ishga tushdi...")
+    bot.infinity_polling()
 
-# Define a few command handlers. These usually take the two arguments update and
-# context.
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /start is issued."""
-    user = update.effective_user
-    await update.message.reply_html(
-        rf"Hi {user.mention_html()}!",
-        reply_markup=ForceReply(selective=True),
-    )
-
-
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /help is issued."""
-    await update.message.reply_text("Help!")
-
-
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
-    await update.message.reply_text(update.message.text)
-
-
-def main() -> None:
-    """Start the bot."""
-    # Create the Application and pass it your bot's token.
-    application = Application.builder().token("TOKEN").build()
-
-    # on different commands - answer in Telegram
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-
-    # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-
-    # Run the bot until the user presses Ctrl-C
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
-
-
-if __name__ == "__main__":
-    main()
