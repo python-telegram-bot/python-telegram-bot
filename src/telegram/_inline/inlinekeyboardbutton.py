@@ -79,7 +79,7 @@ class InlineKeyboardButton(TelegramObject):
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.7
        :attr:`style` and :attr:`icon_custom_emoji_id` are considered as well when
        comparing objects of this type in terms of equality.
 
@@ -148,22 +148,15 @@ class InlineKeyboardButton(TelegramObject):
                 This type of button **must** always be the first button in the first row and can
                 only be used in invoice messages.
         style (:obj:`str`, optional): Style of the button. Must be one of
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
-            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
-            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
-            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
             If omitted, then an app-specific style is used.
 
-            .. versionadded:: NEXT.VERSION
-        icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the
-            custom emoji shown before the text of the button. Can only be used by bots that
-            purchased additional usernames on Fragment or in the messages directly sent by the
-            bot to private, group and supergroup chats if the owner of the bot has a Telegram
-            Premium subscription.
-
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         switch_inline_query_chosen_chat (:class:`telegram.SwitchInlineQueryChosenChat`, optional):
             If set, pressing the button will prompt the user to select one of their chats of the
             specified type, open that chat and insert the bot's username and the specified inline
@@ -185,7 +178,7 @@ class InlineKeyboardButton(TelegramObject):
             the bot to private, group and supergroup chats if the owner of the bot has a Telegram
             Premium subscription.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         text (:obj:`str`): Label text on the button.
@@ -233,22 +226,15 @@ class InlineKeyboardButton(TelegramObject):
 
             .. versionadded:: 21.7
         style (:obj:`str`): Optional. Style of the button. Must be one of
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
-            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
-            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
-            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
             If omitted, then an app-specific style is used.
 
-            .. versionadded:: NEXT.VERSION
-        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
-            custom emoji shown before the text of the button. Can only be used by bots that
-            purchased additional usernames on Fragment or in the messages directly sent by the
-            bot to private, group and supergroup chats if the owner of the bot has a Telegram
-            Premium subscription.
-
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
             be launched when the user presses the button.
 
@@ -282,7 +268,7 @@ class InlineKeyboardButton(TelegramObject):
             the bot to private, group and supergroup chats if the owner of the bot has a Telegram
             Premium subscription.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
     """
 
     __slots__ = (

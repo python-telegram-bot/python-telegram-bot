@@ -251,7 +251,7 @@ class ChatFullInfo(_ChatBase):
         first_profile_audio (:obj:`telegram.Audio`, optional): For private chats, the first audio
             added to the profile of the user.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
 
     Attributes:
@@ -441,7 +441,7 @@ class ChatFullInfo(_ChatBase):
         first_profile_audio (:obj:`telegram.Audio`): Optional. For private chats, the first audio
             added to the profile of the user.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups

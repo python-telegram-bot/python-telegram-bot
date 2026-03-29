@@ -1,0 +1,5 @@
+internal = "Update actions/checkout action to v6"
+[[pull_requests]]
+uid = "5174"
+author_uids = ["renovate[bot]"]
+closes_threads = []

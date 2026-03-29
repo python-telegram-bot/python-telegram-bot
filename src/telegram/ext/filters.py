@@ -2044,7 +2044,7 @@ class StatusUpdate:
     CHAT_OWNER_CHANGED = _ChatOwnerChanged(name="filters.StatusUpdate.CHAT_OWNER_CHANGED")
     """Messages that contain :attr:`telegram.Message.chat_owner_changed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
 
     class _ChatOwnerLeft(MessageFilter):
@@ -2056,7 +2056,7 @@ class StatusUpdate:
     CHAT_OWNER_LEFT = _ChatOwnerLeft(name="filters.StatusUpdate.CHAT_OWNER_LEFT")
     """Messages that contain :attr:`telegram.Message.chat_owner_left`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
     """
 
     class _ChatShared(MessageFilter):

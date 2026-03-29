@@ -65,11 +65,11 @@ class KeyboardButton(TelegramObject):
     .. versionchanged:: 20.5
        :attr:`request_users` and :attr:`request_chat` are considered as well when
        comparing objects of this type in terms of equality.
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.7
        :attr:`icon_custom_emoji_id` is considered as well when comparing objects of this type in
        terms of equality.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.7
        :attr:`style` and :attr:`icon_custom_emoji_id` are considered as well when
        comparing objects of this type in terms of equality.
 
@@ -104,22 +104,22 @@ class KeyboardButton(TelegramObject):
 
             .. versionadded:: 20.1
         style (:obj:`str`, optional): Style of the button. Must be one of
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
-            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
-            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
-            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
             If omitted, then an app-specific style is used.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the
             custom emoji shown before the text of the button. Can only be used by bots that
             purchased additional usernames on Fragment or in the messages directly sent by the
             bot to private, group and supergroup chats if the owner of the bot has a Telegram
             Premium subscription.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
 
     Attributes:
         text (:obj:`str`): Text of the button. If none of the fields other than :attr:`text`,
@@ -151,22 +151,22 @@ class KeyboardButton(TelegramObject):
 
             .. versionadded:: 20.1
         style (:obj:`str`): Optional. Style of the button. Must be one of
-            :tg-const:`telegram.KeyboardButtonStyle.PRIMARY` (blue),
-            :tg-const:`telegram.KeyboardButtonStyle.SUCCESS` (green), and
-            :tg-const:`telegram.KeyboardButtonStyle.DANGER` (red).
-            Color name aliases :tg-const:`telegram.KeyboardButtonStyle.BLUE`,
-            :tg-const:`telegram.KeyboardButtonStyle.GREEN`, and
-            :tg-const:`telegram.KeyboardButtonStyle.RED` are also available.
+            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
             If omitted, then an app-specific style is used.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
         icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
             custom emoji shown before the text of the button. Can only be used by bots that
             purchased additional usernames on Fragment or in the messages directly sent by the
             bot to private, group and supergroup chats if the owner of the bot has a Telegram
             Premium subscription.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.7
     """
 
     __slots__ = (

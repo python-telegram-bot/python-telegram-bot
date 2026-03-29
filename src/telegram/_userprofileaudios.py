@@ -36,7 +36,7 @@ class UserProfileAudios(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`total_count` and :attr:`audios` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.7
 
     Args:
         total_count (:obj:`int`): Total number of profile audios for the target user.
