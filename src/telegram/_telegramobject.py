@@ -61,15 +61,15 @@ def _make_seq_transform(
     item_type: object,
     globalns: dict[str, object],
     tg_ns: dict[str, object],
-    cls_name: str,
-    field_name: str,
+    # cls_name: str,
+    # field_name: str,
 ) -> Any | None:
     """Recursively build a ``(value, bot) → transformed_value`` lambda for a Sequence item type.
 
     Returns :obj:`None` if the item type does not require any transformation.
     """
     if isinstance(item_type, str):
-        print(f"Resolving forward reference for {cls_name}.{field_name}: {item_type}")
+        # print(f"Resolving forward reference for {cls_name}.{field_name}: {item_type}")
         item_type = eval(item_type, globalns, tg_ns)  # noqa: S307
 
     item_origin = get_origin(item_type)
@@ -77,16 +77,17 @@ def _make_seq_transform(
         inner_args = get_args(item_type)
         if not inner_args:
             return None
-        inner_fn = _make_seq_transform(inner_args[0], globalns, tg_ns, cls_name, field_name)
+        # inner_fn = _make_seq_transform(inner_args[0], globalns, tg_ns, cls_name, field_name)
+        inner_fn = _make_seq_transform(inner_args[0], globalns, tg_ns)
         if inner_fn is None:
             return None
-        print(f"Adding nested sequence plan for {cls_name}.{field_name}")
+        # print(f"Adding nested sequence plan for {cls_name}.{field_name}")
         return lambda v, b, _f=inner_fn: (
             () if v is None else [_f(row, b) for row in v] if isinstance(v, list) else v
         )
 
     if isinstance(item_type, type) and issubclass(item_type, TelegramObject):
-        print(f"Adding de_list plan for {cls_name}.{field_name} → {item_type.__name__}")
+        # print(f"Adding de_list plan for {cls_name}.{field_name} → {item_type.__name__}")
         return lambda v, b, _c=item_type: (
             () if v is None else _c.de_list(v, b) if isinstance(v, list) else v
         )
@@ -475,7 +476,7 @@ class TelegramObject:
         if init_fn is None:
             # No own __init__: inherit the nearest ancestor's plan. This is true for e.g. Chat
             parent = cls.__mro__[1]
-            print("No __init__ for", cls.__name__, "inheriting from", parent.__name__)
+            # print("No __init__ for", cls.__name__, "inheriting from", parent.__name__)
             if "__DE_JSON_PLAN__" not in parent.__dict__:
                 parent._build_plan()
             cls.__DE_JSON_PLAN__ = parent.__DE_JSON_PLAN__
@@ -508,7 +509,7 @@ class TelegramObject:
                     else from_timestamp(value, tzinfo=extract_tzinfo_from_defaults(bot))
                 )
             elif isinstance(inner, type) and issubclass(inner, TelegramObject):
-                print("Adding de_json plan for", cls.__name__, name, "→", inner.__name__)
+                # print("Adding de_json plan for", cls.__name__, name, "→", inner.__name__)
                 plan[name] = lambda v, b, _c=inner: (
                     None if v is None else v if isinstance(v, _c) else _c.de_json(v, b)
                 )
@@ -516,11 +517,12 @@ class TelegramObject:
                 args = get_args(inner)
                 if not args:
                     continue
-                fn = _make_seq_transform(args[0], globalns, tg_ns, cls.__name__, name)
+                # fn = _make_seq_transform(args[0], globalns, tg_ns, cls.__name__, name)
+                fn = _make_seq_transform(args[0], globalns, tg_ns)
                 if fn is not None:
                     plan[name] = fn
-            else:
-                print(f"No de_json plan for {cls.__name__}.{name} (annotation: {ann})")
+            # else:
+            #     print(f"No de_json plan for {cls.__name__}.{name} (annotation: {ann})")
 
         cls.__DE_JSON_PLAN__ = plan
         return plan
@@ -590,14 +592,14 @@ class TelegramObject:
         # Move removed/legacy API fields into api_kwargs
         api_kwargs: JSONDict | None = None
         if cls.__REMOVED_API_FIELDS__:
-            print(f"checking for removed API fields for {cls.__name__}")
+            # print(f"checking for removed API fields for {cls.__name__}")
             removed = {f: data.pop(f) for f in cls.__REMOVED_API_FIELDS__ if f in data}
             if removed:
                 api_kwargs = removed
 
         # Make the plan for de_json. This is done only on the first call to de_json for each class.
         if "__DE_JSON_PLAN__" not in cls.__dict__:
-            print(f"building plan for {cls.__name__}")
+            # print(f"building plan for {cls.__name__}")
             cls._build_plan()
         plan = cls.__DE_JSON_PLAN__
 
@@ -609,9 +611,9 @@ class TelegramObject:
         # TelegramObject → None, datetime → None, Sequence[TelegramObject] → ().
         # Iterating plan (not data) is O(plan size) and also handles missing keys correctly.
         if plan:
-            print(f"Data length: {len(data)}, plan length: {len(plan)}")
+            # print(f"Data length: {len(data)}, plan length: {len(plan)}")
             for key, transform in plan.items():
-                print("executing plan for", key)
+                # print("executing plan for", key)
                 data[key] = transform(data.get(key), bot)
 
         return cls._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
