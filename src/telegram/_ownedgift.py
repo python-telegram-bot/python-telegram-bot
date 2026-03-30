@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._gifts import Gift
@@ -29,7 +29,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._uniquegift import UniqueGift
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict
 
@@ -63,6 +63,14 @@ class OwnedGift(TelegramObject):
     UNIQUE: Final[str] = constants.OwnedGiftType.UNIQUE
     """:const:`telegram.constants.OwnedGiftType.UNIQUE`"""
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "regular": "OwnedGiftRegular",
+            "unique": "OwnedGiftUnique",
+        },
+    )
+
     def __init__(
         self,
         type: str,  # pylint: disable=redefined-builtin
@@ -74,31 +82,6 @@ class OwnedGift(TelegramObject):
 
         self._id_attrs = (self.type,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OwnedGift":
-        """Converts JSON data to the appropriate :class:`OwnedGift` object, i.e. takes
-        care of selecting the correct subclass.
-
-        Args:
-            data (dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`, optional): The bot associated with this object.
-
-        Returns:
-            The Telegram object.
-
-        """
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[OwnedGift]] = {
-            cls.REGULAR: OwnedGiftRegular,
-            cls.UNIQUE: OwnedGiftUnique,
-        }
-
-        if cls is OwnedGift and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class OwnedGifts(TelegramObject):
@@ -144,14 +127,6 @@ class OwnedGifts(TelegramObject):
         self._id_attrs = (self.total_count, self.gifts)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OwnedGifts":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["gifts"] = de_list_optional(data.get("gifts"), OwnedGift, bot)
-        return super().de_json(data=data, bot=bot)
 
 
 class OwnedGiftRegular(OwnedGift):

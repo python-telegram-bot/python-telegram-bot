@@ -115,11 +115,16 @@ class TelegramObject:
     # be intercepted by de_json and forwarded into api_kwargs before construction.
     __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset()
 
-    # def __init_subclass__(cls, **kwargs) -> None:
-    #     super().__init_subclass__(**kwargs)
+    # Subclasses may define a "sequence default" set: parameter names that accept
+    # Sequence[...] (or Sequence[Sequence[...]]) arguments and should default to
+    # an empty tuple when the key is absent from incoming JSON data.
+    __DE_JSON_LIST_FIELDS__: ClassVar[frozenset[str]] = frozenset()
 
-    #     print("Building de_json plan for", cls.__name__)
-    #     cls.__DE_JSON_PLAN__ = cls._build_plan()
+    # Delegator base classes may define a dispatch mapping to route de_json to
+    # the correct subclass.  Format: (dispatch_key, {value: "ClassName", ...}).
+    # The dispatch_key is the JSON field name (e.g. "type", "source", "status").
+    # The values are class name strings, resolved lazily via the telegram namespace.
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = None
 
     def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         # Setting _frozen to `False` here means that classes without arguments still need to
@@ -432,6 +437,7 @@ class TelegramObject:
         * ``datetime`` fields  → :func:`~telegram._utils.datetime.from_timestamp`
         * ``TelegramObject`` fields  → ``TargetCls.de_json(...)``
         * ``Sequence[TelegramObject]`` fields  → ``TargetCls.de_list(...)``
+        * ``Sequence[Sequence[TelegramObject]]`` fields  → nested de_list
         """
         init_fn = cls.__dict__.get("__init__")
         if init_fn is None:
@@ -441,9 +447,11 @@ class TelegramObject:
             if "__DE_JSON_PLAN__" not in parent.__dict__:
                 parent._build_plan()
             cls.__DE_JSON_PLAN__ = parent.__DE_JSON_PLAN__
+            cls.__DE_JSON_LIST_FIELDS__ = parent.__DE_JSON_LIST_FIELDS__
             return cls.__DE_JSON_PLAN__
 
         plan: dict[str, Any] = {}
+        list_fields: set[str] = set()
         globalns: dict[str, object] = getattr(init_fn, "__globals__", {})
         tg_ns = _telegram_ns()
 
@@ -469,7 +477,7 @@ class TelegramObject:
                 )
             elif isinstance(inner, type) and issubclass(inner, TelegramObject):
                 print("Adding de_json plan for", cls.__name__, name, "→", inner.__name__)
-                plan[name] = lambda v, b, _c=inner: _c.de_json(v, b) if isinstance(v, dict) else v
+                plan[name] = lambda v, b, _c=inner: v if isinstance(v, _c) else _c.de_json(v, b)
             elif origin is Sequence:
                 args = get_args(inner)
                 if not args:
@@ -480,15 +488,44 @@ class TelegramObject:
                     print(f"Resolving forward reference for {cls.__name__}.{name}: {item_type}")
                     # with contextlib.suppress(Exception):
                     item_type = eval(item_type, globalns, tg_ns)  # noqa: S307
+
+                # Check for nested sequences: Sequence[Sequence[TelegramObject]]
+                item_origin = get_origin(item_type)
+                if item_origin is Sequence:
+                    inner_args = get_args(item_type)
+                    if inner_args:
+                        inner_item: object = inner_args[0]
+                        if isinstance(inner_item, str):
+                            print(
+                                "Resolving nested forward ref for"
+                                f" {cls.__name__}.{name}: {inner_item}"
+                            )
+                            inner_item = eval(inner_item, globalns, tg_ns)  # noqa: S307
+                        if isinstance(inner_item, type) and issubclass(inner_item, TelegramObject):
+                            print(
+                                "Adding nested de_list plan for",
+                                cls.__name__,
+                                name,
+                                "→",
+                                inner_item.__name__,
+                            )
+                            plan[name] = lambda v, b, _c=inner_item: (
+                                [_c.de_list(row, b) for row in v] if isinstance(v, list) else v
+                            )
+                            list_fields.add(name)
+                            continue
+
                 if isinstance(item_type, type) and issubclass(item_type, TelegramObject):
                     print("Adding de_list plan for", cls.__name__, name, "→", item_type.__name__)
                     plan[name] = lambda v, b, _c=item_type: (
                         _c.de_list(v, b) if isinstance(v, list) else v
                     )
+                    list_fields.add(name)
             else:
                 print(f"No de_json plan for {cls.__name__}.{name} (annotation: {ann})")
 
         cls.__DE_JSON_PLAN__ = plan
+        cls.__DE_JSON_LIST_FIELDS__ = frozenset(list_fields)
         return plan
 
     @classmethod
@@ -538,6 +575,21 @@ class TelegramObject:
         """
         data = cls._parse_data(data)
 
+        # Dispatch to subclass for delegator classes (e.g. TransactionPartner, ChatMember).
+        # Only dispatches when __DE_JSON_DISPATCH__ is defined directly on cls (not inherited).
+        if "__DE_JSON_DISPATCH__" in cls.__dict__:
+            dispatch_key, dispatch_mapping = cls.__DE_JSON_DISPATCH__
+            target_name = dispatch_mapping.get(data.get(dispatch_key))
+            if target_name is not None:
+                # Resolve string class name → actual class (lazy, cached)
+                if isinstance(target_name, str):
+                    target_cls = _telegram_ns()[target_name]
+                    dispatch_mapping[data[dispatch_key]] = target_cls
+                else:
+                    target_cls = target_name
+                data.pop(dispatch_key)
+                return target_cls.de_json(data=data, bot=bot)
+
         # Move removed/legacy API fields into api_kwargs
         api_kwargs: JSONDict | None = None
         if cls.__REMOVED_API_FIELDS__:
@@ -559,6 +611,22 @@ class TelegramObject:
                 data["from_user"] = data.pop("from")
             elif "from_user" not in data:
                 data["from_user"] = None
+
+        # Default missing list fields to empty tuple so that required Sequence
+        # parameters don't cause TypeErrors during construction.
+        if cls.__DE_JSON_LIST_FIELDS__:
+            for key in cls.__DE_JSON_LIST_FIELDS__:
+                if key not in data:
+                    data[key] = ()
+
+        # Default missing plan keys to None (mimicking old de_json_optional behavior).
+        # This ensures required TelegramObject/datetime fields get None when missing
+        # from the data, which is what the old manual de_json implementations did.
+        # List fields are already handled above with empty tuples.
+        if plan:
+            for key in plan:
+                if key not in data:
+                    data[key] = None
 
         # Only for classes with a plan. We avoid looping through the data keys for no plan classes.
         if plan:

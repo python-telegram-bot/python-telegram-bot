@@ -19,13 +19,13 @@
 """This module contains objects related to chat backgrounds."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._files.document import Document
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -57,6 +57,15 @@ class BackgroundFill(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "solid": "BackgroundFillSolid",
+            "gradient": "BackgroundFillGradient",
+            "freeform_gradient": "BackgroundFillFreeformGradient",
+        },
+    )
+
     SOLID: Final[constants.BackgroundFillType] = constants.BackgroundFillType.SOLID
     """:const:`telegram.constants.BackgroundFillType.SOLID`"""
     GRADIENT: Final[constants.BackgroundFillType] = constants.BackgroundFillType.GRADIENT
@@ -78,22 +87,6 @@ class BackgroundFill(TelegramObject):
 
         self._id_attrs = (self.type,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BackgroundFill":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[BackgroundFill]] = {
-            cls.SOLID: BackgroundFillSolid,
-            cls.GRADIENT: BackgroundFillGradient,
-            cls.FREEFORM_GRADIENT: BackgroundFillFreeformGradient,
-        }
-
-        if cls is BackgroundFill and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class BackgroundFillSolid(BackgroundFill):
@@ -243,6 +236,16 @@ class BackgroundType(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "fill": "BackgroundTypeFill",
+            "wallpaper": "BackgroundTypeWallpaper",
+            "pattern": "BackgroundTypePattern",
+            "chat_theme": "BackgroundTypeChatTheme",
+        },
+    )
+
     FILL: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.FILL
     """:const:`telegram.constants.BackgroundTypeType.FILL`"""
     WALLPAPER: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.WALLPAPER
@@ -264,29 +267,6 @@ class BackgroundType(TelegramObject):
 
         self._id_attrs = (self.type,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BackgroundType":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[BackgroundType]] = {
-            cls.FILL: BackgroundTypeFill,
-            cls.WALLPAPER: BackgroundTypeWallpaper,
-            cls.PATTERN: BackgroundTypePattern,
-            cls.CHAT_THEME: BackgroundTypeChatTheme,
-        }
-
-        if cls is BackgroundType and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        if "fill" in data:
-            data["fill"] = de_json_optional(data.get("fill"), BackgroundFill, bot)
-
-        if "document" in data:
-            data["document"] = de_json_optional(data.get("document"), Document, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class BackgroundTypeFill(BackgroundType):

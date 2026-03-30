@@ -20,15 +20,14 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -94,6 +93,15 @@ class ChatBoostSource(TelegramObject):
 
     __slots__ = ("source",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "source",
+        {
+            "premium": "ChatBoostSourcePremium",
+            "gift_code": "ChatBoostSourceGiftCode",
+            "giveaway": "ChatBoostSourceGiveaway",
+        },
+    )
+
     PREMIUM: Final[str] = constants.ChatBoostSources.PREMIUM
     """:const:`telegram.constants.ChatBoostSources.PREMIUM`"""
     GIFT_CODE: Final[str] = constants.ChatBoostSources.GIFT_CODE
@@ -109,25 +117,6 @@ class ChatBoostSource(TelegramObject):
 
         self._id_attrs = (self.source,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatBoostSource":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[ChatBoostSource]] = {
-            cls.PREMIUM: ChatBoostSourcePremium,
-            cls.GIFT_CODE: ChatBoostSourceGiftCode,
-            cls.GIVEAWAY: ChatBoostSourceGiveaway,
-        }
-
-        if cls is ChatBoostSource and data.get("source") in _class_mapping:
-            return _class_mapping[data.pop("source")].de_json(data=data, bot=bot)
-
-        if "user" in data:
-            data["user"] = de_json_optional(data.get("user"), User, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class ChatBoostSourcePremium(ChatBoostSource):

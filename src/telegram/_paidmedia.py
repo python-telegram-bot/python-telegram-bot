@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._files.photosize import PhotoSize
@@ -60,6 +60,15 @@ class PaidMedia(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "preview": "PaidMediaPreview",
+            "photo": "PaidMediaPhoto",
+            "video": "PaidMediaVideo",
+        },
+    )
+
     PREVIEW: Final[str] = constants.PaidMediaType.PREVIEW
     """:const:`telegram.constants.PaidMediaType.PREVIEW`"""
     PHOTO: Final[str] = constants.PaidMediaType.PHOTO
@@ -78,35 +87,6 @@ class PaidMedia(TelegramObject):
 
         self._id_attrs = (self.type,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMedia":
-        """Converts JSON data to the appropriate :class:`PaidMedia` object, i.e. takes
-        care of selecting the correct subclass.
-
-        Args:
-            data (dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`, optional): The bot associated with this object.
-
-        Returns:
-            The Telegram object.
-
-        """
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[PaidMedia]] = {
-            cls.PREVIEW: PaidMediaPreview,
-            cls.PHOTO: PaidMediaPhoto,
-            cls.VIDEO: PaidMediaVideo,
-        }
-
-        if cls is PaidMedia and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        if "duration" in data:
-            data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
-
-        return super().de_json(data=data, bot=bot)
 
 
 class PaidMediaPreview(PaidMedia):

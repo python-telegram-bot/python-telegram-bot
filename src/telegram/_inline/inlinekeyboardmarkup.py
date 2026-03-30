@@ -91,22 +91,6 @@ class InlineKeyboardMarkup(TelegramObject):
 
         self._freeze()
 
-    # TODO: Come back to this and modify TGObject to parse nested Sequence's
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InlineKeyboardMarkup":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-
-        keyboard = []
-        for row in data["inline_keyboard"]:
-            tmp = []
-            for col in row:
-                btn = InlineKeyboardButton.de_json(col, bot)
-                if btn:
-                    tmp.append(btn)
-            keyboard.append(tmp)
-
-        return cls(keyboard)
-
     @classmethod
     def from_button(cls, button: InlineKeyboardButton, **kwargs: object) -> "InlineKeyboardMarkup":
         """Shortcut for::

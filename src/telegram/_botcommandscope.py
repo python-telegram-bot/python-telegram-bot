@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains objects representing Telegram bot command scopes."""
 
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -62,6 +62,19 @@ class BotCommandScope(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "default": "BotCommandScopeDefault",
+            "all_private_chats": "BotCommandScopeAllPrivateChats",
+            "all_group_chats": "BotCommandScopeAllGroupChats",
+            "all_chat_administrators": "BotCommandScopeAllChatAdministrators",
+            "chat": "BotCommandScopeChat",
+            "chat_administrators": "BotCommandScopeChatAdministrators",
+            "chat_member": "BotCommandScopeChatMember",
+        },
+    )
+
     DEFAULT: Final[str] = constants.BotCommandScopeType.DEFAULT
     """:const:`telegram.constants.BotCommandScopeType.DEFAULT`"""
     ALL_PRIVATE_CHATS: Final[str] = constants.BotCommandScopeType.ALL_PRIVATE_CHATS
@@ -83,39 +96,6 @@ class BotCommandScope(TelegramObject):
         self._id_attrs = (self.type,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BotCommandScope":
-        """Converts JSON data to the appropriate :class:`BotCommandScope` object, i.e. takes
-        care of selecting the correct subclass.
-
-        Args:
-            data (dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`, optional): The bot associated with this object. Defaults to
-                :obj:`None`, in which case shortcut methods will not be available.
-
-                .. versionchanged:: 21.4
-                   :paramref:`bot` is now optional and defaults to :obj:`None`
-
-        Returns:
-            The Telegram object.
-
-        """
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[BotCommandScope]] = {
-            cls.DEFAULT: BotCommandScopeDefault,
-            cls.ALL_PRIVATE_CHATS: BotCommandScopeAllPrivateChats,
-            cls.ALL_GROUP_CHATS: BotCommandScopeAllGroupChats,
-            cls.ALL_CHAT_ADMINISTRATORS: BotCommandScopeAllChatAdministrators,
-            cls.CHAT: BotCommandScopeChat,
-            cls.CHAT_ADMINISTRATORS: BotCommandScopeChatAdministrators,
-            cls.CHAT_MEMBER: BotCommandScopeChatMember,
-        }
-
-        if cls is BotCommandScope and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-        return super().de_json(data=data, bot=bot)
 
 
 class BotCommandScopeDefault(BotCommandScope):

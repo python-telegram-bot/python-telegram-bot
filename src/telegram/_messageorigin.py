@@ -19,15 +19,13 @@
 """This module contains the classes that represent Telegram MessageOigin."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -68,6 +66,16 @@ class MessageOrigin(TelegramObject):
         "type",
     )
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "user": "MessageOriginUser",
+            "hidden_user": "MessageOriginHiddenUser",
+            "chat": "MessageOriginChat",
+            "channel": "MessageOriginChannel",
+        },
+    )
+
     USER: Final[str] = constants.MessageOriginType.USER
     """:const:`telegram.constants.MessageOriginType.USER`"""
     HIDDEN_USER: Final[str] = constants.MessageOriginType.HIDDEN_USER
@@ -94,36 +102,6 @@ class MessageOrigin(TelegramObject):
             self.date,
         )
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MessageOrigin":
-        """Converts JSON data to the appropriate :class:`MessageOrigin` object, i.e. takes
-        care of selecting the correct subclass.
-        """
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[MessageOrigin]] = {
-            cls.USER: MessageOriginUser,
-            cls.HIDDEN_USER: MessageOriginHiddenUser,
-            cls.CHAT: MessageOriginChat,
-            cls.CHANNEL: MessageOriginChannel,
-        }
-        if cls is MessageOrigin and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-
-        if "sender_user" in data:
-            data["sender_user"] = de_json_optional(data.get("sender_user"), User, bot)
-
-        if "sender_chat" in data:
-            data["sender_chat"] = de_json_optional(data.get("sender_chat"), Chat, bot)
-
-        if "chat" in data:
-            data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class MessageOriginUser(MessageOrigin):
