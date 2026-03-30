@@ -28,8 +28,6 @@ from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
 
@@ -182,19 +180,6 @@ class MessageEntity(TelegramObject):
         self._id_attrs = (self.type, self.offset, self.length)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MessageEntity":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["user"] = de_json_optional(data.get("user"), User, bot)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["unix_time"] = from_timestamp(data.get("unix_time"), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)
 
     @staticmethod
     def adjust_message_entities_to_utf_16(text: str, entities: _SEM) -> _SEM:

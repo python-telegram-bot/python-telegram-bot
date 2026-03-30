@@ -29,8 +29,6 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import (
-    de_json_optional,
-    de_list_optional,
     parse_sequence_arg,
     to_timedelta,
 )
@@ -202,13 +200,6 @@ class PaidMediaPhoto(PaidMedia):
 
             self._id_attrs = (self.type, self.photo)
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaPhoto":
-        data = cls._parse_data(data)
-
-        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
-
 
 class PaidMediaVideo(PaidMedia):
     """
@@ -242,13 +233,6 @@ class PaidMediaVideo(PaidMedia):
             self.video: Video = video
 
             self._id_attrs = (self.type, self.video)
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaVideo":
-        data = cls._parse_data(data)
-
-        data["video"] = de_json_optional(data.get("video"), Video, bot)
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class PaidMediaInfo(TelegramObject):
@@ -287,13 +271,6 @@ class PaidMediaInfo(TelegramObject):
         self._id_attrs = (self.star_count, self.paid_media)
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaInfo":
-        data = cls._parse_data(data)
-
-        data["paid_media"] = de_list_optional(data.get("paid_media"), PaidMedia, bot)
-        return super().de_json(data=data, bot=bot)
-
 
 class PaidMediaPurchased(TelegramObject):
     """This object contains information about a paid media purchase.
@@ -330,10 +307,3 @@ class PaidMediaPurchased(TelegramObject):
 
         self._id_attrs = (self.from_user, self.paid_media_payload)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaPurchased":
-        data = cls._parse_data(data)
-
-        data["from_user"] = User.de_json(data=data.pop("from"), bot=bot)
-        return super().de_json(data=data, bot=bot)

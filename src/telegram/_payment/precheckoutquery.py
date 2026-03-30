@@ -23,7 +23,6 @@ from typing import TYPE_CHECKING
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -109,16 +108,6 @@ class PreCheckoutQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PreCheckoutQuery":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
-        data["order_info"] = de_json_optional(data.get("order_info"), OrderInfo, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     async def answer(
         self,

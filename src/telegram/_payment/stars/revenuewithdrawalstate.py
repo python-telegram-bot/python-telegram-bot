@@ -25,7 +25,6 @@ from typing import TYPE_CHECKING, Final
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -149,19 +148,6 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
                 self.type,
                 self.date,
             )
-
-    @classmethod
-    def de_json(
-        cls, data: JSONDict, bot: "Bot | None" = None
-    ) -> "RevenueWithdrawalStateSucceeded":
-        """See :meth:`telegram.RevenueWithdrawalState.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class RevenueWithdrawalStateFailed(RevenueWithdrawalState):

@@ -91,6 +91,7 @@ class InlineKeyboardMarkup(TelegramObject):
 
         self._freeze()
 
+    # TODO: Come back to this and modify TGObject to parse nested Sequence's
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InlineKeyboardMarkup":
         """See :meth:`telegram.TelegramObject.de_json`."""

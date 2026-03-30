@@ -65,12 +65,3 @@ class UserProfileAudios(TelegramObject):
         self._id_attrs = (self.total_count, self.audios)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UserProfileAudios":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["audios"] = Audio.de_list(data.get("audios", []), bot)
-
-        return super().de_json(data=data, bot=bot)

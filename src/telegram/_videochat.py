@@ -25,11 +25,7 @@ from typing import TYPE_CHECKING
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
-from telegram._utils.datetime import (
-    extract_tzinfo_from_defaults,
-    from_timestamp,
-    get_timedelta_value,
-)
+from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
@@ -146,14 +142,6 @@ class VideoChatParticipantsInvited(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "VideoChatParticipantsInvited":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["users"] = User.de_list(data.get("users", []), bot)
-        return super().de_json(data=data, bot=bot)
-
 
 class VideoChatScheduled(TelegramObject):
     """This object represents a service message about a video chat scheduled in the chat.
@@ -193,15 +181,3 @@ class VideoChatScheduled(TelegramObject):
         self._id_attrs = (self.start_date,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "VideoChatScheduled":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["start_date"] = from_timestamp(data.get("start_date"), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)

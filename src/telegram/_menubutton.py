@@ -23,7 +23,6 @@ from typing import TYPE_CHECKING, Final
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
 
@@ -164,15 +163,6 @@ class MenuButtonWebApp(MenuButton):
             self.web_app: WebAppInfo = web_app
 
             self._id_attrs = (self.type, self.text, self.web_app)
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MenuButtonWebApp":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class MenuButtonDefault(MenuButton):

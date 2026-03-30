@@ -124,17 +124,6 @@ class Game(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Game":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
-        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
-        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
-
-        return super().de_json(data=data, bot=bot)
-
     def parse_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 

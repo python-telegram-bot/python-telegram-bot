@@ -26,14 +26,12 @@ from telegram._chat import Chat
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict
-from telegram.constants import ZERO_DATE
 
 if TYPE_CHECKING:
-    from telegram import Bot, Message
+    from telegram import Message
 
 
 class ChecklistTask(TelegramObject):
@@ -111,25 +109,6 @@ class ChecklistTask(TelegramObject):
         self._id_attrs = (self.id,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChecklistTask":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        if (date := data.get("completion_date")) == 0:
-            data["completion_date"] = ZERO_DATE
-        else:
-            data["completion_date"] = from_timestamp(date, tzinfo=loc_tzinfo)
-
-        data["completed_by_user"] = de_json_optional(data.get("completed_by_user"), User, bot)
-        data["completed_by_chat"] = de_json_optional(data.get("completed_by_chat"), Chat, bot)
-        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`text`
@@ -231,16 +210,6 @@ class Checklist(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "Checklist":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["title_entities"] = de_list_optional(data.get("title_entities"), MessageEntity, bot)
-        data["tasks"] = de_list_optional(data.get("tasks"), ChecklistTask, bot)
-
-        return super().de_json(data=data, bot=bot)
-
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`title`
         from a given :class:`telegram.MessageEntity` of :attr:`title_entities`.
@@ -321,7 +290,7 @@ class ChecklistTasksDone(TelegramObject):
 
     def __init__(
         self,
-        checklist_message: Optional["Message"] = None,
+        checklist_message: "Message | None" = None,
         marked_as_done_task_ids: Sequence[int] | None = None,
         marked_as_not_done_task_ids: Sequence[int] | None = None,
         *,
@@ -337,18 +306,6 @@ class ChecklistTasksDone(TelegramObject):
         self._id_attrs = (self.marked_as_done_task_ids, self.marked_as_not_done_task_ids)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChecklistTasksDone":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # needs to be imported here to avoid circular import issues
-        from telegram import Message  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
-
-        data["checklist_message"] = de_json_optional(data.get("checklist_message"), Message, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class ChecklistTasksAdded(TelegramObject):
@@ -380,7 +337,7 @@ class ChecklistTasksAdded(TelegramObject):
     def __init__(
         self,
         tasks: Sequence[ChecklistTask],
-        checklist_message: Optional["Message"] = None,
+        checklist_message: "Message | None" = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -391,16 +348,3 @@ class ChecklistTasksAdded(TelegramObject):
         self._id_attrs = (self.tasks,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "ChecklistTasksAdded":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # needs to be imported here to avoid circular import issues
-        from telegram import Message  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
-
-        data["checklist_message"] = de_json_optional(data.get("checklist_message"), Message, bot)
-        data["tasks"] = ChecklistTask.de_list(data.get("tasks", []), bot)
-
-        return super().de_json(data=data, bot=bot)

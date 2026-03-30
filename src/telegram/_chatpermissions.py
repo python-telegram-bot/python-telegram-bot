@@ -166,6 +166,12 @@ class ChatPermissions(TelegramObject):
         "can_send_voice_notes",
     )
 
+    __REMOVED_API_FIELDS__ = frozenset(
+        {
+            "can_send_media_messages",
+        }
+    )
+
     def __init__(
         self,
         can_send_messages: bool | None = None,
@@ -245,16 +251,3 @@ class ChatPermissions(TelegramObject):
         .. versionadded:: 20.0
         """
         return cls(*(False,) * len(cls.__slots__))
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatPermissions":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if data.get("can_send_media_messages") is not None:
-            api_kwargs["can_send_media_messages"] = data.pop("can_send_media_messages")
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)

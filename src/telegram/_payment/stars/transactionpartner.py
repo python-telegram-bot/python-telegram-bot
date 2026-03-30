@@ -30,10 +30,10 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import (
-    de_json_optional,
-    de_list_optional,
     parse_sequence_arg,
     to_timedelta,
+    de_json_optional,
+    de_list_optional,
 )
 from telegram._utils.types import JSONDict, TimePeriod
 

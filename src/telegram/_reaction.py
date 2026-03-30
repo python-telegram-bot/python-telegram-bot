@@ -24,7 +24,6 @@ from typing import TYPE_CHECKING, Final, Literal
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -220,12 +219,3 @@ class ReactionCount(TelegramObject):
             self.total_count,
         )
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ReactionCount":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["type"] = de_json_optional(data.get("type"), ReactionType, bot)
-
-        return super().de_json(data=data, bot=bot)

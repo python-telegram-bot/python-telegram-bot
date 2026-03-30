@@ -181,6 +181,12 @@ class KeyboardButton(TelegramObject):
         "web_app",
     )
 
+    __REMOVED_API_FIELDS__ = frozenset(
+        {
+            "request_user",
+        }
+    )
+
     def __init__(
         self,
         text: str,
@@ -222,27 +228,3 @@ class KeyboardButton(TelegramObject):
         )
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "KeyboardButton":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["request_poll"] = de_json_optional(
-            data.get("request_poll"), KeyboardButtonPollType, bot
-        )
-        data["request_users"] = de_json_optional(
-            data.get("request_users"), KeyboardButtonRequestUsers, bot
-        )
-        data["request_chat"] = de_json_optional(
-            data.get("request_chat"), KeyboardButtonRequestChat, bot
-        )
-        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
-
-        api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if request_user := data.get("request_user"):
-            api_kwargs = {"request_user": request_user}
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)

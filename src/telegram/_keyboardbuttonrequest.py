@@ -254,17 +254,3 @@ class KeyboardButtonRequestChat(TelegramObject):
         self._id_attrs = (self.request_id,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "KeyboardButtonRequestChat":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["user_administrator_rights"] = de_json_optional(
-            data.get("user_administrator_rights"), ChatAdministratorRights, bot
-        )
-        data["bot_administrator_rights"] = de_json_optional(
-            data.get("bot_administrator_rights"), ChatAdministratorRights, bot
-        )
-
-        return super().de_json(data=data, bot=bot)

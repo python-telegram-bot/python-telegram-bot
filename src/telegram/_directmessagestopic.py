@@ -22,7 +22,6 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -75,12 +74,3 @@ class DirectMessagesTopic(TelegramObject):
 
         self._id_attrs = (self.topic_id, self.user)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "DirectMessagesTopic":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["user"] = de_json_optional(data.get("user"), User, bot)
-
-        return super().de_json(data=data, bot=bot)

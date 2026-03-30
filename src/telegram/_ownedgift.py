@@ -30,7 +30,6 @@ from telegram._uniquegift import UniqueGift
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict
 
@@ -286,19 +285,6 @@ class OwnedGiftRegular(OwnedGift):
 
             self._id_attrs = (self.type, self.gift, self.send_date)
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OwnedGiftRegular":
-        """See :meth:`telegram.OwnedGift.de_json`."""
-        data = cls._parse_data(data)
-
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["send_date"] = from_timestamp(data.get("send_date"), tzinfo=loc_tzinfo)
-        data["sender_user"] = de_json_optional(data.get("sender_user"), User, bot)
-        data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
-        data["entities"] = de_list_optional(data.get("entities"), MessageEntity, bot)
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
-
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`text`
         from a given :class:`telegram.MessageEntity` of :attr:`entities`.
@@ -438,18 +424,3 @@ class OwnedGiftUnique(OwnedGift):
             self.next_transfer_date: dtm.datetime | None = next_transfer_date
 
             self._id_attrs = (self.type, self.gift, self.send_date)
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "OwnedGiftUnique":
-        """See :meth:`telegram.OwnedGift.de_json`."""
-        data = cls._parse_data(data)
-
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["send_date"] = from_timestamp(data.get("send_date"), tzinfo=loc_tzinfo)
-        data["sender_user"] = de_json_optional(data.get("sender_user"), User, bot)
-        data["gift"] = de_json_optional(data.get("gift"), UniqueGift, bot)
-        data["next_transfer_date"] = from_timestamp(
-            data.get("next_transfer_date"), tzinfo=loc_tzinfo
-        )
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]

@@ -27,7 +27,6 @@ from telegram._reaction import ReactionCount, ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -85,20 +84,6 @@ class MessageReactionCountUpdated(TelegramObject):
 
         self._id_attrs = (self.chat, self.message_id, self.date, self.reactions)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MessageReactionCountUpdated":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-        data["reactions"] = de_list_optional(data.get("reactions"), ReactionCount, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class MessageReactionUpdated(TelegramObject):
@@ -181,20 +166,3 @@ class MessageReactionUpdated(TelegramObject):
             self.new_reaction,
         )
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MessageReactionUpdated":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-        data["old_reaction"] = de_list_optional(data.get("old_reaction"), ReactionType, bot)
-        data["new_reaction"] = de_list_optional(data.get("new_reaction"), ReactionType, bot)
-        data["user"] = de_json_optional(data.get("user"), User, bot)
-        data["actor_chat"] = de_json_optional(data.get("actor_chat"), Chat, bot)
-
-        return super().de_json(data=data, bot=bot)

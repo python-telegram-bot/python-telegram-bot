@@ -24,7 +24,6 @@ from typing import TYPE_CHECKING
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -91,15 +90,3 @@ class ChosenInlineResult(TelegramObject):
         self._id_attrs = (self.result_id,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChosenInlineResult":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Required
-        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
-        # Optionals
-        data["location"] = de_json_optional(data.get("location"), Location, bot)
-
-        return super().de_json(data=data, bot=bot)

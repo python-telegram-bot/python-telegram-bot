@@ -254,12 +254,3 @@ class InputInvoiceMessageContent(InputMessageContent):
                 self.currency,
                 self.prices,
             )
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InputInvoiceMessageContent":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["prices"] = de_list_optional(data.get("prices"), LabeledPrice, bot)
-
-        return super().de_json(data=data, bot=bot)

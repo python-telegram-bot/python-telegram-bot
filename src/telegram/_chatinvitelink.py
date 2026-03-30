@@ -24,11 +24,7 @@ from typing import TYPE_CHECKING
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import de_json_optional, to_timedelta
-from telegram._utils.datetime import (
-    extract_tzinfo_from_defaults,
-    from_timestamp,
-    get_timedelta_value,
-)
+from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
@@ -191,16 +187,3 @@ class ChatInviteLink(TelegramObject):
     @property
     def subscription_period(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._subscription_period, attribute="subscription_period")
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatInviteLink":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["creator"] = de_json_optional(data.get("creator"), User, bot)
-        data["expire_date"] = from_timestamp(data.get("expire_date", None), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)

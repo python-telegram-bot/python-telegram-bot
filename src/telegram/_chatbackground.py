@@ -522,12 +522,3 @@ class ChatBackground(TelegramObject):
 
         self._id_attrs = (self.type,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatBackground":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["type"] = de_json_optional(data.get("type"), BackgroundType, bot)
-
-        return super().de_json(data=data, bot=bot)

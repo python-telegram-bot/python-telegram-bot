@@ -82,16 +82,6 @@ class PassportData(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PassportData":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["data"] = de_list_optional(data.get("data"), EncryptedPassportElement, bot)
-        data["credentials"] = de_json_optional(data.get("credentials"), EncryptedCredentials, bot)
-
-        return super().de_json(data=data, bot=bot)
-
     @property
     def decrypted_data(self) -> tuple[EncryptedPassportElement, ...]:
         """

@@ -22,7 +22,6 @@ from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -60,15 +59,6 @@ class ChatOwnerChanged(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatOwnerChanged":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["new_owner"] = de_json_optional(data.get("new_owner"), User, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class ChatOwnerLeft(TelegramObject):
     """This object represents a service message about the chat owner leaving the chat.
@@ -102,12 +92,3 @@ class ChatOwnerLeft(TelegramObject):
         self._id_attrs = (self.new_owner,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatOwnerLeft":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["new_owner"] = de_json_optional(data.get("new_owner"), User, bot)
-
-        return super().de_json(data=data, bot=bot)

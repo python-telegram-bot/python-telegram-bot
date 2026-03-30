@@ -435,7 +435,7 @@ class TelegramObject:
         """
         init_fn = cls.__dict__.get("__init__")
         if init_fn is None:
-            # No own __init__: inherit the nearest ancestor's plan. This is true for e.g. _ChatBase
+            # No own __init__: inherit the nearest ancestor's plan. This is true for e.g. Chat
             parent = cls.__mro__[1]
             print("No __init__ for", cls.__name__, "inheriting from", parent.__name__)
             if "__DE_JSON_PLAN__" not in parent.__dict__:
@@ -468,21 +468,25 @@ class TelegramObject:
                     else from_timestamp(value, tzinfo=extract_tzinfo_from_defaults(bot))
                 )
             elif isinstance(inner, type) and issubclass(inner, TelegramObject):
+                print("Adding de_json plan for", cls.__name__, name, "→", inner.__name__)
                 plan[name] = lambda v, b, _c=inner: _c.de_json(v, b) if isinstance(v, dict) else v
             elif origin is Sequence:
                 args = get_args(inner)
-                # args: tuple[object, ...] = getattr(inner, "__args__", ())
                 if not args:
                     continue
                 item_type: object = args[0]
-                # if isinstance(item_type, str):
-                #     print(f"Resolving forward reference for {cls.__name__}.{name}: {item_type}")
-                #     with contextlib.suppress(Exception):
-                #         item_type = eval(item_type, globalns, tg_ns)  # noqa: S307
+                # inspect.signature doesn't resolve the forward ref inside Sequence for some reason
+                if isinstance(item_type, str):
+                    print(f"Resolving forward reference for {cls.__name__}.{name}: {item_type}")
+                    # with contextlib.suppress(Exception):
+                    item_type = eval(item_type, globalns, tg_ns)  # noqa: S307
                 if isinstance(item_type, type) and issubclass(item_type, TelegramObject):
+                    print("Adding de_list plan for", cls.__name__, name, "→", item_type.__name__)
                     plan[name] = lambda v, b, _c=item_type: (
                         _c.de_list(v, b) if isinstance(v, list) else v
                     )
+            else:
+                print(f"No de_json plan for {cls.__name__}.{name} (annotation: {ann})")
 
         cls.__DE_JSON_PLAN__ = plan
         return plan
