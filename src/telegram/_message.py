@@ -221,7 +221,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         # Idempotent: the plan may have already converted these fields.
         date_val = data.get("date")
         if date_val is not None and not isinstance(date_val, dtm.datetime):
-            print("this was an int, converting to datetime in MaybeInaccessibleMessage")
+            # print("this was an int, converting to datetime in MaybeInaccessibleMessage")
             if date_val == 0:
                 data["date"] = ZERO_DATE
             else:
@@ -229,7 +229,7 @@ class MaybeInaccessibleMessage(TelegramObject):
                 data["date"] = from_timestamp(date_val, tzinfo=loc_tzinfo)
 
         if not isinstance(data.get("chat"), Chat):
-            print("De-jsoning chat in MaybeInaccessibleMessage")
+            # print("De-jsoning chat in MaybeInaccessibleMessage")
             data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)

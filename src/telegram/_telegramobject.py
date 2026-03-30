@@ -538,18 +538,29 @@ class TelegramObject:
         try:
             obj = cls(**data, api_kwargs=api_kwargs)
         except TypeError as exc:
-            if "__init__() got an unexpected keyword argument" not in str(exc):
+            exc_str = str(exc)
+            if (
+                "unexpected keyword argument" not in exc_str
+                and "required positional argument" not in exc_str
+            ):
                 raise
 
             if cls.__INIT_PARAMS_CHECK is not cls:
-                signature = inspect.signature(cls)
-                cls.__INIT_PARAMS = set(signature.parameters.keys())
+                cls.__INIT_PARAMS = set(inspect.signature(cls).parameters.keys())
                 cls.__INIT_PARAMS_CHECK = cls
 
             api_kwargs = api_kwargs or {}
             existing_kwargs: JSONDict = {}
             for key, value in data.items():
                 (existing_kwargs if key in cls.__INIT_PARAMS else api_kwargs)[key] = value
+
+            # Supply defaults for missing params using the plan's None-handling
+            # (Sequence → (), datetime/TelegramObject → None).  Needed when
+            # data has both unexpected keys *and* is missing required fields
+            # (e.g. TransactionPartnerChat dispatched with sibling fields).
+            plan = cls.__dict__.get("__DE_JSON_PLAN__", {})
+            for key in cls.__INIT_PARAMS - existing_kwargs.keys() - {"self", "api_kwargs"}:
+                existing_kwargs[key] = plan[key](None, bot) if key in plan else None
 
             obj = cls(api_kwargs=api_kwargs, **existing_kwargs)
 
@@ -572,11 +583,21 @@ class TelegramObject:
             The Telegram object.
 
         """
+        # Build the plan lazily (once per class).
+        if "__DE_JSON_PLAN__" not in cls.__dict__:
+            # print(f"building plan for {cls.__name__}")
+            cls._build_plan()
+        plan = cls.__DE_JSON_PLAN__
+
+        # Fast path: no dispatch, no removed fields, empty plan → skip data.copy()
+        if not plan and not cls.__DE_JSON_DISPATCH__ and not cls.__REMOVED_API_FIELDS__:
+            return cls._de_json(data=data, bot=bot)
+
+        # We'll mutate data below (rename, pop, transform), so copy first.
         data = cls._parse_data(data)
 
         # Dispatch to subclass for delegator classes (e.g. TransactionPartner, ChatMember).
-        # Only dispatches when __DE_JSON_DISPATCH__ is defined directly on cls (not inherited).
-        if "__DE_JSON_DISPATCH__" in cls.__dict__:
+        if cls.__DE_JSON_DISPATCH__:
             dispatch_key, dispatch_mapping = cls.__DE_JSON_DISPATCH__
             target_name = dispatch_mapping.get(data.get(dispatch_key))
             if target_name is not None:
@@ -597,24 +618,19 @@ class TelegramObject:
             if removed:
                 api_kwargs = removed
 
-        # Make the plan for de_json. This is done only on the first call to de_json for each class.
-        if "__DE_JSON_PLAN__" not in cls.__dict__:
-            # print(f"building plan for {cls.__name__}")
-            cls._build_plan()
-        plan = cls.__DE_JSON_PLAN__
+        # Rename "from" → "from_user" before the transform loop.
+        if "from_user" in plan:
+            if "from" in data:
+                data["from_user"] = data.pop("from")
+            elif "from_user" not in data:
+                data["from_user"] = None
 
-        # Rename "from" → "from_user" when the plan expects it and "from" is present in data.
-        if "from_user" in plan and "from" in data:
-            data["from_user"] = data.pop("from")
-
-        # Apply plan transforms for all plan keys. Lambdas handle None (missing/null) themselves:
-        # TelegramObject → None, datetime → None, Sequence[TelegramObject] → ().
-        # Iterating plan (not data) is O(plan size) and also handles missing keys correctly.
         if plan:
             # print(f"Data length: {len(data)}, plan length: {len(plan)}")
-            for key, transform in plan.items():
-                # print("executing plan for", key)
-                data[key] = transform(data.get(key), bot)
+            for key in data:
+                if key in plan and data[key] is not None:
+                    # print("executing plan for", key)
+                    data[key] = plan[key](data[key], bot)
 
         return cls._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
