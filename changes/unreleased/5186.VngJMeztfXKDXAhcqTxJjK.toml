@@ -1,4 +1,4 @@
-other = "PoC: Start centralizing `de_json`"
+other = "Centralize `de_json` into `TelegramObject`"
 [[pull_requests]]
 uid = "5186"
 author_uids = ["harshil21"]
