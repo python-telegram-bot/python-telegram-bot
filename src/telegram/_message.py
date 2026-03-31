@@ -73,8 +73,8 @@ from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._uniquegift import UniqueGiftInfo
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
+from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
@@ -209,30 +209,6 @@ class MaybeInaccessibleMessage(TelegramObject):
                 return InaccessibleMessage.de_json(data=data, bot=bot)
             return Message.de_json(data=data, bot=bot)
         return super().de_json(data=data, bot=bot)
-
-    @classmethod
-    def _de_json(
-        cls,
-        data: JSONDict,
-        bot: "Bot | None" = None,
-        api_kwargs: JSONDict | None = None,
-    ) -> "MaybeInaccessibleMessage":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        # Idempotent: the plan may have already converted these fields.
-        date_val = data.get("date")
-        if date_val is not None and not isinstance(date_val, dtm.datetime):
-            # print("this was an int, converting to datetime in MaybeInaccessibleMessage")
-            if date_val == 0:
-                data["date"] = ZERO_DATE
-            else:
-                loc_tzinfo = extract_tzinfo_from_defaults(bot)
-                data["date"] = from_timestamp(date_val, tzinfo=loc_tzinfo)
-
-        if not isinstance(data.get("chat"), Chat):
-            # print("De-jsoning chat in MaybeInaccessibleMessage")
-            data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
 
 class InaccessibleMessage(MaybeInaccessibleMessage):
