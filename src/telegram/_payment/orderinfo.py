@@ -18,14 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram OrderInfo."""
 
-from typing import TYPE_CHECKING
-
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class OrderInfo(TelegramObject):

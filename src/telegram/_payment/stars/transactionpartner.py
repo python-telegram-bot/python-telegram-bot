@@ -27,7 +27,6 @@ from telegram._chat import Chat
 from telegram._gifts import Gift
 from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
-from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import (
     parse_sequence_arg,
@@ -36,12 +35,13 @@ from telegram._utils.argumentparsing import (
 from telegram._utils.types import JSONDict, TimePeriod
 
 from .affiliateinfo import AffiliateInfo
-from .revenuewithdrawalstate import RevenueWithdrawalState
 
 if TYPE_CHECKING:
     import datetime as dtm
 
-    from telegram import Bot
+    from telegram._user import User
+
+    from .revenuewithdrawalstate import RevenueWithdrawalState
 
 
 class TransactionPartner(TelegramObject):

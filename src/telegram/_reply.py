@@ -26,9 +26,7 @@ from telegram._checklists import Checklist
 from telegram._dice import Dice
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
-from telegram._files.contact import Contact
 from telegram._files.document import Document
-from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import Sticker
 from telegram._files.venue import Venue
@@ -45,12 +43,13 @@ from telegram._payment.invoice import Invoice
 from telegram._poll import Poll
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram._files.contact import Contact
+    from telegram._files.location import Location
 
 
 class ExternalReplyInfo(TelegramObject):

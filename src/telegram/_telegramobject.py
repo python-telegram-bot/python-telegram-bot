@@ -30,7 +30,6 @@ from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast, get_args, get_origin
-from collections.abc import Callable
 
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
@@ -38,6 +37,8 @@ from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from telegram import Bot
 
 Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
@@ -53,7 +54,7 @@ def _telegram_ns() -> dict[str, object]:
 def _unwrap_optional(ann: object) -> object:
     """``X | None``  →  ``X``.  Any other annotation is returned unchanged."""
     if isinstance(ann, _types.UnionType):
-        non_none = [a for a in ann.__args__ if a is not type(None)]
+        non_none = [a for a in ann.__args__ if a is not type(None)]  # pylint: disable=unidiomatic-typecheck
         if len(non_none) == 1:
             return non_none[0]
     return ann
@@ -78,7 +79,7 @@ def _make_seq_transform(
     # inspect.signature does not resolve forward refs in Sequence's despite eval_str=True for some
     # reason:
     if isinstance(item_type, str):
-        item_type = eval(item_type, globalns, tg_ns)  # noqa: S307
+        item_type = eval(item_type, globalns, tg_ns)  # pylint: disable=eval-used # noqa: S307
 
     item_origin = get_origin(item_type)
     if item_origin is Sequence:
@@ -88,10 +89,10 @@ def _make_seq_transform(
         inner_fn = _make_seq_transform(inner_args[0], globalns, tg_ns)
         if inner_fn is None:
             return None
-        return lambda v, b, _f=inner_fn: [_f(row, b) for row in v] if isinstance(v, list) else v
+        return lambda v, b, _f=inner_fn: [_f(row, b) for row in v] if isinstance(v, list) else v  # type: ignore[misc] # pylint: disable=line-too-long
 
     if isinstance(item_type, type) and issubclass(item_type, TelegramObject):
-        return lambda v, b, _c=item_type: _c.de_list(v, b) if isinstance(v, list) else v
+        return lambda v, b, _c=item_type: _c.de_list(v, b) if isinstance(v, list) else v  # type: ignore[misc] # pylint: disable=line-too-long
 
     return None
 
@@ -483,11 +484,11 @@ class TelegramObject:
         init_fn = cls.__dict__.get("__init__")
         if init_fn is None:
             # No own __init__: inherit the nearest ancestor's plan. This is true for e.g. Chat
-            parent = cls.__mro__[1]
+            parent = cast("type[TelegramObject]", cls.__mro__[1])
             if "__DE_JSON_PLAN__" not in parent.__dict__:
-                parent._build_plan()
-            cls.__DE_JSON_PLAN__ = parent.__DE_JSON_PLAN__
-            cls.__DE_JSON_COMPAT__ = parent.__DE_JSON_COMPAT__
+                parent._build_plan()  # pylint: disable=protected-access, no-member
+            cls.__DE_JSON_PLAN__ = parent.__DE_JSON_PLAN__  # pylint: disable=no-member
+            cls.__DE_JSON_COMPAT__ = parent.__DE_JSON_COMPAT__  # pylint: disable=no-member
             return cls.__DE_JSON_PLAN__
 
         plan: dict[str, Any] = {}
@@ -529,7 +530,7 @@ class TelegramObject:
             _, dispatch_mapping = cls.__DE_JSON_DISPATCH__
             for key, value in dispatch_mapping.items():
                 if isinstance(value, str):
-                    dispatch_mapping[key] = tg_ns[value]
+                    dispatch_mapping[key] = tg_ns[value]  # type: ignore[assignment]
 
         return plan
 
@@ -602,7 +603,7 @@ class TelegramObject:
         # Dispatch to subclass for delegator classes (e.g. TransactionPartner, ChatMember).
         if cls.__DE_JSON_DISPATCH__:
             dispatch_key, dispatch_mapping = cls.__DE_JSON_DISPATCH__
-            target_cls: Tele_co = dispatch_mapping.get(data.get(dispatch_key))
+            target_cls: Tele_co = dispatch_mapping.get(data.get(dispatch_key))  # type: ignore[assignment, arg-type] # pylint: disable=line-too-long
             if target_cls is not None:
                 data.pop(dispatch_key)
                 return target_cls.de_json(data=data, bot=bot)
@@ -630,7 +631,7 @@ class TelegramObject:
                             data[key] = from_timestamp(data[key], tzinfo=tz)
                     elif isinstance(target, type):  # Target is a TelegramObject subclass → de_json
                         if not isinstance(data[key], target):  # Avoid retransformations
-                            data[key] = target.de_json(data[key], bot)
+                            data[key] = target.de_json(data[key], bot)  # type: ignore[attr-defined]
                     else:
                         # Sequence transform callable (e.g. de_list)
                         data[key] = target(data[key], bot)

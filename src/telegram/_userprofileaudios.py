@@ -19,14 +19,10 @@
 """This module contains an object that represents a Telegram UserProfileAudios."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._files.audio import Audio
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class UserProfileAudios(TelegramObject):

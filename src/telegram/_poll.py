@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from telegram import constants
 from telegram._chat import Chat
@@ -29,7 +29,6 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import (
-    de_list_optional,
     parse_sequence_arg,
     to_timedelta,
 )
@@ -37,9 +36,6 @@ from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class InputPollOption(TelegramObject):

@@ -19,19 +19,13 @@
 """This module contains an object that represents a Telegram ChatJoinRequest."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ChatJoinRequest(TelegramObject):

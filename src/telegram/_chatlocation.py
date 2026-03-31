@@ -18,15 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a location to which a chat is connected."""
 
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from telegram import constants
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ChatLocation(TelegramObject):

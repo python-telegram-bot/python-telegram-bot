@@ -18,15 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects to request chats/users."""
 
-from typing import TYPE_CHECKING
-
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class KeyboardButtonRequestUsers(TelegramObject):

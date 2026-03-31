@@ -18,16 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
 
-from typing import TYPE_CHECKING, ClassVar, Final
+from typing import ClassVar, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class MenuButton(TelegramObject):

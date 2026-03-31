@@ -19,16 +19,13 @@
 """This module contains an object that represents a Telegram ChatMember."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, ClassVar, Final
+from typing import ClassVar, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ChatMember(TelegramObject):

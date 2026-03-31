@@ -19,16 +19,12 @@
 """This module contains two objects used for request chats/users service messages."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 from telegram._utils.usernames import get_full_name, get_link, get_name
-
-if TYPE_CHECKING:
-    from telegram._bot import Bot
 
 
 class UsersShared(TelegramObject):

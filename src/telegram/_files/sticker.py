@@ -23,15 +23,14 @@ from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
-from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram._files.file import File
 
 
 class Sticker(_BaseThumbedMedium):

@@ -27,13 +27,11 @@ from telegram._inputchecklist import InputChecklist
 from telegram._message import MaybeInaccessibleMessage, Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import (
-        Bot,
         GameHighScore,
         InlineKeyboardMarkup,
         InputMedia,

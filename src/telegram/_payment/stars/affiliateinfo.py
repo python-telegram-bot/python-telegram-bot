@@ -20,13 +20,12 @@
 
 from typing import TYPE_CHECKING
 
-from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
-from telegram._user import User
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram._chat import Chat
+    from telegram._user import User
 
 
 class AffiliateInfo(TelegramObject):

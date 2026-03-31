@@ -19,18 +19,14 @@
 """This module contains an object that represents a Telegram Game."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class Game(TelegramObject):

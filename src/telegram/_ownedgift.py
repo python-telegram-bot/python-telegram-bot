@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, ClassVar, Final
+from typing import ClassVar, Final
 
 from telegram import constants
 from telegram._gifts import Gift
@@ -32,9 +32,6 @@ from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class OwnedGift(TelegramObject):

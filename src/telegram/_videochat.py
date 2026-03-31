@@ -20,16 +20,12 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class VideoChatStarted(TelegramObject):

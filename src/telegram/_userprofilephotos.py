@@ -19,14 +19,10 @@
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class UserProfilePhotos(TelegramObject):

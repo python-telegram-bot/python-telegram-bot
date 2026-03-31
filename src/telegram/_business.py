@@ -25,24 +25,19 @@ from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 from telegram._chat import Chat
-from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
-from telegram._user import User
 from telegram._utils.argumentparsing import (
-    de_json_optional,
-    de_list_optional,
     parse_sequence_arg,
 )
 from telegram._utils.datetime import (
-    extract_tzinfo_from_defaults,
-    from_timestamp,
     get_zone_info,
 )
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram._files.location import Location
+    from telegram._user import User
 
 
 class BusinessBotRights(TelegramObject):

@@ -34,20 +34,16 @@ from telegram._reaction import ReactionType
 from telegram._uniquegift import UniqueGiftColors
 from telegram._userrating import UserRating
 from telegram._utils.argumentparsing import (
-    de_json_optional,
-    de_list_optional,
     parse_sequence_arg,
     to_timedelta,
 )
 from telegram._utils.datetime import (
-    extract_tzinfo_from_defaults,
-    from_timestamp,
     get_timedelta_value,
 )
 from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
-    from telegram import Bot, BusinessIntro, BusinessLocation, BusinessOpeningHours, Message
+    from telegram import BusinessIntro, BusinessLocation, BusinessOpeningHours, Message
 
 
 class ChatFullInfo(_ChatBase):

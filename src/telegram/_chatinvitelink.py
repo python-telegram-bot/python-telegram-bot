@@ -19,16 +19,12 @@
 """This module contains an object that represents an invite link for a chat."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, to_timedelta
+from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ChatInviteLink(TelegramObject):

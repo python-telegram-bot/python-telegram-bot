@@ -28,7 +28,6 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
-    from telegram import Bot
     from telegram._payment.shippingoption import ShippingOption
 
 

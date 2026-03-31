@@ -20,15 +20,12 @@
 """This module contains the classes for Telegram Stars Revenue Withdrawals."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, ClassVar, Final
+from typing import ClassVar, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class RevenueWithdrawalState(TelegramObject):

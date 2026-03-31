@@ -24,11 +24,11 @@ from typing import TYPE_CHECKING
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, Credentials
+    from telegram import Credentials
 
 
 class PassportData(TelegramObject):

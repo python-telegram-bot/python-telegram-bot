@@ -19,15 +19,12 @@
 # pylint: disable=redefined-builtin
 """This module contains objects that represents a Telegram ReactionType."""
 
-from typing import TYPE_CHECKING, ClassVar, Final, Literal
+from typing import ClassVar, Final, Literal
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ReactionType(TelegramObject):

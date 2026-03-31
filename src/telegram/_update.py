@@ -39,7 +39,7 @@ from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
-    from telegram import Bot, Chat, User
+    from telegram import Chat, User
 
 
 class Update(TelegramObject):

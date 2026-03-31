@@ -20,17 +20,13 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._reaction import ReactionCount, ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class MessageReactionCountUpdated(TelegramObject):

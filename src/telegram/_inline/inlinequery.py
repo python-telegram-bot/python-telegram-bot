@@ -23,7 +23,6 @@ from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING, Final
 
 from telegram import constants
-from telegram._files.location import Location
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -31,7 +30,8 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
 if TYPE_CHECKING:
-    from telegram import Bot, InlineQueryResult
+    from telegram import InlineQueryResult
+    from telegram._files.location import Location
 
 
 class InlineQuery(TelegramObject):

@@ -21,16 +21,12 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 from .transactionpartner import TransactionPartner
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class StarTransaction(TelegramObject):

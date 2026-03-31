@@ -20,12 +20,11 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
 from telegram._files.videoquality import VideoQuality
-from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
 

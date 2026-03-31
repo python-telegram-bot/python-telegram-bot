@@ -19,7 +19,7 @@
 """This module contains objects related to Telegram suggested posts."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Optional
+from typing import Final
 
 from telegram import constants
 from telegram._message import Message
@@ -27,9 +27,6 @@ from telegram._payment.stars.staramount import StarAmount
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class SuggestedPostPrice(TelegramObject):
