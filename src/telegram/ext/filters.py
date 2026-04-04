@@ -1984,6 +1984,7 @@ class StatusUpdate:
                 or StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
                 or StatusUpdate.GIVEAWAY_CREATED.check_update(update)
                 or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
+                or StatusUpdate.MANAGED_BOT_CREATED.check_update(update)
                 or StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
                 or StatusUpdate.MIGRATE.check_update(update)
                 or StatusUpdate.NEW_CHAT_MEMBERS.check_update(update)
@@ -2258,6 +2259,15 @@ class StatusUpdate:
 
     LEFT_CHAT_MEMBER = _LeftChatMember(name="filters.StatusUpdate.LEFT_CHAT_MEMBER")
     """Messages that contain :attr:`telegram.Message.left_chat_member`."""
+
+    class _ManagedBotCreated(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.managed_bot_created)
+
+    MANAGED_BOT_CREATED = _ManagedBotCreated(name="filters.StatusUpdate.MANAGED_BOT_CREATED")
+    """Messages that contain :attr:`telegram.Message.managed_bot_created`."""
 
     class _MessageAutoDeleteTimerChanged(MessageFilter):
         __slots__ = ()

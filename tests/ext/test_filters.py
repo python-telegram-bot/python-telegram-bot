@@ -1171,6 +1171,11 @@ class TestFilters:
         assert filters.StatusUpdate.CHAT_OWNER_LEFT.check_update(update)
         update.message.chat_owner_left = None
 
+        update.message.managed_bot_created = "test"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.MANAGED_BOT_CREATED.check_update(update)
+        update.message.managed_bot_created = None
+
     def test_filters_forwarded(self, update):
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = MessageOriginHiddenUser(dtm.datetime.utcnow(), 1)
