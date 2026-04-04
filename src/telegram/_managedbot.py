@@ -57,7 +57,7 @@ class ManagedBotCreated(TelegramObject):
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.bot = bot
+        self.bot: User = bot
         self._id_attrs = (self.bot,)
         self._freeze()
 
@@ -103,8 +103,8 @@ class ManagedBotUpdated(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.user = user
-        self.bot = bot
+        self.user: User = user
+        self.bot: User = bot
 
         self._id_attrs = (
             self.user,

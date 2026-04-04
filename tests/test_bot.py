@@ -58,6 +58,8 @@ from telegram import (
     InputPollOption,
     InputProfilePhotoStatic,
     InputTextMessageContent,
+    KeyboardButton,
+    KeyboardButtonRequestManagedBot,
     LabeledPrice,
     LinkPreviewOptions,
     MenuButton,
@@ -2863,6 +2865,23 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         await offline_bot.replace_managed_bot_token(1234)
+
+    # Need real user id to test with request. Otherwise returns User_id_invalid
+    async def test_save_prepared_keyboard_button(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            assert (
+                request_data.parameters.get("button")
+                == KeyboardButton(
+                    text="this", request_managed_bot=KeyboardButtonRequestManagedBot(1234)
+                ).to_dict()
+            )
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.save_prepared_keyboard_button(
+            1234,
+            KeyboardButton(text="this", request_managed_bot=KeyboardButtonRequestManagedBot(1234)),
+        )
 
 
 class TestBotWithRequest:

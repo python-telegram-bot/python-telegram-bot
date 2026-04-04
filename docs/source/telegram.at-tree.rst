@@ -155,6 +155,7 @@ Available Types
     telegram.poll
     telegram.pollanswer
     telegram.polloption
+    telegram.preparedkeyboardbutton
     telegram.proximityalerttriggered
     telegram.reactioncount
     telegram.reactiontype

@@ -63,6 +63,7 @@ from telegram import (
     InputPaidMedia,
     InputPollOption,
     InputProfilePhoto,
+    KeyboardButton,
     LinkPreviewOptions,
     MaskPosition,
     MenuButton,
@@ -72,6 +73,7 @@ from telegram import (
     PhotoSize,
     Poll,
     PreparedInlineMessage,
+    PreparedKeyboardButton,
     ReactionType,
     ReplyParameters,
     SentWebAppMessage,
@@ -5551,6 +5553,29 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def save_prepared_keyboard_button(
+        self,
+        user_id: int,
+        button: KeyboardButton,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> PreparedKeyboardButton:
+
+        return await super().save_prepared_keyboard_button(
+            user_id=user_id,
+            button=button,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -5719,3 +5744,4 @@ class ExtBot(Bot, Generic[RLARGS]):
     setChatMemberTag = set_chat_member_tag
     getManagedBotToken = get_managed_bot_token
     replaceManagedBotToken = replace_managed_bot_token
+    savePreparedKeyboardButton = save_prepared_keyboard_button

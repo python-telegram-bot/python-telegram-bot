@@ -506,6 +506,9 @@
       - Used for getting information about gifts owned and hosted by a user
     * - :meth:`~telegram.Bot.save_prepared_inline_message`
       - Used for storing a message to be sent by a user of a Mini App
+    * - :meth:`~telegram.Bot.get_prepared_keyboard_button`
+      - Used for saving a keyboard button to be used in a Mini App
+    
 
 .. raw:: html
 

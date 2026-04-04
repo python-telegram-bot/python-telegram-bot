@@ -234,6 +234,7 @@ __all__ = (
     "PollOption",
     "PreCheckoutQuery",
     "PreparedInlineMessage",
+    "PreparedKeyboardButton",
     "ProximityAlertTriggered",
     "ReactionCount",
     "ReactionType",
@@ -570,6 +571,7 @@ from ._payment.stars.revenuewithdrawalstate import (
 )
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import InputPollOption, Poll, PollAnswer, PollOption
+from ._preparedkeyboardbutton import PreparedKeyboardButton
 from ._proximityalerttriggered import ProximityAlertTriggered
 from ._reaction import (
     ReactionCount,
