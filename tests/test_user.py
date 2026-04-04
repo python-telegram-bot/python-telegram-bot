@@ -46,6 +46,7 @@ def json_dict():
         "has_main_web_app": UserTestBase.has_main_web_app,
         "has_topics_enabled": UserTestBase.has_topics_enabled,
         "allows_users_to_create_topics": UserTestBase.allows_users_to_create_topics,
+        "can_manage_bots": UserTestBase.can_manage_bots,
     }
 
 
@@ -67,6 +68,7 @@ def user(bot):
         has_main_web_app=UserTestBase.has_main_web_app,
         has_topics_enabled=UserTestBase.has_topics_enabled,
         allows_users_to_create_topics=UserTestBase.allows_users_to_create_topics,
+        can_manage_bots=UserTestBase.can_manage_bots,
     )
     user.set_bot(bot)
     user._unfreeze()
@@ -89,6 +91,7 @@ class UserTestBase:
     has_main_web_app = False
     has_topics_enabled = False
     allows_users_to_create_topics = False
+    can_manage_bots = True
 
 
 class TestUserWithoutRequest(UserTestBase):
@@ -116,6 +119,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user.has_main_web_app == self.has_main_web_app
         assert user.has_topics_enabled == self.has_topics_enabled
         assert user.allows_users_to_create_topics == self.allows_users_to_create_topics
+        assert user.can_manage_bots == self.can_manage_bots
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -136,6 +140,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user_dict["has_main_web_app"] == user.has_main_web_app
         assert user_dict["has_topics_enabled"] == user.has_topics_enabled
         assert user_dict["allows_users_to_create_topics"] == user.allows_users_to_create_topics
+        assert user_dict["can_manage_bots"] == user.can_manage_bots
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)
