@@ -2847,6 +2847,23 @@ class TestBotWithoutRequest:
 
         await offline_bot.set_chat_member_tag(1234, 5678, "This is a tag")
 
+    # TODO: If we create a managed bot, we could test this for real
+    async def test_get_managed_bot_token(self, offline_bot, monkeypatch):
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.get_managed_bot_token(1234)
+
+    async def test_replace_managed_bot_token(self, offline_bot, monkeypatch):
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.replace_managed_bot_token(1234)
+
 
 class TestBotWithRequest:
     """
