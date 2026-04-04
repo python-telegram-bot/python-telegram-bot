@@ -184,6 +184,8 @@ __all__ = (
     "Location",
     "LocationAddress",
     "LoginUrl",
+    "ManagedBotCreated",
+    "ManagedBotUpdated",
     "MaskPosition",
     "MaybeInaccessibleMessage",
     "MenuButton",
@@ -503,6 +505,7 @@ from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonReq
 from ._keyboardbuttonrequestmanagedbot import KeyboardButtonRequestManagedBot
 from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
+from ._managedbot import ManagedBotCreated, ManagedBotUpdated
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged

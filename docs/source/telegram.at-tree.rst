@@ -122,6 +122,8 @@ Available Types
     telegram.location
     telegram.locationaddress
     telegram.loginurl
+    telegram.managedbotcreated
+    telegram.managedbotupdated
     telegram.maybeinaccessiblemessage
     telegram.menubutton
     telegram.menubuttoncommands

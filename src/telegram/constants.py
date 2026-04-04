@@ -3594,6 +3594,11 @@ class UpdateType(StringEnum):
 
     .. versionadded:: 21.6
     """
+    MANAGED_BOT = "managed_bot"
+    """:obj:`str`: Updates with :attr:`telegram.Update.managed_bot`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InvoiceLimit(IntEnum):

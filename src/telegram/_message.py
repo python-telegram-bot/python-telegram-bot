@@ -57,6 +57,7 @@ from telegram._gifts import GiftInfo
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inputchecklist import InputChecklist
 from telegram._linkpreviewoptions import LinkPreviewOptions
+from telegram._managedbot import ManagedBotCreated
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._paidmedia import PaidMediaInfo
@@ -689,6 +690,10 @@ class Message(MaybeInaccessibleMessage):
             supergroups only
 
             .. versionadded:: 22.7
+        managed_bot_created (:class:`telegram.ManagedBotCreated`, optional): Service message: user
+            created a bot that will be managed by the current bot.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1105,6 +1110,10 @@ class Message(MaybeInaccessibleMessage):
             supergroups only
 
             .. versionadded:: 22.7
+        managed_bot_created (:class:`telegram.ManagedBotCreated`): Optional. Service message: user
+            created a bot that will be managed by the current bot.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1176,6 +1185,7 @@ class Message(MaybeInaccessibleMessage):
         "left_chat_member",
         "link_preview_options",
         "location",
+        "managed_bot_created",
         "media_group_id",
         "message_auto_delete_timer_changed",
         "message_thread_id",
@@ -1337,6 +1347,7 @@ class Message(MaybeInaccessibleMessage):
         chat_owner_changed: ChatOwnerChanged | None = None,
         chat_owner_left: ChatOwnerLeft | None = None,
         sender_tag: str | None = None,
+        managed_bot_created: ManagedBotCreated | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1467,6 +1478,7 @@ class Message(MaybeInaccessibleMessage):
             self.chat_owner_changed: ChatOwnerChanged | None = chat_owner_changed
             self.chat_owner_left: ChatOwnerLeft | None = chat_owner_left
             self.sender_tag: str | None = sender_tag
+            self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1687,6 +1699,9 @@ class Message(MaybeInaccessibleMessage):
             data.get("chat_owner_changed"), ChatOwnerChanged, bot
         )
         data["chat_owner_left"] = de_json_optional(data.get("chat_owner_left"), ChatOwnerLeft, bot)
+        data["managed_bot_created"] = de_json_optional(
+            data.get("managed_bot_created"), ManagedBotCreated, bot
+        )
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
