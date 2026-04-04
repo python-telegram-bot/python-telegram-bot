@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
+from telegram._keyboardbuttonrequestmanagedbot import KeyboardButtonRequestManagedBot
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
@@ -120,6 +121,14 @@ class KeyboardButton(TelegramObject):
             Premium subscription.
 
             .. versionadded:: 22.7
+        request_managed_bot (:obj:`telegram.KeyboardButtonRequestManagedBot`, optional): If
+            specified, pressing the button will ask the user to create and share a bot that will
+            be managed by the current bot. Available for bots that enabled management of other bots
+            in the `@BotFather <https://telegram.me/BotFather>` Mini App. Available in private
+            chats only.
+
+            .. versionadded:: NEXT.VERSION
+
 
     Attributes:
         text (:obj:`str`): Text of the button. If none of the fields other than :attr:`text`,
@@ -167,6 +176,13 @@ class KeyboardButton(TelegramObject):
             Premium subscription.
 
             .. versionadded:: 22.7
+        request_managed_bot (:obj:`telegram.KeyboardButtonRequestManagedBot`): Optional. If
+            specified, pressing the button will ask the user to create and share a bot that will
+            be managed by the current bot. Available for bots that enabled management of other bots
+            in the `@BotFather <https://telegram.me/BotFather>` Mini App. Available in private
+            chats only.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -174,6 +190,7 @@ class KeyboardButton(TelegramObject):
         "request_chat",
         "request_contact",
         "request_location",
+        "request_managed_bot",
         "request_poll",
         "request_users",
         "style",
@@ -192,6 +209,7 @@ class KeyboardButton(TelegramObject):
         request_users: KeyboardButtonRequestUsers | None = None,
         style: str | None = None,
         icon_custom_emoji_id: str | None = None,
+        request_managed_bot: KeyboardButtonRequestManagedBot | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -208,6 +226,7 @@ class KeyboardButton(TelegramObject):
         self.request_chat: KeyboardButtonRequestChat | None = request_chat
         self.style: str | None = style
         self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
+        self.request_managed_bot: KeyboardButtonRequestManagedBot | None = request_managed_bot
 
         self._id_attrs = (
             self.text,
@@ -238,6 +257,9 @@ class KeyboardButton(TelegramObject):
             data.get("request_chat"), KeyboardButtonRequestChat, bot
         )
         data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
+        data["request_managed_bot"] = de_json_optional(
+            data.get("request_managed_bot"), KeyboardButtonRequestManagedBot, bot
+        )
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

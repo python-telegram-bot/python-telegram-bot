@@ -116,6 +116,7 @@ Available Types
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
+    telegram.keyboardbuttonrequestmanagedbot
     telegram.keyboardbuttonrequestusers
     telegram.linkpreviewoptions
     telegram.location
