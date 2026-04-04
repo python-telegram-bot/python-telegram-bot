@@ -2347,6 +2347,8 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
+    MANAGED_BOT_CREATED = "managed_bot_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.managed_bot_created`."""
     MESSAGE_AUTO_DELETE_TIMER_CHANGED = "message_auto_delete_timer_changed"
     """:obj:`str`: Messages with :attr:`telegram.Message.message_auto_delete_timer_changed`."""
     MIGRATE_TO_CHAT_ID = "migrate_to_chat_id"
