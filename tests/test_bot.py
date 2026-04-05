@@ -72,6 +72,7 @@ from telegram import (
     Poll,
     PollOption,
     PreparedInlineMessage,
+    PreparedKeyboardButton,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     ReplyParameters,
@@ -2876,12 +2877,14 @@ class TestBotWithoutRequest:
                     text="this", request_managed_bot=KeyboardButtonRequestManagedBot(1234)
                 ).to_dict()
             )
+            return PreparedKeyboardButton(234).to_dict()
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        await offline_bot.save_prepared_keyboard_button(
+        inst = await offline_bot.save_prepared_keyboard_button(
             1234,
             KeyboardButton(text="this", request_managed_bot=KeyboardButtonRequestManagedBot(1234)),
         )
+        assert isinstance(inst, PreparedKeyboardButton)
 
 
 class TestBotWithRequest:

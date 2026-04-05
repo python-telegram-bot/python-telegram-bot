@@ -32,7 +32,7 @@ RT = TypeVar("RT")
 
 class ManagedBotUpdatedHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle
-    :attr:`updated Telegram Managed Bots <telegram.Update.manage_bot>`.
+    :attr:`updated Telegram Managed Bots <telegram.Update.managed_bot>`.
 
     .. versionadded:: NEXT.VERSION
 

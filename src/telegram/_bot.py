@@ -12177,7 +12177,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user that can use the button.
-            button (:obj:`telegram.KeyboardButton`): A object describing the
+            button (:obj:`telegram.KeyboardButton`): An object describing the
                 button to be saved. The button must be of the type
                 :attr:`~telegram.KeyboardButton.request_users`,
                 :attr:`~telegram.KeyboardButton.request_chat`, or
@@ -12194,14 +12194,17 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             "button": button,
         }
 
-        return await self._post(
-            "savePreparedKeyboardButton",
-            data,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
-            api_kwargs=api_kwargs,
+        return PreparedKeyboardButton.de_json(
+            await self._post(
+                "savePreparedKeyboardButton",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
         )
 
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
