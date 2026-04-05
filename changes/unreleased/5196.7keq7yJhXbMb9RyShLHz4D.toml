@@ -1,5 +1,5 @@
 features = "Full Support for Bot API 9.6"
-[[pull_requests]]
-uid = "5196"
-author_uids = ["harshil21"]
-closes_threads = []
+
+pull_requests = [
+    { uid = 5196, author_uid = "harshil21" },
+]
