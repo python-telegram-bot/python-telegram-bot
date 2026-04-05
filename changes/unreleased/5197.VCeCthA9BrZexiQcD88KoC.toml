@@ -1,5 +1,0 @@
-features = "API 9.6: Managed Bots"
-[[pull_requests]]
-uid = "5197"
-author_uids = ["harshil21"]
-closes_threads = []
