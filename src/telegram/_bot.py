@@ -78,6 +78,7 @@ from telegram._gifts import AcceptedGiftTypes, Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._inputchecklist import InputChecklist
+from telegram._keyboardbutton import KeyboardButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -85,6 +86,7 @@ from telegram._ownedgift import OwnedGifts
 from telegram._payment.stars.staramount import StarAmount
 from telegram._payment.stars.startransactions import StarTransactions
 from telegram._poll import InputPollOption, Poll
+from telegram._preparedkeyboardbutton import PreparedKeyboardButton
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
@@ -12081,6 +12083,130 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def get_managed_bot_token(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> str:
+        """
+        Use this method to get the token of a managed bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): User identifier of the managed bot whose token will be returned.
+
+        Returns:
+            :obj:`str`: The token of the managed bot.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+        }
+
+        return await self._post(
+            "getManagedBotToken",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def replace_managed_bot_token(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> str:
+        """
+        Use this method to revoke the current token of a managed bot and generate a new one.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): User identifier of the managed bot whose token will be replaced.
+
+        Returns:
+            :obj:`str`: The new token of the managed bot.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+        }
+
+        return await self._post(
+            "replaceManagedBotToken",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def save_prepared_keyboard_button(
+        self,
+        user_id: int,
+        button: KeyboardButton,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> PreparedKeyboardButton:
+        """
+        Stores a keyboard button that can be used by a user within a Mini App.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user that can use the button.
+            button (:obj:`telegram.KeyboardButton`): An object describing the
+                button to be saved. The button must be of the type
+                :attr:`~telegram.KeyboardButton.request_users`,
+                :attr:`~telegram.KeyboardButton.request_chat`, or
+                :attr:`~telegram.KeyboardButton.request_managed_bot`.
+
+        Returns:
+            :class:`telegram.PreparedKeyboardButton`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "button": button,
+        }
+
+        return PreparedKeyboardButton.de_json(
+            await self._post(
+                "savePreparedKeyboardButton",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -12421,3 +12547,9 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_user_profile_audios`"""
     setChatMemberTag = set_chat_member_tag
     """Alias for :meth:`set_chat_member_tag`"""
+    getManagedBotToken = get_managed_bot_token
+    """Alias for :meth:`get_managed_bot_token`"""
+    replaceManagedBotToken = replace_managed_bot_token
+    """Alias for :meth:`replace_managed_bot_token`"""
+    savePreparedKeyboardButton = save_prepared_keyboard_button
+    """Alias for :meth:`save_prepared_keyboard_button`"""

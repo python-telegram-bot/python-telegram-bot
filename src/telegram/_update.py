@@ -28,6 +28,7 @@ from telegram._chatjoinrequest import ChatJoinRequest
 from telegram._chatmemberupdated import ChatMemberUpdated
 from telegram._choseninlineresult import ChosenInlineResult
 from telegram._inline.inlinequery import InlineQuery
+from telegram._managedbot import ManagedBotUpdated
 from telegram._message import Message
 from telegram._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
 from telegram._paidmedia import PaidMediaPurchased
@@ -163,6 +164,11 @@ class Update(TelegramObject):
 
             .. versionadded:: 21.6
 
+        managed_bot (:class:`telegram.ManagedBotUpdated`, optional): A new bot was created to be
+            managed by the bot or token of a bot was changed.
+
+            .. versionadded:: NEXT.VERSION
+
 
     Attributes:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
@@ -275,6 +281,10 @@ class Update(TelegramObject):
             paid media with a non-empty payload sent by the bot in a non-channel chat.
 
             .. versionadded:: 21.6
+        managed_bot (:class:`telegram.ManagedBotUpdated`): Optional. A new bot was created to be
+            managed by the bot or token of a bot was changed.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -295,6 +305,7 @@ class Update(TelegramObject):
         "edited_channel_post",
         "edited_message",
         "inline_query",
+        "managed_bot",
         "message",
         "message_reaction",
         "message_reaction_count",
@@ -403,6 +414,12 @@ class Update(TelegramObject):
     .. versionadded:: 21.6
     """
 
+    MANAGED_BOT: Final[str] = constants.UpdateType.MANAGED_BOT
+    """:const:`telegram.constants.UpdateType.MANAGED_BOT`
+
+    .. versionadded:: NEXT.VERSION
+    """
+
     ALL_TYPES: Final[list[str]] = list(constants.UpdateType)
     """list[:obj:`str`]: A list of all available update types.
 
@@ -434,6 +451,7 @@ class Update(TelegramObject):
         edited_business_message: Message | None = None,
         deleted_business_messages: BusinessMessagesDeleted | None = None,
         purchased_paid_media: PaidMediaPurchased | None = None,
+        managed_bot: ManagedBotUpdated | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -464,6 +482,7 @@ class Update(TelegramObject):
         self.edited_business_message: Message | None = edited_business_message
         self.deleted_business_messages: BusinessMessagesDeleted | None = deleted_business_messages
         self.purchased_paid_media: PaidMediaPurchased | None = purchased_paid_media
+        self.managed_bot: ManagedBotUpdated | None = managed_bot
 
         self._effective_user: User | None = None
         self._effective_sender: User | Chat | None = None
@@ -497,6 +516,9 @@ class Update(TelegramObject):
 
         .. versionchanged:: 21.6
             This property now also considers :attr:`purchased_paid_media`.
+
+        .. versionadded:: NEXT.VERSION
+            This property now also considers :attr:`managed_bot`.
 
         Example:
             * If :attr:`message` is present, this will give
@@ -556,6 +578,9 @@ class Update(TelegramObject):
 
         elif self.purchased_paid_media:
             user = self.purchased_paid_media.from_user
+
+        elif self.managed_bot:
+            user = self.managed_bot.user
 
         self._effective_user = user
         return user
@@ -627,8 +652,8 @@ class Update(TelegramObject):
         This is the case, if :attr:`inline_query`,
         :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
         :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
-        :attr:`poll_answer`, :attr:`business_connection`, or :attr:`purchased_paid_media`
-        is present.
+        :attr:`poll_answer`, :attr:`business_connection`, :attr:`purchased_paid_media`,
+        or :attr:`managed_bot` is present.
 
         .. versionchanged:: 21.1
             This property now also considers :attr:`business_message`,
@@ -807,5 +832,6 @@ class Update(TelegramObject):
         data["purchased_paid_media"] = de_json_optional(
             data.get("purchased_paid_media"), PaidMediaPurchased, bot
         )
+        data["managed_bot"] = de_json_optional(data.get("managed_bot"), ManagedBotUpdated, bot)
 
         return super().de_json(data=data, bot=bot)

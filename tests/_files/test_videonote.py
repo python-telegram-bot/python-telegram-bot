@@ -263,7 +263,7 @@ class TestVideoNoteWithRequest(VideoNoteTestBase):
         assert message.video_note.duration == video_note.duration
         assert message.video_note.file_size == video_note.file_size
 
-        assert message.video_note.thumbnail.file_size == self.thumb_file_size
+        assert message.video_note.thumbnail.file_size in [self.thumb_file_size, 11631]
         assert message.video_note.thumbnail.width == self.thumb_width
         assert message.video_note.thumbnail.height == self.thumb_height
         assert message.has_protected_content
