@@ -23,7 +23,7 @@ import datetime as dtm
 import re
 from collections.abc import Sequence
 from html import escape
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, ClassVar, TypedDict
 
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
@@ -73,8 +73,8 @@ from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._uniquegift import UniqueGiftInfo
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
+from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
@@ -195,31 +195,20 @@ class MaybeInaccessibleMessage(TelegramObject):
         return self.date != ZERO_DATE
 
     @classmethod
-    def _de_json(
+    def de_json(
         cls,
-        data: JSONDict | None,
+        data: JSONDict,
         bot: "Bot | None" = None,
-        api_kwargs: JSONDict | None = None,
-    ) -> "MaybeInaccessibleMessage | None":
+    ) -> "MaybeInaccessibleMessage":
         """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
+        # Dispatch *before* the plan runs so that the raw ``date`` value is still
+        # an integer and can be compared to 0.
         if cls is MaybeInaccessibleMessage:
-            if data["date"] == 0:
+            data = cls._parse_data(data)
+            if data.get("date") == 0:
                 return InaccessibleMessage.de_json(data=data, bot=bot)
             return Message.de_json(data=data, bot=bot)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        # this is to include the Literal from InaccessibleMessage
-        if data["date"] == 0:
-            data["date"] = ZERO_DATE
-        else:
-            data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-
-        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
+        return super().de_json(data=data, bot=bot)
 
 
 class InaccessibleMessage(MaybeInaccessibleMessage):
@@ -257,6 +246,18 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
 
 
 class Message(MaybeInaccessibleMessage):
+    __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset(
+        {
+            "user_shared",
+            "forward_from",
+            "forward_from_chat",
+            "forward_from_message_id",
+            "forward_signature",
+            "forward_sender_name",
+            "forward_date",
+        }
+    )
+
     # fmt: off
     """This object represents a message.
 
@@ -1505,207 +1506,6 @@ class Message(MaybeInaccessibleMessage):
                 baselink = f"{baselink}?thread={self.message_thread_id}"
             return baselink
         return None
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Message":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
-        data["sender_chat"] = de_json_optional(data.get("sender_chat"), Chat, bot)
-        data["entities"] = de_list_optional(data.get("entities"), MessageEntity, bot)
-        data["caption_entities"] = de_list_optional(
-            data.get("caption_entities"), MessageEntity, bot
-        )
-        data["reply_to_message"] = de_json_optional(data.get("reply_to_message"), Message, bot)
-        data["edit_date"] = from_timestamp(data.get("edit_date"), tzinfo=loc_tzinfo)
-        data["audio"] = de_json_optional(data.get("audio"), Audio, bot)
-        data["document"] = de_json_optional(data.get("document"), Document, bot)
-        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
-        data["game"] = de_json_optional(data.get("game"), Game, bot)
-        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
-        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
-        data["story"] = de_json_optional(data.get("story"), Story, bot)
-        data["video"] = de_json_optional(data.get("video"), Video, bot)
-        data["voice"] = de_json_optional(data.get("voice"), Voice, bot)
-        data["video_note"] = de_json_optional(data.get("video_note"), VideoNote, bot)
-        data["contact"] = de_json_optional(data.get("contact"), Contact, bot)
-        data["location"] = de_json_optional(data.get("location"), Location, bot)
-        data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
-        data["new_chat_members"] = de_list_optional(data.get("new_chat_members"), User, bot)
-        data["left_chat_member"] = de_json_optional(data.get("left_chat_member"), User, bot)
-        data["new_chat_photo"] = de_list_optional(data.get("new_chat_photo"), PhotoSize, bot)
-        data["message_auto_delete_timer_changed"] = de_json_optional(
-            data.get("message_auto_delete_timer_changed"), MessageAutoDeleteTimerChanged, bot
-        )
-        data["pinned_message"] = de_json_optional(
-            data.get("pinned_message"), MaybeInaccessibleMessage, bot
-        )
-        data["invoice"] = de_json_optional(data.get("invoice"), Invoice, bot)
-        data["successful_payment"] = de_json_optional(
-            data.get("successful_payment"), SuccessfulPayment, bot
-        )
-        data["passport_data"] = de_json_optional(data.get("passport_data"), PassportData, bot)
-        data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
-        data["dice"] = de_json_optional(data.get("dice"), Dice, bot)
-        data["via_bot"] = de_json_optional(data.get("via_bot"), User, bot)
-        data["proximity_alert_triggered"] = de_json_optional(
-            data.get("proximity_alert_triggered"), ProximityAlertTriggered, bot
-        )
-        data["reply_markup"] = de_json_optional(
-            data.get("reply_markup"), InlineKeyboardMarkup, bot
-        )
-        data["video_chat_scheduled"] = de_json_optional(
-            data.get("video_chat_scheduled"), VideoChatScheduled, bot
-        )
-        data["video_chat_started"] = de_json_optional(
-            data.get("video_chat_started"), VideoChatStarted, bot
-        )
-        data["video_chat_ended"] = de_json_optional(
-            data.get("video_chat_ended"), VideoChatEnded, bot
-        )
-        data["video_chat_participants_invited"] = de_json_optional(
-            data.get("video_chat_participants_invited"), VideoChatParticipantsInvited, bot
-        )
-        data["web_app_data"] = de_json_optional(data.get("web_app_data"), WebAppData, bot)
-        data["forum_topic_closed"] = de_json_optional(
-            data.get("forum_topic_closed"), ForumTopicClosed, bot
-        )
-        data["forum_topic_created"] = de_json_optional(
-            data.get("forum_topic_created"), ForumTopicCreated, bot
-        )
-        data["forum_topic_reopened"] = de_json_optional(
-            data.get("forum_topic_reopened"), ForumTopicReopened, bot
-        )
-        data["forum_topic_edited"] = de_json_optional(
-            data.get("forum_topic_edited"), ForumTopicEdited, bot
-        )
-        data["general_forum_topic_hidden"] = de_json_optional(
-            data.get("general_forum_topic_hidden"), GeneralForumTopicHidden, bot
-        )
-        data["general_forum_topic_unhidden"] = de_json_optional(
-            data.get("general_forum_topic_unhidden"), GeneralForumTopicUnhidden, bot
-        )
-        data["write_access_allowed"] = de_json_optional(
-            data.get("write_access_allowed"), WriteAccessAllowed, bot
-        )
-        data["users_shared"] = de_json_optional(data.get("users_shared"), UsersShared, bot)
-        data["chat_shared"] = de_json_optional(data.get("chat_shared"), ChatShared, bot)
-        data["chat_background_set"] = de_json_optional(
-            data.get("chat_background_set"), ChatBackground, bot
-        )
-        data["paid_media"] = de_json_optional(data.get("paid_media"), PaidMediaInfo, bot)
-        data["refunded_payment"] = de_json_optional(
-            data.get("refunded_payment"), RefundedPayment, bot
-        )
-        data["gift"] = de_json_optional(data.get("gift"), GiftInfo, bot)
-        data["unique_gift"] = de_json_optional(data.get("unique_gift"), UniqueGiftInfo, bot)
-        data["paid_message_price_changed"] = de_json_optional(
-            data.get("paid_message_price_changed"), PaidMessagePriceChanged, bot
-        )
-
-        # Unfortunately, this needs to be here due to cyclic imports
-        from telegram._giveaway import (  # pylint: disable=C0415  # noqa: PLC0415
-            Giveaway,
-            GiveawayCompleted,
-            GiveawayCreated,
-            GiveawayWinners,
-        )
-        from telegram._messageorigin import (  # pylint: disable=C0415  # noqa: PLC0415
-            MessageOrigin,
-        )
-        from telegram._reply import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
-            ExternalReplyInfo,
-            TextQuote,
-        )
-        from telegram._suggestedpost import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
-            SuggestedPostApprovalFailed,
-            SuggestedPostApproved,
-            SuggestedPostDeclined,
-            SuggestedPostInfo,
-            SuggestedPostPaid,
-            SuggestedPostRefunded,
-        )
-
-        data["giveaway"] = de_json_optional(data.get("giveaway"), Giveaway, bot)
-        data["giveaway_completed"] = de_json_optional(
-            data.get("giveaway_completed"), GiveawayCompleted, bot
-        )
-        data["giveaway_created"] = de_json_optional(
-            data.get("giveaway_created"), GiveawayCreated, bot
-        )
-        data["giveaway_winners"] = de_json_optional(
-            data.get("giveaway_winners"), GiveawayWinners, bot
-        )
-        data["link_preview_options"] = de_json_optional(
-            data.get("link_preview_options"), LinkPreviewOptions, bot
-        )
-        data["external_reply"] = de_json_optional(
-            data.get("external_reply"), ExternalReplyInfo, bot
-        )
-        data["quote"] = de_json_optional(data.get("quote"), TextQuote, bot)
-        data["forward_origin"] = de_json_optional(data.get("forward_origin"), MessageOrigin, bot)
-        data["reply_to_story"] = de_json_optional(data.get("reply_to_story"), Story, bot)
-        data["boost_added"] = de_json_optional(data.get("boost_added"), ChatBoostAdded, bot)
-        data["sender_business_bot"] = de_json_optional(data.get("sender_business_bot"), User, bot)
-        data["direct_message_price_changed"] = de_json_optional(
-            data.get("direct_message_price_changed"), DirectMessagePriceChanged, bot
-        )
-        data["checklist"] = de_json_optional(data.get("checklist"), Checklist, bot)
-        data["checklist_tasks_done"] = de_json_optional(
-            data.get("checklist_tasks_done"), ChecklistTasksDone, bot
-        )
-        data["checklist_tasks_added"] = de_json_optional(
-            data.get("checklist_tasks_added"), ChecklistTasksAdded, bot
-        )
-        data["direct_messages_topic"] = de_json_optional(
-            data.get("direct_messages_topic"), DirectMessagesTopic, bot
-        )
-        data["suggested_post_declined"] = de_json_optional(
-            data.get("suggested_post_declined"), SuggestedPostDeclined, bot
-        )
-        data["suggested_post_paid"] = de_json_optional(
-            data.get("suggested_post_paid"), SuggestedPostPaid, bot
-        )
-        data["suggested_post_refunded"] = de_json_optional(
-            data.get("suggested_post_refunded"), SuggestedPostRefunded, bot
-        )
-        data["suggested_post_info"] = de_json_optional(
-            data.get("suggested_post_info"), SuggestedPostInfo, bot
-        )
-        data["suggested_post_approved"] = de_json_optional(
-            data.get("suggested_post_approved"), SuggestedPostApproved, bot
-        )
-        data["suggested_post_approval_failed"] = de_json_optional(
-            data.get("suggested_post_approval_failed"), SuggestedPostApprovalFailed, bot
-        )
-        data["gift_upgrade_sent"] = de_json_optional(data.get("gift_upgrade_sent"), GiftInfo, bot)
-        data["chat_owner_changed"] = de_json_optional(
-            data.get("chat_owner_changed"), ChatOwnerChanged, bot
-        )
-        data["chat_owner_left"] = de_json_optional(data.get("chat_owner_left"), ChatOwnerLeft, bot)
-
-        api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        for key in (
-            "user_shared",
-            "forward_from",
-            "forward_from_chat",
-            "forward_from_message_id",
-            "forward_signature",
-            "forward_sender_name",
-            "forward_date",
-        ):
-            if entry := data.get(key):
-                api_kwargs = {key: entry}
-
-        return super()._de_json(  # type: ignore[return-value]
-            data=data, bot=bot, api_kwargs=api_kwargs
-        )
 
     @property
     def effective_attachment(

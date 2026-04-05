@@ -20,7 +20,7 @@
 import json
 from base64 import b64decode
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, no_type_check
+from typing import no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -39,13 +39,10 @@ except ImportError:
     CRYPTO_INSTALLED = False
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import JSONDict
 from telegram.error import PassportDecryptionError
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 @no_type_check
@@ -233,15 +230,6 @@ class Credentials(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Credentials":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["secure_data"] = de_json_optional(data.get("secure_data"), SecureData, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class SecureData(TelegramObject):
     """
@@ -340,31 +328,6 @@ class SecureData(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "SecureData":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["temporary_registration"] = de_json_optional(
-            data.get("temporary_registration"), SecureValue, bot
-        )
-        data["passport_registration"] = de_json_optional(
-            data.get("passport_registration"), SecureValue, bot
-        )
-        data["rental_agreement"] = de_json_optional(data.get("rental_agreement"), SecureValue, bot)
-        data["bank_statement"] = de_json_optional(data.get("bank_statement"), SecureValue, bot)
-        data["utility_bill"] = de_json_optional(data.get("utility_bill"), SecureValue, bot)
-        data["address"] = de_json_optional(data.get("address"), SecureValue, bot)
-        data["identity_card"] = de_json_optional(data.get("identity_card"), SecureValue, bot)
-        data["driver_license"] = de_json_optional(data.get("driver_license"), SecureValue, bot)
-        data["internal_passport"] = de_json_optional(
-            data.get("internal_passport"), SecureValue, bot
-        )
-        data["passport"] = de_json_optional(data.get("passport"), SecureValue, bot)
-        data["personal_details"] = de_json_optional(data.get("personal_details"), SecureValue, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class SecureValue(TelegramObject):
     """
@@ -444,20 +407,6 @@ class SecureValue(TelegramObject):
         self.translation: tuple[FileCredentials, ...] = parse_sequence_arg(translation)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "SecureValue":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["data"] = de_json_optional(data.get("data"), DataCredentials, bot)
-        data["front_side"] = de_json_optional(data.get("front_side"), FileCredentials, bot)
-        data["reverse_side"] = de_json_optional(data.get("reverse_side"), FileCredentials, bot)
-        data["selfie"] = de_json_optional(data.get("selfie"), FileCredentials, bot)
-        data["files"] = de_list_optional(data.get("files"), FileCredentials, bot)
-        data["translation"] = de_list_optional(data.get("translation"), FileCredentials, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class _CredentialsBase(TelegramObject):

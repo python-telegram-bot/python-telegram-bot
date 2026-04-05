@@ -19,14 +19,10 @@
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class UserProfilePhotos(TelegramObject):
@@ -70,12 +66,3 @@ class UserProfilePhotos(TelegramObject):
         self._id_attrs = (self.total_count, self.photos)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UserProfilePhotos":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["photos"] = [PhotoSize.de_list(photo, bot) for photo in data["photos"]]
-
-        return super().de_json(data=data, bot=bot)

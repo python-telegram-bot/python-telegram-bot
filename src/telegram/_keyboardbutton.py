@@ -18,17 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
-from typing import TYPE_CHECKING
-
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class KeyboardButton(TelegramObject):
@@ -181,6 +175,12 @@ class KeyboardButton(TelegramObject):
         "web_app",
     )
 
+    __REMOVED_API_FIELDS__ = frozenset(
+        {
+            "request_user",
+        }
+    )
+
     def __init__(
         self,
         text: str,
@@ -222,27 +222,3 @@ class KeyboardButton(TelegramObject):
         )
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "KeyboardButton":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["request_poll"] = de_json_optional(
-            data.get("request_poll"), KeyboardButtonPollType, bot
-        )
-        data["request_users"] = de_json_optional(
-            data.get("request_users"), KeyboardButtonRequestUsers, bot
-        )
-        data["request_chat"] = de_json_optional(
-            data.get("request_chat"), KeyboardButtonRequestChat, bot
-        )
-        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
-
-        api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if request_user := data.get("request_user"):
-            api_kwargs = {"request_user": request_user}
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)

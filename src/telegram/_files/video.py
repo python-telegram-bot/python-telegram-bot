@@ -20,17 +20,13 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
 from telegram._files.videoquality import VideoQuality
-from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class Video(_BaseThumbedMedium):
@@ -167,13 +163,3 @@ class Video(_BaseThumbedMedium):
     @property
     def start_timestamp(self) -> dtm.timedelta | None | int:
         return get_timedelta_value(self._start_timestamp, attribute="start_timestamp")
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Video":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["cover"] = de_list_optional(data.get("cover"), PhotoSize, bot)
-        data["qualities"] = de_list_optional(data.get("qualities"), VideoQuality, bot)
-
-        return super().de_json(data=data, bot=bot)
