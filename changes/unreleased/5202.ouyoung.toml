@@ -1,0 +1,5 @@
+features = "Updates to the poll section in bot API 9.6"
+
+pull_requests = [
+    { uid = "5202", author_uid = "ouyooung" },
+]
