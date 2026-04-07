@@ -78,7 +78,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
-    CorrectOptionID,
+    CorrectOptionIds,
     JSONDict,
     MarkdownVersion,
     ODVInput,
@@ -3419,8 +3419,10 @@ class Message(MaybeInaccessibleMessage):
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
+        allows_revoting: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
         is_closed: bool | None = None,
+        shuffle_options: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
         explanation: str | None = None,
@@ -3483,7 +3485,9 @@ class Message(MaybeInaccessibleMessage):
             is_anonymous=is_anonymous,
             type=type,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            correct_option_ids=correct_option_ids,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,

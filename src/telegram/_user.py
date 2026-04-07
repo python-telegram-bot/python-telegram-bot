@@ -28,7 +28,7 @@ from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
-    CorrectOptionID,
+    CorrectOptionIds,
     JSONDict,
     ODVInput,
     TimePeriod,
@@ -1699,8 +1699,10 @@ class User(TelegramObject):
         is_anonymous: bool | None = None,
         type: str | None = None,
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
+        allows_revoting: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
         is_closed: bool | None = None,
+        shuffle_options: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
         explanation: str | None = None,
@@ -1717,8 +1719,8 @@ class User(TelegramObject):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         *,
-        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: int | None = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1745,7 +1747,9 @@ class User(TelegramObject):
             is_anonymous=is_anonymous,
             type=type,  # pylint=pylint,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            correct_option_ids=correct_option_ids,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -1755,6 +1759,8 @@ class User(TelegramObject):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             explanation=explanation,
             explanation_parse_mode=explanation_parse_mode,
             open_period=open_period,
@@ -1767,8 +1773,6 @@ class User(TelegramObject):
             business_connection_id=business_connection_id,
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
-            message_effect_id=message_effect_id,
-            allow_paid_broadcast=allow_paid_broadcast,
         )
 
     async def send_gift(
