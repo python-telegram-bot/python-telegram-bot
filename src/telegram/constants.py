@@ -3439,11 +3439,13 @@ class PollLimit(IntEnum):
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MAX_OPEN_PERIOD = 600
+    MAX_OPEN_PERIOD = 2628000
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.send_poll.open_period` parameter of :meth:`telegram.Bot.send_poll`.
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
+    
+    .. versionadded:: NEXT.VERSION
     """
 
 

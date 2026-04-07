@@ -101,7 +101,7 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.strings import to_camel_case
 from telegram._utils.types import (
     BaseUrl,
-    CorrectOptionID,
+    CorrectOptionIds,
     FileInput,
     JSONDict,
     ODVInput,
@@ -7597,8 +7597,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
+        allows_revoting: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
         is_closed: bool | None = None,
+        shuffle_options: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
         explanation: str | None = None,
@@ -7650,8 +7654,26 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.REGULAR`, defaults to :tg-const:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): :obj:`True`, if the poll allows
                 multiple answers, ignored for polls in quiz mode, defaults to :obj:`False`.
-            correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
-                option, required for polls in quiz mode.
+            allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to
+                change the chosen answer options
+
+                .. versionadded:: NEXT.VERSION
+            allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
+                added to the poll after creation; not supported for anonymous polls and quizzes
+
+                .. versionadded:: NEXT.VERSION
+            shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
+                shown in random order
+
+                .. versionadded:: NEXT.VERSION
+            hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
+                must be shown only after the poll closes
+
+                .. versionadded:: NEXT.VERSION
+            correct_option_ids (Sequence[:class:`int`], optional): 0-based identifier of the
+                correct answer option, required for polls in quiz mode.
+
+                .. versionadded:: NEXT.VERSION
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
                 answer or taps on the lamp icon in a quiz-style poll,
                 0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
@@ -7755,7 +7777,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_anonymous": is_anonymous,
             "type": type,
             "allows_multiple_answers": allows_multiple_answers,
-            "correct_option_id": correct_option_id,
+            "allow_adding_options": allow_adding_options,
+            "allows_revoting": allows_revoting,
+            "shuffle_options": shuffle_options,
+            "hide_results_until_closes": hide_results_until_closes,
+            "correct_option_ids": correct_option_ids,
             "is_closed": is_closed,
             "explanation": explanation,
             "explanation_entities": explanation_entities,

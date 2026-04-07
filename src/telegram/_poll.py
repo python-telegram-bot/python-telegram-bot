@@ -338,9 +338,23 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
-            option. Available only for closed polls in the quiz mode, which were sent
-            (not forwarded), by the bot or to a private chat with the bot.
+        allows_revoting (:obj:`bool`): :obj:`True`, if the poll allows to change the chosen
+            answer options
+
+            .. versionadded:: NEXT.VERSION
+        correct_option_ids (Sequence[:class:`int`], optional): Array of 0-based identifiers of
+            the correct answer options. Available only for polls in quiz mode which are closed or
+            were sent (not forwarded) by the bot or to the private chat with the bot.
+
+            .. versionadded:: NEXT.VERSION
+        description (:obj:`str`, optional): Description of the poll;
+            for polls inside the :class:`~telegram.Message` object only.
+
+            .. versionadded:: NEXT.VERSION
+        description_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
+            entities like usernames, URLs, bot commands, etc. that appear in the description
+
+            .. versionadded:: NEXT.VERSION
         explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll,
             0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
@@ -382,9 +396,23 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer
-            option. Available only for closed polls in the quiz mode, which were sent
-            (not forwarded), by the bot or to a private chat with the bot.
+        allows_revoting (:obj:`bool`): :obj:`True`, if the poll allows to change the chosen
+            answer options
+
+            .. versionadded:: NEXT.VERSION
+        correct_option_ids (tuple[:class:`int`]): Array of 0-based identifiers of the
+            correct answer options. Available only for polls in quiz mode which are closed or were
+            sent (not forwarded) by the bot or to the private chat with the bot.
+
+            .. versionadded:: NEXT.VERSION
+        description (:obj:`str`): Optional. Description of the poll;
+            for polls inside the Message object only
+
+            .. versionadded:: NEXT.VERSION
+        description_entities (tuple[:class:`telegram.MessageEntity`]): Special
+            entities like usernames, URLs, bot commands, etc. that appear in the description
+
+            .. versionadded:: NEXT.VERSION
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll,
             0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
@@ -419,8 +447,11 @@ class Poll(TelegramObject):
     __slots__ = (
         "_open_period",
         "allows_multiple_answers",
+        "allows_revoting",
         "close_date",
-        "correct_option_id",
+        "correct_option_ids",
+        "description",
+        "description_entities",
         "explanation",
         "explanation_entities",
         "id",
@@ -443,7 +474,10 @@ class Poll(TelegramObject):
         is_anonymous: bool,
         type: str,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool,
-        correct_option_id: int | None = None,
+        allows_revoting: bool,
+        correct_option_ids: Sequence[int] | None = None,
+        description: str | None = None,
+        description_entities: Sequence[MessageEntity] | None = None,
         explanation: str | None = None,
         explanation_entities: Sequence[MessageEntity] | None = None,
         open_period: TimePeriod | None = None,
@@ -461,7 +495,12 @@ class Poll(TelegramObject):
         self.is_anonymous: bool = is_anonymous
         self.type: str = enum.get_member(constants.PollType, type, type)
         self.allows_multiple_answers: bool = allows_multiple_answers
-        self.correct_option_id: int | None = correct_option_id
+        self.allows_revoting: bool = allows_revoting
+        self.correct_option_ids: tuple[int, ...] | None = parse_sequence_arg(correct_option_ids)
+        self.description: str | None = description
+        self.description_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
+            description_entities
+        )
         self.explanation: str | None = explanation
         self.explanation_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
             explanation_entities
