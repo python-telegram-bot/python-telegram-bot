@@ -7597,17 +7597,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         options: Sequence["str | InputPollOption"],
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
-        correct_option_id: CorrectOptionID | None = None,
         allows_multiple_answers: bool | None = None,
-        allows_revoting: bool | None = None,
-        allow_adding_options: bool | None = None,
-        hide_results_until_closes: bool | None = None,
-        correct_option_ids: CorrectOptionIds | None = None,
+        correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
-        description: str | None = None,
-        description_parse_mode: str | None = None,
-        description_entities: Sequence["MessageEntity"] | None = None,
-        shuffle_options: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
         explanation: str | None = None,
@@ -7623,6 +7615,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        allows_revoting: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        description: str | None = None,
+        description_parse_mode: str | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
+        shuffle_options: bool | None = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
@@ -7661,25 +7661,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 multiple answers, ignored for polls in quiz mode, defaults to :obj:`False`.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
-            allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to
-                change the chosen answer options, defaults to :obj:`False` for quizzes and to :obj:`True` for regular polls
-
-                .. versionadded:: NEXT.VERSION
-            allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
-                added to the poll after creation; not supported for anonymous polls and quizzes
-
-                .. versionadded:: NEXT.VERSION
-            shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
-                shown in random order
-
-                .. versionadded:: NEXT.VERSION
-            hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
-                must be shown only after the poll closes
-
-                .. versionadded:: NEXT.VERSION
-            correct_option_ids (Sequence[:class:`int`], optional): A list of monotonically increasing 0-based identifiers of the correct answer options, required for polls in quiz mode.
-
-                .. versionadded:: NEXT.VERSION
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
                 answer or taps on the lamp icon in a quiz-style poll,
                 0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
@@ -7710,21 +7691,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 |tz-naive-dtms|
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be
                 immediately closed. This can be useful for poll preview.
-            description (:obj:`str`, optional): Description of the poll to be sent,
-                0-:tg-const:`telegram.Poll.MAX_DESCRIPTION_CHARACTERS` characters
-                after entities parsing.
-
-                .. versionadded:: NEXT.VERSION
-            description_parse_mode (:obj:`str`, optional): Mode for parsing entities
-                in the poll description. See the constants
-                in :class:`telegram.constants.ParseMode`
-
-                .. versionadded:: NEXT.VERSION
-            description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
-                JSON-serialized list of special entities that appear in the poll description,
-                which can be specified instead of :paramref:`description_parse_mode`
-
-                .. versionadded:: NEXT.VERSION
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -7759,6 +7725,43 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
                 .. versionadded:: 21.7
+            allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to
+                change the chosen answer options, defaults to :obj:`False`
+                for quizzes and to :obj:`True` for regular polls
+
+                .. versionadded:: NEXT.VERSION
+            allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
+                added to the poll after creation; not supported for anonymous polls and quizzes
+
+                .. versionadded:: NEXT.VERSION
+            shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
+                shown in random order
+
+                .. versionadded:: NEXT.VERSION
+            hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
+                must be shown only after the poll closes
+
+                .. versionadded:: NEXT.VERSION
+            correct_option_ids (Sequence[:class:`int`], optional): A list of monotonically
+                increasing 0-based identifiers of the correct answer options,
+                required for polls in quiz mode.
+
+                .. versionadded:: NEXT.VERSION
+            description (:obj:`str`, optional): Description of the poll to be sent,
+                0-:tg-const:`telegram.Poll.MAX_DESCRIPTION_CHARACTERS` characters
+                after entities parsing.
+
+                .. versionadded:: NEXT.VERSION
+            description_parse_mode (:obj:`str`, optional): Mode for parsing entities
+                in the poll description. See the constants
+                in :class:`telegram.constants.ParseMode`
+
+                .. versionadded:: NEXT.VERSION
+            description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
+                JSON-serialized list of special entities that appear in the poll description,
+                which can be specified instead of :paramref:`description_parse_mode`
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
