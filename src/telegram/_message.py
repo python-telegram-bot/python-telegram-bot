@@ -65,7 +65,7 @@ from telegram._passport.passportdata import PassportData
 from telegram._payment.invoice import Invoice
 from telegram._payment.refundedpayment import RefundedPayment
 from telegram._payment.successfulpayment import SuccessfulPayment
-from telegram._poll import Poll
+from telegram._poll import Poll, PollOptionAdded, PollOptionDeleted
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._reply import ReplyParameters
 from telegram._shared import ChatShared, UsersShared
@@ -79,6 +79,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
+    CorrectOptionID,
     CorrectOptionIds,
     JSONDict,
     MarkdownVersion,
@@ -689,6 +690,18 @@ class Message(MaybeInaccessibleMessage):
             supergroups only
 
             .. versionadded:: 22.7
+        poll_option_added (:class:`telegram.PollOptionAdded`, optional): Service message:
+            answer option was added to a poll.
+
+            .. versionadded:: NEXT.VERSION
+        poll_option_deleted (:class:`telegram.PollOptionDeleted`, optional): Service message:
+            answer option was deleted from a poll.
+
+            .. versionadded:: NEXT.VERSION
+        reply_to_poll_option_id (:obj:`str`, optional): Persistent
+            identifier of the specific poll option that is being replied to.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1105,6 +1118,18 @@ class Message(MaybeInaccessibleMessage):
             supergroups only
 
             .. versionadded:: 22.7
+        poll_option_added (:class:`telegram.PollOptionAdded`): Optional. Service message:
+            answer option was added to a poll.
+
+            .. versionadded:: NEXT.VERSION
+        poll_option_deleted (:class:`telegram.PollOptionDeleted`): Optional. Service message:
+            answer option was deleted from a poll.
+
+            .. versionadded:: NEXT.VERSION
+        reply_to_poll_option_id (:obj:`str`): Optional. Persistent
+            identifier of the specific poll option that is being replied to.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1191,12 +1216,15 @@ class Message(MaybeInaccessibleMessage):
         "photo",
         "pinned_message",
         "poll",
+        "poll_option_added",
+        "poll_option_deleted",
         "proximity_alert_triggered",
         "quote",
         "refunded_payment",
         "reply_markup",
         "reply_to_checklist_task_id",
         "reply_to_message",
+        "reply_to_poll_option_id",
         "reply_to_story",
         "sender_boost_count",
         "sender_business_bot",
@@ -1315,6 +1343,8 @@ class Message(MaybeInaccessibleMessage):
         effect_id: str | None = None,
         show_caption_above_media: bool | None = None,
         paid_media: PaidMediaInfo | None = None,
+        poll_option_added: PollOptionAdded | None = None,
+        poll_option_deleted: PollOptionDeleted | None = None,
         refunded_payment: RefundedPayment | None = None,
         gift: GiftInfo | None = None,
         unique_gift: UniqueGiftInfo | None = None,
@@ -1337,6 +1367,7 @@ class Message(MaybeInaccessibleMessage):
         chat_owner_changed: ChatOwnerChanged | None = None,
         chat_owner_left: ChatOwnerLeft | None = None,
         sender_tag: str | None = None,
+        reply_to_poll_option_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1467,6 +1498,9 @@ class Message(MaybeInaccessibleMessage):
             self.chat_owner_changed: ChatOwnerChanged | None = chat_owner_changed
             self.chat_owner_left: ChatOwnerLeft | None = chat_owner_left
             self.sender_tag: str | None = sender_tag
+            self.poll_option_added: PollOptionAdded | None = poll_option_added
+            self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
+            self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -3457,33 +3491,39 @@ class Message(MaybeInaccessibleMessage):
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        allows_revoting: bool | None = None,
-        correct_option_ids: CorrectOptionIds | None = None,
+        correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
-        shuffle_options: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
         explanation: str | None = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: TimePeriod | None = None,
-        close_date: int | (dtm.datetime | None) = None,
+        close_date: int | dtm.datetime | None = None,
         explanation_entities: Sequence["MessageEntity"] | None = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        message_thread_id: int | None = None,
         reply_parameters: "ReplyParameters | None" = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        shuffle_options: bool | None = None,
+        allows_revoting: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        description: str | None = None,
+        description_parse_mode: str | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
         *,
-        reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        do_quote: bool | (_ReplyKwargs | None) = None,
+        reply_to_message_id: int | None = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -3523,6 +3563,7 @@ class Message(MaybeInaccessibleMessage):
             is_anonymous=is_anonymous,
             type=type,
             allows_multiple_answers=allows_multiple_answers,
+            correct_option_id=correct_option_id,
             allows_revoting=allows_revoting,
             shuffle_options=shuffle_options,
             correct_option_ids=correct_option_ids,
@@ -3547,6 +3588,11 @@ class Message(MaybeInaccessibleMessage):
             question_entities=question_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
+            hide_results_until_closes=hide_results_until_closes,
+            allow_adding_options=allow_adding_options,
         )
 
     async def reply_dice(

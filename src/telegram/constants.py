@@ -3444,7 +3444,13 @@ class PollLimit(IntEnum):
     :paramref:`~telegram.Bot.send_poll.open_period` parameter of :meth:`telegram.Bot.send_poll`.
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
-    
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MAX_DESCRIPTION_CHARACTERS = 1024
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.send_poll.description` parameter of :meth:`telegram.Bot.send_poll`.
+
     .. versionadded:: NEXT.VERSION
     """
 

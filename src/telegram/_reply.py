@@ -410,6 +410,10 @@ class ReplyParameters(TelegramObject):
             replied to.
 
             .. versionadded:: 22.4
+        poll_option_id (:obj:`str`, optional): Persistent
+            identifier of the specific poll option to be replied to.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
@@ -437,6 +441,10 @@ class ReplyParameters(TelegramObject):
             replied to.
 
             .. versionadded:: 22.4
+        poll_option_id (:obj:`str`): Optional. Persistent
+            identifier of the specific poll option to be replied to.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -444,6 +452,7 @@ class ReplyParameters(TelegramObject):
         "chat_id",
         "checklist_task_id",
         "message_id",
+        "poll_option_id",
         "quote",
         "quote_entities",
         "quote_parse_mode",
@@ -460,6 +469,7 @@ class ReplyParameters(TelegramObject):
         quote_entities: Sequence[MessageEntity] | None = None,
         quote_position: int | None = None,
         checklist_task_id: int | None = None,
+        poll_option_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -473,6 +483,7 @@ class ReplyParameters(TelegramObject):
         self.quote_entities: tuple[MessageEntity, ...] | None = parse_sequence_arg(quote_entities)
         self.quote_position: int | None = quote_position
         self.checklist_task_id: int | None = checklist_task_id
+        self.poll_option_id: str | None = poll_option_id
 
         self._id_attrs = (self.message_id,)
 

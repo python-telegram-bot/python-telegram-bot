@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._chat import Chat
+from telegram._message import MaybeInaccessibleMessage
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -118,10 +119,26 @@ class PollOption(TelegramObject):
     considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
 
     Args:
+        persistent_id (:obj:`str`): Unique
+            identifier of the option, persistent on option addition and deletion.
+
+            .. versionadded:: NEXT.VERSION
         text (:obj:`str`): Option text,
             :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
             characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
+        added_by_user (:class:`telegram.User`, optional): User who added the option;
+            omitted if the option wasn't added by a user after poll creation.
+
+            .. versionadded:: NEXT.VERSION
+        added_by_chat (:class:`telegram.Chat`, optional): Chat that added the option;
+            omitted if the option wasn't added by a chat after poll creation.
+
+            .. versionadded:: NEXT.VERSION
+        addition_date (:obj:`int`, optional): Point in time (Unix timestamp)
+            when the option was added; omitted if the option existed in the original poll.
+
+            .. versionadded:: NEXT.VERSION
         text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities
             that appear in the option text. Currently, only custom emoji entities are allowed in
             poll option texts.
@@ -129,10 +146,26 @@ class PollOption(TelegramObject):
             .. versionadded:: 21.2
 
     Attributes:
+        persistent_id (:obj:`str`): Unique
+            identifier of the option, persistent on option addition and deletion.
+
+            .. versionadded:: NEXT.VERSION
         text (:obj:`str`): Option text,
             :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
             characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
+        added_by_user (:class:`telegram.User`): Optional. User who added the option;
+            omitted if the option wasn't added by a user after poll creation.
+
+            .. versionadded:: NEXT.VERSION
+        added_by_chat (:class:`telegram.Chat`): Optional. Chat that added the option;
+            omitted if the option wasn't added by a chat after poll creation.
+
+            .. versionadded:: NEXT.VERSION
+        addition_date (:obj:`int`): Optional. Point in time (Unix timestamp)
+            when the option was added; omitted if the option existed in the original poll.
+
+            .. versionadded:: NEXT.VERSION
         text_entities (tuple[:class:`telegram.MessageEntity`]): Special entities
             that appear in the option text. Currently, only custom emoji entities are allowed in
             poll option texts.
@@ -142,19 +175,35 @@ class PollOption(TelegramObject):
 
     """
 
-    __slots__ = ("text", "text_entities", "voter_count")
+    __slots__ = (
+        "added_by_chat",
+        "added_by_user",
+        "addition_date",
+        "persistent_id",
+        "text",
+        "text_entities",
+        "voter_count",
+    )
 
     def __init__(
         self,
         text: str,
         voter_count: int,
+        persistent_id: str | None = None,
         text_entities: Sequence[MessageEntity] | None = None,
+        added_by_user: User | None = None,
+        added_by_chat: Chat | None = None,
+        addition_date: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+        self.persistent_id: str | None = persistent_id
         self.text: str = text
         self.voter_count: int = voter_count
+        self.added_by_user: User | None = added_by_user
+        self.added_by_chat: Chat | None = added_by_chat
+        self.addition_date: int | None = addition_date
         self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
 
         self._id_attrs = (self.text, self.voter_count)
@@ -258,6 +307,10 @@ class PollAnswer(TelegramObject):
             poll, if the voter is anonymous.
 
             .. versionadded:: 20.5
+        option_persistent_ids (Sequence[:obj:`str`]): Persistent identifiers of the
+            chosen answer options. May be empty if the vote was retracted.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -276,10 +329,14 @@ class PollAnswer(TelegramObject):
             poll, if the voter is anonymous.
 
             .. versionadded:: 20.5
+        option_persistent_ids (tuple[:obj:`str`]): Persistent identifiers of the
+            chosen answer options. May be empty if the vote was retracted.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("option_ids", "poll_id", "user", "voter_chat")
+    __slots__ = ("option_ids", "option_persistent_ids", "poll_id", "user", "voter_chat")
 
     def __init__(
         self,
@@ -287,6 +344,7 @@ class PollAnswer(TelegramObject):
         option_ids: Sequence[int],
         user: User | None = None,
         voter_chat: Chat | None = None,
+        option_persistent_ids: Sequence[str] | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -295,6 +353,7 @@ class PollAnswer(TelegramObject):
         self.voter_chat: Chat | None = voter_chat
         self.option_ids: tuple[int, ...] = parse_sequence_arg(option_ids)
         self.user: User | None = user
+        self.option_persistent_ids: tuple[str, ...] = parse_sequence_arg(option_persistent_ids)
 
         self._id_attrs = (
             self.poll_id,
@@ -312,6 +371,177 @@ class PollAnswer(TelegramObject):
 
         data["user"] = de_json_optional(data.get("user"), User, bot)
         data["voter_chat"] = de_json_optional(data.get("voter_chat"), Chat, bot)
+
+        return super().de_json(data=data, bot=bot)
+
+
+class PollOptionAdded(TelegramObject):
+    """
+    Describes a service message about an option added to a poll.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`option_persistent_id` is equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        poll_message (:class:`telegram.MaybeInaccessibleMessage`, optional): Message
+            containing the poll to which the option was added, if known.
+            Note that the Message object in this field will not contain the
+            reply_to_message field even if it itself is a reply.
+
+            .. versionadded:: NEXT.VERSION
+        option_persistent_id (:obj:`str`): Unique identifier of the added option.
+
+            .. versionadded:: NEXT.VERSION
+        option_text (:obj:`str`, optional): Option text.
+
+            .. versionadded:: NEXT.VERSION
+        option_text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
+            entities that appear in the option_text.
+
+            .. versionadded:: NEXT.VERSION
+
+    Attributes:
+        poll_message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Message
+            containing the poll to which the option was added, if known.
+            Note that the Message object in this field will not contain the
+            reply_to_message field even if it itself is a reply.
+
+            .. versionadded:: NEXT.VERSION
+        option_persistent_id (:obj:`str`): Unique identifier of the added option.
+
+            .. versionadded:: NEXT.VERSION
+        option_text (:obj:`str`, optional): Option text.
+
+            .. versionadded:: NEXT.VERSION
+        option_text_entities (tuple[:class:`telegram.MessageEntity`]): Special
+            entities that appear in the option_text.
+
+            .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ("option_persistent_id", "option_text", "option_text_entities", "poll_message")
+
+    def __init__(
+        self,
+        option_persistent_id: str,
+        option_text: str,
+        poll_message: MaybeInaccessibleMessage | None = None,
+        option_text_entities: Sequence[MessageEntity] | None = None,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.option_persistent_id: str = option_persistent_id
+        self.option_text: str = option_text
+        self.poll_message: MaybeInaccessibleMessage | None = poll_message
+
+        self.option_text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
+            option_text_entities
+        )
+
+        self._id_attrs = (self.option_persistent_id,)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollOptionAdded":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["poll_message"] = de_json_optional(
+            data.get("poll_message"), MaybeInaccessibleMessage, bot
+        )
+        data["option_text_entities"] = de_list_optional(
+            data.get("option_text_entities"), MessageEntity, bot
+        )
+
+        return super().de_json(data=data, bot=bot)
+
+
+class PollOptionDeleted(TelegramObject):
+    """
+    Describes a service message about an option deleted from a poll.
+
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, considered equal, if their :attr:`option_persistent_id` is equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        poll_message (:class:`telegram.MaybeInaccessibleMessage`, optional): Message
+            containing the poll to which the option was added, if known.
+            Note that the Message object in this field will not contain the
+            reply_to_message field even if it itself is a reply.
+
+            .. versionadded:: NEXT.VERSION
+        option_persistent_id (:obj:`str`): Unique identifier of the added option.
+
+            .. versionadded:: NEXT.VERSION
+        option_text (:obj:`str`, optional): Option text.
+
+            .. versionadded:: NEXT.VERSION
+        option_text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
+            entities that appear in the option_text.
+
+            .. versionadded:: NEXT.VERSION
+
+    Attributes:
+        poll_message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Message
+            containing the poll to which the option was added, if known.
+            Note that the Message object in this field will not contain the
+            reply_to_message field even if it itself is a reply.
+
+            .. versionadded:: NEXT.VERSION
+        option_persistent_id (:obj:`str`): Unique identifier of the added option.
+
+            .. versionadded:: NEXT.VERSION
+        option_text (:obj:`str`, optional): Option text.
+
+            .. versionadded:: NEXT.VERSION
+        option_text_entities (tuple[:class:`telegram.MessageEntity`]): Special
+            entities that appear in the option_text.
+
+            .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ("option_persistent_id", "option_text", "option_text_entities", "poll_message")
+
+    def __init__(
+        self,
+        option_persistent_id: str,
+        option_text: str,
+        poll_message: MaybeInaccessibleMessage | None = None,
+        option_text_entities: Sequence[MessageEntity] | None = None,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.option_persistent_id: str = option_persistent_id
+        self.option_text: str = option_text
+        self.poll_message: MaybeInaccessibleMessage | None = poll_message
+
+        self.option_text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
+            option_text_entities
+        )
+
+        self._id_attrs = (self.option_persistent_id,)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollOptionDeleted":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["poll_message"] = de_json_optional(
+            data.get("poll_message"), MaybeInaccessibleMessage, bot
+        )
+        data["option_text_entities"] = de_list_optional(
+            data.get("option_text_entities"), MessageEntity, bot
+        )
 
         return super().de_json(data=data, bot=bot)
 
@@ -342,6 +572,9 @@ class Poll(TelegramObject):
             answer options
 
             .. versionadded:: NEXT.VERSION
+        correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
+            option. Available only for closed polls in the quiz mode, which were sent
+            (not forwarded), by the bot or to a private chat with the bot.
         correct_option_ids (Sequence[:class:`int`], optional): Array of 0-based identifiers of
             the correct answer options. Available only for polls in quiz mode which are closed or
             were sent (not forwarded) by the bot or to the private chat with the bot.
@@ -400,6 +633,9 @@ class Poll(TelegramObject):
             answer options
 
             .. versionadded:: NEXT.VERSION
+        correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer
+            option. Available only for closed polls in the quiz mode, which were sent
+            (not forwarded), by the bot or to a private chat with the bot.
         correct_option_ids (tuple[:class:`int`]): Array of 0-based identifiers of the
             correct answer options. Available only for polls in quiz mode which are closed or were
             sent (not forwarded) by the bot or to the private chat with the bot.
@@ -449,6 +685,7 @@ class Poll(TelegramObject):
         "allows_multiple_answers",
         "allows_revoting",
         "close_date",
+        "correct_option_id",
         "correct_option_ids",
         "description",
         "description_entities",
@@ -475,6 +712,7 @@ class Poll(TelegramObject):
         type: str,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool,
         allows_revoting: bool,
+        correct_option_id: int | None = None,
         correct_option_ids: Sequence[int] | None = None,
         description: str | None = None,
         description_entities: Sequence[MessageEntity] | None = None,
@@ -496,6 +734,7 @@ class Poll(TelegramObject):
         self.type: str = enum.get_member(constants.PollType, type, type)
         self.allows_multiple_answers: bool = allows_multiple_answers
         self.allows_revoting: bool = allows_revoting
+        self.correct_option_id: int | None = correct_option_id
         self.correct_option_ids: tuple[int, ...] | None = parse_sequence_arg(correct_option_ids)
         self.description: str | None = description
         self.description_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
@@ -690,4 +929,9 @@ class Poll(TelegramObject):
     """:const:`telegram.constants.PollLimit.MAX_OPTION_NUMBER`
 
     .. versionadded:: 20.0
+    """
+    MAX_DESCRIPTION_CHARACTERS: Final[int] = constants.PollLimit.MAX_DESCRIPTION_CHARACTERS
+    """:const:`telegram.constants.PollLimit.MAX_DESCRIPTION_CHARACTERS`
+
+    .. versionadded:: NEXT.VERSION
     """

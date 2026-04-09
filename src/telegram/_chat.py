@@ -33,6 +33,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
+    CorrectOptionID,
     CorrectOptionIds,
     FileInput,
     JSONDict,
@@ -2279,10 +2280,8 @@ class _ChatBase(TelegramObject):
         is_anonymous: bool | None = None,
         type: str | None = None,
         allows_multiple_answers: bool | None = None,
-        allows_revoting: bool | None = None,
-        correct_option_ids: CorrectOptionIds | None = None,
+        correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
-        shuffle_options: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
         explanation: str | None = None,
@@ -2298,6 +2297,14 @@ class _ChatBase(TelegramObject):
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        shuffle_options: bool | None = None,
+        allows_revoting: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        description: str | None = None,
+        description_parse_mode: str | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
@@ -2324,6 +2331,7 @@ class _ChatBase(TelegramObject):
             is_anonymous=is_anonymous,
             type=type,  # pylint=pylint,
             allows_multiple_answers=allows_multiple_answers,
+            correct_option_id=correct_option_id,
             allows_revoting=allows_revoting,
             shuffle_options=shuffle_options,
             correct_option_ids=correct_option_ids,
@@ -2350,6 +2358,11 @@ class _ChatBase(TelegramObject):
             business_connection_id=business_connection_id,
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
+            hide_results_until_closes=hide_results_until_closes,
+            allow_adding_options=allow_adding_options,
         )
 
     async def send_copy(

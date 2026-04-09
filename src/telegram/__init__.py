@@ -229,6 +229,8 @@ __all__ = (
     "Poll",
     "PollAnswer",
     "PollOption",
+    "PollOptionAdded",
+    "PollOptionDeleted",
     "PreCheckoutQuery",
     "PreparedInlineMessage",
     "ProximityAlertTriggered",
@@ -564,7 +566,14 @@ from ._payment.stars.revenuewithdrawalstate import (
     RevenueWithdrawalStateSucceeded,
 )
 from ._payment.successfulpayment import SuccessfulPayment
-from ._poll import InputPollOption, Poll, PollAnswer, PollOption
+from ._poll import (
+    InputPollOption,
+    Poll,
+    PollAnswer,
+    PollOption,
+    PollOptionAdded,
+    PollOptionDeleted,
+)
 from ._proximityalerttriggered import ProximityAlertTriggered
 from ._reaction import (
     ReactionCount,
