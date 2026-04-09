@@ -23,15 +23,14 @@ from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
-from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram._files.file import File
 
 
 class Sticker(_BaseThumbedMedium):
@@ -144,6 +143,11 @@ class Sticker(_BaseThumbedMedium):
         "type",
         "width",
     )
+    __REMOVED_API_FIELDS__ = frozenset(
+        {
+            "thumb",
+        }
+    )
 
     def __init__(
         self,
@@ -193,23 +197,6 @@ class Sticker(_BaseThumbedMedium):
     """:const:`telegram.constants.StickerType.MASK`"""
     CUSTOM_EMOJI: Final[str] = constants.StickerType.CUSTOM_EMOJI
     """:const:`telegram.constants.StickerType.CUSTOM_EMOJI`"""
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Sticker":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
-        data["mask_position"] = de_json_optional(data.get("mask_position"), MaskPosition, bot)
-        data["premium_animation"] = de_json_optional(data.get("premium_animation"), File, bot)
-
-        api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if data.get("thumb") is not None:
-            api_kwargs["thumb"] = data.pop("thumb")
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
 
 class StickerSet(TelegramObject):
@@ -281,6 +268,7 @@ class StickerSet(TelegramObject):
         "thumbnail",
         "title",
     )
+    __REMOVED_API_FIELDS__ = frozenset({"contains_masks", "is_animated", "is_video", "thumb"})
 
     def __init__(
         self,
@@ -302,23 +290,6 @@ class StickerSet(TelegramObject):
         self._id_attrs = (self.name,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "StickerSet":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
-        data["stickers"] = de_list_optional(data.get("stickers"), Sticker, bot)
-
-        api_kwargs = {}
-        # These are deprecated fields that TG still returns for backwards compatibility
-        # Let's filter them out to speed up the de-json process
-        for deprecated_field in ("contains_masks", "thumb", "is_animated", "is_video"):
-            if deprecated_field in data:
-                api_kwargs[deprecated_field] = data.pop(deprecated_field)
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
 
 class MaskPosition(TelegramObject):

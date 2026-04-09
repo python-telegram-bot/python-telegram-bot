@@ -18,15 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects to request chats/users."""
 
-from typing import TYPE_CHECKING
-
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class KeyboardButtonRequestUsers(TelegramObject):
@@ -254,17 +248,3 @@ class KeyboardButtonRequestChat(TelegramObject):
         self._id_attrs = (self.request_id,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "KeyboardButtonRequestChat":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["user_administrator_rights"] = de_json_optional(
-            data.get("user_administrator_rights"), ChatAdministratorRights, bot
-        )
-        data["bot_administrator_rights"] = de_json_optional(
-            data.get("bot_administrator_rights"), ChatAdministratorRights, bot
-        )
-
-        return super().de_json(data=data, bot=bot)

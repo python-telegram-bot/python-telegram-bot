@@ -24,11 +24,11 @@ from typing import TYPE_CHECKING
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, Credentials
+    from telegram import Credentials
 
 
 class PassportData(TelegramObject):
@@ -81,16 +81,6 @@ class PassportData(TelegramObject):
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PassportData":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["data"] = de_list_optional(data.get("data"), EncryptedPassportElement, bot)
-        data["credentials"] = de_json_optional(data.get("credentials"), EncryptedCredentials, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     @property
     def decrypted_data(self) -> tuple[EncryptedPassportElement, ...]:

@@ -18,16 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a location to which a chat is connected."""
 
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from telegram import constants
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ChatLocation(TelegramObject):
@@ -67,15 +63,6 @@ class ChatLocation(TelegramObject):
         self._id_attrs = (self.location,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatLocation":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["location"] = de_json_optional(data.get("location"), Location, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     MIN_ADDRESS: Final[int] = constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS
     """:const:`telegram.constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS`
