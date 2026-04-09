@@ -135,7 +135,7 @@ class PollOption(TelegramObject):
             omitted if the option wasn't added by a chat after poll creation.
 
             .. versionadded:: NEXT.VERSION
-        addition_date (:obj:`int`, optional): Point in time (Unix timestamp)
+        addition_date (:obj:`datetime.datetime`, optional): Point in time
             when the option was added; omitted if the option existed in the original poll.
 
             .. versionadded:: NEXT.VERSION
@@ -162,7 +162,7 @@ class PollOption(TelegramObject):
             omitted if the option wasn't added by a chat after poll creation.
 
             .. versionadded:: NEXT.VERSION
-        addition_date (:obj:`int`): Optional. Point in time (Unix timestamp)
+        addition_date (:obj:`datetime.datetime`): Optional. Point in time
             when the option was added; omitted if the option existed in the original poll.
 
             .. versionadded:: NEXT.VERSION
@@ -193,7 +193,7 @@ class PollOption(TelegramObject):
         text_entities: Sequence[MessageEntity] | None = None,
         added_by_user: User | None = None,
         added_by_chat: Chat | None = None,
-        addition_date: int | None = None,
+        addition_date: datetime.datetime | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -353,7 +353,7 @@ class PollAnswer(TelegramObject):
         self.voter_chat: Chat | None = voter_chat
         self.option_ids: tuple[int, ...] = parse_sequence_arg(option_ids)
         self.user: User | None = user
-        self.option_persistent_ids: tuple[str, ...] = parse_sequence_arg(option_persistent_ids)
+        self.option_persistent_ids: tuple[str, ...] | None = parse_sequence_arg(option_persistent_ids)
 
         self._id_attrs = (
             self.poll_id,
@@ -380,7 +380,7 @@ class PollOptionAdded(TelegramObject):
     Describes a service message about an option added to a poll.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`option_persistent_id` is equal.
+    considered equal, if their :attr:`option_persistent_id`, and :attr:`option_text` are equal.
 
     .. versionadded:: NEXT.VERSION
 
@@ -388,7 +388,7 @@ class PollOptionAdded(TelegramObject):
         poll_message (:class:`telegram.MaybeInaccessibleMessage`, optional): Message
             containing the poll to which the option was added, if known.
             Note that the Message object in this field will not contain the
-            reply_to_message field even if it itself is a reply.
+            :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
 
             .. versionadded:: NEXT.VERSION
         option_persistent_id (:obj:`str`): Unique identifier of the added option.
@@ -398,7 +398,7 @@ class PollOptionAdded(TelegramObject):
 
             .. versionadded:: NEXT.VERSION
         option_text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
-            entities that appear in the option_text.
+            entities that appear in the :paramref:`option_text`.
 
             .. versionadded:: NEXT.VERSION
 
@@ -464,15 +464,14 @@ class PollOptionDeleted(TelegramObject):
     """
     Describes a service message about an option deleted from a poll.
 
-
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, considered equal, if their :attr:`option_persistent_id` is equal.
+    considered equal, considered equal, if their :attr:`option_persistent_id`, :attr:`option_text` are equal.
 
     .. versionadded:: NEXT.VERSION
 
     Args:
         poll_message (:class:`telegram.MaybeInaccessibleMessage`, optional): Message
-            containing the poll to which the option was added, if known.
+            containing the poll to which the option was deleted, if known.
             Note that the Message object in this field will not contain the
             reply_to_message field even if it itself is a reply.
 
@@ -737,7 +736,7 @@ class Poll(TelegramObject):
         self.correct_option_id: int | None = correct_option_id
         self.correct_option_ids: tuple[int, ...] | None = parse_sequence_arg(correct_option_ids)
         self.description: str | None = description
-        self.description_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
+        self.description_entities: tuple[MessageEntity, ...] | None = parse_sequence_arg(
             description_entities
         )
         self.explanation: str | None = explanation

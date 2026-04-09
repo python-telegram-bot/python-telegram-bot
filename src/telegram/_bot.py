@@ -7662,7 +7662,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
             allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to
-                change the chosen answer options
+                change the chosen answer options, defaults to :obj:`False` for quizzes and to :obj:`True` for regular polls
 
                 .. versionadded:: NEXT.VERSION
             allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
@@ -7677,8 +7677,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 must be shown only after the poll closes
 
                 .. versionadded:: NEXT.VERSION
-            correct_option_ids (Sequence[:class:`int`], optional): 0-based identifier of the
-                correct answer option, required for polls in quiz mode.
+            correct_option_ids (Sequence[:class:`int`], optional): A list of monotonically increasing 0-based identifiers of the correct answer options, required for polls in quiz mode.
 
                 .. versionadded:: NEXT.VERSION
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
@@ -7723,7 +7722,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: NEXT.VERSION
             description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
                 JSON-serialized list of special entities that appear in the poll description,
-                which can be specified instead of description_parse_mode
+                which can be specified instead of :paramref:`description_parse_mode`
 
                 .. versionadded:: NEXT.VERSION
             disable_notification (:obj:`bool`, optional): |disable_notification|
