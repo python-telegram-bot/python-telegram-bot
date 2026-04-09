@@ -102,6 +102,7 @@ from telegram._utils.strings import to_camel_case
 from telegram._utils.types import (
     BaseUrl,
     CorrectOptionID,
+    CorrectOptionIds,
     FileInput,
     JSONDict,
     ODVInput,
@@ -7614,6 +7615,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        allows_revoting: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        description: str | None = None,
+        description_parse_mode: str | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
+        shuffle_options: bool | None = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
@@ -7716,6 +7725,43 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
                 .. versionadded:: 21.7
+            allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to
+                change the chosen answer options, defaults to :obj:`False`
+                for quizzes and to :obj:`True` for regular polls
+
+                .. versionadded:: NEXT.VERSION
+            allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
+                added to the poll after creation; not supported for anonymous polls and quizzes
+
+                .. versionadded:: NEXT.VERSION
+            shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
+                shown in random order
+
+                .. versionadded:: NEXT.VERSION
+            hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
+                must be shown only after the poll closes
+
+                .. versionadded:: NEXT.VERSION
+            correct_option_ids (Sequence[:class:`int`], optional): A list of monotonically
+                increasing 0-based identifiers of the correct answer options,
+                required for polls in quiz mode.
+
+                .. versionadded:: NEXT.VERSION
+            description (:obj:`str`, optional): Description of the poll to be sent,
+                0-:tg-const:`telegram.Poll.MAX_DESCRIPTION_CHARACTERS` characters
+                after entities parsing.
+
+                .. versionadded:: NEXT.VERSION
+            description_parse_mode (:obj:`str`, optional): Mode for parsing entities
+                in the poll description. See the constants
+                in :class:`telegram.constants.ParseMode`
+
+                .. versionadded:: NEXT.VERSION
+            description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
+                JSON-serialized list of special entities that appear in the poll description,
+                which can be specified instead of :paramref:`description_parse_mode`
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7756,7 +7802,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "type": type,
             "allows_multiple_answers": allows_multiple_answers,
             "correct_option_id": correct_option_id,
+            "allow_adding_options": allow_adding_options,
+            "allows_revoting": allows_revoting,
+            "shuffle_options": shuffle_options,
+            "hide_results_until_closes": hide_results_until_closes,
+            "correct_option_ids": correct_option_ids,
             "is_closed": is_closed,
+            "description": description,
+            "description_parse_mode": description_parse_mode,
+            "description_entities": description_entities,
             "explanation": explanation,
             "explanation_entities": explanation_entities,
             "open_period": open_period,

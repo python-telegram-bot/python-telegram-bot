@@ -98,6 +98,7 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
     BaseUrl,
     CorrectOptionID,
+    CorrectOptionIds,
     FileInput,
     JSONDict,
     ODVInput,
@@ -3254,6 +3255,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        allows_revoting: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        description: str | None = None,
+        description_parse_mode: str | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
+        shuffle_options: bool | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3295,6 +3304,14 @@ class ExtBot(Bot, Generic[RLARGS]):
             question_entities=question_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            correct_option_ids=correct_option_ids,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
+            hide_results_until_closes=hide_results_until_closes,
+            allow_adding_options=allow_adding_options,
         )
 
     async def send_sticker(
