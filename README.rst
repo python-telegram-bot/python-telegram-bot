@@ -1,3 +1,7 @@
+.. image:: https://github.com/c6zks4gssn-droid/python-telegram-bot-improved/actions/workflows/unit_tests.yml/badge.svg?branch=improvements/fork-doctor
+   :target: https://github.com/c6zks4gssn-droid/python-telegram-bot-improved/actions
+   :alt: Fork CI Status
+
 .. image:: https://raw.githubusercontent.com/python-telegram-bot/logos/master/logo-text/png/ptb-logo-text_768.png
    :align: center
    :target: https://python-telegram-bot.org
