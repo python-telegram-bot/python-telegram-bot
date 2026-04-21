@@ -2,5 +2,5 @@ features = "Full support for Bot API 9.6"
 
 [[pull_requests]]
 uid = "0001"
-author_uids = ["OpenAI"]
+author_uids = ["LuoYe"]
 closes_threads = []
