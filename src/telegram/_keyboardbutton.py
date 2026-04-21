@@ -21,7 +21,11 @@
 from typing import TYPE_CHECKING
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
-from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
+from telegram._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestManagedBot,
+    KeyboardButtonRequestUsers,
+)
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
@@ -41,7 +45,7 @@ class KeyboardButton(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
     :attr:`request_poll`, :attr:`web_app`, :attr:`request_users`, :attr:`request_chat`,
-    :attr:`style` and :attr:`icon_custom_emoji_id` are equal.
+    :attr:`request_managed_bot`, :attr:`style` and :attr:`icon_custom_emoji_id` are equal.
 
     Note:
         * Optional fields are mutually exclusive.
@@ -103,6 +107,11 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
+        request_managed_bot (:class:`KeyboardButtonRequestManagedBot`, optional): If specified,
+            pressing the button will ask the user to create and share a bot that will be managed
+            by the current bot. Available in private chats only.
+
+            .. versionadded:: 22.8
         style (:obj:`str`, optional): Style of the button. Must be one of
             :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
             :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
@@ -150,6 +159,11 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
+        request_managed_bot (:class:`KeyboardButtonRequestManagedBot`): Optional. If specified,
+            pressing the button will ask the user to create and share a bot that will be managed
+            by the current bot. Available in private chats only.
+
+            .. versionadded:: 22.8
         style (:obj:`str`): Optional. Style of the button. Must be one of
             :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
             :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
@@ -174,6 +188,7 @@ class KeyboardButton(TelegramObject):
         "request_chat",
         "request_contact",
         "request_location",
+        "request_managed_bot",
         "request_poll",
         "request_users",
         "style",
@@ -190,6 +205,7 @@ class KeyboardButton(TelegramObject):
         web_app: WebAppInfo | None = None,
         request_chat: KeyboardButtonRequestChat | None = None,
         request_users: KeyboardButtonRequestUsers | None = None,
+        request_managed_bot: KeyboardButtonRequestManagedBot | None = None,
         style: str | None = None,
         icon_custom_emoji_id: str | None = None,
         *,
@@ -206,6 +222,7 @@ class KeyboardButton(TelegramObject):
         self.web_app: WebAppInfo | None = web_app
         self.request_users: KeyboardButtonRequestUsers | None = request_users
         self.request_chat: KeyboardButtonRequestChat | None = request_chat
+        self.request_managed_bot: KeyboardButtonRequestManagedBot | None = request_managed_bot
         self.style: str | None = style
         self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
 
@@ -217,6 +234,7 @@ class KeyboardButton(TelegramObject):
             self.web_app,
             self.request_users,
             self.request_chat,
+            self.request_managed_bot,
             self.style,
             self.icon_custom_emoji_id,
         )
@@ -236,6 +254,9 @@ class KeyboardButton(TelegramObject):
         )
         data["request_chat"] = de_json_optional(
             data.get("request_chat"), KeyboardButtonRequestChat, bot
+        )
+        data["request_managed_bot"] = de_json_optional(
+            data.get("request_managed_bot"), KeyboardButtonRequestManagedBot, bot
         )
         data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
 

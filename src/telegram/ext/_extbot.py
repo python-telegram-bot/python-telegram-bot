@@ -71,6 +71,7 @@ from telegram import (
     OwnedGifts,
     PhotoSize,
     Poll,
+    PreparedKeyboardButton,
     PreparedInlineMessage,
     ReactionType,
     ReplyParameters,
@@ -97,7 +98,6 @@ from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
     BaseUrl,
-    CorrectOptionID,
     FileInput,
     JSONDict,
     ODVInput,
@@ -118,6 +118,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        KeyboardButton,
         InputSticker,
         InputStoryContent,
         LabeledPrice,
@@ -1037,6 +1038,68 @@ class ExtBot(Bot, Generic[RLARGS]):
             allow_bot_chats=allow_bot_chats,
             allow_group_chats=allow_group_chats,
             allow_channel_chats=allow_channel_chats,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def save_prepared_keyboard_button(
+        self,
+        user_id: int,
+        button: "KeyboardButton",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> PreparedKeyboardButton:
+        return await super().save_prepared_keyboard_button(
+            user_id=user_id,
+            button=button,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_managed_bot_token(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> str:
+        return await super().get_managed_bot_token(
+            user_id=user_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def replace_managed_bot_token(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> str:
+        return await super().replace_managed_bot_token(
+            user_id=user_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3237,7 +3300,11 @@ class ExtBot(Bot, Generic[RLARGS]):
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
+        allows_revoting: bool | None = None,
+        shuffle_options: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: Sequence[int] | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -3252,6 +3319,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         business_connection_id: str | None = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Sequence["MessageEntity"] | None = None,
+        description: str | None = None,
+        description_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        description_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         *,
@@ -3271,7 +3341,11 @@ class ExtBot(Bot, Generic[RLARGS]):
             is_anonymous=is_anonymous,
             type=type,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            allow_adding_options=allow_adding_options,
+            hide_results_until_closes=hide_results_until_closes,
+            correct_option_ids=correct_option_ids,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -3293,6 +3367,9 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
         )
@@ -5537,6 +5614,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     sendChatAction = send_chat_action
     answerInlineQuery = answer_inline_query
     savePreparedInlineMessage = save_prepared_inline_message
+    savePreparedKeyboardButton = save_prepared_keyboard_button
+    getManagedBotToken = get_managed_bot_token
+    replaceManagedBotToken = replace_managed_bot_token
     getUserProfilePhotos = get_user_profile_photos
     getFile = get_file
     banChatMember = ban_chat_member

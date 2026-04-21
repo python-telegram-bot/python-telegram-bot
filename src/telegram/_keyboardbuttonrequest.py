@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains two objects to request chats/users."""
+"""This module contains objects used by keyboard buttons to request chats, users, or bots."""
 
 from typing import TYPE_CHECKING
 
@@ -268,3 +268,46 @@ class KeyboardButtonRequestChat(TelegramObject):
         )
 
         return super().de_json(data=data, bot=bot)
+
+
+class KeyboardButtonRequestManagedBot(TelegramObject):
+    """This object defines the parameters for the creation of a managed bot. Information about
+    the created bot will be shared with the bot using :attr:`telegram.Update.managed_bot` and a
+    :class:`telegram.Message` with :attr:`telegram.Message.managed_bot_created`.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`request_id` is equal.
+
+    .. versionadded:: 22.8
+
+    Args:
+        request_id (:obj:`int`): Signed 32-bit identifier of the request. Must be unique within
+            the message.
+        suggested_name (:obj:`str`, optional): Suggested name for the bot.
+        suggested_username (:obj:`str`, optional): Suggested username for the bot.
+
+    Attributes:
+        request_id (:obj:`int`): Signed 32-bit identifier of the request. Must be unique within
+            the message.
+        suggested_name (:obj:`str`): Optional. Suggested name for the bot.
+        suggested_username (:obj:`str`): Optional. Suggested username for the bot.
+    """
+
+    __slots__ = ("request_id", "suggested_name", "suggested_username")
+
+    def __init__(
+        self,
+        request_id: int,
+        suggested_name: str | None = None,
+        suggested_username: str | None = None,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.request_id: int = request_id
+        self.suggested_name: str | None = suggested_name
+        self.suggested_username: str | None = suggested_username
+
+        self._id_attrs = (self.request_id,)
+
+        self._freeze()

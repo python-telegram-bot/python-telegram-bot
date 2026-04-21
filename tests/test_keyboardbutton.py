@@ -23,6 +23,7 @@ from telegram import (
     KeyboardButton,
     KeyboardButtonPollType,
     KeyboardButtonRequestChat,
+    KeyboardButtonRequestManagedBot,
     KeyboardButtonRequestUsers,
     WebAppInfo,
 )
@@ -39,6 +40,7 @@ def keyboard_button():
         web_app=KeyboardButtonTestBase.web_app,
         request_chat=KeyboardButtonTestBase.request_chat,
         request_users=KeyboardButtonTestBase.request_users,
+        request_managed_bot=KeyboardButtonTestBase.request_managed_bot,
         style=KeyboardButtonTestBase.style,
         icon_custom_emoji_id=KeyboardButtonTestBase.icon_custom_emoji_id,
     )
@@ -52,6 +54,7 @@ class KeyboardButtonTestBase:
     web_app = WebAppInfo(url="https://example.com")
     request_chat = KeyboardButtonRequestChat(1, True)
     request_users = KeyboardButtonRequestUsers(2)
+    request_managed_bot = KeyboardButtonRequestManagedBot(3, "Managed Bot", "managed_bot_test")
     style = "primary"
     icon_custom_emoji_id = "5237829955978547322"
 
@@ -71,6 +74,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button.web_app == self.web_app
         assert keyboard_button.request_chat == self.request_chat
         assert keyboard_button.request_users == self.request_users
+        assert keyboard_button.request_managed_bot == self.request_managed_bot
         assert keyboard_button.style == self.style
         assert keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 
@@ -85,6 +89,10 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button_dict["web_app"] == keyboard_button.web_app.to_dict()
         assert keyboard_button_dict["request_chat"] == keyboard_button.request_chat.to_dict()
         assert keyboard_button_dict["request_users"] == keyboard_button.request_users.to_dict()
+        assert (
+            keyboard_button_dict["request_managed_bot"]
+            == keyboard_button.request_managed_bot.to_dict()
+        )
         assert keyboard_button_dict["style"] == keyboard_button.style
         assert keyboard_button_dict["icon_custom_emoji_id"] == keyboard_button.icon_custom_emoji_id
 
@@ -98,6 +106,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
             "web_app": self.web_app.to_dict(),
             "request_chat": self.request_chat.to_dict(),
             "request_users": self.request_users.to_dict(),
+            "request_managed_bot": self.request_managed_bot.to_dict(),
             "style": self.style,
             "icon_custom_emoji_id": self.icon_custom_emoji_id,
         }
@@ -117,6 +126,7 @@ class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
         assert keyboard_button.web_app == self.web_app
         assert keyboard_button.request_chat == self.request_chat
         assert keyboard_button.request_users == self.request_users
+        assert keyboard_button.request_managed_bot == self.request_managed_bot
         assert keyboard_button.style == self.style
         assert keyboard_button.icon_custom_emoji_id == self.icon_custom_emoji_id
 

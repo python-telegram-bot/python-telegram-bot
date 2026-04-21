@@ -163,6 +163,7 @@ class Defaults:
         self._api_defaults = {}
         for kwarg in (
             "allow_sending_without_reply",
+            "description_parse_mode",
             "disable_notification",
             "do_quote",
             "explanation_parse_mode",
@@ -278,6 +279,21 @@ class Defaults:
     def question_parse_mode(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to question_parse_mode after initialization."
+        )
+
+    @property
+    def description_parse_mode(self) -> str | None:
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        the corresponding parameter of :meth:`telegram.Bot.send_poll`.
+
+        .. versionadded:: 22.8
+        """
+        return self._parse_mode
+
+    @description_parse_mode.setter
+    def description_parse_mode(self, _: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to description_parse_mode after initialization."
         )
 
     @property

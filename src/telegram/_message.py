@@ -57,6 +57,7 @@ from telegram._gifts import GiftInfo
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inputchecklist import InputChecklist
 from telegram._linkpreviewoptions import LinkPreviewOptions
+from telegram._managedbot import ManagedBotCreated
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._paidmedia import PaidMediaInfo
@@ -66,6 +67,7 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.refundedpayment import RefundedPayment
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
+from telegram._polloptionchange import PollOptionAdded, PollOptionDeleted
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._reply import ReplyParameters
 from telegram._shared import ChatShared, UsersShared
@@ -79,7 +81,6 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
-    CorrectOptionID,
     JSONDict,
     MarkdownVersion,
     ODVInput,
@@ -1176,6 +1177,7 @@ class Message(MaybeInaccessibleMessage):
         "left_chat_member",
         "link_preview_options",
         "location",
+        "managed_bot_created",
         "media_group_id",
         "message_auto_delete_timer_changed",
         "message_thread_id",
@@ -1191,12 +1193,15 @@ class Message(MaybeInaccessibleMessage):
         "photo",
         "pinned_message",
         "poll",
+        "poll_option_added",
+        "poll_option_deleted",
         "proximity_alert_triggered",
         "quote",
         "refunded_payment",
         "reply_markup",
         "reply_to_checklist_task_id",
         "reply_to_message",
+        "reply_to_poll_option_id",
         "reply_to_story",
         "sender_boost_count",
         "sender_business_bot",
@@ -1327,6 +1332,10 @@ class Message(MaybeInaccessibleMessage):
         is_paid_post: bool | None = None,
         direct_messages_topic: DirectMessagesTopic | None = None,
         reply_to_checklist_task_id: int | None = None,
+        reply_to_poll_option_id: str | None = None,
+        managed_bot_created: ManagedBotCreated | None = None,
+        poll_option_added: PollOptionAdded | None = None,
+        poll_option_deleted: PollOptionDeleted | None = None,
         suggested_post_declined: "SuggestedPostDeclined | None" = None,
         suggested_post_paid: "SuggestedPostPaid | None" = None,
         suggested_post_refunded: "SuggestedPostRefunded | None" = None,
@@ -1455,6 +1464,10 @@ class Message(MaybeInaccessibleMessage):
             self.is_paid_post: bool | None = is_paid_post
             self.direct_messages_topic: DirectMessagesTopic | None = direct_messages_topic
             self.reply_to_checklist_task_id: int | None = reply_to_checklist_task_id
+            self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
+            self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
+            self.poll_option_added: PollOptionAdded | None = poll_option_added
+            self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
             self.suggested_post_declined: SuggestedPostDeclined | None = suggested_post_declined
             self.suggested_post_paid: SuggestedPostPaid | None = suggested_post_paid
             self.suggested_post_refunded: SuggestedPostRefunded | None = suggested_post_refunded
@@ -1654,12 +1667,21 @@ class Message(MaybeInaccessibleMessage):
         data["direct_message_price_changed"] = de_json_optional(
             data.get("direct_message_price_changed"), DirectMessagePriceChanged, bot
         )
+        data["managed_bot_created"] = de_json_optional(
+            data.get("managed_bot_created"), ManagedBotCreated, bot
+        )
         data["checklist"] = de_json_optional(data.get("checklist"), Checklist, bot)
         data["checklist_tasks_done"] = de_json_optional(
             data.get("checklist_tasks_done"), ChecklistTasksDone, bot
         )
         data["checklist_tasks_added"] = de_json_optional(
             data.get("checklist_tasks_added"), ChecklistTasksAdded, bot
+        )
+        data["poll_option_added"] = de_json_optional(
+            data.get("poll_option_added"), PollOptionAdded, bot
+        )
+        data["poll_option_deleted"] = de_json_optional(
+            data.get("poll_option_deleted"), PollOptionDeleted, bot
         )
         data["direct_messages_topic"] = de_json_optional(
             data.get("direct_messages_topic"), DirectMessagesTopic, bot
@@ -3457,7 +3479,11 @@ class Message(MaybeInaccessibleMessage):
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
+        allows_revoting: bool | None = None,
+        shuffle_options: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: Sequence[int] | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -3471,6 +3497,9 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: "ReplyParameters | None" = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Sequence["MessageEntity"] | None = None,
+        description: str | None = None,
+        description_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        description_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         *,
@@ -3521,7 +3550,11 @@ class Message(MaybeInaccessibleMessage):
             is_anonymous=is_anonymous,
             type=type,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            allow_adding_options=allow_adding_options,
+            hide_results_until_closes=hide_results_until_closes,
+            correct_option_ids=correct_option_ids,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
@@ -3541,6 +3574,9 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
         )

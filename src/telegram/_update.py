@@ -28,6 +28,7 @@ from telegram._chatjoinrequest import ChatJoinRequest
 from telegram._chatmemberupdated import ChatMemberUpdated
 from telegram._choseninlineresult import ChosenInlineResult
 from telegram._inline.inlinequery import InlineQuery
+from telegram._managedbot import ManagedBotUpdated
 from telegram._message import Message
 from telegram._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
 from telegram._paidmedia import PaidMediaPurchased
@@ -298,6 +299,7 @@ class Update(TelegramObject):
         "message",
         "message_reaction",
         "message_reaction_count",
+        "managed_bot",
         "my_chat_member",
         "poll",
         "poll_answer",
@@ -352,6 +354,11 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.POLL_ANSWER`
 
     .. versionadded:: 13.5"""
+    MANAGED_BOT: Final[str] = constants.UpdateType.MANAGED_BOT
+    """:const:`telegram.constants.UpdateType.MANAGED_BOT`
+
+    .. versionadded:: 22.8
+    """
     MY_CHAT_MEMBER: Final[str] = constants.UpdateType.MY_CHAT_MEMBER
     """:const:`telegram.constants.UpdateType.MY_CHAT_MEMBER`
 
@@ -422,6 +429,7 @@ class Update(TelegramObject):
         pre_checkout_query: PreCheckoutQuery | None = None,
         poll: Poll | None = None,
         poll_answer: PollAnswer | None = None,
+        managed_bot: ManagedBotUpdated | None = None,
         my_chat_member: ChatMemberUpdated | None = None,
         chat_member: ChatMemberUpdated | None = None,
         chat_join_request: ChatJoinRequest | None = None,
@@ -452,6 +460,7 @@ class Update(TelegramObject):
         self.edited_channel_post: Message | None = edited_channel_post
         self.poll: Poll | None = poll
         self.poll_answer: PollAnswer | None = poll_answer
+        self.managed_bot: ManagedBotUpdated | None = managed_bot
         self.my_chat_member: ChatMemberUpdated | None = my_chat_member
         self.chat_member: ChatMemberUpdated | None = chat_member
         self.chat_join_request: ChatJoinRequest | None = chat_join_request
@@ -532,6 +541,9 @@ class Update(TelegramObject):
 
         elif self.poll_answer:
             user = self.poll_answer.user
+
+        elif self.managed_bot:
+            user = self.managed_bot.user
 
         elif self.my_chat_member:
             user = self.my_chat_member.from_user
@@ -777,6 +789,7 @@ class Update(TelegramObject):
         )
         data["poll"] = de_json_optional(data.get("poll"), Poll, bot)
         data["poll_answer"] = de_json_optional(data.get("poll_answer"), PollAnswer, bot)
+        data["managed_bot"] = de_json_optional(data.get("managed_bot"), ManagedBotUpdated, bot)
         data["my_chat_member"] = de_json_optional(
             data.get("my_chat_member"), ChatMemberUpdated, bot
         )

@@ -28,7 +28,6 @@ from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
-    CorrectOptionID,
     JSONDict,
     ODVInput,
     TimePeriod,
@@ -124,6 +123,10 @@ class User(TelegramObject):
             :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 22.7
+        can_manage_bots (:obj:`bool`, optional): :obj:`True`, if other bots can be created to be
+            controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: 22.8
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -164,6 +167,10 @@ class User(TelegramObject):
             :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 22.7
+        can_manage_bots (:obj:`bool`): Optional. :obj:`True`, if other bots can be created to be
+            controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: 22.8
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -173,6 +180,7 @@ class User(TelegramObject):
     __slots__ = (
         "added_to_attachment_menu",
         "allows_users_to_create_topics",
+        "can_manage_bots",
         "can_connect_to_business",
         "can_join_groups",
         "can_read_all_group_messages",
@@ -205,6 +213,7 @@ class User(TelegramObject):
         has_main_web_app: bool | None = None,
         has_topics_enabled: bool | None = None,
         allows_users_to_create_topics: bool | None = None,
+        can_manage_bots: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -226,6 +235,7 @@ class User(TelegramObject):
         self.has_main_web_app: bool | None = has_main_web_app
         self.has_topics_enabled: bool | None = has_topics_enabled
         self.allows_users_to_create_topics: bool | None = allows_users_to_create_topics
+        self.can_manage_bots: bool | None = can_manage_bots
 
         self._id_attrs = (self.id,)
 
@@ -1713,7 +1723,11 @@ class User(TelegramObject):
         is_anonymous: bool | None = None,
         type: str | None = None,
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
+        allows_revoting: bool | None = None,
+        shuffle_options: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: Sequence[int] | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -1728,6 +1742,9 @@ class User(TelegramObject):
         business_connection_id: str | None = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Sequence["MessageEntity"] | None = None,
+        description: str | None = None,
+        description_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        description_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         *,
@@ -1759,7 +1776,11 @@ class User(TelegramObject):
             is_anonymous=is_anonymous,
             type=type,  # pylint=pylint,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            allow_adding_options=allow_adding_options,
+            hide_results_until_closes=hide_results_until_closes,
+            correct_option_ids=correct_option_ids,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -1781,6 +1802,9 @@ class User(TelegramObject):
             business_connection_id=business_connection_id,
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
         )

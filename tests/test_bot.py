@@ -3067,7 +3067,7 @@ class TestBotWithRequest:
                 question=question,
                 options=answers,
                 type=Poll.QUIZ,
-                correct_option_id=2,
+                correct_option_ids=[2],
                 is_closed=True,
                 explanation=explanation,
                 explanation_parse_mode=ParseMode.MARKDOWN_V2,
@@ -3106,7 +3106,7 @@ class TestBotWithRequest:
         assert poll.total_voter_count == 0
 
         message_quiz = await quiz_task
-        assert message_quiz.poll.correct_option_id == 2
+        assert message_quiz.poll.correct_option_ids == (2,)
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
         assert message_quiz.poll.explanation == "Here is a link"
@@ -3193,7 +3193,7 @@ class TestBotWithRequest:
             chat_id,
             "question",
             options=["a", "b"],
-            correct_option_id=0,
+            correct_option_ids=[0],
             type=Poll.QUIZ,
             explanation=test_string,
             explanation_entities=entities,
@@ -3216,7 +3216,7 @@ class TestBotWithRequest:
                     question=question,
                     options=answers,
                     type=Poll.QUIZ,
-                    correct_option_id=2,
+                    correct_option_ids=[2],
                     is_closed=True,
                     explanation=explanation_markdown,
                     **i,

@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
 
+from collections.abc import Sequence
+
 from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
 
@@ -71,7 +73,7 @@ class ParamTypeCheckingExceptions:
     # too complex to compare/predict with official API
     # structure: class/method_name: {param_name: reduced form of annotation}
     COMPLEX_TYPES = {
-        "send_poll": {"correct_option_id": int},  # actual: Literal
+        "send_poll": {"correct_option_ids": Sequence[int]},
         "get_file": {
             "file_id": str,  # actual: Union[str, objs_with_file_id_attr]
         },

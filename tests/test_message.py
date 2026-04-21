@@ -55,6 +55,7 @@ from telegram import (
     InputPaidMediaPhoto,
     Invoice,
     LinkPreviewOptions,
+    ManagedBotCreated,
     Location,
     Message,
     MessageAutoDeleteTimerChanged,
@@ -66,6 +67,8 @@ from telegram import (
     PassportData,
     PhotoSize,
     Poll,
+    PollOptionAdded,
+    PollOptionDeleted,
     PollOption,
     ProximityAlertTriggered,
     RefundedPayment,
@@ -375,6 +378,20 @@ def message(bot):
             )
         },
         {"reply_to_checklist_task_id": 11},
+        {"reply_to_poll_option_id": "persistent-option-id"},
+        {"managed_bot_created": ManagedBotCreated(bot=User(42, "ManagedBot", True))},
+        {
+            "poll_option_added": PollOptionAdded(
+                option_persistent_id="persistent-option-id",
+                option_text="Option A",
+            )
+        },
+        {
+            "poll_option_deleted": PollOptionDeleted(
+                option_persistent_id="persistent-option-id",
+                option_text="Option A",
+            )
+        },
         {
             "suggested_post_declined": SuggestedPostDeclined(
                 suggested_post_message=Message(
@@ -520,6 +537,10 @@ def message(bot):
         "is_paid_post",
         "direct_messages_topic",
         "reply_to_checklist_task_id",
+        "reply_to_poll_option_id",
+        "managed_bot_created",
+        "poll_option_added",
+        "poll_option_deleted",
         "suggested_post_declined",
         "suggested_post_paid",
         "suggested_post_refunded",

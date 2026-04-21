@@ -19,7 +19,12 @@
 
 import pytest
 
-from telegram import ChatAdministratorRights, KeyboardButtonRequestChat, KeyboardButtonRequestUsers
+from telegram import (
+    ChatAdministratorRights,
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestManagedBot,
+    KeyboardButtonRequestUsers,
+)
 from tests.auxil.slots import mro_slots
 
 
@@ -183,6 +188,63 @@ class TestKeyboardButtonRequestChatWithoutRequest(KeyboardButtonRequestChatTestB
         a = KeyboardButtonRequestChat(self.request_id, True)
         b = KeyboardButtonRequestChat(self.request_id, True)
         c = KeyboardButtonRequestChat(1, True)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+
+@pytest.fixture(scope="class")
+def request_managed_bot():
+    return KeyboardButtonRequestManagedBot(
+        KeyboardButtonRequestManagedBotTestBase.request_id,
+        KeyboardButtonRequestManagedBotTestBase.suggested_name,
+        KeyboardButtonRequestManagedBotTestBase.suggested_username,
+    )
+
+
+class KeyboardButtonRequestManagedBotTestBase:
+    request_id = 789
+    suggested_name = "Managed Bot"
+    suggested_username = "managed_bot_test"
+
+
+class TestKeyboardButtonRequestManagedBotWithoutRequest(KeyboardButtonRequestManagedBotTestBase):
+    def test_slot_behaviour(self, request_managed_bot):
+        for attr in request_managed_bot.__slots__:
+            assert getattr(request_managed_bot, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(request_managed_bot)) == len(set(mro_slots(request_managed_bot))), (
+            "duplicate slot"
+        )
+
+    def test_to_dict(self, request_managed_bot):
+        request_managed_bot_dict = request_managed_bot.to_dict()
+
+        assert isinstance(request_managed_bot_dict, dict)
+        assert request_managed_bot_dict["request_id"] == self.request_id
+        assert request_managed_bot_dict["suggested_name"] == self.suggested_name
+        assert request_managed_bot_dict["suggested_username"] == self.suggested_username
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "request_id": self.request_id,
+            "suggested_name": self.suggested_name,
+            "suggested_username": self.suggested_username,
+        }
+        request_managed_bot = KeyboardButtonRequestManagedBot.de_json(json_dict, offline_bot)
+        assert request_managed_bot.api_kwargs == {}
+
+        assert request_managed_bot.request_id == self.request_id
+        assert request_managed_bot.suggested_name == self.suggested_name
+        assert request_managed_bot.suggested_username == self.suggested_username
+
+    def test_equality(self):
+        a = KeyboardButtonRequestManagedBot(self.request_id)
+        b = KeyboardButtonRequestManagedBot(self.request_id)
+        c = KeyboardButtonRequestManagedBot(1)
 
         assert a == b
         assert hash(a) == hash(b)

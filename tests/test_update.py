@@ -41,6 +41,7 @@ from telegram import (
     Message,
     MessageReactionCountUpdated,
     MessageReactionUpdated,
+    ManagedBotUpdated,
     PaidMediaPurchased,
     Poll,
     PollAnswer,
@@ -151,6 +152,8 @@ purchased_paid_media = PaidMediaPurchased(
     paid_media_payload="payload",
 )
 
+managed_bot = ManagedBotUpdated(user=User(1, "owner", False), bot=User(2, "managed", True))
+
 
 params = [
     {"message": message},
@@ -179,6 +182,7 @@ params = [
             Chat(1, ""),
         )
     },
+    {"managed_bot": managed_bot},
     {"my_chat_member": chat_member_updated},
     {"chat_member": chat_member_updated},
     {"chat_join_request": chat_join_request},
@@ -207,6 +211,7 @@ all_types = (
     "pre_checkout_query",
     "poll",
     "poll_answer",
+    "managed_bot",
     "my_chat_member",
     "chat_member",
     "chat_join_request",
@@ -298,6 +303,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
             or update.pre_checkout_query is not None
             or update.poll is not None
             or update.poll_answer is not None
+            or update.managed_bot is not None
             or update.business_connection is not None
             or update.purchased_paid_media is not None
         ):
@@ -404,6 +410,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
             or update.pre_checkout_query is not None
             or update.poll is not None
             or update.poll_answer is not None
+            or update.managed_bot is not None
             or update.my_chat_member is not None
             or update.chat_member is not None
             or update.chat_join_request is not None

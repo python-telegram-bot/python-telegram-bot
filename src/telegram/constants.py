@@ -181,7 +181,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=5)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=6)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -2271,6 +2271,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 22.3
     """
+    MANAGED_BOT_CREATED = "managed_bot_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.managed_bot_created`.
+
+    .. versionadded:: 22.8
+    """
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
     EFFECT_ID = "effect_id"
@@ -2366,6 +2371,16 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.paid_message_price_changed`.
 
     .. versionadded:: v22.2
+    """
+    POLL_OPTION_ADDED = "poll_option_added"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_added`.
+
+    .. versionadded:: 22.8
+    """
+    POLL_OPTION_DELETED = "poll_option_deleted"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_deleted`.
+
+    .. versionadded:: 22.8
     """
     SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
@@ -3439,7 +3454,7 @@ class PollLimit(IntEnum):
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MAX_OPEN_PERIOD = 600
+    MAX_OPEN_PERIOD = 2628000
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.send_poll.open_period` parameter of :meth:`telegram.Bot.send_poll`.
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
@@ -3543,6 +3558,11 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.poll`."""
     POLL_ANSWER = "poll_answer"
     """:obj:`str`: Updates with :attr:`telegram.Update.poll_answer`."""
+    MANAGED_BOT = "managed_bot"
+    """:obj:`str`: Updates with :attr:`telegram.Update.managed_bot`.
+
+    .. versionadded:: 22.8
+    """
     MY_CHAT_MEMBER = "my_chat_member"
     """:obj:`str`: Updates with :attr:`telegram.Update.my_chat_member`."""
     CHAT_MEMBER = "chat_member"

@@ -85,6 +85,7 @@ from telegram._ownedgift import OwnedGifts
 from telegram._payment.stars.staramount import StarAmount
 from telegram._payment.stars.startransactions import StarTransactions
 from telegram._poll import InputPollOption, Poll
+from telegram._preparedkeyboardbutton import PreparedKeyboardButton
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
@@ -101,7 +102,6 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.strings import to_camel_case
 from telegram._utils.types import (
     BaseUrl,
-    CorrectOptionID,
     FileInput,
     JSONDict,
     ODVInput,
@@ -125,6 +125,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        KeyboardButton,
         InputProfilePhoto,
         InputSticker,
         InputStoryContent,
@@ -4077,6 +4078,116 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             self,
         )
 
+    async def save_prepared_keyboard_button(
+        self,
+        user_id: int,
+        button: "KeyboardButton",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> PreparedKeyboardButton:
+        """Stores a keyboard button that can be used by a user within a Mini App.
+
+        .. versionadded:: 22.8
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user that can use the button.
+            button (:class:`telegram.KeyboardButton`): The button to store. The button must be of
+                the type :attr:`telegram.KeyboardButton.request_users`,
+                :attr:`telegram.KeyboardButton.request_chat`, or
+                :attr:`telegram.KeyboardButton.request_managed_bot`.
+
+        Returns:
+            :class:`telegram.PreparedKeyboardButton`: On success, the prepared keyboard button is
+            returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        return PreparedKeyboardButton.de_json(
+            await self._post(
+                "savePreparedKeyboardButton",
+                {"user_id": user_id, "button": button},
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
+        )
+
+    async def get_managed_bot_token(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> str:
+        """Gets the token of a managed bot.
+
+        .. versionadded:: 22.8
+
+        Args:
+            user_id (:obj:`int`): User identifier of the managed bot whose token will be
+                returned.
+
+        Returns:
+            :obj:`str`: On success, the managed bot token is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        return await self._post(
+            "getManagedBotToken",
+            {"user_id": user_id},
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def replace_managed_bot_token(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> str:
+        """Revokes the current token of a managed bot and generates a new one.
+
+        .. versionadded:: 22.8
+
+        Args:
+            user_id (:obj:`int`): User identifier of the managed bot whose token will be
+                replaced.
+
+        Returns:
+            :obj:`str`: On success, the new managed bot token is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        return await self._post(
+            "replaceManagedBotToken",
+            {"user_id": user_id},
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def get_user_profile_photos(
         self,
         user_id: int,
@@ -7597,7 +7708,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
+        allows_revoting: bool | None = None,
+        shuffle_options: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: Sequence[int] | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -7612,6 +7727,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         business_connection_id: str | None = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Sequence["MessageEntity"] | None = None,
+        description: str | None = None,
+        description_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        description_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         *,
@@ -7649,9 +7767,25 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
                 :tg-const:`telegram.Poll.REGULAR`, defaults to :tg-const:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): :obj:`True`, if the poll allows
-                multiple answers, ignored for polls in quiz mode, defaults to :obj:`False`.
-            correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
-                option, required for polls in quiz mode.
+                multiple answers, defaults to :obj:`False`.
+            allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to change
+                chosen answer options.
+
+                .. versionadded:: 22.8
+            shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
+                shown in random order.
+
+                .. versionadded:: 22.8
+            allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
+                added to the poll after creation.
+
+                .. versionadded:: 22.8
+            hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results must
+                be shown only after the poll closes.
+
+                .. versionadded:: 22.8
+            correct_option_ids (Sequence[:obj:`int`], optional): Monotonically increasing 0-based
+                identifiers of the correct answer options, required for polls in quiz mode.
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
                 answer or taps on the lamp icon in a quiz-style poll,
                 0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
@@ -7710,6 +7844,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :paramref:`question_parse_mode`.
 
                 .. versionadded:: 21.2
+            description (:obj:`str`, optional): Description of the poll to be sent, 0-1024
+                characters after entities parsing.
+
+                .. versionadded:: 22.8
+            description_parse_mode (:obj:`str`, optional): Mode for parsing entities in the poll
+                description.
+
+                .. versionadded:: 22.8
+            description_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
+                entities that appear in the poll description, which can be specified instead of
+                :paramref:`description_parse_mode`.
+
+                .. versionadded:: 22.8
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: 21.3
@@ -7755,7 +7902,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_anonymous": is_anonymous,
             "type": type,
             "allows_multiple_answers": allows_multiple_answers,
-            "correct_option_id": correct_option_id,
+            "allows_revoting": allows_revoting,
+            "shuffle_options": shuffle_options,
+            "allow_adding_options": allow_adding_options,
+            "hide_results_until_closes": hide_results_until_closes,
+            "correct_option_ids": correct_option_ids,
             "is_closed": is_closed,
             "explanation": explanation,
             "explanation_entities": explanation_entities,
@@ -7763,6 +7914,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "close_date": close_date,
             "question_parse_mode": question_parse_mode,
             "question_entities": question_entities,
+            "description": description,
+            "description_parse_mode": description_parse_mode,
+            "description_entities": description_entities,
         }
 
         return await self._send_message(
@@ -8592,8 +8746,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to copy messages of any kind. If some of the specified messages can't be
         found or copied, they are skipped. Service messages, paid media messages, giveaway
         messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can
-        be copied only if the value
-        of the field :attr:`telegram.Poll.correct_option_id` is known to the bot. The method is
+        be copied only if the value of the field :attr:`telegram.Poll.correct_option_ids` is known
+        to the bot. The method is
         analogous to the method :meth:`forward_messages`, but the copied messages don't have a
         link to the original message. Album grouping is kept for copied messages.
 
@@ -12141,6 +12295,12 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`answer_inline_query`"""
     savePreparedInlineMessage = save_prepared_inline_message
     """Alias for :meth:`save_prepared_inline_message`"""
+    savePreparedKeyboardButton = save_prepared_keyboard_button
+    """Alias for :meth:`save_prepared_keyboard_button`"""
+    getManagedBotToken = get_managed_bot_token
+    """Alias for :meth:`get_managed_bot_token`"""
+    replaceManagedBotToken = replace_managed_bot_token
+    """Alias for :meth:`replace_managed_bot_token`"""
     getUserProfilePhotos = get_user_profile_photos
     """Alias for :meth:`get_user_profile_photos`"""
     getFile = get_file
