@@ -21,7 +21,6 @@ import datetime as dtm
 import pytest
 
 from telegram import (
-    Bot,
     BusinessBotRights,
     BusinessConnection,
     Chat,
@@ -46,10 +45,7 @@ from telegram._reply import ReplyParameters
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.constants import InputProfilePhotoType, InputStoryContentType
-from telegram.ext import ExtBot
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.files import data_file
-from tests.auxil.networking import OfflineRequest
 
 
 class BusinessMethodsTestBase:
@@ -110,7 +106,6 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             assert data.get("exclude_unsaved") is bool_param
             assert data.get("exclude_saved") is bool_param
             assert data.get("exclude_unlimited") is bool_param
-            assert data.get("exclude_limited") is bool_param
             assert data.get("exclude_limited_upgradable") is bool_param
             assert data.get("exclude_limited_non_upgradable") is bool_param
             assert data.get("exclude_unique") is bool_param
@@ -127,7 +122,6 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             exclude_unsaved=bool_param,
             exclude_saved=bool_param,
             exclude_unlimited=bool_param,
-            exclude_limited=bool_param,
             exclude_limited_upgradable=bool_param,
             exclude_limited_non_upgradable=bool_param,
             exclude_unique=bool_param,
@@ -137,40 +131,6 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
             limit=limit,
         )
         assert isinstance(obj, OwnedGifts)
-
-    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
-    async def test_get_business_account_gifts_exclude_limited_deprecation(
-        self, offline_bot, monkeypatch, bot_class
-    ):
-        bot = bot_class(offline_bot.token, request=OfflineRequest())
-
-        async def dummy_response(*args, **kwargs):
-            return OwnedGifts(
-                total_count=1,
-                gifts=[
-                    OwnedGiftRegular(
-                        gift=Gift(
-                            id="id1",
-                            sticker=Sticker(
-                                "file_id", "file_unique_id", 512, 512, False, False, "regular"
-                            ),
-                            star_count=5,
-                        ),
-                        send_date=dtm.datetime.now(tz=UTC).replace(microsecond=0),
-                        owned_gift_id="some_id_1",
-                    )
-                ],
-            ).to_dict()
-
-        monkeypatch.setattr(bot.request, "post", dummy_response)
-        with pytest.warns(PTBDeprecationWarning, match=r"9\.3.*exclude_limited") as record:
-            await bot.get_business_account_gifts(
-                business_connection_id=self.bci,
-                exclude_limited=True,
-            )
-
-        assert record[0].category == PTBDeprecationWarning
-        assert record[0].filename == __file__, "wrong stacklevel!"
 
     async def test_get_business_account_star_balance(self, offline_bot, monkeypatch):
         star_amount_json = StarAmount(amount=100, nanostar_amount=356).to_json()

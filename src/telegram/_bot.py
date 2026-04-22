@@ -35,6 +35,8 @@ from typing import (
     no_type_check,
 )
 
+from telegram._userprofileaudios import UserProfileAudios
+
 try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
@@ -45,7 +47,7 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-from telegram._botcommand import BotCommand
+from telegram._botcommand import BotCommand  # pylint: disable=ungrouped-imports
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
 from telegram._botname import BotName
@@ -106,14 +108,13 @@ from telegram._utils.types import (
     TimePeriod,
 )
 from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import build_deprecation_warning_message
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit, ReactionEmoji
 from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -1217,9 +1218,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Use this method to stream a partial message to a user while the message is being
-        generated; supported only for bots with forum topic mode enabled.
+        generated.
 
         .. versionadded:: 22.6
+
+        .. versionchanged:: 22.7
+            Now all bots can use this method.
+
 
         Args:
             chat_id (:obj:`int`): Unique identifier for the target private chat.
@@ -5931,6 +5936,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         can_edit_stories: bool | None = None,
         can_delete_stories: bool | None = None,
         can_manage_direct_messages: bool | None = None,
+        can_manage_tags: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5958,7 +5964,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 administrator privilege.
 
                 .. versionadded:: 13.4
-
             can_manage_video_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
                 can manage video chats.
 
@@ -5994,7 +5999,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 20.6
             can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 edit stories posted by other users, post stories to the chat page, pin chat
-                stories, and access the chat's story archive
+                stories, and access the chat's story archive.
 
                 .. versionadded:: 20.6
             can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -6003,9 +6008,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 .. versionadded:: 20.6
             can_manage_direct_messages (:obj:`bool`, optional): Pass :obj:`True`, if the
                 administrator can manage direct messages within the channel and decline suggested
-                posts; for channels only
+                posts; for channels only.
 
                 .. versionadded:: 22.4
+            can_manage_tags (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                edit the tags of regular members; for groups and supergroups only.
+
+                .. versionadded:: 22.7
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6033,6 +6042,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             "can_edit_stories": can_edit_stories,
             "can_delete_stories": can_delete_stories,
             "can_manage_direct_messages": can_manage_direct_messages,
+            "can_manage_tags": can_manage_tags,
         }
 
         return await self._post(
@@ -8922,8 +8932,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: JSONDict | None = None,
     ) -> ForumTopic:
         """
-        Use this method to create a topic in a forum supergroup chat. The bot must be
-        an administrator in the chat for this to work and must have
+        Use this method to create a topic in a forum supergroup chat or a private chat with a user.
+        The bot must be an administrator in the chat for this to work and must have
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
         .. versionadded:: 20.0
@@ -9942,8 +9952,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         exclude_unsaved: bool | None = None,
         exclude_saved: bool | None = None,
         exclude_unlimited: bool | None = None,
-        # tags: deprecated 22.6; bot api 9.3
-        exclude_limited: bool | None = None,
         exclude_unique: bool | None = None,
         sort_by_price: bool | None = None,
         offset: str | None = None,
@@ -9964,6 +9972,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. versionadded:: 22.1
 
+        .. versionremoved:: 22.7
+              Bot API 9.3 removed the :paramref:`exclude_limited` parameter. Use
+              :paramref:`exclude_limited_upgradable` and :paramref:`exclude_limited_non_upgradable`
+              instead.
+
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
             exclude_unsaved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that aren't
@@ -9972,13 +9985,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 to the account's profile page.
             exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can
                 be purchased an unlimited number of times.
-            exclude_limited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
-                purchased a limited number of times.
-
-                .. deprecated:: 22.6
-                    Bot API 9.3 deprecated this parameter in favor of
-                    :paramref:`exclude_limited_upgradabale` and
-                    :paramref:`exclude_limited_non_upgradable`.
             exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
                 that can be purchased a limited number of times and can be upgraded to unique.
 
@@ -10009,25 +10015,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        if exclude_limited is not None:
-            self._warn(
-                PTBDeprecationWarning(
-                    version="22.6",
-                    message=build_deprecation_warning_message(
-                        deprecated_name="exclude_limited",
-                        new_name="exclude_limited_(non_)upgradable",
-                        bot_api_version="9.3",
-                        object_type="parameter",
-                    ),
-                ),
-                stacklevel=2,
-            )
         data: JSONDict = {
             "business_connection_id": business_connection_id,
             "exclude_unsaved": exclude_unsaved,
             "exclude_saved": exclude_saved,
             "exclude_unlimited": exclude_unlimited,
-            "exclude_limited": exclude_limited,
             "exclude_limited_upgradable": exclude_limited_upgradable,
             "exclude_limited_non_upgradable": exclude_limited_non_upgradable,
             "exclude_unique": exclude_unique,
@@ -11714,7 +11706,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Reposts a story on behalf of a business account from another business account.
         Both business accounts must be managed by the same bot, and the story on the source account
         must have been posted (or reposted) by the bot. Requires the
-        :attr:`~telegram.BusinessBotRight.can_manage_stories` business bot right for both
+        :attr:`~telegram.BusinessBotRights.can_manage_stories` business bot right for both
         business accounts.
 
         .. versionadded:: 22.6
@@ -11726,10 +11718,10 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             from_story_id (:obj:`int`): Unique identifier of the story that should be reposted
             active_period (:obj:`int` | :class:`datetime.timedelta`): Period after which the story
                 is moved to the archive, in seconds; must be one of
-                :tg-const:`telegram.constants.StoryLimit.SIX_HOURS`,
-                :tg-const:`telegram.constants.StoryLimit.TWELVE_HOURS`,
-                :tg-const:`telegram.constants.StoryLimit.ONE_DAY`, or
-                :tg-const:`telegram.constants.StoryLimit.TWO_DAYS`.
+                :tg-const:`telegram.constants.StoryLimit.ACTIVITY_SIX_HOURS`,
+                :tg-const:`telegram.constants.StoryLimit.ACTIVITY_TWELVE_HOURS`,
+                :tg-const:`telegram.constants.StoryLimit.ACTIVITY_ONE_DAY`, or
+                :tg-const:`telegram.constants.StoryLimit.ACTIVITY_TWO_DAYS`.
             post_to_chat_page (:obj:`bool`, optional): Pass :obj:`True` to keep the story
                 accessible after it expires.
             protect_content (:obj:`bool`, optional): Pass :obj:`True` if the content of the story
@@ -11784,24 +11776,27 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         .. versionadded:: 22.6
 
-        user_id (:obj:`int`): Unique identifier of the user
-        exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
-            purchased an unlimited number of times
-        exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
-            can be purchased a limited number of times and can be upgraded to unique
-        exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
-            that can be purchased a limited number of times and can't be upgraded to unique
-        exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
-            were assigned from the TON blockchain and can't be resold or transferred in Telegram
-        exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts
-        sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
-            instead of send date. Sorting is applied before pagination.
-        offset (:obj:`str`, optional): Offset of the first entry to return as received from the
-            previous request; use an empty string to get the first chunk of results
-        limit (:obj:`int`, optional): The maximum number of gifts to be returned;
-            :tg-const:`~telegram.constants.BusinessLimit.MIN_GIFT_RESULTS` -
-            :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESLUTS`.
-            Defaults to :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESLUTS`
+        Args:
+            user_id (:obj:`int`): Unique identifier of the user
+            exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can
+                be purchased an unlimited number of times
+            exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
+                that can be purchased a limited number of times and can be upgraded to unique
+            exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude
+                gifts that can be purchased a limited number of times and can't be upgraded to
+                unique.
+            exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
+                were assigned from the TON blockchain and can't be resold or transferred in
+                Telegram.
+            exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts
+            sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
+                instead of send date. Sorting is applied before pagination.
+            offset (:obj:`str`, optional): Offset of the first entry to return as received from the
+                previous request; use an empty string to get the first chunk of results
+            limit (:obj:`int`, optional): The maximum number of gifts to be returned;
+                :tg-const:`~telegram.constants.BusinessLimit.MIN_GIFT_RESULTS` -
+                :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`.
+                Defaults to :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`
 
         Returns:
             :class:`telegram.OwnedGifts`: The owned gifts for the user.
@@ -11857,32 +11852,34 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         .. versionadded:: 22.6
 
         Args:
-        chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-        exclude_unsaved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that aren't
-            saved to the chat's profile page. Always :obj:`True`, unless the bot has the
-            :attr:`~telegram.ChatAdministratorRights..can_post_messages` administrator right in the
-                channel.
-        exclude_saved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that are saved to
-            the chat's profile page. Always :obj:`False`, unless the bot has the
-            :attr:`~telegram.ChatAdministratorRights..can_post_messages` administrator right in the
-                channel.
-        exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can be
-            purchased an unlimited number of times
-        exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
-            can be purchased a limited number of times and can be upgraded to unique
-        exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
-            that can be purchased a limited number of times and can't be upgraded to unique
-        exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
-            were assigned from the TON blockchain and can't be resold or transferred in Telegram
-        exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts
-        sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
-            instead of send date. Sorting is applied before pagination.
-        offset (:obj:`str`, optional): Offset of the first entry to return as received from the
-            previous request; use an empty string to get the first chunk of results
-        limit (:obj:`int`, optional): The maximum number of gifts to be returned;
-            :tg-const:`~telegram.constants.BusinessLimit.MIN_GIFT_RESULTS` -
-            :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESLUTS`.
-            Defaults to :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESLUTS`
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            exclude_unsaved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that aren't
+                saved to the chat's profile page. Always :obj:`True`, unless the bot has the
+                :attr:`~telegram.ChatAdministratorRights.can_post_messages` administrator right in
+                the channel.
+            exclude_saved (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that are saved
+                to the chat's profile page. Always :obj:`False`, unless the bot has the
+                :attr:`~telegram.ChatAdministratorRights.can_post_messages` administrator right in
+                the channel.
+            exclude_unlimited (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that can
+                be purchased an unlimited number of times
+            exclude_limited_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts
+                that can be purchased a limited number of times and can be upgraded to unique
+            exclude_limited_non_upgradable (:obj:`bool`, optional): Pass :obj:`True` to exclude
+                gifts that can be purchased a limited number of times and can't be upgraded to
+                unique.
+            exclude_from_blockchain (:obj:`bool`, optional): Pass :obj:`True` to exclude gifts that
+                were assigned from the TON blockchain and can't be resold or transferred in
+                Telegram.
+            exclude_unique (:obj:`bool`, optional): Pass :obj:`True` to exclude unique gifts
+            sort_by_price (:obj:`bool`, optional): Pass :obj:`True` to sort results by gift price
+                instead of send date. Sorting is applied before pagination.
+            offset (:obj:`str`, optional): Offset of the first entry to return as received from the
+                previous request; use an empty string to get the first chunk of results
+            limit (:obj:`int`, optional): The maximum number of gifts to be returned;
+                :tg-const:`~telegram.constants.BusinessLimit.MIN_GIFT_RESULTS` -
+                :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`.
+                Defaults to :tg-const:`~telegram.constants.BusinessLimit.MAX_GIFT_RESULTS`
 
         Returns:
             :class:`telegram.OwnedGifts`: The owned gifts for the chat.
@@ -11915,6 +11912,174 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
         return OwnedGifts.de_json(result, self)
+
+    async def set_my_profile_photo(
+        self,
+        photo: "InputProfilePhoto",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Changes the profile photo of the bot.
+
+        .. versionadded:: 22.7
+
+        Args:
+            photo (:class:`telegram.InputProfilePhoto`): The new profile photo to set.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "photo": photo,
+        }
+        return await self._post(
+            "setMyProfilePhoto",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def remove_my_profile_photo(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Removes the profile photo of the bot. Requires no parameters.
+
+        .. versionadded:: 22.7
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+
+        return await self._post(
+            "removeMyProfilePhoto",
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_user_profile_audios(
+        self,
+        user_id: int,
+        offset: int | None = None,
+        limit: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> UserProfileAudios:
+        """
+        Use this method to get a list of profile audios for a user.
+
+        .. versionadded:: 22.7
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user.
+            offset (:obj:`int`, optional): Sequential number of the first audio to be returned.
+                By default, all audios are returned.
+            limit (:obj:`int`, optional): Limits the number of audios to be retrieved. Values
+                between :tg-const:`telegram.constants.UserProfileAudiosLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.UserProfileAudiosLimit.MAX_LIMIT` are accepted.
+                Defaults to :tg-const:`telegram.constants.UserProfileAudiosLimit.MAX_LIMIT`.
+
+        Returns:
+            :class:`telegram.UserProfileAudios`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+
+        data = {
+            "user_id": user_id,
+            "offset": offset,
+            "limit": limit,
+        }
+
+        result = await self._post(
+            "getUserProfileAudios",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return UserProfileAudios.de_json(result, self)
+
+    async def set_chat_member_tag(
+        self,
+        chat_id: int | str,
+        user_id: int,
+        tag: str | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Use this method to set a tag for a regular member in a group or a supergroup. The bot must
+        be an administrator in the chat for this to work and must have the
+        :attr:`~telegram.ChatMemberAdministrator.can_manage_tags` administrator right.
+
+        .. versionadded:: 22.7
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            user_id (:obj:`int`): Unique identifier of the target user.
+            tag (:obj:`str`, optional): New tag for the member;
+                0-:tg-const:`telegram.constants.TagLimit.MAX_TAG_LENGTH` characters, emoji are not
+                allowed.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "user_id": user_id,
+            "tag": tag,
+        }
+
+        return await self._post(
+            "setChatMemberTag",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
 
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -12248,3 +12413,11 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`get_user_gifts`"""
     getChatGifts = get_chat_gifts
     """Alias for :meth:`get_chat_gifts`"""
+    removeMyProfilePhoto = remove_my_profile_photo
+    """Alias for :meth:`remove_my_profile_photo`"""
+    setMyProfilePhoto = set_my_profile_photo
+    """Alias for :meth:`set_my_profile_photo`"""
+    getUserProfileAudios = get_user_profile_audios
+    """Alias for :meth:`get_user_profile_audios`"""
+    setChatMemberTag = set_chat_member_tag
+    """Alias for :meth:`set_chat_member_tag`"""

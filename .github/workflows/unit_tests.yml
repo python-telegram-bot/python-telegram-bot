@@ -1,6 +1,7 @@
 name: Unit Tests
 on:
   pull_request:
+    types: [synchronize, reopened, ready_for_review]
     paths:
       - src/telegram/**
       - tests/**
@@ -25,7 +26,7 @@ jobs:
             os: ubuntu-latest
       fail-fast: False
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
@@ -86,15 +87,16 @@ jobs:
             .test_report_optionals_junit.xml
 
       - name: Submit coverage
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de  # v5.5.2
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe  # v5.5.4
         with:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload test results to Codecov
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe  # v5.5.4
         if: ${{ !cancelled() }}
         with:
           files: .test_report_no_optionals_junit.xml,.test_report_optionals_junit.xml
           token: ${{ secrets.CODECOV_TOKEN }}
+          report_type: test_results

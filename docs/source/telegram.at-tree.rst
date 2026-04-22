@@ -65,6 +65,8 @@ Available Types
     telegram.chatmemberowner
     telegram.chatmemberrestricted
     telegram.chatmemberupdated
+    telegram.chatownerchanged
+    telegram.chatownerleft
     telegram.chatpermissions
     telegram.chatphoto
     telegram.chatshared
@@ -191,6 +193,7 @@ Available Types
     telegram.update
     telegram.user
     telegram.userchatboosts
+    telegram.userprofileaudios
     telegram.userprofilephotos
     telegram.userrating
     telegram.usersshared
@@ -201,6 +204,7 @@ Available Types
     telegram.videochatscheduled
     telegram.videochatstarted
     telegram.videonote
+    telegram.videoquality
     telegram.voice
     telegram.webappdata
     telegram.webappinfo

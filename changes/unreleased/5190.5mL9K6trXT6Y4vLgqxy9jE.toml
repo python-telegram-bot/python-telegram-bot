@@ -1,0 +1,5 @@
+other = "Update codecov/codecov-action action to v5.5.4"
+[[pull_requests]]
+uid = "5190"
+author_uids = ["renovate[bot]"]
+closes_threads = []

@@ -85,11 +85,13 @@ __all__ = [
     "InputStoryContentType",
     "InvoiceLimit",
     "KeyboardButtonRequestUsersLimit",
+    "KeyboardButtonStyle",
     "LocationLimit",
     "MaskPosition",
     "MediaGroupLimit",
     "MenuButtonType",
     "MessageAttachmentType",
+    "MessageEntityDateTimeFormats",
     "MessageEntityType",
     "MessageLimit",
     "MessageOriginType",
@@ -120,10 +122,13 @@ __all__ = [
     "SuggestedPost",
     "SuggestedPostInfoState",
     "SuggestedPostRefunded",
+    "TagLimit",
     "TransactionPartnerType",
     "TransactionPartnerUser",
     "UniqueGiftInfoOrigin",
+    "UniqueGiftModelRarity",
     "UpdateType",
+    "UserProfileAudiosLimit",
     "UserProfilePhotosLimit",
     "VerifyLimit",
     "WebhookLimit",
@@ -176,7 +181,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=3)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=5)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1402,6 +1407,53 @@ class InlineKeyboardButtonLimit(IntEnum):
     """
 
 
+class KeyboardButtonStyle(StringEnum):
+    """This enum contains the available button styles for
+    :class:`telegram.InlineKeyboardButton` and :class:`telegram.KeyboardButton`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 22.7
+    """
+
+    __slots__ = ()
+
+    PRIMARY = "primary"
+    """:obj:`str`: Primary button style (usually blue) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    SUCCESS = "success"
+    """:obj:`str`: Success button style (usually green) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    DANGER = "danger"
+    """:obj:`str`: Danger/destructive button style (usually red) for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    BLUE = "primary"
+    """:obj:`str`: Alias for :attr:`PRIMARY`. Blue button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    GREEN = "success"
+    """:obj:`str`: Alias for :attr:`SUCCESS`. Green button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+    RED = "danger"
+    """:obj:`str`: Alias for :attr:`DANGER`. Red button style for the
+    :paramref:`~telegram.InlineKeyboardButton.style` and
+    :paramref:`~telegram.KeyboardButton.style` parameters.
+    """
+
+
 class InlineKeyboardMarkupLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineKeyboardMarkup`/
     :meth:`telegram.Bot.send_message` & friends. The enum
@@ -1967,6 +2019,11 @@ class MessageEntityType(StringEnum):
 
     .. versionadded:: 20.0
     """
+    DATE_TIME = "date_time"
+    """:obj:`str`: Message entities representing formatted date and time.
+
+    .. versionadded:: 22.7
+    """
     EMAIL = "email"
     """:obj:`str`: Message entities representing a email."""
     EXPANDABLE_BLOCKQUOTE = "expandable_blockquote"
@@ -1996,6 +2053,63 @@ class MessageEntityType(StringEnum):
     """:obj:`str`: Message entities representing underline text."""
     URL = "url"
     """:obj:`str`: Message entities representing a url."""
+
+
+class MessageEntityDateTimeFormats(StringEnum):
+    """This enum contains all possible formats for :attr:`telegram.MessageEntity.date_time_format`.
+    Please read `date-time entity formatting
+    <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 22.7
+    """
+
+    __slots__ = ()
+
+    RELATIVE = "r"
+    """:obj:`str`: Displays the time relative to the current time."""
+    LOCALIZED_WEEKDAY = "w"
+    """:obj:`str`: Displays the day of the week in the user's localized language."""
+    SHORT_DATE = "d"
+    """:obj:`str`: Displays the date in short form (e.g., ``17.03.22``)."""
+    LONG_DATE = "D"
+    """:obj:`str`: Displays the date in long form (e.g., ``March 17, 2022``)."""
+    SHORT_TIME = "t"
+    """:obj:`str`: Displays the time in short form (e.g., ``22:45``)."""
+    LONG_TIME = "T"
+    """:obj:`str`: Displays the time in long form (e.g., ``22:45:00``)."""
+    LOCALIZED_WEEKDAY_SHORT_DATE = "wd"
+    """:obj:`str`: Displays the day of the week in the user's localized language and the date in
+    short form."""
+    LOCALIZED_WEEKDAY_LONG_DATE = "wD"
+    """:obj:`str`: Displays the day of the week in the user's localized language and the date in
+    long form."""
+    LOCALIZED_WEEKDAY_SHORT_TIME = "wt"
+    """:obj:`str`: Displays the day of the week in the user's localized language and the time in
+    short form."""
+    LOCALIZED_WEEKDAY_LONG_TIME = "wT"
+    """:obj:`str`: Displays the day of the week in the user's localized language and the time in
+    long form."""
+    LOCALIZED_WEEKDAY_SHORT_DATE_SHORT_TIME = "wdt"
+    """:obj:`str`: Displays the day of the week in the user's localized language, the date in
+    short form and the time in short form."""
+    LOCALIZED_WEEKDAY_SHORT_DATE_LONG_TIME = "wdT"
+    """:obj:`str`: Displays the day of the week in the user's localized language, the date in
+    short form and the time in long form."""
+    LOCALIZED_WEEKDAY_LONG_DATE_SHORT_TIME = "wDt"
+    """:obj:`str`: Displays the day of the week in the user's localized language, the date in
+    long form and the time in short form."""
+    LOCALIZED_WEEKDAY_LONG_DATE_LONG_TIME = "wDT"
+    """:obj:`str`: Displays the day of the week in the user's localized language, the date in
+    long form and the time in long form."""
+    SHORT_DATE_SHORT_TIME = "dt"
+    """:obj:`str`: Displays the date in short form and the time in short form."""
+    SHORT_DATE_LONG_TIME = "dT"
+    """:obj:`str`: Displays the date in short form and the time in long form."""
+    LONG_DATE_SHORT_TIME = "Dt"
+    """:obj:`str`: Displays the date in long form and the time in short form."""
+    LONG_DATE_LONG_TIME = "DT"
+    """:obj:`str`: Displays the date in long form and the time in long form."""
 
 
 class MessageLimit(IntEnum):
@@ -2109,15 +2223,25 @@ class MessageType(StringEnum):
     """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
-    CHAT_SHARED = "chat_shared"
-    """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
-
-    .. versionadded:: 20.8
-    """
     CHAT_BACKGROUND_SET = "chat_background_set"
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_background_set`.
 
     .. versionadded:: 21.2
+    """
+    CHAT_OWNER_CHANGED = "chat_owner_changed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_owner_changed`.
+
+    .. versionadded:: 22.7
+    """
+    CHAT_OWNER_LEFT = "chat_owner_left"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_owner_left`.
+
+    .. versionadded:: 22.7
+    """
+    CHAT_SHARED = "chat_shared"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
+
+    .. versionadded:: 20.8
     """
     CHECKLIST = "checklist"
     """:obj:`str`: Messages with :attr:`telegram.Message.checklist`.
@@ -3369,6 +3493,25 @@ class UniqueGiftInfoOrigin(StringEnum):
     """:obj:`str` gift upgraded"""
 
 
+class UniqueGiftModelRarity(StringEnum):
+    """This enum contains the available rarities for :class:`telegram.UniqueGiftModel`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 22.7
+    """
+
+    __slots__ = ()
+
+    UNCOMMON = "uncommon"
+    """:obj:`str` uncommon rarity"""
+    RARE = "rare"
+    """:obj:`str` rare rarity"""
+    EPIC = "epic"
+    """:obj:`str` epic rarity"""
+    LEGENDARY = "legendary"
+    """:obj:`str` legendary rarity"""
+
+
 class UpdateType(StringEnum):
     """This enum contains the available types of :class:`telegram.Update`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -3586,6 +3729,27 @@ class UserProfilePhotosLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for
     :paramref:`~telegram.Bot.get_user_profile_photos.limit` parameter of
     :meth:`telegram.Bot.get_user_profile_photos`.
+    """
+
+
+class UserProfileAudiosLimit(IntEnum):
+    """This enum contains limitations for :paramref:`telegram.Bot.get_user_profile_audios.limit`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 22.7
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.Bot.get_user_profile_audios.limit` parameter of
+    :meth:`telegram.Bot.get_user_profile_audios`.
+    """
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum value allowed for
+    :paramref:`~telegram.Bot.get_user_profile_audios.limit` parameter of
+    :meth:`telegram.Bot.get_user_profile_audios`.
     """
 
 
@@ -3863,4 +4027,19 @@ class VerifyLimit(IntEnum):
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.verify_chat.custom_description` or
     :paramref:`~telegram.Bot.verify_user.custom_description` parameter.
+    """
+
+
+class TagLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.set_chat_member_tag`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 22.7
+    """
+
+    __slots__ = ()
+
+    MAX_TAG_LENGTH = 16
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_member_tag.tag` parameter.
     """

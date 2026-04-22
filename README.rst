@@ -11,7 +11,7 @@ python-telegram-botsyes.. image:: https://raw.githubusercontent.com/python-teleg
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-9.3-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-9.5-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API version
 
@@ -42,10 +42,6 @@ python-telegram-botsyes.. image:: https://raw.githubusercontent.com/python-teleg
 .. image:: https://api.codacy.com/project/badge/Grade/99d901eaa09b44b4819aec05c330c968
    :target: https://app.codacy.com/gh/python-telegram-bot/python-telegram-bot/dashboard
    :alt: Code quality: Codacy
-
-.. image:: https://results.pre-commit.ci/badge/github/python-telegram-bot/python-telegram-bot/master.svg
-   :target: https://results.pre-commit.ci/latest/github/python-telegram-bot/python-telegram-bot/master
-   :alt: pre-commit.ci status
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
@@ -81,7 +77,7 @@ After installing_ the library, be sure to check out the section on `working with
 Telegram API support
 ~~~~~~~~~~~~~~~~~~~~
 
-All types and methods of the Telegram Bot API **9.3** are natively supported by this library.
+All types and methods of the Telegram Bot API **9.5** are natively supported by this library.
 In addition, Bot API functionality not yet natively included can still be used as described `in our wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Bot-API-Forward-Compatibility>`_.
 
 Notable Features

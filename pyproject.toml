@@ -98,7 +98,7 @@ tests = [
     # required for building the wheels for releases
     "build",
     # For the test suite
-    "pytest==9.0.2",
+    "pytest==9.0.3",
     # needed because pytest doesn't come with native support for coroutines as tests
     "pytest-asyncio==0.21.2",
     # xdist runs tests in parallel
@@ -117,12 +117,12 @@ tests = [
 ]
 docs = [
     "chango~=0.6.0; python_version >= '3.12'",
-    "sphinx==8.2.3; python_version >= '3.11'",
-    "furo==2025.9.25",
+    "sphinx==9.1.0; python_version >= '3.12'",
+    "furo==2025.12.19",
     "sphinx-paramlinks==0.6.0",
-    "sphinxcontrib-mermaid==1.0.0",
+    "sphinxcontrib-mermaid==2.0.1",
     "sphinx-copybutton==0.5.2",
-    "sphinx-inline-tabs==2023.4.21",
+    "sphinx-inline-tabs==2025.12.21.14",
     # Temporary. See #4387
     "sphinx-build-compatibility @ git+https://github.com/readthedocs/sphinx-build-compatibility.git@58aabc5f207c6c2421f23d3578adc0b14af57047",
     # For python 3.14 support, we need a version of pydantic-core >= 2.35.0, since it upgrades the
@@ -132,10 +132,10 @@ docs = [
     "pydantic >= 2.12.0a1 ; python_version >= '3.14'"
 ]
 linting = [
-    "pre-commit",
-    "ruff==0.15.0",
-    "mypy==1.18.2",
-    "pylint==4.0.4"
+    "prek",
+    "ruff==0.15.11",
+    "mypy==1.20.1",
+    "pylint==4.0.5"
 ]
 all = [{ include-group = "tests" }, { include-group = "docs" }, { include-group = "linting"}]
 

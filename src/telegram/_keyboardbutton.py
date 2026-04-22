@@ -34,13 +34,14 @@ if TYPE_CHECKING:
 class KeyboardButton(TelegramObject):
     """
     This object represents one button of the reply keyboard. At most one of the optional fields
-    must be used to specify type of the button. For simple text buttons, :obj:`str`
+    other than :attr:`text`, :attr:`icon_custom_emoji_id`, and :attr:`style` must be used to
+    specify the type of the button. For simple text buttons, :obj:`str`
     can be used instead of this object to specify text of the button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
-    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users` and :attr:`request_chat` are
-    equal.
+    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users`, :attr:`request_chat`,
+    :attr:`style` and :attr:`icon_custom_emoji_id` are equal.
 
     Note:
         * Optional fields are mutually exclusive.
@@ -53,6 +54,8 @@ class KeyboardButton(TelegramObject):
         * :attr:`request_users` and :attr:`request_chat` options will only work in Telegram
           versions released after 3 February, 2023. Older clients will display unsupported
           message.
+        * :attr:`style` option will only work in Telegram versions released after February 9, 2026.
+          Older clients will display buttons without styling.
 
     .. versionchanged:: 21.0
        Removed deprecated argument and attribute ``request_user``.
@@ -62,10 +65,18 @@ class KeyboardButton(TelegramObject):
     .. versionchanged:: 20.5
        :attr:`request_users` and :attr:`request_chat` are considered as well when
        comparing objects of this type in terms of equality.
+    .. versionchanged:: 22.7
+       :attr:`icon_custom_emoji_id` is considered as well when comparing objects of this type in
+       terms of equality.
+
+    .. versionchanged:: 22.7
+       :attr:`style` and :attr:`icon_custom_emoji_id` are considered as well when
+       comparing objects of this type in terms of equality.
 
     Args:
-        text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
-            sent to the bot as a message when the button is pressed.
+        text (:obj:`str`): Text of the button. If none of the fields other than :attr:`text`,
+            :attr:`icon_custom_emoji_id`, and :attr:`style` are used, it will be sent as a
+            message when the button is pressed.
         request_contact (:obj:`bool`, optional): If :obj:`True`, the user's phone number will be
             sent as a contact when the button is pressed. Available in private chats only.
         request_location (:obj:`bool`, optional): If :obj:`True`, the user's current location will
@@ -92,9 +103,28 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
+        style (:obj:`str`, optional): Style of the button. Must be one of
+            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
+            If omitted, then an app-specific style is used.
+
+            .. versionadded:: 22.7
+        icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the
+            custom emoji shown before the text of the button. Can only be used by bots that
+            purchased additional usernames on Fragment or in the messages directly sent by the
+            bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
+
+            .. versionadded:: 22.7
+
     Attributes:
-        text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
-            sent to the bot as a message when the button is pressed.
+        text (:obj:`str`): Text of the button. If none of the fields other than :attr:`text`,
+            :attr:`icon_custom_emoji_id`, and :attr:`style` are used, it will be sent as a
+            message when the button is pressed.
         request_contact (:obj:`bool`): Optional. If :obj:`True`, the user's phone number will be
             sent as a contact when the button is pressed. Available in private chats only.
         request_location (:obj:`bool`): Optional. If :obj:`True`, the user's current location will
@@ -120,14 +150,33 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.1
+        style (:obj:`str`): Optional. Style of the button. Must be one of
+            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
+            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
+            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
+            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
+            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
+            If omitted, then an app-specific style is used.
+
+            .. versionadded:: 22.7
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
+            custom emoji shown before the text of the button. Can only be used by bots that
+            purchased additional usernames on Fragment or in the messages directly sent by the
+            bot to private, group and supergroup chats if the owner of the bot has a Telegram
+            Premium subscription.
+
+            .. versionadded:: 22.7
     """
 
     __slots__ = (
+        "icon_custom_emoji_id",
         "request_chat",
         "request_contact",
         "request_location",
         "request_poll",
         "request_users",
+        "style",
         "text",
         "web_app",
     )
@@ -141,6 +190,8 @@ class KeyboardButton(TelegramObject):
         web_app: WebAppInfo | None = None,
         request_chat: KeyboardButtonRequestChat | None = None,
         request_users: KeyboardButtonRequestUsers | None = None,
+        style: str | None = None,
+        icon_custom_emoji_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -155,6 +206,8 @@ class KeyboardButton(TelegramObject):
         self.web_app: WebAppInfo | None = web_app
         self.request_users: KeyboardButtonRequestUsers | None = request_users
         self.request_chat: KeyboardButtonRequestChat | None = request_chat
+        self.style: str | None = style
+        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
 
         self._id_attrs = (
             self.text,
@@ -164,6 +217,8 @@ class KeyboardButton(TelegramObject):
             self.web_app,
             self.request_users,
             self.request_chat,
+            self.style,
+            self.icon_custom_emoji_id,
         )
 
         self._freeze()

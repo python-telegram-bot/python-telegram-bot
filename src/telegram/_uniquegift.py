@@ -31,12 +31,6 @@ from telegram._utils import enum
 from telegram._utils.argumentparsing import de_json_optional, parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import (
-    build_deprecation_warning_message,
-    warn_about_deprecated_attr_in_property,
-)
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -128,18 +122,32 @@ class UniqueGiftModel(TelegramObject):
         name (:obj:`str`): Name of the model.
         sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
         rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
-            model for every ``1000`` gifts upgraded.
+            model for every ``1000`` gifts upgraded. Always ``0`` for crafted gifts.
+        rarity (:obj:`str`, optional): Rarity of the model if it is a crafted model.
+            Currently, can be :tg-const:`telegram.constants.UniqueGiftModelRarity.UNCOMMON`,
+            :tg-const:`telegram.constants.UniqueGiftModelRarity.RARE`,
+            :tg-const:`telegram.constants.UniqueGiftModelRarity.EPIC`,
+            or :tg-const:`telegram.constants.UniqueGiftModelRarity.LEGENDARY`.
+
+            .. versionadded:: 22.7
 
     Attributes:
         name (:obj:`str`): Name of the model.
         sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
         rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
-            model for every ``1000`` gifts upgraded.
+            model for every ``1000`` gifts upgraded. Always ``0`` for crafted gifts.
+        rarity (:obj:`str`): Optional. Rarity of the model if it is a crafted model.
+            Currently, can be :tg-const:`telegram.constants.UniqueGiftModelRarity.UNCOMMON`,
+            :tg-const:`telegram.constants.UniqueGiftModelRarity.RARE`,
+            :tg-const:`telegram.constants.UniqueGiftModelRarity.EPIC`,
+            or :tg-const:`telegram.constants.UniqueGiftModelRarity.LEGENDARY`.
 
+            .. versionadded:: 22.7
     """
 
     __slots__ = (
         "name",
+        "rarity",
         "rarity_per_mille",
         "sticker",
     )
@@ -149,13 +157,17 @@ class UniqueGiftModel(TelegramObject):
         name: str,
         sticker: Sticker,
         rarity_per_mille: int,
+        rarity: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+        # Required
         self.name: str = name
         self.sticker: Sticker = sticker
         self.rarity_per_mille: int = rarity_per_mille
+        # Optional
+        self.rarity: str | None = enum.get_member(constants.UniqueGiftModelRarity, rarity, rarity)
 
         self._id_attrs = (self.name, self.sticker, self.rarity_per_mille)
 
@@ -340,6 +352,9 @@ class UniqueGift(TelegramObject):
 
     .. versionadded:: 22.1
 
+    .. versionchanged:: 22.7
+        :attr:`gift_id` is now a positional argument.
+
     Args:
         gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
 
@@ -370,6 +385,10 @@ class UniqueGift(TelegramObject):
             business account gifts and gifts that are currently on sale only.
 
             .. versionadded:: 22.6
+        is_burned (:obj:`bool`, optional): :obj:`True`, if the gift was used to craft another
+            gift and isn't available anymore.
+
+            .. versionadded:: 22.7
 
     Attributes:
         gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
@@ -401,7 +420,10 @@ class UniqueGift(TelegramObject):
             business account gifts and gifts that are currently on sale only.
 
             .. versionadded:: 22.6
+        is_burned (:obj:`bool`): Optional. :obj:`True`, if the gift was used to craft another
+            gift and isn't available anymore.
 
+            .. versionadded:: 22.7
     """
 
     __slots__ = (
@@ -409,6 +431,7 @@ class UniqueGift(TelegramObject):
         "base_name",
         "colors",
         "gift_id",
+        "is_burned",
         "is_from_blockchain",
         "is_premium",
         "model",
@@ -420,6 +443,7 @@ class UniqueGift(TelegramObject):
 
     def __init__(
         self,
+        gift_id: str,
         base_name: str,
         name: str,
         number: int,
@@ -427,19 +451,13 @@ class UniqueGift(TelegramObject):
         symbol: UniqueGiftSymbol,
         backdrop: UniqueGiftBackdrop,
         publisher_chat: Chat | None = None,
-        # tags: deprecated 22.6, bot api 9.3
-        # temporarily optional to account for changed signature
-        gift_id: str | None = None,
         is_from_blockchain: bool | None = None,
         is_premium: bool | None = None,
         colors: UniqueGiftColors | None = None,
+        is_burned: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
-        # tags: deprecated 22.6, bot api 9.3
-        if gift_id is None:
-            raise TypeError("`gift_id` is a required argument since Bot API 9.3")
-
         super().__init__(api_kwargs=api_kwargs)
         self.gift_id: str = gift_id
         self.base_name: str = base_name
@@ -452,6 +470,7 @@ class UniqueGift(TelegramObject):
         self.is_from_blockchain: bool | None = is_from_blockchain
         self.is_premium: bool | None = is_premium
         self.colors: UniqueGiftColors | None = colors
+        self.is_burned: bool | None = is_burned
 
         self._id_attrs = (
             self.base_name,
@@ -486,6 +505,9 @@ class UniqueGiftInfo(TelegramObject):
 
     .. versionadded:: 22.1
 
+    .. versionremoved:: 22.7
+        Removed argument and attribute ``last_resale_star_count`` deprecated since Bot API 9.3.
+
     Args:
         gift (:class:`UniqueGift`): Information about the gift.
         origin (:obj:`str`): Origin of the gift. Currently, either :attr:`UPGRADE` for gifts
@@ -502,13 +524,6 @@ class UniqueGiftInfo(TelegramObject):
             bot; only present for gifts received on behalf of business accounts.
         transfer_star_count (:obj:`int`, optional): Number of Telegram Stars that must be paid
             to transfer the gift; omitted if the bot cannot transfer the gift.
-        last_resale_star_count (:obj:`int`, optional): For gifts bought from other users, the price
-            paid for the gift.
-
-            .. versionadded:: 22.3
-            .. deprecated:: 22.6
-                Bot API 9.3 deprecated this field. Use :attr:`last_resale_currency` and
-                :attr:`last_resale_amount` instead.
         last_resale_currency (:obj:`str`, optional): For gifts bought from other users, the
             currency in which the payment for the gift was done. Currently, one of ``XTR`` for
             Telegram Stars or ``TON`` for toncoins.
@@ -577,7 +592,6 @@ class UniqueGiftInfo(TelegramObject):
     """:const:`telegram.constants.UniqueGiftInfoOrigin.UPGRADE`"""
 
     __slots__ = (
-        "_last_resale_star_count",
         "gift",
         "last_resale_amount",
         "last_resale_currency",
@@ -593,28 +607,12 @@ class UniqueGiftInfo(TelegramObject):
         origin: str,
         owned_gift_id: str | None = None,
         transfer_star_count: int | None = None,
-        # tags: deprecated 22.6; bot api 9.3
-        last_resale_star_count: int | None = None,
         next_transfer_date: dtm.datetime | None = None,
         last_resale_currency: str | None = None,
         last_resale_amount: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
-        if last_resale_star_count is not None:
-            warn(
-                PTBDeprecationWarning(
-                    version="22.6",
-                    message=build_deprecation_warning_message(
-                        deprecated_name="last_resale_star_count",
-                        new_name="last_resale_currency/amount",
-                        bot_api_version="9.3",
-                        object_type="parameter",
-                    ),
-                ),
-                stacklevel=2,
-            )
-
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.gift: UniqueGift = gift
@@ -622,7 +620,6 @@ class UniqueGiftInfo(TelegramObject):
         # Optional
         self.owned_gift_id: str | None = owned_gift_id
         self.transfer_star_count: int | None = transfer_star_count
-        self._last_resale_star_count: int | None = last_resale_star_count
         self.next_transfer_date: dtm.datetime | None = next_transfer_date
         self.last_resale_currency: str | None = last_resale_currency
         self.last_resale_amount: int | None = last_resale_amount
@@ -630,25 +627,6 @@ class UniqueGiftInfo(TelegramObject):
         self._id_attrs = (self.gift, self.origin)
 
         self._freeze()
-
-    # tags: deprecated 22.6; bot api 9.3
-    @property
-    def last_resale_star_count(self) -> int | None:
-        """:obj:`int`: Optional. For gifts bought from other users, the price
-        paid for the gift.
-
-        .. versionadded:: 22.3
-        .. deprecated:: 22.6
-            Bot API 9.3 deprecated this field. Use :attr:`last_resale_currency` and
-            :attr:`last_resale_amount` instead.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="last_resale_star_count",
-            new_attr_name="last_resale_currency/amount",
-            bot_api_version="9.3",
-            ptb_version="22.6",
-        )
-        return self._last_resale_star_count
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftInfo":

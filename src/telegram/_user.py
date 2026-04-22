@@ -63,6 +63,7 @@ if TYPE_CHECKING:
         Story,
         SuggestedPostParameters,
         UserChatBoosts,
+        UserProfileAudios,
         UserProfilePhotos,
         Venue,
         Video,
@@ -118,6 +119,11 @@ class User(TelegramObject):
             enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 22.6
+        allows_users_to_create_topics (:obj:`bool`, optional): :obj:`True`, if the bot allows
+            users to create and delete topics in private chats. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: 22.7
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -153,6 +159,11 @@ class User(TelegramObject):
             enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 22.6
+        allows_users_to_create_topics (:obj:`bool`): Optional. :obj:`True`, if the bot allows
+            users to create and delete topics in private chats. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: 22.7
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -161,6 +172,7 @@ class User(TelegramObject):
 
     __slots__ = (
         "added_to_attachment_menu",
+        "allows_users_to_create_topics",
         "can_connect_to_business",
         "can_join_groups",
         "can_read_all_group_messages",
@@ -192,6 +204,7 @@ class User(TelegramObject):
         can_connect_to_business: bool | None = None,
         has_main_web_app: bool | None = None,
         has_topics_enabled: bool | None = None,
+        allows_users_to_create_topics: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -212,6 +225,7 @@ class User(TelegramObject):
         self.can_connect_to_business: bool | None = can_connect_to_business
         self.has_main_web_app: bool | None = has_main_web_app
         self.has_topics_enabled: bool | None = has_topics_enabled
+        self.allows_users_to_create_topics: bool | None = allows_users_to_create_topics
 
         self._id_attrs = (self.id,)
 
@@ -2622,6 +2636,76 @@ class User(TelegramObject):
             sort_by_price=sort_by_price,
             offset=offset,
             limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_profile_audios(
+        self,
+        offset: int | None = None,
+        limit: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "UserProfileAudios":
+        """Shortcut for::
+
+             await bot.get_user_profile_audios(update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_user_profile_audios`.
+
+        .. versionadded:: 22.7
+
+        Returns:
+            :class:`telegram.UserProfileAudios`
+
+        """
+        return await self.get_bot().get_user_profile_audios(
+            user_id=self.id,
+            offset=offset,
+            limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_chat_member_tag(
+        self,
+        chat_id: int | str,
+        tag: str | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+             await bot.set_chat_member_tag(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_member_tag`.
+
+        .. versionadded:: 22.7
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_chat_member_tag(
+            user_id=self.id,
+            chat_id=chat_id,
+            tag=tag,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

@@ -20,7 +20,7 @@ jobs:
       IS_RELEASE_PR: ${{ steps.check_title.outputs.IS_RELEASE_PR }}
 
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           # needed for commit and push step at the end
           persist-credentials: true
@@ -63,7 +63,7 @@ jobs:
 
       - name: Commit & Push
         if: steps.check_title.outputs.IS_RELEASE_PR == 'true'
-        uses: stefanzweifel/git-auto-commit-action@28e16e81777b558cc906c8750092100bbb34c5e3 # v7.0.0
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
         with:
           commit_message: "Do chango Release"
           repository: ./target-repo
