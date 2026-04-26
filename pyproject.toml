@@ -133,7 +133,7 @@ docs = [
 ]
 linting = [
     "prek",
-    "ruff==0.15.11",
+    "ruff==0.15.12",
     "mypy==1.20.1",
     "pylint==4.0.5"
 ]
