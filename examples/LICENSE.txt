@@ -1,3 +1,17 @@
+SPDX-License-Identifier: CC0-1.0 OR MIT-0
+
+The examples in this directory are dual-licensed under either:
+
+1. CC0 1.0 Universal (CC0-1.0)
+   https://creativecommons.org/publicdomain/zero/1.0/
+
+2. MIT No Attribution (MIT-0)
+   https://spdx.org/licenses/MIT-0
+
+You may choose either license for your use of the example code.
+
+---
+
 CC0 1.0 Universal
 
 Statement of Purpose
@@ -8,19 +22,19 @@ subsequent owner(s) (each and all, an "owner") of an original work of
 authorship and/or a database (each, a "Work").
 
 Certain owners wish to permanently relinquish those rights to a Work for the
-purpose of contributing to a commons of creative, cultural and scientific
+purpose of contributing to a commons of creative, cultural, and scientific
 works ("Commons") that the public can reliably and without fear of later
 claims of infringement build upon, modify, incorporate in other works, reuse
 and redistribute as freely as possible in any form whatsoever and for any
 purposes, including without limitation commercial purposes. These owners may
 contribute to the Commons to promote the ideal of a free culture and the
-further production of creative, cultural and scientific works, or to gain
+further production of creative, cultural, and scientific works, or to gain
 reputation or greater distribution for their Work in part through the use and
 efforts of others.
 
 For these and/or other purposes and motivations, and without any expectation
 of additional consideration or compensation, the person associating CC0 with a
-Work (the "Affirmer"), to the extent that he or she is an owner of Copyright
+Work (the "Affirmer"), to the the extent that he or she is an owner of Copyright
 and Related Rights in the Work, voluntarily elects to apply CC0 to the Work
 and publicly distribute the Work under its terms, with knowledge of his or her
 Copyright and Related Rights in the Work and the meaning and intended legal
@@ -42,7 +56,7 @@ to, the following:
   iv. rights protecting against unfair competition in regards to a Work,
   subject to the limitations in paragraph 4(a), below;
 
-  v. rights protecting the extraction, dissemination, use and reuse of data in
+  v. rights protecting the extraction, dissemination, use, and reuse of data in
   a Work;
 
   vi. database rights (such as those arising under Directive 96/9/EC of the
@@ -50,7 +64,7 @@ to, the following:
   protection of databases, and under any national implementation thereof,
   including any amended or successor version of such directive); and
 
-  vii. other similar, equivalent or corresponding rights throughout the world
+  vii. other similar, equivalent, or corresponding rights throughout the world
   based on applicable law or treaty, and any national implementations thereof.
 
 2. Waiver. To the greatest extent permitted by, but not in contravention of,
@@ -114,3 +128,23 @@ Affirmer's express Statement of Purpose.
 
 For more information, please see
 <http://creativecommons.org/publicdomain/zero/1.0/>
+
+---
+
+MIT No Attribution
+
+Copyright 2026 python-telegram-bot contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
