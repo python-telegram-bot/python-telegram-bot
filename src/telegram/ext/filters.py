@@ -430,11 +430,7 @@ class _MergedFilter(UpdateFilter):
         ):
             self.data_filter = True
         self.or_filter = or_filter
-        if (
-            self.or_filter
-            and not isinstance(self.or_filter, bool)
-            and self.or_filter.data_filter
-        ):
+        if self.or_filter and not isinstance(self.or_filter, bool) and self.or_filter.data_filter:
             self.data_filter = True
 
     @staticmethod

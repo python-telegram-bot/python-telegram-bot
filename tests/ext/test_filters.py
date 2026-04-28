@@ -276,6 +276,18 @@ class TestFilters:
         result = (filters.COMMAND | filters.Regex(r"linked param")).check_update(update)
         assert result is True
 
+    def test_merged_filter_or_data_filter(self, update):
+        sre_type = type(re.match("", ""))
+        update.message.text = "deep-linked param"
+        update.message.entities = []
+        # COMMAND doesn't match; or_filter (Regex, a data filter) should return match data
+        result = (filters.COMMAND | filters.Regex(r"linked param")).check_update(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result["matches"]
+        assert isinstance(matches, list)
+        assert all(type(res) is sre_type for res in matches)
+
     def test_regex_complex_merges(self, update, message_origin_user):
         sre_type = type(re.match("", ""))
         update.message.text = "test it out"
