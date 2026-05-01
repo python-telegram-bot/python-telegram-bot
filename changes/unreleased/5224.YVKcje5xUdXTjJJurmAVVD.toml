@@ -1,0 +1,5 @@
+internal = "Update jannekem/run-python-script-action action to v1.8"
+[[pull_requests]]
+uid = "5224"
+author_uids = ["renovate[bot]"]
+closes_threads = []
