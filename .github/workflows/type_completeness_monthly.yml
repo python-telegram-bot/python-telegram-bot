@@ -18,7 +18,7 @@ jobs:
           python-version: 3.12
           pyright-version: ~=1.1.367
       - name: Check Output
-        uses: jannekem/run-python-script-action@bbfca66c612a28f3eeca0ae40e1f810265e2ea68 # v1.7
+        uses: jannekem/run-python-script-action@9d8e2e0878d575fb6073277f38ce3f10ebf4f059 # v1.8
         env:
           TYPE_COMPLETENESS: ${{ steps.pyright-type-completeness.outputs.base-completeness-score }}
         with:
