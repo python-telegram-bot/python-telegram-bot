@@ -1,0 +1,5 @@
+bugfixes = "Fixed incorrect isinstance check in class telegram.ext.filters._MergedFilter for or_filter."
+[[pull_requests]]
+uid = "5125"
+author_uids = ["gistrec"]
+closes_threads = []
