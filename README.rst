@@ -227,13 +227,68 @@ You can also help by `reporting bugs or feature requests <https://github.com/pyt
 Donating
 --------
 Occasionally we are asked if we accept donations to support the development.
-While we appreciate the thought, maintaining PTB is our hobby, and we have almost no running costs for it. We therefore have nothing set up to accept donations.
-If you still want to donate, we kindly ask you to donate to another open source project/initiative of your choice instead.
+While we appreciate the thought, maintaining PTB is our hobby, and we from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-License
--------
+TOKEN = "TON_TOKEN_ICI"
 
-You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_.
-Derivative works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
+# ⚽ logique de prédiction
+def predict(teamA_attack, teamA_defense, teamB_attack, teamB_defense):
 
-.. _`GitHub releases page`: https://github.com/python-telegram-bot/python-telegram-bot/releases
+    teamA_goals = (teamA_attack + teamB_defense) / 2
+    teamB_goals = (teamB_attack + teamA_defense) / 2
+
+    scoreA = round(teamA_goals)
+    scoreB = round(teamB_goals)
+
+    if scoreA > scoreB:
+        result = "Équipe A favorite"
+    elif scoreB > scoreA:
+        result = "Équipe B favorite"
+    else:
+        result = "Match équilibré"
+
+    return scoreA, scoreB, result
+
+
+# 📩 commande /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "👋 Bienvenue !\n\nUtilise :\n/predict A_attack A_defense B_attack B_defense"
+    )
+
+
+# 📊 commande /predict
+async def predict_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    try:
+        a_attack = float(context.args[0])
+        a_defense = float(context.args[1])
+        b_attack = float(context.args[2])
+        b_defense = float(context.args[3])
+
+        scoreA, scoreB, result = predict(a_attack, a_defense, b_attack, b_defense)
+
+        message = f"""
+📊 Prédiction du match :
+
+Score probable : {scoreA} - {scoreB}
+👉 {result}
+"""
+
+        await update.message.reply_text(message)
+
+    except:
+        await update.message.reply_text(
+            "❌ Format incorrect !\nExemple : /predict 2 1 1.5 1.8"
+        )
+
+
+# 🚀 lancement du bot
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("predict", predict_cmd))
+
+print("Bot en marche...")
+app.run_polling()
