@@ -1721,6 +1721,12 @@ class Message(MaybeInaccessibleMessage):
             data.get("chat_owner_changed"), ChatOwnerChanged, bot
         )
         data["chat_owner_left"] = de_json_optional(data.get("chat_owner_left"), ChatOwnerLeft, bot)
+        data["poll_option_added"] = de_json_optional(
+            data.get("poll_option_added"), PollOptionAdded, bot
+        )
+        data["poll_option_deleted"] = de_json_optional(
+            data.get("poll_option_deleted"), PollOptionDeleted, bot
+        )
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

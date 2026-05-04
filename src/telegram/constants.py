@@ -2367,6 +2367,16 @@ class MessageType(StringEnum):
 
     .. versionadded:: v22.2
     """
+    POLL_OPTION_ADDED = "poll_option_added"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_added`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    POLL_OPTION_DELETED = "poll_option_deleted"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_deleted`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
 

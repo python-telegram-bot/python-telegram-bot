@@ -218,7 +218,13 @@ class PollOption(TelegramObject):
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
         data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
+        data["added_by_user"] = de_json_optional(data.get("added_by_user"), User, bot)
+        data["added_by_chat"] = de_json_optional(data.get("added_by_chat"), Chat, bot)
+        data["addition_date"] = from_timestamp(data.get("addition_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 
@@ -392,7 +398,7 @@ class PollOptionAdded(TelegramObject):
 
     Args:
         option_persistent_id (:obj:`str`): Unique identifier of the added option.
-        option_text (:obj:`str`, optional): Option text.
+        option_text (:obj:`str`): Option text.
         poll_message (:class:`telegram.MaybeInaccessibleMessage`, optional): Message
             containing the poll to which the option was added, if known.
             Note that the Message object in this field will not contain the
@@ -402,7 +408,7 @@ class PollOptionAdded(TelegramObject):
 
     Attributes:
         option_persistent_id (:obj:`str`): Unique identifier of the added option.
-        option_text (:obj:`str`, optional): Option text.
+        option_text (:obj:`str`): Option text.
         poll_message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Message
             containing the poll to which the option was added, if known.
             Note that the Message object in this field will not contain the
@@ -453,6 +459,48 @@ class PollOptionAdded(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
+    def parse_option_text_entity(self, entity: MessageEntity) -> str:
+        """Returns the text in :attr:`option_text`
+        from a given :class:`telegram.MessageEntity` of :attr:`option_text_entities`.
+
+        Note:
+            This method is present because Telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
+            (That is, you can't just slice ``Message.text`` with the offset and length.)
+
+        Args:
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
+                be an entity that belongs to :attr:`option_text_entities`.
+
+        Returns:
+            :obj:`str`: The text of the given entity.
+        """
+        return parse_message_entity(self.option_text, entity)
+
+    def parse_option_text_entities(
+        self, types: list[str] | None = None
+    ) -> dict[MessageEntity, str]:
+        """
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
+        It contains entities from this polls option text filtered by their ``type`` attribute as
+        the key, and the text that each entity belongs to as the value of the :obj:`dict`.
+
+        Note:
+            This method should always be used instead of the :attr:`option_text_entities`
+            attribute, since it calculates the correct substring from the message text based on
+            UTF-16 codepoints. See :attr:`parse_entity` for more info.
+
+        Args:
+            types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+                    ``type`` attribute of an entity is contained in this list, it will be returned.
+                    Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
+
+        Returns:
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            the text that belongs to them, calculated based on UTF-16 codepoints.
+        """
+        return parse_message_entities(self.option_text, self.option_text_entities, types)
+
 
 class PollOptionDeleted(TelegramObject):
     """
@@ -465,21 +513,21 @@ class PollOptionDeleted(TelegramObject):
 
     Args:
         option_persistent_id (:obj:`str`): Unique identifier of the deleted option.
-        option_text (:obj:`str`, optional): Option text.
+        option_text (:obj:`str`): Option text.
         poll_message (:class:`telegram.MaybeInaccessibleMessage`, optional): Message
             containing the poll to which the option was deleted, if known.
             Note that the Message object in this field will not contain the
-            reply_to_message field even if it itself is a reply.
+            :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
         option_text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
             entities that appear in the option_text.
 
     Attributes:
         option_persistent_id (:obj:`str`): Unique identifier of the deleted option.
-        option_text (:obj:`str`, optional): Option text.
+        option_text (:obj:`str`): Option text.
         poll_message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Message
             containing the poll to which the option was deleted, if known.
             Note that the Message object in this field will not contain the
-            reply_to_message field even if it itself is a reply.
+            :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
         option_text_entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special
             entities that appear in the option_text.
     """
@@ -525,6 +573,48 @@ class PollOptionDeleted(TelegramObject):
         )
 
         return super().de_json(data=data, bot=bot)
+
+    def parse_option_text_entity(self, entity: MessageEntity) -> str:
+        """Returns the text in :attr:`option_text`
+        from a given :class:`telegram.MessageEntity` of :attr:`option_text_entities`.
+
+        Note:
+            This method is present because Telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
+            (That is, you can't just slice ``Message.text`` with the offset and length.)
+
+        Args:
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
+                be an entity that belongs to :attr:`option_text_entities`.
+
+        Returns:
+            :obj:`str`: The text of the given entity.
+        """
+        return parse_message_entity(self.option_text, entity)
+
+    def parse_option_text_entities(
+        self, types: list[str] | None = None
+    ) -> dict[MessageEntity, str]:
+        """
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
+        It contains entities from this polls option text filtered by their ``type`` attribute as
+        the key, and the text that each entity belongs to as the value of the :obj:`dict`.
+
+        Note:
+            This method should always be used instead of the :attr:`option_text_entities`
+            attribute, since it calculates the correct substring from the message text based on
+            UTF-16 codepoints. See :attr:`parse_entity` for more info.
+
+        Args:
+            types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+                    ``type`` attribute of an entity is contained in this list, it will be returned.
+                    Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
+
+        Returns:
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            the text that belongs to them, calculated based on UTF-16 codepoints.
+        """
+        return parse_message_entities(self.option_text, self.option_text_entities, types)
 
 
 class Poll(TelegramObject):
@@ -881,6 +971,63 @@ class Poll(TelegramObject):
 
         """
         return parse_message_entities(self.question, self.question_entities, types)
+
+    def parse_description_entity(self, entity: MessageEntity) -> str:
+        """Returns the text in :attr:`description` from a given :class:`telegram.MessageEntity` of
+        :attr:`description_entities`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Note:
+            This method is present because Telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
+            (That is, you can't just slice ``Message.text`` with the offset and length.)
+
+        Args:
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
+                be an entity that belongs to :attr:`description_entities`.
+
+        Returns:
+            :obj:`str`: The text of the given entity.
+
+        Raises:
+            RuntimeError: If the poll has no description.
+
+        """
+        if not self.description:
+            raise RuntimeError("This Poll has no 'description'.")
+
+        return parse_message_entity(self.description, entity)
+
+    def parse_description_entities(
+        self, types: list[str] | None = None
+    ) -> dict[MessageEntity, str]:
+        """
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
+        It contains entities from this polls description filtered by their ``type`` attribute as
+        the key, and the text that each entity belongs to as the value of the :obj:`dict`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Note:
+            This method should always be used instead of the :attr:`description_entities`
+            attribute, since it calculates the correct substring from the message text based on
+            UTF-16 codepoints. See :attr:`parse_description_entity` for more info.
+
+        Args:
+            types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+                    ``type`` attribute of an entity is contained in this list, it will be returned.
+                    Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
+        Returns:
+            dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities
+            mapped to the text that belongs to them, calculated based on UTF-16 codepoints.
+        Raises:
+            RuntimeError: If the poll has no description.
+        """
+        if not self.description:
+            raise RuntimeError("This Poll has no 'description'.")
+
+        return parse_message_entities(self.description, self.description_entities, types)
 
     @property
     def correct_option_id(self) -> int | None:
