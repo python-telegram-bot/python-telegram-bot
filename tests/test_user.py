@@ -911,3 +911,18 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "set_chat_member_tag", make_assertion)
         assert await user.set_chat_member_tag(chat_id="chat_id", tag="tag")
+
+    async def test_instance_method_replace_token(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id
+
+        assert check_shortcut_signature(
+            user.replace_token, Bot.replace_managed_bot_token, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.replace_token, user.get_bot(), "replace_managed_bot_token"
+        )
+        assert await check_defaults_handling(user.replace_token, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "replace_managed_bot_token", make_assertion)
+        assert await user.replace_token()

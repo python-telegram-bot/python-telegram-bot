@@ -43,10 +43,12 @@ class ManagedBotUpdatedHandler(BaseHandler[Update, CCT, RT]):
 
                 async def callback(update: Update, context: CallbackContext)
         user_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
-            those which are from the specified user ID(s), i.e. the creator of the managed bot.
+            those which are from the specified user ID(s). The user ID(s) can be either the
+            creator of the managed bot or the bot itself.
 
         username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
-            those which are from the specified username(s), i.e. the creator of the managed bot.
+            those which are from the specified username(s). The username(s) can be either the
+            creator of the managed bot or the bot itself.
 
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
@@ -90,7 +92,13 @@ class ManagedBotUpdatedHandler(BaseHandler[Update, CCT, RT]):
         if isinstance(update, Update) and update.managed_bot:
             if not self._user_ids and not self._usernames:
                 return True
-            if update.managed_bot.user.id in self._user_ids:
+            if (
+                update.managed_bot.user.id in self._user_ids
+                or update.managed_bot.bot.id in self._user_ids
+            ):
                 return True
-            return update.managed_bot.user.username in self._usernames
+            return (
+                update.managed_bot.user.username in self._usernames
+                or update.managed_bot.bot.username in self._usernames
+            )
         return False

@@ -502,8 +502,11 @@ from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._inline.preparedinlinemessage import PreparedInlineMessage
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
-from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
-from ._keyboardbuttonrequestmanagedbot import KeyboardButtonRequestManagedBot
+from ._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestManagedBot,
+    KeyboardButtonRequestUsers,
+)
 from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
 from ._managedbot import ManagedBotCreated, ManagedBotUpdated

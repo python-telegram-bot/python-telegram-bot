@@ -2723,3 +2723,34 @@ class User(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
+
+    async def replace_token(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> str:
+        """
+        Shortcut for::
+
+             await bot.replace_managed_bot_token(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.replace_managed_bot_token`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`str` is returned.
+        """
+        return await self.get_bot().replace_managed_bot_token(
+            user_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )

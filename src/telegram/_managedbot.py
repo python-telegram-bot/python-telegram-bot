@@ -73,8 +73,8 @@ class ManagedBotCreated(TelegramObject):
 
 class ManagedBotUpdated(TelegramObject):
     """
-    This object contains information about the creation or token update of a bot that is
-    managed by the current bot.
+    This object contains information about the creation, token update, or owner update of a bot
+    that is managed by the current bot.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`bot` are equal.

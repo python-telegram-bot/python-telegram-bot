@@ -78,7 +78,7 @@ def time():
 def managed_bot_updated(bot):
     bmd = ManagedBotUpdated(
         user=User(1, "", False, username="user_a"),
-        bot=User(2, "", True),
+        bot=User(2, "", True, username="test_bot"),
     )
     bmd.set_bot(bot)
     return bmd
@@ -122,12 +122,16 @@ class TestManagedBotUpdatedHandler:
         assert handler.check_update(managed_bot_updated_update)
         handler = ManagedBotUpdatedHandler(self.callback, user_id=[1])
         assert handler.check_update(managed_bot_updated_update)
+        handler = ManagedBotUpdatedHandler(self.callback, user_id=2)
+        assert handler.check_update(managed_bot_updated_update)
         handler = ManagedBotUpdatedHandler(self.callback, user_id=2, username="@user_a")
         assert handler.check_update(managed_bot_updated_update)
+        handler = ManagedBotUpdatedHandler(self.callback, user_id=[1, 2])
+        assert handler.check_update(managed_bot_updated_update)
 
-        handler = ManagedBotUpdatedHandler(self.callback, user_id=2)
+        handler = ManagedBotUpdatedHandler(self.callback, user_id=3)
         assert not handler.check_update(managed_bot_updated_update)
-        handler = ManagedBotUpdatedHandler(self.callback, user_id=[2])
+        handler = ManagedBotUpdatedHandler(self.callback, user_id=[3])
         assert not handler.check_update(managed_bot_updated_update)
 
     def test_with_username(self, managed_bot_updated_update):
@@ -139,7 +143,11 @@ class TestManagedBotUpdatedHandler:
         assert handler.check_update(managed_bot_updated_update)
         handler = ManagedBotUpdatedHandler(self.callback, username=["@user_a"])
         assert handler.check_update(managed_bot_updated_update)
-        handler = ManagedBotUpdatedHandler(self.callback, user_id=1, username="@user_b")
+        handler = ManagedBotUpdatedHandler(self.callback, username=["test_bot"])
+        assert handler.check_update(managed_bot_updated_update)
+        handler = ManagedBotUpdatedHandler(self.callback, username=["@test_bot"])
+        assert handler.check_update(managed_bot_updated_update)
+        handler = ManagedBotUpdatedHandler(self.callback, user_id=[2], username="@user_b")
         assert handler.check_update(managed_bot_updated_update)
 
         handler = ManagedBotUpdatedHandler(self.callback, username="user_b")

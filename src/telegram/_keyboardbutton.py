@@ -21,8 +21,11 @@
 from typing import TYPE_CHECKING
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
-from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
-from telegram._keyboardbuttonrequestmanagedbot import KeyboardButtonRequestManagedBot
+from telegram._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestManagedBot,
+    KeyboardButtonRequestUsers,
+)
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict

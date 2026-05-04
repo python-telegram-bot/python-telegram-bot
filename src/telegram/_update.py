@@ -165,7 +165,7 @@ class Update(TelegramObject):
             .. versionadded:: 21.6
 
         managed_bot (:class:`telegram.ManagedBotUpdated`, optional): A new bot was created to be
-            managed by the bot or token of a bot was changed.
+            managed by the bot, or token or owner of a managed bot was changed.
 
             .. versionadded:: NEXT.VERSION
 
@@ -282,7 +282,7 @@ class Update(TelegramObject):
 
             .. versionadded:: 21.6
         managed_bot (:class:`telegram.ManagedBotUpdated`): Optional. A new bot was created to be
-            managed by the bot or token of a bot was changed.
+            managed by the bot, or token or owner of a managed bot was changed.
 
             .. versionadded:: NEXT.VERSION
     """
