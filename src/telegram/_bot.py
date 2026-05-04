@@ -7799,9 +7799,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         if correct_option_id:
             warn(
-                message="Bot API 9.6 deprecated `correct_option_id` in favour of "
-                "`correct_option_ids`, please use that.",
-                category=PTBDeprecationWarning,
+                PTBDeprecationWarning(
+                    version="NEXT.VERSION",
+                    message="Bot API 9.6 deprecated `correct_option_id` in favour of "
+                    "`correct_option_ids`, please use that.",
+                ),
                 stacklevel=2,
             )
             correct_option_ids = [correct_option_id]  # type: ignore[assignment]
@@ -9943,14 +9945,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
                 more details. Entities other than :attr:`~MessageEntity.BOLD`,
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
-                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
-                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`
+                :attr:`~MessageEntity.CUSTOM_EMOJI`, and :attr:`~MessageEntity.DATE_TIME` are
+                ignored.
             text_entities (Sequence[:class:`telegram.MessageEntity`], optional): A list of special
                 entities that appear in the gift text. It can be specified instead of
                 :paramref:`text_parse_mode`. Entities other than :attr:`~MessageEntity.BOLD`,
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
-                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
-                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`,
+                :attr:`~MessageEntity.CUSTOM_EMOJI`, and :attr:`~MessageEntity.DATE_TIME` are
+                ignored.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -11431,14 +11435,16 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
                 more details. Entities other than :attr:`~MessageEntity.BOLD`,
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
-                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
-                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`,
+                :attr:`~MessageEntity.CUSTOM_EMOJI`, and :attr:`~MessageEntity.DATE_TIME` are
+                ignored.
             text_entities (Sequence[:class:`telegram.MessageEntity`], optional): A list of special
                 entities that appear in the gift text. It can be specified instead of
                 :paramref:`text_parse_mode`. Entities other than :attr:`~MessageEntity.BOLD`,
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
-                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
-                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`,
+                :attr:`~MessageEntity.CUSTOM_EMOJI`, and :attr:`~MessageEntity.DATE_TIME` are
+                ignored.
             pay_for_upgrade (:obj:`bool`, optional): Pass :obj:`True` to pay for the gift upgrade
                 from the bot's balance, thereby making the upgrade free for the receiver.
 
