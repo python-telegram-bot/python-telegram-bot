@@ -25,7 +25,7 @@ Warning:
 """
 
 import datetime as dtm
-from collections.abc import Callable, Collection
+from collections.abc import Callable, Collection, Sequence
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Literal, TypeAlias, TypeVar, Union
 
@@ -93,7 +93,7 @@ HTTPVersion: TypeAlias = Literal["1.1", "2.0", "2"]
 
 CorrectOptionID: TypeAlias = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # pylint: disable=invalid-name
 
-CorrectOptionIds: TypeAlias = tuple[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], ...]
+CorrectOptionIds: TypeAlias = Sequence[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]]
 """
 .. versionadded:: NEXT.VERSION
 """

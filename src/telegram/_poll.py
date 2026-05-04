@@ -363,9 +363,7 @@ class PollAnswer(TelegramObject):
         self.voter_chat: Chat | None = voter_chat
         self.option_ids: tuple[int, ...] = parse_sequence_arg(option_ids)
         self.user: User | None = user
-        self.option_persistent_ids: tuple[str, ...] | None = parse_sequence_arg(
-            option_persistent_ids
-        )
+        self.option_persistent_ids: tuple[str, ...] = parse_sequence_arg(option_persistent_ids)
 
         self._id_attrs = (
             self.poll_id,
@@ -828,7 +826,7 @@ class Poll(TelegramObject):
             if correct_option_ids is None:
                 correct_option_ids = [correct_option_id]
 
-        self.correct_option_ids: tuple[int, ...] | None = parse_sequence_arg(correct_option_ids)
+        self.correct_option_ids: tuple[int, ...] = parse_sequence_arg(correct_option_ids)
         self.description: str | None = description
         self.description_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
             description_entities

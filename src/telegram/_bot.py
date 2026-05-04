@@ -7797,7 +7797,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
 
-        if correct_option_id:
+        if correct_option_id is not None:
             warn(
                 PTBDeprecationWarning(
                     version="NEXT.VERSION",
@@ -7806,7 +7806,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 ),
                 stacklevel=2,
             )
-            correct_option_ids = [correct_option_id]  # type: ignore[assignment]
+            if correct_option_ids is None:
+                correct_option_ids = [correct_option_id]
 
         data: JSONDict = {
             "chat_id": chat_id,
