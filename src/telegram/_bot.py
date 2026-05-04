@@ -115,7 +115,7 @@ from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -7598,6 +7598,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
+        # tags: deprecated in NEXT.VERSION, to be removed
+        # replaced by `correct_option_ids`
         correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
@@ -7658,9 +7660,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
                 :tg-const:`telegram.Poll.REGULAR`, defaults to :tg-const:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): :obj:`True`, if the poll allows
-                multiple answers, ignored for polls in quiz mode, defaults to :obj:`False`.
+                multiple answers, defaults to :obj:`False`.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
+
+                .. deprecated:: NEXT.VERSION
+                    Bot API 9.6 replaces this with :paramref:`correct_option_ids` instead.
+
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
                 answer or taps on the lamp icon in a quiz-style poll,
                 0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
@@ -7734,10 +7740,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 added to the poll after creation; not supported for anonymous polls and quizzes
 
                 .. versionadded:: NEXT.VERSION
-            shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
-                shown in random order
-
-                .. versionadded:: NEXT.VERSION
             hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
                 must be shown only after the poll closes
 
@@ -7760,6 +7762,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
                 JSON-serialized list of special entities that appear in the poll description,
                 which can be specified instead of :paramref:`description_parse_mode`
+
+                .. versionadded:: NEXT.VERSION
+            shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
+                shown in random order
 
                 .. versionadded:: NEXT.VERSION
 
@@ -7790,6 +7796,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
+
+        if correct_option_id:
+            warn(
+                message="Bot API 9.6 deprecated `correct_option_id` in favour of "
+                "`correct_option_ids`, please use that.",
+                category=PTBDeprecationWarning,
+                stacklevel=2,
+            )
+            correct_option_ids = [correct_option_id]  # type: ignore[assignment]
+
         data: JSONDict = {
             "chat_id": chat_id,
             "question": question,
@@ -7801,7 +7817,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_anonymous": is_anonymous,
             "type": type,
             "allows_multiple_answers": allows_multiple_answers,
-            "correct_option_id": correct_option_id,
             "allow_adding_options": allow_adding_options,
             "allows_revoting": allows_revoting,
             "shuffle_options": shuffle_options,
