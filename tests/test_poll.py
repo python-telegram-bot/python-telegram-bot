@@ -463,6 +463,21 @@ class TestPollWithoutRequest(PollTestBase):
         assert "The attribute `correct_option_id` is deprecated" in str(recwarn[0].message)
         assert recwarn[0].category is PTBDeprecationWarning
 
+        poll = Poll(
+            PollTestBase.id_,
+            PollTestBase.question,
+            PollTestBase.options,
+            PollTestBase.total_voter_count,
+            PollTestBase.is_closed,
+            PollTestBase.is_anonymous,
+            PollTestBase.type,
+            PollTestBase.allows_multiple_answers,
+            correct_option_id=1,
+        )
+        assert poll.correct_option_ids == [
+            1,
+        ]
+
     def test_equality(self):
         a = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
         b = Poll(123, "question", ["o1", "o2"], 1, True, False, Poll.REGULAR, True)
