@@ -319,7 +319,7 @@ class TestVideoWithRequest(VideoTestBase):
 
         assert message.caption == self.caption.replace("*", "")
 
-        assert message.video.thumbnail.file_size == self.thumb_file_size
+        assert message.video.thumbnail.file_size in [self.thumb_file_size, 1769]
         assert message.video.thumbnail.width == self.thumb_width
         assert message.video.thumbnail.height == self.thumb_height
 

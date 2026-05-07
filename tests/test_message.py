@@ -56,6 +56,7 @@ from telegram import (
     Invoice,
     LinkPreviewOptions,
     Location,
+    ManagedBotCreated,
     Message,
     MessageAutoDeleteTimerChanged,
     MessageEntity,
@@ -441,6 +442,7 @@ def message(bot):
         {"poll_option_added": PollOptionAdded(option_persistent_id="abc", option_text="this")},
         {"poll_option_deleted": PollOptionDeleted(option_persistent_id="abc", option_text="this")},
         {"reply_to_poll_option_id": "3123"},
+        {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
     ],
     ids=[
         "reply",
@@ -538,6 +540,7 @@ def message(bot):
         "poll_option_added",
         "poll_option_deleted",
         "reply_to_poll_option_id",
+        "managed_bot_created",
     ],
 )
 def message_params(bot, request):

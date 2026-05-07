@@ -57,6 +57,7 @@ from telegram._gifts import GiftInfo
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inputchecklist import InputChecklist
 from telegram._linkpreviewoptions import LinkPreviewOptions
+from telegram._managedbot import ManagedBotCreated
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._paidmedia import PaidMediaInfo
@@ -703,6 +704,11 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: NEXT.VERSION
 
+        managed_bot_created (:class:`telegram.ManagedBotCreated`, optional): Service message: user
+            created a bot that will be managed by the current bot.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
             (e.g., message containing a video sent to a big chat), the server might automatically
@@ -1130,6 +1136,10 @@ class Message(MaybeInaccessibleMessage):
             identifier of the specific poll option that is being replied to.
 
             .. versionadded:: NEXT.VERSION
+        managed_bot_created (:class:`telegram.ManagedBotCreated`): Optional. Service message: user
+            created a bot that will be managed by the current bot.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1201,6 +1211,7 @@ class Message(MaybeInaccessibleMessage):
         "left_chat_member",
         "link_preview_options",
         "location",
+        "managed_bot_created",
         "media_group_id",
         "message_auto_delete_timer_changed",
         "message_thread_id",
@@ -1368,6 +1379,7 @@ class Message(MaybeInaccessibleMessage):
         poll_option_added: PollOptionAdded | None = None,
         poll_option_deleted: PollOptionDeleted | None = None,
         reply_to_poll_option_id: str | None = None,
+        managed_bot_created: ManagedBotCreated | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1501,6 +1513,7 @@ class Message(MaybeInaccessibleMessage):
             self.poll_option_added: PollOptionAdded | None = poll_option_added
             self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
             self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
+            self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1726,6 +1739,9 @@ class Message(MaybeInaccessibleMessage):
         )
         data["poll_option_deleted"] = de_json_optional(
             data.get("poll_option_deleted"), PollOptionDeleted, bot
+        )
+        data["managed_bot_created"] = de_json_optional(
+            data.get("managed_bot_created"), ManagedBotCreated, bot
         )
 
         api_kwargs = {}
