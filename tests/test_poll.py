@@ -474,9 +474,7 @@ class TestPollWithoutRequest(PollTestBase):
             PollTestBase.allows_multiple_answers,
             correct_option_id=1,
         )
-        assert poll.correct_option_ids == [
-            1,
-        ]
+        assert poll.correct_option_ids == (1,)
 
     def test_equality(self):
         a = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
