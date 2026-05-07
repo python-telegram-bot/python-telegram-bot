@@ -572,6 +572,17 @@ class TestPollWithoutRequest(PollTestBase):
         poll.description_entities = [entity]
 
         assert poll.parse_description_entity(entity) == "description"
+        with pytest.raises(RuntimeError, match="Poll has no"):
+            Poll(
+                "id",
+                "question",
+                [PollOption("text", voter_count=0)],
+                total_voter_count=0,
+                is_closed=False,
+                is_anonymous=False,
+                type=Poll.QUIZ,
+                allows_multiple_answers=False,
+            ).parse_description_entity(entity)
 
     def test_parse_description_entities(self, poll):
         entity = MessageEntity(MessageEntity.ITALIC, 0, 11)
@@ -580,6 +591,17 @@ class TestPollWithoutRequest(PollTestBase):
 
         assert poll.parse_description_entities(MessageEntity.ITALIC) == {entity: "description"}
         assert poll.parse_description_entities() == {entity: "description", entity_2: "desc"}
+        with pytest.raises(RuntimeError, match="Poll has no"):
+            Poll(
+                "id",
+                "question",
+                [PollOption("text", voter_count=0)],
+                total_voter_count=0,
+                is_closed=False,
+                is_anonymous=False,
+                type=Poll.QUIZ,
+                allows_multiple_answers=False,
+            ).parse_description_entities()
 
 
 @pytest.fixture(scope="module")
