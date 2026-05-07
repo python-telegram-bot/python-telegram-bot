@@ -517,7 +517,7 @@ class Update(TelegramObject):
         .. versionchanged:: 21.6
             This property now also considers :attr:`purchased_paid_media`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionchanged:: NEXT.VERSION
             This property now also considers :attr:`managed_bot`.
 
         Example:
