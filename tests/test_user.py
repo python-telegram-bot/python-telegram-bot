@@ -47,6 +47,7 @@ def json_dict():
         "has_topics_enabled": UserTestBase.has_topics_enabled,
         "allows_users_to_create_topics": UserTestBase.allows_users_to_create_topics,
         "can_manage_bots": UserTestBase.can_manage_bots,
+        "supports_guest_queries": UserTestBase.supports_guest_queries,
     }
 
 
@@ -69,6 +70,7 @@ def user(bot):
         has_topics_enabled=UserTestBase.has_topics_enabled,
         allows_users_to_create_topics=UserTestBase.allows_users_to_create_topics,
         can_manage_bots=UserTestBase.can_manage_bots,
+        supports_guest_queries=UserTestBase.supports_guest_queries,
     )
     user.set_bot(bot)
     user._unfreeze()
@@ -92,6 +94,7 @@ class UserTestBase:
     has_topics_enabled = False
     allows_users_to_create_topics = False
     can_manage_bots = True
+    supports_guest_queries = False
 
 
 class TestUserWithoutRequest(UserTestBase):
@@ -120,6 +123,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user.has_topics_enabled == self.has_topics_enabled
         assert user.allows_users_to_create_topics == self.allows_users_to_create_topics
         assert user.can_manage_bots == self.can_manage_bots
+        assert user.supports_guest_queries == self.supports_guest_queries
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -141,6 +145,7 @@ class TestUserWithoutRequest(UserTestBase):
         assert user_dict["has_topics_enabled"] == user.has_topics_enabled
         assert user_dict["allows_users_to_create_topics"] == user.allows_users_to_create_topics
         assert user_dict["can_manage_bots"] == user.can_manage_bots
+        assert user_dict["supports_guest_queries"] == user.supports_guest_queries
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)

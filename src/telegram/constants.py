@@ -3620,6 +3620,11 @@ class UpdateType(StringEnum):
 
     .. versionadded:: NEXT.VERSION
     """
+    GUEST_MESSAGE = "guest_message"
+    """:obj:`str`: Updates with :attr:`telegram.Update.guest_message`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InvoiceLimit(IntEnum):

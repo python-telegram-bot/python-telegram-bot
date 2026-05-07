@@ -443,6 +443,9 @@ def message(bot):
         {"poll_option_deleted": PollOptionDeleted(option_persistent_id="abc", option_text="this")},
         {"reply_to_poll_option_id": "3123"},
         {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
+        {"guest_bot_caller_user": User(10, "hm", False)},
+        {"guest_bot_caller_chat": Chat(14, "om")},
+        {"guest_query_id": "This is a guest_query_id"},
     ],
     ids=[
         "reply",
@@ -541,6 +544,9 @@ def message(bot):
         "poll_option_deleted",
         "reply_to_poll_option_id",
         "managed_bot_created",
+        "guest_bot_caller_user",
+        "guest_bot_caller_chat",
+        "guest_query_id",
     ],
 )
 def message_params(bot, request):

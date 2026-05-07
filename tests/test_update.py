@@ -156,6 +156,13 @@ managed_bot = ManagedBotUpdated(
     user=User(1, "creator", True),
     bot=User(2, "bot", True),
 )
+guest_message = Message(
+    1,
+    dtm.datetime.utcnow(),
+    Chat(1, ""),
+    User(1, "", False),
+)
+
 
 params = [
     {"message": message},
@@ -197,6 +204,7 @@ params = [
     {"edited_business_message": business_message},
     {"purchased_paid_media": purchased_paid_media},
     {"managed_bot": managed_bot},
+    {"guest_message": guest_message},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -226,6 +234,7 @@ all_types = (
     "edited_business_message",
     "purchased_paid_media",
     "managed_bot",
+    "guest_message",
 )
 
 ids = (*all_types, "callback_query_without_message")
