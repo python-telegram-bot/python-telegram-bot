@@ -686,7 +686,7 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 22.7
         sender_tag (:obj:`str`, optional): Tag or custom title of the sender of the message; for
-            supergroups only
+            supergroups only.
 
             .. versionadded:: 22.7
 
@@ -1102,7 +1102,7 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 22.7
         sender_tag (:obj:`str`): Optional. Tag or custom title of the sender of the message; for
-            supergroups only
+            supergroups only.
 
             .. versionadded:: 22.7
 
