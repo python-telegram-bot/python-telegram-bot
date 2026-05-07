@@ -2369,6 +2369,16 @@ class MessageType(StringEnum):
 
     .. versionadded:: v22.2
     """
+    POLL_OPTION_ADDED = "poll_option_added"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_added`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    POLL_OPTION_DELETED = "poll_option_deleted"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_deleted`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
 
@@ -3441,11 +3451,20 @@ class PollLimit(IntEnum):
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MAX_OPEN_PERIOD = 600
+    MAX_OPEN_PERIOD = 2628000
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.send_poll.open_period` parameter of :meth:`telegram.Bot.send_poll`.
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
+
+    .. versionchanged:: NEXT.VERSION
+        Changed from ``600`` to ``2628000`` since Bot API 9.6.
+    """
+    MAX_DESCRIPTION_CHARACTERS = 1024
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.send_poll.description` parameter of :meth:`telegram.Bot.send_poll`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
 

@@ -68,6 +68,7 @@ from telegram import (
     PhotoSize,
     Poll,
     PollOption,
+    PollOptionAdded,
     ProximityAlertTriggered,
     RefundedPayment,
     ReplyParameters,
@@ -103,6 +104,7 @@ from telegram import (
     WebAppData,
 )
 from telegram._directmessagestopic import DirectMessagesTopic
+from telegram._poll import PollOptionDeleted
 from telegram._utils.datetime import UTC
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -437,6 +439,9 @@ def message(bot):
         {"chat_owner_changed": ChatOwnerChanged(new_owner=User(4, "Snow", False))},
         {"chat_owner_left": ChatOwnerLeft(new_owner=User(5, "Crash", False))},
         {"sender_tag": "This is a tag"},
+        {"poll_option_added": PollOptionAdded(option_persistent_id="abc", option_text="this")},
+        {"poll_option_deleted": PollOptionDeleted(option_persistent_id="abc", option_text="this")},
+        {"reply_to_poll_option_id": "3123"},
         {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
     ],
     ids=[
@@ -532,6 +537,9 @@ def message(bot):
         "chat_owner_changed",
         "chat_owner_left",
         "sender_tag",
+        "poll_option_added",
+        "poll_option_deleted",
+        "reply_to_poll_option_id",
         "managed_bot_created",
     ],
 )

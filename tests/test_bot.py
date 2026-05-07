@@ -102,7 +102,7 @@ from telegram.error import BadRequest, EndPointNotFound, InvalidToken, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTIONS
@@ -2849,6 +2849,40 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
         await offline_bot.set_chat_member_tag(1234, 5678, "This is a tag")
+
+    async def test_send_poll_warn_correct_option_id(self, offline_bot, monkeypatch, recwarn):
+        async def make_first_assert(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("correct_option_ids") == [1]
+            assert request_data.parameters.get("correct_option_id") is None
+            return make_message("dummy reply").to_dict()
+
+        async def make_second_assert(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("correct_option_ids") == [1, 2]
+            assert request_data.parameters.get("correct_option_id") is None
+            return make_message("dummy reply").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_first_assert)
+
+        await offline_bot.send_poll(
+            1,
+            question="question",
+            options=["option1", "option2"],
+            correct_option_id=1,
+        )
+
+        w = recwarn.pop()
+        assert issubclass(w.category, PTBDeprecationWarning)
+        assert "correct_option_id" in str(w.message)
+
+        # Test that correct_option_ids takes priority when both correct_option_id(s) are given
+        monkeypatch.setattr(offline_bot.request, "post", make_second_assert)
+        assert await offline_bot.send_poll(
+            1,
+            question="question",
+            options=["option1", "option2"],
+            correct_option_id=1,
+            correct_option_ids=[1, 2],
+        )
 
     # TODO: If we create a managed bot, we could test this for real
     async def test_get_managed_bot_token(self, offline_bot, monkeypatch):

@@ -19,7 +19,17 @@ import datetime as dtm
 
 import pytest
 
-from telegram import Chat, InputPollOption, MessageEntity, Poll, PollAnswer, PollOption, User
+from telegram import (
+    Chat,
+    InputPollOption,
+    MaybeInaccessibleMessage,
+    MessageEntity,
+    Poll,
+    PollAnswer,
+    PollOption,
+    User,
+)
+from telegram._poll import PollOptionAdded, PollOptionDeleted
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from telegram.warnings import PTBDeprecationWarning
@@ -108,6 +118,9 @@ def poll_option():
         text=PollOptionTestBase.text,
         voter_count=PollOptionTestBase.voter_count,
         text_entities=PollOptionTestBase.text_entities,
+        added_by_user=PollOptionTestBase.added_by_user,
+        added_by_chat=PollOptionTestBase.added_by_chat,
+        addition_date=PollOptionTestBase.addition_date,
     )
     out._unfreeze()
     return out
@@ -120,6 +133,9 @@ class PollOptionTestBase:
         MessageEntity(MessageEntity.BOLD, 0, 4),
         MessageEntity(MessageEntity.ITALIC, 5, 6),
     ]
+    added_by_user = User(1, "test_user", False)
+    added_by_chat = Chat(1, "test_chat")
+    addition_date = dtm.datetime.now(dtm.timezone.utc)
 
 
 class TestPollOptionWithoutRequest(PollOptionTestBase):
@@ -129,26 +145,23 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
         assert len(mro_slots(poll_option)) == len(set(mro_slots(poll_option))), "duplicate slot"
 
     def test_de_json(self):
-        json_dict = {"text": self.text, "voter_count": self.voter_count}
-        poll_option = PollOption.de_json(json_dict, None)
-        assert poll_option.api_kwargs == {}
-
-        assert poll_option.text == self.text
-        assert poll_option.voter_count == self.voter_count
-
-    def test_de_json_all(self):
         json_dict = {
             "text": self.text,
             "voter_count": self.voter_count,
             "text_entities": [e.to_dict() for e in self.text_entities],
+            "added_by_user": self.added_by_user.to_dict(),
+            "added_by_chat": self.added_by_chat.to_dict(),
+            "addition_date": to_timestamp(self.addition_date),
         }
         poll_option = PollOption.de_json(json_dict, None)
-
         assert poll_option.api_kwargs == {}
 
         assert poll_option.text == self.text
         assert poll_option.voter_count == self.voter_count
         assert poll_option.text_entities == tuple(self.text_entities)
+        assert poll_option.added_by_user == self.added_by_user
+        assert poll_option.added_by_chat == self.added_by_chat
+        assert abs((poll_option.addition_date - self.addition_date).total_seconds()) < 1
 
     def test_to_dict(self, poll_option):
         poll_option_dict = poll_option.to_dict()
@@ -159,6 +172,9 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
         assert poll_option_dict["text_entities"] == [
             e.to_dict() for e in poll_option.text_entities
         ]
+        assert poll_option_dict["added_by_user"] == poll_option.added_by_user.to_dict()
+        assert poll_option_dict["added_by_chat"] == poll_option.added_by_chat.to_dict()
+        assert poll_option_dict["addition_date"] == to_timestamp(poll_option.addition_date)
 
     def test_parse_entity(self, poll_option):
         entity = MessageEntity(MessageEntity.BOLD, 0, 4)
@@ -201,6 +217,7 @@ def poll_answer():
         PollAnswerTestBase.option_ids,
         PollAnswerTestBase.user,
         PollAnswerTestBase.voter_chat,
+        PollAnswerTestBase.option_persistent_ids,
     )
 
 
@@ -209,6 +226,7 @@ class PollAnswerTestBase:
     option_ids = [2]
     user = User(1, "", False)
     voter_chat = Chat(1, "")
+    option_persistent_ids = ["123"]
 
 
 class TestPollAnswerWithoutRequest(PollAnswerTestBase):
@@ -218,6 +236,7 @@ class TestPollAnswerWithoutRequest(PollAnswerTestBase):
             "option_ids": self.option_ids,
             "user": self.user.to_dict(),
             "voter_chat": self.voter_chat.to_dict(),
+            "option_persistent_ids": self.option_persistent_ids,
         }
         poll_answer = PollAnswer.de_json(json_dict, None)
         assert poll_answer.api_kwargs == {}
@@ -226,6 +245,7 @@ class TestPollAnswerWithoutRequest(PollAnswerTestBase):
         assert poll_answer.option_ids == tuple(self.option_ids)
         assert poll_answer.user == self.user
         assert poll_answer.voter_chat == self.voter_chat
+        assert poll_answer.option_persistent_ids == tuple(self.option_persistent_ids)
 
     def test_to_dict(self, poll_answer):
         poll_answer_dict = poll_answer.to_dict()
@@ -235,6 +255,7 @@ class TestPollAnswerWithoutRequest(PollAnswerTestBase):
         assert poll_answer_dict["option_ids"] == list(poll_answer.option_ids)
         assert poll_answer_dict["user"] == poll_answer.user.to_dict()
         assert poll_answer_dict["voter_chat"] == poll_answer.voter_chat.to_dict()
+        assert poll_answer_dict["option_persistent_ids"] == list(poll_answer.option_persistent_ids)
 
     def test_equality(self):
         a = PollAnswer(123, [2], self.user, self.voter_chat)
@@ -276,6 +297,10 @@ def poll():
         open_period=PollTestBase.open_period,
         close_date=PollTestBase.close_date,
         question_entities=PollTestBase.question_entities,
+        allows_revoting=PollTestBase.allows_revoting,
+        correct_option_ids=PollTestBase.correct_option_ids,
+        description=PollTestBase.description,
+        description_entities=PollTestBase.description_entities,
     )
     poll._unfreeze()
     return poll
@@ -301,6 +326,10 @@ class PollTestBase:
         MessageEntity(MessageEntity.BOLD, 0, 4),
         MessageEntity(MessageEntity.ITALIC, 5, 8),
     ]
+    allows_revoting = True
+    correct_option_ids = [1, 2]
+    description = "description"
+    description_entities = [MessageEntity(MessageEntity.ITALIC, 0, 11)]
 
 
 class TestPollWithoutRequest(PollTestBase):
@@ -319,6 +348,10 @@ class TestPollWithoutRequest(PollTestBase):
             "open_period": int(self.open_period.total_seconds()),
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
+            "allows_revoting": self.allows_revoting,
+            "correct_option_ids": self.correct_option_ids,
+            "description": self.description,
+            "description_entities": [e.to_dict() for e in self.description_entities],
         }
         poll = Poll.de_json(json_dict, offline_bot)
         assert poll.api_kwargs == {}
@@ -341,6 +374,10 @@ class TestPollWithoutRequest(PollTestBase):
         assert abs(poll.close_date - self.close_date) < dtm.timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
         assert poll.question_entities == tuple(self.question_entities)
+        assert poll.allows_revoting == self.allows_revoting
+        assert poll.correct_option_ids == tuple(self.correct_option_ids)
+        assert poll.description == self.description
+        assert poll.description_entities == tuple(self.description_entities)
 
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
@@ -357,6 +394,10 @@ class TestPollWithoutRequest(PollTestBase):
             "open_period": int(self.open_period.total_seconds()),
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
+            "allows_revoting": self.allows_revoting,
+            "correct_option_ids": self.correct_option_ids,
+            "description": self.description,
+            "description_entities": [e.to_dict() for e in self.description_entities],
         }
 
         poll_raw = Poll.de_json(json_dict, raw_bot)
@@ -390,6 +431,12 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll_dict["open_period"] == int(self.open_period.total_seconds())
         assert poll_dict["close_date"] == to_timestamp(poll.close_date)
         assert poll_dict["question_entities"] == [e.to_dict() for e in poll.question_entities]
+        assert poll_dict["allows_revoting"] == poll.allows_revoting
+        assert poll_dict["correct_option_ids"] == list(poll.correct_option_ids)
+        assert poll_dict["description"] == poll.description
+        assert poll_dict["description_entities"] == [
+            e.to_dict() for e in poll.description_entities
+        ]
 
     def test_time_period_properties(self, PTB_TIMEDELTA, poll):
         if PTB_TIMEDELTA:
@@ -408,6 +455,26 @@ class TestPollWithoutRequest(PollTestBase):
             assert len(recwarn) == 1
             assert "`open_period` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
+
+    def test_correct_option_id_deprecated(self, recwarn, poll):
+        poll.correct_option_id
+
+        assert len(recwarn) == 1
+        assert "The attribute `correct_option_id` is deprecated" in str(recwarn[0].message)
+        assert recwarn[0].category is PTBDeprecationWarning
+
+        poll = Poll(
+            PollTestBase.id_,
+            PollTestBase.question,
+            PollTestBase.options,
+            PollTestBase.total_voter_count,
+            PollTestBase.is_closed,
+            PollTestBase.is_anonymous,
+            PollTestBase.type,
+            PollTestBase.allows_multiple_answers,
+            correct_option_id=1,
+        )
+        assert poll.correct_option_ids == (1,)
 
     def test_equality(self):
         a = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
@@ -499,3 +566,281 @@ class TestPollWithoutRequest(PollTestBase):
 
         assert poll.parse_question_entities(MessageEntity.ITALIC) == {entity: "Question"}
         assert poll.parse_question_entities() == {entity: "Question", entity_2: "Test"}
+
+    def test_parse_description_entity(self, poll):
+        entity = MessageEntity(MessageEntity.ITALIC, 0, 11)
+        poll.description_entities = [entity]
+
+        assert poll.parse_description_entity(entity) == "description"
+        with pytest.raises(RuntimeError, match="Poll has no"):
+            Poll(
+                "id",
+                "question",
+                [PollOption("text", voter_count=0)],
+                total_voter_count=0,
+                is_closed=False,
+                is_anonymous=False,
+                type=Poll.QUIZ,
+                allows_multiple_answers=False,
+            ).parse_description_entity(entity)
+
+    def test_parse_description_entities(self, poll):
+        entity = MessageEntity(MessageEntity.ITALIC, 0, 11)
+        entity_2 = MessageEntity(MessageEntity.BOLD, 0, 4)
+        poll.description_entities = [entity_2, entity]
+
+        assert poll.parse_description_entities(MessageEntity.ITALIC) == {entity: "description"}
+        assert poll.parse_description_entities() == {entity: "description", entity_2: "desc"}
+        with pytest.raises(RuntimeError, match="Poll has no"):
+            Poll(
+                "id",
+                "question",
+                [PollOption("text", voter_count=0)],
+                total_voter_count=0,
+                is_closed=False,
+                is_anonymous=False,
+                type=Poll.QUIZ,
+                allows_multiple_answers=False,
+            ).parse_description_entities()
+
+
+@pytest.fixture(scope="module")
+def poll_option_added():
+    p = PollOptionAdded(
+        poll_message=PollOptionAddedTestBase.poll_message,
+        option_persistent_id=PollOptionAddedTestBase.option_persistent_id,
+        option_text=PollOptionAddedTestBase.option_text,
+        option_text_entities=PollOptionAddedTestBase.option_text_entities,
+    )
+    p._unfreeze()
+    return p
+
+
+class PollOptionAddedTestBase:
+    poll_message = MaybeInaccessibleMessage(
+        message_id=1,
+        date=dtm.datetime.now(dtm.timezone.utc),
+        chat=Chat(1, "test_chat"),
+    )
+    option_persistent_id = "123"
+    option_text = "test option"
+    option_text_entities = [
+        MessageEntity(MessageEntity.BOLD, 0, 4),
+        MessageEntity(MessageEntity.ITALIC, 5, 6),
+    ]
+
+
+class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase):
+    def test_slot_behaviour(self, poll_option_added):
+        for attr in poll_option_added.__slots__:
+            assert getattr(poll_option_added, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(poll_option_added)) == len(set(mro_slots(poll_option_added))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "poll_message": self.poll_message.to_dict(),
+            "option_persistent_id": self.option_persistent_id,
+            "option_text": self.option_text,
+            "option_text_entities": [e.to_dict() for e in self.option_text_entities],
+        }
+        poll_option_added = PollOptionAdded.de_json(json_dict, offline_bot)
+        assert poll_option_added.api_kwargs == {}
+
+        assert poll_option_added.poll_message == self.poll_message
+        assert poll_option_added.option_persistent_id == self.option_persistent_id
+        assert poll_option_added.option_text == self.option_text
+        assert poll_option_added.option_text_entities == tuple(self.option_text_entities)
+
+    def test_to_dict(self, poll_option_added):
+        poll_option_added_dict = poll_option_added.to_dict()
+
+        assert isinstance(poll_option_added_dict, dict)
+        assert poll_option_added_dict["poll_message"] == poll_option_added.poll_message.to_dict()
+        assert (
+            poll_option_added_dict["option_persistent_id"]
+            == poll_option_added.option_persistent_id
+        )
+        assert poll_option_added_dict["option_text"] == poll_option_added.option_text
+        assert poll_option_added_dict["option_text_entities"] == [
+            e.to_dict() for e in poll_option_added.option_text_entities
+        ]
+
+    def test_parse_option_text_entity(self, poll_option_added):
+        entity = MessageEntity(MessageEntity.BOLD, 0, 4)
+        poll_option_added.option_text_entities = [entity]
+
+        assert poll_option_added.parse_option_text_entity(entity) == "test"
+
+    def test_parse_option_text_entities(self, poll_option_added):
+        entity = MessageEntity(MessageEntity.BOLD, 0, 4)
+        entity_2 = MessageEntity(MessageEntity.ITALIC, 5, 6)
+        poll_option_added.option_text_entities = [entity, entity_2]
+
+        assert poll_option_added.parse_option_text_entities(MessageEntity.BOLD) == {entity: "test"}
+        assert poll_option_added.parse_option_text_entities() == {
+            entity: "test",
+            entity_2: "option",
+        }
+
+    def test_equality(self):
+        a = PollOptionAdded(
+            poll_message=self.poll_message,
+            option_persistent_id=self.option_persistent_id,
+            option_text=self.option_text,
+            option_text_entities=self.option_text_entities,
+        )
+        b = PollOptionAdded(
+            poll_message=self.poll_message,
+            option_persistent_id=self.option_persistent_id,
+            option_text=self.option_text,
+            option_text_entities=self.option_text_entities,
+        )
+        c = PollOptionAdded(
+            poll_message=MaybeInaccessibleMessage(
+                2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")
+            ),
+            option_persistent_id=self.option_persistent_id,
+            option_text=self.option_text,
+            option_text_entities=self.option_text_entities,
+        )
+
+        d = PollOptionAdded(
+            poll_message=self.poll_message,
+            option_persistent_id="different_id",
+            option_text=self.option_text,
+            option_text_entities=self.option_text_entities,
+        )
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture(scope="module")
+def poll_option_deleted():
+    p = PollOptionDeleted(
+        poll_message=PollOptionDeletedTestBase.poll_message,
+        option_persistent_id=PollOptionDeletedTestBase.option_persistent_id,
+        option_text=PollOptionDeletedTestBase.option_text,
+        option_text_entities=PollOptionDeletedTestBase.option_text_entities,
+    )
+    p._unfreeze()
+    return p
+
+
+class PollOptionDeletedTestBase:
+    poll_message = MaybeInaccessibleMessage(
+        message_id=1,
+        date=dtm.datetime.now(dtm.timezone.utc),
+        chat=Chat(1, "test_chat"),
+    )
+    option_persistent_id = "123"
+    option_text = "test option"
+    option_text_entities = [
+        MessageEntity(MessageEntity.BOLD, 0, 4),
+        MessageEntity(MessageEntity.ITALIC, 5, 6),
+    ]
+
+
+class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase):
+    def test_slot_behaviour(self, poll_option_deleted):
+        for attr in poll_option_deleted.__slots__:
+            assert getattr(poll_option_deleted, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(poll_option_deleted)) == len(set(mro_slots(poll_option_deleted))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "poll_message": self.poll_message.to_dict(),
+            "option_persistent_id": self.option_persistent_id,
+            "option_text": self.option_text,
+            "option_text_entities": [e.to_dict() for e in self.option_text_entities],
+        }
+        poll_option_deleted = PollOptionDeleted.de_json(json_dict, offline_bot)
+        assert poll_option_deleted.api_kwargs == {}
+
+        assert poll_option_deleted.poll_message == self.poll_message
+        assert poll_option_deleted.option_persistent_id == self.option_persistent_id
+        assert poll_option_deleted.option_text == self.option_text
+        assert poll_option_deleted.option_text_entities == tuple(self.option_text_entities)
+
+    def test_to_dict(self, poll_option_deleted):
+        poll_option_deleted_dict = poll_option_deleted.to_dict()
+
+        assert isinstance(poll_option_deleted_dict, dict)
+        assert (
+            poll_option_deleted_dict["poll_message"] == poll_option_deleted.poll_message.to_dict()
+        )
+        assert (
+            poll_option_deleted_dict["option_persistent_id"]
+            == poll_option_deleted.option_persistent_id
+        )
+        assert poll_option_deleted_dict["option_text"] == poll_option_deleted.option_text
+        assert poll_option_deleted_dict["option_text_entities"] == [
+            e.to_dict() for e in poll_option_deleted.option_text_entities
+        ]
+
+    def test_parse_option_text_entity(self, poll_option_deleted):
+        entity = MessageEntity(MessageEntity.BOLD, 0, 4)
+        poll_option_deleted.option_text_entities = [entity]
+
+        assert poll_option_deleted.parse_option_text_entity(entity) == "test"
+
+    def test_parse_option_text_entities(self, poll_option_deleted):
+        entity = MessageEntity(MessageEntity.BOLD, 0, 4)
+        entity_2 = MessageEntity(MessageEntity.ITALIC, 5, 6)
+        poll_option_deleted.option_text_entities = [entity, entity_2]
+
+        assert poll_option_deleted.parse_option_text_entities(MessageEntity.BOLD) == {
+            entity: "test"
+        }
+        assert poll_option_deleted.parse_option_text_entities() == {
+            entity: "test",
+            entity_2: "option",
+        }
+
+    def test_equality(self):
+        a = PollOptionDeleted(
+            poll_message=self.poll_message,
+            option_persistent_id=self.option_persistent_id,
+            option_text=self.option_text,
+            option_text_entities=self.option_text_entities,
+        )
+        b = PollOptionDeleted(
+            poll_message=self.poll_message,
+            option_persistent_id=self.option_persistent_id,
+            option_text=self.option_text,
+            option_text_entities=self.option_text_entities,
+        )
+        c = PollOptionDeleted(
+            poll_message=MaybeInaccessibleMessage(
+                2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")
+            ),
+            option_persistent_id=self.option_persistent_id,
+            option_text=self.option_text,
+            option_text_entities=self.option_text_entities,
+        )
+
+        d = PollOptionDeleted(
+            poll_message=self.poll_message,
+            option_persistent_id="different_id",
+            option_text=self.option_text,
+            option_text_entities=self.option_text_entities,
+        )
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

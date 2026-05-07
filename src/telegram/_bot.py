@@ -104,6 +104,7 @@ from telegram._utils.strings import to_camel_case
 from telegram._utils.types import (
     BaseUrl,
     CorrectOptionID,
+    CorrectOptionIds,
     FileInput,
     JSONDict,
     ODVInput,
@@ -116,7 +117,7 @@ from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -7599,6 +7600,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
+        # tags: deprecated in NEXT.VERSION, to be removed
+        # replaced by `correct_option_ids`
         correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
@@ -7616,6 +7619,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        allows_revoting: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        description: str | None = None,
+        description_parse_mode: str | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
+        shuffle_options: bool | None = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
@@ -7651,9 +7662,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
                 :tg-const:`telegram.Poll.REGULAR`, defaults to :tg-const:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): :obj:`True`, if the poll allows
-                multiple answers, ignored for polls in quiz mode, defaults to :obj:`False`.
+                multiple answers, defaults to :obj:`False`.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
+
+                .. deprecated:: NEXT.VERSION
+                    Bot API 9.6 replaces this with :paramref:`correct_option_ids` instead.
+
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
                 answer or taps on the lamp icon in a quiz-style poll,
                 0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
@@ -7718,6 +7733,43 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
 
                 .. versionadded:: 21.7
+            allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to
+                change the chosen answer options, defaults to :obj:`False`
+                for quizzes and to :obj:`True` for regular polls
+
+                .. versionadded:: NEXT.VERSION
+            allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
+                added to the poll after creation; not supported for anonymous polls and quizzes
+
+                .. versionadded:: NEXT.VERSION
+            hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
+                must be shown only after the poll closes
+
+                .. versionadded:: NEXT.VERSION
+            correct_option_ids (Sequence[:class:`int`], optional): A list of monotonically
+                increasing 0-based identifiers of the correct answer options,
+                required for polls in quiz mode.
+
+                .. versionadded:: NEXT.VERSION
+            description (:obj:`str`, optional): Description of the poll to be sent,
+                0-:tg-const:`telegram.Poll.MAX_DESCRIPTION_CHARACTERS` characters
+                after entities parsing.
+
+                .. versionadded:: NEXT.VERSION
+            description_parse_mode (:obj:`str`, optional): Mode for parsing entities
+                in the poll description. See the constants
+                in :class:`telegram.constants.ParseMode`
+
+                .. versionadded:: NEXT.VERSION
+            description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
+                JSON-serialized list of special entities that appear in the poll description,
+                which can be specified instead of :paramref:`description_parse_mode`
+
+                .. versionadded:: NEXT.VERSION
+            shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
+                shown in random order
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7746,6 +7798,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
+
+        if correct_option_id is not None:
+            warn(
+                PTBDeprecationWarning(
+                    version="NEXT.VERSION",
+                    message="Bot API 9.6 deprecated `correct_option_id` in favour of "
+                    "`correct_option_ids`, please use that.",
+                ),
+                stacklevel=2,
+            )
+            if correct_option_ids is None:
+                correct_option_ids = [correct_option_id]
+
         data: JSONDict = {
             "chat_id": chat_id,
             "question": question,
@@ -7757,8 +7822,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "is_anonymous": is_anonymous,
             "type": type,
             "allows_multiple_answers": allows_multiple_answers,
-            "correct_option_id": correct_option_id,
+            "allow_adding_options": allow_adding_options,
+            "allows_revoting": allows_revoting,
+            "shuffle_options": shuffle_options,
+            "hide_results_until_closes": hide_results_until_closes,
+            "correct_option_ids": correct_option_ids,
             "is_closed": is_closed,
+            "description": description,
+            "description_parse_mode": description_parse_mode,
+            "description_entities": description_entities,
             "explanation": explanation,
             "explanation_entities": explanation_entities,
             "open_period": open_period,
@@ -9876,14 +9948,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
                 more details. Entities other than :attr:`~MessageEntity.BOLD`,
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
-                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
-                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`
+                :attr:`~MessageEntity.CUSTOM_EMOJI`, and :attr:`~MessageEntity.DATE_TIME` are
+                ignored.
             text_entities (Sequence[:class:`telegram.MessageEntity`], optional): A list of special
                 entities that appear in the gift text. It can be specified instead of
                 :paramref:`text_parse_mode`. Entities other than :attr:`~MessageEntity.BOLD`,
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
-                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
-                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`,
+                :attr:`~MessageEntity.CUSTOM_EMOJI`, and :attr:`~MessageEntity.DATE_TIME` are
+                ignored.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -11364,14 +11438,16 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for
                 more details. Entities other than :attr:`~MessageEntity.BOLD`,
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
-                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
-                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`,
+                :attr:`~MessageEntity.CUSTOM_EMOJI`, and :attr:`~MessageEntity.DATE_TIME` are
+                ignored.
             text_entities (Sequence[:class:`telegram.MessageEntity`], optional): A list of special
                 entities that appear in the gift text. It can be specified instead of
                 :paramref:`text_parse_mode`. Entities other than :attr:`~MessageEntity.BOLD`,
                 :attr:`~MessageEntity.ITALIC`, :attr:`~MessageEntity.UNDERLINE`,
-                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`, and
-                :attr:`~MessageEntity.CUSTOM_EMOJI` are ignored.
+                :attr:`~MessageEntity.STRIKETHROUGH`, :attr:`~MessageEntity.SPOILER`,
+                :attr:`~MessageEntity.CUSTOM_EMOJI`, and :attr:`~MessageEntity.DATE_TIME` are
+                ignored.
             pay_for_upgrade (:obj:`bool`, optional): Pass :obj:`True` to pay for the gift upgrade
                 from the bot's balance, thereby making the upgrade free for the receiver.
 

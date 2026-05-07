@@ -49,8 +49,8 @@ class InputChecklistTask(TelegramObject):
             |parse_mode|
         text_entities (Sequence[:class:`telegram.MessageEntity`], optional):
             List of special entities that appear in the text, which can be specified instead of
-            parse_mode. Currently, only bold, italic, underline, strikethrough, spoiler, and
-            custom_emoji entities are allowed.
+            parse_mode. Currently, only bold, italic, underline, strikethrough, spoiler,
+            custom_emoji, and date_time entities are allowed.
 
     Attributes:
         id (:obj:`int`):
@@ -66,7 +66,7 @@ class InputChecklistTask(TelegramObject):
         text_entities (Sequence[:class:`telegram.MessageEntity`]):
             Optional. List of special entities that appear in the text, which can be specified
             instead of parse_mode. Currently, only bold, italic, underline, strikethrough, spoiler,
-            and custom_emoji entities are allowed.
+            custom_emoji, and date_time entities are allowed.
 
     """
 
@@ -117,7 +117,7 @@ class InputChecklist(TelegramObject):
         title_entities (Sequence[:class:`telegram.MessageEntity`], optional):
             List of special entities that appear in the title, which
             can be specified instead of :paramref:`parse_mode`. Currently, only bold, italic,
-            underline, strikethrough, spoiler, and custom_emoji entities are allowed.
+            underline, strikethrough, spoiler, and custom_emoji, and date_time entities are allowed
         tasks (Sequence[:class:`telegram.InputChecklistTask`]):
             List of
             :tg-const:`telegram.constants.InputChecklistLimit.MIN_TASK_NUMBER`\
@@ -139,7 +139,7 @@ class InputChecklist(TelegramObject):
         title_entities (Sequence[:class:`telegram.MessageEntity`]):
             Optional. List of special entities that appear in the title, which
             can be specified instead of :paramref:`parse_mode`. Currently, only bold, italic,
-            underline, strikethrough, spoiler, and custom_emoji entities are allowed.
+            underline, strikethrough, spoiler, and custom_emoji, and date_time entities are allowed
         tasks (Sequence[:class:`telegram.InputChecklistTask`]):
             List of
             :tg-const:`telegram.constants.InputChecklistLimit.MIN_TASK_NUMBER`\
