@@ -116,11 +116,14 @@ Available Types
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
+    telegram.keyboardbuttonrequestmanagedbot
     telegram.keyboardbuttonrequestusers
     telegram.linkpreviewoptions
     telegram.location
     telegram.locationaddress
     telegram.loginurl
+    telegram.managedbotcreated
+    telegram.managedbotupdated
     telegram.maybeinaccessiblemessage
     telegram.menubutton
     telegram.menubuttoncommands
@@ -152,6 +155,7 @@ Available Types
     telegram.poll
     telegram.pollanswer
     telegram.polloption
+    telegram.preparedkeyboardbutton
     telegram.proximityalerttriggered
     telegram.reactioncount
     telegram.reactiontype

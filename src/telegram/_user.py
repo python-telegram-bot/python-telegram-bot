@@ -124,6 +124,10 @@ class User(TelegramObject):
             :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 22.7
+        can_manage_bots (:obj:`bool`, optional): :obj:`True`, if other bots can be created to be
+            controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -164,6 +168,10 @@ class User(TelegramObject):
             :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 22.7
+        can_manage_bots (:obj:`bool`): Optional. :obj:`True`, if other bots can be created to be
+            controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -175,6 +183,7 @@ class User(TelegramObject):
         "allows_users_to_create_topics",
         "can_connect_to_business",
         "can_join_groups",
+        "can_manage_bots",
         "can_read_all_group_messages",
         "first_name",
         "has_main_web_app",
@@ -205,6 +214,7 @@ class User(TelegramObject):
         has_main_web_app: bool | None = None,
         has_topics_enabled: bool | None = None,
         allows_users_to_create_topics: bool | None = None,
+        can_manage_bots: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -226,6 +236,7 @@ class User(TelegramObject):
         self.has_main_web_app: bool | None = has_main_web_app
         self.has_topics_enabled: bool | None = has_topics_enabled
         self.allows_users_to_create_topics: bool | None = allows_users_to_create_topics
+        self.can_manage_bots: bool | None = can_manage_bots
 
         self._id_attrs = (self.id,)
 
@@ -2706,6 +2717,37 @@ class User(TelegramObject):
             user_id=self.id,
             chat_id=chat_id,
             tag=tag,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def replace_token(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> str:
+        """
+        Shortcut for::
+
+             await bot.replace_managed_bot_token(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.replace_managed_bot_token`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`str` is returned.
+        """
+        return await self.get_bot().replace_managed_bot_token(
+            user_id=self.id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

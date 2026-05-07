@@ -56,6 +56,7 @@ from telegram import (
     Invoice,
     LinkPreviewOptions,
     Location,
+    ManagedBotCreated,
     Message,
     MessageAutoDeleteTimerChanged,
     MessageEntity,
@@ -436,6 +437,7 @@ def message(bot):
         {"chat_owner_changed": ChatOwnerChanged(new_owner=User(4, "Snow", False))},
         {"chat_owner_left": ChatOwnerLeft(new_owner=User(5, "Crash", False))},
         {"sender_tag": "This is a tag"},
+        {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
     ],
     ids=[
         "reply",
@@ -530,6 +532,7 @@ def message(bot):
         "chat_owner_changed",
         "chat_owner_left",
         "sender_tag",
+        "managed_bot_created",
     ],
 )
 def message_params(bot, request):

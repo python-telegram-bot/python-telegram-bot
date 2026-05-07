@@ -16,6 +16,7 @@ Handlers
     telegram.ext.conversationhandler
     telegram.ext.filters
     telegram.ext.inlinequeryhandler
+    telegram.ext.managedbotupdatedhandler
     telegram.ext.messagehandler
     telegram.ext.messagereactionhandler
     telegram.ext.paidmediapurchasedhandler
