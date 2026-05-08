@@ -34,21 +34,21 @@ class PreparedKeyboardButton(TelegramObject):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        id (:obj:`int`): Unique identifier of the keyboard button.
+        id (:obj:`str`): Unique identifier of the keyboard button.
 
     Attributes:
-        id (:obj:`int`): Unique identifier of the keyboard button.
+        id (:obj:`str`): Unique identifier of the keyboard button.
     """
 
     __slots__ = ("id",)
 
     def __init__(
         self,
-        id: int,  # pylint: disable=redefined-builtin
+        id: str,  # pylint: disable=redefined-builtin
         *,
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id: int = id
+        self.id: str = id
         self._id_attrs = (self.id,)
         self._freeze()

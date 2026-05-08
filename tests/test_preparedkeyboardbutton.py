@@ -28,7 +28,7 @@ def prepared_keyboard_button():
 
 
 class PreparedKeyboardButtonTestBase:
-    id = 4
+    id = "4"
 
 
 class TestPreparedKeyboardButtonWithoutRequest(PreparedKeyboardButtonTestBase):
@@ -53,7 +53,7 @@ class TestPreparedKeyboardButtonWithoutRequest(PreparedKeyboardButtonTestBase):
     def test_equality(self):
         a = PreparedKeyboardButton(self.id)
         b = PreparedKeyboardButton(self.id)
-        c = PreparedKeyboardButton(self.id + 1)
+        c = PreparedKeyboardButton("5")
 
         assert a == b
         assert hash(a) == hash(b)
