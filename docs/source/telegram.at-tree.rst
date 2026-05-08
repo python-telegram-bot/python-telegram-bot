@@ -154,7 +154,8 @@ Available Types
     telegram.photosize
     telegram.poll
     telegram.pollanswer
-    telegram.polloption
+    telegram.polloptionadded
+    telegram.polloptiondeleted
     telegram.preparedkeyboardbutton
     telegram.proximityalerttriggered
     telegram.reactioncount
