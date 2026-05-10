@@ -45,6 +45,7 @@ __all__ = [
     "BackgroundFillType",
     "BackgroundTypeLimit",
     "BackgroundTypeType",
+    "BaseInputMediaType",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
@@ -1519,9 +1520,40 @@ class InputChecklistLimit(IntEnum):
     """
 
 
+class BaseInputMediaType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputMedia`,
+    :class:`telegram.InputPollMedia` and :class:`telegram.InputPollOptionMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    ANIMATION = "animation"
+    """:obj:`str`: Type of :class:`telegram.InputMediaAnimation`."""
+    DOCUMENT = "document"
+    """:obj:`str`: Type of :class:`telegram.InputMediaDocument`."""
+    AUDIO = "audio"
+    """:obj:`str`: Type of :class:`telegram.InputMediaAudio`."""
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    LOCATION = "location"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLocation`."""
+    STICKER = "sticker"
+    """:obj:`str`: Type of :class:`telegram.InputMediaSticker`."""
+    VENUE = "venue"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVenue`."""
+
+
 class InputMediaType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. deprecated:: NEXT.VERSION
+        Use :class:`telegram.constants.BaseInputMediaType` instead.
 
     .. versionadded:: 20.0
     """
@@ -1784,6 +1816,8 @@ class LocationLimit(IntEnum):
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.horizontal_accuracy` parameter of
       :meth:`telegram.Bot.send_location`
+    * :paramref:`~telegram.InputMediaLocation.horizontal_accuracy` parameter of
+      :class:`telegram.InputMediaLocation`
     """
 
     MIN_HEADING = 1

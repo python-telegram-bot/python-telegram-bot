@@ -24,11 +24,20 @@ from telegram import (
     InputPollOption,
     MaybeInaccessibleMessage,
     MessageEntity,
+    PhotoSize,
     Poll,
     PollAnswer,
+    PollMedia,
     PollOption,
     User,
 )
+from telegram._files.animation import Animation
+from telegram._files.audio import Audio
+from telegram._files.document import Document
+from telegram._files.location import Location
+from telegram._files.sticker import Sticker
+from telegram._files.venue import Venue
+from telegram._files.video import Video
 from telegram._poll import PollOptionAdded, PollOptionDeleted
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
@@ -107,6 +116,103 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+@pytest.fixture(scope="module")
+def poll_media():
+    return PollMedia(
+        animation=PollMediaTestBase.animation,
+        audio=PollMediaTestBase.audio,
+        document=PollMediaTestBase.document,
+        location=PollMediaTestBase.location,
+        photo=PollMediaTestBase.photo,
+        sticker=PollMediaTestBase.sticker,
+        venue=PollMediaTestBase.venue,
+        video=PollMediaTestBase.video,
+        # TODO: LivePhoto
+    )
+
+
+class PollMediaTestBase:
+    animation = Animation("blah", "unique_id", 320, 180, 1)
+    audio = Audio(file_id="file_id", file_unique_id="file_unique_id", duration=30)
+    document = Document("file_id", "file_unique_id", "file_name", 42)
+    location = Location(123, 456)
+    photo = (PhotoSize("file_id", "file_unique_id", 1, 1),)
+    sticker = Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular")
+    venue = Venue(location=Location(123, 456), title="title", address="address")
+    video = Video(
+        file_id="video_file_id",
+        width=640,
+        height=480,
+        file_unique_id="file_unique_id",
+        duration=dtm.timedelta(seconds=60),
+    )
+
+
+class TestPollMediaWithoutRequest(PollMediaTestBase):
+    def test_slot_behaviour(self, poll_media):
+        for attr in poll_media.__slots__:
+            assert getattr(poll_media, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(poll_media)) == len(set(mro_slots(poll_media))), "duplicate slot"
+
+    def test_de_json(self):
+        json_dict = {
+            "animation": self.animation.to_dict(),
+            "audio": self.audio.to_dict(),
+            "document": self.document.to_dict(),
+            "location": self.location.to_dict(),
+            "photo": [photo.to_dict() for photo in self.photo],
+            "sticker": self.sticker.to_dict(),
+            "venue": self.venue.to_dict(),
+            "video": self.video.to_dict(),
+            # TODO: LivePhoto
+        }
+        poll_media = PollMedia.de_json(json_dict, None)
+
+        assert poll_media.api_kwargs == {}
+        assert poll_media.animation == self.animation
+        assert poll_media.audio == self.audio
+        assert poll_media.document == self.document
+        assert poll_media.location == self.location
+        assert poll_media.photo == self.photo
+        assert poll_media.sticker == self.sticker
+        assert poll_media.venue == self.venue
+        assert poll_media.video == self.video
+        # TODO: LivePhoto
+
+    def test_to_dict(self, poll_media):
+        poll_media_dict = poll_media.to_dict()
+
+        assert isinstance(poll_media_dict, dict)
+        assert poll_media_dict["animation"] == poll_media.animation.to_dict()
+        assert poll_media_dict["audio"] == poll_media.audio.to_dict()
+        assert poll_media_dict["document"] == poll_media.document.to_dict()
+        assert poll_media_dict["location"] == poll_media.location.to_dict()
+        assert poll_media_dict["photo"] == [photo.to_dict() for photo in poll_media.photo]
+        assert poll_media_dict["sticker"] == poll_media.sticker.to_dict()
+        assert poll_media_dict["venue"] == poll_media.venue.to_dict()
+        assert poll_media_dict["video"] == poll_media.video.to_dict()
+        # TODO: LivePhoto
+
+    def test_equality(self):
+        a = PollMedia(photo=self.photo)
+        b = PollMedia(photo=self.photo)
+        c = PollMedia(photo=(PhotoSize("file_id", "other_file_unique_id", 1, 1),))
+        d = PollMedia(video=self.video)
+        e = PollOption("text", 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != c
+        assert hash(a) != hash(c)
 
         assert a != e
         assert hash(a) != hash(e)

@@ -28,6 +28,7 @@ from telegram._files.audio import Audio
 from telegram._files.document import Document
 from telegram._files.inputfile import InputFile
 from telegram._files.photosize import PhotoSize
+from telegram._files.sticker import Sticker
 from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
@@ -37,7 +38,7 @@ from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
-from telegram.constants import InputMediaType
+from telegram.constants import BaseInputMediaType
 
 if TYPE_CHECKING:
     from telegram._utils.types import FileInput
@@ -45,7 +46,95 @@ if TYPE_CHECKING:
 MediaType: TypeAlias = Animation | Audio | Document | PhotoSize | Video
 
 
-class InputMedia(TelegramObject):
+class _BaseInputMedia(TelegramObject):
+    """
+    Base class for objects representing the various input media types.
+
+    Args:
+        media_type (:obj:`str`): Type of media that the instance represents.
+
+    Attributes:
+        type (:obj:`str`): Type of media that the instance represents.
+    """
+
+    __slots__ = ("type",)
+
+    def __init__(
+        self,
+        media_type: str,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.type: str = enum.get_member(constants.BaseInputMediaType, media_type, media_type)
+
+        self._freeze()
+
+
+class InputPollMedia(_BaseInputMedia):
+    """Base class for Telegram InputPollMedia Objects. Currently, it can be one of:
+
+    * :class:`telegram.InputMediaAnimation`
+    * :class:`telegram.InputMediaAudio`
+    * :class:`telegram.InputMediaDocument`
+    * :class:`telegram.InputMediaLocation`
+    * :class:`telegram.InputMediaPhoto`
+    * :class:`telegram.InputMediaVenue`
+    * :class:`telegram.InputMediaVideo`
+    # TODO: LivePhoto
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        media_type (:obj:`str`): Type of the input poll media.
+
+    Attributes:
+        type (:obj:`str`): Type of the input poll media.
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        media_type: str,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(media_type=media_type, api_kwargs=api_kwargs)
+
+
+class InputPollOptionMedia(_BaseInputMedia):
+    """Base class for Telegram InputPollOptionMedia Objects. Currently, it can be one of:
+
+    * :class:`telegram.InputMediaAnimation`
+    * :class:`telegram.InputMediaLocation`
+    * :class:`telegram.InputMediaPhoto`
+    * :class:`telegram.InputMediaSticker`
+    * :class:`telegram.InputMediaVenue`
+    * :class:`telegram.InputMediaVideo`
+    # TODO: LivePhoto
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        media_type (:obj:`str`): Type of the input poll option media.
+
+    Attributes:
+        type (:obj:`str`): Type of the input poll option media.
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        media_type: str,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(media_type=media_type, api_kwargs=api_kwargs)
+
+
+class InputMedia(_BaseInputMedia):
     """
     Base class for Telegram InputMedia Objects.
 
@@ -85,7 +174,7 @@ class InputMedia(TelegramObject):
 
     """
 
-    __slots__ = ("caption", "caption_entities", "media", "parse_mode", "type")
+    __slots__ = ("caption", "caption_entities", "media", "parse_mode")
 
     def __init__(
         self,
@@ -97,14 +186,12 @@ class InputMedia(TelegramObject):
         *,
         api_kwargs: JSONDict | None = None,
     ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.InputMediaType, media_type, media_type)
-        self.media: str | InputFile = media
-        self.caption: str | None = caption
-        self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-        self.parse_mode: ODVInput[str] = parse_mode
-
-        self._freeze()
+        super().__init__(media_type=media_type, api_kwargs=api_kwargs)
+        with self._unfrozen():
+            self.media: str | InputFile = media
+            self.caption: str | None = caption
+            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.parse_mode: ODVInput[str] = parse_mode
 
     @staticmethod
     def _parse_thumbnail_input(thumbnail: "FileInput | None") -> str | InputFile | None:
@@ -300,7 +387,7 @@ class InputPaidMediaVideo(InputPaidMedia):
         return get_timedelta_value(self._duration, attribute="duration")
 
 
-class InputMediaAnimation(InputMedia):
+class InputMediaAnimation(InputMedia, InputPollMedia, InputPollOptionMedia):
     """Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 
     Note:
@@ -354,7 +441,7 @@ class InputMediaAnimation(InputMedia):
             .. versionadded:: 21.3
 
     Attributes:
-        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
+        type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.ANIMATION`.
         media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
         caption (:obj:`str`): Optional. Caption of the animation to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -421,7 +508,7 @@ class InputMediaAnimation(InputMedia):
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
         super().__init__(
-            InputMediaType.ANIMATION,
+            BaseInputMediaType.ANIMATION,
             media,
             caption,
             caption_entities,
@@ -441,7 +528,7 @@ class InputMediaAnimation(InputMedia):
         return get_timedelta_value(self._duration, attribute="duration")
 
 
-class InputMediaPhoto(InputMedia):
+class InputMediaPhoto(InputMedia, InputPollMedia, InputPollOptionMedia):
     """Represents a photo to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -475,7 +562,7 @@ class InputMediaPhoto(InputMedia):
             .. versionadded:: 21.3
 
     Attributes:
-        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
+        type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.PHOTO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
         caption (:obj:`str`): Optional. Caption of the photo to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -517,7 +604,7 @@ class InputMediaPhoto(InputMedia):
         # things to work in local mode.
         media = parse_file_input(media, PhotoSize, filename=filename, attach=True, local_mode=True)
         super().__init__(
-            InputMediaType.PHOTO,
+            BaseInputMediaType.PHOTO,
             media,
             caption,
             caption_entities,
@@ -530,7 +617,7 @@ class InputMediaPhoto(InputMedia):
             self.show_caption_above_media: bool | None = show_caption_above_media
 
 
-class InputMediaVideo(InputMedia):
+class InputMediaVideo(InputMedia, InputPollMedia, InputPollOptionMedia):
     """Represents a video to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -595,7 +682,7 @@ class InputMediaVideo(InputMedia):
             .. versionadded:: 21.3
 
     Attributes:
-        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
+        type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.VIDEO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
         caption (:obj:`str`): Optional. Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -676,7 +763,7 @@ class InputMediaVideo(InputMedia):
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
         super().__init__(
-            InputMediaType.VIDEO,
+            BaseInputMediaType.VIDEO,
             media,
             caption,
             caption_entities,
@@ -701,7 +788,157 @@ class InputMediaVideo(InputMedia):
         return get_timedelta_value(self._duration, attribute="duration")
 
 
-class InputMediaAudio(InputMedia):
+class InputMediaLocation(InputPollMedia, InputPollOptionMedia):
+    """Represents a location to be sent.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        latitude (:obj:`float`): Latitude of the location.
+        longitude (:obj:`float`): Longitude of the location.
+        horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
+            measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
+
+    Attributes:
+        type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.LOCATION`.
+        latitude (:obj:`float`): Latitude of the location.
+        longitude (:obj:`float`): Longitude of the location.
+        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
+            measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
+    """
+
+    __slots__ = ("horizontal_accuracy", "latitude", "longitude")
+
+    def __init__(
+        self,
+        latitude: float,
+        longitude: float,
+        horizontal_accuracy: float | None = None,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(media_type=BaseInputMediaType.LOCATION, api_kwargs=api_kwargs)
+        with self._unfrozen():
+            self.latitude: float = latitude
+            self.longitude: float = longitude
+            self.horizontal_accuracy: float | None = horizontal_accuracy
+
+
+class InputMediaVenue(InputPollMedia, InputPollOptionMedia):
+    """Represents a venue to be sent.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        latitude (:obj:`float`): Latitude of the location.
+        longitude (:obj:`float`): Longitude of the location.
+        title (:obj:`str`): Name of the venue.
+        address (:obj:`str`): Address of the venue.
+        foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue.
+        foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known. (For
+            example, ``“arts_entertainment/default”``, ``“arts_entertainment/aquarium”``
+            or ``“food/icecream”``).
+        google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
+        google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
+        `supported types <https://developers.google.com/places/web-service/supported_types>`_)
+
+    Attributes:
+        type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.VENUE`.
+        latitude (:obj:`float`): Latitude of the location.
+        longitude (:obj:`float`): Longitude of the location.
+        title (:obj:`str`): Name of the venue.
+        address (:obj:`str`): Address of the venue.
+        foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue.
+        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known. (For
+            example, ``“arts_entertainment/default”``, ``“arts_entertainment/aquarium”``
+            or ``“food/icecream”``).
+        google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
+        google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See
+        `supported types <https://developers.google.com/places/web-service/supported_types>`_)
+    """
+
+    __slots__ = (
+        "address",
+        "foursquare_id",
+        "foursquare_type",
+        "google_place_id",
+        "google_place_type",
+        "latitude",
+        "longitude",
+        "title",
+    )
+
+    def __init__(
+        self,
+        latitude: float,
+        longitude: float,
+        title: str,
+        address: str,
+        foursquare_id: str | None = None,
+        foursquare_type: str | None = None,
+        google_place_id: str | None = None,
+        google_place_type: str | None = None,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(media_type=BaseInputMediaType.VENUE, api_kwargs=api_kwargs)
+        with self._unfrozen():
+            self.latitude: float = latitude
+            self.longitude: float = longitude
+            self.title: str = title
+            self.address: str = address
+            self.foursquare_id: str | None = foursquare_id
+            self.foursquare_type: str | None = foursquare_type
+            self.google_place_id: str | None = google_place_id
+            self.google_place_type: str | None = google_place_type
+
+
+class InputMediaSticker(InputPollOptionMedia):
+    """Represents a sticker file to be sent.
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`telegram.Sticker`): File to send. |fileinputnopath|
+
+            Lastly you can pass an existing :class:`telegram.Sticker` object to send.
+        emoji (:obj:`str`, optional): Emoji associated with the sticker; only for just uploaded
+            stickers.
+        filename (:obj:`str`, optional): Custom file name for the sticker, when uploading a
+            new file.
+
+    Attributes:
+        type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.STICKER`.
+        media (:obj:`str` | :class:`telegram.InputFile`): Sticker file to send.
+        emoji (:obj:`str`): Optional. Emoji associated with the sticker; only for just uploaded
+            stickers.
+    """
+
+    __slots__ = ("emoji", "media")
+
+    def __init__(
+        self,
+        media: "FileInput | Sticker",
+        emoji: str | None = None,
+        filename: str | None = None,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        if isinstance(media, Sticker):
+            media = media.file_id
+        else:
+            media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
+
+        super().__init__(media_type=BaseInputMediaType.STICKER, api_kwargs=api_kwargs)
+        with self._unfrozen():
+            self.media: str | InputFile = media
+            self.emoji: str | None = emoji
+
+
+class InputMediaAudio(InputMedia, InputPollMedia):
     """Represents an audio file to be treated as music to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -749,7 +986,7 @@ class InputMediaAudio(InputMedia):
             .. versionadded:: 20.2
 
     Attributes:
-        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.AUDIO`.
+        type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.AUDIO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
         caption (:obj:`str`): Optional. Caption of the audio to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -802,7 +1039,7 @@ class InputMediaAudio(InputMedia):
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
         super().__init__(
-            InputMediaType.AUDIO,
+            BaseInputMediaType.AUDIO,
             media,
             caption,
             caption_entities,
@@ -820,7 +1057,7 @@ class InputMediaAudio(InputMedia):
         return get_timedelta_value(self._duration, attribute="duration")
 
 
-class InputMediaDocument(InputMedia):
+class InputMediaDocument(InputMedia, InputPollMedia):
     """Represents a general file to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -858,7 +1095,7 @@ class InputMediaDocument(InputMedia):
             .. versionadded:: 20.2
 
     Attributes:
-        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.DOCUMENT`.
+        type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.DOCUMENT`.
         media (:obj:`str` | :class:`telegram.InputFile`): File to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -897,7 +1134,7 @@ class InputMediaDocument(InputMedia):
         media = parse_file_input(media, Document, filename=filename, attach=True, local_mode=True)
 
         super().__init__(
-            InputMediaType.DOCUMENT,
+            BaseInputMediaType.DOCUMENT,
             media,
             caption,
             caption_entities,

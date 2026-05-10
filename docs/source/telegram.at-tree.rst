@@ -101,15 +101,20 @@ Available Types
     telegram.inputmediaanimation
     telegram.inputmediaaudio
     telegram.inputmediadocument
+    telegram.inputmedialocation
     telegram.inputmediaphoto
+    telegram.inputmediasticker
+    telegram.inputmediavenue
     telegram.inputmediavideo
     telegram.inputpaidmedia
     telegram.inputpaidmediaphoto
     telegram.inputpaidmediavideo
+    telegram.inputpollmedia
     telegram.inputprofilephoto
     telegram.inputprofilephotoanimated
     telegram.inputprofilephotostatic
     telegram.inputpolloption
+    telegram.inputpolloptionmedia
     telegram.inputstorycontent
     telegram.inputstorycontentphoto
     telegram.inputstorycontentvideo
@@ -154,6 +159,7 @@ Available Types
     telegram.photosize
     telegram.poll
     telegram.pollanswer
+    telegram.pollmedia
     telegram.polloption
     telegram.polloptionadded
     telegram.polloptiondeleted

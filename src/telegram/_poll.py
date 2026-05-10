@@ -24,6 +24,14 @@ from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._chat import Chat
+from telegram._files.animation import Animation
+from telegram._files.audio import Audio
+from telegram._files.document import Document
+from telegram._files.location import Location
+from telegram._files.photosize import PhotoSize
+from telegram._files.sticker import Sticker
+from telegram._files.venue import Venue
+from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -47,6 +55,119 @@ from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot, MaybeInaccessibleMessage
+
+
+class PollMedia(TelegramObject):
+    """
+    At most one of the optional fields can be present in any given object.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if all of their attributes are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        animation (:class:`telegram.Animation`, optional): Media is an animation, information about
+            the animation
+        audio (:class:`telegram.Audio`, optional): Media is an audio file, information about the
+            file; currently, can't be received in a poll option
+        document (:class:`telegram.Document`, optional): Media is a general file, information about
+            the file; currently, can't be received in a poll option
+        # TODO: LivePhoto
+        location (:class:`telegram.Location`, optional): Media is a shared location, information
+            about the location
+        photo (Sequence[:class:`telegram.PhotoSize`], optional): Media is a photo, available sizes
+            of the photo
+        sticker (:class:`telegram.Sticker`, optional): Media is a sticker, information about the
+            sticker; currently, for poll options only
+        venue (:class:`telegram.Venue`, optional): Media is a venue, information about the venue
+        video (:class:`telegram.Video`, optional): Media is a video, information about the video
+
+    Attributes:
+        animation (:class:`telegram.Animation`): Optional. Media is an animation, information about
+            the animation
+        audio (:class:`telegram.Audio`): Optional. Media is an audio file, information about the
+            file; currently, can't be received in a poll option
+        document (:class:`telegram.Document`): Optional. Media is a general file, information about
+            the file; currently, can't be received in a poll option
+        # TODO: LivePhoto
+        location (:class:`telegram.Location`): Optional. Media is a shared location, information
+            about the location
+        photo (Sequence[:class:`telegram.PhotoSize`]): Optional. Media is a photo, available sizes
+            of the photo
+        sticker (:class:`telegram.Sticker`): Optional. Media is a sticker, information about the
+            sticker; currently, for poll options only
+        venue (:class:`telegram.Venue`): Optional. Media is a venue, information about the venue
+        video (:class:`telegram.Video`): Optional. Media is a video, information about the video
+    """
+
+    __slots__ = (
+        "animation",
+        "audio",
+        "document",
+        "location",
+        "photo",
+        "sticker",
+        "venue",
+        "video",
+        # TODO: LivePhoto
+    )
+
+    def __init__(
+        self,
+        animation: Animation | None = None,
+        audio: Audio | None = None,
+        document: Document | None = None,
+        location: Location | None = None,
+        photo: Sequence[PhotoSize] | None = None,
+        sticker: Sticker | None = None,
+        venue: Venue | None = None,
+        video: Video | None = None,
+        # TODO: LivePhoto
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.animation: Animation | None = animation
+        self.audio: Audio | None = audio
+        self.document: Document | None = document
+        self.location: Location | None = location
+        self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+        self.sticker: Sticker | None = sticker
+        self.venue: Venue | None = venue
+        self.video: Video | None = video
+        # TODO: LivePhoto
+
+        self._id_attrs = (
+            self.animation,
+            self.audio,
+            self.document,
+            self.location,
+            self.photo,
+            self.sticker,
+            self.venue,
+            self.video,
+            # TODO: LivePhoto
+        )
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollMedia":
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
+        data["audio"] = de_json_optional(data.get("audio"), Audio, bot)
+        data["document"] = de_json_optional(data.get("document"), Document, bot)
+        data["location"] = de_json_optional(data.get("location"), Location, bot)
+        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
+        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
+        data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
+        data["video"] = de_json_optional(data.get("video"), Video, bot)
+        # TODO: LivePhoto
+
+        return super().de_json(data=data, bot=bot)
 
 
 class InputPollOption(TelegramObject):
