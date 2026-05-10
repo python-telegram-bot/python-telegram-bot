@@ -5149,9 +5149,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             tuple[:class:`telegram.ChatMember`]: On success, returns a tuple of ``ChatMember``
-            objects that contains information about all chat administrators except
-            other bots. If the chat is a group or a supergroup and no administrators were
-            appointed, only the creator will be returned.
+            objects that contains information about all chat administrators.
 
         Raises:
             :class:`telegram.error.TelegramError`
