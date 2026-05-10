@@ -1,5 +1,6 @@
-features = "Full Support for Bot API 10.0"
-[[pull_requests]]
-uid = "5229"
-author_uids = ["aelkheir"]
-closes_threads = []
+highlights = "Full Support for Bot API 10.0"
+
+pull_requests = [
+  { uid = "5229", author_uid = "aelkheir", closes_threads = ["5228"] },
+  { uid = "5230", author_uid = "harshil21" },
+]
