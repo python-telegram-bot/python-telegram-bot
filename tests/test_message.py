@@ -3419,3 +3419,29 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         monkeypatch.setattr(message.get_bot(), "decline_suggested_post", make_assertion)
         assert await message.decline_suggested_post(comment="some comment")
+
+    async def test_delete_reaction(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_id"] == message.message_id
+                and kwargs["user_id"] == 23
+                and kwargs["actor_chat_id"] == 12
+            )
+
+        assert check_shortcut_signature(
+            Message.delete_reaction,
+            Bot.delete_message_reaction,
+            ["chat_id", "message_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.delete_reaction,
+            message.get_bot(),
+            "delete_message_reaction",
+            shortcut_kwargs=["chat_id", "message_id"],
+        )
+        assert await check_defaults_handling(message.delete_reaction, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "delete_message_reaction", make_assertion)
+        assert await message.delete_reaction(user_id=23, actor_chat_id=12)

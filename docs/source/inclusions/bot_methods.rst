@@ -104,6 +104,10 @@
       - Used for stopping the running poll
     * - :meth:`~telegram.Bot.set_message_reaction`
       - Used for setting reactions on messages
+    * - :meth:`~telegram.Bot.delete_message_reaction`
+      - Used for deleting reactions on messages
+    * - :meth:`~telegram.Bot.delete_all_message_reactions`
+      - Used for deleting all reactions by a chat or user
 
 .. raw:: html
 

@@ -1537,6 +1537,68 @@ class TestChatWithoutRequest(ChatTestBase):
             active_period=3600,
         )
 
+    async def test_instance_method_delete_reaction(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["message_id"] == 321
+                and kwargs["user_id"] == 123
+                and kwargs["actor_chat_id"] == 222
+            )
+
+        assert check_shortcut_signature(
+            Chat.delete_reaction,
+            Bot.delete_message_reaction,
+            [
+                "chat_id",
+            ],
+            additional_kwargs=[],
+        )
+        assert await check_shortcut_call(
+            chat.delete_reaction,
+            chat.get_bot(),
+            "delete_message_reaction",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.delete_reaction, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "delete_message_reaction", make_assertion)
+        assert await chat.delete_reaction(
+            user_id=123,
+            message_id=321,
+            actor_chat_id=222,
+        )
+
+    async def test_instance_method_delete_all_reactions(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["user_id"] == 123
+                and kwargs["actor_chat_id"] == 222
+            )
+
+        assert check_shortcut_signature(
+            Chat.delete_all_reactions,
+            Bot.delete_all_message_reactions,
+            [
+                "chat_id",
+            ],
+            additional_kwargs=[],
+        )
+        assert await check_shortcut_call(
+            chat.delete_all_reactions,
+            chat.get_bot(),
+            "delete_all_message_reactions",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.delete_all_reactions, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "delete_all_message_reactions", make_assertion)
+        assert await chat.delete_all_reactions(
+            user_id=123,
+            actor_chat_id=222,
+        )
+
     async def test_instance_method_get_gifts(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == chat.id

@@ -5125,6 +5125,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     async def get_chat_administrators(
         self,
         chat_id: str | int,
+        return_bots: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5140,6 +5141,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            return_bots (:obj:`bool`, optional): Pass :obj:`True` to additionally receive all bots
+                that are administrators of the chat. By default, bots other than the current bot
+                are omitted.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             tuple[:class:`telegram.ChatMember`]: On success, returns a tuple of ``ChatMember``
@@ -5151,7 +5157,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id}
+        data: JSONDict = {"chat_id": chat_id, "return_bots": return_bots}
         result = await self._post(
             "getChatAdministrators",
             data,
@@ -12283,6 +12289,106 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             self,
         )
 
+    async def delete_message_reaction(
+        self,
+        chat_id: int | str,
+        message_id: int,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Use this method to remove a reaction from a message in a group or a supergroup chat.
+        The bot must have the :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
+        administrator right in the chat.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_id (:obj:`int`): Identifier of the target message.
+            user_id (:obj:`int`, optional): Identifier of the user whose reaction will be removed,
+                if the reaction were added by a user.
+            actor_chat_id (:obj:`int`, optional): Identifier of the chat whose reaction will be
+                removed, if the reaction were added by a chat.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "user_id": user_id,
+            "actor_chat_id": actor_chat_id,
+        }
+
+        return await self._post(
+            "deleteMessageReaction",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_all_message_reactions(
+        self,
+        chat_id: int | str,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Use this method to remove up to ``10000`` recent reactions in a group or a supergroup chat
+        added by a given user or chat. The bot must have the
+        :attr:`~telegram.ChatMemberAdministrator.can_delete_messages` administrator right in the
+        chat.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            user_id (:obj:`int`, optional): Identifier of the user whose reactions will be removed,
+                if the reactions were added by a user.
+            actor_chat_id (:obj:`int`, optional): Identifier of the chat whose reactions will be
+                removed, if the reactions were added by a chat.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "user_id": user_id,
+            "actor_chat_id": actor_chat_id,
+        }
+
+        return await self._post(
+            "deleteAllMessageReactions",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -12629,3 +12735,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`replace_managed_bot_token`"""
     savePreparedKeyboardButton = save_prepared_keyboard_button
     """Alias for :meth:`save_prepared_keyboard_button`"""
+    deleteMessageReaction = delete_message_reaction
+    """Alias for :meth:`delete_message_reaction`"""
+    deleteAllMessageReactions = delete_all_message_reactions
+    """Alias for :meth:`delete_all_message_reactions`"""
