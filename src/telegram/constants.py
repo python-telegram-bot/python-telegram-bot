@@ -3500,6 +3500,12 @@ class PollLimit(IntEnum):
 
     .. versionadded:: NEXT.VERSION
     """
+    MIN_MEMBERSHIP_HOURS = 24
+    """:obj:`int`: Minimum number of hours a user must have been a member of the chat
+    before they can vote in a members-only poll.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class PollType(StringEnum):

@@ -54,7 +54,7 @@ from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
-    from telegram import Bot, MaybeInaccessibleMessage
+    from telegram import Bot, InputPollOptionMedia, MaybeInaccessibleMessage
 
 
 class PollMedia(TelegramObject):
@@ -190,6 +190,9 @@ class InputPollOption(TelegramObject):
             :paramref:`text_parse_mode`.
             Currently, only custom emoji entities are allowed.
             This list is empty if the text does not contain entities.
+        media (:class:`telegram.InputPollOptionMedia`, optional): Media added to the poll option.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         text (:obj:`str`): Option text,
@@ -202,15 +205,19 @@ class InputPollOption(TelegramObject):
             :paramref:`text_parse_mode`.
             Currently, only custom emoji entities are allowed.
             This list is empty if the text does not contain entities.
+        media (:class:`telegram.InputPollOptionMedia`): Optional. Media added to the poll option.
+
+            .. versionadded:: NEXT.VERSION
     """
 
-    __slots__ = ("text", "text_entities", "text_parse_mode")
+    __slots__ = ("media", "text", "text_entities", "text_parse_mode")
 
     def __init__(
         self,
         text: str,
         text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Sequence[MessageEntity] | None = None,
+        media: "InputPollOptionMedia | None" = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -218,6 +225,7 @@ class InputPollOption(TelegramObject):
         self.text: str = text
         self.text_parse_mode: ODVInput[str] = text_parse_mode
         self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
+        self.media: InputPollOptionMedia | None = media
 
         self._id_attrs = (self.text,)
 
@@ -238,7 +246,12 @@ class PollOption(TelegramObject):
     This object contains information about one answer option in a poll.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
+    considered equal, if their :attr:`text`, :attr:`voter_count` and :attr:`persistent_id`
+    are equal.
+
+    .. versionchanged:: NEXT.VERSION
+        Added attribute :attr:`persistent_id` to equality checks.
+
 
     Args:
         persistent_id (:obj:`str`): Unique identifier of the option, persistent on option addition
@@ -254,6 +267,9 @@ class PollOption(TelegramObject):
             poll option texts.
 
             .. versionadded:: 21.2
+        media (:class:`telegram.PollMedia`, optional): Media added to the poll option.
+
+            .. versionadded:: NEXT.VERSION
         added_by_user (:class:`telegram.User`, optional): User who added the option;
             omitted if the option wasn't added by a user after poll creation.
 
@@ -282,6 +298,9 @@ class PollOption(TelegramObject):
             This list is empty if the question does not contain entities.
 
             .. versionadded:: 21.2
+        media (:class:`telegram.PollMedia`): Optional. Media added to the poll option.
+
+            .. versionadded:: NEXT.VERSION
         added_by_user (:class:`telegram.User`): Optional. User who added the option;
             omitted if the option wasn't added by a user after poll creation.
 
@@ -300,6 +319,7 @@ class PollOption(TelegramObject):
         "added_by_chat",
         "added_by_user",
         "addition_date",
+        "media",
         "persistent_id",
         "text",
         "text_entities",
@@ -314,23 +334,28 @@ class PollOption(TelegramObject):
         added_by_user: User | None = None,
         added_by_chat: Chat | None = None,
         addition_date: dtm.datetime | None = None,
+        media: PollMedia | None = None,
         # tags: required in NEXT.VERSION, bot api 9.6
         # temporarily optional to avoid breaking changes
         persistent_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
+        if persistent_id is None:
+            raise TypeError("`persistent_id` is a required argument since Bot API 9.6")
+
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
         self.voter_count: int = voter_count
         self.added_by_user: User | None = added_by_user
         self.added_by_chat: Chat | None = added_by_chat
         self.addition_date: dtm.datetime | None = addition_date
-        self.persistent_id: str | None = persistent_id
+        self.persistent_id: str = persistent_id
+        self.media: PollMedia | None = media
 
         self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
 
-        self._id_attrs = (self.text, self.voter_count)
+        self._id_attrs = (self.text, self.voter_count, self.persistent_id)
 
         self._freeze()
 
@@ -346,6 +371,7 @@ class PollOption(TelegramObject):
         data["added_by_user"] = de_json_optional(data.get("added_by_user"), User, bot)
         data["added_by_chat"] = de_json_optional(data.get("added_by_chat"), Chat, bot)
         data["addition_date"] = from_timestamp(data.get("addition_date"), tzinfo=loc_tzinfo)
+        data["media"] = de_json_optional(data.get("media"), PollMedia, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -758,6 +784,11 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
+        members_only (:obj:`bool`): :obj:`True`, if voting is limited to users who have been
+            members of the chat where the poll was originally sent for more than
+            :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours.
+
+            .. versionadded:: NEXT.VERSION
         correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
             option. Available only for closed polls in the quiz mode, which were sent
             (not forwarded), by the bot or to a private chat with the bot.
@@ -776,6 +807,10 @@ class Poll(TelegramObject):
 
                * This attribute is now always a (possibly empty) list and never :obj:`None`.
                * |sequenceclassargs|
+        explanation_media (:class:`telegram.PollMedia`, optional): Media added to the quiz
+            explanation.
+
+            .. versionadded:: NEXT.VERSION
         open_period (:obj:`int` | :class:`datetime.timedelta`, optional): Amount of time in seconds
             the poll will be active after creation.
 
@@ -800,12 +835,22 @@ class Poll(TelegramObject):
             were sent (not forwarded) by the bot or to the private chat with the bot.
 
             .. versionadded:: NEXT.VERSION
+        country_codes (Sequence[:obj:`str`], optional): A list of two-letter ``ISO 3166-1 alpha-2``
+            country codes indicating the countries from which users can vote in the poll. The
+            country code ``“FT”`` is used for users with anonymous numbers. If omitted, then users
+            from any country can participate in the poll.
+
+            .. versionadded:: NEXT.VERSION
         description (:obj:`str`, optional): Description of the poll;
             for polls inside the :class:`~telegram.Message` object only.
 
             .. versionadded:: NEXT.VERSION
         description_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
             entities like usernames, URLs, bot commands, etc. that appear in the description
+
+            .. versionadded:: NEXT.VERSION
+        media (:class:`telegram.PollMedia`, optional): Media added to the poll description;
+            for polls inside the :class:`~telegram.Message` object only.
 
             .. versionadded:: NEXT.VERSION
 
@@ -822,6 +867,11 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
+        members_only (:obj:`bool`): :obj:`True`, if voting is limited to users who have been
+            members of the chat where the poll was originally sent for more than
+            :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours.
+
+            .. versionadded:: NEXT.VERSION
         correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer
             option. Available only for closed polls in the quiz mode, which were sent
             (not forwarded), by the bot or to a private chat with the bot.
@@ -840,6 +890,10 @@ class Poll(TelegramObject):
 
             .. versionchanged:: 20.0
                This attribute is now always a (possibly empty) list and never :obj:`None`.
+        explanation_media (:class:`telegram.PollMedia`): Optional. Media added to the quiz
+            explanation.
+
+            .. versionadded:: NEXT.VERSION
         open_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Amount of time in seconds
             the poll will be active after creation.
 
@@ -865,12 +919,22 @@ class Poll(TelegramObject):
             sent (not forwarded) by the bot or to the private chat with the bot.
 
             .. versionadded:: NEXT.VERSION
+        country_codes (tuple[:obj:`str`]): Optional. A list of two-letter ``ISO 3166-1 alpha-2``
+            country codes indicating the countries from which users can vote in the poll. The
+            country code ``“FT”`` is used for users with anonymous numbers. If omitted, then users
+            from any country can participate in the poll.
+
+            .. versionadded:: NEXT.VERSION
         description (:obj:`str`): Optional. Description of the poll;
             for polls inside the Message object only
 
             .. versionadded:: NEXT.VERSION
         description_entities (tuple[:class:`telegram.MessageEntity`]): Special
             entities like usernames, URLs, bot commands, etc. that appear in the description
+
+            .. versionadded:: NEXT.VERSION
+        media (:class:`telegram.PollMedia`): Optional. Media added to the poll description;
+            for polls inside the Message object only.
 
             .. versionadded:: NEXT.VERSION
 
@@ -882,13 +946,17 @@ class Poll(TelegramObject):
         "allows_revoting",
         "close_date",
         "correct_option_ids",
+        "country_codes",
         "description",
         "description_entities",
         "explanation",
         "explanation_entities",
+        "explanation_media",
         "id",
         "is_anonymous",
         "is_closed",
+        "media",
+        "members_only",
         "options",
         "question",
         "question_entities",
@@ -909,6 +977,7 @@ class Poll(TelegramObject):
         # tags: deprecated NEXT.VERSION
         # Removed in bot api 9.6:
         correct_option_id: int | None = None,
+        # ---
         explanation: str | None = None,
         explanation_entities: Sequence[MessageEntity] | None = None,
         open_period: TimePeriod | None = None,
@@ -917,12 +986,23 @@ class Poll(TelegramObject):
         # tags: required in NEXT.VERSION
         # temporarily optional to avoid breaking changes
         allows_revoting: bool | None = None,
+        members_only: bool | None = None,
+        # ---
         correct_option_ids: Sequence[int] | None = None,
         description: str | None = None,
         description_entities: Sequence[MessageEntity] | None = None,
+        country_codes: Sequence[str] | None = None,
+        media: PollMedia | None = None,
+        explanation_media: PollMedia | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
+        if allows_revoting is None:
+            raise TypeError("`allows_revoting` is a required argument since Bot API 9.6")
+
+        if members_only is None:
+            raise TypeError("`members_only` is a required argument since Bot API 10.0")
+
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
         self.question: str = question
@@ -932,7 +1012,8 @@ class Poll(TelegramObject):
         self.is_anonymous: bool = is_anonymous
         self.type: str = enum.get_member(constants.PollType, type, type)
         self.allows_multiple_answers: bool = allows_multiple_answers
-        self.allows_revoting: bool | None = allows_revoting
+        self.allows_revoting: bool = allows_revoting
+        self.members_only: bool = members_only
 
         # tag: deprecated NEXT.VERSION
         if correct_option_id is not None:
@@ -959,6 +1040,9 @@ class Poll(TelegramObject):
         self._open_period: dtm.timedelta | None = to_timedelta(open_period)
         self.close_date: dtm.datetime | None = close_date
         self.question_entities: tuple[MessageEntity, ...] = parse_sequence_arg(question_entities)
+        self.country_codes: tuple[str, ...] = parse_sequence_arg(country_codes)
+        self.media: PollMedia | None = media
+        self.explanation_media: PollMedia | None = explanation_media
 
         self._id_attrs = (self.id,)
 
@@ -987,6 +1071,8 @@ class Poll(TelegramObject):
         data["description_entities"] = de_list_optional(
             data.get("description_entities"), MessageEntity, bot
         )
+        data["media"] = de_json_optional(data.get("media"), PollMedia, bot)
+        data["explanation_media"] = de_json_optional(data.get("explanation_media"), PollMedia, bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -1223,6 +1309,11 @@ class Poll(TelegramObject):
     """
     MAX_DESCRIPTION_CHARACTERS: Final[int] = constants.PollLimit.MAX_DESCRIPTION_CHARACTERS
     """:const:`telegram.constants.PollLimit.MAX_DESCRIPTION_CHARACTERS`
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MIN_MEMBERSHIP_HOURS: Final[int] = constants.PollLimit.MIN_MEMBERSHIP_HOURS
+    """:const:`telegram.constants.PollLimit.MIN_MEMBERSHIP_HOURS`
 
     .. versionadded:: NEXT.VERSION
     """

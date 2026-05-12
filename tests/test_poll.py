@@ -34,6 +34,7 @@ from telegram import (
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.document import Document
+from telegram._files.inputmedia import InputMediaPhoto
 from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._files.venue import Venue
@@ -51,6 +52,7 @@ def input_poll_option():
         text=InputPollOptionTestBase.text,
         text_parse_mode=InputPollOptionTestBase.text_parse_mode,
         text_entities=InputPollOptionTestBase.text_entities,
+        media=InputPollOptionTestBase.media,
     )
     out._unfreeze()
     return out
@@ -63,6 +65,7 @@ class InputPollOptionTestBase:
         MessageEntity(0, 4, MessageEntity.BOLD),
         MessageEntity(5, 7, MessageEntity.ITALIC),
     ]
+    media = InputMediaPhoto("media")
 
 
 class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
@@ -95,6 +98,7 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
         assert input_poll_option_dict["text_entities"] == [
             e.to_dict() for e in input_poll_option.text_entities
         ]
+        assert input_poll_option_dict["media"] == input_poll_option.media.to_dict()
 
         # Test that the default-value parameter is handled correctly
         input_poll_option = InputPollOption("text")
@@ -106,7 +110,18 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
         b = InputPollOption("text", self.text_parse_mode)
         c = InputPollOption("text", text_entities=self.text_entities)
         d = InputPollOption("different_text")
-        e = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
+        e = Poll(
+            123,
+            "question",
+            ["O1", "O2"],
+            1,
+            False,
+            True,
+            Poll.REGULAR,
+            True,
+            allows_revoting=True,
+            members_only=True,
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -203,7 +218,7 @@ class TestPollMediaWithoutRequest(PollMediaTestBase):
         b = PollMedia(photo=self.photo)
         c = PollMedia(photo=(PhotoSize("file_id", "other_file_unique_id", 1, 1),))
         d = PollMedia(video=self.video)
-        e = PollOption("text", 1)
+        e = PollOption("text", 1, persistent_id="persistent_id")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -227,6 +242,8 @@ def poll_option():
         added_by_user=PollOptionTestBase.added_by_user,
         added_by_chat=PollOptionTestBase.added_by_chat,
         addition_date=PollOptionTestBase.addition_date,
+        persistent_id=PollOptionTestBase.persistent_id,
+        media=PollOptionTestBase.media,
     )
     out._unfreeze()
     return out
@@ -242,6 +259,8 @@ class PollOptionTestBase:
     added_by_user = User(1, "test_user", False)
     added_by_chat = Chat(1, "test_chat")
     addition_date = dtm.datetime.now(dtm.timezone.utc)
+    persistent_id = "persistent_id"
+    media = PollMedia(location=Location(123, 456))
 
 
 class TestPollOptionWithoutRequest(PollOptionTestBase):
@@ -258,6 +277,8 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
             "added_by_user": self.added_by_user.to_dict(),
             "added_by_chat": self.added_by_chat.to_dict(),
             "addition_date": to_timestamp(self.addition_date),
+            "persistent_id": self.persistent_id,
+            "media": self.media.to_dict(),
         }
         poll_option = PollOption.de_json(json_dict, None)
         assert poll_option.api_kwargs == {}
@@ -268,6 +289,8 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
         assert poll_option.added_by_user == self.added_by_user
         assert poll_option.added_by_chat == self.added_by_chat
         assert abs((poll_option.addition_date - self.addition_date).total_seconds()) < 1
+        assert poll_option.persistent_id == self.persistent_id
+        assert poll_option.media == self.media
 
     def test_to_dict(self, poll_option):
         poll_option_dict = poll_option.to_dict()
@@ -281,6 +304,8 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
         assert poll_option_dict["added_by_user"] == poll_option.added_by_user.to_dict()
         assert poll_option_dict["added_by_chat"] == poll_option.added_by_chat.to_dict()
         assert poll_option_dict["addition_date"] == to_timestamp(poll_option.addition_date)
+        assert poll_option_dict["persistent_id"] == poll_option.persistent_id
+        assert poll_option_dict["media"] == poll_option.media.to_dict()
 
     def test_parse_entity(self, poll_option):
         entity = MessageEntity(MessageEntity.BOLD, 0, 4)
@@ -296,12 +321,29 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
         assert poll_option.parse_entities(MessageEntity.BOLD) == {entity: "test"}
         assert poll_option.parse_entities() == {entity: "test", entity_2: "option"}
 
+    def test_persistent_id_required_workaround(self):
+        # tags: deprecated NEXT.VERSION, bot api 9.6
+        with pytest.raises(TypeError, match="`persistent_id` is a required"):
+            PollOption(self.text, self.voter_count)
+
     def test_equality(self):
-        a = PollOption("text", 1)
-        b = PollOption("text", 1)
-        c = PollOption("text_1", 1)
-        d = PollOption("text", 2)
-        e = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
+        a = PollOption("text", 1, persistent_id="persistent_id")
+        b = PollOption("text", 1, persistent_id="persistent_id")
+        c = PollOption("other_text", 1, persistent_id="persistent_id")
+        d = PollOption("text", 1 + 9, persistent_id="persistent_id")
+        e = PollOption("text", 1, persistent_id="other_persistent_id")
+        f = Poll(
+            123,
+            "question",
+            ["O1", "O2"],
+            1,
+            False,
+            True,
+            Poll.REGULAR,
+            True,
+            allows_revoting=True,
+            members_only=True,
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -314,6 +356,9 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
 
         assert a != e
         assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)
 
 
 @pytest.fixture(scope="module")
@@ -369,7 +414,7 @@ class TestPollAnswerWithoutRequest(PollAnswerTestBase):
         c = PollAnswer(123, [2], User(1, "first", False), self.voter_chat)
         d = PollAnswer(123, [1, 2], self.user, self.voter_chat)
         e = PollAnswer(456, [2], self.user, self.voter_chat)
-        f = PollOption("Text", 1)
+        f = PollOption("Text", 1, persistent_id="persistent_id")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -404,9 +449,13 @@ def poll():
         close_date=PollTestBase.close_date,
         question_entities=PollTestBase.question_entities,
         allows_revoting=PollTestBase.allows_revoting,
+        members_only=PollTestBase.members_only,
         correct_option_ids=PollTestBase.correct_option_ids,
         description=PollTestBase.description,
         description_entities=PollTestBase.description_entities,
+        country_codes=PollTestBase.country_codes,
+        media=PollTestBase.media,
+        explanation_media=PollTestBase.explanation_media,
     )
     poll._unfreeze()
     return poll
@@ -415,12 +464,16 @@ def poll():
 class PollTestBase:
     id_ = "id"
     question = "Test Question?"
-    options = [PollOption("test", 10), PollOption("test2", 11)]
+    options = [
+        PollOption("test", 10, persistent_id="persistent_id"),
+        PollOption("test2", 11, persistent_id="persistent_id_2"),
+    ]
     total_voter_count = 0
     is_closed = True
     is_anonymous = False
     type = Poll.REGULAR
     allows_multiple_answers = True
+    members_only = True
     explanation = (
         b"\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467"
         b"\\u200d\\U0001f467\\U0001f431http://google.com"
@@ -436,6 +489,9 @@ class PollTestBase:
     correct_option_ids = [1, 2]
     description = "description"
     description_entities = [MessageEntity(MessageEntity.ITALIC, 0, 11)]
+    country_codes = ["AB", "CD"]
+    media = PollMedia(document=Document("file_id", "file_unique_id", "file_name", 42))
+    explanation_media = PollMedia(animation=Animation("blah", "unique_id", 320, 180, 1))
 
 
 class TestPollWithoutRequest(PollTestBase):
@@ -455,9 +511,13 @@ class TestPollWithoutRequest(PollTestBase):
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
             "allows_revoting": self.allows_revoting,
+            "members_only": self.members_only,
             "correct_option_ids": self.correct_option_ids,
             "description": self.description,
             "description_entities": [e.to_dict() for e in self.description_entities],
+            "country_codes": self.country_codes,
+            "media": self.media.to_dict(),
+            "explanation_media": self.explanation_media.to_dict(),
         }
         poll = Poll.de_json(json_dict, offline_bot)
         assert poll.api_kwargs == {}
@@ -474,6 +534,7 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll.is_anonymous == self.is_anonymous
         assert poll.type == self.type
         assert poll.allows_multiple_answers == self.allows_multiple_answers
+        assert poll.members_only == self.members_only
         assert poll.explanation == self.explanation
         assert poll.explanation_entities == tuple(self.explanation_entities)
         assert poll._open_period == self.open_period
@@ -484,6 +545,9 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll.correct_option_ids == tuple(self.correct_option_ids)
         assert poll.description == self.description
         assert poll.description_entities == tuple(self.description_entities)
+        assert poll.country_codes == tuple(self.country_codes)
+        assert poll.media == self.media
+        assert poll.explanation_media == self.explanation_media
 
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
         json_dict = {
@@ -501,9 +565,13 @@ class TestPollWithoutRequest(PollTestBase):
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
             "allows_revoting": self.allows_revoting,
+            "members_only": self.members_only,
             "correct_option_ids": self.correct_option_ids,
             "description": self.description,
             "description_entities": [e.to_dict() for e in self.description_entities],
+            "country_codes": self.country_codes,
+            "media": self.media.to_dict(),
+            "explanation_media": self.explanation_media.to_dict(),
         }
 
         poll_raw = Poll.de_json(json_dict, raw_bot)
@@ -532,6 +600,7 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll_dict["is_anonymous"] == poll.is_anonymous
         assert poll_dict["type"] == poll.type
         assert poll_dict["allows_multiple_answers"] == poll.allows_multiple_answers
+        assert poll_dict["members_only"] == poll.members_only
         assert poll_dict["explanation"] == poll.explanation
         assert poll_dict["explanation_entities"] == [poll.explanation_entities[0].to_dict()]
         assert poll_dict["open_period"] == int(self.open_period.total_seconds())
@@ -543,6 +612,9 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll_dict["description_entities"] == [
             e.to_dict() for e in poll.description_entities
         ]
+        assert poll_dict["country_codes"] == list(poll.country_codes)
+        assert poll_dict["media"] == poll.media.to_dict()
+        assert poll_dict["explanation_media"] == poll.explanation_media.to_dict()
 
     def test_time_period_properties(self, PTB_TIMEDELTA, poll):
         if PTB_TIMEDELTA:
@@ -579,14 +651,79 @@ class TestPollWithoutRequest(PollTestBase):
             PollTestBase.type,
             PollTestBase.allows_multiple_answers,
             correct_option_id=1,
+            allows_revoting=PollTestBase.allows_revoting,
+            members_only=PollTestBase.members_only,
         )
         assert poll.correct_option_ids == (1,)
 
+    def test_allows_revoting_required_workaround(self):
+        # tags: deprecated NEXT.VERSION, bot api 9.6
+        with pytest.raises(TypeError, match="`allows_revoting` is a required"):
+            Poll(
+                self.id_,
+                self.question,
+                self.options,
+                self.total_voter_count,
+                self.is_closed,
+                self.is_anonymous,
+                self.type,
+                self.allows_multiple_answers,
+                members_only=self.members_only,
+            )
+
+    def test_members_only_required_workaround(self):
+        # tags: deprecated NEXT.VERSION, bot api 10.0
+        with pytest.raises(TypeError, match="`members_only` is a required"):
+            Poll(
+                self.id_,
+                self.question,
+                self.options,
+                self.total_voter_count,
+                self.is_closed,
+                self.is_anonymous,
+                self.type,
+                self.allows_multiple_answers,
+                allows_revoting=self.allows_revoting,
+            )
+
     def test_equality(self):
-        a = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
-        b = Poll(123, "question", ["o1", "o2"], 1, True, False, Poll.REGULAR, True)
-        c = Poll(456, "question", ["o1", "o2"], 1, True, False, Poll.REGULAR, True)
-        d = PollOption("Text", 1)
+        a = Poll(
+            123,
+            "question",
+            ["O1", "O2"],
+            1,
+            False,
+            True,
+            Poll.REGULAR,
+            True,
+            allows_revoting=True,
+            members_only=True,
+        )
+        b = Poll(
+            123,
+            "question",
+            ["o1", "o2"],
+            1,
+            True,
+            False,
+            Poll.REGULAR,
+            True,
+            allows_revoting=False,
+            members_only=False,
+        )
+        c = Poll(
+            456,
+            "question",
+            ["o1", "o2"],
+            1,
+            True,
+            False,
+            Poll.REGULAR,
+            True,
+            allows_revoting=True,
+            members_only=True,
+        )
+        d = PollOption("Text", 1, persistent_id="persistent_id")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -607,6 +744,8 @@ class TestPollWithoutRequest(PollTestBase):
             is_closed=False,
             is_anonymous=False,
             allows_multiple_answers=False,
+            allows_revoting=True,
+            members_only=True,
         )
         assert poll.type == "foo"
         poll = Poll(
@@ -618,6 +757,8 @@ class TestPollWithoutRequest(PollTestBase):
             is_closed=False,
             is_anonymous=False,
             allows_multiple_answers=False,
+            allows_revoting=True,
+            members_only=True,
         )
         assert poll.type is PollType.QUIZ
 
@@ -631,12 +772,14 @@ class TestPollWithoutRequest(PollTestBase):
             Poll(
                 "id",
                 "question",
-                [PollOption("text", voter_count=0)],
+                [PollOption("text", voter_count=0, persistent_id="persistent_id")],
                 total_voter_count=0,
                 is_closed=False,
                 is_anonymous=False,
                 type=Poll.QUIZ,
                 allows_multiple_answers=False,
+                allows_revoting=True,
+                members_only=True,
             ).parse_explanation_entity(entity)
 
     def test_parse_explanation_entities(self, poll):
@@ -651,12 +794,14 @@ class TestPollWithoutRequest(PollTestBase):
             Poll(
                 "id",
                 "question",
-                [PollOption("text", voter_count=0)],
+                [PollOption("text", voter_count=0, persistent_id="persistent_id")],
                 total_voter_count=0,
                 is_closed=False,
                 is_anonymous=False,
                 type=Poll.QUIZ,
                 allows_multiple_answers=False,
+                allows_revoting=True,
+                members_only=True,
             ).parse_explanation_entities()
 
     def test_parse_question_entity(self, poll):
@@ -682,12 +827,14 @@ class TestPollWithoutRequest(PollTestBase):
             Poll(
                 "id",
                 "question",
-                [PollOption("text", voter_count=0)],
+                [PollOption("text", voter_count=0, persistent_id="persistent_id")],
                 total_voter_count=0,
                 is_closed=False,
                 is_anonymous=False,
                 type=Poll.QUIZ,
                 allows_multiple_answers=False,
+                allows_revoting=True,
+                members_only=True,
             ).parse_description_entity(entity)
 
     def test_parse_description_entities(self, poll):
@@ -701,12 +848,14 @@ class TestPollWithoutRequest(PollTestBase):
             Poll(
                 "id",
                 "question",
-                [PollOption("text", voter_count=0)],
+                [PollOption("text", voter_count=0, persistent_id="persistent_id")],
                 total_voter_count=0,
                 is_closed=False,
                 is_anonymous=False,
                 type=Poll.QUIZ,
                 allows_multiple_answers=False,
+                allows_revoting=True,
+                members_only=True,
             ).parse_description_entities()
 
 
