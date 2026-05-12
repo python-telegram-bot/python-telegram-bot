@@ -684,6 +684,18 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             "tag": chat_member_restricted.tag,
         }
 
+    def test_can_react_to_messages_raises(self, chat_member_restricted):
+        with pytest.raises(
+            TypeError, match="`can_react_to_messages` is required and cannot be None"
+        ):
+            ChatMemberRestricted(
+                *[
+                    getattr(chat_member_restricted, k)
+                    for k in chat_member_restricted.__slots__
+                    if k != "can_react_to_messages"
+                ]
+            )
+
     def test_equality(self, chat_member_restricted):
         a = chat_member_restricted
         b = deepcopy(chat_member_restricted)
@@ -699,6 +711,7 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             False,
             False,
             self.until_date,
+            False,
             False,
             False,
             False,

@@ -658,6 +658,9 @@ class ChatMemberRestricted(ChatMember):
             self.can_react_to_messages: bool | None = can_react_to_messages
             self.tag: str | None = tag
 
+        if self.can_react_to_messages is None:
+            raise TypeError("`can_react_to_messages` is required and cannot be None")
+
 
 class ChatMemberLeft(ChatMember):
     """
