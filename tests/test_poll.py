@@ -76,6 +76,7 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
             "duplicate slot"
         )
 
+    # tags: deprecated NEXT.VERSION
     def test_de_json(self):
         json_dict = {
             "text": self.text,
@@ -88,6 +89,16 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
         assert input_poll_option.text == self.text
         assert input_poll_option.text_parse_mode == self.text_parse_mode
         assert input_poll_option.text_entities == tuple(self.text_entities)
+
+    def test_de_json_deprecated(self, recwarn):
+        InputPollOption.de_json({"text": self.text}, None)
+
+        assert len(recwarn) == 1
+        assert "`InputPollOption.de_json` is deprecated" in str(recwarn[0].message)
+        assert "The `media` field will not be included for deserialization" in str(
+            recwarn[0].message
+        )
+        assert recwarn[0].category is PTBDeprecationWarning
 
     def test_to_dict(self, input_poll_option):
         input_poll_option_dict = input_poll_option.to_dict()

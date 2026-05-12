@@ -231,9 +231,24 @@ class InputPollOption(TelegramObject):
 
         self._freeze()
 
+    # tags: deprecated NEXT.VERSION
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InputPollOption":
-        """See :meth:`telegram.TelegramObject.de_json`."""
+        """See :meth:`telegram.TelegramObject.de_json`. The :paramref:`media` field will
+        not be included for deserialization.
+
+        .. deprecated:: NEXT.VERSION
+            This class is input only and will be removed in the next version.
+        """
+        warn(
+            PTBDeprecationWarning(
+                "NEXT.VERSION",
+                "`InputPollOption.de_json` is deprecated. This class is input only and will be "
+                "removed in the next version. The `media` field will not be included for "
+                "deserialization.",
+            ),
+            stacklevel=2,
+        )
         data = cls._parse_data(data)
 
         data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
