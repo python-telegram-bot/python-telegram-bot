@@ -54,6 +54,7 @@ def callback_query(bot, request):
     if request.param == "message":
         cbq.message = CallbackQueryTestBase.message
         cbq.message.set_bot(bot)
+        cbq.message.chat.set_bot(bot)
     elif request.param == "inline":
         cbq.inline_message_id = CallbackQueryTestBase.inline_message_id
     elif request.param == "inaccessible_message":
@@ -589,3 +590,70 @@ class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
 
         monkeypatch.setattr(callback_query.get_bot(), "copy_message", make_assertion)
         assert await callback_query.copy_message(1)
+
+    async def test_delete_reaction(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.copy_message(1)
+            return
+        if callback_query.inline_message_id:
+            pytest.skip("Can't copy inline messages")
+
+        async def make_assertion(*args, **kwargs):
+            chat_id = kwargs["chat_id"] == callback_query.message.chat_id
+            user_id = kwargs["user_id"] == callback_query.from_user.id
+            message = kwargs["message_id"] == callback_query.message.message_id
+            return user_id and message and chat_id
+
+        assert check_shortcut_signature(
+            CallbackQuery.delete_reaction,
+            Bot.delete_message_reaction,
+            ["message_id", "chat_id", "user_id", "actor_chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            callback_query.delete_reaction,
+            callback_query.get_bot(),
+            "delete_message_reaction",
+            shortcut_kwargs=["chat_id", "message_id", "user_id", "actor_chat_id"],
+        )
+        assert await check_defaults_handling(
+            callback_query.delete_reaction, callback_query.get_bot()
+        )
+
+        monkeypatch.setattr(callback_query.get_bot(), "delete_message_reaction", make_assertion)
+        assert await callback_query.delete_reaction()
+
+    async def test_delete_all_reactions(self, monkeypatch, callback_query):
+        if isinstance(callback_query.message, InaccessibleMessage):
+            with pytest.raises(TypeError, match="inaccessible message"):
+                await callback_query.copy_message(1)
+            return
+        if callback_query.inline_message_id:
+            pytest.skip("Can't copy inline messages")
+
+        async def make_assertion(*args, **kwargs):
+            chat_id = kwargs["chat_id"] == callback_query.message.chat_id
+            user_id = kwargs["user_id"] == callback_query.from_user.id
+            return user_id and chat_id
+
+        assert check_shortcut_signature(
+            CallbackQuery.delete_all_reactions,
+            Bot.delete_all_message_reactions,
+            ["chat_id", "user_id", "actor_chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            callback_query.delete_all_reactions,
+            callback_query.get_bot(),
+            "delete_all_message_reactions",
+            shortcut_kwargs=["chat_id", "user_id", "actor_chat_id"],
+        )
+        assert await check_defaults_handling(
+            callback_query.delete_all_reactions, callback_query.get_bot()
+        )
+
+        monkeypatch.setattr(
+            callback_query.get_bot(), "delete_all_message_reactions", make_assertion
+        )
+        assert await callback_query.delete_all_reactions()
