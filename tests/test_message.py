@@ -55,6 +55,7 @@ from telegram import (
     InputPaidMediaPhoto,
     Invoice,
     LinkPreviewOptions,
+    LivePhoto,
     Location,
     ManagedBotCreated,
     Message,
@@ -443,6 +444,7 @@ def message(bot):
         {"poll_option_deleted": PollOptionDeleted(option_persistent_id="abc", option_text="this")},
         {"reply_to_poll_option_id": "3123"},
         {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
+        {"live_photo": LivePhoto("file_id", "file_unique_id", 12, 12, 5)},
     ],
     ids=[
         "reply",
@@ -541,6 +543,7 @@ def message(bot):
         "poll_option_deleted",
         "reply_to_poll_option_id",
         "managed_bot_created",
+        "live_photo",
     ],
 )
 def message_params(bot, request):

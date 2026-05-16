@@ -37,6 +37,7 @@ from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
 from telegram._files.document import Document
+from telegram._files.livephoto import LivePhoto
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import Sticker
@@ -708,6 +709,11 @@ class Message(MaybeInaccessibleMessage):
             created a bot that will be managed by the current bot.
 
             .. versionadded:: NEXT.VERSION
+        live_photo (:class:`telegram.LivePhoto`, optional): Message is a live photo, information
+            about the live photo. For backward compatibility, when this field is set, the photo
+            field will also be set.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1140,6 +1146,11 @@ class Message(MaybeInaccessibleMessage):
             created a bot that will be managed by the current bot.
 
             .. versionadded:: NEXT.VERSION
+        live_photo (:class:`telegram.LivePhoto`): Optional. Message is a live photo, information
+            about the live photo. For backward compatibility, when this field is set, the photo
+            field will also be set.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1210,6 +1221,7 @@ class Message(MaybeInaccessibleMessage):
         "is_topic_message",
         "left_chat_member",
         "link_preview_options",
+        "live_photo",
         "location",
         "managed_bot_created",
         "media_group_id",
@@ -1380,6 +1392,7 @@ class Message(MaybeInaccessibleMessage):
         poll_option_deleted: PollOptionDeleted | None = None,
         reply_to_poll_option_id: str | None = None,
         managed_bot_created: ManagedBotCreated | None = None,
+        live_photo: LivePhoto | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1514,6 +1527,7 @@ class Message(MaybeInaccessibleMessage):
             self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
             self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
             self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
+            self.live_photo: LivePhoto | None = live_photo
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1743,6 +1757,7 @@ class Message(MaybeInaccessibleMessage):
         data["managed_bot_created"] = de_json_optional(
             data.get("managed_bot_created"), ManagedBotCreated, bot
         )
+        data["live_photo"] = de_json_optional(data.get("live_photo"), LivePhoto, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

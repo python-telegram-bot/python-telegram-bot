@@ -101,6 +101,7 @@ Available Types
     telegram.inputmediaanimation
     telegram.inputmediaaudio
     telegram.inputmediadocument
+    telegram.inputmedialivephoto
     telegram.inputmediaphoto
     telegram.inputmediavideo
     telegram.inputpaidmedia

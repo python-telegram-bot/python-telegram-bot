@@ -157,6 +157,7 @@ __all__ = (
     "InputMediaAnimation",
     "InputMediaAudio",
     "InputMediaDocument",
+    "InputMediaLivePhoto",
     "InputMediaPhoto",
     "InputMediaVideo",
     "InputMessageContent",
@@ -181,6 +182,7 @@ __all__ = (
     "KeyboardButtonRequestUsers",
     "LabeledPrice",
     "LinkPreviewOptions",
+    "LivePhoto",
     "Location",
     "LocationAddress",
     "LoginUrl",
@@ -435,6 +437,7 @@ from ._files.inputmedia import (
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
+    InputMediaLivePhoto,
     InputMediaPhoto,
     InputMediaVideo,
     InputPaidMedia,
@@ -447,6 +450,7 @@ from ._files.inputprofilephoto import (
     InputProfilePhotoStatic,
 )
 from ._files.inputsticker import InputSticker
+from ._files.livephoto import LivePhoto
 from ._files.location import Location
 from ._files.photosize import PhotoSize
 from ._files.sticker import MaskPosition, Sticker, StickerSet

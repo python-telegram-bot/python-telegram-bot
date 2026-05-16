@@ -1538,6 +1538,11 @@ class InputMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
     VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InputPaidMediaType(StringEnum):

@@ -65,6 +65,7 @@ from telegram._files.contact import Contact
 from telegram._files.document import Document
 from telegram._files.file import File
 from telegram._files.inputmedia import InputMedia, InputPaidMedia
+from telegram._files.livephoto import LivePhoto
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import MaskPosition, Sticker, StickerSet
@@ -12283,6 +12284,138 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             self,
         )
 
+    async def send_live_photo(
+        self,
+        chat_id: int | str,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        caption: str | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        *,
+        filename: str | None = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> Message:
+        """
+        Use this method to send live photos.
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            live_photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.LivePhoto`): Live photo
+                video to send. Pass a ``file_id`` to send a file that exists on the Telegram
+                servers (recommended). |uploadinputnopath| Sending live photos by a URL is
+                currently unsupported. Lastly you can pass an existing
+                :class:`telegram.LivePhoto` object to send.
+
+                Caution:
+                   * The video must be at most 10MB in size.
+                   * The video duration must not exceed 10 seconds.
+                   * If you pass a :class:`telegram.LivePhoto`, its
+                   :attr:`~telegram.LivePhoto.photo` field will not be considered, use
+                   :param:`photo` to specify the photo to send.
+
+            photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+                | :class:`pathlib.Path` | :class:`telegram.PhotoSize`): The static photo to send.
+                Pass a ``file_id`` to send a file that exists on the Telegram servers (recommended)
+                . |uploadinputnopath| Sending live photos by a URL is currently unsupported.
+                Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
+
+            caption (:obj:`str`, optional): Photo caption (may also be used when resending photos
+                by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
+                characters after entities parsing.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
+
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the photo needs to be covered
+                with a spoiler animation.
+
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+            business_connection_id (:obj:`str`, optional): |business_id_str|
+
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+            suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
+                |suggested_post_parameters|
+
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+
+        Keyword Args:
+            filename (:obj:`str`, optional): Custom file name for the photo, when uploading a
+                new file. Convenience parameter, useful e.g. when sending files generated by the
+                :obj:`tempfile` module.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "live_photo": self._parse_file_input(live_photo, LivePhoto, filename=filename),
+            "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
+            "has_spoiler": has_spoiler,
+            "show_caption_above_media": show_caption_above_media,
+        }
+
+        return await self._send_message(
+            "sendLivePhoto",
+            data,
+            disable_notification=disable_notification,
+            reply_markup=reply_markup,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -12629,3 +12762,5 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`replace_managed_bot_token`"""
     savePreparedKeyboardButton = save_prepared_keyboard_button
     """Alias for :meth:`save_prepared_keyboard_button`"""
+    sendLivePhoto = send_live_photo
+    """Alias for :meth:`send_live_photo`"""
