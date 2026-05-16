@@ -5220,6 +5220,45 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
         )
 
+    async def delete_reaction(
+        self,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.delete_message_reaction(
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().delete_message_reaction(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 

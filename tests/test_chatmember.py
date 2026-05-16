@@ -61,6 +61,7 @@ class ChatMemberTestBase:
     can_pin_messages = True
     can_post_stories = True
     can_edit_stories = True
+    can_react_to_messages = True
     can_delete_stories = True
     can_manage_topics = True
     until_date = dtm.datetime.now(UTC).replace(microsecond=0)
@@ -576,6 +577,7 @@ def chat_member_restricted():
         is_member=TestChatMemberRestrictedWithoutRequest.is_member,
         until_date=TestChatMemberRestrictedWithoutRequest.until_date,
         can_edit_tag=TestChatMemberRestrictedWithoutRequest.can_edit_tag,
+        can_react_to_messages=TestChatMemberRestrictedWithoutRequest.can_react_to_messages,
         tag=TestChatMemberRestrictedWithoutRequest.tag,
     )
 
@@ -609,6 +611,7 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             "is_member": self.is_member,
             "until_date": to_timestamp(self.until_date),
             "can_edit_tag": self.can_edit_tag,
+            "can_react_to_messages": self.can_react_to_messages,
             "tag": self.tag,
             # legacy argument
             "can_send_media_messages": False,
@@ -636,6 +639,7 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
         assert chat_member.is_member == self.is_member
         assert chat_member.until_date == self.until_date
         assert chat_member.can_edit_tag == self.can_edit_tag
+        assert chat_member.can_react_to_messages == self.can_react_to_messages
         assert chat_member.tag == self.tag
 
     def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, chat_member_restricted):
@@ -676,8 +680,21 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             "is_member": chat_member_restricted.is_member,
             "until_date": to_timestamp(chat_member_restricted.until_date),
             "can_edit_tag": chat_member_restricted.can_edit_tag,
+            "can_react_to_messages": chat_member_restricted.can_react_to_messages,
             "tag": chat_member_restricted.tag,
         }
+
+    def test_can_react_to_messages_raises(self, chat_member_restricted):
+        with pytest.raises(
+            TypeError, match="`can_react_to_messages` is required and cannot be None"
+        ):
+            ChatMemberRestricted(
+                *[
+                    getattr(chat_member_restricted, k)
+                    for k in chat_member_restricted.__slots__
+                    if k != "can_react_to_messages"
+                ]
+            )
 
     def test_equality(self, chat_member_restricted):
         a = chat_member_restricted
@@ -694,6 +711,7 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             False,
             False,
             self.until_date,
+            False,
             False,
             False,
             False,

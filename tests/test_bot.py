@@ -2920,6 +2920,26 @@ class TestBotWithoutRequest:
         )
         assert isinstance(inst, PreparedKeyboardButton)
 
+    # Bots cannot delete their own reaction from my testing, so we aren't making a real request
+    async def test_delete_message_reaction(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("message_id") == 12
+            assert request_data.parameters.get("user_id") == 3432
+            assert request_data.parameters.get("actor_chat_id") == 1232
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.delete_message_reaction(1234, 12, 3432, 1232)
+
+    async def test_delete_all_message_reactions(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("user_id") == 3432
+            assert request_data.parameters.get("actor_chat_id") == 1232
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.delete_all_message_reactions(1234, 3432, 1232)
+
 
 class TestBotWithRequest:
     """
@@ -3705,11 +3725,15 @@ class TestBotWithRequest:
         assert cfi.id == int(super_group_id)
 
     async def test_get_chat_administrators(self, bot, channel_id):
-        admins = await bot.get_chat_administrators(channel_id)
+        admins = await bot.get_chat_administrators(channel_id, return_bots=True)
         assert isinstance(admins, tuple)
 
+        bots_found = 0
         for a in admins:
             assert a.status in ("administrator", "creator")
+            if a.user.is_bot:
+                bots_found += 1
+        assert bots_found > 1  # will be False if return_bots=False
 
     async def test_get_chat_member_count(self, bot, channel_id):
         count = await bot.get_chat_member_count(channel_id)
