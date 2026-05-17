@@ -3456,10 +3456,13 @@ class PollLimit(IntEnum):
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MIN_OPTION_NUMBER = 2
+    MIN_OPTION_NUMBER = 1
     """:obj:`int`: Minimum number of strings passed in a :obj:`list`
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
+
+    .. versionchanged:: NEXT.VERSION
+        Bot API 10.0 decreased this value from ``2`` to ``1``.
     """
     MAX_OPTION_NUMBER = 12
     """:obj:`int`: Maximum number of strings passed in a :obj:`list`
