@@ -73,7 +73,7 @@ class PollMedia(TelegramObject):
             file; currently, can't be received in a poll option
         document (:class:`telegram.Document`, optional): Media is a general file, information about
             the file; currently, can't be received in a poll option
-        # TODO: LivePhoto
+            .. TODO: LivePhoto
         location (:class:`telegram.Location`, optional): Media is a shared location, information
             about the location
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Media is a photo, available sizes
@@ -90,7 +90,7 @@ class PollMedia(TelegramObject):
             file; currently, can't be received in a poll option
         document (:class:`telegram.Document`): Optional. Media is a general file, information about
             the file; currently, can't be received in a poll option
-        # TODO: LivePhoto
+            .. TODO: LivePhoto
         location (:class:`telegram.Location`): Optional. Media is a shared location, information
             about the location
         photo (Sequence[:class:`telegram.PhotoSize`]): Optional. Media is a photo, available sizes
@@ -887,12 +887,6 @@ class Poll(TelegramObject):
             :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours.
 
             .. versionadded:: NEXT.VERSION
-        correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer
-            option. Available only for closed polls in the quiz mode, which were sent
-            (not forwarded), by the bot or to a private chat with the bot.
-
-            .. deprecated:: NEXT.VERSION
-                Use :attr:`correct_option_ids` instead.
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll,
             0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.

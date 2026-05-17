@@ -81,7 +81,8 @@ class InputPollMedia(_BaseInputMedia):
     * :class:`telegram.InputMediaPhoto`
     * :class:`telegram.InputMediaVenue`
     * :class:`telegram.InputMediaVideo`
-    # TODO: LivePhoto
+
+    .. TODO: LivePhoto
 
     .. versionadded:: NEXT.VERSION
 
@@ -112,7 +113,8 @@ class InputPollOptionMedia(_BaseInputMedia):
     * :class:`telegram.InputMediaSticker`
     * :class:`telegram.InputMediaVenue`
     * :class:`telegram.InputMediaVideo`
-    # TODO: LivePhoto
+
+    .. TODO: LivePhoto
 
     .. versionadded:: NEXT.VERSION
 
@@ -839,8 +841,8 @@ class InputMediaVenue(InputPollMedia, InputPollOptionMedia):
             example, ``“arts_entertainment/default”``, ``“arts_entertainment/aquarium”``
             or ``“food/icecream”``).
         google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
-        google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
-        `supported types <https://developers.google.com/places/web-service/supported_types>`_)
+        google_place_type (:obj:`str`, optional): Google Places type of the venue. (See\
+        `supported types <https://developers.google.com/places/web-service/supported_types>`__)
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.VENUE`.
@@ -853,8 +855,8 @@ class InputMediaVenue(InputPollMedia, InputPollOptionMedia):
             example, ``“arts_entertainment/default”``, ``“arts_entertainment/aquarium”``
             or ``“food/icecream”``).
         google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
-        google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See
-        `supported types <https://developers.google.com/places/web-service/supported_types>`_)
+        google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See\
+        `supported types <https://developers.google.com/places/web-service/supported_types>`__)
     """
 
     __slots__ = (
