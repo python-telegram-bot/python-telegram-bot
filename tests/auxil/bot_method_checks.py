@@ -45,7 +45,7 @@ from telegram import (
 )
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
-from telegram.constants import InputMediaType
+from telegram.constants import BaseInputMediaType
 from telegram.ext import Defaults, ExtBot
 from telegram.request import RequestData
 from tests.auxil.dummy_objects import get_dummy_object_json_dict
@@ -512,7 +512,7 @@ async def make_assertion(
     media = data.pop("media", None)
     paid_media = media and data.pop("star_count", None)
     if media and not paid_media:
-        if isinstance(media, dict) and isinstance(media.get("type", None), InputMediaType):
+        if isinstance(media, dict) and isinstance(media.get("type", None), BaseInputMediaType):
             check_input_media(media)
         else:
             for m in media:

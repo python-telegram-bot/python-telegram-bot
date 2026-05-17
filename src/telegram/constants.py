@@ -45,6 +45,7 @@ __all__ = [
     "BackgroundFillType",
     "BackgroundTypeLimit",
     "BackgroundTypeType",
+    "BaseInputMediaType",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
@@ -1519,9 +1520,40 @@ class InputChecklistLimit(IntEnum):
     """
 
 
+class BaseInputMediaType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputMedia`,
+    :class:`telegram.InputPollMedia` and :class:`telegram.InputPollOptionMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    ANIMATION = "animation"
+    """:obj:`str`: Type of :class:`telegram.InputMediaAnimation`."""
+    DOCUMENT = "document"
+    """:obj:`str`: Type of :class:`telegram.InputMediaDocument`."""
+    AUDIO = "audio"
+    """:obj:`str`: Type of :class:`telegram.InputMediaAudio`."""
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    LOCATION = "location"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLocation`."""
+    STICKER = "sticker"
+    """:obj:`str`: Type of :class:`telegram.InputMediaSticker`."""
+    VENUE = "venue"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVenue`."""
+
+
 class InputMediaType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. deprecated:: NEXT.VERSION
+        Use :class:`telegram.constants.BaseInputMediaType` instead.
 
     .. versionadded:: 20.0
     """
@@ -1784,6 +1816,8 @@ class LocationLimit(IntEnum):
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.horizontal_accuracy` parameter of
       :meth:`telegram.Bot.send_location`
+    * :paramref:`~telegram.InputMediaLocation.horizontal_accuracy` parameter of
+      :class:`telegram.InputMediaLocation`
     """
 
     MIN_HEADING = 1
@@ -3422,10 +3456,13 @@ class PollLimit(IntEnum):
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MIN_OPTION_NUMBER = 2
+    MIN_OPTION_NUMBER = 1
     """:obj:`int`: Minimum number of strings passed in a :obj:`list`
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
+
+    .. versionchanged:: NEXT.VERSION
+        Bot API 10.0 decreased this value from ``2`` to ``1``.
     """
     MAX_OPTION_NUMBER = 12
     """:obj:`int`: Maximum number of strings passed in a :obj:`list`
@@ -3463,6 +3500,19 @@ class PollLimit(IntEnum):
     MAX_DESCRIPTION_CHARACTERS = 1024
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.send_poll.description` parameter of :meth:`telegram.Bot.send_poll`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MIN_MEMBERSHIP_HOURS = 24
+    """:obj:`int`: Minimum number of hours a user must have been a member of the chat
+    before they can vote in a members-only poll.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MAX_COUNTRY_CODES = 12
+    """:obj:`int`: Maximum number of two-letter ``ISO 3166-1 alpha-2`` country codes passed in a
+    :obj:`list` to the :paramref:`~telegram.Bot.send_poll.country_codes` parameter of
+    :meth:`telegram.Bot.send_poll`.
 
     .. versionadded:: NEXT.VERSION
     """

@@ -121,6 +121,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollMedia,
         InputSticker,
         InputStoryContent,
         LabeledPrice,
@@ -3265,6 +3266,10 @@ class ExtBot(Bot, Generic[RLARGS]):
         description_parse_mode: str | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
         shuffle_options: bool | None = None,
+        members_only: bool | None = None,
+        country_codes: Sequence[str] | None = None,
+        explanation_media: "InputPollMedia | None" = None,
+        media: "InputPollMedia | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3314,6 +3319,10 @@ class ExtBot(Bot, Generic[RLARGS]):
             description_entities=description_entities,
             hide_results_until_closes=hide_results_until_closes,
             allow_adding_options=allow_adding_options,
+            members_only=members_only,
+            country_codes=country_codes,
+            explanation_media=explanation_media,
+            media=media,
         )
 
     async def send_sticker(
