@@ -223,7 +223,7 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
     "PollOption": {"persistent_id"},
     "PollAnswer": {"option_persistent_ids"},
-    "Poll": {"allows_revoting"},
+    "Poll": {"allows_revoting", "members_only"},
 }
 
 
