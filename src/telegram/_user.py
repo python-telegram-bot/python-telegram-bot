@@ -50,6 +50,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollMedia,
         InputPollOption,
         LabeledPrice,
         LinkPreviewOptions,
@@ -1750,6 +1751,10 @@ class User(TelegramObject):
         description: str | None = None,
         description_parse_mode: str | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
+        members_only: bool | None = None,
+        country_codes: Sequence[str] | None = None,
+        explanation_media: "InputPollMedia | None" = None,
+        media: "InputPollMedia | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1811,6 +1816,10 @@ class User(TelegramObject):
             description_entities=description_entities,
             hide_results_until_closes=hide_results_until_closes,
             allow_adding_options=allow_adding_options,
+            members_only=members_only,
+            country_codes=country_codes,
+            explanation_media=explanation_media,
+            media=media,
         )
 
     async def send_gift(

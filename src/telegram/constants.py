@@ -3509,6 +3509,13 @@ class PollLimit(IntEnum):
 
     .. versionadded:: NEXT.VERSION
     """
+    MAX_COUNTRY_CODES = 12
+    """:obj:`int`: Maximum number of two-letter ``ISO 3166-1 alpha-2`` country codes passed in a
+    :obj:`list` to the :paramref:`~telegram.Bot.send_poll.country_codes` parameter of
+    :meth:`telegram.Bot.send_poll`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class PollType(StringEnum):

@@ -53,6 +53,7 @@ from telegram import (
     InlineQueryResultVoice,
     InputFile,
     InputMediaDocument,
+    InputMediaLocation,
     InputMediaPhoto,
     InputMessageContent,
     InputPollOption,
@@ -3274,6 +3275,30 @@ class TestBotWithRequest:
 
         assert message.poll.explanation == test_string
         assert message.poll.explanation_entities == tuple(entities)
+
+    async def test_send_poll_media_parameters(self, bot, channel_id, photo):
+        media = InputMediaPhoto(photo.file_id)
+        explanation_media = InputMediaDocument(photo.file_id)
+        option_media = InputMediaLocation(latitude=0, longitude=0)
+
+        message = await bot.send_poll(
+            channel_id,
+            question="question",
+            options=[
+                InputPollOption("option1", media=option_media),
+                InputPollOption("option2"),
+            ],
+            type=Poll.QUIZ,
+            correct_option_ids=[0],
+            media=media,
+            explanation_media=explanation_media,
+            is_closed=True,
+            read_timeout=60,
+        )
+
+        assert message.poll.media.photo
+        assert message.poll.explanation_media.document
+        assert message.poll.options[0].media.location
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_poll_default_parse_mode(self, default_bot, super_group_id):
