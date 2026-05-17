@@ -1795,12 +1795,16 @@ class TestBotWithoutRequest:
                 poll=Poll(
                     "42",
                     "question",
-                    options=[PollOption("option", 0)],
+                    options=[
+                        PollOption(text="option", voter_count=0, persistent_id="persistent_id")
+                    ],
                     total_voter_count=0,
                     is_closed=False,
                     is_anonymous=True,
                     type=Poll.REGULAR,
                     allows_multiple_answers=False,
+                    allows_revoting=True,
+                    members_only=True,
                 ),
             )
             return [update.to_dict()]
@@ -2447,12 +2451,14 @@ class TestBotWithoutRequest:
             Poll(
                 id="42",
                 question="question",
-                options=[PollOption("option", 0)],
+                options=[PollOption(text="option", voter_count=0, persistent_id="persistent_id")],
                 total_voter_count=5,
                 is_closed=True,
                 is_anonymous=True,
                 type="regular",
                 allows_multiple_answers=False,
+                allows_revoting=True,
+                members_only=True,
             ).to_dict()
         )
         await return_values.put(True)

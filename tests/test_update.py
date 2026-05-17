@@ -171,7 +171,20 @@ params = [
         )
     },
     {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
-    {"poll": Poll("id", "?", [PollOption(".", 1)], False, False, False, Poll.REGULAR, True)},
+    {
+        "poll": Poll(
+            "id",
+            "?",
+            [PollOption(text=".", voter_count=1, persistent_id="persistent_id")],
+            False,
+            False,
+            False,
+            Poll.REGULAR,
+            True,
+            allows_revoting=True,
+            members_only=True,
+        )
+    },
     {
         "poll_answer": PollAnswer(
             "id",
