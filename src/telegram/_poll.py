@@ -925,7 +925,7 @@ class Poll(TelegramObject):
             This list is empty if the question does not contain entities.
 
             .. versionadded:: 21.2
-        allows_revoting (:obj:`bool`): Optional. :obj:`True`, if the poll
+        allows_revoting (:obj:`bool`): :obj:`True`, if the poll
             allows to change the chosenanswer options
 
             .. versionadded:: NEXT.VERSION
