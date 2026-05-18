@@ -1,0 +1,5 @@
+features = "Added the class :class:`telegram.SentGuestMessage` and the method :meth:`telegram.Bot.answer_guest_query` as well as the filter :attr:`telegram.ext.filters.UpdateType.GUEST_MESSAGE` for Bot API 10.0 Guest Mode support."
+[[pull_requests]]
+uid = "PR_NUMBER"
+author_uids = ["Phil9l"]
+closes_threads = ["5228"]

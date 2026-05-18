@@ -76,6 +76,7 @@ from telegram import (
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     ReplyParameters,
+    SentGuestMessage,
     SentWebAppMessage,
     ShippingOption,
     StarTransaction,
@@ -859,6 +860,44 @@ class TestBotWithoutRequest:
             ilq_result.input_message_content.parse_mode
             == copied_result.input_message_content.parse_mode
         )
+
+    async def test_answer_guest_query(self, offline_bot, raw_bot, monkeypatch):
+        params = False
+
+        # For now just test that our internals pass the correct data
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            nonlocal params
+            params = request_data.parameters == {
+                "guest_query_id": "12345",
+                "result": {
+                    "title": "title",
+                    "input_message_content": {
+                        "message_text": "text",
+                    },
+                    "type": InlineQueryResultType.ARTICLE,
+                    "id": "1",
+                },
+            }
+            return SentGuestMessage("321").to_dict()
+
+        result = InlineQueryResultArticle("1", "title", InputTextMessageContent("text"))
+        copied_result = copy.copy(result)
+
+        ext_bot = offline_bot
+        for bot_type in (ext_bot, raw_bot):
+            monkeypatch.setattr(bot_type.request, "post", make_assertion)
+            guest_msg = await bot_type.answer_guest_query("12345", result)
+            assert params, "something went wrong with passing arguments to the request"
+            assert isinstance(guest_msg, SentGuestMessage)
+            assert guest_msg.inline_message_id == "321"
+
+            # make sure that the results were not edited in-place
+            assert result == copied_result
+            assert (
+                result.input_message_content.parse_mode
+                == copied_result.input_message_content.parse_mode
+            )
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     @pytest.mark.parametrize("button_type", ["start", "web_app"])
