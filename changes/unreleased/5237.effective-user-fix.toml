@@ -1,0 +1,5 @@
+bugfixes = "`Update.effective_user` now checks for `channel_post` and `edited_channel_post`"
+[[pull_requests]]
+uid = "5237"
+author_uids = ["karin0"]
+closes_threads = ["5236"]

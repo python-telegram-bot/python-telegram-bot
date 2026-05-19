@@ -401,6 +401,18 @@ class TestUpdateWithoutRequest(UpdateTestBase):
         cached = update.effective_sender
         assert cached is sender
 
+    def test_effective_sender_signed_channel_post(self):
+        # channel_post with signatures can have its from_user
+        user = User(1, "", False)
+        post = Message(
+            1, dtm.datetime.utcnow(), Chat(1, ""), author_signature="", from_user=user, text="Text"
+        )
+        update = Update(update_id=1, channel_post=post)
+        assert update.effective_sender == update.effective_user == user
+
+        update = Update(update_id=2, edited_channel_post=post)
+        assert update.effective_sender == update.effective_user == user
+
     def test_effective_message(self, update):
         # Test that it's sometimes None per docstring
         eff_message = update.effective_message
