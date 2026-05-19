@@ -105,6 +105,7 @@ Available Types
     telegram.inputmediaphoto
     telegram.inputmediavideo
     telegram.inputpaidmedia
+    telegram.inputpaidmedialivephoto
     telegram.inputpaidmediaphoto
     telegram.inputpaidmediavideo
     telegram.inputprofilephoto
@@ -147,6 +148,7 @@ Available Types
     telegram.ownedgiftunique
     telegram.paidmedia
     telegram.paidmediainfo
+    telegram.paidmedialivephoto
     telegram.paidmediaphoto
     telegram.paidmediapreview
     telegram.paidmediapurchased

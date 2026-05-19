@@ -1558,6 +1558,11 @@ class InputPaidMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
     VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InputProfilePhotoType(StringEnum):
@@ -2571,6 +2576,11 @@ class PaidMediaType(StringEnum):
     """:obj:`str`: The type of :class:`telegram.PaidMediaVideo`."""
     PHOTO = "photo"
     """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaLivePhoto
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class PollingLimit(IntEnum):

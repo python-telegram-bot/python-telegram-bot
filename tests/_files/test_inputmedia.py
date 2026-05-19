@@ -32,6 +32,7 @@ from telegram import (
     InputMediaLivePhoto,
     InputMediaPhoto,
     InputMediaVideo,
+    InputPaidMediaLivePhoto,
     InputPaidMediaPhoto,
     InputPaidMediaVideo,
     Message,
@@ -153,6 +154,14 @@ def input_media_live_photo():
         caption_entities=InputMediaLivePhotoTestBase.caption_entities,
         show_caption_above_media=InputMediaLivePhotoTestBase.show_caption_above_media,
         has_spoiler=InputMediaLivePhotoTestBase.has_spoiler,
+    )
+
+
+@pytest.fixture(scope="module")
+def input_paid_media_live_photo():
+    return InputPaidMediaLivePhoto(
+        media=InputMediaLivePhotoTestBase.media,
+        photo=InputMediaLivePhotoTestBase.photo,
     )
 
 
@@ -626,13 +635,13 @@ class TestInputPaidMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
         assert input_paid_media_photo_dict["media"] == input_paid_media_photo.media
 
     def test_with_photo(self, photo):
-        # fixture found in test_photo
+        # fixture found in conftest.py
         input_paid_media_photo = InputPaidMediaPhoto(photo)
         assert input_paid_media_photo.type == self.type_
         assert input_paid_media_photo.media == photo.file_id
 
     def test_with_photo_file(self, photo_file):
-        # fixture found in test_photo
+        # fixture found in conftest.py
         input_paid_media_photo = InputPaidMediaPhoto(photo_file)
         assert input_paid_media_photo.type == self.type_
         assert isinstance(input_paid_media_photo.media, InputFile)
@@ -689,6 +698,34 @@ class TestInputMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
             == input_media_live_photo.show_caption_above_media
         )
         assert input_media_live_photo_dict["has_spoiler"] == input_media_live_photo.has_spoiler
+
+    def test_with_photo(self, photo):
+        # fixture found in conftest.py
+        input_media_live_photo = InputMediaLivePhoto(photo, photo)
+        assert input_media_live_photo.type == self.type_
+        assert input_media_live_photo.media == photo.file_id
+        assert input_media_live_photo.photo == photo.file_id
+
+    def test_with_photo_file(self, photo_file):
+        # fixture found in conftest.py
+        input_media_live_photo = InputMediaLivePhoto(photo_file, photo_file)
+        assert input_media_live_photo.type == self.type_
+        assert isinstance(input_media_live_photo.media, InputFile)
+        assert isinstance(input_media_live_photo.photo, InputFile)
+
+    def test_with_video(self, video):
+        # fixture found in conftest.py
+        input_media_live_photo = InputMediaLivePhoto(video, video)
+        assert input_media_live_photo.type == self.type_
+        assert input_media_live_photo.media == video.file_id
+        assert input_media_live_photo.photo == video.file_id
+
+    def test_with_video_file(self, video_file):
+        # fixture found in conftest.py
+        input_media_live_photo = InputMediaLivePhoto(video_file, video_file)
+        assert input_media_live_photo.type == self.type_
+        assert isinstance(input_media_live_photo.media, InputFile)
+        assert isinstance(input_media_live_photo.photo, InputFile)
 
     def test_with_local_files(self):
         input_media_live_photo = InputMediaLivePhoto(
@@ -779,6 +816,46 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_paid_media_video.media == data_file("telegram.mp4").as_uri()
         assert input_paid_media_video.thumbnail == data_file("telegram.jpg").as_uri()
         assert input_paid_media_video.cover == data_file("telegram.jpg").as_uri()
+
+
+class TestInputPaidMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
+    def test_slot_behaviour(self, input_paid_media_live_photo):
+        inst = input_paid_media_live_photo
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_expected_values(self, input_paid_media_live_photo):
+        assert input_paid_media_live_photo.type == self.type_
+        assert input_paid_media_live_photo.media == self.media
+        assert input_paid_media_live_photo.photo == self.photo
+
+    def test_to_dict(self, input_paid_media_live_photo):
+        input_paid_media_live_photo_dict = input_paid_media_live_photo.to_dict()
+        assert input_paid_media_live_photo_dict["type"] == input_paid_media_live_photo.type
+        assert input_paid_media_live_photo_dict["media"] == input_paid_media_live_photo.media
+        assert input_paid_media_live_photo_dict["photo"] == input_paid_media_live_photo.photo
+
+    def test_with_photo(self, photo):
+        # fixture found in conftest.py
+        input_paid_media_live_photo = InputPaidMediaLivePhoto(photo, photo)
+        assert input_paid_media_live_photo.type == self.type_
+        assert input_paid_media_live_photo.media == photo.file_id
+        assert input_paid_media_live_photo.photo == photo.file_id
+
+    def test_with_photo_file(self, photo_file):
+        # fixture found in conftest.py
+        input_paid_media_live_photo = InputPaidMediaLivePhoto(photo_file, photo_file)
+        assert input_paid_media_live_photo.type == self.type_
+        assert isinstance(input_paid_media_live_photo.media, InputFile)
+        assert isinstance(input_paid_media_live_photo.photo, InputFile)
+
+    def test_with_local_files(self):
+        input_paid_media_live_photo = InputPaidMediaLivePhoto(
+            media=data_file("telegram.mp4"), photo=data_file("telegram.jpg")
+        )
+        assert input_paid_media_live_photo.media == data_file("telegram.mp4").as_uri()
+        assert input_paid_media_live_photo.photo == data_file("telegram.jpg").as_uri()
 
 
 @pytest.fixture(scope="module")
@@ -1225,7 +1302,9 @@ class TestSendMediaGroupWithRequest:
     @pytest.mark.parametrize(
         "default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True, ids=["HTML-Bot"]
     )
-    @pytest.mark.parametrize("media_type", ["animation", "document", "audio", "photo", "video"])
+    @pytest.mark.parametrize(
+        "media_type", ["animation", "document", "audio", "live_photo", "photo", "video"]
+    )
     async def test_edit_message_media_default_parse_mode(
         self,
         chat_id,
@@ -1264,6 +1343,8 @@ class TestSendMediaGroupWithRequest:
                 return InputMediaPhoto(photo, **kwargs)
             if med_type == "video":
                 return InputMediaVideo(video, **kwargs)
+            if med_type == "live_photo":
+                return InputMediaLivePhoto(photo, photo, **kwargs)
             return None
 
         message = await default_bot.send_photo(chat_id, photo)

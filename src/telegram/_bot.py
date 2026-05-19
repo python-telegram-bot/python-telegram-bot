@@ -127,6 +127,7 @@ if TYPE_CHECKING:
         InputFile,
         InputMediaAudio,
         InputMediaDocument,
+        InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
         InputProfilePhoto,
@@ -2840,7 +2841,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: int | str,
         media: Sequence[
-            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo | InputMediaLivePhoto"  # noqa: E501  # pylint: disable=line-too-long
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2879,8 +2880,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             media (Sequence[:class:`telegram.InputMediaAudio`,\
                 :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`,\
-                :class:`telegram.InputMediaVideo`]): An array
-                describing messages to be sent, must include
+                :class:`telegram.InputMediaVideo`, :class:`telegram.InputMediaLivePhoto`]): An
+                array describing messages to be sent, must include
                 :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`-
                 :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
 
@@ -4659,12 +4660,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> "Message | bool":
         """
-        Use this method to edit animation, audio, document, photo, or video messages, or to add
-        media to text messages. If a message
+        Use this method to edit animation, audio, document, live photo, photo, or video messages,
+        or to add media to text messages. If a message
         is part of a message album, then it can be edited only to an audio for audio albums, only
-        to a document for document albums and to a photo or a video otherwise. When an inline
-        message is edited, a new file can't be uploaded; use a previously uploaded file via its
-        :attr:`~telegram.File.file_id` or specify a URL.
+        to a document for document albums and to a photo, live photo, or a video otherwise.
+        When an inline message is edited, a new file can't be uploaded; use a previously
+        uploaded file via its :attr:`~telegram.File.file_id` or specify a URL.
 
         Note:
             * |editreplymarkup|

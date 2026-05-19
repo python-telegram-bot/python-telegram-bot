@@ -162,6 +162,7 @@ __all__ = (
     "InputMediaVideo",
     "InputMessageContent",
     "InputPaidMedia",
+    "InputPaidMediaLivePhoto",
     "InputPaidMediaPhoto",
     "InputPaidMediaVideo",
     "InputPollOption",
@@ -212,6 +213,7 @@ __all__ = (
     "OwnedGifts",
     "PaidMedia",
     "PaidMediaInfo",
+    "PaidMediaLivePhoto",
     "PaidMediaPhoto",
     "PaidMediaPreview",
     "PaidMediaPurchased",
@@ -441,6 +443,7 @@ from ._files.inputmedia import (
     InputMediaPhoto,
     InputMediaVideo,
     InputPaidMedia,
+    InputPaidMediaLivePhoto,
     InputPaidMediaPhoto,
     InputPaidMediaVideo,
 )
@@ -533,6 +536,7 @@ from ._ownedgift import OwnedGift, OwnedGiftRegular, OwnedGifts, OwnedGiftUnique
 from ._paidmedia import (
     PaidMedia,
     PaidMediaInfo,
+    PaidMediaLivePhoto,
     PaidMediaPhoto,
     PaidMediaPreview,
     PaidMediaPurchased,
