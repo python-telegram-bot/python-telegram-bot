@@ -1973,6 +1973,11 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
     INVOICE = "invoice"
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     PAID_MEDIA = "paid_media"
@@ -2355,6 +2360,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LEFT_CHAT_MEMBER = "left_chat_member"
     """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     MANAGED_BOT_CREATED = "managed_bot_created"
