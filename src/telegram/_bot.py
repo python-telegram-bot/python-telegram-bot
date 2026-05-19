@@ -89,6 +89,7 @@ from telegram._poll import InputPollOption, Poll
 from telegram._preparedkeyboardbutton import PreparedKeyboardButton
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
+from telegram._sentguestmessage import SentGuestMessage
 from telegram._sentwebappmessage import SentWebAppMessage
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
@@ -5847,6 +5848,51 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         )
 
         return SentWebAppMessage.de_json(api_result, self)
+
+    async def answer_guest_query(
+        self,
+        guest_query_id: str,
+        result: "InlineQueryResult",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> SentGuestMessage:
+        """Use this method to reply to a received guest message.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            guest_query_id (:obj:`str`): Unique identifier for the query to be answered.
+            result (:class:`telegram.InlineQueryResult`): An object describing the message to be
+                sent.
+
+        Returns:
+            :class:`telegram.SentGuestMessage`: On success, a sent
+            :class:`telegram.SentGuestMessage` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "guest_query_id": guest_query_id,
+            "result": self._insert_defaults_for_ilq_results(result),
+        }
+
+        api_result = await self._post(
+            "answerGuestQuery",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return SentGuestMessage.de_json(api_result, self)
 
     async def restrict_chat_member(
         self,
@@ -12399,6 +12445,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`answer_pre_checkout_query`"""
     answerWebAppQuery = answer_web_app_query
     """Alias for :meth:`answer_web_app_query`"""
+    answerGuestQuery = answer_guest_query
+    """Alias for :meth:`answer_guest_query`"""
     restrictChatMember = restrict_chat_member
     """Alias for :meth:`restrict_chat_member`"""
     promoteChatMember = promote_chat_member

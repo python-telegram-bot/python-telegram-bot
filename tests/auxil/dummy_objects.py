@@ -30,6 +30,7 @@ from telegram import (
     PollOption,
     PreparedInlineMessage,
     PreparedKeyboardButton,
+    SentGuestMessage,
     SentWebAppMessage,
     StarAmount,
     StarTransaction,
@@ -136,6 +137,7 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     ),
     "PreparedKeyboardButton": PreparedKeyboardButton(id=1234),
     "PreparedInlineMessage": PreparedInlineMessage(id="dummy_id", expiration_date=_DUMMY_DATE),
+    "SentGuestMessage": SentGuestMessage(inline_message_id="dummy_inline_message_id"),
     "SentWebAppMessage": SentWebAppMessage(inline_message_id="dummy_inline_message_id"),
     "StarAmount": StarAmount(amount=100, nanostar_amount=356),
     "StarTransactions": StarTransactions(

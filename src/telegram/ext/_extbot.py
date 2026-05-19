@@ -76,6 +76,7 @@ from telegram import (
     PreparedKeyboardButton,
     ReactionType,
     ReplyParameters,
+    SentGuestMessage,
     SentWebAppMessage,
     StarAmount,
     StarTransactions,
@@ -1111,6 +1112,28 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> SentWebAppMessage:
         return await super().answer_web_app_query(
             web_app_query_id=web_app_query_id,
+            result=result,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def answer_guest_query(
+        self,
+        guest_query_id: str,
+        result: "InlineQueryResult",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> SentGuestMessage:
+        return await super().answer_guest_query(
+            guest_query_id=guest_query_id,
             result=result,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -5647,6 +5670,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     answerShippingQuery = answer_shipping_query
     answerPreCheckoutQuery = answer_pre_checkout_query
     answerWebAppQuery = answer_web_app_query
+    answerGuestQuery = answer_guest_query
     restrictChatMember = restrict_chat_member
     promoteChatMember = promote_chat_member
     setChatPermissions = set_chat_permissions

@@ -553,7 +553,6 @@ class Update(TelegramObject):
         if message := (
             self.message
             or self.edited_message
-            or self.channel_post
             or self.business_message
             or self.edited_business_message
             or self.guest_message

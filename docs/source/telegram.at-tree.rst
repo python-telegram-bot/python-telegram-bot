@@ -166,6 +166,7 @@ Available Types
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.replyparameters
+    telegram.sentguestmessage
     telegram.sentwebappmessage
     telegram.shareduser
     telegram.story
