@@ -121,6 +121,7 @@ Available Types
     telegram.keyboardbuttonrequestmanagedbot
     telegram.keyboardbuttonrequestusers
     telegram.linkpreviewoptions
+    telegram.livephoto
     telegram.location
     telegram.locationaddress
     telegram.loginurl
