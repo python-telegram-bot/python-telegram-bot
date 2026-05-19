@@ -637,6 +637,10 @@ class ChatMemberRestricted(ChatMember):
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
+
+        if can_react_to_messages is None:
+            raise TypeError("`can_react_to_messages` is required and cannot be None")
+
         with self._unfrozen():
             self.is_member: bool = is_member
             self.can_change_info: bool = can_change_info
@@ -655,11 +659,8 @@ class ChatMemberRestricted(ChatMember):
             self.can_send_video_notes: bool = can_send_video_notes
             self.can_send_voice_notes: bool = can_send_voice_notes
             self.can_edit_tag: bool = can_edit_tag
-            self.can_react_to_messages: bool | None = can_react_to_messages
+            self.can_react_to_messages: bool = can_react_to_messages
             self.tag: str | None = tag
-
-        if self.can_react_to_messages is None:
-            raise TypeError("`can_react_to_messages` is required and cannot be None")
 
 
 class ChatMemberLeft(ChatMember):
