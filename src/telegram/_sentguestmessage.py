@@ -23,7 +23,7 @@ from telegram._utils.types import JSONDict
 
 
 class SentGuestMessage(TelegramObject):
-    """Describes an inline message sent by a guest bot on behalf of a user.
+    """Describes an inline message sent by a guest bot.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`inline_message_id` are equal.

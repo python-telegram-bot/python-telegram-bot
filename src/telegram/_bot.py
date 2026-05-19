@@ -5860,8 +5860,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
     ) -> SentGuestMessage:
-        """Use this method to set the result of a guest query. On success, a
-        :class:`telegram.SentGuestMessage` object is returned.
+        """Use this method to reply to a received guest message.
 
         .. versionadded:: NEXT.VERSION
 
