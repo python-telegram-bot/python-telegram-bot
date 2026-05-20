@@ -500,8 +500,6 @@ class Update(TelegramObject):
         is. If no user is associated with this update, this gives :obj:`None`. This is the case
         if any of
 
-        * :attr:`channel_post`
-        * :attr:`edited_channel_post`
         * :attr:`poll`
         * :attr:`chat_boost`
         * :attr:`removed_chat_boost`
@@ -518,7 +516,8 @@ class Update(TelegramObject):
             This property now also considers :attr:`purchased_paid_media`.
 
         .. versionchanged:: NEXT.VERSION
-            This property now also considers :attr:`managed_bot`.
+            This property now also considers :attr:`managed_bot`, :attr:`channel_post`
+            and :attr:`edited_channel_post`.
 
         Example:
             * If :attr:`message` is present, this will give
@@ -536,6 +535,12 @@ class Update(TelegramObject):
 
         elif self.edited_message:
             user = self.edited_message.from_user
+
+        elif self.channel_post:
+            user = self.channel_post.from_user
+
+        elif self.edited_channel_post:
+            user = self.edited_channel_post.from_user
 
         elif self.inline_query:
             user = self.inline_query.from_user
