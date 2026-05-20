@@ -699,30 +699,16 @@ class TestInputMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
         )
         assert input_media_live_photo_dict["has_spoiler"] == input_media_live_photo.has_spoiler
 
-    def test_with_photo(self, photo):
-        # fixture found in conftest.py
-        input_media_live_photo = InputMediaLivePhoto(photo, photo)
-        assert input_media_live_photo.type == self.type_
-        assert input_media_live_photo.media == photo.file_id
-        assert input_media_live_photo.photo == photo.file_id
-
-    def test_with_photo_file(self, photo_file):
-        # fixture found in conftest.py
-        input_media_live_photo = InputMediaLivePhoto(photo_file, photo_file)
-        assert input_media_live_photo.type == self.type_
-        assert isinstance(input_media_live_photo.media, InputFile)
-        assert isinstance(input_media_live_photo.photo, InputFile)
-
-    def test_with_video(self, video):
-        # fixture found in conftest.py
-        input_media_live_photo = InputMediaLivePhoto(video, video)
+    def test_with_photo_and_video(self, video, photo):
+        # fixtures found in conftest.py
+        input_media_live_photo = InputMediaLivePhoto(video, photo)
         assert input_media_live_photo.type == self.type_
         assert input_media_live_photo.media == video.file_id
-        assert input_media_live_photo.photo == video.file_id
+        assert input_media_live_photo.photo == photo.file_id
 
-    def test_with_video_file(self, video_file):
+    def test_with_photo_and_file(self, video_file, photo_file):
         # fixture found in conftest.py
-        input_media_live_photo = InputMediaLivePhoto(video_file, video_file)
+        input_media_live_photo = InputMediaLivePhoto(video_file, photo_file)
         assert input_media_live_photo.type == self.type_
         assert isinstance(input_media_live_photo.media, InputFile)
         assert isinstance(input_media_live_photo.photo, InputFile)
@@ -836,11 +822,11 @@ class TestInputPaidMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
         assert input_paid_media_live_photo_dict["media"] == input_paid_media_live_photo.media
         assert input_paid_media_live_photo_dict["photo"] == input_paid_media_live_photo.photo
 
-    def test_with_photo(self, photo):
-        # fixture found in conftest.py
-        input_paid_media_live_photo = InputPaidMediaLivePhoto(photo, photo)
+    def test_with_photo(self, video, photo):
+        # fixtures found in conftest.py
+        input_paid_media_live_photo = InputPaidMediaLivePhoto(video, photo)
         assert input_paid_media_live_photo.type == self.type_
-        assert input_paid_media_live_photo.media == photo.file_id
+        assert input_paid_media_live_photo.media == video.file_id
         assert input_paid_media_live_photo.photo == photo.file_id
 
     def test_with_photo_file(self, photo_file):

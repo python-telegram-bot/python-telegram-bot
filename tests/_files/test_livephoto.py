@@ -265,12 +265,20 @@ class TestLivePhotoWithRequest(LivePhotoTestBase):
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_live_photo_default_protect_content(
-        self, chat_id, default_bot, video_file, photo_file
+        self,
+        chat_id,
+        default_bot,
+        real_live_photo,
     ):
         tasks = asyncio.gather(
-            default_bot.send_live_photo(chat_id, photo=photo_file, live_photo=video_file),
             default_bot.send_live_photo(
-                chat_id, photo=photo_file, live_photo=video_file, protect_content=False
+                chat_id, photo=real_live_photo.photo[0], live_photo=real_live_photo
+            ),
+            default_bot.send_live_photo(
+                chat_id,
+                photo=real_live_photo.photo[0],
+                live_photo=real_live_photo,
+                protect_content=False,
             ),
         )
         protected, unprotected = await tasks
