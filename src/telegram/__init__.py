@@ -418,11 +418,6 @@ from ._copytextbutton import CopyTextButton
 from ._dice import Dice
 from ._directmessagepricechanged import DirectMessagePriceChanged
 from ._directmessagestopic import DirectMessagesTopic
-from ._files._inputstorycontent import (
-    InputStoryContent,
-    InputStoryContentPhoto,
-    InputStoryContentVideo,
-)
 from ._files.animation import Animation
 from ._files.audio import Audio
 from ._files.chatphoto import ChatPhoto
@@ -447,6 +442,11 @@ from ._files.inputprofilephoto import (
     InputProfilePhotoStatic,
 )
 from ._files.inputsticker import InputSticker
+from ._files.inputstorycontent import (
+    InputStoryContent,
+    InputStoryContentPhoto,
+    InputStoryContentVideo,
+)
 from ._files.location import Location
 from ._files.photosize import PhotoSize
 from ._files.sticker import MaskPosition, Sticker, StickerSet
