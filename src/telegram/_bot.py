@@ -1209,7 +1209,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: int,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
@@ -1221,7 +1221,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Use this method to stream a partial message to a user while the message is being
-        generated.
+        generated. Note that the streamed draft is ephemeral and acts as a temporary 30-second
+        preview - once the output is finalized, you must call :meth:`~Bot.send_message` with
+        the complete message to persist it in the user's chat.
 
         .. versionadded:: 22.6
 
@@ -1233,19 +1235,22 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             chat_id (:obj:`int`): Unique identifier for the target private chat.
             draft_id (:obj:`int`): Unique identifier of the message draft; must be non-zero.
                 Changes of drafts with the same identifier are animated.
-            text (:obj:`str`): Text of the message to be sent,
+            text (:obj:`str`, optional): Text of the message to be sent,
                 :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
                 :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
-                entities parsing.
+                entities parsing. Pass an empty text to show a "Thinking..." placeholder.
+
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 10.0 now makes this an optional parameter.
+
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target
+                message thread.
             parse_mode (:obj:`str`): |parse_mode|
             entities (Sequence[:class:`telegram.MessageEntity`], optional): Sequence of special
                 entities that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
 
                     |sequenceargs|
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target
-                message thread.
-
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
