@@ -33,7 +33,7 @@ from telegram import (
     StoryAreaTypeUniqueGift,
     User,
 )
-from telegram._files._inputstorycontent import InputStoryContentVideo
+from telegram._files.inputstorycontent import InputStoryContentVideo
 from telegram._files.sticker import Sticker
 from telegram._gifts import AcceptedGiftTypes, Gift
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
