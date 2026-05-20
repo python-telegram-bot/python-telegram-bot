@@ -1555,11 +1555,11 @@ class InputPaidMediaType(StringEnum):
     __slots__ = ()
 
     PHOTO = "photo"
-    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaPhoto`."""
     VIDEO = "video"
-    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaVideo`."""
     LIVE_PHOTO = "live_photo"
-    """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`.
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaLivePhoto`.
 
     .. versionadded:: NEXT.VERSION
     """
@@ -2587,7 +2587,7 @@ class PaidMediaType(StringEnum):
     PHOTO = "photo"
     """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
     LIVE_PHOTO = "live_photo"
-    """:obj:`str`: The type of :class:`telegram.PaidMediaLivePhoto
+    """:obj:`str`: The type of :class:`telegram.PaidMediaLivePhoto`
 
     .. versionadded:: NEXT.VERSION
     """

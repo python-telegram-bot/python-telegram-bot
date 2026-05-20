@@ -121,7 +121,7 @@ class InputPaidMedia(TelegramObject):
 
     * :class:`telegram.InputPaidMediaPhoto`
     * :class:`telegram.InputPaidMediaVideo`
-    * :class:`telegram.InputMediaLivePhoto`
+    * :class:`telegram.InputPaidMediaLivePhoto`
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 

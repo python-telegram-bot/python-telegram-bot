@@ -1489,6 +1489,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             "document",
             "game",
             "invoice",
+            "live_photo",
             "location",
             "paid_media",
             "passport_data",

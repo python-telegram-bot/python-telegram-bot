@@ -233,9 +233,9 @@ class TestLivePhotoWithRequest(LivePhotoTestBase):
 
         assert tmp_file.is_file()
 
-    async def test_send_resend(self, bot, chat_id, real_live_photo, video_file):
+    async def test_send_resend(self, bot, chat_id, real_live_photo, photo_file):
         message = await bot.send_live_photo(
-            chat_id=chat_id, live_photo=real_live_photo.file_id, photo=video_file
+            chat_id=chat_id, live_photo=real_live_photo.file_id, photo=photo_file
         )
         assert message.live_photo == real_live_photo
 

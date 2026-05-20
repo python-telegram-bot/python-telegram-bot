@@ -1344,7 +1344,7 @@ class TestSendMediaGroupWithRequest:
             if med_type == "video":
                 return InputMediaVideo(video, **kwargs)
             if med_type == "live_photo":
-                return InputMediaLivePhoto(photo, photo, **kwargs)
+                return InputMediaLivePhoto(video, photo, **kwargs)
             return None
 
         message = await default_bot.send_photo(chat_id, photo)

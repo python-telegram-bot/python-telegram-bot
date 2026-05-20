@@ -1790,6 +1790,7 @@ class Message(MaybeInaccessibleMessage):
         | Document
         | Game
         | Invoice
+        | LivePhoto
         | Location
         | PassportData
         | Sequence[PhotoSize]
@@ -1814,6 +1815,7 @@ class Message(MaybeInaccessibleMessage):
         * :class:`telegram.Animation`
         * :class:`telegram.Game`
         * :class:`telegram.Invoice`
+        * :class:`telegram.LivePhoto`
         * :class:`telegram.Location`
         * :class:`telegram.PassportData`
         * list[:class:`telegram.PhotoSize`]
