@@ -58,6 +58,8 @@ from telegram import (
     InputPollOption,
     InputProfilePhotoStatic,
     InputTextMessageContent,
+    KeyboardButton,
+    KeyboardButtonRequestManagedBot,
     LabeledPrice,
     LinkPreviewOptions,
     MenuButton,
@@ -70,6 +72,7 @@ from telegram import (
     Poll,
     PollOption,
     PreparedInlineMessage,
+    PreparedKeyboardButton,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     ReplyParameters,
@@ -99,7 +102,7 @@ from telegram.error import BadRequest, EndPointNotFound, InvalidToken, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTIONS
@@ -2846,6 +2849,76 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
         await offline_bot.set_chat_member_tag(1234, 5678, "This is a tag")
+
+    async def test_send_poll_warn_correct_option_id(self, offline_bot, monkeypatch, recwarn):
+        async def make_first_assert(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("correct_option_ids") == [1]
+            assert request_data.parameters.get("correct_option_id") is None
+            return make_message("dummy reply").to_dict()
+
+        async def make_second_assert(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("correct_option_ids") == [1, 2]
+            assert request_data.parameters.get("correct_option_id") is None
+            return make_message("dummy reply").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_first_assert)
+
+        await offline_bot.send_poll(
+            1,
+            question="question",
+            options=["option1", "option2"],
+            correct_option_id=1,
+        )
+
+        w = recwarn.pop()
+        assert issubclass(w.category, PTBDeprecationWarning)
+        assert "correct_option_id" in str(w.message)
+
+        # Test that correct_option_ids takes priority when both correct_option_id(s) are given
+        monkeypatch.setattr(offline_bot.request, "post", make_second_assert)
+        assert await offline_bot.send_poll(
+            1,
+            question="question",
+            options=["option1", "option2"],
+            correct_option_id=1,
+            correct_option_ids=[1, 2],
+        )
+
+    # TODO: If we create a managed bot, we could test this for real
+    async def test_get_managed_bot_token(self, offline_bot, monkeypatch):
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.get_managed_bot_token(1234)
+
+    async def test_replace_managed_bot_token(self, offline_bot, monkeypatch):
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.replace_managed_bot_token(1234)
+
+    # Need real user id to test with request. Otherwise returns User_id_invalid
+    async def test_save_prepared_keyboard_button(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            assert (
+                request_data.parameters.get("button")
+                == KeyboardButton(
+                    text="this", request_managed_bot=KeyboardButtonRequestManagedBot(1234)
+                ).to_dict()
+            )
+            return PreparedKeyboardButton(234).to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        inst = await offline_bot.save_prepared_keyboard_button(
+            1234,
+            KeyboardButton(text="this", request_managed_bot=KeyboardButtonRequestManagedBot(1234)),
+        )
+        assert isinstance(inst, PreparedKeyboardButton)
 
 
 class TestBotWithRequest:

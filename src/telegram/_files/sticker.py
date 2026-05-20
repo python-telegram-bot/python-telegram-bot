@@ -311,7 +311,7 @@ class StickerSet(TelegramObject):
         data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
         data["stickers"] = de_list_optional(data.get("stickers"), Sticker, bot)
 
-        api_kwargs = {}
+        api_kwargs: JSONDict = {}
         # These are deprecated fields that TG still returns for backwards compatibility
         # Let's filter them out to speed up the de-json process
         for deprecated_field in ("contains_masks", "thumb", "is_animated", "is_video"):

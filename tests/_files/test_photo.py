@@ -75,7 +75,7 @@ class TestPhotoWithoutRequest(PhotoTestBase):
         assert thumb.height == 90
         # File sizes don't seem to be consistent, so we use the values that we have observed
         # so far
-        assert thumb.file_size in [1475, 1477]
+        assert thumb.file_size in [1474, 1475, 1477]
 
     def test_de_json(self, offline_bot, photo):
         json_dict = {

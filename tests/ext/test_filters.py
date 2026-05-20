@@ -276,6 +276,18 @@ class TestFilters:
         result = (filters.COMMAND | filters.Regex(r"linked param")).check_update(update)
         assert result is True
 
+    def test_merged_filter_or_data_filter(self, update):
+        sre_type = type(re.match("", ""))
+        update.message.text = "deep-linked param"
+        update.message.entities = []
+        # COMMAND doesn't match; or_filter (Regex, a data filter) should return match data
+        result = (filters.COMMAND | filters.Regex(r"linked param")).check_update(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result["matches"]
+        assert isinstance(matches, list)
+        assert all(type(res) is sre_type for res in matches)
+
     def test_regex_complex_merges(self, update, message_origin_user):
         sre_type = type(re.match("", ""))
         update.message.text = "test it out"
@@ -1170,6 +1182,21 @@ class TestFilters:
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.CHAT_OWNER_LEFT.check_update(update)
         update.message.chat_owner_left = None
+
+        update.message.poll_option_added = "poll_option_added"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.POLL_OPTION_ADDED.check_update(update)
+        update.message.poll_option_added = None
+
+        update.message.poll_option_deleted = "poll_option_deleted"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.POLL_OPTION_DELETED.check_update(update)
+        update.message.poll_option_deleted = None
+
+        update.message.managed_bot_created = "test"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.MANAGED_BOT_CREATED.check_update(update)
+        update.message.managed_bot_created = None
 
     def test_filters_forwarded(self, update):
         assert filters.FORWARDED.check_update(update)

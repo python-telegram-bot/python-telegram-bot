@@ -79,6 +79,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `kennethcheo <https://github.com/kennethcheo>`_
 - `Kirill Vasin <https://github.com/vasinkd>`_
 - `Kjwon15 <https://github.com/kjwon15>`_
+- `Krishna Chaitanya Balusu <https://github.com/Krishnachaitanyakc>`_
 - `Li-aung Yip <https://github.com/LiaungYip>`_
 - `locobott <https://github.com/locobott>`_
 - `Loo Zheng Yuan <https://github.com/loozhengyuan>`_

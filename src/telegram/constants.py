@@ -181,7 +181,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=5)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=6)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -2347,6 +2347,8 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
+    MANAGED_BOT_CREATED = "managed_bot_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.managed_bot_created`."""
     MESSAGE_AUTO_DELETE_TIMER_CHANGED = "message_auto_delete_timer_changed"
     """:obj:`str`: Messages with :attr:`telegram.Message.message_auto_delete_timer_changed`."""
     MIGRATE_TO_CHAT_ID = "migrate_to_chat_id"
@@ -2366,6 +2368,16 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.paid_message_price_changed`.
 
     .. versionadded:: v22.2
+    """
+    POLL_OPTION_ADDED = "poll_option_added"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_added`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    POLL_OPTION_DELETED = "poll_option_deleted"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_deleted`.
+
+    .. versionadded:: NEXT.VERSION
     """
     SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
@@ -3439,11 +3451,20 @@ class PollLimit(IntEnum):
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MAX_OPEN_PERIOD = 600
+    MAX_OPEN_PERIOD = 2628000
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.send_poll.open_period` parameter of :meth:`telegram.Bot.send_poll`.
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
+
+    .. versionchanged:: NEXT.VERSION
+        Changed from ``600`` to ``2628000`` since Bot API 9.6.
+    """
+    MAX_DESCRIPTION_CHARACTERS = 1024
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.send_poll.description` parameter of :meth:`telegram.Bot.send_poll`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
 
@@ -3593,6 +3614,11 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.purchased_paid_media`.
 
     .. versionadded:: 21.6
+    """
+    MANAGED_BOT = "managed_bot"
+    """:obj:`str`: Updates with :attr:`telegram.Update.managed_bot`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
 
