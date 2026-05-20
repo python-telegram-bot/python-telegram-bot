@@ -12405,7 +12405,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 :tg-const:`telegram.constants.PersonalChatMessagesLimit.MAX_LIMIT`.
 
         Returns:
-            :obj:`bool`: On success, a tuple of :class:`telegram.Message`'s are returned.
+            tuple[:class:`telegram.Message`, ...]: On success, a tuple of
+            :class:`telegram.Message` objects is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
