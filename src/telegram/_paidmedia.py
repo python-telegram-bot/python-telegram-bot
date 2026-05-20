@@ -285,7 +285,7 @@ class PaidMediaLivePhoto(PaidMedia):
         super().__init__(type=PaidMedia.LIVE_PHOTO, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.live_photo = live_photo
+            self.live_photo: LivePhoto = live_photo
             self._id_attrs = (self.type, self.live_photo)
 
     @classmethod
