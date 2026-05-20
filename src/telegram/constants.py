@@ -101,6 +101,7 @@ __all__ = [
     "OwnedGiftType",
     "PaidMediaType",
     "ParseMode",
+    "PersonalChatMessagesLimit",
     "PollLimit",
     "PollType",
     "PollingLimit",
@@ -2566,6 +2567,28 @@ class PaidMediaType(StringEnum):
     """:obj:`str`: The type of :class:`telegram.PaidMediaVideo`."""
     PHOTO = "photo"
     """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
+
+
+class PersonalChatMessagesLimit(IntEnum):
+    """This enum contains limitations for
+    :paramref:`telegram.Bot.get_user_personal_chat_messages.limit`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.get_user_personal_chat_messages.limit`
+    parameter of :meth:`telegram.Bot.get_user_personal_chat_messages`.
+    """
+    MAX_LIMIT = 20
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.get_user_personal_chat_messages.limit`
+    parameter of :meth:`telegram.Bot.get_user_personal_chat_messages`.
+    """
 
 
 class PollingLimit(IntEnum):
