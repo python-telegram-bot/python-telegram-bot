@@ -311,6 +311,7 @@ class _ChatBase(TelegramObject):
 
     async def get_administrators(
         self,
+        return_bots: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -334,6 +335,7 @@ class _ChatBase(TelegramObject):
         """
         return await self.get_bot().get_chat_administrators(
             chat_id=self.id,
+            return_bots=return_bots,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4042,6 +4044,82 @@ class _ChatBase(TelegramObject):
             chat_id=self.id,
             user_id=user_id,
             tag=tag,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_reaction(
+        self,
+        message_id: int,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+             await bot.delete_message_reaction(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().delete_message_reaction(
+            chat_id=self.id,
+            message_id=message_id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_all_reactions(
+        self,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+            await bot.delete_all_message_reactions(
+                chat_id=update.effective_chat.id,
+                *args,
+                **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_all_message_reactions`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().delete_all_message_reactions(
+            chat_id=self.id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

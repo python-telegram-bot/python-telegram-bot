@@ -926,3 +926,48 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "replace_managed_bot_token", make_assertion)
         assert await user.replace_token()
+
+    async def test_instance_method_delete_reaction(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["chat_id"] == 1234
+                and kwargs["message_id"] == 123
+                and kwargs["actor_chat_id"] == 42
+            )
+
+        assert check_shortcut_signature(
+            user.delete_reaction, Bot.delete_message_reaction, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.delete_reaction,
+            user.get_bot(),
+            "delete_message_reaction",
+            shortcut_kwargs=["user_id"],
+        )
+        assert await check_defaults_handling(user.delete_reaction, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "delete_message_reaction", make_assertion)
+        assert await user.delete_reaction(chat_id=1234, message_id=123, actor_chat_id=42)
+
+    async def test_instance_method_delete_all_reactions(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["chat_id"] == 1234
+                and kwargs["actor_chat_id"] == 42
+            )
+
+        assert check_shortcut_signature(
+            user.delete_all_reactions, Bot.delete_all_message_reactions, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.delete_all_reactions,
+            user.get_bot(),
+            "delete_all_message_reactions",
+            shortcut_kwargs=["user_id"],
+        )
+        assert await check_defaults_handling(user.delete_all_reactions, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "delete_all_message_reactions", make_assertion)
+        assert await user.delete_all_reactions(chat_id=1234, actor_chat_id=42)
