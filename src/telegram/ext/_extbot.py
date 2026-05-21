@@ -1845,6 +1845,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def get_chat_administrators(
         self,
         chat_id: str | int,
+        return_bots: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1855,6 +1856,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> tuple[ChatMember, ...]:
         return await super().get_chat_administrators(
             chat_id=chat_id,
+            return_bots=return_bots,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -5662,6 +5664,56 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def delete_message_reaction(
+        self,
+        chat_id: int | str,
+        message_id: int,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().delete_message_reaction(
+            chat_id=chat_id,
+            message_id=message_id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def delete_all_message_reactions(
+        self,
+        chat_id: int | str,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().delete_all_message_reactions(
+            chat_id=chat_id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -5834,3 +5886,5 @@ class ExtBot(Bot, Generic[RLARGS]):
     getManagedBotAccessSettings = get_managed_bot_access_settings
     setManagedBotAccessSettings = set_managed_bot_access_settings
     getUserPersonalChatMessages = get_user_personal_chat_messages
+    deleteMessageReaction = delete_message_reaction
+    deleteAllMessageReactions = delete_all_message_reactions
