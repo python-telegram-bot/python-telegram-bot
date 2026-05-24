@@ -311,8 +311,8 @@ class TextQuote(TelegramObject):
             units as specified by the sender.
         entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities that
             appear
-            in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
-            custom_emoji entities are kept in quotes.
+            in the quote. Currently, only bold, italic, underline, strikethrough, spoiler,
+            custom_emoji, and date_time entities are kept in quotes.
         is_manual (:obj:`bool`, optional): :obj:`True`, if the quote was chosen manually by the
             message sender. Otherwise, the quote was added automatically by the server.
 
@@ -322,8 +322,8 @@ class TextQuote(TelegramObject):
         position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
             units as specified by the sender.
         entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that appear
-            in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
-            custom_emoji entities are kept in quotes.
+            in the quote. Currently, only bold, italic, underline, strikethrough, spoiler,
+            custom_emoji, and date_time entities are kept in quotes.
         is_manual (:obj:`bool`): Optional. :obj:`True`, if the quote was chosen manually by the
             message sender. Otherwise, the quote was added automatically by the server.
     """
@@ -394,9 +394,9 @@ class ReplyParameters(TelegramObject):
             used only for replies in the same chat and forum topic.
         quote (:obj:`str`, optional): Quoted part of the message to be replied to; 0-1024
             characters after entities parsing. The quote must be an exact substring of the message
-            to be replied to, including bold, italic, underline, strikethrough, spoiler, and
-            custom_emoji entities. The message will fail to send if the quote isn't found in the
-            original message.
+            to be replied to, including bold, italic, underline, strikethrough, spoiler,
+            custom_emoji, and date_time entities. The message will fail to send if the quote isn't
+            found in the original message.
         quote_parse_mode (:obj:`str`, optional): Mode for parsing entities in the quote. See
             :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
             more details.
@@ -410,6 +410,10 @@ class ReplyParameters(TelegramObject):
             replied to.
 
             .. versionadded:: 22.4
+        poll_option_id (:obj:`str`, optional): Persistent
+            identifier of the specific poll option to be replied to.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
@@ -422,9 +426,9 @@ class ReplyParameters(TelegramObject):
             used only for replies in the same chat and forum topic.
         quote (:obj:`str`): Optional. Quoted part of the message to be replied to; 0-1024
             characters after entities parsing. The quote must be an exact substring of the message
-            to be replied to, including bold, italic, underline, strikethrough, spoiler, and
-            custom_emoji entities. The message will fail to send if the quote isn't found in the
-            original message.
+            to be replied to, including bold, italic, underline, strikethrough, spoiler,
+            custom_emoji, and date_time entities. The message will fail to send if the quote isn't
+            found in the original message.
         quote_parse_mode (:obj:`str`): Optional. Mode for parsing entities in the quote. See
             :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
             more details.
@@ -437,6 +441,10 @@ class ReplyParameters(TelegramObject):
             replied to.
 
             .. versionadded:: 22.4
+        poll_option_id (:obj:`str`): Optional. Persistent
+            identifier of the specific poll option to be replied to.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -444,6 +452,7 @@ class ReplyParameters(TelegramObject):
         "chat_id",
         "checklist_task_id",
         "message_id",
+        "poll_option_id",
         "quote",
         "quote_entities",
         "quote_parse_mode",
@@ -460,6 +469,7 @@ class ReplyParameters(TelegramObject):
         quote_entities: Sequence[MessageEntity] | None = None,
         quote_position: int | None = None,
         checklist_task_id: int | None = None,
+        poll_option_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -473,6 +483,7 @@ class ReplyParameters(TelegramObject):
         self.quote_entities: tuple[MessageEntity, ...] | None = parse_sequence_arg(quote_entities)
         self.quote_position: int | None = quote_position
         self.checklist_task_id: int | None = checklist_task_id
+        self.poll_option_id: str | None = poll_option_id
 
         self._id_attrs = (self.message_id,)
 

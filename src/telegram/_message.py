@@ -57,6 +57,7 @@ from telegram._gifts import GiftInfo
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inputchecklist import InputChecklist
 from telegram._linkpreviewoptions import LinkPreviewOptions
+from telegram._managedbot import ManagedBotCreated
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._paidmedia import PaidMediaInfo
@@ -65,7 +66,7 @@ from telegram._passport.passportdata import PassportData
 from telegram._payment.invoice import Invoice
 from telegram._payment.refundedpayment import RefundedPayment
 from telegram._payment.successfulpayment import SuccessfulPayment
-from telegram._poll import Poll
+from telegram._poll import Poll, PollOptionAdded, PollOptionDeleted
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._reply import ReplyParameters
 from telegram._shared import ChatShared, UsersShared
@@ -80,6 +81,7 @@ from telegram._utils.entities import parse_message_entities, parse_message_entit
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
     CorrectOptionID,
+    CorrectOptionIds,
     JSONDict,
     MarkdownVersion,
     ODVInput,
@@ -689,6 +691,23 @@ class Message(MaybeInaccessibleMessage):
             supergroups only
 
             .. versionadded:: 22.7
+        poll_option_added (:class:`telegram.PollOptionAdded`, optional): Service message:
+            answer option was added to a poll.
+
+            .. versionadded:: NEXT.VERSION
+        poll_option_deleted (:class:`telegram.PollOptionDeleted`, optional): Service message:
+            answer option was deleted from a poll.
+
+            .. versionadded:: NEXT.VERSION
+        reply_to_poll_option_id (:obj:`str`, optional): Persistent
+            identifier of the specific poll option that is being replied to.
+
+            .. versionadded:: NEXT.VERSION
+
+        managed_bot_created (:class:`telegram.ManagedBotCreated`, optional): Service message: user
+            created a bot that will be managed by the current bot.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1105,6 +1124,22 @@ class Message(MaybeInaccessibleMessage):
             supergroups only
 
             .. versionadded:: 22.7
+        poll_option_added (:class:`telegram.PollOptionAdded`): Optional. Service message:
+            answer option was added to a poll.
+
+            .. versionadded:: NEXT.VERSION
+        poll_option_deleted (:class:`telegram.PollOptionDeleted`): Optional. Service message:
+            answer option was deleted from a poll.
+
+            .. versionadded:: NEXT.VERSION
+        reply_to_poll_option_id (:obj:`str`): Optional. Persistent
+            identifier of the specific poll option that is being replied to.
+
+            .. versionadded:: NEXT.VERSION
+        managed_bot_created (:class:`telegram.ManagedBotCreated`): Optional. Service message: user
+            created a bot that will be managed by the current bot.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1176,6 +1211,7 @@ class Message(MaybeInaccessibleMessage):
         "left_chat_member",
         "link_preview_options",
         "location",
+        "managed_bot_created",
         "media_group_id",
         "message_auto_delete_timer_changed",
         "message_thread_id",
@@ -1191,12 +1227,15 @@ class Message(MaybeInaccessibleMessage):
         "photo",
         "pinned_message",
         "poll",
+        "poll_option_added",
+        "poll_option_deleted",
         "proximity_alert_triggered",
         "quote",
         "refunded_payment",
         "reply_markup",
         "reply_to_checklist_task_id",
         "reply_to_message",
+        "reply_to_poll_option_id",
         "reply_to_story",
         "sender_boost_count",
         "sender_business_bot",
@@ -1337,6 +1376,10 @@ class Message(MaybeInaccessibleMessage):
         chat_owner_changed: ChatOwnerChanged | None = None,
         chat_owner_left: ChatOwnerLeft | None = None,
         sender_tag: str | None = None,
+        poll_option_added: PollOptionAdded | None = None,
+        poll_option_deleted: PollOptionDeleted | None = None,
+        reply_to_poll_option_id: str | None = None,
+        managed_bot_created: ManagedBotCreated | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1467,6 +1510,10 @@ class Message(MaybeInaccessibleMessage):
             self.chat_owner_changed: ChatOwnerChanged | None = chat_owner_changed
             self.chat_owner_left: ChatOwnerLeft | None = chat_owner_left
             self.sender_tag: str | None = sender_tag
+            self.poll_option_added: PollOptionAdded | None = poll_option_added
+            self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
+            self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
+            self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1687,6 +1734,15 @@ class Message(MaybeInaccessibleMessage):
             data.get("chat_owner_changed"), ChatOwnerChanged, bot
         )
         data["chat_owner_left"] = de_json_optional(data.get("chat_owner_left"), ChatOwnerLeft, bot)
+        data["poll_option_added"] = de_json_optional(
+            data.get("poll_option_added"), PollOptionAdded, bot
+        )
+        data["poll_option_deleted"] = de_json_optional(
+            data.get("poll_option_deleted"), PollOptionDeleted, bot
+        )
+        data["managed_bot_created"] = de_json_optional(
+            data.get("managed_bot_created"), ManagedBotCreated, bot
+        )
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -3473,6 +3529,14 @@ class Message(MaybeInaccessibleMessage):
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        shuffle_options: bool | None = None,
+        allows_revoting: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        description: str | None = None,
+        description_parse_mode: str | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3522,6 +3586,9 @@ class Message(MaybeInaccessibleMessage):
             type=type,
             allows_multiple_answers=allows_multiple_answers,
             correct_option_id=correct_option_id,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            correct_option_ids=correct_option_ids,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
@@ -3543,6 +3610,11 @@ class Message(MaybeInaccessibleMessage):
             question_entities=question_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
+            hide_results_until_closes=hide_results_until_closes,
+            allow_adding_options=allow_adding_options,
         )
 
     async def reply_dice(

@@ -1,0 +1,5 @@
+internal = "Update Mypy to v1.20.2"
+[[pull_requests]]
+uid = "5223"
+author_uids = ["renovate[bot]"]
+closes_threads = []

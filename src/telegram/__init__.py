@@ -177,12 +177,15 @@ __all__ = (
     "KeyboardButton",
     "KeyboardButtonPollType",
     "KeyboardButtonRequestChat",
+    "KeyboardButtonRequestManagedBot",
     "KeyboardButtonRequestUsers",
     "LabeledPrice",
     "LinkPreviewOptions",
     "Location",
     "LocationAddress",
     "LoginUrl",
+    "ManagedBotCreated",
+    "ManagedBotUpdated",
     "MaskPosition",
     "MaybeInaccessibleMessage",
     "MenuButton",
@@ -229,8 +232,11 @@ __all__ = (
     "Poll",
     "PollAnswer",
     "PollOption",
+    "PollOptionAdded",
+    "PollOptionDeleted",
     "PreCheckoutQuery",
     "PreparedInlineMessage",
+    "PreparedKeyboardButton",
     "ProximityAlertTriggered",
     "ReactionCount",
     "ReactionType",
@@ -498,9 +504,14 @@ from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._inline.preparedinlinemessage import PreparedInlineMessage
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
-from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
+from ._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestManagedBot,
+    KeyboardButtonRequestUsers,
+)
 from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
+from ._managedbot import ManagedBotCreated, ManagedBotUpdated
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
@@ -564,7 +575,15 @@ from ._payment.stars.revenuewithdrawalstate import (
     RevenueWithdrawalStateSucceeded,
 )
 from ._payment.successfulpayment import SuccessfulPayment
-from ._poll import InputPollOption, Poll, PollAnswer, PollOption
+from ._poll import (
+    InputPollOption,
+    Poll,
+    PollAnswer,
+    PollOption,
+    PollOptionAdded,
+    PollOptionDeleted,
+)
+from ._preparedkeyboardbutton import PreparedKeyboardButton
 from ._proximityalerttriggered import ProximityAlertTriggered
 from ._reaction import (
     ReactionCount,

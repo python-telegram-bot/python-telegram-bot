@@ -63,6 +63,7 @@ from telegram import (
     InputPaidMedia,
     InputPollOption,
     InputProfilePhoto,
+    KeyboardButton,
     LinkPreviewOptions,
     MaskPosition,
     MenuButton,
@@ -72,6 +73,7 @@ from telegram import (
     PhotoSize,
     Poll,
     PreparedInlineMessage,
+    PreparedKeyboardButton,
     ReactionType,
     ReplyParameters,
     SentWebAppMessage,
@@ -98,6 +100,7 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
     BaseUrl,
     CorrectOptionID,
+    CorrectOptionIds,
     FileInput,
     JSONDict,
     ODVInput,
@@ -3254,6 +3257,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        allows_revoting: bool | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        description: str | None = None,
+        description_parse_mode: str | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
+        shuffle_options: bool | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3295,6 +3306,14 @@ class ExtBot(Bot, Generic[RLARGS]):
             question_entities=question_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            correct_option_ids=correct_option_ids,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
+            hide_results_until_closes=hide_results_until_closes,
+            allow_adding_options=allow_adding_options,
         )
 
     async def send_sticker(
@@ -5511,6 +5530,69 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_managed_bot_token(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> str:
+        return await super().get_managed_bot_token(
+            user_id=user_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def replace_managed_bot_token(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> str:
+        return await super().replace_managed_bot_token(
+            user_id=user_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def save_prepared_keyboard_button(
+        self,
+        user_id: int,
+        button: KeyboardButton,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> PreparedKeyboardButton:
+
+        return await super().save_prepared_keyboard_button(
+            user_id=user_id,
+            button=button,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -5677,3 +5759,6 @@ class ExtBot(Bot, Generic[RLARGS]):
     removeMyProfilePhoto = remove_my_profile_photo
     getUserProfileAudios = get_user_profile_audios
     setChatMemberTag = set_chat_member_tag
+    getManagedBotToken = get_managed_bot_token
+    replaceManagedBotToken = replace_managed_bot_token
+    savePreparedKeyboardButton = save_prepared_keyboard_button
