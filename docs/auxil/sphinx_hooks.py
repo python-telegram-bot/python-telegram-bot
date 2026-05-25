@@ -15,6 +15,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+import pprint
 import contextlib
 import inspect
 import re
@@ -104,12 +105,15 @@ def autodoc_process_docstring(
 
     # 1) Insert the Keyword Args and "Shortcuts" admonitions for the Bot methods
     method_name = name.rsplit(".", maxsplit=1)[-1]
+    object_signature = inspect.signature(obj) if callable(obj) else None
     if (
         name.startswith("telegram.Bot.")
         and what == "method"
         and method_name.islower()
         and check_timeout_and_api_kwargs_presence(obj)
     ):
+        if method_name == "get_updates":
+            pprint.pprint(lines)
         # Logic for inserting keyword args into docstrings:
         # -------------------------------------------------
         insert_index = find_insert_pos_for_kwargs(lines)
