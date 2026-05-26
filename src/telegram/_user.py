@@ -130,51 +130,7 @@ class User(TelegramObject):
 
             .. versionadded:: NEXT.VERSION
 
-    Attributes:
-        id (:obj:`int`): Unique identifier for this user or bot.
-        is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
-        first_name (:obj:`str`): User's or bot's first name.
-        last_name (:obj:`str`): Optional. User's or bot's last name.
-        username (:obj:`str`): Optional. User's or bot's username.
-        language_code (:obj:`str`): Optional. IETF language tag of the user's language.
-        can_join_groups (:obj:`str`): Optional. :obj:`True`, if the bot can be invited to groups.
-            Returned only in :attr:`telegram.Bot.get_me` requests.
-        can_read_all_group_messages (:obj:`str`): Optional. :obj:`True`, if privacy mode is
-            disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
-        supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
-            queries. Returned only in :attr:`telegram.Bot.get_me` requests.
-        is_premium (:obj:`bool`): Optional. :obj:`True`, if this user is a Telegram
-            Premium user.
-
-            .. versionadded:: 20.0
-        added_to_attachment_menu (:obj:`bool`): Optional. :obj:`True`, if this user added
-            the bot to the attachment menu.
-
-            .. versionadded:: 20.0
-        can_connect_to_business (:obj:`bool`): Optional. :obj:`True`,  if the bot can be connected
-            to a Telegram Business account to receive its messages. Returned only in
-            :meth:`telegram.Bot.get_me`.
-
-            .. versionadded:: 21.1
-        has_main_web_app (:obj:`bool`) Optional. :obj:`True`, if the bot has the main Web App.
-            Returned only in :meth:`telegram.Bot.get_me`.
-
-            .. versionadded:: 21.5
-        has_topics_enabled (:obj:`bool`): Optional. :obj:`True`, if the bot has forum topic mode
-            enabled in private chats. Returned only in :meth:`telegram.Bot.get_me`.
-
-            .. versionadded:: 22.6
-        allows_users_to_create_topics (:obj:`bool`): Optional. :obj:`True`, if the bot allows
-            users to create and delete topics in private chats. Returned only in
-            :meth:`telegram.Bot.get_me`.
-
-            .. versionadded:: 22.7
-        can_manage_bots (:obj:`bool`): Optional. :obj:`True`, if other bots can be created to be
-            controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
-
-            .. versionadded:: NEXT.VERSION
-
-    .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
+    .. |user_chat_id_note| replace:: This shortcut builds on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
         case so far, but Telegram does not guarantee that this stays this way.
     """

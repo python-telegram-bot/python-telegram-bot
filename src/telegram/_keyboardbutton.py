@@ -61,21 +61,17 @@ class KeyboardButton(TelegramObject):
         * :attr:`style` option will only work in Telegram versions released after February 9, 2026.
           Older clients will display buttons without styling.
 
-    .. versionchanged:: 21.0
-       Removed deprecated argument and attribute ``request_user``.
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
     .. versionchanged:: 20.5
        :attr:`request_users` and :attr:`request_chat` are considered as well when
        comparing objects of this type in terms of equality.
+    .. versionchanged:: 21.0
+       Removed deprecated argument and attribute ``request_user``.
     .. versionchanged:: 22.7
-       :attr:`icon_custom_emoji_id` is considered as well when comparing objects of this type in
-       terms of equality.
-
-    .. versionchanged:: 22.7
-       :attr:`style` and :attr:`icon_custom_emoji_id` are considered as well when
-       comparing objects of this type in terms of equality.
+       :attr:`style`, and :attr:`icon_custom_emoji_id` is considered as well when comparing objects
+       of this type in terms of equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the fields other than :attr:`text`,
@@ -125,61 +121,6 @@ class KeyboardButton(TelegramObject):
 
             .. versionadded:: 22.7
         request_managed_bot (:obj:`telegram.KeyboardButtonRequestManagedBot`, optional): If
-            specified, pressing the button will ask the user to create and share a bot that will
-            be managed by the current bot. Available for bots that enabled management of other bots
-            in the `@BotFather <https://telegram.me/BotFather>` Mini App. Available in private
-            chats only.
-
-            .. versionadded:: NEXT.VERSION
-
-
-    Attributes:
-        text (:obj:`str`): Text of the button. If none of the fields other than :attr:`text`,
-            :attr:`icon_custom_emoji_id`, and :attr:`style` are used, it will be sent as a
-            message when the button is pressed.
-        request_contact (:obj:`bool`): Optional. If :obj:`True`, the user's phone number will be
-            sent as a contact when the button is pressed. Available in private chats only.
-        request_location (:obj:`bool`): Optional. If :obj:`True`, the user's current location will
-            be sent when the button is pressed. Available in private chats only.
-        request_poll (:class:`~telegram.KeyboardButtonPollType`): Optional. If specified,
-            the user will be asked to create a poll and send it to the bot when the button is
-            pressed. Available in private chats only.
-        web_app (:class:`~telegram.WebAppInfo`): Optional. If specified, the described `Web App
-            <https://core.telegram.org/bots/webapps>`_ will be launched when the button is pressed.
-            The Web App will be able to send a :attr:`Message.web_app_data` service message.
-            Available in private chats only.
-
-            .. versionadded:: 20.0
-        request_users (:class:`KeyboardButtonRequestUsers`): Optional. If specified, pressing the
-            button will open a list of suitable users. Tapping on any user will send its
-            identifier to the bot in a :attr:`telegram.Message.users_shared` service message.
-            Available in private chats only.
-
-            .. versionadded:: 20.8
-        request_chat (:class:`KeyboardButtonRequestChat`): Optional. If specified, pressing the
-            button will open a list of suitable chats. Tapping on a chat will send its
-            identifier to the bot in a :attr:`telegram.Message.chat_shared` service message.
-            Available in private chats only.
-
-            .. versionadded:: 20.1
-        style (:obj:`str`): Optional. Style of the button. Must be one of
-            :tg-const:`telegram.constants.KeyboardButtonStyle.PRIMARY` (blue),
-            :tg-const:`telegram.constants.KeyboardButtonStyle.SUCCESS` (green), and
-            :tg-const:`telegram.constants.KeyboardButtonStyle.DANGER` (red).
-            Color name aliases :tg-const:`telegram.constants.KeyboardButtonStyle.BLUE`,
-            :tg-const:`telegram.constants.KeyboardButtonStyle.GREEN`, and
-            :tg-const:`telegram.constants.KeyboardButtonStyle.RED` are also available.
-            If omitted, then an app-specific style is used.
-
-            .. versionadded:: 22.7
-        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the
-            custom emoji shown before the text of the button. Can only be used by bots that
-            purchased additional usernames on Fragment or in the messages directly sent by the
-            bot to private, group and supergroup chats if the owner of the bot has a Telegram
-            Premium subscription.
-
-            .. versionadded:: 22.7
-        request_managed_bot (:obj:`telegram.KeyboardButtonRequestManagedBot`): Optional. If
             specified, pressing the button will ask the user to create and share a bot that will
             be managed by the current bot. Available for bots that enabled management of other bots
             in the `@BotFather <https://telegram.me/BotFather>` Mini App. Available in private

@@ -188,10 +188,6 @@ class ChatMigrated(TelegramError):
 
     Args:
         new_chat_id (:obj:`int`): The new chat id of the group.
-
-    Attributes:
-        new_chat_id (:obj:`int`): The new chat id of the group.
-
     """
 
     __slots__ = ("new_chat_id",)

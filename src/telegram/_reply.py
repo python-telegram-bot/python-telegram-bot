@@ -114,58 +114,6 @@ class ExternalReplyInfo(TelegramObject):
             information about the paid media.
 
             .. versionadded:: 21.4
-
-    Attributes:
-        origin (:class:`telegram.MessageOrigin`): Origin of the message replied to by the given
-            message.
-        chat (:class:`telegram.Chat`): Optional. Chat the original message belongs to. Available
-            only if the chat is a supergroup or a channel.
-        message_id (:obj:`int`): Optional. Unique message identifier inside the original chat.
-            Available only if the original chat is a supergroup or a channel.
-        link_preview_options (:class:`telegram.LinkPreviewOptions`): Optional. Options used for
-            link preview generation for the original message, if it is a text message.
-        animation (:class:`telegram.Animation`): Optional. Message is an animation, information
-            about the animation.
-        audio (:class:`telegram.Audio`): Optional. Message is an audio file, information about the
-            file.
-        document (:class:`telegram.Document`): Optional. Message is a general file, information
-            about the file.
-        photo (tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available sizes
-            of the photo.
-        sticker (:class:`telegram.Sticker`): Optional. Message is a sticker, information about the
-            sticker.
-        story (:class:`telegram.Story`): Optional. Message is a forwarded story.
-        video (:class:`telegram.Video`): Optional. Message is a video, information about the video.
-        video_note (:class:`telegram.VideoNote`): Optional. Message is a `video note
-            <https://telegram.org/blog/video-messages-and-telescope>`_, information about the video
-            message.
-        voice (:class:`telegram.Voice`): Optional. Message is a voice message, information about
-            the file.
-        has_media_spoiler (:obj:`bool`): Optional. :obj:`True`, if the message media is covered by
-            a spoiler animation.
-        checklist (:class:`telegram.Checklist`): Optional. Message is a checklist.
-
-            .. versionadded:: 22.3
-        contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
-            about the contact.
-        dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.
-        game (:Class:`telegram.Game`): Optional. Message is a game, information about the game.
-            :ref:`More about games >> <games-tree>`.
-        giveaway (:class:`telegram.Giveaway`): Optional. Message is a scheduled giveaway,
-            information about the giveaway.
-        giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
-            winners was completed.
-        invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
-            information about the invoice. :ref:`More about payments >> <payments-tree>`.
-        location (:class:`telegram.Location`): Optional. Message is a shared location, information
-            about the location.
-        poll (:class:`telegram.Poll`): Optional. Message is a native poll, information about the
-            poll.
-        venue (:class:`telegram.Venue`): Optional. Message is a venue, information about the venue.
-        paid_media (:class:`telegram.PaidMedia`): Optional. Message contains paid media;
-            information about the paid media.
-
-            .. versionadded:: 21.4
     """
 
     __slots__ = (
@@ -315,17 +263,6 @@ class TextQuote(TelegramObject):
             custom_emoji, and date_time entities are kept in quotes.
         is_manual (:obj:`bool`, optional): :obj:`True`, if the quote was chosen manually by the
             message sender. Otherwise, the quote was added automatically by the server.
-
-    Attributes:
-        text (:obj:`str`): Text of the quoted part of a message that is replied to by the given
-            message.
-        position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
-            units as specified by the sender.
-        entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that appear
-            in the quote. Currently, only bold, italic, underline, strikethrough, spoiler,
-            custom_emoji, and date_time entities are kept in quotes.
-        is_manual (:obj:`bool`): Optional. :obj:`True`, if the quote was chosen manually by the
-            message sender. Otherwise, the quote was added automatically by the server.
     """
 
     __slots__ = (
@@ -411,37 +348,6 @@ class ReplyParameters(TelegramObject):
 
             .. versionadded:: 22.4
         poll_option_id (:obj:`str`, optional): Persistent
-            identifier of the specific poll option to be replied to.
-
-            .. versionadded:: NEXT.VERSION
-
-    Attributes:
-        message_id (:obj:`int`): Identifier of the message that will be replied to in the current
-            chat, or in the chat :paramref:`chat_id` if it is specified.
-        chat_id (:obj:`int` | :obj:`str`): Optional. If the message to be replied to is from a
-            different chat, |chat_id_channel|
-            Not supported for messages sent on behalf of a business account and messages from
-            channel direct messages chats.
-        allow_sending_without_reply (:obj:`bool`): Optional. |allow_sending_without_reply| Can be
-            used only for replies in the same chat and forum topic.
-        quote (:obj:`str`): Optional. Quoted part of the message to be replied to; 0-1024
-            characters after entities parsing. The quote must be an exact substring of the message
-            to be replied to, including bold, italic, underline, strikethrough, spoiler,
-            custom_emoji, and date_time entities. The message will fail to send if the quote isn't
-            found in the original message.
-        quote_parse_mode (:obj:`str`): Optional. Mode for parsing entities in the quote. See
-            :wiki:`formatting options <Code-snippets#message-formatting-bold-italic-code->` for
-            more details.
-        quote_entities (tuple[:class:`telegram.MessageEntity`]): Optional. A JSON-serialized list
-            of special entities that appear in the quote. It can be specified instead of
-            :paramref:`quote_parse_mode`.
-        quote_position (:obj:`int`): Optional. Position of the quote in the original message in
-            UTF-16 code units.
-        checklist_task_id (:obj:`int`): Optional. Identifier of the specific checklist task to be
-            replied to.
-
-            .. versionadded:: 22.4
-        poll_option_id (:obj:`str`): Optional. Persistent
             identifier of the specific poll option to be replied to.
 
             .. versionadded:: NEXT.VERSION

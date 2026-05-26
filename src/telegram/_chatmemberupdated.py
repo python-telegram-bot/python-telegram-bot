@@ -70,29 +70,6 @@ class ChatMemberUpdated(TelegramObject):
             an administrator
 
             .. versionadded:: 21.2
-
-    Attributes:
-        chat (:class:`telegram.Chat`): Chat the user belongs to.
-        from_user (:class:`telegram.User`): Performer of the action, which resulted in the change.
-        date (:class:`datetime.datetime`): Date the change was done in Unix time. Converted to
-            :class:`datetime.datetime`.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-        old_chat_member (:class:`telegram.ChatMember`): Previous information about the chat member.
-        new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
-        invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link, which was used
-            by the user to join the chat. For joining by invite link events only.
-        via_chat_folder_invite_link (:obj:`bool`): Optional. :obj:`True`, if the user joined the
-            chat via a chat folder invite link
-
-            .. versionadded:: 20.3
-        via_join_request (:obj:`bool`): Optional. :obj:`True`, if the user joined the chat after
-            sending a direct join request without using an invite link and being approved
-            by an administrator
-
-            .. versionadded:: 21.2
-
     """
 
     __slots__ = (

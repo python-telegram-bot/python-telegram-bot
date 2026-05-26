@@ -103,9 +103,6 @@ class ApplicationHandlerStop(Exception):
 
     Args:
         state (:obj:`object`, optional): The next state of the conversation.
-
-    Attributes:
-        state (:obj:`object`): Optional. The next state of the conversation.
     """
 
     __slots__ = ("state",)

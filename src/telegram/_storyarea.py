@@ -48,21 +48,6 @@ class StoryAreaPosition(TelegramObject):
             0-:tg-const:`~telegram.constants.StoryAreaPositionLimit.MAX_ROTATION_ANGLE`.
         corner_radius_percentage (:obj:`float`): The radius of the rectangle corner rounding, as a
             percentage of the media width.
-
-    Attributes:
-        x_percentage (:obj:`float`): The abscissa of the area's center, as a percentage of the
-            media width.
-        y_percentage (:obj:`float`): The ordinate of the area's center, as a percentage of the
-            media height.
-        width_percentage (:obj:`float`): The width of the area's rectangle, as a percentage of the
-            media width.
-        height_percentage (:obj:`float`): The height of the area's rectangle, as a percentage of
-            the media height.
-        rotation_angle (:obj:`float`): The clockwise rotation angle of the rectangle, in degrees;
-            0-:tg-const:`~telegram.constants.StoryAreaPositionLimit.MAX_ROTATION_ANGLE`.
-        corner_radius_percentage (:obj:`float`): The radius of the rectangle corner rounding, as a
-            percentage of the media width.
-
     """
 
     __slots__ = (
@@ -119,14 +104,6 @@ class LocationAddress(TelegramObject):
         state (:obj:`str`, optional): State of the location.
         city (:obj:`str`, optional): City of the location.
         street (:obj:`str`, optional): Street address of the location.
-
-    Attributes:
-        country_code (:obj:`str`): The two-letter ``ISO 3166-1 alpha-2`` country code of the
-            country where the location is located.
-        state (:obj:`str`): Optional. State of the location.
-        city (:obj:`str`): Optional. City of the location.
-        street (:obj:`str`): Optional. Street address of the location.
-
     """
 
     __slots__ = ("city", "country_code", "state", "street")
@@ -166,10 +143,6 @@ class StoryAreaType(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of the area.
-
-    Attributes:
-        type (:obj:`str`): Type of the area.
-
     """
 
     __slots__ = ("type",)
@@ -214,10 +187,6 @@ class StoryAreaTypeLocation(StoryAreaType):
 
     Attributes:
         type (:obj:`str`): Type of the area, always :attr:`~telegram.StoryAreaType.LOCATION`.
-        latitude (:obj:`float`): Location latitude in degrees.
-        longitude (:obj:`float`): Location longitude in degrees.
-        address (:class:`telegram.LocationAddress`): Optional. Address of the location.
-
     """
 
     __slots__ = ("address", "latitude", "longitude")
@@ -261,11 +230,6 @@ class StoryAreaTypeSuggestedReaction(StoryAreaType):
     Attributes:
         type (:obj:`str`): Type of the area, always
             :tg-const:`~telegram.StoryAreaType.SUGGESTED_REACTION`.
-        reaction_type (:class:`ReactionType`): Type of the reaction.
-        is_dark (:obj:`bool`): Optional. Pass :obj:`True` if the reaction area has a dark
-            background.
-        is_flipped (:obj:`bool`): Optional. Pass :obj:`True` if reaction area corner is flipped.
-
     """
 
     __slots__ = ("is_dark", "is_flipped", "reaction_type")
@@ -302,8 +266,6 @@ class StoryAreaTypeLink(StoryAreaType):
 
     Attributes:
         type (:obj:`str`): Type of the area, always :attr:`~telegram.StoryAreaType.LINK`.
-        url (:obj:`str`): ``HTTP`` or ``tg://`` URL to be opened when the area is clicked.
-
     """
 
     __slots__ = ("url",)
@@ -341,10 +303,6 @@ class StoryAreaTypeWeather(StoryAreaType):
     Attributes:
         type (:obj:`str`): Type of the area, always
             :tg-const:`~telegram.StoryAreaType.WEATHER`.
-        temperature (:obj:`float`): Temperature, in degree Celsius.
-        emoji (:obj:`str`): Emoji representing the weather.
-        background_color (:obj:`int`): A color of the area background in the ``ARGB`` format.
-
     """
 
     __slots__ = ("background_color", "emoji", "temperature")
@@ -383,8 +341,6 @@ class StoryAreaTypeUniqueGift(StoryAreaType):
     Attributes:
         type (:obj:`str`): Type of the area, always
             :tg-const:`~telegram.StoryAreaType.UNIQUE_GIFT`.
-        name (:obj:`str`): Unique name of the gift.
-
     """
 
     __slots__ = ("name",)
@@ -414,11 +370,6 @@ class StoryArea(TelegramObject):
     Args:
         position (:class:`telegram.StoryAreaPosition`): Position of the area.
         type (:class:`telegram.StoryAreaType`): Type of the area.
-
-    Attributes:
-        position (:class:`telegram.StoryAreaPosition`): Position of the area.
-        type (:class:`telegram.StoryAreaType`): Type of the area.
-
     """
 
     __slots__ = ("position", "type")

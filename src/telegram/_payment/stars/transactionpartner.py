@@ -68,9 +68,6 @@ class TransactionPartner(TelegramObject):
 
     Args:
         type (:obj:`str`): The type of the transaction partner.
-
-    Attributes:
-        type (:obj:`str`): The type of the transaction partner.
     """
 
     __slots__ = ("type",)
@@ -152,10 +149,6 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.AFFILIATE_PROGRAM`.
-        sponsor_user (:class:`telegram.User`): Optional. Information about the bot that sponsored
-            the affiliate program
-        commission_per_mille (:obj:`int`): The number of Telegram Stars received by the bot for
-            each 1000 Telegram Stars received by the affiliate program sponsor from referred users.
     """
 
     __slots__ = ("commission_per_mille", "sponsor_user")
@@ -204,9 +197,6 @@ class TransactionPartnerChat(TransactionPartner):
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.CHAT`.
-        chat (:class:`telegram.Chat`): Information about the chat.
-        gift (:class:`telegram.Gift`): Optional. The gift sent to the user by the bot.
-
     """
 
     __slots__ = (
@@ -255,8 +245,6 @@ class TransactionPartnerFragment(TransactionPartner):
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.FRAGMENT`.
-        withdrawal_state (:class:`telegram.RevenueWithdrawalState`): Optional. State of the
-            transaction if the transaction is outgoing.
     """
 
     __slots__ = ("withdrawal_state",)
@@ -352,55 +340,11 @@ class TransactionPartnerUser(TransactionPartner):
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.USER`.
-        transaction_type (:obj:`str`): Type of the transaction, currently one of
-            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT` for payments via
-            invoices, :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
-            for payments for paid media,
-            :tg-const:`telegram.constants.TransactionPartnerUser.GIFT_PURCHASE` for gifts sent by
-            the bot, :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
-            for Telegram Premium subscriptions gifted by the bot,
-            :tg-const:`telegram.constants.TransactionPartnerUser.BUSINESS_ACCOUNT_TRANSFER` for
-            direct transfers from managed business accounts.
-
-            .. versionadded:: 22.1
-        user (:class:`telegram.User`): Information about the user.
-        affiliate (:class:`telegram.AffiliateInfo`): Optional. Information about the affiliate that
-            received a commission via this transaction. Can be available only for
-            :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT`
-            and :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
-            transactions.
-
-            .. versionadded:: 21.9
-        invoice_payload (:obj:`str`): Optional. Bot-specified invoice payload. Can be available
-            only for :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT`
-            transactions.
         subscription_period (:class:`datetime.timedelta`): Optional. The duration of the paid
             subscription. Can be available only for
             :tg-const:`telegram.constants.TransactionPartnerUser.INVOICE_PAYMENT` transactions.
 
             .. versionadded:: 21.8
-        paid_media (tuple[:class:`telegram.PaidMedia`]): Optional. Information about the paid
-            media bought by the user. for
-            :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT`
-            transactions only.
-
-            .. versionadded:: 21.5
-        paid_media_payload (:obj:`str`): Optional. Bot-specified paid media payload. Can be
-            available only for
-            :tg-const:`telegram.constants.TransactionPartnerUser.PAID_MEDIA_PAYMENT` transactions.
-
-            .. versionadded:: 21.6
-        gift (:class:`telegram.Gift`): Optional. The gift sent to the user by the bot; for
-            :tg-const:`telegram.constants.TransactionPartnerUser.GIFT_PURCHASE` transactions only.
-
-            .. versionadded:: 21.8
-        premium_subscription_duration (:obj:`int`): Optional. Number of months the gifted Telegram
-            Premium subscription will be active for; for
-            :tg-const:`telegram.constants.TransactionPartnerUser.PREMIUM_PURCHASE`
-            transactions only.
-
-            .. versionadded:: 22.1
-
     """
 
     __slots__ = (
@@ -511,8 +455,6 @@ class TransactionPartnerTelegramApi(TransactionPartner):
     Attributes:
         type (:obj:`str`): The type of the transaction partner,
             always :tg-const:`telegram.TransactionPartner.TELEGRAM_API`.
-        request_count (:obj:`int`): The number of successful requests that exceeded regular limits
-            and were therefore billed.
     """
 
     __slots__ = ("request_count",)

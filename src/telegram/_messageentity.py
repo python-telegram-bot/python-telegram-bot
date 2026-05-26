@@ -92,52 +92,6 @@ class MessageEntity(TelegramObject):
             |datetime_localization|
 
             .. versionadded:: 22.7
-    Attributes:
-        type (:obj:`str`): Type of the entity.  Can be :attr:`MENTION` (``@username``),
-            :attr:`HASHTAG` (``#hashtag`` or ``#hashtag@chatusername``), :attr:`CASHTAG` (``$USD``
-            or ``USD@chatusername``), :attr:`BOT_COMMAND` (``/start@jobs_bot``), :attr:`URL`
-            (``https://telegram.org``), :attr:`EMAIL` (``do-not-reply@telegram.org``),
-            :attr:`PHONE_NUMBER` (``+1-212-555-0123``),
-            :attr:`BOLD` (**bold text**), :attr:`ITALIC` (*italic text*), :attr:`UNDERLINE`
-            (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
-            :attr:`BLOCKQUOTE` (block quotation), :attr:`CODE` (monowidth string), :attr:`PRE`
-            (monowidth block), :attr:`TEXT_LINK` (for clickable text URLs), :attr:`TEXT_MENTION`
-            (for users without usernames), :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers)
-            or :attr:`DATE_TIME` (for formatted date and time).
-
-            .. versionadded:: 20.0
-                Added inline custom emoji
-
-            .. versionadded:: 20.8
-                Added block quotation
-
-            .. versionadded:: 22.7
-                Added date_time
-        offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
-        length (:obj:`int`): Length of the entity in UTF-16 code units.
-        url (:obj:`str`): Optional. For :attr:`TEXT_LINK` only, url that will be opened after
-            user taps on the text.
-        user (:class:`telegram.User`): Optional. For :attr:`TEXT_MENTION` only, the mentioned
-             user.
-        language (:obj:`str`): Optional. For :attr:`PRE` only, the programming language of
-            the entity text.
-        custom_emoji_id (:obj:`str`): Optional. For :attr:`CUSTOM_EMOJI` only, unique identifier
-            of the custom emoji. Use :meth:`telegram.Bot.get_custom_emoji_stickers` to get full
-            information about the sticker.
-
-            .. versionadded:: 20.0
-        date_time_format (:obj:`str`): Optional. For :attr:`DATE_TIME` only, the string that
-            defines the formatting of the date and time. See `date-time entity formatting
-            <https://core.telegram.org/bots/api#date-time-entity-formatting>`_ for more details and
-            :class:`telegram.constants.MessageEntityDateTimeFormats` for all possible formats.
-
-            .. versionadded:: 22.7
-        unix_time (:class:`datetime.datetime`): Optional. For :attr:`DATE_TIME` only, the time
-            associated with the entity.
-            |datetime_localization|
-
-            .. versionadded:: 22.7
-
     """
 
     __slots__ = (

@@ -65,40 +65,6 @@ class WebhookInfo(TelegramObject):
             subscribed to. Defaults to all update types, except
             :attr:`telegram.Update.chat_member`.
 
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
-        last_synchronization_error_date (:class:`datetime.datetime`, optional): Datetime of the
-            most recent error that happened when trying to synchronize available updates with
-            Telegram datacenters.
-
-            .. versionadded:: 20.0
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-    Attributes:
-        url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
-        has_custom_certificate (:obj:`bool`): :obj:`True`, if a custom certificate was provided for
-            webhook certificate checks.
-        pending_update_count (:obj:`int`): Number of updates awaiting delivery.
-        ip_address (:obj:`str`): Optional. Currently used webhook IP address.
-        last_error_date (:class:`datetime.datetime`): Optional. Datetime for the most recent
-            error that happened when trying to deliver an update via webhook.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-        last_error_message (:obj:`str`): Optional. Error message in human-readable format for the
-            most recent error that happened when trying to deliver an update via webhook.
-        max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
-            connections to the webhook for update delivery.
-        allowed_updates (tuple[:obj:`str`]): Optional. A tuple of update types the bot is
-            subscribed to. Defaults to all update types, except
-            :attr:`telegram.Update.chat_member`.
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
         last_synchronization_error_date (:class:`datetime.datetime`, optional): Datetime of the
             most recent error that happened when trying to synchronize available updates with
             Telegram datacenters.

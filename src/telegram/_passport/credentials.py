@@ -121,14 +121,6 @@ class EncryptedCredentials(TelegramObject):
             authentication or base64 encrypted data.
         hash (:obj:`str`): Base64-encoded data hash for data authentication.
         secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
-
-    Attributes:
-        data (:class:`telegram.Credentials` | :obj:`str`): Decrypted data with unique user's
-            nonce, data hashes and secrets used for EncryptedPassportElement decryption and
-            authentication or base64 encrypted data.
-        hash (:obj:`str`): Base64-encoded data hash for data authentication.
-        secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
-
     """
 
     __slots__ = (
@@ -212,7 +204,7 @@ class EncryptedCredentials(TelegramObject):
 
 class Credentials(TelegramObject):
     """
-    Attributes:
+    Args:
         secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
         nonce (:obj:`str`): Bot-specified nonce
     """
@@ -268,28 +260,6 @@ class SecureData(TelegramObject):
         passport_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
             registration from internal passport.
         temporary_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            temporary registration.
-
-    Attributes:
-        personal_details (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
-            personal details.
-        passport (:class:`telegram.SecureValue`): Optional. Credentials for encrypted passport.
-        internal_passport (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
-            internal passport.
-        driver_license (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
-            driver license.
-        identity_card (:class:`telegram.SecureValue`): Optional. Credentials for encrypted ID card
-        address (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
-            residential address.
-        utility_bill (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
-            utility bill.
-        bank_statement (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
-            bank statement.
-        rental_agreement (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
-            rental agreement.
-        passport_registration (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
-            registration from internal passport.
-        temporary_registration (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             temporary registration.
     """
 
@@ -383,43 +353,13 @@ class SecureValue(TelegramObject):
         selfie (:class:`telegram.FileCredentials`, optional): Credentials for encrypted selfie
             of the user with a document. Can be available for "passport", "driver_license",
             "identity_card" and "internal_passport".
-        translation (list[:class:`telegram.FileCredentials`], optional): Credentials for an
+        translation (Sequence[:class:`telegram.FileCredentials`], optional): Credentials for an
             encrypted translation of the document. Available for "passport", "driver_license",
             "identity_card", "internal_passport", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration" and "temporary_registration".
-        files (list[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
+        files (Sequence[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
             files. Available for "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
-
-    Attributes:
-        data (:class:`telegram.DataCredentials`): Optional. Credentials for encrypted Telegram
-            Passport data. Available for "personal_details", "passport", "driver_license",
-            "identity_card", "identity_passport" and "address" types.
-        front_side (:class:`telegram.FileCredentials`): Optional. Credentials for encrypted
-            document's front side. Available for "passport", "driver_license", "identity_card"
-            and "internal_passport".
-        reverse_side (:class:`telegram.FileCredentials`): Optional. Credentials for encrypted
-            document's reverse side. Available for "driver_license" and "identity_card".
-        selfie (:class:`telegram.FileCredentials`): Optional. Credentials for encrypted selfie
-            of the user with a document. Can be available for "passport", "driver_license",
-            "identity_card" and "internal_passport".
-        translation (tuple[:class:`telegram.FileCredentials`]): Optional. Credentials for an
-            encrypted translation of the document. Available for "passport", "driver_license",
-            "identity_card", "internal_passport", "utility_bill", "bank_statement",
-            "rental_agreement", "passport_registration" and "temporary_registration".
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
-        files (tuple[:class:`telegram.FileCredentials`]): Optional. Credentials for encrypted
-            files. Available for "utility_bill", "bank_statement", "rental_agreement",
-            "passport_registration" and "temporary_registration" types.
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-
     """
 
     __slots__ = ("data", "files", "front_side", "reverse_side", "selfie", "translation")
@@ -492,8 +432,8 @@ class DataCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted data
 
     Attributes:
-        hash (:obj:`str`): Checksum of encrypted data
-        secret (:obj:`str`): Secret of encrypted data
+        hash (:obj:`str`): Checksum of encrypted data.
+        file_hash (:obj:`str`): Alias for :attr:`hash`.
     """
 
     __slots__ = ()
@@ -513,8 +453,8 @@ class FileCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted file
 
     Attributes:
-        hash (:obj:`str`): Checksum of encrypted file
-        secret (:obj:`str`): Secret of encrypted file
+        hash (:obj:`str`): Checksum of encrypted file.
+        data_hash (:obj:`str`): Alias for :attr:`hash`.
     """
 
     __slots__ = ()
