@@ -1090,7 +1090,7 @@ class _ChatBase(TelegramObject):
     async def send_message_draft(
         self,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
@@ -1106,6 +1106,9 @@ class _ChatBase(TelegramObject):
              await bot.send_message_draft(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message_draft`.
+
+        .. versionchanged:: NEXT.VERSION
+            Bot API 10.0 makes the ``text`` argument optional.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

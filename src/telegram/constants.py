@@ -87,6 +87,7 @@ __all__ = [
     "KeyboardButtonRequestUsersLimit",
     "KeyboardButtonStyle",
     "LocationLimit",
+    "ManagedBotAccessLimit",
     "MaskPosition",
     "MediaGroupLimit",
     "MenuButtonType",
@@ -101,6 +102,7 @@ __all__ = [
     "OwnedGiftType",
     "PaidMediaType",
     "ParseMode",
+    "PersonalChatMessagesLimit",
     "PollLimit",
     "PollType",
     "PollingLimit",
@@ -2568,6 +2570,28 @@ class PaidMediaType(StringEnum):
     """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
 
 
+class PersonalChatMessagesLimit(IntEnum):
+    """This enum contains limitations for
+    :paramref:`telegram.Bot.get_user_personal_chat_messages.limit`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.get_user_personal_chat_messages.limit`
+    parameter of :meth:`telegram.Bot.get_user_personal_chat_messages`.
+    """
+    MAX_LIMIT = 20
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.get_user_personal_chat_messages.limit`
+    parameter of :meth:`telegram.Bot.get_user_personal_chat_messages`.
+    """
+
+
 class PollingLimit(IntEnum):
     """This enum contains limitations for :paramref:`telegram.Bot.get_updates.limit`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -4037,6 +4061,22 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Woman Shrugging"""
     POUTING_FACE = "😡"
     """:obj:`str`: Pouting face"""
+
+
+class ManagedBotAccessLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.set_managed_bot_access_settings`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_ALLOWED_USERS = 10
+    """:obj:`int`: Maximum number of users that can be allowed to access a managed bot in the
+    :paramref:`~telegram.Bot.set_managed_bot_access_settings.added_user_ids` parameter of
+    :meth:`~telegram.Bot.set_managed_bot_access_settings`.
+    """
 
 
 class VerifyLimit(IntEnum):

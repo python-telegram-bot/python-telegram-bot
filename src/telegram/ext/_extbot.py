@@ -38,6 +38,7 @@ from telegram import (
     Animation,
     Audio,
     Bot,
+    BotAccessSettings,
     BotCommand,
     BotCommandScope,
     BotDescription,
@@ -3150,7 +3151,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: int,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
@@ -5034,6 +5035,74 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_managed_bot_access_settings(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> BotAccessSettings:
+
+        return await super().get_managed_bot_access_settings(
+            user_id=user_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_managed_bot_access_settings(
+        self,
+        user_id: int,
+        is_access_restricted: bool,
+        added_user_ids: Sequence[int] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+
+        return await super().set_managed_bot_access_settings(
+            user_id=user_id,
+            is_access_restricted=is_access_restricted,
+            added_user_ids=added_user_ids,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_user_personal_chat_messages(
+        self,
+        user_id: int,
+        limit: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> tuple[Message, ...]:
+        return await super().get_user_personal_chat_messages(
+            user_id=user_id,
+            limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def send_paid_media(
         self,
         chat_id: str | int,
@@ -5814,5 +5883,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     getManagedBotToken = get_managed_bot_token
     replaceManagedBotToken = replace_managed_bot_token
     savePreparedKeyboardButton = save_prepared_keyboard_button
+    getManagedBotAccessSettings = get_managed_bot_access_settings
+    setManagedBotAccessSettings = set_managed_bot_access_settings
+    getUserPersonalChatMessages = get_user_personal_chat_messages
     deleteMessageReaction = delete_message_reaction
     deleteAllMessageReactions = delete_all_message_reactions

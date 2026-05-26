@@ -47,7 +47,8 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-from telegram._botcommand import BotCommand  # pylint: disable=ungrouped-imports
+from telegram._botaccesssettings import BotAccessSettings  # pylint: disable=ungrouped-imports
+from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
 from telegram._botname import BotName
@@ -1209,7 +1210,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: int,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
@@ -1221,7 +1222,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Use this method to stream a partial message to a user while the message is being
-        generated.
+        generated. Note that the streamed draft is ephemeral and acts as a temporary 30-second
+        preview - once the output is finalized, you must call :meth:`~Bot.send_message` with
+        the complete message to persist it in the user's chat.
 
         .. versionadded:: 22.6
 
@@ -1233,19 +1236,21 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             chat_id (:obj:`int`): Unique identifier for the target private chat.
             draft_id (:obj:`int`): Unique identifier of the message draft; must be non-zero.
                 Changes of drafts with the same identifier are animated.
-            text (:obj:`str`): Text of the message to be sent,
-                :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
-                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
-                entities parsing.
+            text (:obj:`str`, optional): Text of the message to be sent,
+                0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                entities parsing. Pass an empty text to show a "Thinking..." placeholder.
+
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 10.0 now makes this an optional parameter.
+
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target
+                message thread.
             parse_mode (:obj:`str`): |parse_mode|
             entities (Sequence[:class:`telegram.MessageEntity`], optional): Sequence of special
                 entities that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
 
                     |sequenceargs|
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target
-                message thread.
-
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -11127,6 +11132,145 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def get_managed_bot_access_settings(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> BotAccessSettings:
+        """
+        Use this method to get the access settings of a managed bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): User identifier of the managed bot whose access settings will be
+                returned.
+
+        Returns:
+            :class:`telegram.BotAccessSettings`: The access settings of the managed bot.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+
+        data: JSONDict = {
+            "user_id": user_id,
+        }
+
+        return BotAccessSettings.de_json(
+            await self._post(
+                "getManagedBotAccessSettings",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
+        )
+
+    async def set_managed_bot_access_settings(
+        self,
+        user_id: int,
+        is_access_restricted: bool,
+        added_user_ids: Sequence[int] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Use this method to change the access settings of a managed bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): User identifier of the managed bot whose access settings will be
+                changed.
+            is_access_restricted (:obj:`bool`): Pass :obj:`True`, if only selected users can access
+                the bot. The bot's owner can always access it.
+            added_user_ids (Sequence[:obj:`int`], optional): A list of up to
+                :tg-const:`telegram.constants.ManagedBotAccessLimit.MAX_ALLOWED_USERS`
+                identifiers of users who will have access to the bot in addition to its owner.
+                Ignored if :paramref:`is_access_restricted` is :obj:`False`.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+
+        data: JSONDict = {
+            "user_id": user_id,
+            "is_access_restricted": is_access_restricted,
+            "added_user_ids": added_user_ids,
+        }
+
+        return await self._post(
+            "setManagedBotAccessSettings",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_user_personal_chat_messages(
+        self,
+        user_id: int,
+        limit: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> tuple[Message, ...]:
+        """
+        Use this method to get the last messages from the personal chat (i.e., the chat currently
+        added to their profile) of a given user.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user.
+            limit (:obj:`int`): The maximum number of messages to return;
+                :tg-const:`telegram.constants.PersonalChatMessagesLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.PersonalChatMessagesLimit.MAX_LIMIT`.
+
+        Returns:
+            tuple[:class:`telegram.Message`, ...]: On success, a tuple of
+            :class:`telegram.Message` objects is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+
+        data: JSONDict = {"user_id": user_id, "limit": limit}
+
+        return Message.de_list(
+            await self._post(
+                "getUserPersonalChatMessages",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
+        )
+
     async def send_paid_media(
         self,
         chat_id: str | int,
@@ -12733,6 +12877,12 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`replace_managed_bot_token`"""
     savePreparedKeyboardButton = save_prepared_keyboard_button
     """Alias for :meth:`save_prepared_keyboard_button`"""
+    getManagedBotAccessSettings = get_managed_bot_access_settings
+    """Alias for :meth:`get_managed_bot_access_settings`"""
+    setManagedBotAccessSettings = set_managed_bot_access_settings
+    """Alias for :meth:`set_managed_bot_access_settings`"""
+    getUserPersonalChatMessages = get_user_personal_chat_messages
+    """Alias for :meth:`get_user_personal_chat_messages`"""
     deleteMessageReaction = delete_message_reaction
     """Alias for :meth:`delete_message_reaction`"""
     deleteAllMessageReactions = delete_all_message_reactions

@@ -33,6 +33,7 @@ import pytest
 
 from telegram import (
     Bot,
+    BotAccessSettings,
     BotCommand,
     BotCommandScopeChat,
     BotDescription,
@@ -2920,6 +2921,42 @@ class TestBotWithoutRequest:
         )
         assert isinstance(inst, PreparedKeyboardButton)
 
+    async def test_get_managed_bot_access_settings(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            return BotAccessSettings(
+                is_access_restricted=True,
+                added_users=[User(1, "first", False)],
+            ).to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        settings = await offline_bot.get_managed_bot_access_settings(1234)
+        assert isinstance(settings, BotAccessSettings)
+
+    async def test_set_managed_bot_access_settings(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            assert request_data.parameters.get("is_access_restricted") is True
+            assert request_data.parameters.get("added_user_ids") == [1, 2, 3]
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.set_managed_bot_access_settings(
+            1234,
+            is_access_restricted=True,
+            added_user_ids=[1, 2, 3],
+        )
+
+    async def test_get_user_personal_chat_messages(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            assert request_data.parameters.get("limit") == 1
+            return [make_message("dummy reply").to_dict()]
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        msgs = await offline_bot.get_user_personal_chat_messages(1234, limit=1)
+        assert isinstance(msgs, tuple)
+        assert all(isinstance(msg, Message) for msg in msgs)
+
     # Bots cannot delete their own reaction from my testing, so we aren't making a real request
     async def test_delete_message_reaction(self, offline_bot, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -4947,6 +4984,12 @@ class TestBotWithRequest:
         )
         bot_profile_photos = await bot.get_user_profile_photos(bot.id)
         assert bot_profile_photos.total_count == 1
+
+    async def test_get_user_personal_chat_messages(self, bot):
+        # id is of the Test User
+        messages = await bot.get_user_personal_chat_messages(user_id=675666224, limit=2)
+        assert isinstance(messages, tuple)
+        assert len(messages) == 2
 
     async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
         """Test that requests and bot user are initialized separately and only once."""
