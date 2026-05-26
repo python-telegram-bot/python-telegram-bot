@@ -63,7 +63,7 @@ class BotAccessSettings(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.is_access_restricted: bool = is_access_restricted
-        self.added_users: tuple[User, ...] | None = parse_sequence_arg(added_users)
+        self.added_users: tuple[User, ...] = parse_sequence_arg(added_users)
 
         self._id_attrs = (self.is_access_restricted, self.added_users)
         self._freeze()

@@ -1237,8 +1237,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             draft_id (:obj:`int`): Unique identifier of the message draft; must be non-zero.
                 Changes of drafts with the same identifier are animated.
             text (:obj:`str`, optional): Text of the message to be sent,
-                :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
-                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing. Pass an empty text to show a "Thinking..." placeholder.
 
                 .. versionchanged:: NEXT.VERSION
@@ -11198,9 +11197,10 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 changed.
             is_access_restricted (:obj:`bool`): Pass :obj:`True`, if only selected users can access
                 the bot. The bot's owner can always access it.
-            added_user_ids (Sequence[:obj:`int`], optional): A list of up to 10 identifiers of
-                users who will have access to the bot in addition to its owner. Ignored if
-                :paramref:`is_access_restricted` is :obj:`False`.
+            added_user_ids (Sequence[:obj:`int`], optional): A list of up to
+                :tg-const:`telegram.constants.ManagedBotAccessLimit.MAX_ALLOWED_USERS`
+                identifiers of users who will have access to the bot in addition to its owner.
+                Ignored if :paramref:`is_access_restricted` is :obj:`False`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

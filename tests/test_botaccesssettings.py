@@ -20,7 +20,7 @@
 
 import pytest
 
-from telegram import BotAccessSettings
+from telegram import BotAccessSettings, Dice
 from telegram._user import User
 from tests.auxil.slots import mro_slots
 
@@ -72,6 +72,7 @@ class TestBotAccessSettingsWithoutRequest(BotAccessSettingsTestBase):
         b = BotAccessSettings(is_access_restricted=True, added_users=self.added_users)
         c = BotAccessSettings(is_access_restricted=False, added_users=self.added_users)
         d = BotAccessSettings(is_access_restricted=True, added_users=None)
+        e = Dice(emoji="🎲", value=4)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -81,3 +82,6 @@ class TestBotAccessSettingsWithoutRequest(BotAccessSettingsTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
