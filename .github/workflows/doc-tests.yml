@@ -1,11 +1,11 @@
-name: Test Admonitions Generation
+name: Test Admonitions & Attributes Generation
 on:
   pull_request:
     types: [synchronize, reopened, ready_for_review]
     paths:
       - src/telegram/**
       - docs/**
-      - .github/workflows/docs-admonitions.yml
+      - .github/workflows/doc-tests.yml
   push:
     branches:
       - master
@@ -13,8 +13,8 @@ on:
 permissions: {}
 
 jobs:
-  test-admonitions:
-    name: Test Admonitions Generation
+  test-admonitions-attributes:
+    name: Test Admonitions & Attributes Generation
     runs-on: ${{matrix.os}}
     permissions:
       # for uploading artifacts
@@ -38,5 +38,5 @@ jobs:
         run: |
           python -W ignore -m pip install --upgrade pip
           python -W ignore -m pip install .[all] --group all
-      - name: Test autogeneration of admonitions
-        run: pytest -v --tb=short tests/docs/admonition_inserter.py
+      - name: Test autogeneration of admonitions and attributes
+        run: pytest -v --tb=short tests/docs/admonition_inserter.py tests/docs/attributes_inserter.py
