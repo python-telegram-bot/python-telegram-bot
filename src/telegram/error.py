@@ -54,6 +54,9 @@ class TelegramError(Exception):
         conversion of the data may be needed on major updates of the library.
 
     .. seealso:: :wiki:`Exceptions, Warnings and Logging <Exceptions%2C-Warnings-and-Logging>`
+
+    Args:
+        message (:obj:`str`): The error message.
     """
 
     __slots__ = ("message",)

@@ -1,6 +1,10 @@
-documentation = "Documentation Improvements"
+documentation = """Documentation Improvements
+
+* Autogenerate "Attributes" section for easier maintainence and reliability.
+"""
 
 pull_requests = [
     { uid = "5240", author_uids = ["harshil21", "Poolitzer"] },
     { uid = "5241", author_uids = ["harshil21"] },
+    { uid = "5245", author_uids = ["harshil21"] },
 ]
