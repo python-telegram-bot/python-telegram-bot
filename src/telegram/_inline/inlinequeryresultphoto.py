@@ -47,7 +47,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
             must not exceed 5MB.
         thumbnail_url (:obj:`str`): URL of the thumbnail for the photo.
@@ -66,48 +66,17 @@ class InlineQueryResultPhoto(InlineQueryResult):
             entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the photo.
-        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+        show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
 
             .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.PHOTO`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
-            must not exceed 5MB.
         thumbnail_url (:obj:`str`): URL of the thumbnail for the photo.
-        photo_width (:obj:`int`): Optional. Width of the photo.
-        photo_height (:obj:`int`): Optional. Height of the photo.
-        title (:obj:`str`): Optional. Title for the result.
-        description (:obj:`str`): Optional. Short description of the result.
-        caption (:obj:`str`): Optional. Caption of the photo to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
-            entities parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the photo.
-        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
-
-            .. versionadded:: 21.3
-
     """
 
     __slots__ = (

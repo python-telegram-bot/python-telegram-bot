@@ -253,129 +253,12 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 22.7
 
-
     Attributes:
-        id (:obj:`int`): Unique identifier for this chat.
-        type (:obj:`str`): Type of chat, can be either :attr:`PRIVATE`, :attr:`GROUP`,
-            :attr:`SUPERGROUP` or :attr:`CHANNEL`.
-        accent_color_id (:obj:`int`): Optional. Identifier of the
-            :class:`accent color <telegram.constants.AccentColor>` for the chat name and
-            backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
-            for more details.
-
-            .. versionadded:: 20.8
-        max_reaction_count (:obj:`int`): The maximum number of reactions that can be set on a
-            message in the chat.
-
-            .. versionadded:: 21.2
-        accepted_gift_types (:class:`telegram.AcceptedGiftTypes`): Information about types of
-            gifts that are accepted by the chat or by the corresponding user for private chats.
-
-            .. versionadded:: 22.1
-        title (:obj:`str`, optional): Title, for supergroups, channels and group chats.
-        username (:obj:`str`, optional): Username, for private chats, supergroups and channels if
-            available.
-        first_name (:obj:`str`, optional): First name of the other party in a private chat.
-        last_name (:obj:`str`, optional): Last name of the other party in a private chat.
-        is_forum (:obj:`bool`, optional): :obj:`True`, if the supergroup chat is a forum
-            (has topics_ enabled).
-
-            .. versionadded:: 20.0
-        photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
-        active_usernames (tuple[:obj:`str`]): Optional. If set, the list of all `active chat
-            usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
-            #collectible-usernames>`_; for private chats, supergroups and channels.
-
-            This list is empty if the chat has no active usernames or this chat instance was not
-            obtained via :meth:`~telegram.Bot.get_chat`.
-
-            .. versionadded:: 20.0
-        birthdate (:class:`telegram.Birthdate`): Optional. For private chats,
-            the date of birth of the user.
-
-            .. versionadded:: 21.1
-        business_intro (:class:`telegram.BusinessIntro`): Optional. For private chats with
-            business accounts, the intro of the business.
-
-            .. versionadded:: 21.1
-        business_location (:class:`telegram.BusinessLocation`): Optional. For private chats with
-            business accounts, the location of the business.
-
-            .. versionadded:: 21.1
-        business_opening_hours (:class:`telegram.BusinessOpeningHours`): Optional. For private
-            chats with business accounts, the opening hours of the business.
-
-            .. versionadded:: 21.1
-        personal_chat (:class:`telegram.Chat`): Optional. For private chats, the personal channel
-            of the user.
-
-            .. versionadded:: 21.1
-        available_reactions (tuple[:class:`telegram.ReactionType`]): Optional. List of available
-            reactions allowed in the chat. If omitted, then all of
-            :const:`telegram.constants.ReactionEmoji` are allowed.
-
-            .. versionadded:: 20.8
-        background_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji chosen
-            by the chat for the reply header and link preview background.
-
-            .. versionadded:: 20.8
-        profile_accent_color_id (:obj:`int`): Optional. Identifier of the
-            :class:`accent color <telegram.constants.ProfileAccentColor>` for the chat's profile
-            background. See profile `accent colors`_ for more details.
-
-            .. versionadded:: 20.8
-        profile_background_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of
-            the emoji chosen by the chat for its profile background.
-
-            .. versionadded:: 20.8
-        emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
-            status of the chat or the other party in a private chat.
-
-            .. versionadded:: 20.0
-        emoji_status_expiration_date (:class:`datetime.datetime`): Optional. Expiration date of
-            emoji status of the chat or the other party in a private chat, as a datetime object,
-            if any.
-
-            |datetime_localization|
-
-            .. versionadded:: 20.5
-        bio (:obj:`str`): Optional. Bio of the other party in a private chat.
-        has_private_forwards (:obj:`bool`): Optional. :obj:`True`, if privacy settings of the other
-            party in the private chat allows to use ``tg://user?id=<user_id>`` links only in chats
-            with the user.
-
-            .. versionadded:: 13.9
-        has_restricted_voice_and_video_messages (:obj:`bool`): Optional. :obj:`True`, if the
-            privacy settings of the other party restrict sending voice and video note messages
-            in the private chat.
-
-            .. versionadded:: 20.0
-        join_to_send_messages (:obj:`bool`): Optional. :obj:`True`, if users need to join
-            the supergroup before they can send messages.
-
-            .. versionadded:: 20.0
-        join_by_request (:obj:`bool`): Optional. :obj:`True`, if all users directly joining the
-            supergroup without using an invite link need to be approved by supergroup
-            administrators.
-
-            .. versionadded:: 20.0
-        description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
-        invite_link (:obj:`str`): Optional. Primary invite link, for groups, supergroups and
-            channel.
-        pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
-            (by sending date).
-        permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
-            for groups and supergroups.
         slow_mode_delay (:obj:`int` | :class:`datetime.timedelta`): Optional. For supergroups,
             the minimum allowed delay between consecutive messages sent by each unprivileged user.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        unrestrict_boost_count (:obj:`int`): Optional. For supergroups, the minimum number of
-            boosts that a non-administrator user needs to add in order to ignore slow mode and chat
-            permissions.
-
-            .. versionadded:: 21.0
         message_auto_delete_time (:obj:`int` | :class:`datetime.timedelta`): Optional. The time
             after which all messages sent to the chat will be automatically deleted; in seconds.
 
@@ -383,65 +266,6 @@ class ChatFullInfo(_ChatBase):
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
-            anti-spam checks are enabled in the supergroup. The field is only available to chat
-            administrators.
-
-            .. versionadded:: 20.0
-        has_hidden_members (:obj:`bool`): Optional. :obj:`True`, if non-administrators can only
-            get the list of bots and administrators in the chat.
-
-            .. versionadded:: 20.0
-        has_protected_content (:obj:`bool`): Optional. :obj:`True`, if messages from the chat can't
-            be forwarded to other chats.
-
-            .. versionadded:: 13.9
-        has_visible_history (:obj:`bool`): Optional. :obj:`True`, if new chat members will have
-            access to old messages; available only to chat administrators.
-
-            .. versionadded:: 20.8
-        sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
-        can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
-            sticker set.
-        custom_emoji_sticker_set_name (:obj:`str`): Optional. For supergroups, the name of the
-            group's custom emoji sticker set. Custom emoji from this set can be used by all users
-            and bots in the group.
-
-            .. versionadded:: 21.0
-        linked_chat_id (:obj:`int`): Optional. Unique identifier for the linked chat, i.e. the
-            discussion group identifier for a channel and vice versa; for supergroups and channel
-            chats.
-        location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
-            the supergroup is connected.
-        can_send_paid_media (:obj:`bool`): Optional. :obj:`True`, if paid media messages can be
-            sent or forwarded to the channel chat. The field is available only for channel chats.
-
-            .. versionadded:: 21.4
-        is_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the chat is the direct messages
-            chat of a channel.
-
-            .. versionadded:: 22.4
-        parent_chat (:obj:`telegram.Chat`): Optional. Information about the corresponding channel
-            chat; for direct messages chats only.
-
-            .. versionadded:: 22.4
-        rating (:class:`telegram.UserRating`): Optional. For private chats, the rating of the user
-            if any.
-
-            .. versionadded:: 22.6
-        unique_gift_colors (:class:`telegram.UniqueGiftColors`): Optional. The color scheme based
-            on a unique gift that must be used for the chat's name, message replies and link
-            previews
-
-            .. versionadded:: 22.6
-        paid_message_star_count (:obj:`int`): Optional. The number of Telegram Stars a general user
-            have to pay to send a message to the chat
-
-            .. versionadded:: 22.6
-        first_profile_audio (:obj:`telegram.Audio`): Optional. For private chats, the first audio
-            added to the profile of the user.
-
-            .. versionadded:: 22.7
 
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups

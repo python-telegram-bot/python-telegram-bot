@@ -45,11 +45,6 @@ class ReactionType(TelegramObject):
         type (:obj:`str`): Type of the reaction. Can be
             :attr:`~telegram.ReactionType.EMOJI`, :attr:`~telegram.ReactionType.CUSTOM_EMOJI` or
             :attr:`~telegram.ReactionType.PAID`.
-    Attributes:
-        type (:obj:`str`): Type of the reaction. Can be
-            :attr:`~telegram.ReactionType.EMOJI`, :attr:`~telegram.ReactionType.CUSTOM_EMOJI` or
-            :attr:`~telegram.ReactionType.PAID`.
-
     """
 
     __slots__ = ("type",)
@@ -109,8 +104,6 @@ class ReactionTypeEmoji(ReactionType):
     Attributes:
         type (:obj:`str`): Type of the reaction,
             always :tg-const:`telegram.ReactionType.EMOJI`.
-        emoji (:obj:`str`): Reaction emoji. It can be one of
-        :const:`telegram.constants.ReactionEmoji`.
     """
 
     __slots__ = ("emoji",)
@@ -143,8 +136,6 @@ class ReactionTypeCustomEmoji(ReactionType):
     Attributes:
         type (:obj:`str`): Type of the reaction,
             always :tg-const:`telegram.ReactionType.CUSTOM_EMOJI`.
-        custom_emoji_id (:obj:`str`): Custom emoji identifier.
-
     """
 
     __slots__ = ("custom_emoji_id",)
@@ -195,7 +186,6 @@ class ReactionCount(TelegramObject):
 
     Attributes:
         type (:class:`telegram.ReactionType`): Type of the reaction.
-        total_count (:obj:`int`): Number of times the reaction was added.
     """
 
     __slots__ = (

@@ -45,7 +45,7 @@ class InlineQueryResultVenue(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` bytes.
         latitude (:obj:`float`): Latitude of the venue location in degrees.
         longitude (:obj:`float`): Longitude of the venue location in degrees.
         title (:obj:`str`): Title of the venue.
@@ -74,35 +74,6 @@ class InlineQueryResultVenue(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VENUE`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        latitude (:obj:`float`): Latitude of the venue location in degrees.
-        longitude (:obj:`float`): Longitude of the venue location in degrees.
-        title (:obj:`str`): Title of the venue.
-        address (:obj:`str`): Address of the venue.
-        foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue if known.
-        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
-            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
-            "food/icecream".)
-        google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
-        google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See
-            `supported types <https://developers.google.com/maps/documentation/places/web-service\
-            /place-types>`_.)
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the venue.
-        thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
-
-            .. versionadded:: 20.2
-        thumbnail_width (:obj:`int`): Optional. Thumbnail width.
-
-            .. versionadded:: 20.2
-        thumbnail_height (:obj:`int`): Optional. Thumbnail height.
-
-            .. versionadded:: 20.2
-
     """
 
     __slots__ = (

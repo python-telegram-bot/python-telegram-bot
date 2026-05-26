@@ -69,18 +69,6 @@ class InputPollOption(TelegramObject):
             :paramref:`text_parse_mode`.
             Currently, only custom emoji entities are allowed.
             This list is empty if the text does not contain entities.
-
-    Attributes:
-        text (:obj:`str`): Option text,
-            :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
-            characters.
-        text_parse_mode (:obj:`str`): Optional. |parse_mode|
-            Currently, only custom emoji entities are allowed.
-        text_entities (Sequence[:class:`telegram.MessageEntity`]): Special entities
-            that appear in the option :paramref:`text`. It can be specified instead of
-            :paramref:`text_parse_mode`.
-            Currently, only custom emoji entities are allowed.
-            This list is empty if the text does not contain entities.
     """
 
     __slots__ = ("text", "text_entities", "text_parse_mode")
@@ -142,34 +130,6 @@ class PollOption(TelegramObject):
 
             .. versionadded:: NEXT.VERSION
         addition_date (:obj:`datetime.datetime`, optional): Point in time
-            when the option was added; omitted if the option existed in the original poll.
-
-            .. versionadded:: NEXT.VERSION
-
-    Attributes:
-        persistent_id (:obj:`str`): Unique identifier of the option, persistent on option addition
-            and deletion.
-
-            .. versionadded:: NEXT.VERSION
-        text (:obj:`str`): Option text,
-            :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
-            characters.
-        voter_count (:obj:`int`): Number of users that voted for this option.
-        text_entities (tuple[:class:`telegram.MessageEntity`]): Special entities
-            that appear in the option text. Currently, only custom emoji entities are allowed in
-            poll option texts.
-            This list is empty if the question does not contain entities.
-
-            .. versionadded:: 21.2
-        added_by_user (:class:`telegram.User`): Optional. User who added the option;
-            omitted if the option wasn't added by a user after poll creation.
-
-            .. versionadded:: NEXT.VERSION
-        added_by_chat (:class:`telegram.Chat`): Optional. Chat that added the option;
-            omitted if the option wasn't added by a chat after poll creation.
-
-            .. versionadded:: NEXT.VERSION
-        addition_date (:obj:`datetime.datetime`): Optional. Point in time
             when the option was added; omitted if the option existed in the original poll.
 
             .. versionadded:: NEXT.VERSION
@@ -320,28 +280,6 @@ class PollAnswer(TelegramObject):
             poll, if the voter is anonymous.
 
             .. versionadded:: 20.5
-
-    Attributes:
-        poll_id (:obj:`str`): Unique poll identifier.
-        option_ids (tuple[:obj:`int`]): Identifiers of answer options, chosen by the user. May
-            be empty if the user retracted their vote.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-        option_persistent_ids (tuple[:obj:`str`]): Persistent identifiers of the
-            chosen answer options. May be empty if the vote was retracted.
-
-            .. versionadded:: NEXT.VERSION
-        user (:class:`telegram.User`): Optional. The user, who changed the answer to the
-            poll, if the voter isn't anonymous. If the voter is anonymous, this field will contain
-            the user :tg-const:`telegram.constants.ChatID.FAKE_CHANNEL` for backwards compatibility
-
-            .. versionchanged:: 20.5
-                :paramref:`user` became optional.
-        voter_chat (:class:`telegram.Chat`): Optional. The chat that changed the answer to the
-            poll, if the voter is anonymous.
-
-            .. versionadded:: 20.5
     """
 
     __slots__ = ("option_ids", "option_persistent_ids", "poll_id", "user", "voter_chat")
@@ -402,16 +340,6 @@ class PollOptionAdded(TelegramObject):
             Note that the Message object in this field will not contain the
             :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
         option_text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
-            entities that appear in the :paramref:`option_text`.
-
-    Attributes:
-        option_persistent_id (:obj:`str`): Unique identifier of the added option.
-        option_text (:obj:`str`): Option text.
-        poll_message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Message
-            containing the poll to which the option was added, if known.
-            Note that the Message object in this field will not contain the
-            :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
-        option_text_entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special
             entities that appear in the :paramref:`option_text`.
     """
 
@@ -486,7 +414,7 @@ class PollOptionAdded(TelegramObject):
         Note:
             This method should always be used instead of the :attr:`option_text_entities`
             attribute, since it calculates the correct substring from the message text based on
-            UTF-16 codepoints. See :attr:`parse_entity` for more info.
+            UTF-16 codepoints. See :attr:`parse_option_text_entity` for more info.
 
         Args:
             types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
@@ -517,16 +445,6 @@ class PollOptionDeleted(TelegramObject):
             Note that the Message object in this field will not contain the
             :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
         option_text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
-            entities that appear in the option_text.
-
-    Attributes:
-        option_persistent_id (:obj:`str`): Unique identifier of the deleted option.
-        option_text (:obj:`str`): Option text.
-        poll_message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Message
-            containing the poll to which the option was deleted, if known.
-            Note that the Message object in this field will not contain the
-            :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
-        option_text_entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special
             entities that appear in the option_text.
     """
 
@@ -601,7 +519,7 @@ class PollOptionDeleted(TelegramObject):
         Note:
             This method should always be used instead of the :attr:`option_text_entities`
             attribute, since it calculates the correct substring from the message text based on
-            UTF-16 codepoints. See :attr:`parse_entity` for more info.
+            UTF-16 codepoints. See :attr:`parse_option_text_entity` for more info.
 
         Args:
             types (list[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
@@ -633,6 +551,7 @@ class Poll(TelegramObject):
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
+        total_voter_count (:obj:`int`): Total number of users that voted in the poll.
         is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
@@ -689,70 +608,11 @@ class Poll(TelegramObject):
             .. versionadded:: NEXT.VERSION
 
     Attributes:
-        id (:obj:`str`): Unique poll identifier.
-        question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
-            :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-        options (tuple[:class:`~telegram.PollOption`]): List of poll options.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-        total_voter_count (:obj:`int`): Total number of users that voted in the poll.
-        is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
-        is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
-        type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
-        allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer
-            option. Available only for closed polls in the quiz mode, which were sent
-            (not forwarded), by the bot or to a private chat with the bot.
-
-            .. deprecated:: NEXT.VERSION
-                Use :attr:`correct_option_ids` instead.
-        explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
-            answer or taps on the lamp icon in a quiz-style poll,
-            0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
-        explanation_entities (tuple[:class:`telegram.MessageEntity`]): Special entities
-            like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
-            This list is empty if the message does not contain explanation entities.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
-            .. versionchanged:: 20.0
-               This attribute is now always a (possibly empty) list and never :obj:`None`.
         open_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Amount of time in seconds
             the poll will be active after creation.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
-            automatically closed.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-        question_entities (tuple[:class:`telegram.MessageEntity`]): Special entities
-            that appear in the :attr:`question`. Currently, only custom emoji entities are allowed
-            in poll questions.
-            This list is empty if the question does not contain entities.
-
-            .. versionadded:: 21.2
-        allows_revoting (:obj:`bool`): Optional. :obj:`True`, if the poll
-            allows to change the chosenanswer options
-
-            .. versionadded:: NEXT.VERSION
-        correct_option_ids (tuple[:class:`int`]): Array of 0-based identifiers of the
-            correct answer options. Available only for polls in quiz mode which are closed or were
-            sent (not forwarded) by the bot or to the private chat with the bot.
-
-            .. versionadded:: NEXT.VERSION
-        description (:obj:`str`): Optional. Description of the poll;
-            for polls inside the Message object only
-
-            .. versionadded:: NEXT.VERSION
-        description_entities (tuple[:class:`telegram.MessageEntity`]): Special
-            entities like usernames, URLs, bot commands, etc. that appear in the description
-
-            .. versionadded:: NEXT.VERSION
-
     """
 
     __slots__ = (

@@ -55,19 +55,6 @@ class SuggestedPostPrice(TelegramObject):
             nanotoncoins must be between
             :tg-const:`telegram.constants.SuggestedPost.MIN_PRICE_NANOTONCOINS`
             and :tg-const:`telegram.constants.SuggestedPost.MAX_PRICE_NANOTONCOINS`.
-
-    Attributes:
-        currency (:obj:`str`):
-            Currency in which the post will be paid. Currently, must be one of ``“XTR”`` for
-            Telegram Stars or ``“TON”`` for toncoins.
-        amount (:obj:`int`):
-            The amount of the currency that will be paid for the post in the smallest units of the
-            currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must
-            be between :tg-const:`telegram.constants.SuggestedPost.MIN_PRICE_STARS`
-            and :tg-const:`telegram.constants.SuggestedPost.MAX_PRICE_STARS`, and price in
-            nanotoncoins must be between
-            :tg-const:`telegram.constants.SuggestedPost.MIN_PRICE_NANOTONCOINS`
-            and :tg-const:`telegram.constants.SuggestedPost.MAX_PRICE_NANOTONCOINS`.
     """
 
     __slots__ = ("amount", "currency")
@@ -108,20 +95,6 @@ class SuggestedPostParameters(TelegramObject):
             within :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days) at
             the sole discretion of the user who approves it.
             |datetime_localization|
-
-    Attributes:
-        price (:class:`telegram.SuggestedPostPrice`):
-            Optional. Proposed price for the post. If the field is omitted, then the post
-            is unpaid.
-        send_date (:class:`datetime.datetime`):
-            Optional. Proposed send date of the post. If specified, then the date
-            must be between :tg-const:`telegram.constants.SuggestedPost.MIN_SEND_DATE`
-            second and :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days)
-            in the future. If the field is omitted, then the post can be published at any time
-            within :tg-const:`telegram.constants.SuggestedPost.MAX_SEND_DATE` seconds (30 days) at
-            the sole discretion of the user who approves it.
-            |datetime_localization|
-
     """
 
     __slots__ = ("price", "send_date")
@@ -178,21 +151,6 @@ class SuggestedPostInfo(TelegramObject):
             at any time within 30 days at the sole discretion of the user or administrator who
             approves it.
             |datetime_localization|
-
-    Attributes:
-        state (:obj:`str`):
-            State of the suggested post. Currently, it can be one of
-            :tg-const:`~telegram.constants.SuggestedPostInfoState.PENDING`,
-            :tg-const:`~telegram.constants.SuggestedPostInfoState.APPROVED`,
-            :tg-const:`~telegram.constants.SuggestedPostInfoState.DECLINED`.
-        price (:obj:`SuggestedPostPrice`):
-            Optional. Proposed price of the post. If the field is omitted, then the post is unpaid.
-        send_date (:class:`datetime.datetime`):
-            Optional. Proposed send date of the post. If the field is omitted, then the post can be
-            published at any time within 30 days at the sole discretion of the user or
-            administrator who approves it.
-            |datetime_localization|
-
     """
 
     __slots__ = ("price", "send_date", "state")
@@ -253,15 +211,6 @@ class SuggestedPostDeclined(TelegramObject):
             even if it itself is a reply.
         comment (:obj:`str`, optional):
             Comment with which the post was declined.
-
-    Attributes:
-        suggested_post_message (:class:`telegram.Message`):
-            Optional. Message containing the suggested post. Note that the
-            :class:`~telegram.Message` object in this field will not contain
-            the :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
-        comment (:obj:`str`):
-            Optional. Comment with which the post was declined.
-
     """
 
     __slots__ = ("comment", "suggested_post_message")
@@ -316,23 +265,6 @@ class SuggestedPostPaid(TelegramObject):
         star_amount (:class:`telegram.StarAmount`, optional):
             The amount of Telegram Stars that was received by the channel; for payments in Telegram
             Stars only.
-
-
-    Attributes:
-        suggested_post_message (:class:`telegram.Message`):
-            Optional. Message containing the suggested post. Note that the
-            :class:`~telegram.Message` object in this field will not contain
-            the :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
-        currency (:obj:`str`):
-            Currency in which the payment was made. Currently, one of ``“XTR”`` for Telegram Stars
-            or ``“TON”`` for toncoins.
-        amount (:obj:`int`):
-            Optional. The amount of the currency that was received by the channel in nanotoncoins;
-            for payments in toncoins only.
-        star_amount (:class:`telegram.StarAmount`):
-            Optional. The amount of Telegram Stars that was received by the channel; for payments
-            in Telegram Stars only.
-
     """
 
     __slots__ = ("amount", "currency", "star_amount", "suggested_post_message")
@@ -396,19 +328,6 @@ class SuggestedPostRefunded(TelegramObject):
             was deleted within 24 hours of being posted or removed from scheduled messages without
             being posted, or :tg-const:`telegram.constants.SuggestedPostRefunded.PAYMENT_REFUNDED`
             if the payer refunded their payment.
-
-    Attributes:
-        suggested_post_message (:class:`telegram.Message`):
-            Optional. Message containing the suggested post. Note that the
-            :class:`~telegram.Message` object in this field will not contain
-            the :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
-        reason (:obj:`str`):
-            Reason for the refund. Currently,
-            one of :tg-const:`telegram.constants.SuggestedPostRefunded.POST_DELETED` if the post
-            was deleted within 24 hours of being posted or removed from scheduled messages without
-            being posted, or :tg-const:`telegram.constants.SuggestedPostRefunded.PAYMENT_REFUNDED`
-            if the payer refunded their payment.
-
     """
 
     __slots__ = ("reason", "suggested_post_message")
@@ -461,18 +380,6 @@ class SuggestedPostApproved(TelegramObject):
         send_date (:class:`datetime.datetime`):
             Date when the post will be published.
             |datetime_localization|
-
-    Attributes:
-        suggested_post_message (:class:`telegram.Message`):
-            Optional. Message containing the suggested post. Note that the
-            :class:`~telegram.Message` object in this field will not contain
-            the :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
-        price (:obj:`SuggestedPostPrice`):
-            Optional. Amount paid for the post.
-        send_date (:class:`datetime.datetime`):
-            Date when the post will be published.
-            |datetime_localization|
-
     """
 
     __slots__ = ("price", "send_date", "suggested_post_message")
@@ -530,15 +437,6 @@ class SuggestedPostApprovalFailed(TelegramObject):
             even if it itself is a reply.
         price (:obj:`SuggestedPostPrice`):
             Expected price of the post.
-
-    Attributes:
-        suggested_post_message (:class:`telegram.Message`):
-            Optional. Message containing the suggested post. Note that the
-            :class:`~telegram.Message` object in this field will not contain
-            the :attr:`~telegram.Message.reply_to_message` field even if it itself is a reply.
-        price (:obj:`SuggestedPostPrice`):
-            Expected price of the post.
-
     """
 
     __slots__ = ("price", "suggested_post_message")

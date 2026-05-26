@@ -63,26 +63,11 @@ class InputMedia(TelegramObject):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         parse_mode (:obj:`str`, optional): |parse_mode|
 
     Attributes:
         type (:obj:`str`): Type of the input media.
         media (:obj:`str` | :class:`telegram.InputFile`): Media to send.
-        caption (:obj:`str`): Optional. Caption of the media to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
-            parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-
     """
 
     __slots__ = ("caption", "caption_entities", "media", "parse_mode", "type")
@@ -134,7 +119,6 @@ class InputPaidMedia(TelegramObject):
             to send. |fileinputnopath|
 
     Attributes:
-        type (:obj:`str`): Type of the input media.
         media (:obj:`str` | :class:`telegram.InputFile`): Media to send.
     """
 
@@ -234,20 +218,12 @@ class InputPaidMediaVideo(InputPaidMedia):
         media (:obj:`str` | :class:`telegram.InputFile`): Video to send.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
         cover (:class:`telegram.InputFile`): Optional. Cover for the video in the message.
-            |fileinputnopath|
 
             .. versionchanged:: 21.11
-        start_timestamp (:obj:`int`): Optional. Start timestamp for the video in the message
-
-            .. versionchanged:: 21.11
-        width (:obj:`int`): Optional. Video width.
-        height (:obj:`int`): Optional. Video height.
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration in seconds.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
-            suitable for streaming.
     """
 
     __slots__ = (
@@ -330,10 +306,6 @@ class InputMediaAnimation(InputMedia):
             after entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         width (:obj:`int`, optional): Animation width.
         height (:obj:`int`, optional): Animation height.
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Animation duration
@@ -356,33 +328,14 @@ class InputMediaAnimation(InputMedia):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
         media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
-        caption (:obj:`str`): Optional. Caption of the animation to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        width (:obj:`int`): Optional. Animation width.
-        height (:obj:`int`): Optional. Animation height.
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Animation duration
             in seconds.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the animation is covered with a
-            spoiler animation.
-
-            .. versionadded:: 20.0
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: 20.2
-        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
-
-            .. versionadded:: 21.3
     """
 
     __slots__ = (
@@ -463,37 +416,17 @@ class InputMediaPhoto(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the photo needs to be covered
             with a spoiler animation.
 
             .. versionadded:: 20.0
-        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+        show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
 
             .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
-        caption (:obj:`str`): Optional. Caption of the photo to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the photo is covered with a
-            spoiler animation.
-
-            .. versionadded:: 20.0
-        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
-
-            .. versionadded:: 21.3
     """
 
     __slots__ = (
@@ -563,10 +496,6 @@ class InputMediaVideo(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Video duration in seconds.
@@ -590,46 +519,22 @@ class InputMediaVideo(InputMedia):
         start_timestamp (:obj:`int`, optional): Start timestamp for the video in the message
 
             .. versionchanged:: 21.11
-        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+        show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
 
             .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
-        caption (:obj:`str`): Optional. Caption of the video to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        width (:obj:`int`): Optional. Video width.
-        height (:obj:`int`): Optional. Video height.
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration in seconds.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
-            suitable for streaming.
-        has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the video is covered with a
-            spoiler animation.
-
-            .. versionadded:: 20.0
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: 20.2
-        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
-
-            .. versionadded:: 21.3
         cover (:class:`telegram.InputFile`): Optional. Cover for the video in the message.
             |fileinputnopath|
-
-            .. versionchanged:: 21.11
-        start_timestamp (:obj:`int`): Optional. Start timestamp for the video in the message
 
             .. versionchanged:: 21.11
     """
@@ -731,10 +636,6 @@ class InputMediaAudio(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the audio
             in seconds as defined by the sender.
 
@@ -751,24 +652,11 @@ class InputMediaAudio(InputMedia):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.AUDIO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
-        caption (:obj:`str`): Optional. Caption of the audio to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Duration of the audio
             in seconds.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
-            audio tags.
-        title (:obj:`str`): Optional. Title of the audio as defined by the sender or by audio tags.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: 20.2
@@ -845,10 +733,6 @@ class InputMediaDocument(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
             content type detection for files uploaded using multipart/form-data. Always
             :obj:`True`, if the document is sent as part of an album.
@@ -860,19 +744,6 @@ class InputMediaDocument(InputMedia):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.DOCUMENT`.
         media (:obj:`str` | :class:`telegram.InputFile`): File to send.
-        caption (:obj:`str`): Optional. Caption of the document to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        disable_content_type_detection (:obj:`bool`): Optional. Disables automatic server-side
-            content type detection for files uploaded using multipart/form-data. Always
-            :obj:`True`, if the document is sent as part of an album.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: 20.2

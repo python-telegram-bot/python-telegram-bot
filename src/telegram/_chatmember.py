@@ -65,14 +65,6 @@ class ChatMember(TelegramObject):
             :attr:`~telegram.ChatMember.ADMINISTRATOR`, :attr:`~telegram.ChatMember.OWNER`,
             :attr:`~telegram.ChatMember.BANNED`, :attr:`~telegram.ChatMember.LEFT`,
             :attr:`~telegram.ChatMember.MEMBER` or :attr:`~telegram.ChatMember.RESTRICTED`.
-
-    Attributes:
-        user (:class:`telegram.User`): Information about the user.
-        status (:obj:`str`): The member's status in the chat. Can be
-            :attr:`~telegram.ChatMember.ADMINISTRATOR`, :attr:`~telegram.ChatMember.OWNER`,
-            :attr:`~telegram.ChatMember.BANNED`, :attr:`~telegram.ChatMember.LEFT`,
-            :attr:`~telegram.ChatMember.MEMBER` or :attr:`~telegram.ChatMember.RESTRICTED`.
-
     """
 
     __slots__ = ("status", "user")
@@ -155,11 +147,6 @@ class ChatMemberOwner(ChatMember):
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.OWNER`.
-        user (:class:`telegram.User`): Information about the user.
-        is_anonymous (:obj:`bool`): :obj:`True`, if the user's
-            presence in the chat is hidden.
-        custom_title (:obj:`str`): Optional. Custom title for
-            this user.
     """
 
     __slots__ = ("custom_title", "is_anonymous")
@@ -266,71 +253,6 @@ class ChatMemberAdministrator(ChatMember):
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.ADMINISTRATOR`.
-        user (:class:`telegram.User`): Information about the user.
-        can_be_edited (:obj:`bool`): :obj:`True`, if the bot
-            is allowed to edit administrator privileges of that user.
-        is_anonymous (:obj:`bool`): :obj:`True`, if the  user's
-            presence in the chat is hidden.
-        can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
-            log, get boost list, see hidden supergroup and channel members, report spam messages
-            and ignore slow mode. Implied by any other administrator privilege.
-        can_delete_messages (:obj:`bool`): :obj:`True`, if the
-            administrator can delete messages of other users.
-        can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
-            administrator can manage video chats.
-
-            .. versionadded:: 20.0
-        can_restrict_members (:obj:`bool`): :obj:`True`, if the
-            administrator can restrict, ban or unban chat members, or access supergroup statistics.
-        can_promote_members (:obj:`bool`): :obj:`True`, if the administrator can add new
-            administrators with a subset of their own privileges or demote administrators
-            that they have promoted, directly or indirectly (promoted by administrators that
-            were appointed by the user).
-        can_change_info (:obj:`bool`): :obj:`True`, if the user can change
-            the chat title, photo and other settings.
-        can_invite_users (:obj:`bool`): :obj:`True`, if the user can invite
-            new users to the chat.
-        can_post_messages (:obj:`bool`): Optional. :obj:`True`, if the
-            administrator can post messages in the channel or access channel statistics;
-            for channels only.
-        can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the
-            administrator can edit messages of other users and can pin
-            messages; for channels only.
-        can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
-            to pin messages; for groups and supergroups only.
-        can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
-            stories to the chat.
-
-            .. versionadded:: 20.6
-            .. versionchanged:: 21.0
-                |non_optional_story_argument|
-        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit stories posted
-            by other users, post stories to the chat page, pin chat stories, and access the chat's
-            story archive
-
-            .. versionadded:: 20.6
-            .. versionchanged:: 21.0
-                |non_optional_story_argument|
-        can_delete_stories (:obj:`bool`): :obj:`True`, if the administrator can delete
-            stories posted by other users.
-
-            .. versionadded:: 20.6
-            .. versionchanged:: 21.0
-                |non_optional_story_argument|
-        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; for supergroups only
-
-            .. versionadded:: 20.0
-        custom_title (:obj:`str`): Optional. Custom title for this user.
-        can_manage_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can
-            manage direct messages of the channel and decline suggested posts; for channels only.
-
-            .. versionadded:: 22.4
-        can_manage_tags (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit the
-            tags of regular members; for groups and supergroups only. If omitted defaults to the
-            value of :attr:`can_pin_messages`.
-
-            .. versionadded:: 22.7
     """
 
     __slots__ = (
@@ -424,15 +346,6 @@ class ChatMemberMember(ChatMember):
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.MEMBER`.
-        user (:class:`telegram.User`): Information about the user.
-        until_date (:class:`datetime.datetime`): Optional. Date when the user's subscription will
-            expire.
-
-            .. versionadded:: 21.5
-        tag (:obj:`str`): Optional. Tag of the member.
-
-            .. versionadded:: 22.7
-
     """
 
     __slots__ = (
@@ -524,59 +437,6 @@ class ChatMemberRestricted(ChatMember):
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.RESTRICTED`.
-        user (:class:`telegram.User`): Information about the user.
-        is_member (:obj:`bool`): :obj:`True`, if the user is a
-            member of the chat at the moment of the request.
-        can_change_info (:obj:`bool`): :obj:`True`, if the user can change
-            the chat title, photo and other settings.
-        can_invite_users (:obj:`bool`): :obj:`True`, if the user can invite
-            new users to the chat.
-        can_pin_messages (:obj:`bool`): :obj:`True`, if the user is allowed
-            to pin messages; groups and supergroups only.
-        can_send_messages (:obj:`bool`): :obj:`True`, if the user is allowed
-            to send text messages, contacts, locations and venues.
-        can_send_polls (:obj:`bool`): :obj:`True`, if the user is allowed
-            to send polls.
-        can_send_other_messages (:obj:`bool`): :obj:`True`, if the user is allowed
-            to send animations, games, stickers and use inline bots.
-        can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
-           allowed to add web page previews to their messages.
-        can_manage_topics (:obj:`bool`): :obj:`True`, if the user is allowed to create
-            forum topics.
-
-            .. versionadded:: 20.0
-        until_date (:class:`datetime.datetime`): Date when restrictions
-           will be lifted for this user.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-        can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
-
-            .. versionadded:: 20.1
-        can_send_documents (:obj:`bool`): :obj:`True`, if the user is allowed to send documents.
-
-            .. versionadded:: 20.1
-        can_send_photos (:obj:`bool`): :obj:`True`, if the user is allowed to send photos.
-
-            .. versionadded:: 20.1
-        can_send_videos (:obj:`bool`): :obj:`True`, if the user is allowed to send videos.
-
-            .. versionadded:: 20.1
-        can_send_video_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send video
-            notes.
-
-            .. versionadded:: 20.1
-        can_send_voice_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send voice
-            notes.
-
-            .. versionadded:: 20.1
-        can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
-
-            .. versionadded:: 22.7
-        tag (:obj:`str`): Optional. Tag of the member.
-
-            .. versionadded:: 22.7
-
     """
 
     __slots__ = (
@@ -659,7 +519,6 @@ class ChatMemberLeft(ChatMember):
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.LEFT`.
-        user (:class:`telegram.User`): Information about the user.
     """
 
     __slots__ = ()
@@ -692,13 +551,6 @@ class ChatMemberBanned(ChatMember):
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.BANNED`.
-        user (:class:`telegram.User`): Information about the user.
-        until_date (:class:`datetime.datetime`): Date when restrictions
-           will be lifted for this user.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-
     """
 
     __slots__ = ("until_date",)
