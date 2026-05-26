@@ -39,4 +39,4 @@ jobs:
           python -W ignore -m pip install --upgrade pip
           python -W ignore -m pip install .[all] --group all
       - name: Test autogeneration of admonitions and attributes
-        run: pytest -v --tb=short tests/docs/admonition_inserter.py tests/docs/attributes_inserter.py
+        run: pytest -v --tb=short tests/docs/admonition_inserter.py tests/docs/attribute_inserter.py
