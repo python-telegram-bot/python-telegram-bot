@@ -104,7 +104,6 @@ def autodoc_process_docstring(
 
     # 1) Insert the Keyword Args and "Shortcuts" admonitions for the Bot methods
     method_name = name.rsplit(".", maxsplit=1)[-1]
-    # object_signature = inspect.signature(obj) if callable(obj) else None
     if (
         name.startswith("telegram.Bot.")
         and what == "method"
@@ -154,7 +153,7 @@ def autodoc_process_docstring(
 
     # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
     # (where applicable)
-    if what == "class":
+    if what in ("class", "exception"):
         # Auto-generate Attributes section entries from Args before admonitions are inserted
         ATTRIBUTE_INSERTER.insert_attributes(
             obj=typing.cast("type", obj),

@@ -488,8 +488,8 @@ class TestAttributeInserter:
         # No Attributes section should be created because 'value' is a property.
         assert "Attributes:" not in lines
 
-    def test_undocumented_public_slot_warns(self, inserter):
-        """A public own slot with no Args entry and no Attributes entry raises a warning."""
+    def test_undocumented_public_slot_raises(self, inserter):
+        """A public own slot with no Args entry and no Attributes entry raises an error."""
 
         class _MyClass:
             __slots__ = ("computed",)
@@ -498,7 +498,7 @@ class TestAttributeInserter:
             "Args:",
             "    name (:obj:`str`): The name.",
         ]
-        with pytest.warns(UserWarning, match="public slot 'computed'"):
+        with pytest.raises(RuntimeError, match="public slot 'computed'"):
             inserter.insert_attributes(_MyClass, lines)
 
     def test_rst_substitution_after_attributes_not_swallowed(self, inserter):
@@ -555,14 +555,14 @@ class TestAttributeInserter:
         assert "|tupleclassattrs|" not in "\n".join(attrs_block)
         assert "|alwaystuple|" not in "\n".join(attrs_block)
 
-    def test_no_args_section_slot_warns(self, inserter):
-        """No Args section but class has undocumented public slot -> warning."""
+    def test_no_args_section_slot_raises(self, inserter):
+        """No Args section but class has undocumented public slot -> raises."""
 
         class _MyClass:
             __slots__ = ("computed",)
 
         lines = ["Just a description."]
-        with pytest.warns(UserWarning, match="public slot 'computed'"):
+        with pytest.raises(RuntimeError, match="public slot 'computed'"):
             inserter.insert_attributes(_MyClass, lines)
         # Lines unchanged (no args to generate from)
         assert "Attributes:" not in lines

@@ -1,4 +1,3 @@
-#
 #  A library that provides a Python interface to the Telegram Bot API
 #  Copyright (C) 2015-2026
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
@@ -232,10 +231,9 @@ class AttributeInserter:
                 and slot not in args_names
                 and slot not in properties_on_class
             ):
-                warnings.warn(
+                raise RuntimeError(
                     f"Class {obj.__qualname__!r}: public slot {slot!r} has no documentation "
                     f"source. Please add it to the 'Attributes:' section manually.",
-                    stacklevel=2,
                 )
 
         new_attr_lines: list[str] = []
