@@ -291,6 +291,21 @@ class TestUserWithoutRequest(UserTestBase):
         monkeypatch.setattr(user.get_bot(), "send_photo", make_assertion)
         assert await user.send_photo("test_photo")
 
+    async def test_instance_method_send_live_photo(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == user.id
+                and kwargs["live_photo"] == "test_live_photo"
+                and kwargs["photo"] == "test_photo"
+            )
+
+        assert check_shortcut_signature(User.send_live_photo, Bot.send_live_photo, ["chat_id"], [])
+        assert await check_shortcut_call(user.send_live_photo, user.get_bot(), "send_live_photo")
+        assert await check_defaults_handling(user.send_live_photo, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "send_live_photo", make_assertion)
+        assert await user.send_live_photo("test_live_photo", "test_photo")
+
     async def test_instance_method_send_media_group(self, monkeypatch, user):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == user.id and kwargs["media"] == "test_media_group"

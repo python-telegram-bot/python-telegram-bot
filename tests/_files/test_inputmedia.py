@@ -706,7 +706,7 @@ class TestInputMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
         assert input_media_live_photo.media == video.file_id
         assert input_media_live_photo.photo == photo.file_id
 
-    def test_with_photo_and_file(self, video_file, photo_file):
+    def test_with_photo_and_video_files(self, video_file, photo_file):
         # fixture found in conftest.py
         input_media_live_photo = InputMediaLivePhoto(video_file, photo_file)
         assert input_media_live_photo.type == self.type_

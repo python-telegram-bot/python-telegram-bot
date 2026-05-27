@@ -2013,6 +2013,54 @@ class TestMessageWithoutRequest(MessageTestBase):
             message, message.reply_photo, "send_photo", ["test_photo"], monkeypatch
         )
 
+    async def test_reply_live_photo(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            id_ = kwargs["chat_id"] == message.chat_id
+            live_photo = kwargs["live_photo"] == "test_live_photo"
+            photo = kwargs["photo"] == "test_photo"
+            return id_ and live_photo and photo
+
+        assert check_shortcut_signature(
+            Message.reply_live_photo,
+            Bot.send_live_photo,
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
+            ["do_quote", "reply_to_message_id"],
+            annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
+        )
+        assert await check_shortcut_call(
+            message.reply_live_photo,
+            message.get_bot(),
+            "send_live_photo",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
+        )
+        assert await check_defaults_handling(
+            message.reply_live_photo, message.get_bot(), no_default_kwargs={"message_thread_id"}
+        )
+
+        monkeypatch.setattr(message.get_bot(), "send_live_photo", make_assertion)
+        assert await message.reply_live_photo(live_photo="test_live_photo", photo="test_photo")
+        await self.check_quote_parsing(
+            message,
+            message.reply_live_photo,
+            "send_live_photo",
+            ["test_live_photo", "test_photo"],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
+            message,
+            message.reply_live_photo,
+            "send_live_photo",
+            ["test_live_photo", "test_photo"],
+            monkeypatch,
+        )
+
     async def test_reply_audio(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id

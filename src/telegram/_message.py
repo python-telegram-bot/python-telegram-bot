@@ -2664,6 +2664,87 @@ class Message(MaybeInaccessibleMessage):
             suggested_post_parameters=suggested_post_parameters,
         )
 
+    async def reply_live_photo(
+        self,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        caption: str | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        reply_markup: "ReplyMarkup | None" = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        *,
+        reply_to_message_id: int | None = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_live_photo(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
+                 *args,
+                 **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_live_photo`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Keyword Args:
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
+        )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
+        return await self.get_bot().send_live_photo(
+            chat_id=chat_id,
+            live_photo=live_photo,
+            photo=photo,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_parameters=effective_reply_parameters,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            filename=filename,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
+            show_caption_above_media=show_caption_above_media,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
+        )
+
     async def reply_audio(
         self,
         audio: "FileInput | Audio",

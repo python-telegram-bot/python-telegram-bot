@@ -367,9 +367,8 @@ class TestLivePhotoWithRequest(LivePhotoTestBase):
                 chat_id,
                 photo=photo_file,
                 live_photo=video_file,
-                reply_parameters=ReplyParameters(
-                    message_id=reply_to_message.message_id, allow_sending_without_reply=custom
-                ),
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
@@ -377,7 +376,7 @@ class TestLivePhotoWithRequest(LivePhotoTestBase):
                 chat_id,
                 photo=photo_file,
                 live_photo=video_file,
-                reply_parameters=ReplyParameters(message_id=reply_to_message.message_id),
+                reply_to_message_id=reply_to_message.message_id,
             )
             assert message.reply_to_message is None
         else:
@@ -386,5 +385,5 @@ class TestLivePhotoWithRequest(LivePhotoTestBase):
                     chat_id,
                     photo=photo_file,
                     live_photo=video_file,
-                    reply_parameters=ReplyParameters(message_id=reply_to_message.message_id),
+                    reply_to_message_id=reply_to_message.message_id,
                 )
