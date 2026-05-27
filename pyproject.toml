@@ -153,6 +153,10 @@ exclude = [".venv*", "venv*", ".github", "uv.lock"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/telegram"]
 
+# uv
+[tool.uv]
+exclude-newer = "7 days"
+
 # CHANGO
 [tool.chango]
 sys_path = "changes"

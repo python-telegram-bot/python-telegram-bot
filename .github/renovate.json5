@@ -26,6 +26,9 @@
   // Enable automerge globally:
   "automerge": true,
 
+  // Only upgrade packages if 7 days have passed:
+  "minimumReleaseAge": "7 days",
+
   // Group package updates together:
   "packageRules": [
     // Linting dependencies in pyproject.toml in sync with the pre-commit-config hooks:
