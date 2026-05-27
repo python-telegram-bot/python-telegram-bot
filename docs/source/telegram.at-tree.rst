@@ -8,6 +8,7 @@ Available Types
     telegram.animation
     telegram.audio
     telegram.birthdate
+    telegram.botaccesssettings
     telegram.botcommand
     telegram.botcommandscope
     telegram.botcommandscopeallchatadministrators

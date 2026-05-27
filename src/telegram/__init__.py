@@ -35,6 +35,7 @@ __all__ = (
     "BackgroundTypeWallpaper",
     "Birthdate",
     "Bot",
+    "BotAccessSettings",
     "BotCommand",
     "BotCommandScope",
     "BotCommandScopeAllChatAdministrators",
@@ -352,6 +353,7 @@ from telegram._payment.stars.transactionpartner import (
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
 from ._bot import Bot
+from ._botaccesssettings import BotAccessSettings
 from ._botcommand import BotCommand
 from ._botcommandscope import (
     BotCommandScope,

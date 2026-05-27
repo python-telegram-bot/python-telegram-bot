@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     from telegram import (
         Animation,
         Audio,
+        BotAccessSettings,
         Contact,
         Document,
         Gift,
@@ -530,7 +531,7 @@ class User(TelegramObject):
     async def send_message_draft(
         self,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
@@ -551,6 +552,9 @@ class User(TelegramObject):
             |user_chat_id_note|
 
         .. versionadded:: 22.6
+
+        .. versionchanged:: NEXT.VERSION
+            Bot API 10.0 makes the ``text`` argument optional.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -2847,6 +2851,81 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def get_managed_bot_access_settings(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "BotAccessSettings":
+        """
+        Shortcut for::
+
+             await bot.get_managed_bot_access_settings(
+                user_id=update.effective_user.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_managed_bot_access_settings`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.BotAccessSettings`: On success, returns the access settings of the bot
+                managed by the user.
+        """
+
+        return await self.get_bot().get_managed_bot_access_settings(
+            user_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_managed_bot_access_settings(
+        self,
+        is_access_restricted: bool,
+        added_user_ids: Sequence[int] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+             await bot.set_managed_bot_access_settings(
+                user_id=update.effective_user.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_managed_bot_access_settings`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+
+        return await self.get_bot().set_managed_bot_access_settings(
+            user_id=self.id,
+            is_access_restricted=is_access_restricted,
+            added_user_ids=added_user_ids,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def delete_reaction(
         self,
         chat_id: int | str,
@@ -2881,6 +2960,44 @@ class User(TelegramObject):
             chat_id=chat_id,
             message_id=message_id,
             actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_personal_chat_messages(
+        self,
+        limit: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> tuple["Message", ...]:
+        """
+        Shortcut for::
+
+             await bot.get_user_personal_chat_messages(
+                user_id=update.effective_user.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_user_personal_chat_messages`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            tuple[:class:`telegram.Message`]: On success, a tuple of messages from the personal
+                channel chat is returned.
+        """
+
+        return await self.get_bot().get_user_personal_chat_messages(
+            user_id=self.id,
+            limit=limit,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

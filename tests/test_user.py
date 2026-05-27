@@ -942,6 +942,73 @@ class TestUserWithoutRequest(UserTestBase):
         monkeypatch.setattr(user.get_bot(), "replace_managed_bot_token", make_assertion)
         assert await user.replace_token()
 
+    async def test_instance_method_get_managed_bot_access_settings(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id
+
+        assert check_shortcut_signature(
+            user.get_managed_bot_access_settings,
+            Bot.get_managed_bot_access_settings,
+            ["user_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            user.get_managed_bot_access_settings,
+            user.get_bot(),
+            "get_managed_bot_access_settings",
+        )
+        assert await check_defaults_handling(user.get_managed_bot_access_settings, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "get_managed_bot_access_settings", make_assertion)
+        assert await user.get_managed_bot_access_settings()
+
+    async def test_instance_method_set_managed_bot_access_settings(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["user_id"] == user.id
+                and kwargs["is_access_restricted"] is True
+                and kwargs["added_user_ids"] == [123]
+            )
+
+        assert check_shortcut_signature(
+            user.set_managed_bot_access_settings,
+            Bot.set_managed_bot_access_settings,
+            ["user_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            user.set_managed_bot_access_settings,
+            user.get_bot(),
+            "set_managed_bot_access_settings",
+        )
+        assert await check_defaults_handling(user.set_managed_bot_access_settings, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "set_managed_bot_access_settings", make_assertion)
+        assert await user.set_managed_bot_access_settings(
+            is_access_restricted=True,
+            added_user_ids=[123],
+        )
+
+    async def test_instance_method_get_personal_chat_messages(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id and kwargs["limit"] == 2
+
+        assert check_shortcut_signature(
+            user.get_personal_chat_messages,
+            Bot.get_user_personal_chat_messages,
+            ["user_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            user.get_personal_chat_messages,
+            user.get_bot(),
+            "get_user_personal_chat_messages",
+        )
+        assert await check_defaults_handling(user.get_personal_chat_messages, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "get_user_personal_chat_messages", make_assertion)
+        assert await user.get_personal_chat_messages(limit=2)
+
     async def test_instance_method_delete_reaction(self, monkeypatch, user):
         async def make_assertion(*_, **kwargs):
             return (

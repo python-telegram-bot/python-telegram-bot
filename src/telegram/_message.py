@@ -2204,7 +2204,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_text_draft(
         self,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
@@ -2230,6 +2230,9 @@ class Message(MaybeInaccessibleMessage):
             |reply_same_thread|
 
         .. versionadded:: 22.6
+
+        .. versionchanged:: NEXT.VERSION
+            Bot API 10.0 makes the ``text`` argument optional.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

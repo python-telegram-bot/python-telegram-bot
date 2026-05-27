@@ -173,6 +173,8 @@
       - Used for unpinning a message
     * - :meth:`~telegram.Bot.unpin_all_chat_messages`
       - Used for unpinning all pinned chat messages
+    * - :meth:`~telegram.Bot.get_user_personal_chat_messages`
+      - Used for obtaining the personal chat messages of a user
     * - :meth:`~telegram.Bot.get_user_profile_audios`
       - Used for obtaining user's profile audios
     * - :meth:`~telegram.Bot.get_user_profile_photos`
@@ -243,6 +245,10 @@
       - Used for obtaining the menu button of a private chat or the default menu button
     * - :meth:`~telegram.Bot.set_chat_menu_button`
       - Used for setting the menu button of a private chat or the default menu button
+    * - :meth:`~telegram.Bot.set_managed_bot_access_settings`
+      - Used for changing the access settings of a managed bot
+    * - :meth:`~telegram.Bot.get_managed_bot_access_settings`
+      - Used for obtaining the access settings of a managed bot
     * - :meth:`~telegram.Bot.set_my_description`
       - Used for setting the description of the bot
     * - :meth:`~telegram.Bot.get_my_description`
