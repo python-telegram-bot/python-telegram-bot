@@ -3339,25 +3339,29 @@ class TestBotWithRequest:
         assert message.poll.explanation == test_string
         assert message.poll.explanation_entities == tuple(entities)
 
-    async def test_send_poll_media_parameters(self, bot, channel_id, photo):
-        media = InputMediaPhoto(photo.file_id)
-        explanation_media = InputMediaDocument(photo.file_id)
-        option_media = InputMediaLocation(latitude=0, longitude=0)
+    async def test_send_poll_media_parameters(self, bot, channel_id):
+        with (
+            data_file("telegram.jpg").open("rb") as photo_file,
+            data_file("text_file.txt").open("rb") as document_file,
+        ):
+            i_photo = InputMediaPhoto(InputFile(photo_file, attach=True))
+            i_document = InputMediaDocument(InputFile(document_file, attach=True))
+            i_location = InputMediaLocation(latitude=0, longitude=0)
 
-        message = await bot.send_poll(
-            channel_id,
-            question="question",
-            options=[
-                InputPollOption("option1", media=option_media),
-                InputPollOption("option2"),
-            ],
-            type=Poll.QUIZ,
-            correct_option_ids=[0],
-            media=media,
-            explanation_media=explanation_media,
-            is_closed=True,
-            read_timeout=60,
-        )
+            message = await bot.send_poll(
+                channel_id,
+                question="question",
+                options=[
+                    InputPollOption("option1", media=i_location),
+                    InputPollOption("option2"),
+                ],
+                type=Poll.QUIZ,
+                correct_option_ids=[0],
+                media=i_photo,
+                explanation_media=i_document,
+                is_closed=True,
+                read_timeout=60,
+            )
 
         assert message.poll.media.photo
         assert message.poll.explanation_media.document
