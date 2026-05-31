@@ -165,7 +165,6 @@ Available Types
     telegram.poll
     telegram.pollanswer
     telegram.pollmedia
-    telegram.polloption
     telegram.polloptionadded
     telegram.polloptiondeleted
     telegram.preparedkeyboardbutton
