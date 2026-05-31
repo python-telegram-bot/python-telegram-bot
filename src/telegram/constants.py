@@ -1540,6 +1540,11 @@ class InputMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
     VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InputPaidMediaType(StringEnum):
@@ -1552,9 +1557,14 @@ class InputPaidMediaType(StringEnum):
     __slots__ = ()
 
     PHOTO = "photo"
-    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaPhoto`."""
     VIDEO = "video"
-    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaVideo`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaLivePhoto`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InputProfilePhotoType(StringEnum):
@@ -1965,6 +1975,11 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
     INVOICE = "invoice"
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     PAID_MEDIA = "paid_media"
@@ -2347,6 +2362,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LEFT_CHAT_MEMBER = "left_chat_member"
     """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     MANAGED_BOT_CREATED = "managed_bot_created"
@@ -2568,6 +2588,11 @@ class PaidMediaType(StringEnum):
     """:obj:`str`: The type of :class:`telegram.PaidMediaVideo`."""
     PHOTO = "photo"
     """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaLivePhoto`
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class PersonalChatMessagesLimit(IntEnum):

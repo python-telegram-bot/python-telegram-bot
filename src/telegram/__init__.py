@@ -158,10 +158,12 @@ __all__ = (
     "InputMediaAnimation",
     "InputMediaAudio",
     "InputMediaDocument",
+    "InputMediaLivePhoto",
     "InputMediaPhoto",
     "InputMediaVideo",
     "InputMessageContent",
     "InputPaidMedia",
+    "InputPaidMediaLivePhoto",
     "InputPaidMediaPhoto",
     "InputPaidMediaVideo",
     "InputPollOption",
@@ -182,6 +184,7 @@ __all__ = (
     "KeyboardButtonRequestUsers",
     "LabeledPrice",
     "LinkPreviewOptions",
+    "LivePhoto",
     "Location",
     "LocationAddress",
     "LoginUrl",
@@ -211,6 +214,7 @@ __all__ = (
     "OwnedGifts",
     "PaidMedia",
     "PaidMediaInfo",
+    "PaidMediaLivePhoto",
     "PaidMediaPhoto",
     "PaidMediaPreview",
     "PaidMediaPurchased",
@@ -437,9 +441,11 @@ from ._files.inputmedia import (
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
+    InputMediaLivePhoto,
     InputMediaPhoto,
     InputMediaVideo,
     InputPaidMedia,
+    InputPaidMediaLivePhoto,
     InputPaidMediaPhoto,
     InputPaidMediaVideo,
 )
@@ -449,6 +455,7 @@ from ._files.inputprofilephoto import (
     InputProfilePhotoStatic,
 )
 from ._files.inputsticker import InputSticker
+from ._files.livephoto import LivePhoto
 from ._files.location import Location
 from ._files.photosize import PhotoSize
 from ._files.sticker import MaskPosition, Sticker, StickerSet
@@ -531,6 +538,7 @@ from ._ownedgift import OwnedGift, OwnedGiftRegular, OwnedGifts, OwnedGiftUnique
 from ._paidmedia import (
     PaidMedia,
     PaidMediaInfo,
+    PaidMediaLivePhoto,
     PaidMediaPhoto,
     PaidMediaPreview,
     PaidMediaPurchased,

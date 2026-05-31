@@ -66,6 +66,7 @@ from telegram._files.contact import Contact
 from telegram._files.document import Document
 from telegram._files.file import File
 from telegram._files.inputmedia import InputMedia, InputPaidMedia
+from telegram._files.livephoto import LivePhoto
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import MaskPosition, Sticker, StickerSet
@@ -127,6 +128,7 @@ if TYPE_CHECKING:
         InputFile,
         InputMediaAudio,
         InputMediaDocument,
+        InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
         InputProfilePhoto,
@@ -2844,7 +2846,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: int | str,
         media: Sequence[
-            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo | InputMediaLivePhoto"  # noqa: E501  # pylint: disable=line-too-long
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2883,8 +2885,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             media (Sequence[:class:`telegram.InputMediaAudio`,\
                 :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`,\
-                :class:`telegram.InputMediaVideo`]): An array
-                describing messages to be sent, must include
+                :class:`telegram.InputMediaVideo`, :class:`telegram.InputMediaLivePhoto`]): An
+                array describing messages to be sent, must include
                 :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`-
                 :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
 
@@ -4663,12 +4665,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> "Message | bool":
         """
-        Use this method to edit animation, audio, document, photo, or video messages, or to add
-        media to text messages. If a message
+        Use this method to edit animation, audio, document, live photo, photo, or video messages,
+        or to add media to text messages. If a message
         is part of a message album, then it can be edited only to an audio for audio albums, only
-        to a document for document albums and to a photo or a video otherwise. When an inline
-        message is edited, a new file can't be uploaded; use a previously uploaded file via its
-        :attr:`~telegram.File.file_id` or specify a URL.
+        to a document for document albums and to a photo, live photo, or a video otherwise.
+        When an inline message is edited, a new file can't be uploaded; use a previously
+        uploaded file via its :attr:`~telegram.File.file_id` or specify a URL.
 
         Note:
             * |editreplymarkup|
@@ -12431,6 +12433,141 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             self,
         )
 
+    async def send_live_photo(
+        self,
+        chat_id: int | str,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        caption: str | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: int | None = None,
+        filename: str | None = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> Message:
+        """
+        Use this method to send live photos.
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            live_photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.LivePhoto`): Live photo
+                video to send. Pass a ``file_id`` to send a file that exists on the Telegram
+                servers (recommended). |uploadinputnopath| Sending live photos by a URL is
+                currently unsupported. Lastly you can pass an existing
+                :class:`telegram.LivePhoto` object to send.
+
+                Caution:
+                   * The video must be at most 10MB in size.
+                   * The video duration must not exceed 10 seconds.
+                   * If you pass a :class:`telegram.LivePhoto`, its
+                   :attr:`~telegram.LivePhoto.photo` field will not be considered, use
+                   :paramref:`photo` to specify the photo to send.
+
+            photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+                | :class:`pathlib.Path` | :class:`telegram.PhotoSize`): The static photo to send.
+                Pass a ``file_id`` to send a file that exists on the Telegram servers (recommended)
+                . |uploadinputnopath| Sending live photos by a URL is currently unsupported.
+                Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
+            business_connection_id (:obj:`str`, optional): |business_id_str|
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+            caption (:obj:`str`, optional): Video caption (may also be used when resending videos
+                by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
+                characters after entities parsing.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the video needs to be covered
+                with a spoiler animation.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+            suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
+                |suggested_post_parameters|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for.
+
+            filename (:obj:`str`, optional): Custom file name for :paramref:`photo`, when
+                uploading a new file. Convenience parameter, useful e.g. when sending files
+                generated by the :obj:`tempfile` module.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "live_photo": self._parse_file_input(live_photo, LivePhoto),
+            "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
+            "has_spoiler": has_spoiler,
+            "show_caption_above_media": show_caption_above_media,
+        }
+
+        return await self._send_message(
+            "sendLivePhoto",
+            data,
+            disable_notification=disable_notification,
+            reply_markup=reply_markup,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_to_message_id=reply_to_message_id,
+        )
+
     async def delete_message_reaction(
         self,
         chat_id: int | str,
@@ -12458,7 +12595,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 if the reaction were added by a user.
             actor_chat_id (:obj:`int`, optional): Identifier of the chat whose reaction will be
                 removed, if the reaction were added by a chat.
-
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -12877,6 +13013,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`replace_managed_bot_token`"""
     savePreparedKeyboardButton = save_prepared_keyboard_button
     """Alias for :meth:`save_prepared_keyboard_button`"""
+    sendLivePhoto = send_live_photo
+    """Alias for :meth:`send_live_photo`"""
     getManagedBotAccessSettings = get_managed_bot_access_settings
     """Alias for :meth:`get_managed_bot_access_settings`"""
     setManagedBotAccessSettings = set_managed_bot_access_settings

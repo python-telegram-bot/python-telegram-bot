@@ -20,7 +20,7 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, TypeAlias
+from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._files.animation import Animation
@@ -41,8 +41,6 @@ from telegram.constants import InputMediaType
 
 if TYPE_CHECKING:
     from telegram._utils.types import FileInput
-
-MediaType: TypeAlias = Animation | Audio | Document | PhotoSize | Video
 
 
 class InputMedia(TelegramObject):
@@ -123,6 +121,7 @@ class InputPaidMedia(TelegramObject):
 
     * :class:`telegram.InputPaidMediaPhoto`
     * :class:`telegram.InputPaidMediaVideo`
+    * :class:`telegram.InputPaidMediaLivePhoto`
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
@@ -142,6 +141,11 @@ class InputPaidMedia(TelegramObject):
     """:const:`telegram.constants.InputPaidMediaType.PHOTO`"""
     VIDEO: Final[str] = constants.InputPaidMediaType.VIDEO
     """:const:`telegram.constants.InputPaidMediaType.VIDEO`"""
+    LIVE_PHOTO: Final[str] = constants.InputPaidMediaType.LIVE_PHOTO
+    """:const:`telegram.constants.InputPaidMediaType.LIVE_PHOTO`
+
+    .. versionadded:: NEXT.VERSION
+    """
 
     __slots__ = ("media", "type")
 
@@ -298,6 +302,51 @@ class InputPaidMediaVideo(InputPaidMedia):
     @property
     def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
+
+
+class InputPaidMediaLivePhoto(InputPaidMedia):
+    """
+    The paid media to send is a live photo.
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+            | :class:`pathlib.Path` | :class:`~telegram.Video`): Video of the live photo to send.
+           Pass a ``file_id`` to send a file that exists on the Telegram servers (recommended).
+           |uploadinputnopath| Sending live photos by a URL is currently unsupported. Lastly you
+           can pass an existing :class:`telegram.Video` object to send.
+        photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
+            :class:`pathlib.Path` | :class:`~telegram.PhotoSize`): Photo of the live photo to send.
+            Pass a ``file_id`` to send a file that exists on the Telegram servers (recommended).
+            |uploadinputnopath| Sending live photos by a URL is currently unsupported.
+            Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
+
+    Attributes:
+        type (:obj:`str`): Type of the media, always
+            :tg-const:`telegram.constants.InputPaidMediaType.LIVE_PHOTO`.
+        media (:obj:`str` | :class:`telegram.InputFile`): Video of the live photo to send.
+            |fileinputnopath|
+        photo (:obj:`str` | :class:`telegram.InputFile`): Photo of the live photo to send.
+            |fileinputnopath|
+    """
+
+    __slots__ = ("photo",)
+
+    def __init__(
+        self,
+        media: "FileInput | Video",
+        photo: "FileInput | PhotoSize",
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        media = parse_file_input(media, tg_type=Video, attach=True, local_mode=True)
+        photo = parse_file_input(photo, tg_type=PhotoSize, attach=True, local_mode=True)
+        super().__init__(type=InputPaidMedia.LIVE_PHOTO, media=media, api_kwargs=api_kwargs)
+        with self._unfrozen():
+            self.photo: str | InputFile = photo
 
 
 class InputMediaAnimation(InputMedia):
@@ -907,3 +956,75 @@ class InputMediaDocument(InputMedia):
         with self._unfrozen():
             self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
             self.disable_content_type_detection: bool | None = disable_content_type_detection
+
+
+class InputMediaLivePhoto(InputMedia):
+    """Represents a live photo to be sent.
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+            | :class:`pathlib.Path` | :class:`~telegram.Video`): Video of the live photo to send.
+           Pass a ``file_id`` to send a file that exists on the Telegram servers (recommended).
+           |uploadinputnopath| Sending live photos by a URL is currently unsupported. Lastly
+           you can pass an existing :class:`telegram.Video` object to send.
+        photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+            | :class:`pathlib.Path` | :class:`~telegram.PhotoSize`): The static photo to send.
+            Pass a ``file_id`` to send a file that exists on the Telegram servers (recommended).
+            |uploadinputnopath| Sending live photos by a URL is currently unsupported. Lastly
+            you can pass an existing :class:`telegram.PhotoSize` object to send.
+        caption (:obj:`str`, optional): Caption of the live photo to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
+            entities parsing.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+        has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the video needs to be covered
+            with a spoiler animation.
+
+    Attributes:
+        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.LIVE_PHOTO`.
+        media (:obj:`str` | :class:`telegram.InputFile`): Video of the live photo to send.
+        photo (:obj:`str` | :class:`telegram.InputFile`): The static photo to send.
+        caption (:obj:`str`): Optional. Caption of the live photo to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
+        has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the video is covered with a
+            spoiler animation.
+    """
+
+    __slots__ = ("has_spoiler", "photo", "show_caption_above_media")
+
+    def __init__(
+        self,
+        media: "FileInput | Video",
+        photo: "FileInput | PhotoSize",
+        caption: str | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence[MessageEntity] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        media = parse_file_input(media, tg_type=Video, attach=True, local_mode=True)
+        photo = parse_file_input(photo, tg_type=PhotoSize, attach=True, local_mode=True)
+
+        super().__init__(
+            InputMediaType.LIVE_PHOTO,
+            media,
+            caption,
+            caption_entities,
+            parse_mode,
+            api_kwargs=api_kwargs,
+        )
+        with self._unfrozen():
+            self.photo: str | InputFile = photo
+            self.show_caption_above_media: bool | None = show_caption_above_media
+            self.has_spoiler: bool | None = has_spoiler

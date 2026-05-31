@@ -41,6 +41,8 @@
           - Used for sending paid media to channels
         * - :meth:`~telegram.Bot.send_photo`
           - Used for sending photos
+        * - :meth:`~telegram.Bot.send_live_photo`
+          - Used for sending live photos
         * - :meth:`~telegram.Bot.send_poll`
           - Used for sending polls
         * - :meth:`~telegram.Bot.send_sticker`

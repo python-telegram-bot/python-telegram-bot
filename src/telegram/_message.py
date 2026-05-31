@@ -37,6 +37,7 @@ from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
 from telegram._files.document import Document
+from telegram._files.livephoto import LivePhoto
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import Sticker
@@ -112,6 +113,7 @@ if TYPE_CHECKING:
         InputMedia,
         InputMediaAudio,
         InputMediaDocument,
+        InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
         InputPaidMedia,
@@ -708,6 +710,11 @@ class Message(MaybeInaccessibleMessage):
             created a bot that will be managed by the current bot.
 
             .. versionadded:: NEXT.VERSION
+        live_photo (:class:`telegram.LivePhoto`, optional): Message is a live photo, information
+            about the live photo. For backward compatibility, when this field is set, the photo
+            field will also be set.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1140,6 +1147,11 @@ class Message(MaybeInaccessibleMessage):
             created a bot that will be managed by the current bot.
 
             .. versionadded:: NEXT.VERSION
+        live_photo (:class:`telegram.LivePhoto`): Optional. Message is a live photo, information
+            about the live photo. For backward compatibility, when this field is set, the photo
+            field will also be set.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1210,6 +1222,7 @@ class Message(MaybeInaccessibleMessage):
         "is_topic_message",
         "left_chat_member",
         "link_preview_options",
+        "live_photo",
         "location",
         "managed_bot_created",
         "media_group_id",
@@ -1380,6 +1393,7 @@ class Message(MaybeInaccessibleMessage):
         poll_option_deleted: PollOptionDeleted | None = None,
         reply_to_poll_option_id: str | None = None,
         managed_bot_created: ManagedBotCreated | None = None,
+        live_photo: LivePhoto | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1514,6 +1528,7 @@ class Message(MaybeInaccessibleMessage):
             self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
             self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
             self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
+            self.live_photo: LivePhoto | None = live_photo
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1743,6 +1758,7 @@ class Message(MaybeInaccessibleMessage):
         data["managed_bot_created"] = de_json_optional(
             data.get("managed_bot_created"), ManagedBotCreated, bot
         )
+        data["live_photo"] = de_json_optional(data.get("live_photo"), LivePhoto, bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -1774,6 +1790,7 @@ class Message(MaybeInaccessibleMessage):
         | Document
         | Game
         | Invoice
+        | LivePhoto
         | Location
         | PassportData
         | Sequence[PhotoSize]
@@ -1798,6 +1815,7 @@ class Message(MaybeInaccessibleMessage):
         * :class:`telegram.Animation`
         * :class:`telegram.Game`
         * :class:`telegram.Invoice`
+        * :class:`telegram.LivePhoto`
         * :class:`telegram.Location`
         * :class:`telegram.PassportData`
         * list[:class:`telegram.PhotoSize`]
@@ -2488,7 +2506,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_media_group(
         self,
         media: Sequence[
-            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo | InputMediaLivePhoto"  # noqa: E501  # pylint: disable=line-too-long
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2645,6 +2663,87 @@ class Message(MaybeInaccessibleMessage):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
+        )
+
+    async def reply_live_photo(
+        self,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        caption: str | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        reply_markup: "ReplyMarkup | None" = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        *,
+        reply_to_message_id: int | None = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_live_photo(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
+                 *args,
+                 **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_live_photo`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Keyword Args:
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
+        )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
+        return await self.get_bot().send_live_photo(
+            chat_id=chat_id,
+            live_photo=live_photo,
+            photo=photo,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_parameters=effective_reply_parameters,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            filename=filename,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
+            show_caption_above_media=show_caption_above_media,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
         )

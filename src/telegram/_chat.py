@@ -58,12 +58,14 @@ if TYPE_CHECKING:
         InputChecklist,
         InputMediaAudio,
         InputMediaDocument,
+        InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
         InputPaidMedia,
         InputPollOption,
         LabeledPrice,
         LinkPreviewOptions,
+        LivePhoto,
         Location,
         Message,
         MessageEntity,
@@ -1195,7 +1197,7 @@ class _ChatBase(TelegramObject):
     async def send_media_group(
         self,
         media: Sequence[
-            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo | InputMediaLivePhoto"  # noqa: E501  # pylint: disable=line-too-long
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1352,6 +1354,76 @@ class _ChatBase(TelegramObject):
             show_caption_above_media=show_caption_above_media,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+        )
+
+    async def send_live_photo(
+        self,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        caption: str | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: int | None = None,
+        filename: str | None = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_live_photo(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_live_photo`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return await self.get_bot().send_live_photo(
+            chat_id=self.id,
+            live_photo=live_photo,
+            photo=photo,
+            business_connection_id=business_connection_id,
+            message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            show_caption_above_media=show_caption_above_media,
+            has_spoiler=has_spoiler,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=suggested_post_parameters,
+            reply_parameters=reply_parameters,
+            reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_to_message_id=reply_to_message_id,
+            filename=filename,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def send_contact(

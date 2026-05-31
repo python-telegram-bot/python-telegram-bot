@@ -563,6 +563,21 @@ class TestChatWithoutRequest(ChatTestBase):
         monkeypatch.setattr(chat.get_bot(), "send_photo", make_assertion)
         assert await chat.send_photo(photo="test_photo")
 
+    async def test_instance_method_send_live_photo(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["live_photo"] == "test_live_photo"
+                and kwargs["photo"] == "test_photo"
+            )
+
+        assert check_shortcut_signature(Chat.send_live_photo, Bot.send_live_photo, ["chat_id"], [])
+        assert await check_shortcut_call(chat.send_live_photo, chat.get_bot(), "send_live_photo")
+        assert await check_defaults_handling(chat.send_live_photo, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_live_photo", make_assertion)
+        assert await chat.send_live_photo(live_photo="test_live_photo", photo="test_photo")
+
     async def test_instance_method_send_contact(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == chat.id and kwargs["phone_number"] == "test_contact"

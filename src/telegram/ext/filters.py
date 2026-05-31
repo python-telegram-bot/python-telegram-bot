@@ -62,6 +62,7 @@ __all__ = (
     "IS_AUTOMATIC_FORWARD",
     "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
+    "LIVE_PHOTO",
     "LOCATION",
     "PAID_MEDIA",
     "PASSPORT_DATA",
@@ -1649,6 +1650,20 @@ class Language(MessageFilter):
             and message.from_user.language_code
             and any(message.from_user.language_code.startswith(x) for x in self.lang)
         )
+
+
+class _LivePhoto(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.live_photo)
+
+
+LIVE_PHOTO = _LivePhoto(name="filters.LIVE_PHOTO")
+"""Messages that contain :attr:`telegram.Message.live_photo`.
+
+.. versionadded:: NEXT.VERSION
+"""
 
 
 class _Location(MessageFilter):
