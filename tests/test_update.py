@@ -187,14 +187,15 @@ params = [
     },
     {
         "poll_answer": PollAnswer(
-            "id",
-            [1],
-            User(
+            poll_id="id",
+            option_ids=[1],
+            option_persistent_ids=["1"],
+            user=User(
                 1,
                 "",
                 False,
             ),
-            Chat(1, ""),
+            voter_chat=Chat(1, ""),
         )
     },
     {"my_chat_member": chat_member_updated},

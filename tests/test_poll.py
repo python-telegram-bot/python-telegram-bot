@@ -430,12 +430,19 @@ class TestPollAnswerWithoutRequest(PollAnswerTestBase):
         assert poll_answer_dict["voter_chat"] == poll_answer.voter_chat.to_dict()
         assert poll_answer_dict["option_persistent_ids"] == list(poll_answer.option_persistent_ids)
 
+    def test_persistent_id_required_workaround(self):
+        # tags: deprecated NEXT.VERSION, bot api 9.6
+        with pytest.raises(TypeError, match="`option_persistent_ids` is a required"):
+            PollAnswer(poll_id=123, option_ids=[2], user=self.user, voter_chat=self.voter_chat)
+
     def test_equality(self):
-        a = PollAnswer(123, [2], self.user, self.voter_chat)
-        b = PollAnswer(123, [2], self.user, Chat(1, ""))
-        c = PollAnswer(123, [2], User(1, "first", False), self.voter_chat)
-        d = PollAnswer(123, [1, 2], self.user, self.voter_chat)
-        e = PollAnswer(456, [2], self.user, self.voter_chat)
+        a = PollAnswer(123, [2], self.user, self.voter_chat, option_persistent_ids=["2"])
+        b = PollAnswer(123, [2], self.user, Chat(1, ""), option_persistent_ids=["2"])
+        c = PollAnswer(
+            123, [2], User(1, "first", False), self.voter_chat, option_persistent_ids=["2"]
+        )
+        d = PollAnswer(123, [1, 2], self.user, self.voter_chat, option_persistent_ids=["1", "2"])
+        e = PollAnswer(456, [2], self.user, self.voter_chat, option_persistent_ids=["2"])
         f = PollOption("Text", 1, persistent_id="persistent_id")
 
         assert a == b

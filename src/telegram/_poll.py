@@ -523,6 +523,9 @@ class PollAnswer(TelegramObject):
         *,
         api_kwargs: JSONDict | None = None,
     ):
+        if option_persistent_ids is None:
+            raise TypeError("`option_persistent_ids` is a required argument since Bot API 9.6")
+
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id: str = poll_id
         self.voter_chat: Chat | None = voter_chat
