@@ -42,18 +42,21 @@ if TYPE_CHECKING:
     from telegram import (
         Animation,
         Audio,
+        BotAccessSettings,
         Contact,
         Document,
         Gift,
         InlineKeyboardMarkup,
         InputMediaAudio,
         InputMediaDocument,
+        InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
         InputPollMedia,
         InputPollOption,
         LabeledPrice,
         LinkPreviewOptions,
+        LivePhoto,
         Location,
         Message,
         MessageEntity,
@@ -529,7 +532,7 @@ class User(TelegramObject):
     async def send_message_draft(
         self,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
@@ -550,6 +553,9 @@ class User(TelegramObject):
             |user_chat_id_note|
 
         .. versionadded:: 22.6
+
+        .. versionchanged:: NEXT.VERSION
+            Bot API 10.0 makes the ``text`` argument optional.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -702,10 +708,83 @@ class User(TelegramObject):
             suggested_post_parameters=suggested_post_parameters,
         )
 
+    async def send_live_photo(
+        self,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        caption: str | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: int | None = None,
+        filename: str | None = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_live_photo(update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_live_photo`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Note:
+            |user_chat_id_note|
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return await self.get_bot().send_live_photo(
+            chat_id=self.id,
+            live_photo=live_photo,
+            photo=photo,
+            business_connection_id=business_connection_id,
+            message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            show_caption_above_media=show_caption_above_media,
+            has_spoiler=has_spoiler,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=suggested_post_parameters,
+            reply_parameters=reply_parameters,
+            reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_to_message_id=reply_to_message_id,
+            filename=filename,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_media_group(
         self,
         media: Sequence[
-            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo | InputMediaLivePhoto"  # noqa: E501  # pylint: disable=line-too-long
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2770,10 +2849,203 @@ class User(TelegramObject):
         .. versionadded:: NEXT.VERSION
 
         Returns:
-            :obj:`bool`: On success, :obj:`str` is returned.
+            :obj:`str`: On success, :obj:`str` is returned.
         """
         return await self.get_bot().replace_managed_bot_token(
             user_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_managed_bot_access_settings(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "BotAccessSettings":
+        """
+        Shortcut for::
+
+             await bot.get_managed_bot_access_settings(
+                user_id=update.effective_user.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_managed_bot_access_settings`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.BotAccessSettings`: On success, returns the access settings of the bot
+                managed by the user.
+        """
+
+        return await self.get_bot().get_managed_bot_access_settings(
+            user_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_managed_bot_access_settings(
+        self,
+        is_access_restricted: bool,
+        added_user_ids: Sequence[int] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+             await bot.set_managed_bot_access_settings(
+                user_id=update.effective_user.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_managed_bot_access_settings`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+
+        return await self.get_bot().set_managed_bot_access_settings(
+            user_id=self.id,
+            is_access_restricted=is_access_restricted,
+            added_user_ids=added_user_ids,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_reaction(
+        self,
+        chat_id: int | str,
+        message_id: int,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+            await bot.delete_message_reaction(
+                user_id=update.effective_user.id,
+                *args,
+                **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().delete_message_reaction(
+            user_id=self.id,
+            chat_id=chat_id,
+            message_id=message_id,
+            actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_personal_chat_messages(
+        self,
+        limit: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> tuple["Message", ...]:
+        """
+        Shortcut for::
+
+             await bot.get_user_personal_chat_messages(
+                user_id=update.effective_user.id,
+                *args, **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_user_personal_chat_messages`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            tuple[:class:`telegram.Message`]: On success, a tuple of messages from the personal
+                channel chat is returned.
+        """
+
+        return await self.get_bot().get_user_personal_chat_messages(
+            user_id=self.id,
+            limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_all_reactions(
+        self,
+        chat_id: int | str,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Shortcut for::
+
+            await bot.delete_all_message_reactions(
+                user_id=update.effective_user.id,
+                *args,
+                **kwargs
+            )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_all_message_reactions`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().delete_all_message_reactions(
+            chat_id=chat_id,
+            user_id=self.id,
+            actor_chat_id=actor_chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

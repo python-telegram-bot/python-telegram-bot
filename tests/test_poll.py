@@ -20,8 +20,14 @@ import datetime as dtm
 import pytest
 
 from telegram import (
+    Animation,
+    Audio,
     Chat,
+    Document,
+    InputMediaPhoto,
     InputPollOption,
+    LivePhoto,
+    Location,
     MaybeInaccessibleMessage,
     MessageEntity,
     PhotoSize,
@@ -29,17 +35,13 @@ from telegram import (
     PollAnswer,
     PollMedia,
     PollOption,
+    PollOptionAdded,
+    PollOptionDeleted,
+    Sticker,
     User,
+    Venue,
+    Video,
 )
-from telegram._files.animation import Animation
-from telegram._files.audio import Audio
-from telegram._files.document import Document
-from telegram._files.inputmedia import InputMediaPhoto
-from telegram._files.location import Location
-from telegram._files.sticker import Sticker
-from telegram._files.venue import Venue
-from telegram._files.video import Video
-from telegram._poll import PollOptionAdded, PollOptionDeleted
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from telegram.warnings import PTBDeprecationWarning
@@ -153,12 +155,12 @@ def poll_media():
         animation=PollMediaTestBase.animation,
         audio=PollMediaTestBase.audio,
         document=PollMediaTestBase.document,
+        live_photo=PollMediaTestBase.live_photo,
         location=PollMediaTestBase.location,
         photo=PollMediaTestBase.photo,
         sticker=PollMediaTestBase.sticker,
         venue=PollMediaTestBase.venue,
         video=PollMediaTestBase.video,
-        # TODO: LivePhoto
     )
 
 
@@ -177,6 +179,15 @@ class PollMediaTestBase:
         file_unique_id="file_unique_id",
         duration=dtm.timedelta(seconds=60),
     )
+    live_photo = LivePhoto(
+        file_id="video_file_id",
+        file_unique_id="file_unique_id",
+        width=640,
+        height=480,
+        duration=dtm.timedelta(seconds=60),
+        mime_type="video/mp4",
+        file_size=326534,
+    )
 
 
 class TestPollMediaWithoutRequest(PollMediaTestBase):
@@ -190,12 +201,12 @@ class TestPollMediaWithoutRequest(PollMediaTestBase):
             "animation": self.animation.to_dict(),
             "audio": self.audio.to_dict(),
             "document": self.document.to_dict(),
+            "live_photo": self.live_photo.to_dict(),
             "location": self.location.to_dict(),
             "photo": [photo.to_dict() for photo in self.photo],
             "sticker": self.sticker.to_dict(),
             "venue": self.venue.to_dict(),
             "video": self.video.to_dict(),
-            # TODO: LivePhoto
         }
         poll_media = PollMedia.de_json(json_dict, None)
 
@@ -203,12 +214,12 @@ class TestPollMediaWithoutRequest(PollMediaTestBase):
         assert poll_media.animation == self.animation
         assert poll_media.audio == self.audio
         assert poll_media.document == self.document
+        assert poll_media.live_photo == self.live_photo
         assert poll_media.location == self.location
         assert poll_media.photo == self.photo
         assert poll_media.sticker == self.sticker
         assert poll_media.venue == self.venue
         assert poll_media.video == self.video
-        # TODO: LivePhoto
 
     def test_to_dict(self, poll_media):
         poll_media_dict = poll_media.to_dict()
@@ -217,12 +228,12 @@ class TestPollMediaWithoutRequest(PollMediaTestBase):
         assert poll_media_dict["animation"] == poll_media.animation.to_dict()
         assert poll_media_dict["audio"] == poll_media.audio.to_dict()
         assert poll_media_dict["document"] == poll_media.document.to_dict()
+        assert poll_media_dict["live_photo"] == poll_media.live_photo.to_dict()
         assert poll_media_dict["location"] == poll_media.location.to_dict()
         assert poll_media_dict["photo"] == [photo.to_dict() for photo in poll_media.photo]
         assert poll_media_dict["sticker"] == poll_media.sticker.to_dict()
         assert poll_media_dict["venue"] == poll_media.venue.to_dict()
         assert poll_media_dict["video"] == poll_media.video.to_dict()
-        # TODO: LivePhoto
 
     def test_equality(self):
         a = PollMedia(photo=self.photo)

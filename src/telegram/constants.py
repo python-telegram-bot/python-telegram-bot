@@ -88,6 +88,7 @@ __all__ = [
     "KeyboardButtonRequestUsersLimit",
     "KeyboardButtonStyle",
     "LocationLimit",
+    "ManagedBotAccessLimit",
     "MaskPosition",
     "MediaGroupLimit",
     "MenuButtonType",
@@ -102,6 +103,7 @@ __all__ = [
     "OwnedGiftType",
     "PaidMediaType",
     "ParseMode",
+    "PersonalChatMessagesLimit",
     "PollLimit",
     "PollType",
     "PollingLimit",
@@ -1546,6 +1548,8 @@ class BaseInputMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaSticker`."""
     VENUE = "venue"
     """:obj:`str`: Type of :class:`telegram.InputMediaVenue`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`."""
 
 
 class InputMediaType(StringEnum):
@@ -1570,6 +1574,11 @@ class InputMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
     VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InputPaidMediaType(StringEnum):
@@ -1582,9 +1591,14 @@ class InputPaidMediaType(StringEnum):
     __slots__ = ()
 
     PHOTO = "photo"
-    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaPhoto`."""
     VIDEO = "video"
-    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaVideo`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaLivePhoto`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InputProfilePhotoType(StringEnum):
@@ -1997,6 +2011,11 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
     INVOICE = "invoice"
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     PAID_MEDIA = "paid_media"
@@ -2379,6 +2398,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LEFT_CHAT_MEMBER = "left_chat_member"
     """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     MANAGED_BOT_CREATED = "managed_bot_created"
@@ -2600,6 +2624,33 @@ class PaidMediaType(StringEnum):
     """:obj:`str`: The type of :class:`telegram.PaidMediaVideo`."""
     PHOTO = "photo"
     """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaLivePhoto`
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+
+class PersonalChatMessagesLimit(IntEnum):
+    """This enum contains limitations for
+    :paramref:`telegram.Bot.get_user_personal_chat_messages.limit`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.get_user_personal_chat_messages.limit`
+    parameter of :meth:`telegram.Bot.get_user_personal_chat_messages`.
+    """
+    MAX_LIMIT = 20
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.get_user_personal_chat_messages.limit`
+    parameter of :meth:`telegram.Bot.get_user_personal_chat_messages`.
+    """
 
 
 class PollingLimit(IntEnum):
@@ -4087,6 +4138,22 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Woman Shrugging"""
     POUTING_FACE = "😡"
     """:obj:`str`: Pouting face"""
+
+
+class ManagedBotAccessLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.set_managed_bot_access_settings`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_ALLOWED_USERS = 10
+    """:obj:`int`: Maximum number of users that can be allowed to access a managed bot in the
+    :paramref:`~telegram.Bot.set_managed_bot_access_settings.added_user_ids` parameter of
+    :meth:`~telegram.Bot.set_managed_bot_access_settings`.
+    """
 
 
 class VerifyLimit(IntEnum):

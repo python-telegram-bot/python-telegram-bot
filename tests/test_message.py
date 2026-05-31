@@ -55,6 +55,7 @@ from telegram import (
     InputPaidMediaPhoto,
     Invoice,
     LinkPreviewOptions,
+    LivePhoto,
     Location,
     ManagedBotCreated,
     Message,
@@ -448,6 +449,7 @@ def message(bot):
         {"poll_option_deleted": PollOptionDeleted(option_persistent_id="abc", option_text="this")},
         {"reply_to_poll_option_id": "3123"},
         {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
+        {"live_photo": LivePhoto("file_id", "file_unique_id", 12, 12, 5)},
     ],
     ids=[
         "reply",
@@ -546,6 +548,7 @@ def message(bot):
         "poll_option_deleted",
         "reply_to_poll_option_id",
         "managed_bot_created",
+        "live_photo",
     ],
 )
 def message_params(bot, request):
@@ -1491,6 +1494,7 @@ class TestMessageWithoutRequest(MessageTestBase):
             "document",
             "game",
             "invoice",
+            "live_photo",
             "location",
             "paid_media",
             "passport_data",
@@ -2012,6 +2016,54 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         await self.check_thread_id_parsing(
             message, message.reply_photo, "send_photo", ["test_photo"], monkeypatch
+        )
+
+    async def test_reply_live_photo(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            id_ = kwargs["chat_id"] == message.chat_id
+            live_photo = kwargs["live_photo"] == "test_live_photo"
+            photo = kwargs["photo"] == "test_photo"
+            return id_ and live_photo and photo
+
+        assert check_shortcut_signature(
+            Message.reply_live_photo,
+            Bot.send_live_photo,
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
+            ["do_quote", "reply_to_message_id"],
+            annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
+        )
+        assert await check_shortcut_call(
+            message.reply_live_photo,
+            message.get_bot(),
+            "send_live_photo",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
+        )
+        assert await check_defaults_handling(
+            message.reply_live_photo, message.get_bot(), no_default_kwargs={"message_thread_id"}
+        )
+
+        monkeypatch.setattr(message.get_bot(), "send_live_photo", make_assertion)
+        assert await message.reply_live_photo(live_photo="test_live_photo", photo="test_photo")
+        await self.check_quote_parsing(
+            message,
+            message.reply_live_photo,
+            "send_live_photo",
+            ["test_live_photo", "test_photo"],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
+            message,
+            message.reply_live_photo,
+            "send_live_photo",
+            ["test_live_photo", "test_photo"],
+            monkeypatch,
         )
 
     async def test_reply_audio(self, monkeypatch, message):
@@ -3424,3 +3476,29 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         monkeypatch.setattr(message.get_bot(), "decline_suggested_post", make_assertion)
         assert await message.decline_suggested_post(comment="some comment")
+
+    async def test_delete_reaction(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_id"] == message.message_id
+                and kwargs["user_id"] == 23
+                and kwargs["actor_chat_id"] == 12
+            )
+
+        assert check_shortcut_signature(
+            Message.delete_reaction,
+            Bot.delete_message_reaction,
+            ["chat_id", "message_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.delete_reaction,
+            message.get_bot(),
+            "delete_message_reaction",
+            shortcut_kwargs=["chat_id", "message_id"],
+        )
+        assert await check_defaults_handling(message.delete_reaction, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "delete_message_reaction", make_assertion)
+        assert await message.delete_reaction(user_id=23, actor_chat_id=12)

@@ -33,6 +33,7 @@ import pytest
 
 from telegram import (
     Bot,
+    BotAccessSettings,
     BotCommand,
     BotCommandScopeChat,
     BotDescription,
@@ -2927,6 +2928,62 @@ class TestBotWithoutRequest:
         )
         assert isinstance(inst, PreparedKeyboardButton)
 
+    async def test_get_managed_bot_access_settings(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            return BotAccessSettings(
+                is_access_restricted=True,
+                added_users=[User(1, "first", False)],
+            ).to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        settings = await offline_bot.get_managed_bot_access_settings(1234)
+        assert isinstance(settings, BotAccessSettings)
+
+    async def test_set_managed_bot_access_settings(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            assert request_data.parameters.get("is_access_restricted") is True
+            assert request_data.parameters.get("added_user_ids") == [1, 2, 3]
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.set_managed_bot_access_settings(
+            1234,
+            is_access_restricted=True,
+            added_user_ids=[1, 2, 3],
+        )
+
+    async def test_get_user_personal_chat_messages(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("user_id") == 1234
+            assert request_data.parameters.get("limit") == 1
+            return [make_message("dummy reply").to_dict()]
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        msgs = await offline_bot.get_user_personal_chat_messages(1234, limit=1)
+        assert isinstance(msgs, tuple)
+        assert all(isinstance(msg, Message) for msg in msgs)
+
+    # Bots cannot delete their own reaction from my testing, so we aren't making a real request
+    async def test_delete_message_reaction(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("message_id") == 12
+            assert request_data.parameters.get("user_id") == 3432
+            assert request_data.parameters.get("actor_chat_id") == 1232
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.delete_message_reaction(1234, 12, 3432, 1232)
+
+    async def test_delete_all_message_reactions(self, offline_bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters.get("chat_id") == 1234
+            assert request_data.parameters.get("user_id") == 3432
+            assert request_data.parameters.get("actor_chat_id") == 1232
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        await offline_bot.delete_all_message_reactions(1234, 3432, 1232)
+
 
 class TestBotWithRequest:
     """
@@ -3736,11 +3793,15 @@ class TestBotWithRequest:
         assert cfi.id == int(super_group_id)
 
     async def test_get_chat_administrators(self, bot, channel_id):
-        admins = await bot.get_chat_administrators(channel_id)
+        admins = await bot.get_chat_administrators(channel_id, return_bots=True)
         assert isinstance(admins, tuple)
 
+        bots_found = 0
         for a in admins:
             assert a.status in ("administrator", "creator")
+            if a.user.is_bot:
+                bots_found += 1
+        assert bots_found > 1  # will be False if return_bots=False
 
     async def test_get_chat_member_count(self, bot, channel_id):
         count = await bot.get_chat_member_count(channel_id)
@@ -4954,6 +5015,12 @@ class TestBotWithRequest:
         )
         bot_profile_photos = await bot.get_user_profile_photos(bot.id)
         assert bot_profile_photos.total_count == 1
+
+    async def test_get_user_personal_chat_messages(self, bot):
+        # id is of the Test User
+        messages = await bot.get_user_personal_chat_messages(user_id=675666224, limit=2)
+        assert isinstance(messages, tuple)
+        assert len(messages) == 2
 
     async def test_initialize_tracks_requests_and_bot_separately(self, offline_bot, monkeypatch):
         """Test that requests and bot user are initialized separately and only once."""

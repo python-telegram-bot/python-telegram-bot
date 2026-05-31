@@ -27,6 +27,7 @@ from telegram._chat import Chat
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.document import Document
+from telegram._files.livephoto import LivePhoto
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import Sticker
@@ -73,7 +74,8 @@ class PollMedia(TelegramObject):
             file; currently, can't be received in a poll option
         document (:class:`telegram.Document`, optional): Media is a general file, information about
             the file; currently, can't be received in a poll option
-            .. TODO: LivePhoto
+        live_photo (:class:`telegram.LivePhoto`, optional): Media is a live photo, information
+            about the live photo
         location (:class:`telegram.Location`, optional): Media is a shared location, information
             about the location
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Media is a photo, available sizes
@@ -90,7 +92,8 @@ class PollMedia(TelegramObject):
             file; currently, can't be received in a poll option
         document (:class:`telegram.Document`): Optional. Media is a general file, information about
             the file; currently, can't be received in a poll option
-            .. TODO: LivePhoto
+        live_photo (:class:`telegram.LivePhoto`, optional): Media is a live photo, information
+            about the live photo
         location (:class:`telegram.Location`): Optional. Media is a shared location, information
             about the location
         photo (Sequence[:class:`telegram.PhotoSize`]): Optional. Media is a photo, available sizes
@@ -105,12 +108,12 @@ class PollMedia(TelegramObject):
         "animation",
         "audio",
         "document",
+        "live_photo",
         "location",
         "photo",
         "sticker",
         "venue",
         "video",
-        # TODO: LivePhoto
     )
 
     def __init__(
@@ -118,12 +121,12 @@ class PollMedia(TelegramObject):
         animation: Animation | None = None,
         audio: Audio | None = None,
         document: Document | None = None,
+        live_photo: LivePhoto | None = None,
         location: Location | None = None,
         photo: Sequence[PhotoSize] | None = None,
         sticker: Sticker | None = None,
         venue: Venue | None = None,
         video: Video | None = None,
-        # TODO: LivePhoto
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -131,23 +134,23 @@ class PollMedia(TelegramObject):
         self.animation: Animation | None = animation
         self.audio: Audio | None = audio
         self.document: Document | None = document
+        self.live_photo: LivePhoto | None = live_photo
         self.location: Location | None = location
         self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
         self.sticker: Sticker | None = sticker
         self.venue: Venue | None = venue
         self.video: Video | None = video
-        # TODO: LivePhoto
 
         self._id_attrs = (
             self.animation,
             self.audio,
             self.document,
+            self.live_photo,
             self.location,
             self.photo,
             self.sticker,
             self.venue,
             self.video,
-            # TODO: LivePhoto
         )
 
         self._freeze()
@@ -160,12 +163,12 @@ class PollMedia(TelegramObject):
         data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
         data["audio"] = de_json_optional(data.get("audio"), Audio, bot)
         data["document"] = de_json_optional(data.get("document"), Document, bot)
+        data["live_photo"] = de_json_optional(data.get("live_photo"), LivePhoto, bot)
         data["location"] = de_json_optional(data.get("location"), Location, bot)
         data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
         data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
         data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
         data["video"] = de_json_optional(data.get("video"), Video, bot)
-        # TODO: LivePhoto
 
         return super().de_json(data=data, bot=bot)
 

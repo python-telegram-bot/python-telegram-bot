@@ -24,8 +24,10 @@ import pytest
 
 from telegram import (
     Dice,
+    LivePhoto,
     PaidMedia,
     PaidMediaInfo,
+    PaidMediaLivePhoto,
     PaidMediaPhoto,
     PaidMediaPreview,
     PaidMediaPurchased,
@@ -64,6 +66,14 @@ class PaidMediaTestBase:
             file_unique_id="file_unique_id",
         ),
     )
+    live_photo = LivePhoto(
+        file_id="live_photo_file_id",
+        file_unique_id="live_photo_file_unique_id",
+        width=640,
+        height=480,
+        duration=dtm.timedelta(seconds=60),
+        photo=photo,
+    )
 
 
 class TestPaidMediaWithoutRequest(PaidMediaTestBase):
@@ -89,6 +99,7 @@ class TestPaidMediaWithoutRequest(PaidMediaTestBase):
             ("photo", PaidMediaPhoto),
             ("video", PaidMediaVideo),
             ("preview", PaidMediaPreview),
+            ("live_photo", PaidMediaLivePhoto),
         ],
     )
     def test_de_json_subclass(self, offline_bot, pm_type, subclass):
@@ -99,6 +110,7 @@ class TestPaidMediaWithoutRequest(PaidMediaTestBase):
             "width": self.width,
             "height": self.height,
             "duration": int(self.duration.total_seconds()),
+            "live_photo": self.live_photo.to_dict(),
         }
         pm = PaidMedia.de_json(json_dict, offline_bot)
 
@@ -213,6 +225,56 @@ class TestPaidMediaVideoWithoutRequest(PaidMediaTestBase):
         )
         c = PaidMediaVideo(
             video=Video("test", "test_unique", 640, 480, 60),
+        )
+        d = Dice(5, "test")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+@pytest.fixture
+def paid_media_live_photo():
+    return PaidMediaLivePhoto(
+        live_photo=TestPaidMediaLivePhotoWithoutRequest.live_photo,
+    )
+
+
+class TestPaidMediaLivePhotoWithoutRequest(PaidMediaTestBase):
+    type = PaidMediaType.LIVE_PHOTO
+
+    def test_slot_behaviour(self, paid_media_live_photo):
+        inst = paid_media_live_photo
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot):
+        json_dict = {
+            "live_photo": self.live_photo.to_dict(),
+        }
+        pmlp = PaidMediaLivePhoto.de_json(json_dict, offline_bot)
+        assert pmlp.live_photo == self.live_photo
+        assert pmlp.api_kwargs == {}
+
+    def test_to_dict(self, paid_media_live_photo):
+        assert paid_media_live_photo.to_dict() == {
+            "type": self.type,
+            "live_photo": paid_media_live_photo.live_photo.to_dict(),
+        }
+
+    def test_equality(self, paid_media_live_photo):
+        a = paid_media_live_photo
+        b = PaidMediaLivePhoto(
+            live_photo=deepcopy(self.live_photo),
+        )
+        c = PaidMediaLivePhoto(
+            live_photo=LivePhoto("test", "test_unique", 640, 480, 60),
         )
         d = Dice(5, "test")
 
