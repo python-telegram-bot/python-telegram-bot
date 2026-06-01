@@ -67,8 +67,6 @@ class _BaseInputMedia(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.BaseInputMediaType, media_type, media_type)
 
-        self._freeze()
-
 
 class InputPollMedia(_BaseInputMedia):
     """This object represents the content of a poll description or a quiz explanation to be sent.
@@ -102,6 +100,8 @@ class InputPollMedia(_BaseInputMedia):
     ):
         super().__init__(media_type=media_type, api_kwargs=api_kwargs)
 
+        self._freeze()
+
 
 class InputPollOptionMedia(_BaseInputMedia):
     """This object represents the content of a poll option to be sent. It should be one of:
@@ -132,6 +132,8 @@ class InputPollOptionMedia(_BaseInputMedia):
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(media_type=media_type, api_kwargs=api_kwargs)
+
+        self._freeze()
 
 
 class InputMedia(_BaseInputMedia):
