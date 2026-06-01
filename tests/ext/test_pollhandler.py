@@ -73,14 +73,19 @@ def poll(bot):
     return Update(
         0,
         poll=Poll(
-            1,
-            "question",
-            [PollOption("1", 0), PollOption("2", 0)],
-            0,
-            False,
-            False,
-            Poll.REGULAR,
-            True,
+            id=1,
+            question="question",
+            options=[
+                PollOption(text="1", voter_count=0, persistent_id="1"),
+                PollOption(text="2", voter_count=0, persistent_id="2"),
+            ],
+            total_voter_count=0,
+            is_closed=False,
+            is_anonymous=False,
+            type=Poll.REGULAR,
+            allows_revoting=True,
+            members_only=True,
+            allows_multiple_answers=True,
         ),
     )
 
