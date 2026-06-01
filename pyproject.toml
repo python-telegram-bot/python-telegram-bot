@@ -120,7 +120,7 @@ docs = [
     "sphinx==9.1.0; python_version >= '3.12'",
     "furo==2025.12.19",
     "sphinx-paramlinks==0.6.0",
-    "sphinxcontrib-mermaid==2.0.1",
+    "sphinxcontrib-mermaid==2.0.2",
     "sphinx-copybutton==0.5.2",
     "sphinx-inline-tabs==2025.12.21.14",
     # Temporary. See #4387
