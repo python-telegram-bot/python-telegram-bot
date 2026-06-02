@@ -7794,7 +7794,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             country_codes (Sequence[:obj:`str`], optional): A list of
                 0-:tg-const:`telegram.constants.PollLimit.MAX_COUNTRY_CODES` two-letter
                 ``ISO 3166-1 alpha-2`` country codes indicating the countries from which users can
-                vote in the poll; for channel chats only. Use ``“FT”`` as a country code to allow
+                vote in the poll; for channel chats only. Use ``"FT"`` as a country code to allow
                 users with anonymous numbers to vote. If omitted or empty, then users from any
                 country can participate in the poll.
 

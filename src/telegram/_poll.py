@@ -96,7 +96,7 @@ class PollMedia(TelegramObject):
             about the live photo
         location (:class:`telegram.Location`): Optional. Media is a shared location, information
             about the location
-        photo (Sequence[:class:`telegram.PhotoSize`]): Optional. Media is a photo, available sizes
+        photo (tuple[:class:`telegram.PhotoSize`]): Optional. Media is a photo, available sizes
             of the photo
         sticker (:class:`telegram.Sticker`): Optional. Media is a sticker, information about the
             sticker; currently, for poll options only
@@ -858,7 +858,7 @@ class Poll(TelegramObject):
             .. versionadded:: NEXT.VERSION
         country_codes (Sequence[:obj:`str`], optional): A list of two-letter ``ISO 3166-1 alpha-2``
             country codes indicating the countries from which users can vote in the poll. The
-            country code ``“FT”`` is used for users with anonymous numbers. If omitted, then users
+            country code ``"FT"`` is used for users with anonymous numbers. If omitted, then users
             from any country can participate in the poll.
 
             .. versionadded:: NEXT.VERSION
@@ -936,7 +936,7 @@ class Poll(TelegramObject):
             .. versionadded:: NEXT.VERSION
         country_codes (tuple[:obj:`str`]): Optional. A list of two-letter ``ISO 3166-1 alpha-2``
             country codes indicating the countries from which users can vote in the poll. The
-            country code ``“FT”`` is used for users with anonymous numbers. If omitted, then users
+            country code ``"FT"`` is used for users with anonymous numbers. If omitted, then users
             from any country can participate in the poll.
 
             .. versionadded:: NEXT.VERSION
