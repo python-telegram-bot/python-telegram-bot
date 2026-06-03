@@ -21,7 +21,7 @@ and InputPollOptionMedia Objects."""
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, TypeAlias
 
 from telegram import constants
 from telegram._files.animation import Animation
@@ -66,74 +66,6 @@ class _BaseInputMedia(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = enum.get_member(constants.BaseInputMediaType, media_type, media_type)
-
-
-class InputPollMedia(_BaseInputMedia):
-    """This object represents the content of a poll description or a quiz explanation to be sent.
-    It should be one of:
-
-    * :class:`telegram.InputMediaAnimation`
-    * :class:`telegram.InputMediaAudio`
-    * :class:`telegram.InputMediaDocument`
-    * :class:`telegram.LivePhoto`
-    * :class:`telegram.InputMediaLocation`
-    * :class:`telegram.InputMediaPhoto`
-    * :class:`telegram.InputMediaVenue`
-    * :class:`telegram.InputMediaVideo`
-
-    .. versionadded:: NEXT.VERSION
-
-    Args:
-        media_type (:obj:`str`): Type of the input poll media.
-
-    Attributes:
-        type (:obj:`str`): Type of the input poll media.
-    """
-
-    __slots__ = ()
-
-    def __init__(
-        self,
-        media_type: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(media_type=media_type, api_kwargs=api_kwargs)
-
-        self._freeze()
-
-
-class InputPollOptionMedia(_BaseInputMedia):
-    """This object represents the content of a poll option to be sent. It should be one of:
-
-    * :class:`telegram.InputMediaAnimation`
-    * :class:`telegram.InputMediaLivePhoto`
-    * :class:`telegram.InputMediaLocation`
-    * :class:`telegram.InputMediaPhoto`
-    * :class:`telegram.InputMediaSticker`
-    * :class:`telegram.InputMediaVenue`
-    * :class:`telegram.InputMediaVideo`
-
-    .. versionadded:: NEXT.VERSION
-
-    Args:
-        media_type (:obj:`str`): Type of the input poll option media.
-
-    Attributes:
-        type (:obj:`str`): Type of the input poll option media.
-    """
-
-    __slots__ = ()
-
-    def __init__(
-        self,
-        media_type: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(media_type=media_type, api_kwargs=api_kwargs)
-
-        self._freeze()
 
 
 class InputMedia(_BaseInputMedia):
@@ -447,7 +379,7 @@ class InputPaidMediaLivePhoto(InputPaidMedia):
             self.photo: str | InputFile = photo
 
 
-class InputMediaAnimation(InputMedia, InputPollMedia, InputPollOptionMedia):
+class InputMediaAnimation(InputMedia):
     """Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 
     Note:
@@ -588,7 +520,7 @@ class InputMediaAnimation(InputMedia, InputPollMedia, InputPollOptionMedia):
         return get_timedelta_value(self._duration, attribute="duration")
 
 
-class InputMediaPhoto(InputMedia, InputPollMedia, InputPollOptionMedia):
+class InputMediaPhoto(InputMedia):
     """Represents a photo to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -677,7 +609,7 @@ class InputMediaPhoto(InputMedia, InputPollMedia, InputPollOptionMedia):
             self.show_caption_above_media: bool | None = show_caption_above_media
 
 
-class InputMediaVideo(InputMedia, InputPollMedia, InputPollOptionMedia):
+class InputMediaVideo(InputMedia):
     """Represents a video to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -848,7 +780,7 @@ class InputMediaVideo(InputMedia, InputPollMedia, InputPollOptionMedia):
         return get_timedelta_value(self._duration, attribute="duration")
 
 
-class InputMediaLocation(InputPollMedia, InputPollOptionMedia):
+class InputMediaLocation(_BaseInputMedia):
     """Represents a location to be sent.
 
     .. versionadded:: NEXT.VERSION
@@ -884,7 +816,7 @@ class InputMediaLocation(InputPollMedia, InputPollOptionMedia):
             self.horizontal_accuracy: float | None = horizontal_accuracy
 
 
-class InputMediaVenue(InputPollMedia, InputPollOptionMedia):
+class InputMediaVenue(_BaseInputMedia):
     """Represents a venue to be sent.
 
     .. versionadded:: NEXT.VERSION
@@ -953,7 +885,7 @@ class InputMediaVenue(InputPollMedia, InputPollOptionMedia):
             self.google_place_type: str | None = google_place_type
 
 
-class InputMediaSticker(InputPollOptionMedia):
+class InputMediaSticker(_BaseInputMedia):
     """Represents a sticker file to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -996,7 +928,7 @@ class InputMediaSticker(InputPollOptionMedia):
             self.emoji: str | None = emoji
 
 
-class InputMediaAudio(InputMedia, InputPollMedia):
+class InputMediaAudio(InputMedia):
     """Represents an audio file to be treated as music to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -1115,7 +1047,7 @@ class InputMediaAudio(InputMedia, InputPollMedia):
         return get_timedelta_value(self._duration, attribute="duration")
 
 
-class InputMediaDocument(InputMedia, InputPollMedia):
+class InputMediaDocument(InputMedia):
     """Represents a general file to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -1204,7 +1136,7 @@ class InputMediaDocument(InputMedia, InputPollMedia):
             self.disable_content_type_detection: bool | None = disable_content_type_detection
 
 
-class InputMediaLivePhoto(InputMedia, InputPollMedia, InputPollOptionMedia):
+class InputMediaLivePhoto(InputMedia):
     """Represents a live photo to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
@@ -1274,3 +1206,33 @@ class InputMediaLivePhoto(InputMedia, InputPollMedia, InputPollOptionMedia):
             self.photo: str | InputFile = photo
             self.show_caption_above_media: bool | None = show_caption_above_media
             self.has_spoiler: bool | None = has_spoiler
+
+
+InputPollMedia: TypeAlias = (
+    InputMediaAnimation
+    | InputMediaAudio
+    | InputMediaDocument
+    | InputMediaLivePhoto
+    | InputMediaLocation
+    | InputMediaPhoto
+    | InputMediaVenue
+    | InputMediaVideo
+)
+"""Type alias for InputPollMedia objects.
+
+versionadded:: NEXT.VERSION
+"""
+
+InputPollOptionMedia: TypeAlias = (
+    InputMediaAnimation
+    | InputMediaLivePhoto
+    | InputMediaLocation
+    | InputMediaPhoto
+    | InputMediaSticker
+    | InputMediaVenue
+    | InputMediaVideo
+)
+"""Type alias for InputPollOptionMedia objects.
+
+.. versionadded:: NEXT.VERSION
+"""

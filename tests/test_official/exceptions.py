@@ -165,6 +165,8 @@ PTB_EXTRA_PARAMS = {
     "InputStoryContent": {"type"},  # attributes common to all subclasses
     "StoryAreaType": {"type"},  # attributes common to all subclasses
     "InputProfilePhoto": {"type"},  # attributes common to all subclasses
+    "InputPollOptionMedia": {"args", "kwargs"},  # UnionType's __init__ signature
+    "InputPollMedia": {"args", "kwargs"},  # UnionType's __init__ signature
     # backwards compatibility for api 10.0 changes
     # tags: deprecated NEXT.VERSION, bot api 10.0
     "Poll": {"correct_option_id"},

@@ -1,6 +1,6 @@
 InputPollMedia
 ==============
 
+.. versionadded:: NEXT.VERSION
+
 .. autoclass:: telegram.InputPollMedia
-    :members:
-    :show-inheritance:

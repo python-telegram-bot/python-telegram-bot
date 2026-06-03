@@ -231,24 +231,6 @@ class TestInputMediaWithoutRequest:
         }
 
 
-class TestInputPollMediaWithoutRequest:
-    def test_type_enum_conversion(self):
-        assert type(InputPollMedia("photo").type) is BaseInputMediaType
-        assert InputPollMedia("unknown").type == "unknown"
-
-    def test_to_dict(self):
-        assert InputPollMedia("photo").to_dict() == {"type": BaseInputMediaType.PHOTO}
-
-
-class TestInputPollOptionMediaWithoutRequest:
-    def test_type_enum_conversion(self):
-        assert type(InputPollOptionMedia("sticker").type) is BaseInputMediaType
-        assert InputPollOptionMedia("unknown").type == "unknown"
-
-    def test_to_dict(self):
-        assert InputPollOptionMedia("sticker").to_dict() == {"type": BaseInputMediaType.STICKER}
-
-
 class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
     def test_slot_behaviour(self, input_media_video):
         inst = input_media_video
