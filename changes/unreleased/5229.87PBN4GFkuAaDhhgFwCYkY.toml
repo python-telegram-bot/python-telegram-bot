@@ -9,15 +9,18 @@ Full Support for Bot API 10.0
 """
 
 deprecations = """
-Deprecated passing the ``filename`` parameter positionally to the classes:
+* Deprecated passing the ``filename`` parameter positionally to the classes:
 
-* ``InputMediaAnimation``
-* ``InputMediaAudio``
-* ``InputMediaPhoto``
-* ``InputMediaDocument``
-* ``InputMediaVideo``
+  * ``InputMediaAnimation``
+  * ``InputMediaAudio``
+  * ``InputMediaPhoto``
+  * ``InputMediaDocument``
+  * ``InputMediaVideo``
 
-Please pass ``filename`` as a keyword argument instead, as this parameter will become keyword-only in the future.
+  Please pass ``filename`` as a keyword argument instead, as this parameter will become keyword-only in the future.
+
+* Deprecated ``InputPollOption.de_json``. The class ``InputPollOption`` is input only and its ``de_json`` method will be removed in future versions. The Bot API 10.0 ``media`` field of ``InputPollOption`` will not be included for deserialization.
+
 """
 
 pull_requests = [
