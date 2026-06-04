@@ -331,6 +331,92 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video.thumbnail == data_file("telegram.jpg").as_uri()
         assert input_media_video.cover == data_file("telegram.jpg").as_uri()
 
+    def test_effective_filename(self, video_file):
+        inst = InputMediaVideo(
+            video_file,
+            "caption",
+            24,
+            24,
+            10,
+            True,
+            "parse_mode",
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaVideo(
+            video_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaVideo(
+            video_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, video_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaVideo(
+                video_file,
+                "caption",
+                24,
+                24,
+                10,
+                True,
+                "parse_mode",
+                [],
+                "pos_filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaVideo(
+                video_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, video_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaVideo(
+                video_file,
+                "caption",
+                24,
+                24,
+                10,
+                True,
+                "parse_mode",
+                [],
+                "pos_filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, video_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaVideo(
+                video_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
 
 class InputMediaPhotoTestBase:
     type_ = "photo"
@@ -398,6 +484,80 @@ class TestInputMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
     def test_with_local_files(self):
         input_media_photo = InputMediaPhoto(data_file("telegram.mp4"))
         assert input_media_photo.media == data_file("telegram.mp4").as_uri()
+
+    def test_effective_filename(self, photo_file):
+        inst = InputMediaPhoto(
+            photo_file,
+            "caption",
+            "parse_mode",
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaPhoto(
+            photo_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaPhoto(
+            photo_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, photo_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaPhoto(
+                photo_file,
+                "caption",
+                "parse_mode",
+                [],
+                "filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaPhoto(
+                photo_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, photo_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaPhoto(
+                photo_file,
+                "caption",
+                "parse_mode",
+                [],
+                "filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, photo_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaPhoto(
+                photo_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
 
 class InputMediaAnimationTestBase:
@@ -499,6 +659,89 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
         assert input_media_animation.media == data_file("telegram.mp4").as_uri()
         assert input_media_animation.thumbnail == data_file("telegram.jpg").as_uri()
 
+    def test_effective_filename(self, animation_file):
+        inst = InputMediaAnimation(
+            animation_file,
+            "caption",
+            "parse_mode",
+            24,
+            24,
+            10,
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaAnimation(
+            animation_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaAnimation(
+            animation_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, animation_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaAnimation(
+                animation_file,
+                "caption",
+                "parse_mode",
+                24,
+                24,
+                10,
+                [],
+                "pos_filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaAnimation(
+                animation_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, animation_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaAnimation(
+                animation_file,
+                "caption",
+                "parse_mode",
+                24,
+                24,
+                10,
+                [],
+                "pos_filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, animation_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaAnimation(
+                animation_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
 
 class InputMediaAudioTestBase:
     type_ = "audio"
@@ -595,6 +838,89 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
         )
         assert input_media_audio.media == data_file("telegram.mp4").as_uri()
         assert input_media_audio.thumbnail == data_file("telegram.jpg").as_uri()
+
+    def test_effective_filename(self, audio_file):
+        inst = InputMediaAudio(
+            audio_file,
+            "caption",
+            "parse_mode",
+            10,
+            "performer",
+            "title",
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaAudio(
+            audio_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaAudio(
+            audio_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, audio_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaAudio(
+                audio_file,
+                "caption",
+                "parse_mode",
+                10,
+                "performer",
+                "title",
+                [],
+                "pos_filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaAudio(
+                audio_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, audio_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaAudio(
+                audio_file,
+                "caption",
+                "parse_mode",
+                10,
+                "performer",
+                "title",
+                [],
+                "pos_filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, audio_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaAudio(
+                audio_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
 
 class InputMediaDocumentTestBase:
@@ -797,6 +1123,83 @@ class TestInputMediaDocumentWithoutRequest(InputMediaDocumentTestBase):
         )
         assert input_media_document.media == data_file("telegram.mp4").as_uri()
         assert input_media_document.thumbnail == data_file("telegram.jpg").as_uri()
+
+    def test_effective_filename(self, document_file):
+        inst = InputMediaDocument(
+            document_file,
+            "caption",
+            "parse_mode",
+            True,
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaDocument(
+            document_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaDocument(
+            document_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, document_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaDocument(
+                document_file,
+                "caption",
+                "parse_mode",
+                True,
+                [],
+                "pos_filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaDocument(
+                document_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, document_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaDocument(
+                document_file,
+                "caption",
+                "parse_mode",
+                True,
+                [],
+                "pos_filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, document_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaDocument(
+                document_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
 
 class TestInputPaidMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
