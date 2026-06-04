@@ -131,6 +131,7 @@ if TYPE_CHECKING:
         InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollMedia,
         InputProfilePhoto,
         InputSticker,
         InputStoryContent,
@@ -7638,6 +7639,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         description_parse_mode: str | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
         shuffle_options: bool | None = None,
+        members_only: bool | None = None,
+        country_codes: Sequence[str] | None = None,
+        explanation_media: "InputPollMedia | None" = None,
+        media: "InputPollMedia | None" = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
@@ -7781,6 +7786,27 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 shown in random order
 
                 .. versionadded:: NEXT.VERSION
+            members_only (:obj:`bool`, optional): :obj:`True`, if voting is limited to users who
+                have been members of the chat where the poll is being sent for more than
+                :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours; for channel chats only
+
+                .. versionadded:: NEXT.VERSION
+            country_codes (Sequence[:obj:`str`], optional): A list of
+                0-:tg-const:`telegram.constants.PollLimit.MAX_COUNTRY_CODES` two-letter
+                ``ISO 3166-1 alpha-2`` country codes indicating the countries from which users can
+                vote in the poll; for channel chats only. Use ``"FT"`` as a country code to allow
+                users with anonymous numbers to vote. If omitted or empty, then users from any
+                country can participate in the poll.
+
+                .. versionadded:: NEXT.VERSION
+            explanation_media (:class:`telegram.InputPollMedia`, optional): Media added to the quiz
+                explanation
+
+                .. versionadded:: NEXT.VERSION
+            media (:class:`telegram.InputPollMedia`, optional): Media added to the poll
+                description.
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7848,6 +7874,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "close_date": close_date,
             "question_parse_mode": question_parse_mode,
             "question_entities": question_entities,
+            "members_only": members_only,
+            "country_codes": country_codes,
+            "explanation_media": explanation_media,
+            "media": media,
         }
 
         return await self._send_message(

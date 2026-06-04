@@ -69,7 +69,16 @@ def false_update(request):
 
 @pytest.fixture
 def poll_answer(bot):
-    return Update(0, poll_answer=PollAnswer(1, [0, 1], User(2, "test user", False), Chat(1, "")))
+    return Update(
+        0,
+        poll_answer=PollAnswer(
+            poll_id=1,
+            option_ids=[0, 1],
+            option_persistent_ids=["0", "1"],
+            user=User(2, "test user", False),
+            voter_chat=Chat(1, ""),
+        ),
+    )
 
 
 class TestPollAnswerHandler:

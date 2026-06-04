@@ -214,13 +214,18 @@ def message(bot):
             "poll": Poll(
                 id="abc",
                 question="What is this?",
-                options=[PollOption(text="a", voter_count=1), PollOption(text="b", voter_count=2)],
+                options=[
+                    PollOption(text="a", voter_count=1, persistent_id="persistent_id_a"),
+                    PollOption(text="b", voter_count=2, persistent_id="persistent_id_b"),
+                ],
                 is_closed=False,
                 total_voter_count=0,
                 is_anonymous=False,
                 type=Poll.REGULAR,
                 allows_multiple_answers=True,
                 explanation_entities=[],
+                allows_revoting=True,
+                members_only=True,
             )
         },
         {
