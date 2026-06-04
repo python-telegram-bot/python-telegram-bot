@@ -402,7 +402,7 @@ class InputMediaAnimation(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
-            :paramref:`filename`. For backwoard compatibility.
+            :paramref:`filename`. For backward compatibility.
 
             .. versionadded:: NEXT.VERSION
             .. deprecated:: NEXT.VERSION
@@ -563,7 +563,7 @@ class InputMediaPhoto(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
-            :paramref:`filename`. For backwoard compatibility.
+            :paramref:`filename`. For backward compatibility.
 
             .. versionadded:: NEXT.VERSION
             .. deprecated:: NEXT.VERSION
@@ -691,7 +691,7 @@ class InputMediaVideo(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
-            :paramref:`filename`. For backwoard compatibility.
+            :paramref:`filename`. For backward compatibility.
 
             .. versionadded:: NEXT.VERSION
             .. deprecated:: NEXT.VERSION
@@ -1037,7 +1037,7 @@ class InputMediaAudio(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
-            :paramref:`filename`. For backwoard compatibility.
+            :paramref:`filename`. For backward compatibility.
 
             .. versionadded:: NEXT.VERSION
             .. deprecated:: NEXT.VERSION
@@ -1179,7 +1179,7 @@ class InputMediaDocument(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
-            :paramref:`filename`. For backwoard compatibility.
+            :paramref:`filename`. For backward compatibility.
 
             .. versionadded:: NEXT.VERSION
             .. deprecated:: NEXT.VERSION
