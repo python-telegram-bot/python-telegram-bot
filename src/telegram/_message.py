@@ -713,13 +713,13 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: NEXT.VERSION
         guest_bot_caller_chat (:class:`telegram.Chat`, optional): For a message sent by a guest
-            bot, this is the user whose original message triggered the bot's response.
+            bot, this is the chat whose original message triggered the bot's response.
 
             .. versionadded:: NEXT.VERSION
         guest_query_id (:obj:`str`, optional): The unique identifier for the guest query. Use this
             identifier with the method :meth:`telegram.Bot.answer_guest_query` to send a response
-            message. If non-empty, the message belongs to a chat of the corresponding business
-            account that is independent from any potential bot chat which might share the same
+            message. If non-empty, the message belongs to the chat where the guest bot was
+            summoned, which may not coincide with other existing bot chats sharing the same
             identifier.
 
             .. versionadded:: NEXT.VERSION
@@ -1160,13 +1160,13 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: NEXT.VERSION
         guest_bot_caller_chat (:class:`telegram.Chat`): Optional. For a message sent by a guest
-            bot, this is the user whose original message triggered the bot's response.
+            bot, this is the chat whose original message triggered the bot's response.
 
             .. versionadded:: NEXT.VERSION
         guest_query_id (:obj:`str`): Optional. The unique identifier for the guest query. Use this
             identifier with the method :meth:`telegram.Bot.answer_guest_query` to send a response
-            message. If non-empty, the message belongs to a chat of the corresponding business
-            account that is independent from any potential bot chat which might share the same
+            message. If non-empty, the message belongs to the chat where the guest bot was
+            summoned, which may not coincide with other existing bot chats sharing the same
             identifier.
 
             .. versionadded:: NEXT.VERSION

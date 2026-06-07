@@ -5870,7 +5870,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 sent.
 
         Returns:
-            :class:`telegram.SentGuestMessage`: On success, a sent
+            :class:`telegram.SentGuestMessage`: On success, a
             :class:`telegram.SentGuestMessage` is returned.
 
         Raises:
