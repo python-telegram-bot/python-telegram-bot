@@ -274,6 +274,10 @@ class BaseFilter:
             :attr:`~telegram.Update.business_message`
             or :attr:`~telegram.Update.edited_business_message`.
 
+        .. versionchanged:: NEXT.VERSION
+            This filter now also returns :obj:`True` if the update contains
+            :attr:`~telegram.Update.guest_message`.
+
         Args:
             update (:class:`telegram.Update`): The update to check.
 
@@ -282,7 +286,8 @@ class BaseFilter:
             :attr:`~telegram.Update.channel_post`, :attr:`~telegram.Update.message`,
             :attr:`~telegram.Update.edited_channel_post`,
             :attr:`~telegram.Update.edited_message`, :attr:`telegram.Update.business_message`,
-            :attr:`telegram.Update.edited_business_message`, or :obj:`False` otherwise.
+            :attr:`telegram.Update.edited_business_message`,
+            :attr:`telegram.Update.guest_message`, or :obj:`False` otherwise.
         """
         return bool(  # Only message updates should be handled.
             update.channel_post
@@ -291,6 +296,7 @@ class BaseFilter:
             or update.edited_message
             or update.business_message
             or update.edited_business_message
+            or update.guest_message
         )
 
 
@@ -2907,6 +2913,18 @@ class UpdateType:
     :attr:`telegram.Update.edited_business_message`.
 
     .. versionadded:: 21.1
+    """
+
+    class _GuestMessage(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.guest_message is not None
+
+    GUEST_MESSAGE = _GuestMessage(name="filters.UpdateType.GUEST_MESSAGE")
+    """Updates with :attr:`telegram.Update.guest_message`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
 

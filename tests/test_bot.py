@@ -78,6 +78,7 @@ from telegram import (
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     ReplyParameters,
+    SentGuestMessage,
     SentWebAppMessage,
     ShippingOption,
     StarTransaction,
@@ -854,6 +855,150 @@ class TestBotWithoutRequest:
         assert params, "something went wrong with passing arguments to the request"
         assert isinstance(web_app_msg, SentWebAppMessage)
         assert web_app_msg.inline_message_id == "321"
+
+        # make sure that the results were not edited in-place
+        assert ilq_result == copied_result
+        assert (
+            ilq_result.input_message_content.parse_mode
+            == copied_result.input_message_content.parse_mode
+        )
+
+    async def test_answer_guest_query(self, offline_bot, raw_bot, monkeypatch):
+        params = False
+
+        # For now just test that our internals pass the correct data
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            nonlocal params
+            params = request_data.parameters == {
+                "guest_query_id": "12345",
+                "result": {
+                    "title": "title",
+                    "input_message_content": {
+                        "message_text": "text",
+                    },
+                    "type": InlineQueryResultType.ARTICLE,
+                    "id": "1",
+                },
+            }
+            return SentGuestMessage("321").to_dict()
+
+        result = InlineQueryResultArticle("1", "title", InputTextMessageContent("text"))
+        copied_result = copy.copy(result)
+
+        ext_bot = offline_bot
+        for bot_type in (ext_bot, raw_bot):
+            monkeypatch.setattr(bot_type.request, "post", make_assertion)
+            guest_msg = await bot_type.answer_guest_query("12345", result)
+            assert params, "something went wrong with passing arguments to the request"
+            assert isinstance(guest_msg, SentGuestMessage)
+            assert guest_msg.inline_message_id == "321"
+
+            # make sure that the results were not edited in-place
+            assert result == copied_result
+            assert (
+                result.input_message_content.parse_mode
+                == copied_result.input_message_content.parse_mode
+            )
+
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"parse_mode": "Markdown", "link_preview_options": LinkPreviewOptions(is_disabled=True)}],
+        indirect=True,
+    )
+    @pytest.mark.parametrize(
+        ("ilq_result", "expected_params"),
+        [
+            (
+                InlineQueryResultArticle("1", "title", InputTextMessageContent("text")),
+                {
+                    "guest_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "parse_mode": "Markdown",
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+            (
+                InlineQueryResultArticle(
+                    "1",
+                    "title",
+                    InputTextMessageContent(
+                        "text", parse_mode="HTML", disable_web_page_preview=False
+                    ),
+                ),
+                {
+                    "guest_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "parse_mode": "HTML",
+                            "link_preview_options": {
+                                "is_disabled": False,
+                            },
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+            (
+                InlineQueryResultArticle(
+                    "1",
+                    "title",
+                    InputTextMessageContent(
+                        "text", parse_mode=None, disable_web_page_preview="False"
+                    ),
+                ),
+                {
+                    "guest_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "link_preview_options": {
+                                "is_disabled": "False",
+                            },
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+        ],
+    )
+    async def test_answer_guest_query_defaults(
+        self, default_bot, ilq_result, expected_params, monkeypatch
+    ):
+        offline_bot = default_bot
+        params = False
+
+        # For now just test that our internals pass the correct data
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            nonlocal params
+            params = request_data.parameters == expected_params
+            return SentGuestMessage("321").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+
+        # We test different result types more thoroughly for answer_inline_query, so we just
+        # use the one type here
+        copied_result = copy.copy(ilq_result)
+
+        guest_msg = await offline_bot.answer_guest_query("12345", ilq_result)
+        assert params, "something went wrong with passing arguments to the request"
+        assert isinstance(guest_msg, SentGuestMessage)
+        assert guest_msg.inline_message_id == "321"
 
         # make sure that the results were not edited in-place
         assert ilq_result == copied_result

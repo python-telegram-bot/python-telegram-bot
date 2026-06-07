@@ -110,6 +110,7 @@ if TYPE_CHECKING:
         GiveawayCompleted,
         GiveawayCreated,
         GiveawayWinners,
+        InlineQueryResult,
         InputMedia,
         InputMediaAudio,
         InputMediaDocument,
@@ -123,6 +124,7 @@ if TYPE_CHECKING:
         MessageId,
         MessageOrigin,
         ReactionType,
+        SentGuestMessage,
         SuggestedPostApprovalFailed,
         SuggestedPostApproved,
         SuggestedPostDeclined,
@@ -711,6 +713,21 @@ class Message(MaybeInaccessibleMessage):
             created a bot that will be managed by the current bot.
 
             .. versionadded:: NEXT.VERSION
+        guest_bot_caller_user (:class:`telegram.User`, optional): For a message sent by a guest
+            bot, this is the user whose original message triggered the bot's response.
+
+            .. versionadded:: NEXT.VERSION
+        guest_bot_caller_chat (:class:`telegram.Chat`, optional): For a message sent by a guest
+            bot, this is the chat whose original message triggered the bot's response.
+
+            .. versionadded:: NEXT.VERSION
+        guest_query_id (:obj:`str`, optional): The unique identifier for the guest query. Use this
+            identifier with the method :meth:`telegram.Bot.answer_guest_query` to send a response
+            message. If non-empty, the message belongs to the chat where the guest bot was
+            summoned, which may not coincide with other existing bot chats sharing the same
+            identifier.
+
+            .. versionadded:: NEXT.VERSION
         live_photo (:class:`telegram.LivePhoto`, optional): Message is a live photo, information
             about the live photo. For backward compatibility, when this field is set, the photo
             field will also be set.
@@ -1148,6 +1165,21 @@ class Message(MaybeInaccessibleMessage):
             created a bot that will be managed by the current bot.
 
             .. versionadded:: NEXT.VERSION
+        guest_bot_caller_user (:class:`telegram.User`): Optional. For a message sent by a guest
+            bot, this is the user whose original message triggered the bot's response.
+
+            .. versionadded:: NEXT.VERSION
+        guest_bot_caller_chat (:class:`telegram.Chat`): Optional. For a message sent by a guest
+            bot, this is the chat whose original message triggered the bot's response.
+
+            .. versionadded:: NEXT.VERSION
+        guest_query_id (:obj:`str`): Optional. The unique identifier for the guest query. Use this
+            identifier with the method :meth:`telegram.Bot.answer_guest_query` to send a response
+            message. If non-empty, the message belongs to the chat where the guest bot was
+            summoned, which may not coincide with other existing bot chats sharing the same
+            identifier.
+
+            .. versionadded:: NEXT.VERSION
         live_photo (:class:`telegram.LivePhoto`): Optional. Message is a live photo, information
             about the live photo. For backward compatibility, when this field is set, the photo
             field will also be set.
@@ -1214,6 +1246,9 @@ class Message(MaybeInaccessibleMessage):
         "giveaway_created",
         "giveaway_winners",
         "group_chat_created",
+        "guest_bot_caller_chat",
+        "guest_bot_caller_user",
+        "guest_query_id",
         "has_media_spoiler",
         "has_protected_content",
         "invoice",
@@ -1394,6 +1429,9 @@ class Message(MaybeInaccessibleMessage):
         poll_option_deleted: PollOptionDeleted | None = None,
         reply_to_poll_option_id: str | None = None,
         managed_bot_created: ManagedBotCreated | None = None,
+        guest_bot_caller_user: User | None = None,
+        guest_bot_caller_chat: Chat | None = None,
+        guest_query_id: str | None = None,
         live_photo: LivePhoto | None = None,
         *,
         api_kwargs: JSONDict | None = None,
@@ -1529,6 +1567,9 @@ class Message(MaybeInaccessibleMessage):
             self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
             self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
             self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
+            self.guest_bot_caller_user: User | None = guest_bot_caller_user
+            self.guest_bot_caller_chat: Chat | None = guest_bot_caller_chat
+            self.guest_query_id: str | None = guest_query_id
             self.live_photo: LivePhoto | None = live_photo
 
             self._effective_attachment = DEFAULT_NONE
@@ -1758,6 +1799,12 @@ class Message(MaybeInaccessibleMessage):
         )
         data["managed_bot_created"] = de_json_optional(
             data.get("managed_bot_created"), ManagedBotCreated, bot
+        )
+        data["guest_bot_caller_user"] = de_json_optional(
+            data.get("guest_bot_caller_user"), User, bot
+        )
+        data["guest_bot_caller_chat"] = de_json_optional(
+            data.get("guest_bot_caller_chat"), Chat, bot
         )
         data["live_photo"] = de_json_optional(data.get("live_photo"), LivePhoto, bot)
 
@@ -5363,6 +5410,41 @@ class Message(MaybeInaccessibleMessage):
             message_id=self.message_id,
             user_id=user_id,
             actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def answer_guest_query(
+        self,
+        result: "InlineQueryResult",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "SentGuestMessage":
+        """Shortcut for::
+
+             await bot.answer_guest_query(
+                 self.guest_query_id,
+                 *args, **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.answer_guest_query`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.SentGuestMessage`: On success, a
+            :class:`telegram.SentGuestMessage` is returned.
+        """
+        return await self.get_bot().answer_guest_query(
+            guest_query_id=self.guest_query_id,
+            result=result,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

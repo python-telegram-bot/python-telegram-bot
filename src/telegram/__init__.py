@@ -265,6 +265,7 @@ __all__ = (
     "RevenueWithdrawalStateSucceeded",
     "SecureData",
     "SecureValue",
+    "SentGuestMessage",
     "SentWebAppMessage",
     "SharedUser",
     "ShippingAddress",
@@ -617,6 +618,7 @@ from ._reaction import (
 from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
+from ._sentguestmessage import SentGuestMessage
 from ._sentwebappmessage import SentWebAppMessage
 from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story

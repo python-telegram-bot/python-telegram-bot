@@ -156,6 +156,14 @@ managed_bot = ManagedBotUpdated(
     user=User(1, "creator", True),
     bot=User(2, "bot", True),
 )
+guest_message = Message(
+    1,
+    dtm.datetime.utcnow(),
+    Chat(1, ""),
+    User(1, "", False),
+    sender_chat=Chat(1, ""),
+)
+
 
 params = [
     {"message": message},
@@ -211,6 +219,7 @@ params = [
     {"edited_business_message": business_message},
     {"purchased_paid_media": purchased_paid_media},
     {"managed_bot": managed_bot},
+    {"guest_message": guest_message},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -240,6 +249,7 @@ all_types = (
     "edited_business_message",
     "purchased_paid_media",
     "managed_bot",
+    "guest_message",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -346,7 +356,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
     def test_effective_sender_non_anonymous(self, update):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned off
-        if message := (update.message or update.edited_message):
+        if message := (update.message or update.edited_message or update.guest_message):
             message._unfreeze()
             message.sender_chat = None
         elif reaction := (update.message_reaction):
@@ -379,7 +389,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
     def test_effective_sender_anonymous(self, update):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned on
-        if message := (update.message or update.edited_message):
+        if message := (update.message or update.edited_message or update.guest_message):
             message._unfreeze()
             message.from_user = None
         elif reaction := (update.message_reaction):
@@ -405,6 +415,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
                 or update.edited_channel_post
                 or update.message_reaction
                 or update.poll_answer
+                or update.guest_message
             ):
                 assert isinstance(sender, Chat)
             else:

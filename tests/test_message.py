@@ -50,9 +50,11 @@ from telegram import (
     GiveawayCompleted,
     GiveawayCreated,
     GiveawayWinners,
+    InlineQueryResultArticle,
     InputChecklist,
     InputChecklistTask,
     InputPaidMediaPhoto,
+    InputTextMessageContent,
     Invoice,
     LinkPreviewOptions,
     LivePhoto,
@@ -132,6 +134,7 @@ def message(bot):
         chat=copy(MessageTestBase.chat),
         from_user=copy(MessageTestBase.from_user),
         business_connection_id="123456789",
+        guest_query_id="706654132",
     )
     message.set_bot(bot)
     message._unfreeze()
@@ -449,6 +452,9 @@ def message(bot):
         {"poll_option_deleted": PollOptionDeleted(option_persistent_id="abc", option_text="this")},
         {"reply_to_poll_option_id": "3123"},
         {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
+        {"guest_bot_caller_user": User(10, "hm", False)},
+        {"guest_bot_caller_chat": Chat(14, "om")},
+        {"guest_query_id": "This is a guest_query_id"},
         {"live_photo": LivePhoto("file_id", "file_unique_id", 12, 12, 5)},
     ],
     ids=[
@@ -548,6 +554,9 @@ def message(bot):
         "poll_option_deleted",
         "reply_to_poll_option_id",
         "managed_bot_created",
+        "guest_bot_caller_user",
+        "guest_bot_caller_chat",
+        "guest_query_id",
         "live_photo",
     ],
 )
@@ -3502,3 +3511,28 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         monkeypatch.setattr(message.get_bot(), "delete_message_reaction", make_assertion)
         assert await message.delete_reaction(user_id=23, actor_chat_id=12)
+
+    async def test_answer_guest_query(self, monkeypatch, message):
+        iqra = InlineQueryResultArticle(
+            id="iqra_id", title="title", input_message_content=InputTextMessageContent("content")
+        )
+
+        async def make_assertion(*_, **kwargs):
+            return kwargs["guest_query_id"] == message.guest_query_id and kwargs["result"] == iqra
+
+        assert check_shortcut_signature(
+            Message.answer_guest_query,
+            Bot.answer_guest_query,
+            ["guest_query_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.answer_guest_query,
+            message.get_bot(),
+            "answer_guest_query",
+            shortcut_kwargs=["guest_query_id"],
+        )
+        assert await check_defaults_handling(message.answer_guest_query, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "answer_guest_query", make_assertion)
+        assert await message.answer_guest_query(result=iqra)

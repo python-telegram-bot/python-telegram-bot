@@ -82,6 +82,8 @@
       - Used for answering the callback query
     * - :meth:`~telegram.Bot.answer_inline_query`
       - Used for answering the inline query
+    * - :meth:`~telegram.Bot.answer_guest_query`
+      - Used for replying to a received guest message
     * - :meth:`~telegram.Bot.answer_pre_checkout_query`
       - Used for answering a pre checkout query
     * - :meth:`~telegram.Bot.answer_shipping_query`

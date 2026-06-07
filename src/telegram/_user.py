@@ -133,6 +133,11 @@ class User(TelegramObject):
             controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: NEXT.VERSION
+        supports_guest_queries (:obj:`bool`, optional): :obj:`True`, if the bot supports guest
+            queries from chats it is not a member of. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -177,6 +182,11 @@ class User(TelegramObject):
             controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: NEXT.VERSION
+        supports_guest_queries (:obj:`bool`): Optional. :obj:`True`, if the bot supports guest
+            queries from chats it is not a member of. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -198,6 +208,7 @@ class User(TelegramObject):
         "is_premium",
         "language_code",
         "last_name",
+        "supports_guest_queries",
         "supports_inline_queries",
         "username",
     )
@@ -220,6 +231,7 @@ class User(TelegramObject):
         has_topics_enabled: bool | None = None,
         allows_users_to_create_topics: bool | None = None,
         can_manage_bots: bool | None = None,
+        supports_guest_queries: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -242,6 +254,7 @@ class User(TelegramObject):
         self.has_topics_enabled: bool | None = has_topics_enabled
         self.allows_users_to_create_topics: bool | None = allows_users_to_create_topics
         self.can_manage_bots: bool | None = can_manage_bots
+        self.supports_guest_queries: bool | None = supports_guest_queries
 
         self._id_attrs = (self.id,)
 
