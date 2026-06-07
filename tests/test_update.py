@@ -161,6 +161,7 @@ guest_message = Message(
     dtm.datetime.utcnow(),
     Chat(1, ""),
     User(1, "", False),
+    sender_chat=Chat(1, ""),
 )
 
 
@@ -341,7 +342,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
     def test_effective_sender_non_anonymous(self, update):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned off
-        if message := (update.message or update.edited_message):
+        if message := (update.message or update.edited_message or update.guest_message):
             message._unfreeze()
             message.sender_chat = None
         elif reaction := (update.message_reaction):
@@ -374,7 +375,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
     def test_effective_sender_anonymous(self, update):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned on
-        if message := (update.message or update.edited_message):
+        if message := (update.message or update.edited_message or update.guest_message):
             message._unfreeze()
             message.from_user = None
         elif reaction := (update.message_reaction):
@@ -400,6 +401,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
                 or update.edited_channel_post
                 or update.message_reaction
                 or update.poll_answer
+                or update.guest_message
             ):
                 assert isinstance(sender, Chat)
             else:

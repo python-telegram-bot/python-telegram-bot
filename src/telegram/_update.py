@@ -525,7 +525,6 @@ class Update(TelegramObject):
         * :attr:`removed_chat_boost`
         * :attr:`message_reaction_count`
         * :attr:`deleted_business_messages`
-        * :attr:`guest_message`
 
         is present.
 
