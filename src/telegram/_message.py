@@ -109,6 +109,7 @@ if TYPE_CHECKING:
         GiveawayCompleted,
         GiveawayCreated,
         GiveawayWinners,
+        InlineQueryResult,
         InputMedia,
         InputMediaAudio,
         InputMediaDocument,
@@ -120,6 +121,7 @@ if TYPE_CHECKING:
         MessageId,
         MessageOrigin,
         ReactionType,
+        SentGuestMessage,
         SuggestedPostApprovalFailed,
         SuggestedPostApproved,
         SuggestedPostDeclined,
@@ -5258,6 +5260,41 @@ class Message(MaybeInaccessibleMessage):
             chat_id=self.chat_id,
             message_id=self.message_id,
             comment=comment,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def answer_guest_query(
+        self,
+        result: "InlineQueryResult",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "SentGuestMessage":
+        """Shortcut for::
+
+             await bot.answer_guest_query(
+                 self.guest_query_id,
+                 *args, **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.answer_guest_query`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.SentGuestMessage`: On success, a
+            :class:`telegram.SentGuestMessage` is returned.
+        """
+        return await self.get_bot().answer_guest_query(
+            guest_query_id=self.guest_query_id,
+            result=result,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

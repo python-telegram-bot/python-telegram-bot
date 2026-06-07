@@ -50,9 +50,11 @@ from telegram import (
     GiveawayCompleted,
     GiveawayCreated,
     GiveawayWinners,
+    InlineQueryResultArticle,
     InputChecklist,
     InputChecklistTask,
     InputPaidMediaPhoto,
+    InputTextMessageContent,
     Invoice,
     LinkPreviewOptions,
     Location,
@@ -131,6 +133,7 @@ def message(bot):
         chat=copy(MessageTestBase.chat),
         from_user=copy(MessageTestBase.from_user),
         business_connection_id="123456789",
+        guest_query_id="706654132",
     )
     message.set_bot(bot)
     message._unfreeze()
@@ -3425,3 +3428,28 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         monkeypatch.setattr(message.get_bot(), "decline_suggested_post", make_assertion)
         assert await message.decline_suggested_post(comment="some comment")
+
+    async def test_answer_guest_query(self, monkeypatch, message):
+        iqra = InlineQueryResultArticle(
+            id="iqra_id", title="title", input_message_content=InputTextMessageContent("content")
+        )
+
+        async def make_assertion(*_, **kwargs):
+            return kwargs["guest_query_id"] == message.guest_query_id and kwargs["result"] == iqra
+
+        assert check_shortcut_signature(
+            Message.answer_guest_query,
+            Bot.answer_guest_query,
+            ["guest_query_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.answer_guest_query,
+            message.get_bot(),
+            "answer_guest_query",
+            shortcut_kwargs=["guest_query_id"],
+        )
+        assert await check_defaults_handling(message.answer_guest_query, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "answer_guest_query", make_assertion)
+        assert await message.answer_guest_query(result=iqra)
