@@ -517,6 +517,10 @@ class ChatMemberRestricted(ChatMember):
         can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
 
             .. versionadded:: 22.7
+        can_react_to_messages (:obj:`bool`): :obj:`True`, if the user is allowed to react to
+            messages.
+
+            .. versionadded:: NEXT.VERSION
         tag (:obj:`str`, optional): Tag of the member.
 
             .. versionadded:: 22.7
@@ -573,6 +577,10 @@ class ChatMemberRestricted(ChatMember):
         can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
 
             .. versionadded:: 22.7
+        can_react_to_messages (:obj:`bool`): :obj:`True`, if the user is allowed to react to
+            messages.
+
+            .. versionadded:: NEXT.VERSION
         tag (:obj:`str`): Optional. Tag of the member.
 
             .. versionadded:: 22.7
@@ -586,6 +594,7 @@ class ChatMemberRestricted(ChatMember):
         "can_invite_users",
         "can_manage_topics",
         "can_pin_messages",
+        "can_react_to_messages",
         "can_send_audios",
         "can_send_documents",
         "can_send_messages",
@@ -621,10 +630,17 @@ class ChatMemberRestricted(ChatMember):
         can_send_voice_notes: bool,
         can_edit_tag: bool,
         tag: str | None = None,
+        # tags: NEXT.VERSION
+        # temporarily optional to make it not breaking
+        can_react_to_messages: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
+
+        if can_react_to_messages is None:
+            raise TypeError("`can_react_to_messages` is required and cannot be None")
+
         with self._unfrozen():
             self.is_member: bool = is_member
             self.can_change_info: bool = can_change_info
@@ -643,6 +659,7 @@ class ChatMemberRestricted(ChatMember):
             self.can_send_video_notes: bool = can_send_video_notes
             self.can_send_voice_notes: bool = can_send_voice_notes
             self.can_edit_tag: bool = can_edit_tag
+            self.can_react_to_messages: bool = can_react_to_messages
             self.tag: str | None = tag
 
 

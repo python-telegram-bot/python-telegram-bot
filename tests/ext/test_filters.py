@@ -945,6 +945,11 @@ class TestFilters:
         update.message.location = "test"
         assert filters.LOCATION.check_update(update)
 
+    def test_filters_live_photo(self, update):
+        assert not filters.LIVE_PHOTO.check_update(update)
+        update.message.live_photo = "test"
+        assert filters.LIVE_PHOTO.check_update(update)
+
     def test_filters_venue(self, update):
         assert not filters.VENUE.check_update(update)
         update.message.venue = "test"

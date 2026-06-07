@@ -146,8 +146,13 @@ PTB_EXTRA_PARAMS = {
     "PassportFile": {"credentials"},
     "EncryptedPassportElement": {"credentials"},
     "PassportElementError": {"source", "type", "message"},
+    "InputPoll(Option)?Media": {"media_type"},
     "InputMedia": {"caption", "caption_entities", "media", "media_type", "parse_mode"},
-    "InputMedia(Animation|Audio|Document|Photo|Video|VideoNote|Voice)": {"filename"},
+    "InputMedia(Animation|Audio|Document|Photo|Sticker|Video|VideoNote|Voice)": {
+        "filename",
+        # tags: deprecated NEXT.VERSION
+        "filename_depr",
+    },
     "InputFile": {"attach", "filename", "obj", "read_file_handle"},
     "MaybeInaccessibleMessage": {"date", "message_id", "chat"},  # attributes common to all subcls
     "ChatBoostSource": {"source"},  # attributes common to all subclasses
@@ -164,6 +169,11 @@ PTB_EXTRA_PARAMS = {
     "InputStoryContent": {"type"},  # attributes common to all subclasses
     "StoryAreaType": {"type"},  # attributes common to all subclasses
     "InputProfilePhoto": {"type"},  # attributes common to all subclasses
+    "InputPollOptionMedia": {"args", "kwargs"},  # UnionType's __init__ signature
+    "InputPollMedia": {"args", "kwargs"},  # UnionType's __init__ signature
+    # backwards compatibility for api 10.0 changes
+    # tags: deprecated NEXT.VERSION, bot api 10.0
+    "Poll": {"correct_option_id"},
 }
 
 
@@ -222,7 +232,7 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
     "PollOption": {"persistent_id"},
     "PollAnswer": {"option_persistent_ids"},
-    "Poll": {"allows_revoting"},
+    "Poll": {"allows_revoting", "members_only"},
 }
 
 

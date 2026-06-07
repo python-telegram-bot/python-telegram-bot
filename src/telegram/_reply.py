@@ -28,6 +28,7 @@ from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
 from telegram._files.document import Document
+from telegram._files.livephoto import LivePhoto
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import Sticker
@@ -114,6 +115,10 @@ class ExternalReplyInfo(TelegramObject):
             information about the paid media.
 
             .. versionadded:: 21.4
+        live_photo (:class:`telegram.LivePhoto`, optional): Message is a live photo, information
+            about the live photo.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         origin (:class:`telegram.MessageOrigin`): Origin of the message replied to by the given
@@ -166,6 +171,11 @@ class ExternalReplyInfo(TelegramObject):
             information about the paid media.
 
             .. versionadded:: 21.4
+        live_photo (:class:`telegram.LivePhoto`): Optional. Message is a live photo, information
+            about the live photo.
+
+            .. versionadded:: NEXT.VERSION
+
     """
 
     __slots__ = (
@@ -182,6 +192,7 @@ class ExternalReplyInfo(TelegramObject):
         "has_media_spoiler",
         "invoice",
         "link_preview_options",
+        "live_photo",
         "location",
         "message_id",
         "origin",
@@ -223,6 +234,7 @@ class ExternalReplyInfo(TelegramObject):
         venue: Venue | None = None,
         paid_media: PaidMediaInfo | None = None,
         checklist: Checklist | None = None,
+        live_photo: LivePhoto | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -253,6 +265,7 @@ class ExternalReplyInfo(TelegramObject):
         self.poll: Poll | None = poll
         self.venue: Venue | None = venue
         self.paid_media: PaidMediaInfo | None = paid_media
+        self.live_photo: LivePhoto | None = live_photo
 
         self._id_attrs = (self.origin,)
 
@@ -290,6 +303,7 @@ class ExternalReplyInfo(TelegramObject):
         data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
         data["paid_media"] = de_json_optional(data.get("paid_media"), PaidMediaInfo, bot)
         data["checklist"] = de_json_optional(data.get("checklist"), Checklist, bot)
+        data["live_photo"] = de_json_optional(data.get("live_photo"), LivePhoto, bot)
 
         return super().de_json(data=data, bot=bot)
 

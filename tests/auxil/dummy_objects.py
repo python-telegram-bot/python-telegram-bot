@@ -4,6 +4,7 @@ from typing import TypeAlias
 
 from telegram import (
     AcceptedGiftTypes,
+    BotAccessSettings,
     BotCommand,
     BotDescription,
     BotName,
@@ -64,6 +65,7 @@ _DUMMY_STICKER = Sticker(
 
 _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     "bool": True,
+    "BotAccessSettings": BotAccessSettings(is_access_restricted=True, added_users=[_DUMMY_USER]),
     "BotCommand": BotCommand(command="dummy_command", description="dummy_description"),
     "BotDescription": BotDescription(description="dummy_description"),
     "BotName": BotName(name="dummy_name"),
@@ -128,12 +130,14 @@ _PREPARED_DUMMY_OBJECTS: dict[str, object] = {
     "Poll": Poll(
         id="dummy_id",
         question="dummy_question",
-        options=[PollOption(text="dummy_text", voter_count=1)],
+        options=[PollOption(text="dummy_text", voter_count=1, persistent_id="persistent_id")],
         is_closed=False,
         is_anonymous=False,
         total_voter_count=1,
         type="dummy_type",
         allows_multiple_answers=False,
+        allows_revoting=True,
+        members_only=True,
     ),
     "PreparedKeyboardButton": PreparedKeyboardButton(id=1234),
     "PreparedInlineMessage": PreparedInlineMessage(id="dummy_id", expiration_date=_DUMMY_DATE),

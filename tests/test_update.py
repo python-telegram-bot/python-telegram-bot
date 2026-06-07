@@ -179,17 +179,31 @@ params = [
         )
     },
     {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
-    {"poll": Poll("id", "?", [PollOption(".", 1)], False, False, False, Poll.REGULAR, True)},
+    {
+        "poll": Poll(
+            "id",
+            "?",
+            [PollOption(text=".", voter_count=1, persistent_id="persistent_id")],
+            False,
+            False,
+            False,
+            Poll.REGULAR,
+            True,
+            allows_revoting=True,
+            members_only=True,
+        )
+    },
     {
         "poll_answer": PollAnswer(
-            "id",
-            [1],
-            User(
+            poll_id="id",
+            option_ids=[1],
+            option_persistent_ids=["1"],
+            user=User(
                 1,
                 "",
                 False,
             ),
-            Chat(1, ""),
+            voter_chat=Chat(1, ""),
         )
     },
     {"my_chat_member": chat_member_updated},
