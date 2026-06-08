@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.15.0-beta.2']
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - python-version: '3.14t'

@@ -331,10 +331,12 @@ __all__ = (
     "warnings",
 )
 
-from telegram._inputchecklist import InputChecklist, InputChecklistTask
-from telegram._payment.stars.staramount import StarAmount
-from telegram._payment.stars.startransactions import StarTransaction, StarTransactions
-from telegram._payment.stars.transactionpartner import (
+__lazy_modules__ = ["constants", "error", "helpers", "request", "warnings"]
+
+from ._inputchecklist import InputChecklist, InputChecklistTask
+from ._payment.stars.staramount import StarAmount
+from ._payment.stars.startransactions import StarTransaction, StarTransactions
+from ._payment.stars.transactionpartner import (
     TransactionPartner,
     TransactionPartnerAffiliateProgram,
     TransactionPartnerChat,
