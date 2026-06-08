@@ -1,0 +1,5 @@
+internal = "Update pypa/gh-action-pypi-publish action to v1.14.0"
+[[pull_requests]]
+uid = "5257"
+author_uids = ["renovate[bot]"]
+closes_threads = []

@@ -95,22 +95,7 @@ class TestMessageHandler:
             and isinstance(context.job_queue, JobQueue)
             and isinstance(context.chat_data, dict)
             and isinstance(context.bot_data, dict)
-            and (
-                (
-                    isinstance(context.user_data, dict)
-                    and (
-                        isinstance(update.message, Message)
-                        or isinstance(update.edited_message, Message)
-                    )
-                )
-                or (
-                    context.user_data is None
-                    and (
-                        isinstance(update.channel_post, Message)
-                        or isinstance(update.edited_channel_post, Message)
-                    )
-                )
-            )
+            and isinstance(context.user_data, dict)
         )
 
     def callback_regex1(self, update, context):
