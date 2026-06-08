@@ -2718,7 +2718,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def send_checklist(
         self,
         business_connection_id: str,
-        chat_id: int,
+        chat_id: int | str,
         checklist: InputChecklist,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2756,7 +2756,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def edit_message_checklist(
         self,
         business_connection_id: str,
-        chat_id: int,
+        chat_id: int | str,
         message_id: int,
         checklist: InputChecklist,
         reply_markup: "InlineKeyboardMarkup | None" = None,
@@ -2887,7 +2887,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def send_game(
         self,
-        chat_id: int,
+        chat_id: int | str,
         game_short_name: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "InlineKeyboardMarkup | None" = None,
@@ -3291,7 +3291,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         hide_results_until_closes: bool | None = None,
         correct_option_ids: CorrectOptionIds | None = None,
         description: str | None = None,
-        description_parse_mode: str | None = None,
+        description_parse_mode: ODVInput[str] | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
         shuffle_options: bool | None = None,
         members_only: bool | None = None,

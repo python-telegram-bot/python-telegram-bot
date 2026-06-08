@@ -3686,7 +3686,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
     async def send_game(
         self,
-        chat_id: int,
+        chat_id: int | str,
         game_short_name: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "InlineKeyboardMarkup | None" = None,
@@ -3708,7 +3708,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         """Use this method to send a game.
 
         Args:
-            chat_id (:obj:`int`): Unique identifier for the target chat.
+            chat_id (:obj:`int`): Unique identifier for the target chat or username of the
+                target bot in the format ``@username``. Games can't be sent to channel direct
+                messages chats and channel chats.
             game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
                 for the game. Set up your games via `@BotFather <https://t.me/BotFather>`_.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -7682,7 +7684,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         hide_results_until_closes: bool | None = None,
         correct_option_ids: CorrectOptionIds | None = None,
         description: str | None = None,
-        description_parse_mode: str | None = None,
+        description_parse_mode: ODVInput[str] | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
         shuffle_options: bool | None = None,
         members_only: bool | None = None,
@@ -7999,7 +8001,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def send_checklist(
         self,
         business_connection_id: str,
-        chat_id: int,
+        chat_id: int | str,
         checklist: InputChecklist,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -8021,20 +8023,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 22.3
 
         Args:
-            business_connection_id (:obj:`str`):
-                |business_id_str|
-            chat_id (:obj:`int`):
-                Unique identifier for the target chat.
-            checklist (:class:`telegram.InputChecklist`):
-                The checklist to send.
-            disable_notification (:obj:`bool`, optional):
-                |disable_notification|
-            protect_content (:obj:`bool`, optional):
-                |protect_content|
-            message_effect_id (:obj:`str`, optional):
-                |message_effect_id|
-            reply_parameters (:class:`telegram.ReplyParameters`, optional):
-                |reply_parameters|
+            business_connection_id (:obj:`str`): |business_id_str|
+            chat_id (:obj:`int`): Unique identifier for the target chat or username of the target
+                bot in the format ``@username``.
+            checklist (:class:`telegram.InputChecklist`): The checklist to send.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional):
                 An object for an inline keyboard
 
@@ -8079,7 +8075,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def edit_message_checklist(
         self,
         business_connection_id: str,
-        chat_id: int,
+        chat_id: int | str,
         message_id: int,
         checklist: InputChecklist,
         reply_markup: "InlineKeyboardMarkup | None" = None,
@@ -8096,14 +8092,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 22.3
 
         Args:
-            business_connection_id (:obj:`str`):
-                |business_id_str|
-            chat_id (:obj:`int`):
-                Unique identifier for the target chat.
-            message_id (:obj:`int`):
-                Unique identifier for the target message.
-            checklist (:class:`telegram.InputChecklist`):
-                The new checklist.
+            business_connection_id (:obj:`str`): |business_id_str|
+            chat_id (:obj:`int`): Unique identifier for the target chat or username of the target
+                bot in the format ``@username``.
+            message_id (:obj:`int`): Unique identifier for the target message.
+            checklist (:class:`telegram.InputChecklist`): The new checklist.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional):
                 An object for the new inline keyboard for the message.
 

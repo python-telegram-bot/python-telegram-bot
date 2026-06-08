@@ -2381,7 +2381,7 @@ class _ChatBase(TelegramObject):
         allow_adding_options: bool | None = None,
         hide_results_until_closes: bool | None = None,
         description: str | None = None,
-        description_parse_mode: str | None = None,
+        description_parse_mode: ODVInput[str] | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
         members_only: bool | None = None,
         country_codes: Sequence[str] | None = None,

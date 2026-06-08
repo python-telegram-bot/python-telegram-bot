@@ -20,7 +20,18 @@
 
 from collections.abc import Sequence
 
-from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
+from telegram import (
+    Animation,
+    Audio,
+    Document,
+    Gift,
+    LivePhoto,
+    PhotoSize,
+    Sticker,
+    Video,
+    VideoNote,
+    Voice,
+)
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -41,6 +52,7 @@ class ParamTypeCheckingExceptions:
     ADDITIONAL_TYPES = {
         r"send_\w*": {
             "photo$": PhotoSize,
+            "live_photo": LivePhoto,
             "video$": Video,
             "video_note": VideoNote,
             "audio": Audio,
@@ -67,6 +79,7 @@ class ParamTypeCheckingExceptions:
         ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
         ("reaction", False): "ReactionType",  # + str
         ("options", False): "InputPollOption",  # + str
+        ("correct_option_ids", False): "Sequence[typing.Literal[",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
@@ -91,6 +104,7 @@ class ParamTypeCheckingExceptions:
         },
         "Input(Paid)?Media.*": {
             "media": str,  # actual: Union[str, InputMedia*, FileInput]
+            "photo": str,  # actual: Union[str, FileInput]
             # see also https://github.com/tdlib/telegram-bot-api/issues/707
             "thumbnail": str,  # actual: Union[str, FileInput]
             "cover": str,  # actual: Union[str, FileInput]
@@ -138,7 +152,7 @@ PTB_EXTRA_PARAMS = {
     "send_venue": {"venue"},
     "answer_inline_query": {"current_offset"},
     "send_media_group": {"caption", "parse_mode", "caption_entities"},
-    "send_(animation|audio|document|photo|video(_note)?|voice)": {"filename"},
+    "send_(animation|audio|document|photo|video(_note)?|voice|live_photo)": {"filename"},
     "InlineQueryResult": {"id", "type"},  # attributes common to all subclasses
     "ChatMember": {"user", "status"},  # attributes common to all subclasses
     "BotCommandScope": {"type"},  # attributes common to all subclasses
@@ -174,6 +188,7 @@ PTB_EXTRA_PARAMS = {
     # backwards compatibility for api 10.0 changes
     # tags: deprecated NEXT.VERSION, bot api 10.0
     "Poll": {"correct_option_id"},
+    "send_poll": {"correct_option_id"},
 }
 
 
@@ -233,6 +248,8 @@ BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
     "PollOption": {"persistent_id"},
     "PollAnswer": {"option_persistent_ids"},
     "Poll": {"allows_revoting", "members_only"},
+    "ChatMemberRestricted": {"can_react_to_messages"},
+    "send_poll": {"correct_option_id"},
 }
 
 

@@ -3685,7 +3685,7 @@ class Message(MaybeInaccessibleMessage):
         allow_adding_options: bool | None = None,
         hide_results_until_closes: bool | None = None,
         description: str | None = None,
-        description_parse_mode: str | None = None,
+        description_parse_mode: ODVInput[str] | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
         members_only: bool | None = None,
         country_codes: Sequence[str] | None = None,
@@ -3891,7 +3891,7 @@ class Message(MaybeInaccessibleMessage):
         )
         return await self.get_bot().send_checklist(
             business_connection_id=self.business_connection_id,
-            chat_id=chat_id,  # type: ignore[arg-type]
+            chat_id=chat_id,
             checklist=checklist,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
@@ -4003,7 +4003,7 @@ class Message(MaybeInaccessibleMessage):
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_game(
-            chat_id=chat_id,  # type: ignore[arg-type]
+            chat_id=chat_id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
