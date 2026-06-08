@@ -333,20 +333,6 @@ __all__ = (
 
 __lazy_modules__ = ["constants", "error", "helpers", "request", "warnings"]
 
-from ._inputchecklist import InputChecklist, InputChecklistTask
-from ._payment.stars.staramount import StarAmount
-from ._payment.stars.startransactions import StarTransaction, StarTransactions
-from ._payment.stars.transactionpartner import (
-    TransactionPartner,
-    TransactionPartnerAffiliateProgram,
-    TransactionPartnerChat,
-    TransactionPartnerFragment,
-    TransactionPartnerOther,
-    TransactionPartnerTelegramAds,
-    TransactionPartnerTelegramApi,
-    TransactionPartnerUser,
-)
-
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
 from ._bot import Bot
@@ -504,6 +490,7 @@ from ._inline.inputmessagecontent import InputMessageContent
 from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._inline.preparedinlinemessage import PreparedInlineMessage
+from ._inputchecklist import InputChecklist, InputChecklistTask
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._keyboardbuttonrequest import (
@@ -575,6 +562,18 @@ from ._payment.stars.revenuewithdrawalstate import (
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
     RevenueWithdrawalStateSucceeded,
+)
+from ._payment.stars.staramount import StarAmount
+from ._payment.stars.startransactions import StarTransaction, StarTransactions
+from ._payment.stars.transactionpartner import (
+    TransactionPartner,
+    TransactionPartnerAffiliateProgram,
+    TransactionPartnerChat,
+    TransactionPartnerFragment,
+    TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
+    TransactionPartnerTelegramApi,
+    TransactionPartnerUser,
 )
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import (
