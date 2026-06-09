@@ -38,6 +38,7 @@ from telegram import (
     Animation,
     Audio,
     Bot,
+    BotAccessSettings,
     BotCommand,
     BotCommandScope,
     BotDescription,
@@ -76,6 +77,7 @@ from telegram import (
     PreparedKeyboardButton,
     ReactionType,
     ReplyParameters,
+    SentGuestMessage,
     SentWebAppMessage,
     StarAmount,
     StarTransactions,
@@ -119,11 +121,14 @@ if TYPE_CHECKING:
         InlineQueryResult,
         InputMediaAudio,
         InputMediaDocument,
+        InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollMedia,
         InputSticker,
         InputStoryContent,
         LabeledPrice,
+        LivePhoto,
         Location,
         MessageEntity,
         PassportElementError,
@@ -1119,6 +1124,28 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def answer_guest_query(
+        self,
+        guest_query_id: str,
+        result: "InlineQueryResult",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> SentGuestMessage:
+        return await super().answer_guest_query(
+            guest_query_id=guest_query_id,
+            result=result,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def approve_chat_join_request(
         self,
         chat_id: str | int,
@@ -1844,6 +1871,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def get_chat_administrators(
         self,
         chat_id: str | int,
+        return_bots: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1854,6 +1882,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> tuple[ChatMember, ...]:
         return await super().get_chat_administrators(
             chat_id=chat_id,
+            return_bots=return_bots,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2689,7 +2718,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def send_checklist(
         self,
         business_connection_id: str,
-        chat_id: int,
+        chat_id: int | str,
         checklist: InputChecklist,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2727,7 +2756,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def edit_message_checklist(
         self,
         business_connection_id: str,
-        chat_id: int,
+        chat_id: int | str,
         message_id: int,
         checklist: InputChecklist,
         reply_markup: "InlineKeyboardMarkup | None" = None,
@@ -2858,7 +2887,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def send_game(
         self,
-        chat_id: int,
+        chat_id: int | str,
         game_short_name: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "InlineKeyboardMarkup | None" = None,
@@ -3044,7 +3073,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: int | str,
         media: Sequence[
-            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo | InputMediaLivePhoto"  # noqa: E501  # pylint: disable=line-too-long
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -3148,7 +3177,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: int,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
@@ -3262,9 +3291,13 @@ class ExtBot(Bot, Generic[RLARGS]):
         hide_results_until_closes: bool | None = None,
         correct_option_ids: CorrectOptionIds | None = None,
         description: str | None = None,
-        description_parse_mode: str | None = None,
+        description_parse_mode: ODVInput[str] | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
         shuffle_options: bool | None = None,
+        members_only: bool | None = None,
+        country_codes: Sequence[str] | None = None,
+        explanation_media: "InputPollMedia | None" = None,
+        media: "InputPollMedia | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3314,6 +3347,10 @@ class ExtBot(Bot, Generic[RLARGS]):
             description_entities=description_entities,
             hide_results_until_closes=hide_results_until_closes,
             allow_adding_options=allow_adding_options,
+            members_only=members_only,
+            country_codes=country_codes,
+            explanation_media=explanation_media,
+            media=media,
         )
 
     async def send_sticker(
@@ -5032,6 +5069,74 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_managed_bot_access_settings(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> BotAccessSettings:
+
+        return await super().get_managed_bot_access_settings(
+            user_id=user_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_managed_bot_access_settings(
+        self,
+        user_id: int,
+        is_access_restricted: bool,
+        added_user_ids: Sequence[int] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+
+        return await super().set_managed_bot_access_settings(
+            user_id=user_id,
+            is_access_restricted=is_access_restricted,
+            added_user_ids=added_user_ids,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_user_personal_chat_messages(
+        self,
+        user_id: int,
+        limit: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> tuple[Message, ...]:
+        return await super().get_user_personal_chat_messages(
+            user_id=user_id,
+            limit=limit,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def send_paid_media(
         self,
         chat_id: str | int,
@@ -5593,6 +5698,117 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def send_live_photo(
+        self,
+        chat_id: int | str,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        caption: str | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: int | None = None,
+        filename: str | None = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> Message:
+
+        return await super().send_live_photo(
+            chat_id=chat_id,
+            live_photo=live_photo,
+            photo=photo,
+            business_connection_id=business_connection_id,
+            message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            show_caption_above_media=show_caption_above_media,
+            has_spoiler=has_spoiler,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=suggested_post_parameters,
+            reply_parameters=reply_parameters,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            filename=filename,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def delete_message_reaction(
+        self,
+        chat_id: int | str,
+        message_id: int,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().delete_message_reaction(
+            chat_id=chat_id,
+            message_id=message_id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def delete_all_message_reactions(
+        self,
+        chat_id: int | str,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().delete_all_message_reactions(
+            chat_id=chat_id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -5647,6 +5863,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     answerShippingQuery = answer_shipping_query
     answerPreCheckoutQuery = answer_pre_checkout_query
     answerWebAppQuery = answer_web_app_query
+    answerGuestQuery = answer_guest_query
     restrictChatMember = restrict_chat_member
     promoteChatMember = promote_chat_member
     setChatPermissions = set_chat_permissions
@@ -5762,3 +5979,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     getManagedBotToken = get_managed_bot_token
     replaceManagedBotToken = replace_managed_bot_token
     savePreparedKeyboardButton = save_prepared_keyboard_button
+    sendLivePhoto = send_live_photo
+    getManagedBotAccessSettings = get_managed_bot_access_settings
+    setManagedBotAccessSettings = set_managed_bot_access_settings
+    getUserPersonalChatMessages = get_user_personal_chat_messages
+    deleteMessageReaction = delete_message_reaction
+    deleteAllMessageReactions = delete_all_message_reactions

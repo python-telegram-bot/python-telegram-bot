@@ -945,6 +945,11 @@ class TestFilters:
         update.message.location = "test"
         assert filters.LOCATION.check_update(update)
 
+    def test_filters_live_photo(self, update):
+        assert not filters.LIVE_PHOTO.check_update(update)
+        update.message.live_photo = "test"
+        assert filters.LIVE_PHOTO.check_update(update)
+
     def test_filters_venue(self, update):
         assert not filters.VENUE.check_update(update)
         update.message.venue = "test"
@@ -2471,6 +2476,7 @@ class TestFilters:
         assert not filters.UpdateType.BUSINESS_MESSAGES.check_update(update)
         assert not filters.UpdateType.BUSINESS_MESSAGE.check_update(update)
         assert not filters.UpdateType.EDITED_BUSINESS_MESSAGE.check_update(update)
+        assert not filters.UpdateType.GUEST_MESSAGE.check_update(update)
 
     def test_update_type_edited_message(self, update):
         update.edited_message, update.message = update.message, update.edited_message
@@ -2484,6 +2490,7 @@ class TestFilters:
         assert not filters.UpdateType.BUSINESS_MESSAGES.check_update(update)
         assert not filters.UpdateType.BUSINESS_MESSAGE.check_update(update)
         assert not filters.UpdateType.EDITED_BUSINESS_MESSAGE.check_update(update)
+        assert not filters.UpdateType.GUEST_MESSAGE.check_update(update)
 
     def test_update_type_channel_post(self, update):
         update.channel_post, update.message = update.message, update.edited_message
@@ -2497,6 +2504,7 @@ class TestFilters:
         assert not filters.UpdateType.BUSINESS_MESSAGES.check_update(update)
         assert not filters.UpdateType.BUSINESS_MESSAGE.check_update(update)
         assert not filters.UpdateType.EDITED_BUSINESS_MESSAGE.check_update(update)
+        assert not filters.UpdateType.GUEST_MESSAGE.check_update(update)
 
     def test_update_type_edited_channel_post(self, update):
         update.edited_channel_post, update.message = update.message, update.edited_message
@@ -2510,6 +2518,7 @@ class TestFilters:
         assert not filters.UpdateType.BUSINESS_MESSAGES.check_update(update)
         assert not filters.UpdateType.BUSINESS_MESSAGE.check_update(update)
         assert not filters.UpdateType.EDITED_BUSINESS_MESSAGE.check_update(update)
+        assert not filters.UpdateType.GUEST_MESSAGE.check_update(update)
 
     def test_update_type_business_message(self, update):
         update.business_message, update.message = update.message, update.edited_message
@@ -2523,6 +2532,7 @@ class TestFilters:
         assert filters.UpdateType.BUSINESS_MESSAGES.check_update(update)
         assert filters.UpdateType.BUSINESS_MESSAGE.check_update(update)
         assert not filters.UpdateType.EDITED_BUSINESS_MESSAGE.check_update(update)
+        assert not filters.UpdateType.GUEST_MESSAGE.check_update(update)
 
     def test_update_type_edited_business_message(self, update):
         update.edited_business_message, update.message = update.message, update.edited_message
@@ -2536,6 +2546,21 @@ class TestFilters:
         assert filters.UpdateType.BUSINESS_MESSAGES.check_update(update)
         assert not filters.UpdateType.BUSINESS_MESSAGE.check_update(update)
         assert filters.UpdateType.EDITED_BUSINESS_MESSAGE.check_update(update)
+        assert not filters.UpdateType.GUEST_MESSAGE.check_update(update)
+
+    def test_update_type_guest_message(self, update):
+        update.guest_message, update.message = update.message, update.edited_message
+        assert not filters.UpdateType.MESSAGE.check_update(update)
+        assert not filters.UpdateType.EDITED_MESSAGE.check_update(update)
+        assert not filters.UpdateType.MESSAGES.check_update(update)
+        assert not filters.UpdateType.CHANNEL_POST.check_update(update)
+        assert not filters.UpdateType.EDITED_CHANNEL_POST.check_update(update)
+        assert not filters.UpdateType.CHANNEL_POSTS.check_update(update)
+        assert not filters.UpdateType.EDITED.check_update(update)
+        assert not filters.UpdateType.BUSINESS_MESSAGES.check_update(update)
+        assert not filters.UpdateType.BUSINESS_MESSAGE.check_update(update)
+        assert not filters.UpdateType.EDITED_BUSINESS_MESSAGE.check_update(update)
+        assert filters.UpdateType.GUEST_MESSAGE.check_update(update)
 
     def test_merged_short_circuit_and(self, update, base_class):
         update.message.text = "/test"
