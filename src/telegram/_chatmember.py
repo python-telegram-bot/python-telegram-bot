@@ -515,6 +515,7 @@ class ChatMemberRestricted(ChatMember):
 
             .. versionadded:: 20.1
         can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
+            If omitted, defaults to the value of :attr:`can_pin_messages`.
 
             .. versionadded:: 22.7
         can_react_to_messages (:obj:`bool`): :obj:`True`, if the user is allowed to react to
@@ -575,6 +576,7 @@ class ChatMemberRestricted(ChatMember):
 
             .. versionadded:: 20.1
         can_edit_tag (:obj:`bool`): :obj:`True`, if the user is allowed to edit their own tag.
+            If omitted, defaults to the value of :attr:`can_pin_messages`.
 
             .. versionadded:: 22.7
         can_react_to_messages (:obj:`bool`): :obj:`True`, if the user is allowed to react to

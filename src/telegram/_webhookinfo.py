@@ -63,7 +63,8 @@ class WebhookInfo(TelegramObject):
             connections to the webhook for update delivery.
         allowed_updates (Sequence[:obj:`str`], optional): A sequence of update types the bot is
             subscribed to. Defaults to all update types, except
-            :attr:`telegram.Update.chat_member`.
+            :attr:`~telegram.Update.chat_member`, :attr:`~telegram.Update.message_reaction`,
+            and :attr:`~telegram.Update.message_reaction_count`.
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
@@ -93,7 +94,8 @@ class WebhookInfo(TelegramObject):
             connections to the webhook for update delivery.
         allowed_updates (tuple[:obj:`str`]): Optional. A tuple of update types the bot is
             subscribed to. Defaults to all update types, except
-            :attr:`telegram.Update.chat_member`.
+            :attr:`~telegram.Update.chat_member`, :attr:`~telegram.Update.message_reaction`,
+            and :attr:`~telegram.Update.message_reaction_count`.
 
             .. versionchanged:: 20.0
 

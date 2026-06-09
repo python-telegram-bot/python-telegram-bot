@@ -112,7 +112,7 @@ class User(TelegramObject):
 
             .. versionadded:: 20.0
         can_connect_to_business (:obj:`bool`, optional): :obj:`True`,  if the bot can be connected
-            to a Telegram Business account to receive its messages. Returned only in
+            to a user account to manage it. Returned only in
             :meth:`telegram.Bot.get_me`.
 
             .. versionadded:: 21.1

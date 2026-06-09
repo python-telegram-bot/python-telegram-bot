@@ -8825,7 +8825,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
-                specified, default bot's menu button will be changed
+                specified, the bot's default menu button will be changed
             menu_button (:class:`telegram.MenuButton`, optional): An object for the new bot's menu
                 button. Defaults to :class:`telegram.MenuButtonDefault`.
 
@@ -8865,7 +8865,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
-                specified, default bot's menu button will be returned.
+                specified, the bot's default menu button will be returned.
 
         Returns:
             :class:`telegram.MenuButton`: On success, the current menu button is returned.
