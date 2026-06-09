@@ -343,7 +343,7 @@ __all__ = (
     "warnings",
 )
 
-__lazy_modules__ = ["constants", "error", "helpers", "request", "warnings"]
+__lazy_modules__: list[str] = ["constants", "error", "helpers", "request", "warnings"]
 
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
