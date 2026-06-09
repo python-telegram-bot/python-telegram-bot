@@ -29,6 +29,7 @@ from telegram import (
     ExternalReplyInfo,
     Giveaway,
     LinkPreviewOptions,
+    LivePhoto,
     MessageEntity,
     MessageOriginUser,
     PaidMediaInfo,
@@ -50,6 +51,7 @@ def external_reply_info():
         giveaway=ExternalReplyInfoTestBase.giveaway,
         paid_media=ExternalReplyInfoTestBase.paid_media,
         checklist=ExternalReplyInfoTestBase.checklist,
+        live_photo=ExternalReplyInfoTestBase.live_photo,
     )
 
 
@@ -73,6 +75,16 @@ class ExternalReplyInfoTestBase:
             ChecklistTask(text="Item 2", id=2),
         ],
     )
+    live_photo = LivePhoto(
+        file_id="file_id",
+        file_unique_id="file_unique_id",
+        width=100,
+        height=100,
+        duration=dtm.timedelta(seconds=10),
+        photo=[],
+        mime_type="image/jpeg",
+        file_size=1024,
+    )
 
 
 class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
@@ -92,6 +104,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
             "giveaway": self.giveaway.to_dict(),
             "paid_media": self.paid_media.to_dict(),
             "checklist": self.checklist.to_dict(),
+            "live_photo": self.live_photo.to_dict(),
         }
 
         external_reply_info = ExternalReplyInfo.de_json(json_dict, offline_bot)
@@ -104,6 +117,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert external_reply_info.giveaway == self.giveaway
         assert external_reply_info.paid_media == self.paid_media
         assert external_reply_info.checklist == self.checklist
+        assert external_reply_info.live_photo == self.live_photo
 
     def test_to_dict(self, external_reply_info):
         ext_reply_info_dict = external_reply_info.to_dict()
@@ -116,6 +130,7 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert ext_reply_info_dict["giveaway"] == self.giveaway.to_dict()
         assert ext_reply_info_dict["paid_media"] == self.paid_media.to_dict()
         assert ext_reply_info_dict["checklist"] == self.checklist.to_dict()
+        assert ext_reply_info_dict["live_photo"] == self.live_photo.to_dict()
 
     def test_equality(self, external_reply_info):
         a = external_reply_info
