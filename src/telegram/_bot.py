@@ -5731,10 +5731,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.SentGuestMessage`: On success, a
             :class:`telegram.SentGuestMessage` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "guest_query_id": guest_query_id,
@@ -8019,9 +8015,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: Returns :obj:`True` on success.
-
-        Raises:
-            :exc:`telegram.error.TelegramError`
         """
         data: JSONDict = {"rights": rights, "for_channels": for_channels}
 
@@ -10743,9 +10736,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.BotAccessSettings`: The access settings of the managed bot.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {
@@ -10794,9 +10784,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {
@@ -10841,9 +10828,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Returns:
             tuple[:class:`telegram.Message`, ...]: On success, a tuple of
             :class:`telegram.Message` objects is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {"user_id": user_id, "limit": limit}
@@ -12049,9 +12033,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
 
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -12115,9 +12096,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 removed, if the reaction were added by a chat.
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -12165,9 +12143,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
