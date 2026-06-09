@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 import inspect
+import platform
 from typing import TYPE_CHECKING
 
 import pytest
@@ -45,6 +46,10 @@ pytestmark = pytest.mark.skipif(not RUN_TEST_OFFICIAL, reason="test_official is 
 methods, method_ids, classes, class_ids = [], [], [], []  # not needed (just for completeness)
 
 if RUN_TEST_OFFICIAL:
+    if platform.python_version_tuple() > ("3", "15"):
+        pytest.skip(
+            "Running on Python version > 3.15 is not supported yet!", allow_module_level=True
+        )
     scraper = Scraper()
     methods, method_ids = scraper.collect_methods()
     classes, class_ids = scraper.collect_classes()
