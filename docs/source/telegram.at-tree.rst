@@ -8,6 +8,7 @@ Available Types
     telegram.animation
     telegram.audio
     telegram.birthdate
+    telegram.botaccesssettings
     telegram.botcommand
     telegram.botcommandscope
     telegram.botcommandscopeallchatadministrators
@@ -101,15 +102,22 @@ Available Types
     telegram.inputmediaanimation
     telegram.inputmediaaudio
     telegram.inputmediadocument
+    telegram.inputmedialivephoto
+    telegram.inputmedialocation
     telegram.inputmediaphoto
+    telegram.inputmediasticker
+    telegram.inputmediavenue
     telegram.inputmediavideo
     telegram.inputpaidmedia
+    telegram.inputpaidmedialivephoto
     telegram.inputpaidmediaphoto
     telegram.inputpaidmediavideo
+    telegram.inputpollmedia
     telegram.inputprofilephoto
     telegram.inputprofilephotoanimated
     telegram.inputprofilephotostatic
     telegram.inputpolloption
+    telegram.inputpolloptionmedia
     telegram.inputstorycontent
     telegram.inputstorycontentphoto
     telegram.inputstorycontentvideo
@@ -119,6 +127,7 @@ Available Types
     telegram.keyboardbuttonrequestmanagedbot
     telegram.keyboardbuttonrequestusers
     telegram.linkpreviewoptions
+    telegram.livephoto
     telegram.location
     telegram.locationaddress
     telegram.loginurl
@@ -146,6 +155,7 @@ Available Types
     telegram.ownedgiftunique
     telegram.paidmedia
     telegram.paidmediainfo
+    telegram.paidmedialivephoto
     telegram.paidmediaphoto
     telegram.paidmediapreview
     telegram.paidmediapurchased
@@ -154,6 +164,7 @@ Available Types
     telegram.photosize
     telegram.poll
     telegram.pollanswer
+    telegram.pollmedia
     telegram.polloption
     telegram.polloptionadded
     telegram.polloptiondeleted
@@ -167,6 +178,7 @@ Available Types
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.replyparameters
+    telegram.sentguestmessage
     telegram.sentwebappmessage
     telegram.shareduser
     telegram.story

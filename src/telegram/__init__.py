@@ -35,6 +35,7 @@ __all__ = (
     "BackgroundTypeWallpaper",
     "Birthdate",
     "Bot",
+    "BotAccessSettings",
     "BotCommand",
     "BotCommandScope",
     "BotCommandScopeAllChatAdministrators",
@@ -157,13 +158,20 @@ __all__ = (
     "InputMediaAnimation",
     "InputMediaAudio",
     "InputMediaDocument",
+    "InputMediaLivePhoto",
+    "InputMediaLocation",
     "InputMediaPhoto",
+    "InputMediaSticker",
+    "InputMediaVenue",
     "InputMediaVideo",
     "InputMessageContent",
     "InputPaidMedia",
+    "InputPaidMediaLivePhoto",
     "InputPaidMediaPhoto",
     "InputPaidMediaVideo",
+    "InputPollMedia",
     "InputPollOption",
+    "InputPollOptionMedia",
     "InputProfilePhoto",
     "InputProfilePhotoAnimated",
     "InputProfilePhotoStatic",
@@ -181,6 +189,7 @@ __all__ = (
     "KeyboardButtonRequestUsers",
     "LabeledPrice",
     "LinkPreviewOptions",
+    "LivePhoto",
     "Location",
     "LocationAddress",
     "LoginUrl",
@@ -210,6 +219,7 @@ __all__ = (
     "OwnedGifts",
     "PaidMedia",
     "PaidMediaInfo",
+    "PaidMediaLivePhoto",
     "PaidMediaPhoto",
     "PaidMediaPreview",
     "PaidMediaPurchased",
@@ -231,6 +241,7 @@ __all__ = (
     "PhotoSize",
     "Poll",
     "PollAnswer",
+    "PollMedia",
     "PollOption",
     "PollOptionAdded",
     "PollOptionDeleted",
@@ -254,6 +265,7 @@ __all__ = (
     "RevenueWithdrawalStateSucceeded",
     "SecureData",
     "SecureValue",
+    "SentGuestMessage",
     "SentWebAppMessage",
     "SharedUser",
     "ShippingAddress",
@@ -348,6 +360,7 @@ from telegram._payment.stars.transactionpartner import (
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
 from ._bot import Bot
+from ._botaccesssettings import BotAccessSettings
 from ._botcommand import BotCommand
 from ._botcommandscope import (
     BotCommandScope,
@@ -430,11 +443,18 @@ from ._files.inputmedia import (
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
+    InputMediaLivePhoto,
+    InputMediaLocation,
     InputMediaPhoto,
+    InputMediaSticker,
+    InputMediaVenue,
     InputMediaVideo,
     InputPaidMedia,
+    InputPaidMediaLivePhoto,
     InputPaidMediaPhoto,
     InputPaidMediaVideo,
+    InputPollMedia,
+    InputPollOptionMedia,
 )
 from ._files.inputprofilephoto import (
     InputProfilePhoto,
@@ -447,6 +467,7 @@ from ._files.inputstorycontent import (
     InputStoryContentPhoto,
     InputStoryContentVideo,
 )
+from ._files.livephoto import LivePhoto
 from ._files.location import Location
 from ._files.photosize import PhotoSize
 from ._files.sticker import MaskPosition, Sticker, StickerSet
@@ -529,6 +550,7 @@ from ._ownedgift import OwnedGift, OwnedGiftRegular, OwnedGifts, OwnedGiftUnique
 from ._paidmedia import (
     PaidMedia,
     PaidMediaInfo,
+    PaidMediaLivePhoto,
     PaidMediaPhoto,
     PaidMediaPreview,
     PaidMediaPurchased,
@@ -579,6 +601,7 @@ from ._poll import (
     InputPollOption,
     Poll,
     PollAnswer,
+    PollMedia,
     PollOption,
     PollOptionAdded,
     PollOptionDeleted,
@@ -595,6 +618,7 @@ from ._reaction import (
 from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
+from ._sentguestmessage import SentGuestMessage
 from ._sentwebappmessage import SentWebAppMessage
 from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story

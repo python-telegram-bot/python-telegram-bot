@@ -29,15 +29,22 @@ from telegram import (
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
+    InputMediaLivePhoto,
+    InputMediaLocation,
     InputMediaPhoto,
+    InputMediaSticker,
+    InputMediaVenue,
     InputMediaVideo,
+    InputPaidMediaLivePhoto,
     InputPaidMediaPhoto,
     InputPaidMediaVideo,
+    InputPollMedia,
+    InputPollOptionMedia,
     Message,
     MessageEntity,
     ReplyParameters,
 )
-from telegram.constants import InputMediaType, ParseMode
+from telegram.constants import BaseInputMediaType, ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
 from telegram.warnings import PTBDeprecationWarning
@@ -122,6 +129,37 @@ def input_media_document(class_thumb_file):
 
 
 @pytest.fixture(scope="module")
+def input_media_location():
+    return InputMediaLocation(
+        latitude=InputMediaLocationTestBase.latitude,
+        longitude=InputMediaLocationTestBase.longitude,
+        horizontal_accuracy=InputMediaLocationTestBase.horizontal_accuracy,
+    )
+
+
+@pytest.fixture(scope="module")
+def input_media_venue():
+    return InputMediaVenue(
+        latitude=InputMediaVenueTestBase.latitude,
+        longitude=InputMediaVenueTestBase.longitude,
+        title=InputMediaVenueTestBase.title,
+        address=InputMediaVenueTestBase.address,
+        foursquare_id=InputMediaVenueTestBase.foursquare_id,
+        foursquare_type=InputMediaVenueTestBase.foursquare_type,
+        google_place_id=InputMediaVenueTestBase.google_place_id,
+        google_place_type=InputMediaVenueTestBase.google_place_type,
+    )
+
+
+@pytest.fixture(scope="module")
+def input_media_sticker():
+    return InputMediaSticker(
+        media=InputMediaStickerTestBase.media,
+        emoji=InputMediaStickerTestBase.emoji,
+    )
+
+
+@pytest.fixture(scope="module")
 def input_paid_media_photo():
     return InputPaidMediaPhoto(
         media=InputMediaPhotoTestBase.media,
@@ -142,6 +180,27 @@ def input_paid_media_video(class_thumb_file):
     )
 
 
+@pytest.fixture(scope="module")
+def input_media_live_photo():
+    return InputMediaLivePhoto(
+        media=InputMediaLivePhotoTestBase.media,
+        photo=InputMediaLivePhotoTestBase.photo,
+        caption=InputMediaLivePhotoTestBase.caption,
+        parse_mode=InputMediaLivePhotoTestBase.parse_mode,
+        caption_entities=InputMediaLivePhotoTestBase.caption_entities,
+        show_caption_above_media=InputMediaLivePhotoTestBase.show_caption_above_media,
+        has_spoiler=InputMediaLivePhotoTestBase.has_spoiler,
+    )
+
+
+@pytest.fixture(scope="module")
+def input_paid_media_live_photo():
+    return InputPaidMediaLivePhoto(
+        media=InputMediaLivePhotoTestBase.media,
+        photo=InputMediaLivePhotoTestBase.photo,
+    )
+
+
 class InputMediaVideoTestBase:
     type_ = "video"
     media = "NOTAREALFILEID"
@@ -155,6 +214,21 @@ class InputMediaVideoTestBase:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     has_spoiler = True
     show_caption_above_media = True
+
+
+class TestInputMediaWithoutRequest:
+    def test_type_enum_conversion(self):
+        assert type(InputMedia(media_type="video", media="media").type) is BaseInputMediaType
+        assert InputMedia(media_type="unknown", media="media").type == "unknown"
+
+    def test_to_dict(self):
+        assert InputMedia(
+            media_type="video",
+            media="media",
+        ).to_dict() == {
+            "type": BaseInputMediaType.VIDEO,
+            "media": "media",
+        }
 
 
 class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
@@ -179,6 +253,10 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video.start_timestamp == self.start_timestamp
         assert input_media_video.has_spoiler == self.has_spoiler
         assert input_media_video.show_caption_above_media == self.show_caption_above_media
+
+        assert isinstance(input_media_video, InputMedia)
+        assert isinstance(input_media_video, InputPollMedia)
+        assert isinstance(input_media_video, InputPollOptionMedia)
 
     def test_caption_entities_always_tuple(self):
         input_media_video = InputMediaVideo(self.media)
@@ -253,25 +331,91 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_media_video.thumbnail == data_file("telegram.jpg").as_uri()
         assert input_media_video.cover == data_file("telegram.jpg").as_uri()
 
-    def test_type_enum_conversion(self):
-        # Since we have a lot of different test classes for all the input media types, we test this
-        # conversion only here. It is independent of the specific class
-        assert (
-            type(
-                InputMedia(
-                    media_type="animation",
-                    media="media",
-                ).type
+    def test_effective_filename(self, video_file):
+        inst = InputMediaVideo(
+            video_file,
+            "caption",
+            24,
+            24,
+            10,
+            True,
+            "parse_mode",
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaVideo(
+            video_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaVideo(
+            video_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, video_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaVideo(
+                video_file,
+                "caption",
+                24,
+                24,
+                10,
+                True,
+                "parse_mode",
+                [],
+                "pos_filename_depr",
+                filename="kw_filename",
             )
-            is InputMediaType
-        )
-        assert (
-            InputMedia(
-                media_type="unknown",
-                media="media",
-            ).type
-            == "unknown"
-        )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaVideo(
+                video_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, video_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaVideo(
+                video_file,
+                "caption",
+                24,
+                24,
+                10,
+                True,
+                "parse_mode",
+                [],
+                "pos_filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, video_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaVideo(
+                video_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
 
 class InputMediaPhotoTestBase:
@@ -299,6 +443,10 @@ class TestInputMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
         assert input_media_photo.caption_entities == tuple(self.caption_entities)
         assert input_media_photo.has_spoiler == self.has_spoiler
         assert input_media_photo.show_caption_above_media == self.show_caption_above_media
+
+        assert isinstance(input_media_photo, InputMedia)
+        assert isinstance(input_media_photo, InputPollMedia)
+        assert isinstance(input_media_photo, InputPollOptionMedia)
 
     def test_caption_entities_always_tuple(self):
         input_media_photo = InputMediaPhoto(self.media)
@@ -337,6 +485,80 @@ class TestInputMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
         input_media_photo = InputMediaPhoto(data_file("telegram.mp4"))
         assert input_media_photo.media == data_file("telegram.mp4").as_uri()
 
+    def test_effective_filename(self, photo_file):
+        inst = InputMediaPhoto(
+            photo_file,
+            "caption",
+            "parse_mode",
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaPhoto(
+            photo_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaPhoto(
+            photo_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, photo_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaPhoto(
+                photo_file,
+                "caption",
+                "parse_mode",
+                [],
+                "filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaPhoto(
+                photo_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, photo_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaPhoto(
+                photo_file,
+                "caption",
+                "parse_mode",
+                [],
+                "filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, photo_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaPhoto(
+                photo_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
 
 class InputMediaAnimationTestBase:
     type_ = "animation"
@@ -368,6 +590,10 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
         assert input_media_animation.has_spoiler == self.has_spoiler
         assert input_media_animation.show_caption_above_media == self.show_caption_above_media
         assert input_media_animation._duration == self.duration
+
+        assert isinstance(input_media_animation, InputMedia)
+        assert isinstance(input_media_animation, InputPollMedia)
+        assert isinstance(input_media_animation, InputPollOptionMedia)
 
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(self.media)
@@ -433,6 +659,89 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
         assert input_media_animation.media == data_file("telegram.mp4").as_uri()
         assert input_media_animation.thumbnail == data_file("telegram.jpg").as_uri()
 
+    def test_effective_filename(self, animation_file):
+        inst = InputMediaAnimation(
+            animation_file,
+            "caption",
+            "parse_mode",
+            24,
+            24,
+            10,
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaAnimation(
+            animation_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaAnimation(
+            animation_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, animation_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaAnimation(
+                animation_file,
+                "caption",
+                "parse_mode",
+                24,
+                24,
+                10,
+                [],
+                "pos_filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaAnimation(
+                animation_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, animation_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaAnimation(
+                animation_file,
+                "caption",
+                "parse_mode",
+                24,
+                24,
+                10,
+                [],
+                "pos_filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, animation_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaAnimation(
+                animation_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
 
 class InputMediaAudioTestBase:
     type_ = "audio"
@@ -462,6 +771,10 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
         assert input_media_audio.parse_mode == self.parse_mode
         assert input_media_audio.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_audio.thumbnail, InputFile)
+
+        assert isinstance(input_media_audio, InputMedia)
+        assert isinstance(input_media_audio, InputPollMedia)
+        assert not isinstance(input_media_audio, InputPollOptionMedia)
 
     def test_caption_entities_always_tuple(self):
         input_media_audio = InputMediaAudio(self.media)
@@ -526,6 +839,89 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
         assert input_media_audio.media == data_file("telegram.mp4").as_uri()
         assert input_media_audio.thumbnail == data_file("telegram.jpg").as_uri()
 
+    def test_effective_filename(self, audio_file):
+        inst = InputMediaAudio(
+            audio_file,
+            "caption",
+            "parse_mode",
+            10,
+            "performer",
+            "title",
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaAudio(
+            audio_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaAudio(
+            audio_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, audio_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaAudio(
+                audio_file,
+                "caption",
+                "parse_mode",
+                10,
+                "performer",
+                "title",
+                [],
+                "pos_filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaAudio(
+                audio_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, audio_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaAudio(
+                audio_file,
+                "caption",
+                "parse_mode",
+                10,
+                "performer",
+                "title",
+                [],
+                "pos_filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, audio_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaAudio(
+                audio_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
 
 class InputMediaDocumentTestBase:
     type_ = "document"
@@ -534,6 +930,136 @@ class InputMediaDocumentTestBase:
     parse_mode = "HTML"
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     disable_content_type_detection = True
+
+
+class InputMediaLocationTestBase:
+    type_ = "location"
+    latitude = 1.0
+    longitude = 2.0
+    horizontal_accuracy = 10.0
+
+
+class TestInputMediaLocationWithoutRequest(InputMediaLocationTestBase):
+    def test_slot_behaviour(self, input_media_location):
+        inst = input_media_location
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_expected_values(self, input_media_location):
+        assert input_media_location.type == self.type_
+        assert input_media_location.latitude == self.latitude
+        assert input_media_location.longitude == self.longitude
+        assert input_media_location.horizontal_accuracy == self.horizontal_accuracy
+
+        assert isinstance(input_media_location, InputPollMedia)
+        assert isinstance(input_media_location, InputPollOptionMedia)
+        assert not isinstance(input_media_location, InputMedia)
+
+    def test_to_dict(self, input_media_location):
+        input_media_location_dict = input_media_location.to_dict()
+        assert input_media_location_dict["type"] == input_media_location.type
+        assert input_media_location_dict["latitude"] == input_media_location.latitude
+        assert input_media_location_dict["longitude"] == input_media_location.longitude
+        assert (
+            input_media_location_dict["horizontal_accuracy"]
+            == input_media_location.horizontal_accuracy
+        )
+
+
+class InputMediaVenueTestBase:
+    type_ = "venue"
+    latitude = 1.0
+    longitude = 2.0
+    title = "title"
+    address = "address"
+    foursquare_id = "foursquare_id"
+    foursquare_type = "food/icecream"
+    google_place_id = "google_place_id"
+    google_place_type = "restaurant"
+
+
+class TestInputMediaVenueWithoutRequest(InputMediaVenueTestBase):
+    def test_slot_behaviour(self, input_media_venue):
+        inst = input_media_venue
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_expected_values(self, input_media_venue):
+        assert input_media_venue.type == self.type_
+        assert input_media_venue.latitude == self.latitude
+        assert input_media_venue.longitude == self.longitude
+        assert input_media_venue.title == self.title
+        assert input_media_venue.address == self.address
+        assert input_media_venue.foursquare_id == self.foursquare_id
+        assert input_media_venue.foursquare_type == self.foursquare_type
+        assert input_media_venue.google_place_id == self.google_place_id
+        assert input_media_venue.google_place_type == self.google_place_type
+
+        assert isinstance(input_media_venue, InputPollMedia)
+        assert isinstance(input_media_venue, InputPollOptionMedia)
+        assert not isinstance(input_media_venue, InputMedia)
+
+    def test_to_dict(self, input_media_venue):
+        input_media_venue_dict = input_media_venue.to_dict()
+        assert input_media_venue_dict["type"] == input_media_venue.type
+        assert input_media_venue_dict["latitude"] == input_media_venue.latitude
+        assert input_media_venue_dict["longitude"] == input_media_venue.longitude
+        assert input_media_venue_dict["title"] == input_media_venue.title
+        assert input_media_venue_dict["address"] == input_media_venue.address
+        assert input_media_venue_dict["foursquare_id"] == input_media_venue.foursquare_id
+        assert input_media_venue_dict["foursquare_type"] == input_media_venue.foursquare_type
+        assert input_media_venue_dict["google_place_id"] == input_media_venue.google_place_id
+        assert input_media_venue_dict["google_place_type"] == input_media_venue.google_place_type
+
+
+class InputMediaStickerTestBase:
+    type_ = "sticker"
+    media = "NOTAREALFILEID"
+    emoji = "💪"
+
+
+class TestInputMediaStickerWithoutRequest(InputMediaStickerTestBase):
+    def test_slot_behaviour(self, input_media_sticker):
+        inst = input_media_sticker
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_expected_values(self, input_media_sticker):
+        assert input_media_sticker.type == self.type_
+        assert input_media_sticker.media == self.media
+        assert input_media_sticker.emoji == self.emoji
+
+        assert isinstance(input_media_sticker, InputPollOptionMedia)
+        assert not isinstance(input_media_sticker, InputPollMedia)
+        assert not isinstance(input_media_sticker, InputMedia)
+
+    def test_to_dict(self, input_media_sticker):
+        input_media_sticker_dict = input_media_sticker.to_dict()
+        assert input_media_sticker_dict["type"] == input_media_sticker.type
+        assert input_media_sticker_dict["media"] == input_media_sticker.media
+        assert input_media_sticker_dict["emoji"] == input_media_sticker.emoji
+
+    def test_with_sticker(self, sticker):
+        input_media_sticker = InputMediaSticker(sticker, emoji=self.emoji)
+        assert input_media_sticker.type == self.type_
+        assert input_media_sticker.media == sticker.file_id
+        assert input_media_sticker.emoji == self.emoji
+
+    def test_with_sticker_file(self, sticker_file):
+        input_media_sticker = InputMediaSticker(sticker_file, emoji=self.emoji)
+        assert input_media_sticker.type == self.type_
+        assert isinstance(input_media_sticker.media, InputFile)
+        assert input_media_sticker.emoji == self.emoji
+
+    def test_with_local_files(self):
+        input_media_sticker = InputMediaSticker(
+            data_file("telegram_sticker.png"), emoji=self.emoji
+        )
+        assert input_media_sticker.media == data_file("telegram_sticker.png").as_uri()
+        assert input_media_sticker.emoji == self.emoji
 
 
 class TestInputMediaDocumentWithoutRequest(InputMediaDocumentTestBase):
@@ -554,6 +1080,10 @@ class TestInputMediaDocumentWithoutRequest(InputMediaDocumentTestBase):
             == self.disable_content_type_detection
         )
         assert isinstance(input_media_document.thumbnail, InputFile)
+
+        assert isinstance(input_media_document, InputMedia)
+        assert isinstance(input_media_document, InputPollMedia)
+        assert not isinstance(input_media_document, InputPollOptionMedia)
 
     def test_caption_entities_always_tuple(self):
         input_media_document = InputMediaDocument(self.media)
@@ -594,6 +1124,83 @@ class TestInputMediaDocumentWithoutRequest(InputMediaDocumentTestBase):
         assert input_media_document.media == data_file("telegram.mp4").as_uri()
         assert input_media_document.thumbnail == data_file("telegram.jpg").as_uri()
 
+    def test_effective_filename(self, document_file):
+        inst = InputMediaDocument(
+            document_file,
+            "caption",
+            "parse_mode",
+            True,
+            [],
+            "pos_filename_depr",
+        )
+        assert inst.media.filename == "pos_filename_depr"
+
+        inst = InputMediaDocument(
+            document_file,
+            filename="kw_only_filename",
+        )
+        assert inst.media.filename == "kw_only_filename"
+
+        # Deprecated, but for completeness
+        inst = InputMediaDocument(
+            document_file,
+            filename_depr="kw_filename_depr",
+        )
+        assert inst.media.filename == "kw_filename_depr"
+
+    def test_filename_depr_mutually_exclusive_filename(self, document_file):
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaDocument(
+                document_file,
+                "caption",
+                "parse_mode",
+                True,
+                [],
+                "pos_filename_depr",
+                filename="kw_filename",
+            )
+
+        with pytest.raises(
+            ValueError, match="`filename_depr` and `filename` are mutually exclusive"
+        ):
+            InputMediaDocument(
+                document_file,
+                filename_depr="filename_depr",
+                filename="kw_filename",
+            )
+
+    def test_positional_filename_deprecated(self, document_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaDocument(
+                document_file,
+                "caption",
+                "parse_mode",
+                True,
+                [],
+                "pos_filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+    def test_keyword_filename_depr_deprecated(self, document_file):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="Positional.*`filename`.*keyword.*`filename_depr`.*deprecated",
+        ) as record:
+            InputMediaDocument(
+                document_file,
+                filename_depr="filename_depr",
+            )
+
+        assert record[0].category == PTBDeprecationWarning
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
 
 class TestInputPaidMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
     def test_slot_behaviour(self, input_paid_media_photo):
@@ -612,13 +1219,13 @@ class TestInputPaidMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
         assert input_paid_media_photo_dict["media"] == input_paid_media_photo.media
 
     def test_with_photo(self, photo):
-        # fixture found in test_photo
+        # fixture found in conftest.py
         input_paid_media_photo = InputPaidMediaPhoto(photo)
         assert input_paid_media_photo.type == self.type_
         assert input_paid_media_photo.media == photo.file_id
 
     def test_with_photo_file(self, photo_file):
-        # fixture found in test_photo
+        # fixture found in conftest.py
         input_paid_media_photo = InputPaidMediaPhoto(photo_file)
         assert input_paid_media_photo.type == self.type_
         assert isinstance(input_paid_media_photo.media, InputFile)
@@ -626,6 +1233,76 @@ class TestInputPaidMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
     def test_with_local_files(self):
         input_paid_media_photo = InputPaidMediaPhoto(data_file("telegram.jpg"))
         assert input_paid_media_photo.media == data_file("telegram.jpg").as_uri()
+
+
+class InputMediaLivePhotoTestBase:
+    type_ = "live_photo"
+    media = "NOTAREALFILEID"
+    photo = "NOTAREALFILEID"
+    caption = "My Caption"
+    parse_mode = "Markdown"
+    caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
+    show_caption_above_media = True
+    has_spoiler = True
+
+
+class TestInputMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
+    def test_slot_behaviour(self, input_media_live_photo):
+        inst = input_media_live_photo
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_expected_values(self, input_media_live_photo):
+        assert input_media_live_photo.type == self.type_
+        assert input_media_live_photo.media == self.media
+        assert input_media_live_photo.photo == self.photo
+        assert input_media_live_photo.caption == self.caption
+        assert input_media_live_photo.parse_mode == self.parse_mode
+        assert input_media_live_photo.caption_entities == tuple(self.caption_entities)
+        assert input_media_live_photo.show_caption_above_media == self.show_caption_above_media
+        assert input_media_live_photo.has_spoiler == self.has_spoiler
+
+    def test_caption_entities_always_tuple(self):
+        input_media_live_photo = InputMediaLivePhoto(self.media, self.photo)
+        assert input_media_live_photo.caption_entities == ()
+
+    def test_to_dict(self, input_media_live_photo):
+        input_media_live_photo_dict = input_media_live_photo.to_dict()
+        assert input_media_live_photo_dict["type"] == input_media_live_photo.type
+        assert input_media_live_photo_dict["media"] == input_media_live_photo.media
+        assert input_media_live_photo_dict["photo"] == input_media_live_photo.photo
+        assert input_media_live_photo_dict["caption"] == input_media_live_photo.caption
+        assert input_media_live_photo_dict["parse_mode"] == input_media_live_photo.parse_mode
+        assert input_media_live_photo_dict["caption_entities"] == [
+            ce.to_dict() for ce in input_media_live_photo.caption_entities
+        ]
+        assert (
+            input_media_live_photo_dict["show_caption_above_media"]
+            == input_media_live_photo.show_caption_above_media
+        )
+        assert input_media_live_photo_dict["has_spoiler"] == input_media_live_photo.has_spoiler
+
+    def test_with_photo_and_video(self, video, photo):
+        # fixtures found in conftest.py
+        input_media_live_photo = InputMediaLivePhoto(video, photo)
+        assert input_media_live_photo.type == self.type_
+        assert input_media_live_photo.media == video.file_id
+        assert input_media_live_photo.photo == photo.file_id
+
+    def test_with_photo_and_video_files(self, video_file, photo_file):
+        # fixture found in conftest.py
+        input_media_live_photo = InputMediaLivePhoto(video_file, photo_file)
+        assert input_media_live_photo.type == self.type_
+        assert isinstance(input_media_live_photo.media, InputFile)
+        assert isinstance(input_media_live_photo.photo, InputFile)
+
+    def test_with_local_files(self):
+        input_media_live_photo = InputMediaLivePhoto(
+            media=data_file("telegram.mp4"), photo=data_file("telegram.jpg")
+        )
+        assert input_media_live_photo.media == data_file("telegram.mp4").as_uri()
+        assert input_media_live_photo.photo == data_file("telegram.jpg").as_uri()
 
 
 class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
@@ -709,6 +1386,46 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
         assert input_paid_media_video.media == data_file("telegram.mp4").as_uri()
         assert input_paid_media_video.thumbnail == data_file("telegram.jpg").as_uri()
         assert input_paid_media_video.cover == data_file("telegram.jpg").as_uri()
+
+
+class TestInputPaidMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
+    def test_slot_behaviour(self, input_paid_media_live_photo):
+        inst = input_paid_media_live_photo
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_expected_values(self, input_paid_media_live_photo):
+        assert input_paid_media_live_photo.type == self.type_
+        assert input_paid_media_live_photo.media == self.media
+        assert input_paid_media_live_photo.photo == self.photo
+
+    def test_to_dict(self, input_paid_media_live_photo):
+        input_paid_media_live_photo_dict = input_paid_media_live_photo.to_dict()
+        assert input_paid_media_live_photo_dict["type"] == input_paid_media_live_photo.type
+        assert input_paid_media_live_photo_dict["media"] == input_paid_media_live_photo.media
+        assert input_paid_media_live_photo_dict["photo"] == input_paid_media_live_photo.photo
+
+    def test_with_photo(self, video, photo):
+        # fixtures found in conftest.py
+        input_paid_media_live_photo = InputPaidMediaLivePhoto(video, photo)
+        assert input_paid_media_live_photo.type == self.type_
+        assert input_paid_media_live_photo.media == video.file_id
+        assert input_paid_media_live_photo.photo == photo.file_id
+
+    def test_with_photo_file(self, photo_file):
+        # fixture found in conftest.py
+        input_paid_media_live_photo = InputPaidMediaLivePhoto(photo_file, photo_file)
+        assert input_paid_media_live_photo.type == self.type_
+        assert isinstance(input_paid_media_live_photo.media, InputFile)
+        assert isinstance(input_paid_media_live_photo.photo, InputFile)
+
+    def test_with_local_files(self):
+        input_paid_media_live_photo = InputPaidMediaLivePhoto(
+            media=data_file("telegram.mp4"), photo=data_file("telegram.jpg")
+        )
+        assert input_paid_media_live_photo.media == data_file("telegram.mp4").as_uri()
+        assert input_paid_media_live_photo.photo == data_file("telegram.jpg").as_uri()
 
 
 @pytest.fixture(scope="module")
@@ -1155,7 +1872,9 @@ class TestSendMediaGroupWithRequest:
     @pytest.mark.parametrize(
         "default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True, ids=["HTML-Bot"]
     )
-    @pytest.mark.parametrize("media_type", ["animation", "document", "audio", "photo", "video"])
+    @pytest.mark.parametrize(
+        "media_type", ["animation", "document", "audio", "live_photo", "photo", "video"]
+    )
     async def test_edit_message_media_default_parse_mode(
         self,
         chat_id,
@@ -1194,6 +1913,8 @@ class TestSendMediaGroupWithRequest:
                 return InputMediaPhoto(photo, **kwargs)
             if med_type == "video":
                 return InputMediaVideo(video, **kwargs)
+            if med_type == "live_photo":
+                return InputMediaLivePhoto(video, photo, **kwargs)
             return None
 
         message = await default_bot.send_photo(chat_id, photo)
