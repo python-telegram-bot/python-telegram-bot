@@ -89,10 +89,14 @@ def _make_seq_transform(
         inner_fn = _make_seq_transform(inner_args[0], globalns, tg_ns)
         if inner_fn is None:
             return None
-        return lambda v, b, _f=inner_fn: [_f(row, b) for row in v] if isinstance(v, list) else v  # type: ignore[misc] # pylint: disable=line-too-long
+        return lambda v, b, _f=inner_fn: (  # type: ignore[misc]
+            [_f(row, b) for row in v] if isinstance(v, list) else v
+        )
 
     if isinstance(item_type, type) and issubclass(item_type, TelegramObject):
-        return lambda v, b, _c=item_type: _c.de_list(v, b) if isinstance(v, list) else v  # type: ignore[misc] # pylint: disable=line-too-long
+        return lambda v, b, _c=item_type: (  # type: ignore[misc]
+            _c.de_list(v, b) if isinstance(v, list) else v
+        )
 
     return None
 
@@ -235,7 +239,7 @@ class TelegramObject:
             :exc:`AttributeError`
         """
         # protected attributes can always be set for convenient internal use
-        if key[0] == "_" or not getattr(self, "_frozen", True):
+        if key[0] == "_" or not self._frozen:
             super().__setattr__(key, value)
             return
 
@@ -250,7 +254,7 @@ class TelegramObject:
             :exc:`AttributeError`
         """
         # protected attributes can always be set for convenient internal use
-        if key[0] == "_" or not getattr(self, "_frozen", True):
+        if key[0] == "_" or not self._frozen:
             super().__delattr__(key)
             return
 
@@ -603,7 +607,9 @@ class TelegramObject:
         # Dispatch to subclass for delegator classes (e.g. TransactionPartner, ChatMember).
         if cls.__DE_JSON_DISPATCH__:
             dispatch_key, dispatch_mapping = cls.__DE_JSON_DISPATCH__
-            target_cls: Tele_co = dispatch_mapping.get(data.get(dispatch_key))  # type: ignore[assignment, arg-type] # pylint: disable=line-too-long
+            target_cls: Tele_co = dispatch_mapping.get(  # type: ignore[assignment]
+                data.get(dispatch_key)  # type: ignore[arg-type]
+            )
             if target_cls is not None:
                 data.pop(dispatch_key)
                 return target_cls.de_json(data=data, bot=bot)

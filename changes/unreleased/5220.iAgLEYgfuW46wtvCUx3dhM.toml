@@ -1,0 +1,5 @@
+internal = "Update actions/upload-artifact action to v7.0.1"
+[[pull_requests]]
+uid = "5220"
+author_uids = ["renovate[bot]"]
+closes_threads = []

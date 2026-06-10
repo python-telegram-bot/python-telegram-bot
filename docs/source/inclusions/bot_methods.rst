@@ -41,6 +41,8 @@
           - Used for sending paid media to channels
         * - :meth:`~telegram.Bot.send_photo`
           - Used for sending photos
+        * - :meth:`~telegram.Bot.send_live_photo`
+          - Used for sending live photos
         * - :meth:`~telegram.Bot.send_poll`
           - Used for sending polls
         * - :meth:`~telegram.Bot.send_sticker`
@@ -80,6 +82,8 @@
       - Used for answering the callback query
     * - :meth:`~telegram.Bot.answer_inline_query`
       - Used for answering the inline query
+    * - :meth:`~telegram.Bot.answer_guest_query`
+      - Used for replying to a received guest message
     * - :meth:`~telegram.Bot.answer_pre_checkout_query`
       - Used for answering a pre checkout query
     * - :meth:`~telegram.Bot.answer_shipping_query`
@@ -104,6 +108,10 @@
       - Used for stopping the running poll
     * - :meth:`~telegram.Bot.set_message_reaction`
       - Used for setting reactions on messages
+    * - :meth:`~telegram.Bot.delete_message_reaction`
+      - Used for deleting reactions on messages
+    * - :meth:`~telegram.Bot.delete_all_message_reactions`
+      - Used for deleting all reactions by a chat or user
 
 .. raw:: html
 
@@ -167,6 +175,8 @@
       - Used for unpinning a message
     * - :meth:`~telegram.Bot.unpin_all_chat_messages`
       - Used for unpinning all pinned chat messages
+    * - :meth:`~telegram.Bot.get_user_personal_chat_messages`
+      - Used for obtaining the personal chat messages of a user
     * - :meth:`~telegram.Bot.get_user_profile_audios`
       - Used for obtaining user's profile audios
     * - :meth:`~telegram.Bot.get_user_profile_photos`
@@ -237,6 +247,10 @@
       - Used for obtaining the menu button of a private chat or the default menu button
     * - :meth:`~telegram.Bot.set_chat_menu_button`
       - Used for setting the menu button of a private chat or the default menu button
+    * - :meth:`~telegram.Bot.set_managed_bot_access_settings`
+      - Used for changing the access settings of a managed bot
+    * - :meth:`~telegram.Bot.get_managed_bot_access_settings`
+      - Used for obtaining the access settings of a managed bot
     * - :meth:`~telegram.Bot.set_my_description`
       - Used for setting the description of the bot
     * - :meth:`~telegram.Bot.get_my_description`
@@ -496,12 +510,19 @@
       - Used for getting information about gifts available for sending
     * - :meth:`~telegram.Bot.get_chat_gifts`
       - Used for getting information about gifts owned and hosted by a chat
+    * - :meth:`~telegram.Bot.get_managed_bot_token`
+      - Used for getting the token of a managed bot
+    * - :meth:`~telegram.Bot.replace_managed_bot_token`
+      - Used for replacing the token of a managed bot
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
     * - :meth:`~telegram.Bot.get_user_gifts`
       - Used for getting information about gifts owned and hosted by a user
     * - :meth:`~telegram.Bot.save_prepared_inline_message`
       - Used for storing a message to be sent by a user of a Mini App
+    * - :meth:`~telegram.Bot.save_prepared_keyboard_button`
+      - Used for saving a keyboard button to be used in a Mini App
+    
 
 .. raw:: html
 

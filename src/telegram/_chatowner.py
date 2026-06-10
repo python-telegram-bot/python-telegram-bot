@@ -64,11 +64,11 @@ class ChatOwnerLeft(TelegramObject):
     .. versionadded:: 22.7
 
     Args:
-        new_owner (:class:`telegram.User`, optional): The user which will be the new owner of the
+        new_owner (:class:`telegram.User`, optional): The user who will become the new owner of the
             chat if the previous owner does not return to the chat
 
     Attributes:
-        new_owner (:class:`telegram.User`): Optional. The user which will be the new owner of the
+        new_owner (:class:`telegram.User`): Optional. The user who will become the new owner of the
             chat if the previous owner does not return to the chat
 
     """

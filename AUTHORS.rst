@@ -75,10 +75,12 @@ The following wonderful people contributed directly or indirectly to this projec
 - `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
 - `Juan Cuevas <https://github.com/cuevasrja>`
+- `karin0 <https://github.com/karin0>`_
 - `kenjitagawa <https://github.com/kenjitagawa>`_
 - `kennethcheo <https://github.com/kennethcheo>`_
 - `Kirill Vasin <https://github.com/vasinkd>`_
 - `Kjwon15 <https://github.com/kjwon15>`_
+- `Krishna Chaitanya Balusu <https://github.com/Krishnachaitanyakc>`_
 - `Li-aung Yip <https://github.com/LiaungYip>`_
 - `locobott <https://github.com/locobott>`_
 - `Loo Zheng Yuan <https://github.com/loozhengyuan>`_

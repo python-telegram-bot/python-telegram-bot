@@ -145,3 +145,19 @@ def video_sticker_file():
 def video_sticker(bot, chat_id):
     with data_file("telegram_video_sticker.webm").open("rb") as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
+
+
+@pytest.fixture(scope="session")
+async def real_live_photo(bot, chat_id):
+    with (
+        data_file("telegram.jpg").open("rb") as photo,
+        data_file("telegram.mp4").open("rb") as video,
+    ):
+        return (
+            await bot.send_live_photo(
+                chat_id,
+                live_photo=video,
+                photo=photo,
+                read_timeout=50,
+            )
+        ).live_photo

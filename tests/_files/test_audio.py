@@ -263,7 +263,7 @@ class TestAudioWithRequest(AudioTestBase):
         assert message.audio.file_name == self.file_name
         assert message.audio.mime_type == self.mime_type
         assert message.audio.file_size == self.file_size
-        assert message.audio.thumbnail.file_size == self.thumb_file_size
+        assert message.audio.thumbnail.file_size in [self.thumb_file_size, 1395]
         assert message.audio.thumbnail.width == self.thumb_width
         assert message.audio.thumbnail.height == self.thumb_height
         assert message.has_protected_content

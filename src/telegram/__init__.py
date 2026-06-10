@@ -35,6 +35,7 @@ __all__ = (
     "BackgroundTypeWallpaper",
     "Birthdate",
     "Bot",
+    "BotAccessSettings",
     "BotCommand",
     "BotCommandScope",
     "BotCommandScopeAllChatAdministrators",
@@ -157,13 +158,20 @@ __all__ = (
     "InputMediaAnimation",
     "InputMediaAudio",
     "InputMediaDocument",
+    "InputMediaLivePhoto",
+    "InputMediaLocation",
     "InputMediaPhoto",
+    "InputMediaSticker",
+    "InputMediaVenue",
     "InputMediaVideo",
     "InputMessageContent",
     "InputPaidMedia",
+    "InputPaidMediaLivePhoto",
     "InputPaidMediaPhoto",
     "InputPaidMediaVideo",
+    "InputPollMedia",
     "InputPollOption",
+    "InputPollOptionMedia",
     "InputProfilePhoto",
     "InputProfilePhotoAnimated",
     "InputProfilePhotoStatic",
@@ -177,12 +185,16 @@ __all__ = (
     "KeyboardButton",
     "KeyboardButtonPollType",
     "KeyboardButtonRequestChat",
+    "KeyboardButtonRequestManagedBot",
     "KeyboardButtonRequestUsers",
     "LabeledPrice",
     "LinkPreviewOptions",
+    "LivePhoto",
     "Location",
     "LocationAddress",
     "LoginUrl",
+    "ManagedBotCreated",
+    "ManagedBotUpdated",
     "MaskPosition",
     "MaybeInaccessibleMessage",
     "MenuButton",
@@ -207,6 +219,7 @@ __all__ = (
     "OwnedGifts",
     "PaidMedia",
     "PaidMediaInfo",
+    "PaidMediaLivePhoto",
     "PaidMediaPhoto",
     "PaidMediaPreview",
     "PaidMediaPurchased",
@@ -228,9 +241,13 @@ __all__ = (
     "PhotoSize",
     "Poll",
     "PollAnswer",
+    "PollMedia",
     "PollOption",
+    "PollOptionAdded",
+    "PollOptionDeleted",
     "PreCheckoutQuery",
     "PreparedInlineMessage",
+    "PreparedKeyboardButton",
     "ProximityAlertTriggered",
     "ReactionCount",
     "ReactionType",
@@ -248,6 +265,7 @@ __all__ = (
     "RevenueWithdrawalStateSucceeded",
     "SecureData",
     "SecureValue",
+    "SentGuestMessage",
     "SentWebAppMessage",
     "SharedUser",
     "ShippingAddress",
@@ -342,6 +360,7 @@ from telegram._payment.stars.transactionpartner import (
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
 from ._bot import Bot
+from ._botaccesssettings import BotAccessSettings
 from ._botcommand import BotCommand
 from ._botcommandscope import (
     BotCommandScope,
@@ -429,11 +448,18 @@ from ._files.inputmedia import (
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
+    InputMediaLivePhoto,
+    InputMediaLocation,
     InputMediaPhoto,
+    InputMediaSticker,
+    InputMediaVenue,
     InputMediaVideo,
     InputPaidMedia,
+    InputPaidMediaLivePhoto,
     InputPaidMediaPhoto,
     InputPaidMediaVideo,
+    InputPollMedia,
+    InputPollOptionMedia,
 )
 from ._files.inputprofilephoto import (
     InputProfilePhoto,
@@ -441,6 +467,7 @@ from ._files.inputprofilephoto import (
     InputProfilePhotoStatic,
 )
 from ._files.inputsticker import InputSticker
+from ._files.livephoto import LivePhoto
 from ._files.location import Location
 from ._files.photosize import PhotoSize
 from ._files.sticker import MaskPosition, Sticker, StickerSet
@@ -498,9 +525,14 @@ from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._inline.preparedinlinemessage import PreparedInlineMessage
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
-from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
+from ._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestManagedBot,
+    KeyboardButtonRequestUsers,
+)
 from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
+from ._managedbot import ManagedBotCreated, ManagedBotUpdated
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
@@ -518,6 +550,7 @@ from ._ownedgift import OwnedGift, OwnedGiftRegular, OwnedGifts, OwnedGiftUnique
 from ._paidmedia import (
     PaidMedia,
     PaidMediaInfo,
+    PaidMediaLivePhoto,
     PaidMediaPhoto,
     PaidMediaPreview,
     PaidMediaPurchased,
@@ -564,7 +597,16 @@ from ._payment.stars.revenuewithdrawalstate import (
     RevenueWithdrawalStateSucceeded,
 )
 from ._payment.successfulpayment import SuccessfulPayment
-from ._poll import InputPollOption, Poll, PollAnswer, PollOption
+from ._poll import (
+    InputPollOption,
+    Poll,
+    PollAnswer,
+    PollMedia,
+    PollOption,
+    PollOptionAdded,
+    PollOptionDeleted,
+)
+from ._preparedkeyboardbutton import PreparedKeyboardButton
 from ._proximityalerttriggered import ProximityAlertTriggered
 from ._reaction import (
     ReactionCount,
@@ -576,6 +618,7 @@ from ._reaction import (
 from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
+from ._sentguestmessage import SentGuestMessage
 from ._sentwebappmessage import SentWebAppMessage
 from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story

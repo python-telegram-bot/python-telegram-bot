@@ -31,7 +31,7 @@ class ChatPermissions(TelegramObject):
     :attr:`can_change_info`, :attr:`can_invite_users`, :attr:`can_pin_messages`,
     :attr:`can_send_audios`, :attr:`can_send_documents`, :attr:`can_send_photos`,
     :attr:`can_send_videos`, :attr:`can_send_video_notes`, :attr:`can_send_voice_notes`,
-    :attr:`can_manage_topics` and :attr:`can_edit_tag` are equal.
+    :attr:`can_manage_topics`, :attr:`can_edit_tag`, and :attr:`can_react_to_messages` are equal.
 
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
@@ -44,6 +44,9 @@ class ChatPermissions(TelegramObject):
         * Removed deprecated argument and attribute ``can_send_media_messages``.
     .. versionchanged:: 22.7
         :attr:`can_edit_tag` is considered as well when comparing objects of
+        this type in terms of equality.
+    .. versionchanged:: NEXT.VERSION
+        :attr:`can_react_to_messages` is considered as well when comparing objects of
         this type in terms of equality.
 
 
@@ -95,6 +98,10 @@ class ChatPermissions(TelegramObject):
             tag.
 
             .. versionadded:: 22.7
+        can_react_to_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to react
+            to messages. If omitted, defaults to the value of :attr:`can_send_messages`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send text
@@ -140,6 +147,10 @@ class ChatPermissions(TelegramObject):
             tag.
 
             .. versionadded:: 22.7
+        can_react_to_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to react
+            to messages. If omitted, defaults to the value of :attr:`can_send_messages`.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -150,6 +161,7 @@ class ChatPermissions(TelegramObject):
         "can_invite_users",
         "can_manage_topics",
         "can_pin_messages",
+        "can_react_to_messages",
         "can_send_audios",
         "can_send_documents",
         "can_send_messages",
@@ -184,6 +196,7 @@ class ChatPermissions(TelegramObject):
         can_send_video_notes: bool | None = None,
         can_send_voice_notes: bool | None = None,
         can_edit_tag: bool | None = None,
+        can_react_to_messages: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -204,6 +217,7 @@ class ChatPermissions(TelegramObject):
         self.can_send_video_notes: bool | None = can_send_video_notes
         self.can_send_voice_notes: bool | None = can_send_voice_notes
         self.can_edit_tag: bool | None = can_edit_tag
+        self.can_react_to_messages: bool | None = can_react_to_messages
 
         self._id_attrs = (
             self.can_send_messages,
@@ -221,6 +235,7 @@ class ChatPermissions(TelegramObject):
             self.can_send_video_notes,
             self.can_send_voice_notes,
             self.can_edit_tag,
+            self.can_react_to_messages,
         )
 
         self._freeze()

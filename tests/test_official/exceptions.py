@@ -18,7 +18,20 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
 
-from telegram import Animation, Audio, Document, Gift, PhotoSize, Sticker, Video, VideoNote, Voice
+from collections.abc import Sequence
+
+from telegram import (
+    Animation,
+    Audio,
+    Document,
+    Gift,
+    LivePhoto,
+    PhotoSize,
+    Sticker,
+    Video,
+    VideoNote,
+    Voice,
+)
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -39,6 +52,7 @@ class ParamTypeCheckingExceptions:
     ADDITIONAL_TYPES = {
         r"send_\w*": {
             "photo$": PhotoSize,
+            "live_photo": LivePhoto,
             "video$": Video,
             "video_note": VideoNote,
             "audio": Audio,
@@ -65,13 +79,17 @@ class ParamTypeCheckingExceptions:
         ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
         ("reaction", False): "ReactionType",  # + str
         ("options", False): "InputPollOption",  # + str
+        ("correct_option_ids", False): "Sequence[typing.Literal[",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
     # too complex to compare/predict with official API
     # structure: class/method_name: {param_name: reduced form of annotation}
     COMPLEX_TYPES = {
-        "send_poll": {"correct_option_id": int},  # actual: Literal
+        "send_poll": {
+            # "correct_option_id": int,
+            "correct_option_ids": Sequence[int]
+        },
         "get_file": {
             "file_id": str,  # actual: Union[str, objs_with_file_id_attr]
         },
@@ -86,6 +104,7 @@ class ParamTypeCheckingExceptions:
         },
         "Input(Paid)?Media.*": {
             "media": str,  # actual: Union[str, InputMedia*, FileInput]
+            "photo": str,  # actual: Union[str, FileInput]
             # see also https://github.com/tdlib/telegram-bot-api/issues/707
             "thumbnail": str,  # actual: Union[str, FileInput]
             "cover": str,  # actual: Union[str, FileInput]
@@ -133,7 +152,7 @@ PTB_EXTRA_PARAMS = {
     "send_venue": {"venue"},
     "answer_inline_query": {"current_offset"},
     "send_media_group": {"caption", "parse_mode", "caption_entities"},
-    "send_(animation|audio|document|photo|video(_note)?|voice)": {"filename"},
+    "send_(animation|audio|document|photo|video(_note)?|voice|live_photo)": {"filename"},
     "InlineQueryResult": {"id", "type"},  # attributes common to all subclasses
     "ChatMember": {"user", "status"},  # attributes common to all subclasses
     "BotCommandScope": {"type"},  # attributes common to all subclasses
@@ -141,8 +160,13 @@ PTB_EXTRA_PARAMS = {
     "PassportFile": {"credentials"},
     "EncryptedPassportElement": {"credentials"},
     "PassportElementError": {"source", "type", "message"},
+    "InputPoll(Option)?Media": {"media_type"},
     "InputMedia": {"caption", "caption_entities", "media", "media_type", "parse_mode"},
-    "InputMedia(Animation|Audio|Document|Photo|Video|VideoNote|Voice)": {"filename"},
+    "InputMedia(Animation|Audio|Document|Photo|Sticker|Video|VideoNote|Voice)": {
+        "filename",
+        # tags: deprecated NEXT.VERSION
+        "filename_depr",
+    },
     "InputFile": {"attach", "filename", "obj", "read_file_handle"},
     "MaybeInaccessibleMessage": {"date", "message_id", "chat"},  # attributes common to all subcls
     "ChatBoostSource": {"source"},  # attributes common to all subclasses
@@ -159,6 +183,12 @@ PTB_EXTRA_PARAMS = {
     "InputStoryContent": {"type"},  # attributes common to all subclasses
     "StoryAreaType": {"type"},  # attributes common to all subclasses
     "InputProfilePhoto": {"type"},  # attributes common to all subclasses
+    "InputPollOptionMedia": {"args", "kwargs"},  # UnionType's __init__ signature
+    "InputPollMedia": {"args", "kwargs"},  # UnionType's __init__ signature
+    # backwards compatibility for api 10.0 changes
+    # tags: deprecated NEXT.VERSION, bot api 10.0
+    "Poll": {"correct_option_id"},
+    "send_poll": {"correct_option_id"},
 }
 
 
@@ -214,7 +244,13 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
+    "PollOption": {"persistent_id"},
+    "PollAnswer": {"option_persistent_ids"},
+    "Poll": {"allows_revoting", "members_only"},
+    "ChatMemberRestricted": {"can_react_to_messages"},
+    "send_poll": {"correct_option_id"},
+}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:

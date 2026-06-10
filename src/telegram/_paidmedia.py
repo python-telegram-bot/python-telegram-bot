@@ -23,6 +23,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
+from telegram._files.livephoto import LivePhoto
 from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
@@ -65,6 +66,7 @@ class PaidMedia(TelegramObject):
             "preview": "PaidMediaPreview",
             "photo": "PaidMediaPhoto",
             "video": "PaidMediaVideo",
+            "live_photo": "PaidMediaLivePhoto",
         },
     )
 
@@ -74,6 +76,8 @@ class PaidMedia(TelegramObject):
     """:const:`telegram.constants.PaidMediaType.PHOTO`"""
     VIDEO: Final[str] = constants.PaidMediaType.VIDEO
     """:const:`telegram.constants.PaidMediaType.VIDEO`"""
+    LIVE_PHOTO: Final[str] = constants.PaidMediaType.LIVE_PHOTO
+    """:const:`telegram.constants.PaidMediaType.LIVE_PHOTO`"""
 
     def __init__(
         self,
@@ -212,6 +216,40 @@ class PaidMediaVideo(PaidMedia):
             self.video: Video = video
 
             self._id_attrs = (self.type, self.video)
+
+
+class PaidMediaLivePhoto(PaidMedia):
+    """
+    The paid media is a live photo.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`live_photo` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.LIVE_PHOTO`
+        live_photo (:class:`telegram.LivePhoto`): The photo.
+
+    Attributes:
+        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.LIVE_PHOTO`
+        live_photo (:class:`telegram.LivePhoto`): The photo.
+
+    """
+
+    __slots__ = ("live_photo",)
+
+    def __init__(
+        self,
+        live_photo: LivePhoto,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ) -> None:
+        super().__init__(type=PaidMedia.LIVE_PHOTO, api_kwargs=api_kwargs)
+
+        with self._unfrozen():
+            self.live_photo: LivePhoto = live_photo
+            self._id_attrs = (self.type, self.live_photo)
 
 
 class PaidMediaInfo(TelegramObject):

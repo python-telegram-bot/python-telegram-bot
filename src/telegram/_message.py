@@ -37,6 +37,7 @@ from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
 from telegram._files.document import Document
+from telegram._files.livephoto import LivePhoto
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import Sticker
@@ -57,6 +58,7 @@ from telegram._gifts import GiftInfo
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inputchecklist import InputChecklist
 from telegram._linkpreviewoptions import LinkPreviewOptions
+from telegram._managedbot import ManagedBotCreated
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._paidmedia import PaidMediaInfo
@@ -65,7 +67,7 @@ from telegram._passport.passportdata import PassportData
 from telegram._payment.invoice import Invoice
 from telegram._payment.refundedpayment import RefundedPayment
 from telegram._payment.successfulpayment import SuccessfulPayment
-from telegram._poll import Poll
+from telegram._poll import Poll, PollOptionAdded, PollOptionDeleted
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._reply import ReplyParameters
 from telegram._shared import ChatShared, UsersShared
@@ -80,6 +82,7 @@ from telegram._utils.entities import parse_message_entities, parse_message_entit
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
     CorrectOptionID,
+    CorrectOptionIds,
     JSONDict,
     MarkdownVersion,
     ODVInput,
@@ -107,17 +110,21 @@ if TYPE_CHECKING:
         GiveawayCompleted,
         GiveawayCreated,
         GiveawayWinners,
+        InlineQueryResult,
         InputMedia,
         InputMediaAudio,
         InputMediaDocument,
+        InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
         InputPaidMedia,
+        InputPollMedia,
         InputPollOption,
         LabeledPrice,
         MessageId,
         MessageOrigin,
         ReactionType,
+        SentGuestMessage,
         SuggestedPostApprovalFailed,
         SuggestedPostApproved,
         SuggestedPostDeclined,
@@ -690,6 +697,43 @@ class Message(MaybeInaccessibleMessage):
             supergroups only
 
             .. versionadded:: 22.7
+        poll_option_added (:class:`telegram.PollOptionAdded`, optional): Service message:
+            answer option was added to a poll.
+
+            .. versionadded:: NEXT.VERSION
+        poll_option_deleted (:class:`telegram.PollOptionDeleted`, optional): Service message:
+            answer option was deleted from a poll.
+
+            .. versionadded:: NEXT.VERSION
+        reply_to_poll_option_id (:obj:`str`, optional): Persistent
+            identifier of the specific poll option that is being replied to.
+
+            .. versionadded:: NEXT.VERSION
+
+        managed_bot_created (:class:`telegram.ManagedBotCreated`, optional): Service message: user
+            created a bot that will be managed by the current bot.
+
+            .. versionadded:: NEXT.VERSION
+        guest_bot_caller_user (:class:`telegram.User`, optional): For a message sent by a guest
+            bot, this is the user whose original message triggered the bot's response.
+
+            .. versionadded:: NEXT.VERSION
+        guest_bot_caller_chat (:class:`telegram.Chat`, optional): For a message sent by a guest
+            bot, this is the chat whose original message triggered the bot's response.
+
+            .. versionadded:: NEXT.VERSION
+        guest_query_id (:obj:`str`, optional): The unique identifier for the guest query. Use this
+            identifier with the method :meth:`telegram.Bot.answer_guest_query` to send a response
+            message. If non-empty, the message belongs to the chat where the guest bot was
+            summoned, which may not coincide with other existing bot chats sharing the same
+            identifier.
+
+            .. versionadded:: NEXT.VERSION
+        live_photo (:class:`telegram.LivePhoto`, optional): Message is a live photo, information
+            about the live photo. For backward compatibility, when this field is set, the photo
+            field will also be set.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1106,6 +1150,42 @@ class Message(MaybeInaccessibleMessage):
             supergroups only
 
             .. versionadded:: 22.7
+        poll_option_added (:class:`telegram.PollOptionAdded`): Optional. Service message:
+            answer option was added to a poll.
+
+            .. versionadded:: NEXT.VERSION
+        poll_option_deleted (:class:`telegram.PollOptionDeleted`): Optional. Service message:
+            answer option was deleted from a poll.
+
+            .. versionadded:: NEXT.VERSION
+        reply_to_poll_option_id (:obj:`str`): Optional. Persistent
+            identifier of the specific poll option that is being replied to.
+
+            .. versionadded:: NEXT.VERSION
+        managed_bot_created (:class:`telegram.ManagedBotCreated`): Optional. Service message: user
+            created a bot that will be managed by the current bot.
+
+            .. versionadded:: NEXT.VERSION
+        guest_bot_caller_user (:class:`telegram.User`): Optional. For a message sent by a guest
+            bot, this is the user whose original message triggered the bot's response.
+
+            .. versionadded:: NEXT.VERSION
+        guest_bot_caller_chat (:class:`telegram.Chat`): Optional. For a message sent by a guest
+            bot, this is the chat whose original message triggered the bot's response.
+
+            .. versionadded:: NEXT.VERSION
+        guest_query_id (:obj:`str`): Optional. The unique identifier for the guest query. Use this
+            identifier with the method :meth:`telegram.Bot.answer_guest_query` to send a response
+            message. If non-empty, the message belongs to the chat where the guest bot was
+            summoned, which may not coincide with other existing bot chats sharing the same
+            identifier.
+
+            .. versionadded:: NEXT.VERSION
+        live_photo (:class:`telegram.LivePhoto`): Optional. Message is a live photo, information
+            about the live photo. For backward compatibility, when this field is set, the photo
+            field will also be set.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1167,6 +1247,9 @@ class Message(MaybeInaccessibleMessage):
         "giveaway_created",
         "giveaway_winners",
         "group_chat_created",
+        "guest_bot_caller_chat",
+        "guest_bot_caller_user",
+        "guest_query_id",
         "has_media_spoiler",
         "has_protected_content",
         "invoice",
@@ -1176,7 +1259,9 @@ class Message(MaybeInaccessibleMessage):
         "is_topic_message",
         "left_chat_member",
         "link_preview_options",
+        "live_photo",
         "location",
+        "managed_bot_created",
         "media_group_id",
         "message_auto_delete_timer_changed",
         "message_thread_id",
@@ -1192,12 +1277,15 @@ class Message(MaybeInaccessibleMessage):
         "photo",
         "pinned_message",
         "poll",
+        "poll_option_added",
+        "poll_option_deleted",
         "proximity_alert_triggered",
         "quote",
         "refunded_payment",
         "reply_markup",
         "reply_to_checklist_task_id",
         "reply_to_message",
+        "reply_to_poll_option_id",
         "reply_to_story",
         "sender_boost_count",
         "sender_business_bot",
@@ -1338,6 +1426,14 @@ class Message(MaybeInaccessibleMessage):
         chat_owner_changed: ChatOwnerChanged | None = None,
         chat_owner_left: ChatOwnerLeft | None = None,
         sender_tag: str | None = None,
+        poll_option_added: PollOptionAdded | None = None,
+        poll_option_deleted: PollOptionDeleted | None = None,
+        reply_to_poll_option_id: str | None = None,
+        managed_bot_created: ManagedBotCreated | None = None,
+        guest_bot_caller_user: User | None = None,
+        guest_bot_caller_chat: Chat | None = None,
+        guest_query_id: str | None = None,
+        live_photo: LivePhoto | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1468,6 +1564,14 @@ class Message(MaybeInaccessibleMessage):
             self.chat_owner_changed: ChatOwnerChanged | None = chat_owner_changed
             self.chat_owner_left: ChatOwnerLeft | None = chat_owner_left
             self.sender_tag: str | None = sender_tag
+            self.poll_option_added: PollOptionAdded | None = poll_option_added
+            self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
+            self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
+            self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
+            self.guest_bot_caller_user: User | None = guest_bot_caller_user
+            self.guest_bot_caller_chat: Chat | None = guest_bot_caller_chat
+            self.guest_query_id: str | None = guest_query_id
+            self.live_photo: LivePhoto | None = live_photo
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1518,6 +1622,7 @@ class Message(MaybeInaccessibleMessage):
         | Document
         | Game
         | Invoice
+        | LivePhoto
         | Location
         | PassportData
         | Sequence[PhotoSize]
@@ -1542,6 +1647,7 @@ class Message(MaybeInaccessibleMessage):
         * :class:`telegram.Animation`
         * :class:`telegram.Game`
         * :class:`telegram.Invoice`
+        * :class:`telegram.LivePhoto`
         * :class:`telegram.Location`
         * :class:`telegram.PassportData`
         * list[:class:`telegram.PhotoSize`]
@@ -1930,7 +2036,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_text_draft(
         self,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
@@ -1956,6 +2062,9 @@ class Message(MaybeInaccessibleMessage):
             |reply_same_thread|
 
         .. versionadded:: 22.6
+
+        .. versionchanged:: NEXT.VERSION
+            Bot API 10.0 makes the ``text`` argument optional.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -2229,7 +2338,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_media_group(
         self,
         media: Sequence[
-            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo | InputMediaLivePhoto"  # noqa: E501  # pylint: disable=line-too-long
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2386,6 +2495,87 @@ class Message(MaybeInaccessibleMessage):
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
             show_caption_above_media=show_caption_above_media,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
+        )
+
+    async def reply_live_photo(
+        self,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        caption: str | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        reply_markup: "ReplyMarkup | None" = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        *,
+        reply_to_message_id: int | None = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        filename: str | None = None,
+        do_quote: bool | (_ReplyKwargs | None) = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_live_photo(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
+                 *args,
+                 **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_live_photo`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Keyword Args:
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
+        )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
+        return await self.get_bot().send_live_photo(
+            chat_id=chat_id,
+            live_photo=live_photo,
+            photo=photo,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_parameters=effective_reply_parameters,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            filename=filename,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
+            show_caption_above_media=show_caption_above_media,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
         )
@@ -3273,6 +3463,18 @@ class Message(MaybeInaccessibleMessage):
         question_entities: Sequence["MessageEntity"] | None = None,
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
+        shuffle_options: bool | None = None,
+        allows_revoting: bool | None = None,
+        correct_option_ids: CorrectOptionIds | None = None,
+        allow_adding_options: bool | None = None,
+        hide_results_until_closes: bool | None = None,
+        description: str | None = None,
+        description_parse_mode: ODVInput[str] | None = None,
+        description_entities: Sequence["MessageEntity"] | None = None,
+        members_only: bool | None = None,
+        country_codes: Sequence[str] | None = None,
+        explanation_media: "InputPollMedia | None" = None,
+        media: "InputPollMedia | None" = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3322,6 +3524,9 @@ class Message(MaybeInaccessibleMessage):
             type=type,
             allows_multiple_answers=allows_multiple_answers,
             correct_option_id=correct_option_id,
+            allows_revoting=allows_revoting,
+            shuffle_options=shuffle_options,
+            correct_option_ids=correct_option_ids,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
@@ -3343,6 +3548,15 @@ class Message(MaybeInaccessibleMessage):
             question_entities=question_entities,
             message_effect_id=message_effect_id,
             allow_paid_broadcast=allow_paid_broadcast,
+            description=description,
+            description_parse_mode=description_parse_mode,
+            description_entities=description_entities,
+            hide_results_until_closes=hide_results_until_closes,
+            allow_adding_options=allow_adding_options,
+            members_only=members_only,
+            country_codes=country_codes,
+            explanation_media=explanation_media,
+            media=media,
         )
 
     async def reply_dice(
@@ -3461,7 +3675,7 @@ class Message(MaybeInaccessibleMessage):
         )
         return await self.get_bot().send_checklist(
             business_connection_id=self.business_connection_id,
-            chat_id=chat_id,  # type: ignore[arg-type]
+            chat_id=chat_id,
             checklist=checklist,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
@@ -3573,7 +3787,7 @@ class Message(MaybeInaccessibleMessage):
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_game(
-            chat_id=chat_id,  # type: ignore[arg-type]
+            chat_id=chat_id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,
@@ -4941,6 +5155,80 @@ class Message(MaybeInaccessibleMessage):
             chat_id=self.chat_id,
             message_id=self.message_id,
             comment=comment,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_reaction(
+        self,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.delete_message_reaction(
+                 chat_id=message.chat_id,
+                 message_id=message.message_id,
+                 *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().delete_message_reaction(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def answer_guest_query(
+        self,
+        result: "InlineQueryResult",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "SentGuestMessage":
+        """Shortcut for::
+
+             await bot.answer_guest_query(
+                 self.guest_query_id,
+                 *args, **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.answer_guest_query`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.SentGuestMessage`: On success, a
+            :class:`telegram.SentGuestMessage` is returned.
+        """
+        return await self.get_bot().answer_guest_query(
+            guest_query_id=self.guest_query_id,
+            result=result,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

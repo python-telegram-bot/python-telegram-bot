@@ -52,6 +52,7 @@ PRIVATE_BASE_CLASSES = {
     "_BaseMedium": "TelegramObject",
     "_CredentialsBase": "TelegramObject",
     "_ChatBase": "TelegramObject",
+    "_BaseInputMedia": "TelegramObject",
 }
 
 

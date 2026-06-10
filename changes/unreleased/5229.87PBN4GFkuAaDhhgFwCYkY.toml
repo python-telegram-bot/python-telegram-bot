@@ -1,0 +1,33 @@
+features = """
+Full Support for Bot API 10.0
+
+.. warning::
+
+    - Bot API 10.0 introduces a now required argument ``members_only`` to ``Poll``. For backward compatibility, the argument is currently still marked as optional in the signature and its presence is enforced through a runtime check. In future versions, this argument will be made required in the signature as well.
+
+    Please make sure to update your code accordingly to avoid potential issues in the future. We recommend using keyword arguments to ensure compatibility with future updates.
+"""
+
+deprecations = """
+* Deprecated passing the ``filename`` parameter positionally to the classes:
+
+  * ``InputMediaAnimation``
+  * ``InputMediaAudio``
+  * ``InputMediaPhoto``
+  * ``InputMediaDocument``
+  * ``InputMediaVideo``
+
+  Please pass ``filename`` as a keyword argument instead, as this parameter will become keyword-only in the future.
+
+* Deprecated ``InputPollOption.de_json``. The class ``InputPollOption`` is input only and its ``de_json`` method will be removed in future versions. The Bot API 10.0 ``media`` field of ``InputPollOption`` will not be included for deserialization.
+
+"""
+
+pull_requests = [
+  { uid = "5229", author_uid = "aelkheir", closes_threads = ["5228"] },
+  { uid = "5230", author_uid = "harshil21" },
+  { uid = "5235", author_uid = "harshil21" },
+  { uid = "5238", author_uid = "harshil21" },
+  { uid = "5232", author_uid = "aelkheir" },
+  { uid = "5232", author_uid = ["Poolitzer", "Phil9l", "harshil21", "aelkheir"] },
+]
