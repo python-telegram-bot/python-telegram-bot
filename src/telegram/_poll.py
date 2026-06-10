@@ -38,16 +38,10 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import (
-    de_json_optional,
-    de_list_optional,
     parse_sequence_arg,
     to_timedelta,
 )
-from telegram._utils.datetime import (
-    extract_tzinfo_from_defaults,
-    from_timestamp,
-    get_timedelta_value,
-)
+from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
@@ -55,7 +49,8 @@ from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
-    from telegram import Bot, InputPollOptionMedia, MaybeInaccessibleMessage
+    from telegram._files.inputmedia import InputPollOptionMedia
+    from telegram._message import MaybeInaccessibleMessage
 
 
 class PollMedia(TelegramObject):
@@ -155,23 +150,6 @@ class PollMedia(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollMedia":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["animation"] = de_json_optional(data.get("animation"), Animation, bot)
-        data["audio"] = de_json_optional(data.get("audio"), Audio, bot)
-        data["document"] = de_json_optional(data.get("document"), Document, bot)
-        data["live_photo"] = de_json_optional(data.get("live_photo"), LivePhoto, bot)
-        data["location"] = de_json_optional(data.get("location"), Location, bot)
-        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
-        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
-        data["venue"] = de_json_optional(data.get("venue"), Venue, bot)
-        data["video"] = de_json_optional(data.get("video"), Video, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class InputPollOption(TelegramObject):
     """
@@ -233,30 +211,6 @@ class InputPollOption(TelegramObject):
         self._id_attrs = (self.text,)
 
         self._freeze()
-
-    # tags: deprecated NEXT.VERSION
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InputPollOption":
-        """See :meth:`telegram.TelegramObject.de_json`. The :paramref:`media` field will
-        not be included for deserialization.
-
-        .. deprecated:: NEXT.VERSION
-            This class is input only and will be removed in the next version.
-        """
-        warn(
-            PTBDeprecationWarning(
-                "NEXT.VERSION",
-                "`InputPollOption.de_json` is deprecated. This class is input only and will be "
-                "removed in the next version. The `media` field will not be included for "
-                "deserialization.",
-            ),
-            stacklevel=2,
-        )
-        data = cls._parse_data(data)
-
-        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class PollOption(TelegramObject):
@@ -376,22 +330,6 @@ class PollOption(TelegramObject):
         self._id_attrs = (self.text, self.voter_count, self.persistent_id)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollOption":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
-        data["added_by_user"] = de_json_optional(data.get("added_by_user"), User, bot)
-        data["added_by_chat"] = de_json_optional(data.get("added_by_chat"), Chat, bot)
-        data["addition_date"] = from_timestamp(data.get("addition_date"), tzinfo=loc_tzinfo)
-        data["media"] = de_json_optional(data.get("media"), PollMedia, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`text`
@@ -542,16 +480,6 @@ class PollAnswer(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollAnswer":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["user"] = de_json_optional(data.get("user"), User, bot)
-        data["voter_chat"] = de_json_optional(data.get("voter_chat"), Chat, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class PollOptionAdded(TelegramObject):
     """
@@ -606,24 +534,6 @@ class PollOptionAdded(TelegramObject):
         self._id_attrs = (self.option_persistent_id, self.option_text)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollOptionAdded":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        from telegram._message import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
-            MaybeInaccessibleMessage,
-        )
-
-        data = cls._parse_data(data)
-
-        data["poll_message"] = de_json_optional(
-            data.get("poll_message"), MaybeInaccessibleMessage, bot
-        )
-        data["option_text_entities"] = de_list_optional(
-            data.get("option_text_entities"), MessageEntity, bot
-        )
-
-        return super().de_json(data=data, bot=bot)
 
     def parse_option_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`option_text`
@@ -721,24 +631,6 @@ class PollOptionDeleted(TelegramObject):
         self._id_attrs = (self.option_persistent_id, self.option_text)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PollOptionDeleted":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        from telegram._message import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
-            MaybeInaccessibleMessage,
-        )
-
-        data = cls._parse_data(data)
-
-        data["poll_message"] = de_json_optional(
-            data.get("poll_message"), MaybeInaccessibleMessage, bot
-        )
-        data["option_text_entities"] = de_list_optional(
-            data.get("option_text_entities"), MessageEntity, bot
-        )
-
-        return super().de_json(data=data, bot=bot)
 
     def parse_option_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`option_text`
@@ -1066,30 +958,6 @@ class Poll(TelegramObject):
     @property
     def open_period(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._open_period, attribute="open_period")
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Poll":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["options"] = de_list_optional(data.get("options"), PollOption, bot)
-        data["explanation_entities"] = de_list_optional(
-            data.get("explanation_entities"), MessageEntity, bot
-        )
-        data["close_date"] = from_timestamp(data.get("close_date"), tzinfo=loc_tzinfo)
-        data["question_entities"] = de_list_optional(
-            data.get("question_entities"), MessageEntity, bot
-        )
-        data["description_entities"] = de_list_optional(
-            data.get("description_entities"), MessageEntity, bot
-        )
-        data["media"] = de_json_optional(data.get("media"), PollMedia, bot)
-        data["explanation_media"] = de_json_optional(data.get("explanation_media"), PollMedia, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     def parse_explanation_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`explanation` from a given :class:`telegram.MessageEntity` of

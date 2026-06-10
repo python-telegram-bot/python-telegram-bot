@@ -18,16 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent managed bots in the Telegram Bot API."""
 
-from typing import TYPE_CHECKING
-
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.types import (
     JSONDict,
 )
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ManagedBotCreated(TelegramObject):
@@ -60,15 +55,6 @@ class ManagedBotCreated(TelegramObject):
         self.bot: User = bot
         self._id_attrs = (self.bot,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ManagedBotCreated":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data=data)
-
-        data["bot"] = User.de_json(data=data["bot"], bot=bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class ManagedBotUpdated(TelegramObject):
@@ -111,13 +97,3 @@ class ManagedBotUpdated(TelegramObject):
             self.bot,
         )
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ManagedBotUpdated":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data=data)
-
-        data["user"] = User.de_json(data=data["user"], bot=bot)
-        data["bot"] = User.de_json(data=data["bot"], bot=bot)
-
-        return super().de_json(data=data, bot=bot)
