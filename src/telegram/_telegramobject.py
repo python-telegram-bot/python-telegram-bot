@@ -23,12 +23,11 @@ import datetime as dtm
 import importlib
 import inspect
 import json
-import types as _types
 from collections.abc import Iterator, Mapping, Sequence, Sized
 from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
-from types import MappingProxyType
+from types import MappingProxyType, UnionType
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast, get_args, get_origin
 
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
@@ -53,7 +52,7 @@ def _telegram_ns() -> dict[str, object]:
 
 def _unwrap_optional(ann: object) -> object:
     """``X | None``  →  ``X``.  Any other annotation is returned unchanged."""
-    if isinstance(ann, _types.UnionType):
+    if isinstance(ann, UnionType):
         non_none = [a for a in ann.__args__ if a is not type(None)]  # pylint: disable=unidiomatic-typecheck
         if len(non_none) == 1:
             return non_none[0]
