@@ -27,9 +27,11 @@ from sphinx.application import Sphinx
 import telegram
 import telegram.ext
 from docs.auxil.admonition_inserter import AdmonitionInserter
-from docs.auxil.kwargs_insertion import (
+from docs.auxil.bot_insertion import (
+    RAISES_BLOCK,
     check_timeout_and_api_kwargs_presence,
     find_insert_pos_for_kwargs,
+    find_insert_pos_for_raises,
     get_updates_read_timeout_addition,
     keyword_args,
     media_write_timeout_change,
@@ -85,8 +87,8 @@ def autodoc_process_docstring(
     app: Sphinx, what, name: str, obj: object, options, lines: list[str]
 ):
     """We do the following things:
-    1) Use this method to automatically insert the Keyword Args and "Shortcuts" admonitions
-       for the Bot methods.
+    1) Use this method to automatically insert the Keyword Args, "Shortcuts" admonitions,
+       and the Raises block, wherever applicable, for the Bot methods.
 
     2) Use this method to automatically insert "Returned in" admonition into classes
        that are returned from the Bot methods
@@ -102,13 +104,15 @@ def autodoc_process_docstring(
     """
 
     # 1) Insert the Keyword Args and "Shortcuts" admonitions for the Bot methods
-    method_name = name.rsplit(".", maxsplit=1)[0]
+    method_name = name.rsplit(".", maxsplit=1)[-1]
     if (
         name.startswith("telegram.Bot.")
         and what == "method"
         and method_name.islower()
         and check_timeout_and_api_kwargs_presence(obj)
     ):
+        # Logic for inserting keyword args into docstrings:
+        # -------------------------------------------------
         insert_index = find_insert_pos_for_kwargs(lines)
         if not insert_index:
             raise ValueError(
@@ -134,6 +138,16 @@ def autodoc_process_docstring(
             lines[insert_idx:insert_idx] = effective_insert
             insert_idx += len(effective_insert)
 
+        # Logic for inserting Raises:
+        # -------------------------------------------------
+        # We will only insert the Raises block if there isn't already one.
+
+        insert_index = find_insert_pos_for_raises(lines)
+        if insert_index != -1:
+            lines[insert_index:insert_index] = RAISES_BLOCK
+
+        # Logic for inserting "Shortcuts" admonition:
+        # -------------------------------------------
         ADMONITION_INSERTER.insert_admonitions(
             obj=typing.cast("collections.abc.Callable", obj),
             docstring_lines=lines,
