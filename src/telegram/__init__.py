@@ -175,6 +175,7 @@ __all__ = (
     "InputProfilePhoto",
     "InputProfilePhotoAnimated",
     "InputProfilePhotoStatic",
+    "InputRichMessage",
     "InputSticker",
     "InputStoryContent",
     "InputStoryContentPhoto",
@@ -512,6 +513,7 @@ from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._inline.preparedinlinemessage import PreparedInlineMessage
 from ._inputchecklist import InputChecklist, InputChecklistTask
+from ._inputrichmessage import InputRichMessage
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._keyboardbuttonrequest import (
