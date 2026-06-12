@@ -31,7 +31,7 @@ class PreparedKeyboardButton(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         id (:obj:`str`): Unique identifier of the keyboard button.

@@ -50,7 +50,7 @@ class ChatPermissions(TelegramObject):
     .. versionchanged:: 22.7
         :attr:`can_edit_tag` is considered as well when comparing objects of
         this type in terms of equality.
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.8
         :attr:`can_react_to_messages` is considered as well when comparing objects of
         this type in terms of equality.
 
@@ -106,7 +106,7 @@ class ChatPermissions(TelegramObject):
         can_react_to_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to react
             to messages. If omitted, defaults to the value of :attr:`can_send_messages`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     Attributes:
         can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send text
@@ -155,7 +155,7 @@ class ChatPermissions(TelegramObject):
         can_react_to_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to react
             to messages. If omitted, defaults to the value of :attr:`can_send_messages`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     """
 

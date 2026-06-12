@@ -37,7 +37,7 @@ class BotAccessSettings(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`is_access_restricted` and :attr:`added_users` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         is_access_restricted (:obj:`bool`): :obj:`True`, if only selected users can access the bot.

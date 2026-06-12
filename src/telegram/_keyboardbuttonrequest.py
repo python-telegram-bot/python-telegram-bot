@@ -280,7 +280,7 @@ class KeyboardButtonRequestManagedBot(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`request_id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         request_id (:obj:`int`): Signed 32-bit identifier of the request. Must be unique

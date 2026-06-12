@@ -167,12 +167,12 @@ class Update(TelegramObject):
         managed_bot (:class:`telegram.ManagedBotUpdated`, optional): A new bot was created to be
             managed by the bot, or token or owner of a managed bot was changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         guest_message (:class:`telegram.Message`, optional): New guest message. The bot can use
             the field :attr:`telegram.Message.guest_query_id` and the method
             :meth:`telegram.Bot.answer_guest_query` to send a message in response.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
 
     Attributes:
@@ -289,12 +289,12 @@ class Update(TelegramObject):
         managed_bot (:class:`telegram.ManagedBotUpdated`): Optional. A new bot was created to be
             managed by the bot, or token or owner of a managed bot was changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         guest_message (:class:`telegram.Message`): Optional. New guest message. The bot can use
             the field :attr:`telegram.Message.guest_query_id` and the method
             :meth:`telegram.Bot.answerGuestQuery` to send a message in response.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
     """
 
     __slots__ = (
@@ -428,12 +428,12 @@ class Update(TelegramObject):
     MANAGED_BOT: Final[str] = constants.UpdateType.MANAGED_BOT
     """:const:`telegram.constants.UpdateType.MANAGED_BOT`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     GUEST_MESSAGE: Final[str] = constants.UpdateType.GUEST_MESSAGE
     """:const:`telegram.constants.UpdateType.GUEST_MESSAGE`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     ALL_TYPES: Final[list[str]] = list(constants.UpdateType)
@@ -533,7 +533,7 @@ class Update(TelegramObject):
         .. versionchanged:: 21.6
             This property now also considers :attr:`purchased_paid_media`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.8
             This property now also considers :attr:`managed_bot`, :attr:`guest_message`,
             :attr:`channel_post`, and :attr:`edited_channel_post`.
 
@@ -626,7 +626,7 @@ class Update(TelegramObject):
 
         is present.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.8
             This property now also considers :attr:`guest_message`.
 
         Example:
@@ -683,7 +683,7 @@ class Update(TelegramObject):
             This property now also considers :attr:`business_message`,
             :attr:`edited_business_message`, and :attr:`deleted_business_messages`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.8
             This property now also considers :attr:`guest_message`.
 
         Example:
@@ -747,7 +747,7 @@ class Update(TelegramObject):
             This property now also considers :attr:`business_message`, and
             :attr:`edited_business_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.8
             This property now also considers :attr:`guest_message`.
 
         Tip:
