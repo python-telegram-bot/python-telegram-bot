@@ -24,11 +24,11 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import final
 
-from telegram._files._inputstorycontent import InputStoryContent
 from telegram._files.inputfile import InputFile
 from telegram._files.inputmedia import InputMedia, InputPaidMedia
 from telegram._files.inputprofilephoto import InputProfilePhoto, InputProfilePhotoStatic
 from telegram._files.inputsticker import InputSticker
+from telegram._files.inputstorycontent import InputStoryContent
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.enum import StringEnum
