@@ -1247,7 +1247,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing. Pass an empty text to show a "Thinking..." placeholder.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 22.8
                     Bot API 10.0 now makes this an optional parameter.
 
             message_thread_id (:obj:`int`, optional): Unique identifier for the target
@@ -5031,7 +5031,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 that are administrators of the chat. By default, bots other than the current bot
                 are omitted.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
 
         Returns:
             tuple[:class:`telegram.ChatMember`]: On success, returns a tuple of ``ChatMember``
@@ -5721,7 +5721,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     ) -> SentGuestMessage:
         """Use this method to reply to a received guest message.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             guest_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -7376,7 +7376,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        # tags: deprecated in NEXT.VERSION, to be removed
+        # tags: deprecated in 22.8, to be removed
         # replaced by `correct_option_ids`
         correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
@@ -7446,7 +7446,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 22.8
                     Bot API 9.6 replaces this with :paramref:`correct_option_ids` instead.
 
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
@@ -7517,44 +7517,44 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 change the chosen answer options, defaults to :obj:`False`
                 for quizzes and to :obj:`True` for regular polls
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
                 added to the poll after creation; not supported for anonymous polls and quizzes
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
                 must be shown only after the poll closes
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             correct_option_ids (Sequence[:class:`int`], optional): A list of monotonically
                 increasing 0-based identifiers of the correct answer options,
                 required for polls in quiz mode.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description (:obj:`str`, optional): Description of the poll to be sent,
                 0-:tg-const:`telegram.Poll.MAX_DESCRIPTION_CHARACTERS` characters
                 after entities parsing.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description_parse_mode (:obj:`str`, optional): Mode for parsing entities
                 in the poll description. See the constants
                 in :class:`telegram.constants.ParseMode`
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
                 JSON-serialized list of special entities that appear in the poll description,
                 which can be specified instead of :paramref:`description_parse_mode`
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
                 shown in random order
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             members_only (:obj:`bool`, optional): :obj:`True`, if voting is limited to users who
                 have been members of the chat where the poll is being sent for more than
                 :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours; for channel chats only
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             country_codes (Sequence[:obj:`str`], optional): A list of
                 0-:tg-const:`telegram.constants.PollLimit.MAX_COUNTRY_CODES` two-letter
                 ``ISO 3166-1 alpha-2`` country codes indicating the countries from which users can
@@ -7562,15 +7562,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 users with anonymous numbers to vote. If omitted or empty, then users from any
                 country can participate in the poll.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             explanation_media (:class:`telegram.InputPollMedia`, optional): Media added to the quiz
                 explanation
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             media (:class:`telegram.InputPollMedia`, optional): Media added to the poll
                 description.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7599,7 +7599,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         if correct_option_id is not None:
             warn(
                 PTBDeprecationWarning(
-                    version="NEXT.VERSION",
+                    version="22.8",
                     message="Bot API 9.6 deprecated `correct_option_id` in favour of "
                     "`correct_option_ids`, please use that.",
                 ),
@@ -10728,7 +10728,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to get the access settings of a managed bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose access settings will be
@@ -10770,7 +10770,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to change the access settings of a managed bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose access settings will be
@@ -10817,7 +10817,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Use this method to get the last messages from the personal chat (i.e., the chat currently
         added to their profile) of a given user.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.
@@ -11833,7 +11833,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to get the token of a managed bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose token will be returned.
@@ -11868,7 +11868,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to revoke the current token of a managed bot and generate a new one.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose token will be replaced.
@@ -11904,7 +11904,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Stores a keyboard button that can be used by a user within a Mini App.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user that can use the button.
@@ -11970,7 +11970,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -12085,7 +12085,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         The bot must have the :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
         administrator right in the chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
@@ -12132,7 +12132,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         :attr:`~telegram.ChatMemberAdministrator.can_delete_messages` administrator right in the
         chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|

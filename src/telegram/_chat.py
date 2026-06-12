@@ -1110,7 +1110,7 @@ class _ChatBase(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message_draft`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.8
             Bot API 10.0 makes the ``text`` argument optional.
 
         Returns:
@@ -1392,7 +1392,7 @@ class _ChatBase(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_live_photo`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -4155,7 +4155,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.delete_message_reaction`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4195,7 +4195,7 @@ class _ChatBase(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.delete_all_message_reactions`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

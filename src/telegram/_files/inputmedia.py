@@ -176,7 +176,7 @@ class InputPaidMedia(TelegramObject):
     LIVE_PHOTO: Final[str] = constants.InputPaidMediaType.LIVE_PHOTO
     """:const:`telegram.constants.InputPaidMediaType.LIVE_PHOTO`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     __slots__ = ("media", "type")
@@ -342,7 +342,7 @@ class InputPaidMediaLivePhoto(InputPaidMedia):
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
@@ -404,8 +404,8 @@ class InputMediaAnimation(InputMedia):
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
             :paramref:`filename`. For backward compatibility.
 
-            .. versionadded:: NEXT.VERSION
-            .. deprecated:: NEXT.VERSION
+            .. versionadded:: 22.8
+            .. deprecated:: 22.8
                 This parameter is deprecated, use :paramref:`filename` instead.
         caption (:obj:`str`, optional): Caption of the animation to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -441,7 +441,7 @@ class InputMediaAnimation(InputMedia):
             :obj:`tempfile` module.
 
             .. versionadded:: 13.1
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.8
                This parameter is now keyword-only.
 
     Attributes:
@@ -494,7 +494,7 @@ class InputMediaAnimation(InputMedia):
         height: int | None = None,
         duration: TimePeriod | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated NEXT.VERSION
+        # tag: deprecated 22.8
         filename_depr: str | None = None,
         # -
         has_spoiler: bool | None = None,
@@ -509,7 +509,7 @@ class InputMediaAnimation(InputMedia):
         if filename_depr is not None:
             warn(
                 PTBDeprecationWarning(
-                    "NEXT.VERSION",
+                    "22.8",
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
@@ -565,8 +565,8 @@ class InputMediaPhoto(InputMedia):
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
             :paramref:`filename`. For backward compatibility.
 
-            .. versionadded:: NEXT.VERSION
-            .. deprecated:: NEXT.VERSION
+            .. versionadded:: 22.8
+            .. deprecated:: 22.8
                 This parameter is deprecated, use :paramref:`filename` instead.
         caption (:obj:`str`, optional ): Caption of the photo to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
@@ -590,7 +590,7 @@ class InputMediaPhoto(InputMedia):
             :obj:`tempfile` module.
 
             .. versionadded:: 13.1
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.8
                This parameter is now keyword-only.
 
     Attributes:
@@ -626,7 +626,7 @@ class InputMediaPhoto(InputMedia):
         caption: str | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated NEXT.VERSION
+        # tag: deprecated 22.8
         filename_depr: str | None = None,
         # -
         has_spoiler: bool | None = None,
@@ -640,7 +640,7 @@ class InputMediaPhoto(InputMedia):
         if filename_depr is not None:
             warn(
                 PTBDeprecationWarning(
-                    "NEXT.VERSION",
+                    "22.8",
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
@@ -693,8 +693,8 @@ class InputMediaVideo(InputMedia):
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
             :paramref:`filename`. For backward compatibility.
 
-            .. versionadded:: NEXT.VERSION
-            .. deprecated:: NEXT.VERSION
+            .. versionadded:: 22.8
+            .. deprecated:: 22.8
                 This parameter is deprecated, use :paramref:`filename` instead.
         caption (:obj:`str`, optional): Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
@@ -738,7 +738,7 @@ class InputMediaVideo(InputMedia):
             :obj:`tempfile` module.
 
             .. versionadded:: 13.1
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.8
                This parameter is now keyword-only.
 
     Attributes:
@@ -803,7 +803,7 @@ class InputMediaVideo(InputMedia):
         supports_streaming: bool | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated NEXT.VERSION
+        # tag: deprecated 22.8
         filename_depr: str | None = None,
         # -
         has_spoiler: bool | None = None,
@@ -820,7 +820,7 @@ class InputMediaVideo(InputMedia):
         if filename_depr is not None:
             warn(
                 PTBDeprecationWarning(
-                    "NEXT.VERSION",
+                    "22.8",
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
@@ -869,7 +869,7 @@ class InputMediaVideo(InputMedia):
 class InputMediaLocation(_BaseInputMedia):
     """Represents a location to be sent.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         latitude (:obj:`float`): Latitude of the location.
@@ -905,7 +905,7 @@ class InputMediaLocation(_BaseInputMedia):
 class InputMediaVenue(_BaseInputMedia):
     """Represents a venue to be sent.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         latitude (:obj:`float`): Latitude of the location.
@@ -976,7 +976,7 @@ class InputMediaSticker(_BaseInputMedia):
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
@@ -1039,8 +1039,8 @@ class InputMediaAudio(InputMedia):
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
             :paramref:`filename`. For backward compatibility.
 
-            .. versionadded:: NEXT.VERSION
-            .. deprecated:: NEXT.VERSION
+            .. versionadded:: 22.8
+            .. deprecated:: 22.8
                 This parameter is deprecated, use :paramref:`filename` instead.
         caption (:obj:`str`, optional): Caption of the audio to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
@@ -1070,7 +1070,7 @@ class InputMediaAudio(InputMedia):
             :obj:`tempfile` module.
 
             .. versionadded:: 13.1
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.8
                This parameter is now keyword-only.
 
     Attributes:
@@ -1111,7 +1111,7 @@ class InputMediaAudio(InputMedia):
         performer: str | None = None,
         title: str | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated NEXT.VERSION
+        # tag: deprecated 22.8
         filename_depr: str | None = None,
         # -
         thumbnail: "FileInput | None" = None,
@@ -1124,7 +1124,7 @@ class InputMediaAudio(InputMedia):
         if filename_depr is not None:
             warn(
                 PTBDeprecationWarning(
-                    "NEXT.VERSION",
+                    "22.8",
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
@@ -1181,8 +1181,8 @@ class InputMediaDocument(InputMedia):
         filename_depr (:obj:`str`, optional): Positional placeholder for keyword only parameter
             :paramref:`filename`. For backward compatibility.
 
-            .. versionadded:: NEXT.VERSION
-            .. deprecated:: NEXT.VERSION
+            .. versionadded:: 22.8
+            .. deprecated:: 22.8
                 This parameter is deprecated, use :paramref:`filename` instead.
         caption (:obj:`str`, optional): Caption of the document to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
@@ -1207,7 +1207,7 @@ class InputMediaDocument(InputMedia):
             :obj:`tempfile` module.
 
             .. versionadded:: 13.1
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 22.8
                This parameter is now keyword-only.
 
     Attributes:
@@ -1240,7 +1240,7 @@ class InputMediaDocument(InputMedia):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_content_type_detection: bool | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated NEXT.VERSION
+        # tag: deprecated 22.8
         filename_depr: str | None = None,
         # -
         thumbnail: "FileInput | None" = None,
@@ -1253,7 +1253,7 @@ class InputMediaDocument(InputMedia):
         if filename_depr is not None:
             warn(
                 PTBDeprecationWarning(
-                    "NEXT.VERSION",
+                    "22.8",
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
@@ -1285,7 +1285,7 @@ class InputMediaLivePhoto(InputMedia):
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         media (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
@@ -1364,7 +1364,7 @@ InputPollMedia: TypeAlias = (
 )
 """Type alias for InputPollMedia objects.
 
-versionadded:: NEXT.VERSION
+versionadded:: 22.8
 """
 
 InputPollOptionMedia: TypeAlias = (
@@ -1378,5 +1378,5 @@ InputPollOptionMedia: TypeAlias = (
 )
 """Type alias for InputPollOptionMedia objects.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 22.8
 """

@@ -34,7 +34,7 @@ class ManagedBotUpdatedHandler(BaseHandler[Update, CCT, RT]):
     """Handler class to handle
     :attr:`updated Telegram Managed Bots <telegram.Update.managed_bot>`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

@@ -132,12 +132,12 @@ class User(TelegramObject):
         can_manage_bots (:obj:`bool`, optional): :obj:`True`, if other bots can be created to be
             controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         supports_guest_queries (:obj:`bool`, optional): :obj:`True`, if the bot supports guest
             queries from chats it is not a member of. Returned only in
             :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -181,12 +181,12 @@ class User(TelegramObject):
         can_manage_bots (:obj:`bool`): Optional. :obj:`True`, if other bots can be created to be
             controlled by the bot. Returned only in :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         supports_guest_queries (:obj:`bool`): Optional. :obj:`True`, if the bot supports guest
             queries from chats it is not a member of. Returned only in
             :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
@@ -567,7 +567,7 @@ class User(TelegramObject):
 
         .. versionadded:: 22.6
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.8
             Bot API 10.0 makes the ``text`` argument optional.
 
         Returns:
@@ -756,7 +756,7 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_live_photo`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Note:
             |user_chat_id_note|
@@ -2859,7 +2859,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.replace_managed_bot_token`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :obj:`str`: On success, :obj:`str` is returned.
@@ -2893,7 +2893,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_managed_bot_access_settings`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :class:`telegram.BotAccessSettings`: On success, returns the access settings of the bot
@@ -2931,7 +2931,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_managed_bot_access_settings`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -2972,7 +2972,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.delete_message_reaction`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3010,7 +3010,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_personal_chat_messages`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             tuple[:class:`telegram.Message`]: On success, a tuple of messages from the personal
@@ -3050,7 +3050,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.delete_all_message_reactions`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

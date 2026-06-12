@@ -65,7 +65,7 @@ class PollMedia(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if all of their attributes are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         animation (:class:`telegram.Animation`, optional): Media is an animation, information about
@@ -195,7 +195,7 @@ class InputPollOption(TelegramObject):
             This list is empty if the text does not contain entities.
         media (:class:`telegram.InputPollOptionMedia`, optional): Media added to the poll option.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     Attributes:
         text (:obj:`str`): Option text,
@@ -210,7 +210,7 @@ class InputPollOption(TelegramObject):
             This list is empty if the text does not contain entities.
         media (:class:`telegram.InputPollOptionMedia`): Optional. Media added to the poll option.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
     """
 
     __slots__ = ("media", "text", "text_entities", "text_parse_mode")
@@ -234,18 +234,18 @@ class InputPollOption(TelegramObject):
 
         self._freeze()
 
-    # tags: deprecated NEXT.VERSION
+    # tags: deprecated 22.8
     @classmethod
     def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InputPollOption":
         """See :meth:`telegram.TelegramObject.de_json`. The :paramref:`media` field will
         not be included for deserialization.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 22.8
             This class is input only and will be removed in the next version.
         """
         warn(
             PTBDeprecationWarning(
-                "NEXT.VERSION",
+                "22.8",
                 "`InputPollOption.de_json` is deprecated. This class is input only and will be "
                 "removed in the next version. The `media` field will not be included for "
                 "deserialization.",
@@ -267,7 +267,7 @@ class PollOption(TelegramObject):
     considered equal, if their :attr:`text`, :attr:`voter_count` and :attr:`persistent_id`
     are equal.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.8
         Added attribute :attr:`persistent_id` to equality checks.
 
 
@@ -275,7 +275,7 @@ class PollOption(TelegramObject):
         persistent_id (:obj:`str`): Unique identifier of the option, persistent on option addition
             and deletion.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         text (:obj:`str`): Option text,
             :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
             characters.
@@ -287,25 +287,25 @@ class PollOption(TelegramObject):
             .. versionadded:: 21.2
         media (:class:`telegram.PollMedia`, optional): Media added to the poll option.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         added_by_user (:class:`telegram.User`, optional): User who added the option;
             omitted if the option wasn't added by a user after poll creation.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         added_by_chat (:class:`telegram.Chat`, optional): Chat that added the option;
             omitted if the option wasn't added by a chat after poll creation.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         addition_date (:obj:`datetime.datetime`, optional): Point in time
             when the option was added; omitted if the option existed in the original poll.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     Attributes:
         persistent_id (:obj:`str`): Unique identifier of the option, persistent on option addition
             and deletion.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         text (:obj:`str`): Option text,
             :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
             characters.
@@ -318,19 +318,19 @@ class PollOption(TelegramObject):
             .. versionadded:: 21.2
         media (:class:`telegram.PollMedia`): Optional. Media added to the poll option.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         added_by_user (:class:`telegram.User`): Optional. User who added the option;
             omitted if the option wasn't added by a user after poll creation.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         added_by_chat (:class:`telegram.Chat`): Optional. Chat that added the option;
             omitted if the option wasn't added by a chat after poll creation.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         addition_date (:obj:`datetime.datetime`): Optional. Point in time
             when the option was added; omitted if the option existed in the original poll.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
     """
 
     __slots__ = (
@@ -353,7 +353,7 @@ class PollOption(TelegramObject):
         added_by_chat: Chat | None = None,
         addition_date: dtm.datetime | None = None,
         media: PollMedia | None = None,
-        # tags: required in NEXT.VERSION, bot api 9.6
+        # tags: required in 22.8, bot api 9.6
         # temporarily optional to avoid breaking changes
         persistent_id: str | None = None,
         *,
@@ -474,7 +474,7 @@ class PollAnswer(TelegramObject):
         option_persistent_ids (Sequence[:obj:`str`]): Persistent identifiers of the
             chosen answer options. May be empty if the vote was retracted.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         user (:class:`telegram.User`, optional): The user that changed the answer to the poll,
             if the voter isn't anonymous. If the voter is anonymous, this field will contain the
             user :tg-const:`telegram.constants.ChatID.FAKE_CHANNEL` for backwards compatibility.
@@ -496,7 +496,7 @@ class PollAnswer(TelegramObject):
         option_persistent_ids (tuple[:obj:`str`]): Persistent identifiers of the
             chosen answer options. May be empty if the vote was retracted.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         user (:class:`telegram.User`): Optional. The user, who changed the answer to the
             poll, if the voter isn't anonymous. If the voter is anonymous, this field will contain
             the user :tg-const:`telegram.constants.ChatID.FAKE_CHANNEL` for backwards compatibility
@@ -517,7 +517,7 @@ class PollAnswer(TelegramObject):
         option_ids: Sequence[int],
         user: User | None = None,
         voter_chat: Chat | None = None,
-        # tags: required in NEXT.VERSION, bot api 9.6
+        # tags: required in 22.8, bot api 9.6
         # temporarily optional to avoid breaking changes
         option_persistent_ids: Sequence[str] | None = None,
         *,
@@ -560,7 +560,7 @@ class PollOptionAdded(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`option_persistent_id`, and :attr:`option_text` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         option_persistent_id (:obj:`str`): Unique identifier of the added option.
@@ -675,7 +675,7 @@ class PollOptionDeleted(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`option_persistent_id`, :attr:`option_text` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         option_persistent_id (:obj:`str`): Unique identifier of the deleted option.
@@ -809,12 +809,12 @@ class Poll(TelegramObject):
             members of the chat where the poll was originally sent for more than
             :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
             option. Available only for closed polls in the quiz mode, which were sent
             (not forwarded), by the bot or to a private chat with the bot.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 22.8
                 Use :paramref:`correct_option_ids` instead.
         explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll,
@@ -831,7 +831,7 @@ class Poll(TelegramObject):
         explanation_media (:class:`telegram.PollMedia`, optional): Media added to the quiz
             explanation.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         open_period (:obj:`int` | :class:`datetime.timedelta`, optional): Amount of time in seconds
             the poll will be active after creation.
 
@@ -850,30 +850,30 @@ class Poll(TelegramObject):
         allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to
             change the chosenanswer options.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         correct_option_ids (Sequence[:class:`int`], optional): Array of 0-based identifiers of
             the correct answer options. Available only for polls in quiz mode which are closed or
             were sent (not forwarded) by the bot or to the private chat with the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         country_codes (Sequence[:obj:`str`], optional): A list of two-letter ``ISO 3166-1 alpha-2``
             country codes indicating the countries from which users can vote in the poll. The
             country code ``"FT"`` is used for users with anonymous numbers. If omitted, then users
             from any country can participate in the poll.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         description (:obj:`str`, optional): Description of the poll;
             for polls inside the :class:`~telegram.Message` object only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         description_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
             entities like usernames, URLs, bot commands, etc. that appear in the description
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         media (:class:`telegram.PollMedia`, optional): Media added to the poll description;
             for polls inside the :class:`~telegram.Message` object only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     Attributes:
         id (:obj:`str`): Unique poll identifier.
@@ -892,7 +892,7 @@ class Poll(TelegramObject):
             members of the chat where the poll was originally sent for more than
             :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll,
             0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
@@ -908,7 +908,7 @@ class Poll(TelegramObject):
         explanation_media (:class:`telegram.PollMedia`): Optional. Media added to the quiz
             explanation.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         open_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Amount of time in seconds
             the poll will be active after creation.
 
@@ -928,30 +928,30 @@ class Poll(TelegramObject):
         allows_revoting (:obj:`bool`): :obj:`True`, if the poll
             allows to change the chosenanswer options
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         correct_option_ids (tuple[:class:`int`]): Array of 0-based identifiers of the
             correct answer options. Available only for polls in quiz mode which are closed or were
             sent (not forwarded) by the bot or to the private chat with the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         country_codes (tuple[:obj:`str`]): Optional. A list of two-letter ``ISO 3166-1 alpha-2``
             country codes indicating the countries from which users can vote in the poll. The
             country code ``"FT"`` is used for users with anonymous numbers. If omitted, then users
             from any country can participate in the poll.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         description (:obj:`str`): Optional. Description of the poll;
             for polls inside the Message object only
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         description_entities (tuple[:class:`telegram.MessageEntity`]): Special
             entities like usernames, URLs, bot commands, etc. that appear in the description
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         media (:class:`telegram.PollMedia`): Optional. Media added to the poll description;
             for polls inside the Message object only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     """
 
@@ -989,7 +989,7 @@ class Poll(TelegramObject):
         is_anonymous: bool,
         type: str,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool,
-        # tags: deprecated NEXT.VERSION
+        # tags: deprecated 22.8
         # Removed in bot api 9.6:
         correct_option_id: int | None = None,
         # ---
@@ -998,7 +998,7 @@ class Poll(TelegramObject):
         open_period: TimePeriod | None = None,
         close_date: dtm.datetime | None = None,
         question_entities: Sequence[MessageEntity] | None = None,
-        # tags: required in NEXT.VERSION
+        # tags: required in 22.8
         # temporarily optional to avoid breaking changes
         allows_revoting: bool | None = None,
         members_only: bool | None = None,
@@ -1030,11 +1030,11 @@ class Poll(TelegramObject):
         self.allows_revoting: bool = allows_revoting
         self.members_only: bool = members_only
 
-        # tag: deprecated NEXT.VERSION
+        # tag: deprecated 22.8
         if correct_option_id is not None:
             warn(
                 PTBDeprecationWarning(
-                    "NEXT.VERSION",
+                    "22.8",
                     "The parameter `correct_option_id` is deprecated. "
                     "Use `correct_option_ids` instead.",
                 ),
@@ -1196,7 +1196,7 @@ class Poll(TelegramObject):
         """Returns the text in :attr:`description` from a given :class:`telegram.MessageEntity` of
         :attr:`description_entities`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Note:
             This method is present because Telegram calculates the offset and length in
@@ -1227,7 +1227,7 @@ class Poll(TelegramObject):
         It contains entities from this polls description filtered by their ``type`` attribute as
         the key, and the text that each entity belongs to as the value of the :obj:`dict`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Note:
             This method should always be used instead of the :attr:`description_entities`
@@ -1255,12 +1255,12 @@ class Poll(TelegramObject):
         option. Available only for closed polls in the quiz mode, which were sent
         (not forwarded), by the bot or to a private chat with the bot.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 22.8
             Use :attr:`correct_option_ids` instead.
         """
         warn(
             PTBDeprecationWarning(
-                "NEXT.VERSION",
+                "22.8",
                 "The attribute `correct_option_id` is deprecated. "
                 "Use `correct_option_ids` instead.",
             ),
@@ -1325,10 +1325,10 @@ class Poll(TelegramObject):
     MAX_DESCRIPTION_CHARACTERS: Final[int] = constants.PollLimit.MAX_DESCRIPTION_CHARACTERS
     """:const:`telegram.constants.PollLimit.MAX_DESCRIPTION_CHARACTERS`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     MIN_MEMBERSHIP_HOURS: Final[int] = constants.PollLimit.MIN_MEMBERSHIP_HOURS
     """:const:`telegram.constants.PollLimit.MIN_MEMBERSHIP_HOURS`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """

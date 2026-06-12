@@ -118,7 +118,7 @@ class ExternalReplyInfo(TelegramObject):
         live_photo (:class:`telegram.LivePhoto`, optional): Message is a live photo, information
             about the live photo.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     Attributes:
         origin (:class:`telegram.MessageOrigin`): Origin of the message replied to by the given
@@ -174,7 +174,7 @@ class ExternalReplyInfo(TelegramObject):
         live_photo (:class:`telegram.LivePhoto`): Optional. Message is a live photo, information
             about the live photo.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     """
 
@@ -427,7 +427,7 @@ class ReplyParameters(TelegramObject):
         poll_option_id (:obj:`str`, optional): Persistent
             identifier of the specific poll option to be replied to.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     Attributes:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
@@ -458,7 +458,7 @@ class ReplyParameters(TelegramObject):
         poll_option_id (:obj:`str`): Optional. Persistent
             identifier of the specific poll option to be replied to.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
     """
 
     __slots__ = (
