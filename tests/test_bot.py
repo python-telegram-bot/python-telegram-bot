@@ -59,6 +59,7 @@ from telegram import (
     InputMessageContent,
     InputPollOption,
     InputProfilePhotoStatic,
+    InputRichMessage,
     InputTextMessageContent,
     KeyboardButton,
     KeyboardButtonRequestManagedBot,
@@ -1683,6 +1684,46 @@ class TestBotWithoutRequest:
             kwargs["parse_mode"] = passed_value
 
         await default_bot.send_message_draft(**kwargs)
+
+    async def test_send_rich_message(self, offline_bot, monkeypatch):
+        rich_message = InputRichMessage(html="<h3>Report</h3>", is_rtl=True)
+        markup = InlineKeyboardMarkup([[InlineKeyboardButton("t", callback_data="d")]])
+
+        async def make_assertion(url, request_data, *args, **kwargs):
+            params = request_data.parameters
+            assert params.get("chat_id") == 123
+            assert params.get("rich_message") == rich_message.to_dict()
+            assert params.get("message_thread_id") == 9
+            assert params.get("reply_markup") == markup.to_dict()
+            return {"message_id": 1, "date": 0, "chat": {"id": 123, "type": "private"}}
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        message = await offline_bot.send_rich_message(
+            chat_id=123,
+            rich_message=rich_message,
+            message_thread_id=9,
+            reply_markup=markup,
+        )
+        assert isinstance(message, Message)
+
+    async def test_send_rich_message_draft(self, offline_bot, monkeypatch):
+        rich_message = InputRichMessage(markdown="# Report")
+
+        async def make_assertion(url, request_data, *args, **kwargs):
+            params = request_data.parameters
+            assert params.get("chat_id") == 123
+            assert params.get("draft_id") == 7
+            assert params.get("rich_message") == rich_message.to_dict()
+            assert params.get("message_thread_id") == 9
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertion)
+        assert await offline_bot.send_rich_message_draft(
+            chat_id=123,
+            draft_id=7,
+            rich_message=rich_message,
+            message_thread_id=9,
+        )
 
     # TODO: Needs improvement. Need incoming shipping queries to test
     async def test_answer_shipping_query_ok(self, monkeypatch, offline_bot):
