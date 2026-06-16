@@ -62,6 +62,7 @@ __all__ = (
     "IS_AUTOMATIC_FORWARD",
     "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
+    "LIVE_PHOTO",
     "LOCATION",
     "PAID_MEDIA",
     "PASSPORT_DATA",
@@ -273,6 +274,10 @@ class BaseFilter:
             :attr:`~telegram.Update.business_message`
             or :attr:`~telegram.Update.edited_business_message`.
 
+        .. versionchanged:: 22.8
+            This filter now also returns :obj:`True` if the update contains
+            :attr:`~telegram.Update.guest_message`.
+
         Args:
             update (:class:`telegram.Update`): The update to check.
 
@@ -281,7 +286,8 @@ class BaseFilter:
             :attr:`~telegram.Update.channel_post`, :attr:`~telegram.Update.message`,
             :attr:`~telegram.Update.edited_channel_post`,
             :attr:`~telegram.Update.edited_message`, :attr:`telegram.Update.business_message`,
-            :attr:`telegram.Update.edited_business_message`, or :obj:`False` otherwise.
+            :attr:`telegram.Update.edited_business_message`,
+            :attr:`telegram.Update.guest_message`, or :obj:`False` otherwise.
         """
         return bool(  # Only message updates should be handled.
             update.channel_post
@@ -290,6 +296,7 @@ class BaseFilter:
             or update.edited_message
             or update.business_message
             or update.edited_business_message
+            or update.guest_message
         )
 
 
@@ -1651,6 +1658,20 @@ class Language(MessageFilter):
         )
 
 
+class _LivePhoto(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.live_photo)
+
+
+LIVE_PHOTO = _LivePhoto(name="filters.LIVE_PHOTO")
+"""Messages that contain :attr:`telegram.Message.live_photo`.
+
+.. versionadded:: 22.8
+"""
+
+
 class _Location(MessageFilter):
     __slots__ = ()
 
@@ -2353,7 +2374,7 @@ class StatusUpdate:
 
     POLL_OPTION_ADDED = _PollOptionAdded(name="filters.StatusUpdate.POLL_OPTION_ADDED")
     """Messages that contain :attr:`telegram.Message.poll_option_added`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     class _PollOptionDeleted(MessageFilter):
@@ -2364,7 +2385,7 @@ class StatusUpdate:
 
     POLL_OPTION_DELETED = _PollOptionDeleted(name="filters.StatusUpdate.POLL_OPTION_DELETED")
     """Messages that contain :attr:`telegram.Message.poll_option_deleted`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     class _ProximityAlertTriggered(MessageFilter):
@@ -2892,6 +2913,18 @@ class UpdateType:
     :attr:`telegram.Update.edited_business_message`.
 
     .. versionadded:: 21.1
+    """
+
+    class _GuestMessage(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.guest_message is not None
+
+    GUEST_MESSAGE = _GuestMessage(name="filters.UpdateType.GUEST_MESSAGE")
+    """Updates with :attr:`telegram.Update.guest_message`.
+
+    .. versionadded:: 22.8
     """
 
 

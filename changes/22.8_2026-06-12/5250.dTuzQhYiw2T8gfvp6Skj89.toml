@@ -1,0 +1,5 @@
+other = "Make instantiation of ``TelegramObject``'s 15% faster"
+[[pull_requests]]
+uid = "5250"
+author_uids = ["harshil21"]
+closes_threads = []

@@ -91,6 +91,13 @@ RAISES_BLOCK = [
 ]
 
 
+def find_insert_pos_for_raises(lines: list[str]) -> int:
+    """Finds the correct position to insert the Raises block and returns the index."""
+    if "Raises:" in lines:
+        return -1  # Don't insert if there's already a Raises block
+    return len(lines)  # Insert at the end if there's no Raises block
+
+
 def check_timeout_and_api_kwargs_presence(obj: object) -> int:
     sig = inspect.signature(obj)
     params_to_check = (

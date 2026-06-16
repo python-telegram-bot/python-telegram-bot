@@ -75,6 +75,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
 - `Juan Cuevas <https://github.com/cuevasrja>`
+- `karin0 <https://github.com/karin0>`_
 - `kenjitagawa <https://github.com/kenjitagawa>`_
 - `kennethcheo <https://github.com/kennethcheo>`_
 - `Kirill Vasin <https://github.com/vasinkd>`_

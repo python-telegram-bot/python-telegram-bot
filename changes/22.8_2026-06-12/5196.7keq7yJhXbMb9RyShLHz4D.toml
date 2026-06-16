@@ -1,0 +1,24 @@
+features = """
+Full Support for Bot API 9.6
+
+.. warning::
+
+    - Bot API 9.6 replaces the field ``correct_option_id`` of ``Poll`` with the new field ``correct_option_ids``. The field ``correct_option_id`` is still present in PTB for backward compatibility, but it will be removed in future releases.
+
+    - Bot API 9.6 replaces the argument ``correct_option_id`` of ``Bot.send_poll`` with the new argument ``correct_option_ids``. The argument ``correct_option_id`` is still present in PTB for backward compatibility, but it will be removed in future releases.
+
+    - Bot API 9.6 introduces a now required argument ``persistent_id`` to ``PollOption``. For backward compatibility, the argument is currently still marked as optional in the signature and its presence is enforced through a runtime check. In future versions, this argument will be made required in the signature as well.
+
+    - Bot API 9.6 introduces a now required argument ``option_persistent_ids`` to ``PollAnswer``. For backward compatibility, the argument is currently still marked as optional in the signature and its presence is enforced through a runtime check. In future versions, this argument will be made required in the signature as well.
+
+    - Bot API 9.6 introduces a now required argument ``allows_revoting`` to ``Poll``. For backward compatibility, the argument is currently still marked as optional in the signature and its presence is enforced through a runtime check. In future versions, this argument will be made required in the signature as well.
+
+
+    Please make sure to update your code accordingly to avoid potential issues in the future. We recommend using keyword arguments to ensure compatibility with future updates.
+"""
+
+pull_requests = [
+    { uid = "5196", author_uid = "harshil21" },
+    { uid = "5202", author_uid = "ouyooung" },
+    { uid = "5197", author_uid = "harshil21" },
+]

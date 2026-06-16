@@ -23,6 +23,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Final
 
 from telegram import constants
+from telegram._files.livephoto import LivePhoto
 from telegram._files.photosize import PhotoSize
 from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
@@ -65,6 +66,8 @@ class PaidMedia(TelegramObject):
     """:const:`telegram.constants.PaidMediaType.PHOTO`"""
     VIDEO: Final[str] = constants.PaidMediaType.VIDEO
     """:const:`telegram.constants.PaidMediaType.VIDEO`"""
+    LIVE_PHOTO: Final[str] = constants.PaidMediaType.LIVE_PHOTO
+    """:const:`telegram.constants.PaidMediaType.LIVE_PHOTO`"""
 
     def __init__(
         self,
@@ -97,6 +100,7 @@ class PaidMedia(TelegramObject):
             cls.PREVIEW: PaidMediaPreview,
             cls.PHOTO: PaidMediaPhoto,
             cls.VIDEO: PaidMediaVideo,
+            cls.LIVE_PHOTO: PaidMediaLivePhoto,
         }
 
         if cls is PaidMedia and data.get("type") in _class_mapping:
@@ -238,6 +242,47 @@ class PaidMediaVideo(PaidMedia):
         data = cls._parse_data(data)
 
         data["video"] = de_json_optional(data.get("video"), Video, bot)
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
+
+
+class PaidMediaLivePhoto(PaidMedia):
+    """
+    The paid media is a live photo.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`live_photo` are equal.
+
+    .. versionadded:: 22.8
+
+    Args:
+        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.LIVE_PHOTO`
+        live_photo (:class:`telegram.LivePhoto`): The photo.
+
+    Attributes:
+        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.LIVE_PHOTO`
+        live_photo (:class:`telegram.LivePhoto`): The photo.
+
+    """
+
+    __slots__ = ("live_photo",)
+
+    def __init__(
+        self,
+        live_photo: LivePhoto,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ) -> None:
+        super().__init__(type=PaidMedia.LIVE_PHOTO, api_kwargs=api_kwargs)
+
+        with self._unfrozen():
+            self.live_photo: LivePhoto = live_photo
+            self._id_attrs = (self.type, self.live_photo)
+
+    @classmethod
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaLivePhoto":
+        data = cls._parse_data(data)
+
+        data["live_photo"] = de_json_optional(data.get("live_photo"), LivePhoto, bot)
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 

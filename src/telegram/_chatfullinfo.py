@@ -245,7 +245,7 @@ class ChatFullInfo(_ChatBase):
 
             .. versionadded:: 22.6
         paid_message_star_count (:obj:`int`, optional): The number of Telegram Stars a general user
-            have to pay to send a message to the chat
+            has to pay to send a message to the chat
 
             .. versionadded:: 22.6
         first_profile_audio (:obj:`telegram.Audio`, optional): For private chats, the first audio

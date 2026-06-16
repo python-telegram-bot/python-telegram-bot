@@ -38,7 +38,7 @@ class ManagedBotCreated(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`bot` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         bot (:class:`telegram.User`): Information about the bot. The bot's token can be fetched
@@ -76,7 +76,7 @@ class ManagedBotUpdated(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`bot` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         user (:class:`telegram.User`): User that created the bot.

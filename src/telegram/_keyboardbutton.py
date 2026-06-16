@@ -126,7 +126,7 @@ class KeyboardButton(TelegramObject):
             in the `@BotFather <https://telegram.me/BotFather>` Mini App. Available in private
             chats only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
     """
 
     __slots__ = (

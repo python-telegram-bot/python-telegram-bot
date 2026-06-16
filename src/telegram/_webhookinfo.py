@@ -63,7 +63,11 @@ class WebhookInfo(TelegramObject):
             connections to the webhook for update delivery.
         allowed_updates (Sequence[:obj:`str`], optional): A sequence of update types the bot is
             subscribed to. Defaults to all update types, except
-            :attr:`telegram.Update.chat_member`.
+            :attr:`~telegram.Update.chat_member`, :attr:`~telegram.Update.message_reaction`,
+            and :attr:`~telegram.Update.message_reaction_count`.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
 
         last_synchronization_error_date (:class:`datetime.datetime`, optional): Datetime of the
             most recent error that happened when trying to synchronize available updates with

@@ -156,6 +156,14 @@ managed_bot = ManagedBotUpdated(
     user=User(1, "creator", True),
     bot=User(2, "bot", True),
 )
+guest_message = Message(
+    1,
+    dtm.datetime.utcnow(),
+    Chat(1, ""),
+    User(1, "", False),
+    sender_chat=Chat(1, ""),
+)
+
 
 params = [
     {"message": message},
@@ -171,17 +179,31 @@ params = [
         )
     },
     {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
-    {"poll": Poll("id", "?", [PollOption(".", 1)], False, False, False, Poll.REGULAR, True)},
+    {
+        "poll": Poll(
+            "id",
+            "?",
+            [PollOption(text=".", voter_count=1, persistent_id="persistent_id")],
+            False,
+            False,
+            False,
+            Poll.REGULAR,
+            True,
+            allows_revoting=True,
+            members_only=True,
+        )
+    },
     {
         "poll_answer": PollAnswer(
-            "id",
-            [1],
-            User(
+            poll_id="id",
+            option_ids=[1],
+            option_persistent_ids=["1"],
+            user=User(
                 1,
                 "",
                 False,
             ),
-            Chat(1, ""),
+            voter_chat=Chat(1, ""),
         )
     },
     {"my_chat_member": chat_member_updated},
@@ -197,6 +219,7 @@ params = [
     {"edited_business_message": business_message},
     {"purchased_paid_media": purchased_paid_media},
     {"managed_bot": managed_bot},
+    {"guest_message": guest_message},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -226,6 +249,7 @@ all_types = (
     "edited_business_message",
     "purchased_paid_media",
     "managed_bot",
+    "guest_message",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -332,7 +356,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
     def test_effective_sender_non_anonymous(self, update):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned off
-        if message := (update.message or update.edited_message):
+        if message := (update.message or update.edited_message or update.guest_message):
             message._unfreeze()
             message.sender_chat = None
         elif reaction := (update.message_reaction):
@@ -365,7 +389,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
     def test_effective_sender_anonymous(self, update):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned on
-        if message := (update.message or update.edited_message):
+        if message := (update.message or update.edited_message or update.guest_message):
             message._unfreeze()
             message.from_user = None
         elif reaction := (update.message_reaction):
@@ -391,6 +415,7 @@ class TestUpdateWithoutRequest(UpdateTestBase):
                 or update.edited_channel_post
                 or update.message_reaction
                 or update.poll_answer
+                or update.guest_message
             ):
                 assert isinstance(sender, Chat)
             else:
@@ -400,6 +425,18 @@ class TestUpdateWithoutRequest(UpdateTestBase):
 
         cached = update.effective_sender
         assert cached is sender
+
+    def test_effective_sender_signed_channel_post(self):
+        # channel_post with signatures can have its from_user
+        user = User(1, "", False)
+        post = Message(
+            1, dtm.datetime.utcnow(), Chat(1, ""), author_signature="", from_user=user, text="Text"
+        )
+        update = Update(update_id=1, channel_post=post)
+        assert update.effective_sender == update.effective_user == user
+
+        update = Update(update_id=2, edited_channel_post=post)
+        assert update.effective_sender == update.effective_user == user
 
     def test_effective_message(self, update):
         # Test that it's sometimes None per docstring

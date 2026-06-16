@@ -17,9 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 import inspect
+import platform
 from typing import TYPE_CHECKING
 
 import pytest
+
+if platform.python_version_tuple() >= ("3", "15"):
+    pytest.skip("Running on Python version > 3.15 is not supported yet!", allow_module_level=True)
 
 import telegram
 from tests.auxil.envvars import RUN_TEST_OFFICIAL

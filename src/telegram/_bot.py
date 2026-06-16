@@ -47,7 +47,8 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-from telegram._botcommand import BotCommand  # pylint: disable=ungrouped-imports
+from telegram._botaccesssettings import BotAccessSettings  # pylint: disable=ungrouped-imports
+from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
 from telegram._botname import BotName
@@ -65,6 +66,7 @@ from telegram._files.contact import Contact
 from telegram._files.document import Document
 from telegram._files.file import File
 from telegram._files.inputmedia import InputMedia, InputPaidMedia
+from telegram._files.livephoto import LivePhoto
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import MaskPosition, Sticker, StickerSet
@@ -89,6 +91,7 @@ from telegram._poll import InputPollOption, Poll
 from telegram._preparedkeyboardbutton import PreparedKeyboardButton
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
+from telegram._sentguestmessage import SentGuestMessage
 from telegram._sentwebappmessage import SentWebAppMessage
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
@@ -126,8 +129,10 @@ if TYPE_CHECKING:
         InputFile,
         InputMediaAudio,
         InputMediaDocument,
+        InputMediaLivePhoto,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollMedia,
         InputProfilePhoto,
         InputSticker,
         InputStoryContent,
@@ -1212,7 +1217,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: int,
         draft_id: int,
-        text: str,
+        text: str | None = None,
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
@@ -1224,7 +1229,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> bool:
         """Use this method to stream a partial message to a user while the message is being
-        generated.
+        generated. Note that the streamed draft is ephemeral and acts as a temporary 30-second
+        preview - once the output is finalized, you must call :meth:`~Bot.send_message` with
+        the complete message to persist it in the user's chat.
 
         .. versionadded:: 22.6
 
@@ -1236,19 +1243,21 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             chat_id (:obj:`int`): Unique identifier for the target private chat.
             draft_id (:obj:`int`): Unique identifier of the message draft; must be non-zero.
                 Changes of drafts with the same identifier are animated.
-            text (:obj:`str`): Text of the message to be sent,
-                :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
-                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
-                entities parsing.
+            text (:obj:`str`, optional): Text of the message to be sent,
+                0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                entities parsing. Pass an empty text to show a "Thinking..." placeholder.
+
+                .. versionchanged:: 22.8
+                    Bot API 10.0 now makes this an optional parameter.
+
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target
+                message thread.
             parse_mode (:obj:`str`): |parse_mode|
             entities (Sequence[:class:`telegram.MessageEntity`], optional): Sequence of special
                 entities that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
 
                     |sequenceargs|
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target
-                message thread.
-
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -2800,7 +2809,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         self,
         chat_id: int | str,
         media: Sequence[
-            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo"
+            "InputMediaAudio | InputMediaDocument | InputMediaPhoto | InputMediaVideo | InputMediaLivePhoto"  # noqa: E501  # pylint: disable=line-too-long
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2839,8 +2848,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             media (Sequence[:class:`telegram.InputMediaAudio`,\
                 :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`,\
-                :class:`telegram.InputMediaVideo`]): An array
-                describing messages to be sent, must include
+                :class:`telegram.InputMediaVideo`, :class:`telegram.InputMediaLivePhoto`]): An
+                array describing messages to be sent, must include
                 :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`-
                 :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
 
@@ -3623,7 +3632,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
     async def send_game(
         self,
-        chat_id: int,
+        chat_id: int | str,
         game_short_name: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "InlineKeyboardMarkup | None" = None,
@@ -3645,7 +3654,9 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         """Use this method to send a game.
 
         Args:
-            chat_id (:obj:`int`): Unique identifier for the target chat.
+            chat_id (:obj:`int`): Unique identifier for the target chat or username of the
+                target bot in the format ``@username``. Games can't be sent to channel direct
+                messages chats and channel chats.
             game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
                 for the game. Set up your games via `@BotFather <https://t.me/BotFather>`_.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -4557,12 +4568,12 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         api_kwargs: JSONDict | None = None,
     ) -> "Message | bool":
         """
-        Use this method to edit animation, audio, document, photo, or video messages, or to add
-        media to text messages. If a message
+        Use this method to edit animation, audio, document, live photo, photo, or video messages,
+        or to add media to text messages. If a message
         is part of a message album, then it can be edited only to an audio for audio albums, only
-        to a document for document albums and to a photo or a video otherwise. When an inline
-        message is edited, a new file can't be uploaded; use a previously uploaded file via its
-        :attr:`~telegram.File.file_id` or specify a URL.
+        to a document for document albums and to a photo, live photo, or a video otherwise.
+        When an inline message is edited, a new file can't be uploaded; use a previously
+        uploaded file via its :attr:`~telegram.File.file_id` or specify a URL.
 
         Note:
             * |editreplymarkup|
@@ -5001,6 +5012,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     async def get_chat_administrators(
         self,
         chat_id: str | int,
+        return_bots: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5016,6 +5028,11 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            return_bots (:obj:`bool`, optional): Pass :obj:`True` to additionally receive all bots
+                that are administrators of the chat. By default, bots other than the current bot
+                are omitted.
+
+                .. versionadded:: 22.8
 
         Returns:
             tuple[:class:`telegram.ChatMember`]: On success, returns a tuple of ``ChatMember``
@@ -5023,7 +5040,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             other bots. If the chat is a group or a supergroup and no administrators were
             appointed, only the creator will be returned.
         """
-        data: JSONDict = {"chat_id": chat_id}
+        data: JSONDict = {"chat_id": chat_id, "return_bots": return_bots}
         result = await self._post(
             "getChatAdministrators",
             data,
@@ -5691,6 +5708,47 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         )
 
         return SentWebAppMessage.de_json(api_result, self)
+
+    async def answer_guest_query(
+        self,
+        guest_query_id: str,
+        result: "InlineQueryResult",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> SentGuestMessage:
+        """Use this method to reply to a received guest message.
+
+        .. versionadded:: 22.8
+
+        Args:
+            guest_query_id (:obj:`str`): Unique identifier for the query to be answered.
+            result (:class:`telegram.InlineQueryResult`): An object describing the message to be
+                sent.
+
+        Returns:
+            :class:`telegram.SentGuestMessage`: On success, a
+            :class:`telegram.SentGuestMessage` is returned.
+        """
+        data: JSONDict = {
+            "guest_query_id": guest_query_id,
+            "result": self._insert_defaults_for_ilq_results(result),
+        }
+
+        api_result = await self._post(
+            "answerGuestQuery",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return SentGuestMessage.de_json(api_result, self)
 
     async def restrict_chat_member(
         self,
@@ -7319,7 +7377,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        # tags: deprecated in NEXT.VERSION, to be removed
+        # tags: deprecated in 22.8, to be removed
         # replaced by `correct_option_ids`
         correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
@@ -7343,9 +7401,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         hide_results_until_closes: bool | None = None,
         correct_option_ids: CorrectOptionIds | None = None,
         description: str | None = None,
-        description_parse_mode: str | None = None,
+        description_parse_mode: ODVInput[str] | None = None,
         description_entities: Sequence["MessageEntity"] | None = None,
         shuffle_options: bool | None = None,
+        members_only: bool | None = None,
+        country_codes: Sequence[str] | None = None,
+        explanation_media: "InputPollMedia | None" = None,
+        media: "InputPollMedia | None" = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int | None = None,
@@ -7385,7 +7447,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 22.8
                     Bot API 9.6 replaces this with :paramref:`correct_option_ids` instead.
 
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
@@ -7456,39 +7518,60 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 change the chosen answer options, defaults to :obj:`False`
                 for quizzes and to :obj:`True` for regular polls
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
                 added to the poll after creation; not supported for anonymous polls and quizzes
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
                 must be shown only after the poll closes
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             correct_option_ids (Sequence[:class:`int`], optional): A list of monotonically
                 increasing 0-based identifiers of the correct answer options,
                 required for polls in quiz mode.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description (:obj:`str`, optional): Description of the poll to be sent,
                 0-:tg-const:`telegram.Poll.MAX_DESCRIPTION_CHARACTERS` characters
                 after entities parsing.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description_parse_mode (:obj:`str`, optional): Mode for parsing entities
                 in the poll description. See the constants
                 in :class:`telegram.constants.ParseMode`
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
                 JSON-serialized list of special entities that appear in the poll description,
                 which can be specified instead of :paramref:`description_parse_mode`
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
                 shown in random order
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
+            members_only (:obj:`bool`, optional): :obj:`True`, if voting is limited to users who
+                have been members of the chat where the poll is being sent for more than
+                :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours; for channel chats only
+
+                .. versionadded:: 22.8
+            country_codes (Sequence[:obj:`str`], optional): A list of
+                0-:tg-const:`telegram.constants.PollLimit.MAX_COUNTRY_CODES` two-letter
+                ``ISO 3166-1 alpha-2`` country codes indicating the countries from which users can
+                vote in the poll; for channel chats only. Use ``"FT"`` as a country code to allow
+                users with anonymous numbers to vote. If omitted or empty, then users from any
+                country can participate in the poll.
+
+                .. versionadded:: 22.8
+            explanation_media (:class:`telegram.InputPollMedia`, optional): Media added to the quiz
+                explanation
+
+                .. versionadded:: 22.8
+            media (:class:`telegram.InputPollMedia`, optional): Media added to the poll
+                description.
+
+                .. versionadded:: 22.8
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7517,7 +7600,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         if correct_option_id is not None:
             warn(
                 PTBDeprecationWarning(
-                    version="NEXT.VERSION",
+                    version="22.8",
                     message="Bot API 9.6 deprecated `correct_option_id` in favour of "
                     "`correct_option_ids`, please use that.",
                 ),
@@ -7552,6 +7635,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "close_date": close_date,
             "question_parse_mode": question_parse_mode,
             "question_entities": question_entities,
+            "members_only": members_only,
+            "country_codes": country_codes,
+            "explanation_media": explanation_media,
+            "media": media,
         }
 
         return await self._send_message(
@@ -7623,7 +7710,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def send_checklist(
         self,
         business_connection_id: str,
-        chat_id: int,
+        chat_id: int | str,
         checklist: InputChecklist,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -7645,20 +7732,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 22.3
 
         Args:
-            business_connection_id (:obj:`str`):
-                |business_id_str|
-            chat_id (:obj:`int`):
-                Unique identifier for the target chat.
-            checklist (:class:`telegram.InputChecklist`):
-                The checklist to send.
-            disable_notification (:obj:`bool`, optional):
-                |disable_notification|
-            protect_content (:obj:`bool`, optional):
-                |protect_content|
-            message_effect_id (:obj:`str`, optional):
-                |message_effect_id|
-            reply_parameters (:class:`telegram.ReplyParameters`, optional):
-                |reply_parameters|
+            business_connection_id (:obj:`str`): |business_id_str|
+            chat_id (:obj:`int`): Unique identifier for the target chat or username of the target
+                bot in the format ``@username``.
+            checklist (:class:`telegram.InputChecklist`): The checklist to send.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional):
                 An object for an inline keyboard
 
@@ -7699,7 +7780,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def edit_message_checklist(
         self,
         business_connection_id: str,
-        chat_id: int,
+        chat_id: int | str,
         message_id: int,
         checklist: InputChecklist,
         reply_markup: "InlineKeyboardMarkup | None" = None,
@@ -7716,14 +7797,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 22.3
 
         Args:
-            business_connection_id (:obj:`str`):
-                |business_id_str|
-            chat_id (:obj:`int`):
-                Unique identifier for the target chat.
-            message_id (:obj:`int`):
-                Unique identifier for the target message.
-            checklist (:class:`telegram.InputChecklist`):
-                The new checklist.
+            business_connection_id (:obj:`str`): |business_id_str|
+            chat_id (:obj:`int`): Unique identifier for the target chat or username of the target
+                bot in the format ``@username``.
+            message_id (:obj:`int`): Unique identifier for the target message.
+            checklist (:class:`telegram.InputChecklist`): The new checklist.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional):
                 An object for the new inline keyboard for the message.
 
@@ -7938,9 +8016,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: Returns :obj:`True` on success.
-
-        Raises:
-            :exc:`telegram.error.TelegramError`
         """
         data: JSONDict = {"rights": rights, "for_channels": for_channels}
 
@@ -8414,7 +8489,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
-                specified, default bot's menu button will be changed
+                specified, the bot's default menu button will be changed
             menu_button (:class:`telegram.MenuButton`, optional): An object for the new bot's menu
                 button. Defaults to :class:`telegram.MenuButtonDefault`.
 
@@ -8454,7 +8529,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
-                specified, default bot's menu button will be returned.
+                specified, the bot's default menu button will be returned.
 
         Returns:
             :class:`telegram.MenuButton`: On success, the current menu button is returned.
@@ -10641,6 +10716,136 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
             api_kwargs=api_kwargs,
         )
 
+    async def get_managed_bot_access_settings(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> BotAccessSettings:
+        """
+        Use this method to get the access settings of a managed bot.
+
+        .. versionadded:: 22.8
+
+        Args:
+            user_id (:obj:`int`): User identifier of the managed bot whose access settings will be
+                returned.
+
+        Returns:
+            :class:`telegram.BotAccessSettings`: The access settings of the managed bot.
+        """
+
+        data: JSONDict = {
+            "user_id": user_id,
+        }
+
+        return BotAccessSettings.de_json(
+            await self._post(
+                "getManagedBotAccessSettings",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
+        )
+
+    async def set_managed_bot_access_settings(
+        self,
+        user_id: int,
+        is_access_restricted: bool,
+        added_user_ids: Sequence[int] | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Use this method to change the access settings of a managed bot.
+
+        .. versionadded:: 22.8
+
+        Args:
+            user_id (:obj:`int`): User identifier of the managed bot whose access settings will be
+                changed.
+            is_access_restricted (:obj:`bool`): Pass :obj:`True`, if only selected users can access
+                the bot. The bot's owner can always access it.
+            added_user_ids (Sequence[:obj:`int`], optional): A list of up to
+                :tg-const:`telegram.constants.ManagedBotAccessLimit.MAX_ALLOWED_USERS`
+                identifiers of users who will have access to the bot in addition to its owner.
+                Ignored if :paramref:`is_access_restricted` is :obj:`False`.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+
+        data: JSONDict = {
+            "user_id": user_id,
+            "is_access_restricted": is_access_restricted,
+            "added_user_ids": added_user_ids,
+        }
+
+        return await self._post(
+            "setManagedBotAccessSettings",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_user_personal_chat_messages(
+        self,
+        user_id: int,
+        limit: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> tuple[Message, ...]:
+        """
+        Use this method to get the last messages from the personal chat (i.e., the chat currently
+        added to their profile) of a given user.
+
+        .. versionadded:: 22.8
+
+        Args:
+            user_id (:obj:`int`): Unique identifier of the target user.
+            limit (:obj:`int`): The maximum number of messages to return;
+                :tg-const:`telegram.constants.PersonalChatMessagesLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.PersonalChatMessagesLimit.MAX_LIMIT`.
+
+        Returns:
+            tuple[:class:`telegram.Message`, ...]: On success, a tuple of
+            :class:`telegram.Message` objects is returned.
+        """
+
+        data: JSONDict = {"user_id": user_id, "limit": limit}
+
+        return Message.de_list(
+            await self._post(
+                "getUserPersonalChatMessages",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            self,
+        )
+
     async def send_paid_media(
         self,
         chat_id: str | int,
@@ -11629,7 +11834,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to get the token of a managed bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose token will be returned.
@@ -11664,7 +11869,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to revoke the current token of a managed bot and generate a new one.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose token will be replaced.
@@ -11700,7 +11905,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Stores a keyboard button that can be used by a user within a Mini App.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user that can use the button.
@@ -11729,6 +11934,231 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 api_kwargs=api_kwargs,
             ),
             self,
+        )
+
+    async def send_live_photo(
+        self,
+        chat_id: int | str,
+        live_photo: "FileInput | LivePhoto",
+        photo: "FileInput | PhotoSize",
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        caption: str | None = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Sequence["MessageEntity"] | None = None,
+        show_caption_above_media: bool | None = None,
+        has_spoiler: bool | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: "ReplyMarkup | None" = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: int | None = None,
+        filename: str | None = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> Message:
+        """
+        Use this method to send live photos.
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionadded:: 22.8
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            live_photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+                :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.LivePhoto`): Live photo
+                video to send. Pass a ``file_id`` to send a file that exists on the Telegram
+                servers (recommended). |uploadinputnopath| Sending live photos by a URL is
+                currently unsupported. Lastly you can pass an existing
+                :class:`telegram.LivePhoto` object to send.
+
+                Caution:
+                   * The video must be at most 10MB in size.
+                   * The video duration must not exceed 10 seconds.
+                   * If you pass a :class:`telegram.LivePhoto`, its
+                   :attr:`~telegram.LivePhoto.photo` field will not be considered, use
+                   :paramref:`photo` to specify the photo to send.
+
+            photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+                | :class:`pathlib.Path` | :class:`telegram.PhotoSize`): The static photo to send.
+                Pass a ``file_id`` to send a file that exists on the Telegram servers (recommended)
+                . |uploadinputnopath| Sending live photos by a URL is currently unsupported.
+                Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
+            business_connection_id (:obj:`str`, optional): |business_id_str|
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+            caption (:obj:`str`, optional): Video caption (may also be used when resending videos
+                by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
+                characters after entities parsing.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the video needs to be covered
+                with a spoiler animation.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+            suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
+                |suggested_post_parameters|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for.
+
+            filename (:obj:`str`, optional): Custom file name for :paramref:`photo`, when
+                uploading a new file. Convenience parameter, useful e.g. when sending files
+                generated by the :obj:`tempfile` module.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "live_photo": self._parse_file_input(live_photo, LivePhoto),
+            "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
+            "has_spoiler": has_spoiler,
+            "show_caption_above_media": show_caption_above_media,
+        }
+
+        return await self._send_message(
+            "sendLivePhoto",
+            data,
+            disable_notification=disable_notification,
+            reply_markup=reply_markup,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_to_message_id=reply_to_message_id,
+        )
+
+    async def delete_message_reaction(
+        self,
+        chat_id: int | str,
+        message_id: int,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Use this method to remove a reaction from a message in a group or a supergroup chat.
+        The bot must have the :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
+        administrator right in the chat.
+
+        .. versionadded:: 22.8
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_id (:obj:`int`): Identifier of the target message.
+            user_id (:obj:`int`, optional): Identifier of the user whose reaction will be removed,
+                if the reaction were added by a user.
+            actor_chat_id (:obj:`int`, optional): Identifier of the chat whose reaction will be
+                removed, if the reaction were added by a chat.
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "user_id": user_id,
+            "actor_chat_id": actor_chat_id,
+        }
+
+        return await self._post(
+            "deleteMessageReaction",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_all_message_reactions(
+        self,
+        chat_id: int | str,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """
+        Use this method to remove up to ``10000`` recent reactions in a group or a supergroup chat
+        added by a given user or chat. The bot must have the
+        :attr:`~telegram.ChatMemberAdministrator.can_delete_messages` administrator right in the
+        chat.
+
+        .. versionadded:: 22.8
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            user_id (:obj:`int`, optional): Identifier of the user whose reactions will be removed,
+                if the reactions were added by a user.
+            actor_chat_id (:obj:`int`, optional): Identifier of the chat whose reactions will be
+                removed, if the reactions were added by a chat.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "user_id": user_id,
+            "actor_chat_id": actor_chat_id,
+        }
+
+        return await self._post(
+            "deleteAllMessageReactions",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     def to_dict(self, recursive: bool = True) -> JSONDict:  # noqa: ARG002
@@ -11847,6 +12277,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`answer_pre_checkout_query`"""
     answerWebAppQuery = answer_web_app_query
     """Alias for :meth:`answer_web_app_query`"""
+    answerGuestQuery = answer_guest_query
+    """Alias for :meth:`answer_guest_query`"""
     restrictChatMember = restrict_chat_member
     """Alias for :meth:`restrict_chat_member`"""
     promoteChatMember = promote_chat_member
@@ -12077,3 +12509,15 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`replace_managed_bot_token`"""
     savePreparedKeyboardButton = save_prepared_keyboard_button
     """Alias for :meth:`save_prepared_keyboard_button`"""
+    sendLivePhoto = send_live_photo
+    """Alias for :meth:`send_live_photo`"""
+    getManagedBotAccessSettings = get_managed_bot_access_settings
+    """Alias for :meth:`get_managed_bot_access_settings`"""
+    setManagedBotAccessSettings = set_managed_bot_access_settings
+    """Alias for :meth:`set_managed_bot_access_settings`"""
+    getUserPersonalChatMessages = get_user_personal_chat_messages
+    """Alias for :meth:`get_user_personal_chat_messages`"""
+    deleteMessageReaction = delete_message_reaction
+    """Alias for :meth:`delete_message_reaction`"""
+    deleteAllMessageReactions = delete_all_message_reactions
+    """Alias for :meth:`delete_all_message_reactions`"""

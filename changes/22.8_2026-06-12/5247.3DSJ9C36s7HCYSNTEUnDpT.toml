@@ -1,0 +1,5 @@
+security = "Disallow packages newer than last 7 days"
+[[pull_requests]]
+uid = "5247"
+author_uids = ["harshil21"]
+closes_threads = ["5195"]

@@ -1,0 +1,9 @@
+other = """Support Python 3.15 Beta
+
+* Python 3.15 free threading is not fully supported yet, as the optional dependency ``cryptography`` is not yet compatible with it. 
+
+"""
+[[pull_requests]]
+uid = "5259"
+author_uids = ["harshil21"]
+closes_threads = ["5231"]

@@ -45,6 +45,7 @@ __all__ = [
     "BackgroundFillType",
     "BackgroundTypeLimit",
     "BackgroundTypeType",
+    "BaseInputMediaType",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
@@ -87,6 +88,7 @@ __all__ = [
     "KeyboardButtonRequestUsersLimit",
     "KeyboardButtonStyle",
     "LocationLimit",
+    "ManagedBotAccessLimit",
     "MaskPosition",
     "MediaGroupLimit",
     "MenuButtonType",
@@ -101,6 +103,7 @@ __all__ = [
     "OwnedGiftType",
     "PaidMediaType",
     "ParseMode",
+    "PersonalChatMessagesLimit",
     "PollLimit",
     "PollType",
     "PollingLimit",
@@ -181,7 +184,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=9, minor=6)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=10, minor=0)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1519,9 +1522,42 @@ class InputChecklistLimit(IntEnum):
     """
 
 
+class BaseInputMediaType(StringEnum):
+    """This enum contains the available types of :class:`telegram.InputMedia`,
+    :class:`telegram.InputPollMedia` and :class:`telegram.InputPollOptionMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 22.8
+    """
+
+    __slots__ = ()
+
+    ANIMATION = "animation"
+    """:obj:`str`: Type of :class:`telegram.InputMediaAnimation`."""
+    DOCUMENT = "document"
+    """:obj:`str`: Type of :class:`telegram.InputMediaDocument`."""
+    AUDIO = "audio"
+    """:obj:`str`: Type of :class:`telegram.InputMediaAudio`."""
+    PHOTO = "photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    VIDEO = "video"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    LOCATION = "location"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLocation`."""
+    STICKER = "sticker"
+    """:obj:`str`: Type of :class:`telegram.InputMediaSticker`."""
+    VENUE = "venue"
+    """:obj:`str`: Type of :class:`telegram.InputMediaVenue`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`."""
+
+
 class InputMediaType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. deprecated:: 22.8
+        Use :class:`telegram.constants.BaseInputMediaType` instead.
 
     .. versionadded:: 20.0
     """
@@ -1538,6 +1574,11 @@ class InputMediaType(StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
     VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`.
+
+    .. versionadded:: 22.8
+    """
 
 
 class InputPaidMediaType(StringEnum):
@@ -1550,9 +1591,14 @@ class InputPaidMediaType(StringEnum):
     __slots__ = ()
 
     PHOTO = "photo"
-    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaPhoto`."""
     VIDEO = "video"
-    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaVideo`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Type of :class:`telegram.InputPaidMediaLivePhoto`.
+
+    .. versionadded:: 22.8
+    """
 
 
 class InputProfilePhotoType(StringEnum):
@@ -1784,6 +1830,8 @@ class LocationLimit(IntEnum):
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.horizontal_accuracy` parameter of
       :meth:`telegram.Bot.send_location`
+    * :paramref:`~telegram.InputMediaLocation.horizontal_accuracy` parameter of
+      :class:`telegram.InputMediaLocation`
     """
 
     MIN_HEADING = 1
@@ -1963,6 +2011,11 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
     INVOICE = "invoice"
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
+
+    .. versionadded:: 22.8
+    """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     PAID_MEDIA = "paid_media"
@@ -2345,6 +2398,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LEFT_CHAT_MEMBER = "left_chat_member"
     """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
+
+    .. versionadded:: 22.8
+    """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     MANAGED_BOT_CREATED = "managed_bot_created"
@@ -2372,12 +2430,12 @@ class MessageType(StringEnum):
     POLL_OPTION_ADDED = "poll_option_added"
     """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_added`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     POLL_OPTION_DELETED = "poll_option_deleted"
     """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_deleted`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
@@ -2566,6 +2624,33 @@ class PaidMediaType(StringEnum):
     """:obj:`str`: The type of :class:`telegram.PaidMediaVideo`."""
     PHOTO = "photo"
     """:obj:`str`: The type of :class:`telegram.PaidMediaPhoto`."""
+    LIVE_PHOTO = "live_photo"
+    """:obj:`str`: The type of :class:`telegram.PaidMediaLivePhoto`
+
+    .. versionadded:: 22.8
+    """
+
+
+class PersonalChatMessagesLimit(IntEnum):
+    """This enum contains limitations for
+    :paramref:`telegram.Bot.get_user_personal_chat_messages.limit`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 22.8
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.get_user_personal_chat_messages.limit`
+    parameter of :meth:`telegram.Bot.get_user_personal_chat_messages`.
+    """
+    MAX_LIMIT = 20
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.get_user_personal_chat_messages.limit`
+    parameter of :meth:`telegram.Bot.get_user_personal_chat_messages`.
+    """
 
 
 class PollingLimit(IntEnum):
@@ -3422,10 +3507,13 @@ class PollLimit(IntEnum):
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
     """
-    MIN_OPTION_NUMBER = 2
+    MIN_OPTION_NUMBER = 1
     """:obj:`int`: Minimum number of strings passed in a :obj:`list`
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
+
+    .. versionchanged:: 22.8
+        Bot API 10.0 decreased this value from ``2`` to ``1``.
     """
     MAX_OPTION_NUMBER = 12
     """:obj:`int`: Maximum number of strings passed in a :obj:`list`
@@ -3457,14 +3545,27 @@ class PollLimit(IntEnum):
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.8
         Changed from ``600`` to ``2628000`` since Bot API 9.6.
     """
     MAX_DESCRIPTION_CHARACTERS = 1024
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.send_poll.description` parameter of :meth:`telegram.Bot.send_poll`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
+    """
+    MIN_MEMBERSHIP_HOURS = 24
+    """:obj:`int`: Minimum number of hours a user must have been a member of the chat
+    before they can vote in a members-only poll.
+
+    .. versionadded:: 22.8
+    """
+    MAX_COUNTRY_CODES = 12
+    """:obj:`int`: Maximum number of two-letter ``ISO 3166-1 alpha-2`` country codes passed in a
+    :obj:`list` to the :paramref:`~telegram.Bot.send_poll.country_codes` parameter of
+    :meth:`telegram.Bot.send_poll`.
+
+    .. versionadded:: 22.8
     """
 
 
@@ -3618,7 +3719,12 @@ class UpdateType(StringEnum):
     MANAGED_BOT = "managed_bot"
     """:obj:`str`: Updates with :attr:`telegram.Update.managed_bot`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
+    """
+    GUEST_MESSAGE = "guest_message"
+    """:obj:`str`: Updates with :attr:`telegram.Update.guest_message`.
+
+    .. versionadded:: 22.8
     """
 
 
@@ -4037,6 +4143,22 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Woman Shrugging"""
     POUTING_FACE = "😡"
     """:obj:`str`: Pouting face"""
+
+
+class ManagedBotAccessLimit(IntEnum):
+    """This enum contains limitations for :meth:`~telegram.Bot.set_managed_bot_access_settings`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 22.8
+    """
+
+    __slots__ = ()
+
+    MAX_ALLOWED_USERS = 10
+    """:obj:`int`: Maximum number of users that can be allowed to access a managed bot in the
+    :paramref:`~telegram.Bot.set_managed_bot_access_settings.added_user_ids` parameter of
+    :meth:`~telegram.Bot.set_managed_bot_access_settings`.
+    """
 
 
 class VerifyLimit(IntEnum):

@@ -167,7 +167,14 @@ class Update(TelegramObject):
         managed_bot (:class:`telegram.ManagedBotUpdated`, optional): A new bot was created to be
             managed by the bot, or token or owner of a managed bot was changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
+
+        guest_message (:class:`telegram.Message`, optional): New guest message. The bot can use
+        the field :attr:`telegram.Message.guest_query_id` and the method
+        :meth:`telegram.Bot.answer_guest_query` to send a message in response.
+
+            .. versionadded:: 22.8
+
     """
 
     __slots__ = (
@@ -187,6 +194,7 @@ class Update(TelegramObject):
         "edited_business_message",
         "edited_channel_post",
         "edited_message",
+        "guest_message",
         "inline_query",
         "managed_bot",
         "message",
@@ -300,7 +308,12 @@ class Update(TelegramObject):
     MANAGED_BOT: Final[str] = constants.UpdateType.MANAGED_BOT
     """:const:`telegram.constants.UpdateType.MANAGED_BOT`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
+    """
+    GUEST_MESSAGE: Final[str] = constants.UpdateType.GUEST_MESSAGE
+    """:const:`telegram.constants.UpdateType.GUEST_MESSAGE`
+
+    .. versionadded:: 22.8
     """
 
     ALL_TYPES: Final[list[str]] = list(constants.UpdateType)
@@ -335,6 +348,7 @@ class Update(TelegramObject):
         deleted_business_messages: BusinessMessagesDeleted | None = None,
         purchased_paid_media: PaidMediaPurchased | None = None,
         managed_bot: ManagedBotUpdated | None = None,
+        guest_message: Message | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -366,6 +380,7 @@ class Update(TelegramObject):
         self.deleted_business_messages: BusinessMessagesDeleted | None = deleted_business_messages
         self.purchased_paid_media: PaidMediaPurchased | None = purchased_paid_media
         self.managed_bot: ManagedBotUpdated | None = managed_bot
+        self.guest_message: Message | None = guest_message
 
         self._effective_user: User | None = None
         self._effective_sender: User | Chat | None = None
@@ -383,8 +398,6 @@ class Update(TelegramObject):
         is. If no user is associated with this update, this gives :obj:`None`. This is the case
         if any of
 
-        * :attr:`channel_post`
-        * :attr:`edited_channel_post`
         * :attr:`poll`
         * :attr:`chat_boost`
         * :attr:`removed_chat_boost`
@@ -400,8 +413,9 @@ class Update(TelegramObject):
         .. versionchanged:: 21.6
             This property now also considers :attr:`purchased_paid_media`.
 
-        .. versionchanged:: NEXT.VERSION
-            This property now also considers :attr:`managed_bot`.
+        .. versionchanged:: 22.8
+            This property now also considers :attr:`managed_bot`, :attr:`guest_message`,
+            :attr:`channel_post`, and :attr:`edited_channel_post`.
 
         Example:
             * If :attr:`message` is present, this will give
@@ -414,11 +428,20 @@ class Update(TelegramObject):
 
         user = None
 
-        if self.message:
-            user = self.message.from_user
+        if message := (
+            self.message
+            or self.edited_message
+            or self.business_message
+            or self.edited_business_message
+            or self.guest_message
+        ):
+            user = message.from_user
 
-        elif self.edited_message:
-            user = self.edited_message.from_user
+        elif self.channel_post:
+            user = self.channel_post.from_user
+
+        elif self.edited_channel_post:
+            user = self.edited_channel_post.from_user
 
         elif self.inline_query:
             user = self.inline_query.from_user
@@ -449,12 +472,6 @@ class Update(TelegramObject):
 
         elif self.message_reaction:
             user = self.message_reaction.user
-
-        elif self.business_message:
-            user = self.business_message.from_user
-
-        elif self.edited_business_message:
-            user = self.edited_business_message.from_user
 
         elif self.business_connection:
             user = self.business_connection.user
@@ -489,6 +506,9 @@ class Update(TelegramObject):
 
         is present.
 
+        .. versionchanged:: 22.8
+            This property now also considers :attr:`guest_message`.
+
         Example:
             * If :attr:`message` is present, this will give either
               :attr:`telegram.Message.from_user` or :attr:`telegram.Message.sender_chat`.
@@ -511,6 +531,7 @@ class Update(TelegramObject):
             or self.edited_channel_post
             or self.business_message
             or self.edited_business_message
+            or self.guest_message
         ):
             sender = message.sender_chat
 
@@ -542,6 +563,9 @@ class Update(TelegramObject):
             This property now also considers :attr:`business_message`,
             :attr:`edited_business_message`, and :attr:`deleted_business_messages`.
 
+        .. versionchanged:: 22.8
+            This property now also considers :attr:`guest_message`.
+
         Example:
             If :attr:`message` is present, this will give :attr:`telegram.Message.chat`.
 
@@ -551,20 +575,20 @@ class Update(TelegramObject):
 
         chat = None
 
-        if self.message:
-            chat = self.message.chat
-
-        elif self.edited_message:
-            chat = self.edited_message.chat
+        if message := (
+            self.message
+            or self.edited_message
+            or self.channel_post
+            or self.edited_channel_post
+            or self.business_message
+            or self.edited_business_message
+            or self.deleted_business_messages
+            or self.guest_message
+        ):
+            chat = message.chat
 
         elif self.callback_query and self.callback_query.message:
             chat = self.callback_query.message.chat
-
-        elif self.channel_post:
-            chat = self.channel_post.chat
-
-        elif self.edited_channel_post:
-            chat = self.edited_channel_post.chat
 
         elif self.my_chat_member:
             chat = self.my_chat_member.chat
@@ -587,15 +611,6 @@ class Update(TelegramObject):
         elif self.message_reaction_count:
             chat = self.message_reaction_count.chat
 
-        elif self.business_message:
-            chat = self.business_message.chat
-
-        elif self.edited_business_message:
-            chat = self.edited_business_message.chat
-
-        elif self.deleted_business_messages:
-            chat = self.deleted_business_messages.chat
-
         self._effective_chat = chat
         return chat
 
@@ -611,6 +626,9 @@ class Update(TelegramObject):
         .. versionchanged:: 21.1
             This property now also considers :attr:`business_message`, and
             :attr:`edited_business_message`.
+
+        .. versionchanged:: 22.8
+            This property now also considers :attr:`guest_message`.
 
         Tip:
             This property will only ever return objects of type :class:`telegram.Message` or
@@ -659,6 +677,9 @@ class Update(TelegramObject):
 
         elif self.edited_business_message:
             message = self.edited_business_message
+
+        elif self.guest_message:
+            message = self.guest_message
 
         self._effective_message = message
         return message
@@ -716,5 +737,6 @@ class Update(TelegramObject):
             data.get("purchased_paid_media"), PaidMediaPurchased, bot
         )
         data["managed_bot"] = de_json_optional(data.get("managed_bot"), ManagedBotUpdated, bot)
+        data["guest_message"] = de_json_optional(data.get("guest_message"), Message, bot)
 
         return super().de_json(data=data, bot=bot)
