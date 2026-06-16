@@ -93,8 +93,9 @@ def autodoc_process_docstring(
     2) Use this method to automatically insert "Returned in" admonition into classes
        that are returned from the Bot methods
 
-    3) Use this method to automatically insert "Available in" admonition into classes
-       whose instances are available as attributes of other classes
+    3) Use this method to automatically insert the Attributes block, wherever applicable,
+       for Telegram objects. The "Available in" admonition is then also inserted. These are
+       instances of a class which are available as attributes of other classes.
 
     4) Use this method to automatically insert "Use in" admonition into classes
        whose instances can be used as arguments of the Bot methods
@@ -103,7 +104,7 @@ def autodoc_process_docstring(
        to the actual object here.
     """
 
-    # 1) Insert the Keyword Args and "Shortcuts" admonitions for the Bot methods
+    # 1) Insert the Keyword Args, "Shortcuts" admonitions, and "Raises" block for the Bot methods
     method_name = name.rsplit(".", maxsplit=1)[-1]
     if (
         name.startswith("telegram.Bot.")
@@ -111,9 +112,10 @@ def autodoc_process_docstring(
         and method_name.islower()
         and check_timeout_and_api_kwargs_presence(obj)
     ):
+        parser = DocstringParser(lines)
         # Logic for inserting keyword args into docstrings:
         # -------------------------------------------------
-        returns_section = DocstringParser(lines).get_section("Returns")
+        returns_section = parser.get_section("Returns")
         if not returns_section:
             raise ValueError(
                 f"Couldn't find the correct position to insert the keyword args for {obj}."
@@ -142,7 +144,7 @@ def autodoc_process_docstring(
         # Logic for inserting Raises:
         # -------------------------------------------------
         # We will only insert the Raises block if there isn't already one.
-        if DocstringParser(lines).get_section("Raises") is None:
+        if parser.get_section("Raises") is None:
             lines.extend(RAISES_BLOCK)
 
         # Logic for inserting "Shortcuts" admonition:

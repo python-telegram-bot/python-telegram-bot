@@ -24,6 +24,8 @@ from dataclasses import dataclass
 from telegram import TelegramObject
 
 ENTRY_PATTERN: re.Pattern[str] = re.compile(r"^    (\w+) \((.+)\):\s*(.*)")
+"""Matches a single entry like ``    name (type): description`` in a docstring."""
+
 
 KNOWN_SECTION_TITLES: frozenset[str] = frozenset(
     {
@@ -212,7 +214,7 @@ class AttributeInserter:
             name for name, _ in inspect.getmembers(obj, lambda o: isinstance(o, property))
         }
 
-        # Warn about own public slots that have no documentation source.
+        # Raise when own public slots have no documentation source.
         # Get slots from TGObject if it's a TGObj subclass:
         if issubclass(obj, TelegramObject):
             all_slots = {

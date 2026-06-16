@@ -98,7 +98,8 @@ def find_insert_pos_for_raises(lines: list[str]) -> int:
     return len(lines)  # Insert at the end if there's no Raises block
 
 
-def check_timeout_and_api_kwargs_presence(obj: object) -> int:
+def check_timeout_and_api_kwargs_presence(obj: object) -> bool:
+    """Checks if the method has timeout and api_kwargs keyword only parameters."""
     sig = inspect.signature(obj)
     params_to_check = (
         "read_timeout",
