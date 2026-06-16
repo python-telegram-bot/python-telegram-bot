@@ -60,19 +60,6 @@ class InlineQueryResultsButton(TelegramObject):
                 doing so, passes a start parameter that instructs the bot to return an OAuth link.
                 Once done, the bot can offer a switch_inline button so that the user can easily
                 return to the chat where they wanted to use the bot's inline capabilities.
-
-    Attributes:
-        text (:obj:`str`): Label text on the button.
-        web_app (:class:`telegram.WebAppInfo`): Optional. Description of the
-            `Web App <https://core.telegram.org/bots/webapps>`_ that will be launched when the
-            user presses the button. The Web App will be able to switch back to the inline mode
-            using the method ``web_app_switch_inline_query`` inside the Web App.
-        start_parameter (:obj:`str`): Optional. Deep-linking parameter for the
-            :tg-const:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`
-            -
-            :tg-const:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`
-            characters, only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
-
     """
 
     __slots__ = ("start_parameter", "text", "web_app")

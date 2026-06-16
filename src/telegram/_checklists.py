@@ -61,23 +61,6 @@ class ChecklistTask(TelegramObject):
             completed
 
             |datetime_localization|
-
-    Attributes:
-        id (:obj:`int`): Unique identifier of the task.
-        text (:obj:`str`): Text of the task.
-        text_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special
-            entities that appear in the task text.
-        completed_by_user (:class:`telegram.User`): Optional. User that completed the task; omitted
-            if the task wasn't completed
-        completed_by_chat (:class:`telegram.Chat`): Optional. Chat that completed the task; omitted
-            if the task wasn't completed by a chat
-
-            .. versionadded:: 22.6
-        completion_date (:class:`datetime.datetime`): Optional. Point in time when
-            the task was completed; :attr:`~telegram.constants.ZERO_DATE` if the task wasn't
-            completed
-
-            |datetime_localization|
     """
 
     __slots__ = (
@@ -190,16 +173,6 @@ class Checklist(TelegramObject):
             of the list can add tasks to the list
         others_can_mark_tasks_as_done (:obj:`bool`, optional): :obj:`True` if users other than the
             creator of the list can mark tasks as done or not done
-
-    Attributes:
-        title (:obj:`str`): Title of the checklist.
-        title_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special
-            entities that appear in the checklist title.
-        tasks (Tuple[:class:`telegram.ChecklistTask`]): List of tasks in the checklist.
-        others_can_add_tasks (:obj:`bool`): Optional. :obj:`True` if users other than the creator
-            of the list can add tasks to the list
-        others_can_mark_tasks_as_done (:obj:`bool`): Optional. :obj:`True` if users other than the
-            creator of the list can mark tasks as done or not done
     """
 
     __slots__ = (
@@ -298,19 +271,9 @@ class ChecklistTasksDone(TelegramObject):
             object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
             field even if it itself is a reply.
         marked_as_done_task_ids (Sequence[:obj:`int`], optional): Identifiers of the tasks that
-            were marked as done
+            were marked as done.
         marked_as_not_done_task_ids (Sequence[:obj:`int`], optional): Identifiers of the tasks that
-            were marked as not done
-
-    Attributes:
-        checklist_message (:class:`telegram.Message`): Optional. Message containing the checklist
-            whose tasks were marked as done or not done. Note that the ~:class:`telegram.Message`
-            object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
-            field even if it itself is a reply.
-        marked_as_done_task_ids (Tuple[:obj:`int`]): Optional. Identifiers of the tasks that were
-            marked as done
-        marked_as_not_done_task_ids (Tuple[:obj:`int`]): Optional. Identifiers of the tasks that
-            were marked as not done
+            were marked as not done.
     """
 
     __slots__ = (
@@ -365,14 +328,7 @@ class ChecklistTasksAdded(TelegramObject):
             to which tasks were added. Note that the ~:class:`telegram.Message`
             object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
             field even if it itself is a reply.
-        tasks (Sequence[:class:`telegram.ChecklistTask`]): List of tasks added to the checklist
-
-    Attributes:
-        checklist_message (:class:`telegram.Message`): Optional. Message containing the checklist
-            to which tasks were added. Note that the ~:class:`telegram.Message`
-            object in this field will not contain the :attr:`~telegram.Message.reply_to_message`
-            field even if it itself is a reply.
-        tasks (Tuple[:class:`telegram.ChecklistTask`]): List of tasks added to the checklist
+        tasks (Sequence[:class:`telegram.ChecklistTask`]): List of tasks added to the checklist.
     """
 
     __slots__ = ("checklist_message", "tasks")

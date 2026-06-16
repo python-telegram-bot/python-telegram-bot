@@ -66,7 +66,7 @@ class TelegramObject:
           or delete attributes anymore. Moreover, attributes that were formerly of type
           :obj:`list` are now of type :obj:`tuple`.
 
-    Arguments:
+    Args:
         api_kwargs (dict[:obj:`str`, any], optional): |toapikwargsarg|
 
             .. versionadded:: 20.0
@@ -688,7 +688,7 @@ class TelegramObject:
 
         .. versionadded: 20.0
 
-        Arguments:
+        Args:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
         """
         self._bot = bot

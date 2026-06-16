@@ -54,22 +54,6 @@ class AffiliateInfo(TelegramObject):
             :tg-const:`~telegram.constants.NanostarLimit.MIN_AMOUNT` to
             :tg-const:`~telegram.constants.NanostarLimit.MAX_AMOUNT`;
             can be negative for refunds
-
-    Attributes:
-        affiliate_user (:class:`telegram.User`): Optional. The bot or the user that received an
-            affiliate commission if it was received by a bot or a user
-        affiliate_chat (:class:`telegram.Chat`): Optional. The chat that received an affiliate
-            commission if it was received by a chat
-        commission_per_mille (:obj:`int`): The number of Telegram Stars received by the affiliate
-            for each 1000 Telegram Stars received by the bot from referred users
-        amount (:obj:`int`): Integer amount of Telegram Stars received by the affiliate from the
-            transaction, rounded to 0; can be negative for refunds
-        nanostar_amount (:obj:`int`): Optional. The number of
-            :tg-const:`~telegram.constants.Nanostar.VALUE` shares of Telegram
-            Stars received by the affiliate; from
-            :tg-const:`~telegram.constants.NanostarLimit.MIN_AMOUNT` to
-            :tg-const:`~telegram.constants.NanostarLimit.MAX_AMOUNT`;
-            can be negative for refunds
     """
 
     __slots__ = (

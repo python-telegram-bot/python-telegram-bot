@@ -4253,24 +4253,6 @@ class Chat(_ChatBase):
 
             .. versionadded:: 22.4
 
-    Attributes:
-        id (:obj:`int`): Unique identifier for this chat.
-        type (:obj:`str`): Type of chat, can be either :attr:`PRIVATE`, :attr:`GROUP`,
-            :attr:`SUPERGROUP` or :attr:`CHANNEL`.
-        title (:obj:`str`): Optional. Title, for supergroups, channels and group chats.
-        username (:obj:`str`): Optional. Username, for private chats, supergroups and channels if
-            available.
-        first_name (:obj:`str`): Optional. First name of the other party in a private chat.
-        last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
-        is_forum (:obj:`bool`): Optional. :obj:`True`, if the supergroup chat is a forum
-            (has topics_ enabled).
-
-            .. versionadded:: 20.0
-        is_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the chat is the direct messages
-            chat of a channel.
-
-            .. versionadded:: 22.4
-
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """
 

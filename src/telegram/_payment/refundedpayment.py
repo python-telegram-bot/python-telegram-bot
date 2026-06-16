@@ -43,21 +43,6 @@ class RefundedPayment(TelegramObject):
         invoice_payload (:obj:`str`): Bot-specified invoice payload.
         telegram_payment_charge_id (:obj:`str`): Telegram payment identifier.
         provider_payment_charge_id (:obj:`str`, optional): Provider payment identifier.
-
-    Attributes:
-        currency (:obj:`str`): Three-letter ISO 4217 `currency
-            <https://core.telegram.org/bots/payments#supported-currencies>`_ code, or ``XTR`` for
-            payments in |tg_stars|. Currently, always ``XTR``.
-        total_amount (:obj:`int`): Total refunded price in the *smallest units* of the currency
-            (integer, **not** float/double). For example, for a price of ``US$ 1.45``,
-            ``total_amount = 145``. See the *exp* parameter in
-            `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
-            it shows the number of digits past the decimal point for each currency
-            (2 for the majority of currencies).
-        invoice_payload (:obj:`str`): Bot-specified invoice payload.
-        telegram_payment_charge_id (:obj:`str`): Telegram payment identifier.
-        provider_payment_charge_id (:obj:`str`): Optional. Provider payment identifier.
-
     """
 
     __slots__ = (

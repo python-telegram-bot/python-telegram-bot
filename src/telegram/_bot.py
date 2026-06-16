@@ -4692,6 +4692,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         """Use this method to receive incoming updates using long polling.
 
         Note:
+
             1. This method will not work if an outgoing webhook is set up.
             2. In order to avoid getting duplicate updates, recalculate offset after each
                server response.

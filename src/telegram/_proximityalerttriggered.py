@@ -41,12 +41,6 @@ class ProximityAlertTriggered(TelegramObject):
         traveler (:class:`telegram.User`): User that triggered the alert
         watcher (:class:`telegram.User`): User that set the alert
         distance (:obj:`int`): The distance between the users
-
-    Attributes:
-        traveler (:class:`telegram.User`): User that triggered the alert
-        watcher (:class:`telegram.User`): User that set the alert
-        distance (:obj:`int`): The distance between the users
-
     """
 
     __slots__ = ("distance", "traveler", "watcher")

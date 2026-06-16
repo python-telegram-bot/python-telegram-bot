@@ -48,11 +48,6 @@ class BackgroundFill(TelegramObject):
         type (:obj:`str`): Type of the background fill. Can be one of:
             :attr:`~telegram.BackgroundFill.SOLID`, :attr:`~telegram.BackgroundFill.GRADIENT`
             or :attr:`~telegram.BackgroundFill.FREEFORM_GRADIENT`.
-
-    Attributes:
-        type (:obj:`str`): Type of the background fill. Can be one of:
-            :attr:`~telegram.BackgroundFill.SOLID`, :attr:`~telegram.BackgroundFill.GRADIENT`
-            or :attr:`~telegram.BackgroundFill.FREEFORM_GRADIENT`.
     """
 
     __slots__ = ("type",)
@@ -111,7 +106,6 @@ class BackgroundFillSolid(BackgroundFill):
     Attributes:
         type (:obj:`str`): Type of the background fill. Always
             :attr:`~telegram.BackgroundFill.SOLID`.
-        color (:obj:`int`): The color of the background fill in the `RGB24` format.
     """
 
     __slots__ = ("color",)
@@ -151,11 +145,6 @@ class BackgroundFillGradient(BackgroundFill):
     Attributes:
         type (:obj:`str`): Type of the background fill. Always
             :attr:`~telegram.BackgroundFill.GRADIENT`.
-        top_color (:obj:`int`): Top color of the gradient in the `RGB24` format.
-        bottom_color (:obj:`int`): Bottom color of the gradient in the `RGB24` format.
-        rotation_angle (:obj:`int`): Clockwise rotation angle of the background
-            fill in degrees;
-            0-:tg-const:`telegram.constants.BackgroundFillLimit.MAX_ROTATION_ANGLE`.
     """
 
     __slots__ = ("bottom_color", "rotation_angle", "top_color")
@@ -194,8 +183,6 @@ class BackgroundFillFreeformGradient(BackgroundFill):
     Attributes:
         type (:obj:`str`): Type of the background fill. Always
             :attr:`~telegram.BackgroundFill.FREEFORM_GRADIENT`.
-        colors (Sequence[:obj:`int`]): A list of the 3 or 4 base colors that are used to
-            generate the freeform gradient in the `RGB24` format
     """
 
     __slots__ = ("colors",)
@@ -232,13 +219,6 @@ class BackgroundType(TelegramObject):
             :attr:`~telegram.BackgroundType.FILL`, :attr:`~telegram.BackgroundType.WALLPAPER`
             :attr:`~telegram.BackgroundType.PATTERN` or
             :attr:`~telegram.BackgroundType.CHAT_THEME`.
-
-    Attributes:
-        type (:obj:`str`): Type of the background. Can be one of:
-            :attr:`~telegram.BackgroundType.FILL`, :attr:`~telegram.BackgroundType.WALLPAPER`
-            :attr:`~telegram.BackgroundType.PATTERN` or
-            :attr:`~telegram.BackgroundType.CHAT_THEME`.
-
     """
 
     __slots__ = ("type",)
@@ -307,10 +287,6 @@ class BackgroundTypeFill(BackgroundType):
     Attributes:
         type (:obj:`str`): Type of the background. Always
             :attr:`~telegram.BackgroundType.FILL`.
-        fill (:class:`telegram.BackgroundFill`): The background fill.
-        dark_theme_dimming (:obj:`int`): Dimming of the background in dark themes, as a
-            percentage;
-            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
     """
 
     __slots__ = ("dark_theme_dimming", "fill")
@@ -353,14 +329,6 @@ class BackgroundTypeWallpaper(BackgroundType):
     Attributes:
         type (:obj:`str`): Type of the background. Always
             :attr:`~telegram.BackgroundType.WALLPAPER`.
-        document (:class:`telegram.Document`): Document with the wallpaper
-        dark_theme_dimming (:obj:`int`): Dimming of the background in dark themes, as a
-            percentage;
-            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
-        is_blurred (:obj:`bool`): Optional. :obj:`True`, if the wallpaper is downscaled to fit
-            in a 450x450 square and then box-blurred with radius 12
-        is_moving (:obj:`bool`): Optional. :obj:`True`, if the background moves slightly
-            when the device is tilted
     """
 
     __slots__ = ("dark_theme_dimming", "document", "is_blurred", "is_moving")
@@ -414,17 +382,6 @@ class BackgroundTypePattern(BackgroundType):
     Attributes:
         type (:obj:`str`): Type of the background. Always
             :attr:`~telegram.BackgroundType.PATTERN`.
-        document (:class:`telegram.Document`): Document with the pattern.
-        fill (:class:`telegram.BackgroundFill`): The background fill that is combined with
-            the pattern.
-        intensity (:obj:`int`): Intensity of the pattern when it is shown above the filled
-            background;
-            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_INTENSITY`.
-        is_inverted (:obj:`int`): Optional. :obj:`True`, if the background fill must be applied
-            only to the pattern itself. All other pixels are black in this case. For dark
-            themes only.
-        is_moving (:obj:`bool`): Optional. :obj:`True`, if the background moves slightly
-            when the device is tilted.
     """
 
     __slots__ = (
@@ -474,7 +431,6 @@ class BackgroundTypeChatTheme(BackgroundType):
     Attributes:
         type (:obj:`str`): Type of the background. Always
             :attr:`~telegram.BackgroundType.CHAT_THEME`.
-        theme_name (:obj:`str`): Name of the chat theme, which is usually an emoji.
     """
 
     __slots__ = ("theme_name",)
@@ -503,9 +459,6 @@ class ChatBackground(TelegramObject):
     .. versionadded:: 21.2
 
     Args:
-        type (:class:`telegram.BackgroundType`): Type of the background.
-
-    Attributes:
         type (:class:`telegram.BackgroundType`): Type of the background.
     """
 

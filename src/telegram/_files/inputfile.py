@@ -86,7 +86,6 @@ class InputFile:
         attach_name (:obj:`str`): Optional. If present, the parameter this file belongs to in
             the request to Telegram should point to the multipart data via a an URI of the form
             ``attach://<attach_name>`` URI.
-        filename (:obj:`str`): Filename for the file to be sent.
         mimetype (:obj:`str`): The mimetype inferred from the file to be sent.
 
     """
