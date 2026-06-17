@@ -1,0 +1,5 @@
+bugfixes = "Fixed ``parse_lpo_and_dwpp`` silently overwriting ``link_preview_options`` when ``disable_web_page_preview=False``."
+[[pull_requests]]
+uid = "5268"
+author_uids = ["JSap0914"]
+closes_threads = []
