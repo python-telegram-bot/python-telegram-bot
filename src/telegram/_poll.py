@@ -51,8 +51,6 @@ from telegram._utils.datetime import (
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot, InputPollOptionMedia, MaybeInaccessibleMessage
@@ -234,30 +232,6 @@ class InputPollOption(TelegramObject):
 
         self._freeze()
 
-    # tags: deprecated 22.8
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InputPollOption":
-        """See :meth:`telegram.TelegramObject.de_json`. The :paramref:`media` field will
-        not be included for deserialization.
-
-        .. deprecated:: 22.8
-            This class is input only and will be removed in the next version.
-        """
-        warn(
-            PTBDeprecationWarning(
-                "22.8",
-                "`InputPollOption.de_json` is deprecated. This class is input only and will be "
-                "removed in the next version. The `media` field will not be included for "
-                "deserialization.",
-            ),
-            stacklevel=2,
-        )
-        data = cls._parse_data(data)
-
-        data["text_entities"] = de_list_optional(data.get("text_entities"), MessageEntity, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class PollOption(TelegramObject):
     """
@@ -348,20 +322,15 @@ class PollOption(TelegramObject):
         self,
         text: str,
         voter_count: int,
+        persistent_id: str,
         text_entities: Sequence[MessageEntity] | None = None,
         added_by_user: User | None = None,
         added_by_chat: Chat | None = None,
         addition_date: dtm.datetime | None = None,
         media: PollMedia | None = None,
-        # tags: required in 22.8, bot api 9.6
-        # temporarily optional to avoid breaking changes
-        persistent_id: str | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
-        if persistent_id is None:
-            raise TypeError("`persistent_id` is a required argument since Bot API 9.6")
-
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
         self.voter_count: int = voter_count
@@ -515,17 +484,12 @@ class PollAnswer(TelegramObject):
         self,
         poll_id: str,
         option_ids: Sequence[int],
+        option_persistent_ids: Sequence[str],
         user: User | None = None,
         voter_chat: Chat | None = None,
-        # tags: required in 22.8, bot api 9.6
-        # temporarily optional to avoid breaking changes
-        option_persistent_ids: Sequence[str] | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
-        if option_persistent_ids is None:
-            raise TypeError("`option_persistent_ids` is a required argument since Bot API 9.6")
-
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id: str = poll_id
         self.voter_chat: Chat | None = voter_chat
@@ -805,17 +769,15 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
+        allows_revoting (:obj:`bool`): :obj:`True`, if the poll allows to
+            change the chosen answer options.
+
+            .. versionadded:: 22.8
         members_only (:obj:`bool`): :obj:`True`, if voting is limited to users who have been
             members of the chat where the poll was originally sent for more than
             :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours.
 
             .. versionadded:: 22.8
-        correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
-            option. Available only for closed polls in the quiz mode, which were sent
-            (not forwarded), by the bot or to a private chat with the bot.
-
-            .. deprecated:: 22.8
-                Use :paramref:`correct_option_ids` instead.
         explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll,
             0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
@@ -847,10 +809,6 @@ class Poll(TelegramObject):
             in poll questions.
 
             .. versionadded:: 21.2
-        allows_revoting (:obj:`bool`, optional): :obj:`True`, if the poll allows to
-            change the chosenanswer options.
-
-            .. versionadded:: 22.8
         correct_option_ids (Sequence[:class:`int`], optional): Array of 0-based identifiers of
             the correct answer options. Available only for polls in quiz mode which are closed or
             were sent (not forwarded) by the bot or to the private chat with the bot.
@@ -888,6 +846,10 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
+        allows_revoting (:obj:`bool`): :obj:`True`, if the poll
+            allows to change the chosen answer options
+
+            .. versionadded:: 22.8
         members_only (:obj:`bool`): :obj:`True`, if voting is limited to users who have been
             members of the chat where the poll was originally sent for more than
             :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours.
@@ -925,10 +887,6 @@ class Poll(TelegramObject):
             This list is empty if the question does not contain entities.
 
             .. versionadded:: 21.2
-        allows_revoting (:obj:`bool`): :obj:`True`, if the poll
-            allows to change the chosenanswer options
-
-            .. versionadded:: 22.8
         correct_option_ids (tuple[:class:`int`]): Array of 0-based identifiers of the
             correct answer options. Available only for polls in quiz mode which are closed or were
             sent (not forwarded) by the bot or to the private chat with the bot.
@@ -989,20 +947,13 @@ class Poll(TelegramObject):
         is_anonymous: bool,
         type: str,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool,
-        # tags: deprecated 22.8
-        # Removed in bot api 9.6:
-        correct_option_id: int | None = None,
-        # ---
+        allows_revoting: bool,
+        members_only: bool,
         explanation: str | None = None,
         explanation_entities: Sequence[MessageEntity] | None = None,
         open_period: TimePeriod | None = None,
         close_date: dtm.datetime | None = None,
         question_entities: Sequence[MessageEntity] | None = None,
-        # tags: required in 22.8
-        # temporarily optional to avoid breaking changes
-        allows_revoting: bool | None = None,
-        members_only: bool | None = None,
-        # ---
         correct_option_ids: Sequence[int] | None = None,
         description: str | None = None,
         description_entities: Sequence[MessageEntity] | None = None,
@@ -1012,12 +963,6 @@ class Poll(TelegramObject):
         *,
         api_kwargs: JSONDict | None = None,
     ):
-        if allows_revoting is None:
-            raise TypeError("`allows_revoting` is a required argument since Bot API 9.6")
-
-        if members_only is None:
-            raise TypeError("`members_only` is a required argument since Bot API 10.0")
-
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id
         self.question: str = question
@@ -1029,19 +974,6 @@ class Poll(TelegramObject):
         self.allows_multiple_answers: bool = allows_multiple_answers
         self.allows_revoting: bool = allows_revoting
         self.members_only: bool = members_only
-
-        # tag: deprecated 22.8
-        if correct_option_id is not None:
-            warn(
-                PTBDeprecationWarning(
-                    "22.8",
-                    "The parameter `correct_option_id` is deprecated. "
-                    "Use `correct_option_ids` instead.",
-                ),
-                stacklevel=2,
-            )
-            if correct_option_ids is None:
-                correct_option_ids = [correct_option_id]
 
         self.correct_option_ids: tuple[int, ...] = parse_sequence_arg(correct_option_ids)
         self.description: str | None = description
@@ -1248,25 +1180,6 @@ class Poll(TelegramObject):
             raise RuntimeError("This Poll has no 'description'.")
 
         return parse_message_entities(self.description, self.description_entities, types)
-
-    @property
-    def correct_option_id(self) -> int | None:
-        """A zero based identifier of the correct answer
-        option. Available only for closed polls in the quiz mode, which were sent
-        (not forwarded), by the bot or to a private chat with the bot.
-
-        .. deprecated:: 22.8
-            Use :attr:`correct_option_ids` instead.
-        """
-        warn(
-            PTBDeprecationWarning(
-                "22.8",
-                "The attribute `correct_option_id` is deprecated. "
-                "Use `correct_option_ids` instead.",
-            ),
-            stacklevel=2,
-        )
-        return self.correct_option_ids[0] if self.correct_option_ids else None
 
     REGULAR: Final[str] = constants.PollType.REGULAR
     """:const:`telegram.constants.PollType.REGULAR`"""

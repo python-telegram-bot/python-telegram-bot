@@ -28,7 +28,6 @@ from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
-    CorrectOptionID,
     CorrectOptionIds,
     JSONDict,
     ODVInput,
@@ -1818,7 +1817,6 @@ class User(TelegramObject):
         is_anonymous: bool | None = None,
         type: str | None = None,
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -1876,7 +1874,6 @@ class User(TelegramObject):
             is_anonymous=is_anonymous,
             type=type,  # pylint=pylint,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
             allows_revoting=allows_revoting,
             shuffle_options=shuffle_options,
             correct_option_ids=correct_option_ids,
