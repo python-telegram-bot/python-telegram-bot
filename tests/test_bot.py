@@ -59,6 +59,7 @@ from telegram import (
     InputMessageContent,
     InputPollOption,
     InputProfilePhotoStatic,
+    InputRichMessage,
     InputTextMessageContent,
     KeyboardButton,
     KeyboardButtonRequestManagedBot,
@@ -1655,6 +1656,64 @@ class TestBotWithoutRequest:
             parse_mode="markdown",
             entities=entities,
         )
+
+    async def test_send_rich_message_draft(self, offline_bot, monkeypatch):
+        rich_message = InputRichMessage(html="<b>test</b>")
+
+        async def make_assertions(*args, **kwargs):
+            params = kwargs.get("request_data").parameters
+            assert params.get("chat_id") == 123
+            assert params.get("draft_id") == 1
+            assert params.get("rich_message") == rich_message.to_dict()
+            assert params.get("message_thread_id") == 9
+
+            return True
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertions)
+        assert await offline_bot.send_rich_message_draft(
+            chat_id=123,
+            draft_id=1,
+            rich_message=rich_message,
+            message_thread_id=9,
+        )
+
+    async def test_send_rich_message(self, offline_bot, monkeypatch):
+        chat_id = 123
+        rich_message = InputRichMessage(markdown="**test**")
+        reply_parameters = ReplyParameters(23, chat_id, allow_sending_without_reply=True)
+        reply_markup = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+
+        async def make_assertions(*args, **kwargs):
+            params = kwargs.get("request_data").parameters
+            assert params.get("business_connection_id") == "bci"
+            assert params.get("chat_id") == chat_id
+            assert params.get("rich_message") == rich_message.to_dict()
+            assert params.get("disable_notification") is True
+            assert params.get("protect_content") is False
+            assert params.get("message_effect_id") == "effect"
+            assert params.get("allow_paid_broadcast") is True
+            assert params.get("direct_messages_topic_id") == 7
+            assert params.get("reply_parameters") == reply_parameters.to_dict()
+            assert params.get("reply_markup") == reply_markup.to_dict()
+
+            return Message(1, dtm.datetime.now(), Chat(1, ""), text="test").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", make_assertions)
+        obj = await offline_bot.send_rich_message(
+            chat_id=chat_id,
+            rich_message=rich_message,
+            disable_notification=True,
+            protect_content=False,
+            message_effect_id="effect",
+            reply_parameters=reply_parameters,
+            reply_markup=reply_markup,
+            business_connection_id="bci",
+            allow_paid_broadcast=True,
+            direct_messages_topic_id=7,
+        )
+        assert isinstance(obj, Message)
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     @pytest.mark.parametrize(

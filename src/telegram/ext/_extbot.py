@@ -64,6 +64,7 @@ from telegram import (
     InputPaidMedia,
     InputPollOption,
     InputProfilePhoto,
+    InputRichMessage,
     KeyboardButton,
     LinkPreviewOptions,
     MaskPosition,
@@ -3173,6 +3174,52 @@ class ExtBot(Bot, Generic[RLARGS]):
             suggested_post_parameters=suggested_post_parameters,
         )
 
+    async def send_rich_message(
+        self,
+        chat_id: int | str,
+        rich_message: InputRichMessage,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        reply_markup: "ReplyMarkup | None" = None,
+        message_thread_id: int | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        business_connection_id: str | None = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        *,
+        reply_to_message_id: int | None = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> Message:
+        return await super().send_rich_message(
+            chat_id=chat_id,
+            rich_message=rich_message,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            reply_markup=reply_markup,
+            message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
+            business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
+            reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def send_message_draft(
         self,
         chat_id: int,
@@ -3196,6 +3243,32 @@ class ExtBot(Bot, Generic[RLARGS]):
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,
             entities=entities,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def send_rich_message_draft(
+        self,
+        chat_id: int,
+        draft_id: int,
+        rich_message: InputRichMessage,
+        message_thread_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+        rate_limit_args: RLARGS | None = None,
+    ) -> bool:
+        return await super().send_rich_message_draft(
+            chat_id=chat_id,
+            draft_id=draft_id,
+            rich_message=rich_message,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -5813,6 +5886,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     getMe = get_me
     sendMessage = send_message
     sendMessageDraft = send_message_draft
+    sendRichMessage = send_rich_message
+    sendRichMessageDraft = send_rich_message_draft
     deleteMessage = delete_message
     deleteMessages = delete_messages
     forwardMessage = forward_message

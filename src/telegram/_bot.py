@@ -80,6 +80,7 @@ from telegram._gifts import AcceptedGiftTypes, Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._inputchecklist import InputChecklist
+from telegram._inputrichmessage import InputRichMessage
 from telegram._keyboardbutton import KeyboardButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
@@ -1159,6 +1160,88 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
+    async def send_rich_message(
+        self,
+        chat_id: int | str,
+        rich_message: InputRichMessage,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        reply_markup: "ReplyMarkup | None" = None,
+        message_thread_id: int | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        business_connection_id: str | None = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: int | None = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> Message:
+        """Use this method to send rich messages. If the message contains a block with a media
+        element, then the bot must have the right to send the media to the chat.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target bot, supergroup or channel in the format ``@username``.
+            rich_message (:class:`telegram.InputRichMessage`): The message to be sent.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+            business_connection_id (:obj:`str`, optional): |business_id_str|
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+            suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
+                |suggested_post_parameters|
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+        """
+        data: JSONDict = {"chat_id": chat_id, "rich_message": rich_message}
+
+        return await self._send_message(
+            "sendRichMessage",
+            data,
+            reply_to_message_id=reply_to_message_id,
+            disable_notification=disable_notification,
+            reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
+            reply_parameters=reply_parameters,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def delete_message(
         self,
         chat_id: str | int,
@@ -1273,6 +1356,53 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             data,
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def send_rich_message_draft(
+        self,
+        chat_id: int,
+        draft_id: int,
+        rich_message: InputRichMessage,
+        message_thread_id: int | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Use this method to stream a partial rich message to a user while the message is being
+        generated. Note that the streamed draft is ephemeral and acts as a temporary 30-second
+        preview - once the output is finalized, you must call :meth:`~Bot.send_rich_message` with
+        the complete message to persist it in the user's chat.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int`): Unique identifier for the target private chat.
+            draft_id (:obj:`int`): Unique identifier of the message draft; must be non-zero.
+                Changes to drafts with the same identifier are animated.
+            rich_message (:class:`telegram.InputRichMessage`): The partial message to be streamed.
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target
+                message thread.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "draft_id": draft_id,
+            "rich_message": rich_message,
+            "message_thread_id": message_thread_id,
+        }
+        return await self._post(
+            "sendRichMessageDraft",
+            data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -12176,6 +12306,10 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`send_message`"""
     sendMessageDraft = send_message_draft
     """Alias for :meth:`send_message_draft`"""
+    sendRichMessage = send_rich_message
+    """Alias for :meth:`send_rich_message`"""
+    sendRichMessageDraft = send_rich_message_draft
+    """Alias for :meth:`send_rich_message_draft`"""
     deleteMessage = delete_message
     """Alias for :meth:`delete_message`"""
     deleteMessages = delete_messages

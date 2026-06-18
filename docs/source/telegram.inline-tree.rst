@@ -37,6 +37,7 @@ To enable this option, send the ``/setinline`` command to `@BotFather <https://t
     telegram.inlinequeryresultvideo
     telegram.inlinequeryresultvoice
     telegram.inputmessagecontent
+    telegram.inputrichmessagecontent
     telegram.inputtextmessagecontent
     telegram.inputlocationmessagecontent
     telegram.inputvenuemessagecontent

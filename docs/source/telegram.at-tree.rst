@@ -116,6 +116,7 @@ Available Types
     telegram.inputprofilephoto
     telegram.inputprofilephotoanimated
     telegram.inputprofilephotostatic
+    telegram.inputrichmessage
     telegram.inputpolloption
     telegram.inputpolloptionmedia
     telegram.inputstorycontent
@@ -228,4 +229,3 @@ Available Types
     telegram.webappinfo
     telegram.webhookinfo
     telegram.writeaccessallowed
-
