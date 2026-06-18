@@ -1,0 +1,6 @@
+features = "Add support for sending rich messages (`Bot API 10.1 <https://core.telegram.org/bots/api#rich-message-formatting-options>`_) via :class:`telegram.InputRichMessage`, :class:`telegram.InputRichMessageContent`, :meth:`telegram.Bot.send_rich_message`, :meth:`telegram.Bot.send_rich_message_draft`, and corresponding shortcut methods."
+
+[[pull_requests]]
+uid = "5275"
+author_uids = ["tymrtn"]
+closes_threads = ["5261"]
