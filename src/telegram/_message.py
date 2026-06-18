@@ -120,6 +120,7 @@ if TYPE_CHECKING:
         InputPaidMedia,
         InputPollMedia,
         InputPollOption,
+        InputRichMessage,
         LabeledPrice,
         MessageId,
         MessageOrigin,
@@ -2294,6 +2295,73 @@ class Message(MaybeInaccessibleMessage):
             parse_mode=parse_mode,
             entities=entities,
             message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def reply_rich_message(
+        self,
+        rich_message: "InputRichMessage",
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        reply_markup: "ReplyMarkup | None" = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        reply_parameters: "ReplyParameters | None" = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        *,
+        reply_to_message_id: int | None = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        do_quote: bool | (_ReplyKwargs | None) = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.send_rich_message(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 direct_messages_topic_id=self.direct_messages_topic.topic_id,
+                 *args,
+                 **kwargs,
+             )
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_rich_message`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Keyword Args:
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
+        )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
+        return await self.get_bot().send_rich_message(
+            chat_id=chat_id,
+            rich_message=rich_message,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            reply_markup=reply_markup,
+            message_thread_id=message_thread_id,
+            reply_parameters=effective_reply_parameters,
+            business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

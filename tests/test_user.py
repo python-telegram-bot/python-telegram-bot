@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Bot, InlineKeyboardButton, Update, User
+from telegram import Bot, InlineKeyboardButton, InputRichMessage, Update, User
 from telegram.helpers import escape_markdown
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
@@ -284,6 +284,44 @@ class TestUserWithoutRequest(UserTestBase):
 
         monkeypatch.setattr(user.get_bot(), "send_message_draft", make_assertion)
         assert await user.send_message_draft(123, "test")
+
+    async def test_instance_method_send_rich_message(self, monkeypatch, user):
+        rich_message = InputRichMessage(html="<b>test</b>")
+
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == user.id and kwargs["rich_message"] == rich_message
+
+        assert check_shortcut_signature(
+            User.send_rich_message, Bot.send_rich_message, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            user.send_rich_message, user.get_bot(), "send_rich_message"
+        )
+        assert await check_defaults_handling(user.send_rich_message, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "send_rich_message", make_assertion)
+        assert await user.send_rich_message(rich_message)
+
+    async def test_instance_method_send_rich_message_draft(self, monkeypatch, user):
+        rich_message = InputRichMessage(html="<b>test</b>")
+
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == user.id
+                and kwargs["draft_id"] == 123
+                and kwargs["rich_message"] == rich_message
+            )
+
+        assert check_shortcut_signature(
+            User.send_rich_message_draft, Bot.send_rich_message_draft, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            user.send_rich_message_draft, user.get_bot(), "send_rich_message_draft"
+        )
+        assert await check_defaults_handling(user.send_rich_message_draft, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "send_rich_message_draft", make_assertion)
+        assert await user.send_rich_message_draft(123, rich_message)
 
     async def test_instance_method_send_photo(self, monkeypatch, user):
         async def make_assertion(*_, **kwargs):

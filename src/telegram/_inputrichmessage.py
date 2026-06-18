@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the InputRichMessage class."""
 
+from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -88,3 +89,33 @@ class InputRichMessage(TelegramObject):
         )
 
         self._freeze()
+
+
+class InputRichMessageContent(InputMessageContent):
+    """Represents the content of a rich message to be sent as the result of an inline query.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`rich_message` is equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        rich_message (:class:`telegram.InputRichMessage`): The message to be sent.
+
+    Attributes:
+        rich_message (:class:`telegram.InputRichMessage`): The message to be sent.
+    """
+
+    __slots__ = ("rich_message",)
+
+    def __init__(
+        self,
+        rich_message: InputRichMessage,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+
+        with self._unfrozen():
+            self.rich_message: InputRichMessage = rich_message
+            self._id_attrs = (self.rich_message,)

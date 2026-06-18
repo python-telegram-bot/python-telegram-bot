@@ -119,6 +119,7 @@ Available Types
     telegram.inputpolloption
     telegram.inputpolloptionmedia
     telegram.inputrichmessage
+    telegram.inputrichmessagecontent
     telegram.inputstorycontent
     telegram.inputstorycontentphoto
     telegram.inputstorycontentvideo

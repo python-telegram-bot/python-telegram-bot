@@ -26,6 +26,7 @@ from telegram import (
     ChatPermissions,
     InputChecklist,
     InputChecklistTask,
+    InputRichMessage,
     ReactionTypeEmoji,
     User,
 )
@@ -538,6 +539,44 @@ class TestChatWithoutRequest(ChatTestBase):
 
         monkeypatch.setattr(chat.get_bot(), "send_message_draft", make_assertion)
         assert await chat.send_message_draft(draft_id=1, text="test")
+
+    async def test_instance_method_send_rich_message(self, monkeypatch, chat):
+        rich_message = InputRichMessage(html="<b>test</b>")
+
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["rich_message"] == rich_message
+
+        assert check_shortcut_signature(
+            Chat.send_rich_message, Bot.send_rich_message, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.send_rich_message, chat.get_bot(), "send_rich_message"
+        )
+        assert await check_defaults_handling(chat.send_rich_message, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_rich_message", make_assertion)
+        assert await chat.send_rich_message(rich_message)
+
+    async def test_instance_method_send_rich_message_draft(self, monkeypatch, chat):
+        rich_message = InputRichMessage(html="<b>test</b>")
+
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["draft_id"] == 1
+                and kwargs["rich_message"] == rich_message
+            )
+
+        assert check_shortcut_signature(
+            Chat.send_rich_message_draft, Bot.send_rich_message_draft, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.send_rich_message_draft, chat.get_bot(), "send_rich_message_draft"
+        )
+        assert await check_defaults_handling(chat.send_rich_message_draft, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "send_rich_message_draft", make_assertion)
+        assert await chat.send_rich_message_draft(1, rich_message)
 
     async def test_instance_method_send_media_group(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):

@@ -54,6 +54,7 @@ from telegram import (
     InputChecklist,
     InputChecklistTask,
     InputPaidMediaPhoto,
+    InputRichMessage,
     InputTextMessageContent,
     Invoice,
     LinkPreviewOptions,
@@ -1939,6 +1940,54 @@ class TestMessageWithoutRequest(MessageTestBase):
 
         await self.check_thread_id_parsing(
             message, message.reply_text_draft, "send_message_draft", [1, "test"], monkeypatch
+        )
+
+    async def test_reply_rich_message(self, monkeypatch, message):
+        rich_message = InputRichMessage(html="<b>test</b>")
+
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["business_connection_id"] == message.business_connection_id
+                and kwargs["rich_message"] == rich_message
+                and kwargs["disable_notification"] is True
+            )
+
+        assert check_shortcut_signature(
+            Message.reply_rich_message,
+            Bot.send_rich_message,
+            [
+                "chat_id",
+                "reply_to_message_id",
+                "business_connection_id",
+                "direct_messages_topic_id",
+            ],
+            ["do_quote", "reply_to_message_id"],
+            annotation_overrides={"message_thread_id": (ODVInput[int], DEFAULT_NONE)},
+        )
+        assert await check_shortcut_call(
+            message.reply_rich_message,
+            message.get_bot(),
+            "send_rich_message",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id", "direct_messages_topic_id"],
+        )
+        assert await check_defaults_handling(
+            message.reply_rich_message, message.get_bot(), no_default_kwargs={"message_thread_id"}
+        )
+
+        monkeypatch.setattr(message.get_bot(), "send_rich_message", make_assertion)
+        assert await message.reply_rich_message(rich_message, disable_notification=True)
+        await self.check_quote_parsing(
+            message,
+            message.reply_rich_message,
+            "send_rich_message",
+            [rich_message, True],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
+            message, message.reply_rich_message, "send_rich_message", [rich_message], monkeypatch
         )
 
     async def test_reply_media_group(self, monkeypatch, message):

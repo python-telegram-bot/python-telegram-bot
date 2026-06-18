@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import InputRichMessage
+from telegram import InputRichMessage, InputRichMessageContent
 from tests.auxil.slots import mro_slots
 
 
@@ -84,3 +84,25 @@ class TestInputRichMessageWithoutRequest(InputRichMessageTestBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+
+class TestInputRichMessageContentWithoutRequest(InputRichMessageTestBase):
+    def test_slot_behaviour(self, input_rich_message):
+        inst = InputRichMessageContent(rich_message=input_rich_message)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+
+    def test_to_dict(self, input_rich_message):
+        inst = InputRichMessageContent(rich_message=input_rich_message)
+        assert inst.to_dict() == {"rich_message": input_rich_message.to_dict()}
+
+    def test_equality(self):
+        rich_message = InputRichMessage(markdown=self.markdown)
+        a = InputRichMessageContent(rich_message=rich_message)
+        b = InputRichMessageContent(rich_message=rich_message)
+        c = InputRichMessageContent(rich_message=InputRichMessage(html=self.html))
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a != c
+        assert hash(a) != hash(c)
