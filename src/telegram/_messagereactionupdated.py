@@ -50,14 +50,6 @@ class MessageReactionCountUpdated(TelegramObject):
             |datetime_localization|
         reactions (Sequence[:class:`telegram.ReactionCount`]): List of reactions that are present
             on the message
-
-    Attributes:
-        chat (:class:`telegram.Chat`): The chat containing the message.
-        message_id (:obj:`int`): Unique message identifier inside the chat.
-        date (:class:`datetime.datetime`): Date of the change in Unix time
-            |datetime_localization|
-        reactions (tuple[:class:`telegram.ReactionCount`]): List of reactions that are present on
-            the message
     """
 
     __slots__ = (
@@ -122,20 +114,6 @@ class MessageReactionUpdated(TelegramObject):
         user (:class:`telegram.User`, optional): The user that changed the reaction, if the user
             isn't anonymous.
         actor_chat (:class:`telegram.Chat`, optional): The chat on behalf of which the reaction was
-            changed, if the user is anonymous.
-
-    Attributes:
-        chat (:class:`telegram.Chat`): The chat containing the message.
-        message_id (:obj:`int`): Unique message identifier inside the chat.
-        date (:class:`datetime.datetime`): Date of the change in Unix time.
-            |datetime_localization|
-        old_reaction (tuple[:class:`telegram.ReactionType`]): Previous list of reaction types
-            that were set by the user.
-        new_reaction (tuple[:class:`telegram.ReactionType`]): New list of reaction types that
-            were set by the user.
-        user (:class:`telegram.User`): Optional. The user that changed the reaction, if the user
-            isn't anonymous.
-        actor_chat (:class:`telegram.Chat`): Optional. The chat on behalf of which the reaction was
             changed, if the user is anonymous.
     """
 

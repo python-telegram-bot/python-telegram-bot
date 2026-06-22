@@ -65,32 +65,6 @@ class KeyboardButtonRequestUsers(TelegramObject):
         request_photo (:obj:`bool`, optional): Pass :obj:`True` to request the users' photo.
 
             .. versionadded:: 21.1
-
-    Attributes:
-        request_id (:obj:`int`): Identifier of the request.
-        user_is_bot (:obj:`bool`): Optional. Pass :obj:`True` to request a bot, pass :obj:`False`
-            to request a regular user. If not specified, no additional restrictions are applied.
-        user_is_premium (:obj:`bool`): Optional. Pass :obj:`True` to request a premium user, pass
-            :obj:`False` to request a non-premium user. If not specified, no additional
-            restrictions are applied.
-        max_quantity (:obj:`int`): Optional. The maximum number of users to be selected;
-            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY` -
-            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MAX_QUANTITY`.
-            Defaults to :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY`
-            .
-
-            .. versionadded:: 20.8
-        request_name (:obj:`bool`): Optional. Pass :obj:`True` to request the users' first and last
-            name.
-
-            .. versionadded:: 21.1
-        request_username (:obj:`bool`): Optional. Pass :obj:`True` to request the users' username.
-
-            .. versionadded:: 21.1
-        request_photo (:obj:`bool`): Optional. Pass :obj:`True` to request the users' photo.
-
-            .. versionadded:: 21.1
-
     """
 
     __slots__ = (
@@ -173,36 +147,6 @@ class KeyboardButtonRequestChat(TelegramObject):
         request_photo (:obj:`bool`, optional): Pass :obj:`True` to request the chat's photo.
 
             .. versionadded:: 21.1
-    Attributes:
-        request_id (:obj:`int`): Identifier of the request.
-        chat_is_channel (:obj:`bool`): Pass :obj:`True` to request a channel chat, pass
-            :obj:`False` to request a group or a supergroup chat.
-        chat_is_forum (:obj:`bool`): Optional. Pass :obj:`True` to request a forum supergroup, pass
-            :obj:`False` to request a non-forum chat. If not specified, no additional
-            restrictions are applied.
-        chat_has_username (:obj:`bool`): Optional. Pass :obj:`True` to request a supergroup or a
-            channel with a username, pass :obj:`False` to request a chat without a username. If
-            not specified, no additional restrictions are applied.
-        chat_is_created (:obj:`bool`) Optional. Pass :obj:`True` to request a chat owned by the
-            user. Otherwise, no additional restrictions are applied.
-        user_administrator_rights (:class:`ChatAdministratorRights`) Optional. Specifies the
-            required administrator rights of the user in the chat. If not specified, no additional
-            restrictions are applied.
-        bot_administrator_rights (:class:`ChatAdministratorRights`) Optional. Specifies the
-            required administrator rights of the bot in the chat. The rights must be a subset of
-            :attr:`user_administrator_rights`. If not specified, no additional restrictions are
-            applied.
-        bot_is_member (:obj:`bool`) Optional. Pass :obj:`True` to request a chat with the bot
-            as a member. Otherwise, no additional restrictions are applied.
-        request_title (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's title.
-
-            .. versionadded:: 21.1
-        request_username (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's username.
-
-            .. versionadded:: 21.1
-        request_photo (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's photo.
-
-            .. versionadded:: 21.1
     """
 
     __slots__ = (
@@ -283,16 +227,10 @@ class KeyboardButtonRequestManagedBot(TelegramObject):
     .. versionadded:: 22.8
 
     Args:
-        request_id (:obj:`int`): Signed 32-bit identifier of the request. Must be unique
+        request_id (:obj:`int`): Identifier of the request. Must be unique
             within the message.
         suggested_name (:obj:`str`, optional): Suggested name for the bot.
         suggested_username (:obj:`str`, optional): Suggested username for the bot.
-
-    Attributes:
-        request_id (:obj:`int`): Signed 32-bit identifier of the request. Must be unique
-            within the message.
-        suggested_name (:obj:`str`): Optional. Suggested name for the bot.
-        suggested_username (:obj:`str`): Optional. Suggested username for the bot.
     """
 
     __slots__ = (

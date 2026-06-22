@@ -39,18 +39,6 @@ class UserProfilePhotos(TelegramObject):
         total_count (:obj:`int`): Total number of profile pictures the target user has.
         photos (Sequence[Sequence[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up
             to 4 sizes each).
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
-    Attributes:
-        total_count (:obj:`int`): Total number of profile pictures.
-        photos (tuple[tuple[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4
-            sizes each).
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
     """
 
     __slots__ = ("photos", "total_count")

@@ -43,7 +43,7 @@ def was_called_by(frame: FrameType | None, caller: Path) -> bool:
             >>> was_called_by(inspect.currentframe(), Path(__file__))
             True
 
-    Arguments:
+    Args:
         frame (:obj:`FrameType`): The frame - usually the return value of
             ``inspect.currentframe()``. If :obj:`None` is passed, the return value will be
             :obj:`False`.

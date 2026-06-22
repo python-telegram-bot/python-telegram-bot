@@ -65,10 +65,6 @@ class InputInvoiceMessageContent(InputMessageContent):
         prices (Sequence[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
             components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
             etc.). Must contain exactly one item for payments in |tg_stars|.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
             *smallest units* of the currency (integer, **not** float/double). For example, for a
             maximum tip of ``US$ 1.45`` pass ``max_tip_amount = 145``. See the ``exp`` parameter in
@@ -80,12 +76,6 @@ class InputInvoiceMessageContent(InputMessageContent):
             At most 4 suggested tip amounts can be specified. The suggested tip amounts must be
             positive, passed in a strictly increased order and must not exceed
             :attr:`max_tip_amount`.
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-
         provider_data (:obj:`str`, optional): An object for data about the invoice,
             which will be shared with the payment provider. A detailed description of the required
             fields should be provided by the payment provider.
@@ -109,69 +99,6 @@ class InputInvoiceMessageContent(InputMessageContent):
             address should be sent to provider. Ignored for payments in |tg_stars|.
         is_flexible (:obj:`bool`, optional): Pass :obj:`True`, if the final price depends on
             the shipping method. Ignored for payments in |tg_stars|.
-
-    Attributes:
-        title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
-            :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
-        description (:obj:`str`): Product description.
-            :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
-            :tg-const:`telegram.Invoice.MAX_DESCRIPTION_LENGTH` characters.
-        payload (:obj:`str`): Bot-defined invoice payload.
-            :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
-            :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be displayed
-            to the user, use it for your internal processes.
-        provider_token (:obj:`str`): Payment provider token, obtained via
-            `@Botfather <https://t.me/Botfather>`_. Pass an empty string for payments in `Telegram
-            Stars <https://t.me/BotNews/90>`_.
-        currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
-            `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_.
-            Pass ``XTR`` for payments in |tg_stars|.
-        prices (tuple[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
-            components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
-            etc.). Must contain exactly one item for payments in |tg_stars|.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
-        max_tip_amount (:obj:`int`): Optional. The maximum accepted amount for tips in the
-            *smallest units* of the currency (integer, **not** float/double). For example, for a
-            maximum tip of ``US$ 1.45`` ``max_tip_amount`` is ``145``. See the ``exp`` parameter in
-            `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
-            shows the number of digits past the decimal point for each currency (2 for the majority
-            of currencies). Defaults to ``0``. Not supported for payments in |tg_stars|.
-        suggested_tip_amounts (tuple[:obj:`int`]): Optional. An array of suggested
-            amounts of tip in the *smallest units* of the currency (integer, **not** float/double).
-            At most 4 suggested tip amounts can be specified. The suggested tip amounts must be
-            positive, passed in a strictly increased order and must not exceed
-            :attr:`max_tip_amount`.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
-        provider_data (:obj:`str`): Optional. An object for data about the invoice,
-            which will be shared with the payment provider. A detailed description of the required
-            fields should be provided by the payment provider.
-        photo_url (:obj:`str`): Optional. URL of the product photo for the invoice. Can be a photo
-            of the goods or a marketing image for a service. People like it better when they see
-            what they are paying for.
-        photo_size (:obj:`int`): Optional. Photo size.
-        photo_width (:obj:`int`): Optional. Photo width.
-        photo_height (:obj:`int`): Optional. Photo height.
-        need_name (:obj:`bool`): Optional. Pass :obj:`True`, if you require the user's full name to
-            complete the order. Ignored for payments in |tg_stars|.
-        need_phone_number (:obj:`bool`): Optional. Pass :obj:`True`, if you require the user's
-            phone number to complete the order. Ignored for payments in |tg_stars|.
-        need_email (:obj:`bool`): Optional. Pass :obj:`True`, if you require the user's email
-            address to complete the order. Ignored for payments in |tg_stars|.
-        need_shipping_address (:obj:`bool`): Optional. Pass :obj:`True`, if you require the user's
-            shipping address to complete the order. Ignored for payments in |tg_stars|.
-        send_phone_number_to_provider (:obj:`bool`): Optional. Pass :obj:`True`, if user's phone
-            number should be sent to provider. Ignored for payments in |tg_stars|.
-        send_email_to_provider (:obj:`bool`): Optional. Pass :obj:`True`, if user's email address
-            should be sent to provider. Ignored for payments in |tg_stars|.
-        is_flexible (:obj:`bool`): Optional. Pass :obj:`True`, if the final price depends on the
-            shipping method. Ignored for payments in |tg_stars|.
-
     """
 
     __slots__ = (

@@ -47,12 +47,6 @@ class GiftBackground(TelegramObject):
         center_color (:obj:`int`): Center color of the background in RGB format.
         edge_color (:obj:`int`): Edge color of the background in RGB format.
         text_color (:obj:`int`): Text color of the background in RGB format.
-
-    Attributes:
-        center_color (:obj:`int`): Center color of the background in RGB format.
-        edge_color (:obj:`int`): Edge color of the background in RGB format.
-        text_color (:obj:`int`): Text color of the background in RGB format.
-
     """
 
     __slots__ = (
@@ -131,48 +125,6 @@ class Gift(TelegramObject):
             gifts that can be obtained by upgrading the gift.
 
             .. versionadded:: 22.6
-
-    Attributes:
-        id (:obj:`str`): Unique identifier of the gift.
-        sticker (:class:`~telegram.Sticker`): The sticker that represents the gift.
-        star_count (:obj:`int`): The number of Telegram Stars that must be paid to send the
-            sticker.
-        total_count (:obj:`int`): Optional. The total number of the gifts of this type that can be
-            sent by all users; for limited gifts only.
-        remaining_count (:obj:`int`): Optional. The number of remaining gifts of this type that can
-            be sent by all users; for limited gifts only.
-        upgrade_star_count (:obj:`int`): Optional. The number of Telegram Stars that must be paid
-            to upgrade the gift to a unique one.
-
-            .. versionadded:: 21.10
-        publisher_chat (:class:`telegram.Chat`): Optional. Information about the chat that
-            published the gift.
-
-            .. versionadded:: 22.4
-        personal_total_count (:obj:`int`): Optional. The total number of gifts of this type that
-            can be sent by the bot; for limited gifts only.
-
-            .. versionadded:: 22.6
-        personal_remaining_count (:obj:`int`): Optional. The number of remaining gifts of this type
-            that can be sent by the bot; for limited gifts only.
-
-            .. versionadded:: 22.6
-        background (:class:`GiftBackground`): Optional. Background of the gift.
-
-            .. versionadded:: 22.6
-        is_premium (:obj:`bool`): Optional. :obj:`True`, if the gift can only be purchased by
-            Telegram Premium subscribers.
-
-            .. versionadded:: 22.6
-        has_colors (:obj:`bool`): Optional. :obj:`True`, if the gift can be used (after being
-            upgraded) to customize a user's appearance.
-
-            .. versionadded:: 22.6
-        unique_gift_variant_count (:obj:`int`): Optional. The total number of different unique
-            gifts that can be obtained by upgrading the gift.
-
-            .. versionadded:: 22.6
-
     """
 
     __slots__ = (
@@ -249,10 +201,6 @@ class Gifts(TelegramObject):
 
     Args:
         gifts (Sequence[:class:`Gift`]): The sequence of gifts.
-
-    Attributes:
-        gifts (tuple[:class:`Gift`]): The sequence of gifts.
-
     """
 
     __slots__ = ("gifts",)
@@ -291,7 +239,7 @@ class GiftInfo(TelegramObject):
         gift (:class:`Gift`): Information about the gift.
         owned_gift_id (:obj:`str`, optional): Unique identifier of the received gift for the bot;
             only present for gifts received on behalf of business accounts.
-        convert_star_count (:obj:`int`, optional) Number of Telegram Stars that can be claimed by
+        convert_star_count (:obj:`int`, optional): Number of Telegram Stars that can be claimed by
             the receiver by converting the gift; omitted if conversion to Telegram Stars
             is impossible.
         prepaid_upgrade_star_count (:obj:`int`, optional): Number of Telegram Stars that were
@@ -311,32 +259,6 @@ class GiftInfo(TelegramObject):
             upgraded. See the number field in :class:`~telegram.UniqueGift`.
 
             .. versionadded:: 22.6
-
-    Attributes:
-        gift (:class:`Gift`): Information about the gift.
-        owned_gift_id (:obj:`str`): Optional. Unique identifier of the received gift for the bot;
-            only present for gifts received on behalf of business accounts.
-        convert_star_count (:obj:`int`): Optional. Number of Telegram Stars that can be claimed by
-            the receiver by converting the gift; omitted if conversion to Telegram Stars
-            is impossible.
-        prepaid_upgrade_star_count (:obj:`int`): Optional. Number of Telegram Stars that were
-            prepaid for the ability to upgrade the gift.
-        can_be_upgraded (:obj:`bool`): Optional. :obj:`True`, if the gift can be upgraded
-            to a unique gift.
-        text (:obj:`str`): Optional. Text of the message that was added to the gift.
-        entities (Sequence[:class:`telegram.MessageEntity`]): Optional. Special entities that
-            appear in the text.
-        is_private (:obj:`bool`): Optional. :obj:`True`, if the sender and gift text are
-            shown only to the gift receiver; otherwise, everyone will be able to see them.
-        is_upgrade_separate (:obj:`bool`): Optional. :obj:`True`, if the gift's upgrade was
-            purchased after the gift was sent.
-
-            .. versionadded:: 22.6
-        unique_gift_number (:obj:`int`): Optional. Unique number reserved for this gift when
-            upgraded. See the number field in :class:`~telegram.UniqueGift`.
-
-            .. versionadded:: 22.6
-
     """
 
     __slots__ = (
@@ -472,19 +394,6 @@ class AcceptedGiftTypes(TelegramObject):
             are accepted
 
             .. versionadded:: 22.6
-
-    Attributes:
-        unlimited_gifts (:class:`bool`): :obj:`True`, if unlimited regular gifts are accepted.
-        limited_gifts (:class:`bool`): :obj:`True`, if limited regular gifts are accepted.
-        unique_gifts (:class:`bool`): :obj:`True`, if unique gifts or gifts that can be upgraded
-            to unique for free are accepted.
-        premium_subscription (:class:`bool`): :obj:`True`, if a Telegram Premium subscription
-            is accepted.
-        gifts_from_channels (:obj:`bool`): :obj:`True`, if transfers of unique gifts from channels
-            are accepted
-
-            .. versionadded:: 22.6
-
     """
 
     __slots__ = (

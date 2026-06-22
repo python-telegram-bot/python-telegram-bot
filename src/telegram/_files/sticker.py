@@ -88,47 +88,6 @@ class Sticker(_BaseThumbedMedium):
             white color on chat photos, or another appropriate color in other places.
 
             .. versionadded:: 20.2
-
-    Attributes:
-        file_id (:obj:`str`): Identifier for this file, which can be used to download
-            or reuse the file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        width (:obj:`int`): Sticker width.
-        height (:obj:`int`): Sticker height.
-        is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
-        is_video (:obj:`bool`): :obj:`True`, if the sticker is a video sticker.
-
-            .. versionadded:: 13.11
-        type (:obj:`str`): Type of the sticker. Currently one of :attr:`REGULAR`,
-            :attr:`MASK`, :attr:`CUSTOM_EMOJI`. The type of the sticker is independent from its
-            format, which is determined by the fields :attr:`is_animated` and :attr:`is_video`.
-
-            .. versionadded:: 20.0
-        emoji (:obj:`str`): Optional. Emoji associated with the sticker.
-        set_name (:obj:`str`): Optional. Name of the sticker set to which the sticker belongs.
-        mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
-            where the mask should be placed.
-        file_size (:obj:`int`): Optional. File size in bytes.
-
-        premium_animation (:class:`telegram.File`): Optional. For premium regular stickers,
-            premium animation for the sticker.
-
-            .. versionadded:: 20.0
-        custom_emoji_id (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
-            custom emoji.
-
-            .. versionadded:: 20.0
-        thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the ``.WEBP`` or
-            ``.JPG`` format.
-
-            .. versionadded:: 20.2
-        needs_repainting (:obj:`bool`): Optional. :obj:`True`, if the sticker must be repainted to
-            a text color in messages, the color of the Telegram Premium badge in emoji status,
-            white color on chat photos, or another appropriate color in other places.
-
-            .. versionadded:: 20.2
     """
 
     __slots__ = (
@@ -226,13 +185,12 @@ class StickerSet(TelegramObject):
     .. versionchanged:: 20.0
         The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
 
+    .. versionchanged:: 20.5
+       |removed_thumb_note|
 
     .. versionchanged:: 21.1
         The parameters ``is_video`` and ``is_animated`` are deprecated and now made optional. Thus,
         the order of the arguments had to be changed.
-
-    .. versionchanged:: 20.5
-       |removed_thumb_note|
 
     .. versionremoved:: 21.2
        Removed the deprecated arguments and attributes ``is_animated`` and ``is_video``.
@@ -241,34 +199,12 @@ class StickerSet(TelegramObject):
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
         stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         sticker_type (:obj:`str`): Type of stickers in the set, currently one of
             :attr:`telegram.Sticker.REGULAR`, :attr:`telegram.Sticker.MASK`,
             :attr:`telegram.Sticker.CUSTOM_EMOJI`.
 
             .. versionadded:: 20.0
         thumbnail (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
-            ``.TGS``, or ``.WEBM`` format.
-
-            .. versionadded:: 20.2
-
-    Attributes:
-        name (:obj:`str`): Sticker set name.
-        title (:obj:`str`): Sticker set title.
-        stickers (tuple[:class:`telegram.Sticker`]): List of all set stickers.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
-        sticker_type (:obj:`str`): Type of stickers in the set, currently one of
-            :attr:`telegram.Sticker.REGULAR`, :attr:`telegram.Sticker.MASK`,
-            :attr:`telegram.Sticker.CUSTOM_EMOJI`.
-
-            .. versionadded:: 20.0
-        thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
             .. versionadded:: 20.2
@@ -338,18 +274,6 @@ class MaskPosition(TelegramObject):
             size, from top to bottom. For example, ``1.0`` will place the mask just below the
             default mask position.
         scale (:obj:`float`): Mask scaling coefficient. For example, ``2.0`` means double size.
-
-    Attributes:
-        point (:obj:`str`): The part of the face relative to which the mask should be placed.
-            One of :attr:`FOREHEAD`, :attr:`EYES`, :attr:`MOUTH`, or :attr:`CHIN`.
-        x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
-            size, from left to right. For example, choosing ``-1.0`` will place mask just to the
-            left of the default mask position.
-        y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
-            size, from top to bottom. For example, ``1.0`` will place the mask just below the
-            default mask position.
-        scale (:obj:`float`): Mask scaling coefficient. For example, ``2.0`` means double size.
-
     """
 
     __slots__ = ("point", "scale", "x_shift", "y_shift")

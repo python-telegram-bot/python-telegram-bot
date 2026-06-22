@@ -56,9 +56,6 @@ class PaidMedia(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of the paid media.
-
-    Attributes:
-        type (:obj:`str`): Type of the paid media.
     """
 
     __slots__ = ("type",)
@@ -129,7 +126,6 @@ class PaidMediaPreview(PaidMedia):
        equality comparison now considers integer durations and equivalent timedeltas as equal.
 
     Args:
-        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PREVIEW`.
         width (:obj:`int`, optional): Media width as defined by the sender.
         height (:obj:`int`, optional): Media height as defined by the sender.
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the media in
@@ -140,8 +136,6 @@ class PaidMediaPreview(PaidMedia):
 
     Attributes:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PREVIEW`.
-        width (:obj:`int`): Optional. Media width as defined by the sender.
-        height (:obj:`int`): Optional. Media height as defined by the sender.
         duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Duration of the media in
             seconds as defined by the sender.
 
@@ -183,12 +177,10 @@ class PaidMediaPhoto(PaidMedia):
     .. versionadded:: 21.4
 
     Args:
-        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PHOTO`.
         photo (Sequence[:class:`telegram.PhotoSize`]): The photo.
 
     Attributes:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PHOTO`.
-        photo (tuple[:class:`telegram.PhotoSize`]): The photo.
     """
 
     __slots__ = ("photo",)
@@ -224,12 +216,10 @@ class PaidMediaVideo(PaidMedia):
     .. versionadded:: 21.4
 
     Args:
-        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.VIDEO`.
         video (:class:`telegram.Video`): The video.
 
     Attributes:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.VIDEO`.
-        video (:class:`telegram.Video`): The video.
     """
 
     __slots__ = ("video",)
@@ -309,11 +299,6 @@ class PaidMediaInfo(TelegramObject):
         star_count (:obj:`int`): The number of Telegram Stars that must be paid to buy access to
             the media.
         paid_media (Sequence[:class:`telegram.PaidMedia`]): Information about the paid media.
-
-    Attributes:
-        star_count (:obj:`int`): The number of Telegram Stars that must be paid to buy access to
-            the media.
-        paid_media (tuple[:class:`telegram.PaidMedia`]): Information about the paid media.
     """
 
     __slots__ = ("paid_media", "star_count")
@@ -352,10 +337,6 @@ class PaidMediaPurchased(TelegramObject):
     .. versionadded:: 21.6
 
     Args:
-        from_user (:class:`telegram.User`): User who purchased the media.
-        paid_media_payload (:obj:`str`): Bot-specified paid media payload.
-
-    Attributes:
         from_user (:class:`telegram.User`): User who purchased the media.
         paid_media_payload (:obj:`str`): Bot-specified paid media payload.
     """

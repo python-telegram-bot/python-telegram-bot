@@ -70,10 +70,6 @@ class EncryptedPassportElement(TelegramObject):
             files with documents provided by the user; available only for "utility_bill",
             "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         front_side (:class:`telegram.PassportFile`, optional): Encrypted/decrypted file with the
             front side of the document, provided by the user; Available only for "passport",
             "driver_license", "identity_card" and "internal_passport".
@@ -88,55 +84,6 @@ class EncryptedPassportElement(TelegramObject):
             available if requested requested for "passport", "driver_license", "identity_card",
             "internal_passport", "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
-    Attributes:
-        type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",
-            "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",
-            "rental_agreement", "passport_registration", "temporary_registration", "phone_number",
-            "email".
-        hash (:obj:`str`): Base64-encoded element hash for using in
-            :class:`telegram.PassportElementErrorUnspecified`.
-        data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocumentData` | \
-            :class:`telegram.ResidentialAddress` | :obj:`str`):
-            Optional. Decrypted or encrypted data; available only for "personal_details",
-            "passport", "driver_license", "identity_card", "internal_passport" and "address" types.
-        phone_number (:obj:`str`): Optional. User's verified phone number; available only for
-            "phone_number" type.
-        email (:obj:`str`): Optional. User's verified email address; available only for "email"
-            type.
-        files (tuple[:class:`telegram.PassportFile`]): Optional. Array of encrypted/decrypted
-            files with documents provided by the user; available only for "utility_bill",
-            "bank_statement", "rental_agreement", "passport_registration" and
-            "temporary_registration" types.
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-
-        front_side (:class:`telegram.PassportFile`): Optional. Encrypted/decrypted file with the
-            front side of the document, provided by the user; available only for "passport",
-            "driver_license", "identity_card" and "internal_passport".
-        reverse_side (:class:`telegram.PassportFile`): Optional. Encrypted/decrypted file with the
-            reverse side of the document, provided by the user; available only for "driver_license"
-            and "identity_card".
-        selfie (:class:`telegram.PassportFile`): Optional. Encrypted/decrypted file with the
-            selfie of the user holding a document, provided by the user; available if requested for
-            "passport", "driver_license", "identity_card" and "internal_passport".
-        translation (tuple[:class:`telegram.PassportFile`]): Optional. Array of
-            encrypted/decrypted files with translated versions of documents provided by the user;
-            available if requested for "passport", "driver_license", "identity_card",
-            "internal_passport", "utility_bill", "bank_statement", "rental_agreement",
-            "passport_registration" and "temporary_registration" types.
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-
     """
 
     __slots__ = (
