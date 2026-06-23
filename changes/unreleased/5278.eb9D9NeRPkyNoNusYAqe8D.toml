@@ -1,5 +1,5 @@
-other = "[WIP] Fix failing GitHub Actions job 'lock'"
+internal = "Fix Failing 'Lock Closed Threads' Github Action"
 [[pull_requests]]
 uid = "5278"
-author_uids = ["Copilot"]
+author_uids = ["harshil21", "Copilot"]
 closes_threads = []
