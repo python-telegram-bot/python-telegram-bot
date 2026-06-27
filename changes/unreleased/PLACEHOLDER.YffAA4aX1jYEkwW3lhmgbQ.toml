@@ -1,0 +1,5 @@
+bugfixes = "Fixed ``mention_html`` not HTML-escaping the ``user_id`` argument, which could produce malformed HTML when ``user_id`` is a string containing special characters such as ``\"``."
+[[pull_requests]]
+uid = "PLACEHOLDER"
+author_uids = ["JSap0914"]
+closes_threads = ["5281"]
