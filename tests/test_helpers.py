@@ -144,8 +144,18 @@ class TestHelpers:
 
     def test_mention_html(self):
         expected = '<a href="tg://user?id=1">the name</a>'
-
         assert expected == helpers.mention_html(1, "the name")
+
+    def test_mention_html_escapes_str_user_id(self):
+        """mention_html must HTML-escape special chars in a string user_id.
+
+        A double-quote in user_id broke the href attribute, producing malformed HTML:
+          <a href="tg://user?id=123"bad">name</a>
+        After the fix the quote is rendered as &quot;.
+        """
+        assert helpers.mention_html('123"bad', "name") == (
+            '<a href="tg://user?id=123&quot;bad">name</a>'
+        )
 
     @pytest.mark.parametrize(
         ("test_str", "expected"),

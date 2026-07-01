@@ -88,7 +88,7 @@ def mention_html(user_id: int | str, name: str) -> str:
     Returns:
         :obj:`str`: The inline mention for the user as HTML.
     """
-    return f'<a href="tg://user?id={user_id}">{escape(name)}</a>'
+    return f'<a href="tg://user?id={escape(str(user_id))}">{escape(name)}</a>'
 
 
 def mention_markdown(user_id: int | str, name: str, version: MarkdownVersion = 1) -> str:
