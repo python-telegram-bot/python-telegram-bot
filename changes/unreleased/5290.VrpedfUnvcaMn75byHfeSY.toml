@@ -1,0 +1,5 @@
+internal = "Update sigstore/gh-action-sigstore-python action to v3.4.0"
+[[pull_requests]]
+uid = "5290"
+author_uids = ["renovate[bot]"]
+closes_threads = []
