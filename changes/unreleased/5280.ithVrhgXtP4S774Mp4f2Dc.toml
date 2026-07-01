@@ -1,0 +1,5 @@
+internal = "Avoid leaking of bot tokens through CI tracebacks"
+[[pull_requests]]
+uid = "5280"
+author_uids = ["harshil21"]
+closes_threads = []

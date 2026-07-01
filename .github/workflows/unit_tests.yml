@@ -48,6 +48,26 @@ jobs:
         # The first & second one are achieved by mocking the corresponding import
         # See test_helpers.py & test_no_passport.py for details
         run: |
+          # Mask bot tokens and payment provider tokens in the logs.
+          # Needs to be run before pytest so Github knows about them
+          python -c '
+          import base64
+          import json
+          import os
+
+          def mask(value):
+              if not value:
+                  return
+              print(f"::add-mask::{value}")
+
+          bots = os.environ.get("BOTS")
+          mask(bots)
+          if bots:
+              for bot in json.loads(base64.b64decode(bots).decode("utf-8")):
+                  for key in ("token", "payment_provider_token"):
+                      mask(bot.get(key))
+          '
+
           # We test without optional dependencies first. This includes:
           # - without pytz
           # - without jobqueue

@@ -22,11 +22,14 @@ pytest framework. A common change is to allow monkeypatching of the class member
 enforcing slots in the subclasses."""
 
 from telegram import Bot, Message, User
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram.ext import Application, ExtBot, Updater
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.networking import NonchalantHttpxRequest, OfflineRequest
+
+_REDACTED_TOKEN = "<redacted>"
 
 
 def _get_bot_user(token: str) -> User:
@@ -66,6 +69,9 @@ class PytestExtBot(ExtBot):
         # Makes it easier to work with the bot in tests
         self._unfreeze()
 
+    def __repr__(self) -> str:
+        return build_repr_with_selected_attrs(self, token=_REDACTED_TOKEN)
+
     # Here we override get_me for caching because we don't want to call the API repeatedly in tests
     async def get_me(self, *args, **kwargs) -> User:
         return await _mocked_get_me(self)
@@ -76,6 +82,9 @@ class PytestBot(Bot):
         super().__init__(*args, **kwargs)
         # Makes it easier to work with the bot in tests
         self._unfreeze()
+
+    def __repr__(self) -> str:
+        return build_repr_with_selected_attrs(self, token=_REDACTED_TOKEN)
 
     # Here we override get_me for caching because we don't want to call the API repeatedly in tests
     async def get_me(self, *args, **kwargs) -> User:
