@@ -103,7 +103,7 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a predefined poll"""
     questions = ["1", "2", "4", "20"]
     message = await update.effective_message.reply_poll(
-        "How many eggs do you need for a cake?", questions, type=Poll.QUIZ, correct_option_id=2
+        "How many eggs do you need for a cake?", questions, type=Poll.QUIZ, correct_option_ids=[2]
     )
     # Save some info about the poll the bot_data for later use in receive_quiz_answer
     payload = {
