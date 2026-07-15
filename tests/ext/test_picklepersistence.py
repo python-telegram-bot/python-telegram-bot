@@ -698,6 +698,24 @@ class TestPicklePersistence:
         with pytest.raises(FileNotFoundError, match="pickletest"), Path("pickletest").open("rb"):
             pass
 
+    @pytest.mark.parametrize("single_file", [True, False])
+    async def test_save_on_flush_empty_user_data(self, pickle_persistence, single_file):
+        pickle_persistence.single_file = single_file
+        pickle_persistence.on_flush = True
+
+        await pickle_persistence.update_user_data(123, {"foo": "bar"})
+        await pickle_persistence.flush()
+        await pickle_persistence.drop_user_data(123)
+        await pickle_persistence.flush()
+
+        persistence = PicklePersistence(
+            "pickletest",
+            single_file=single_file,
+            on_flush=True,
+            store_data=PersistenceInput(callback_data=False),
+        )
+        assert await persistence.get_user_data() == {}
+
     async def test_save_on_flush_multi_files(self, pickle_persistence, good_pickle_files):
         # Should run without error
         await pickle_persistence.flush()
