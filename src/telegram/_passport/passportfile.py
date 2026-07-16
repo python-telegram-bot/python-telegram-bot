@@ -29,6 +29,20 @@ if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials
 
 
+def with_file_credentials(data: JSONDict, credentials: "FileCredentials | None") -> JSONDict:
+    """Return a copy of passport file data with serialized credentials attached."""
+    credentials_data = (
+        {
+            **credentials.api_kwargs,
+            "file_hash": credentials.file_hash,
+            "secret": credentials.secret,
+        }
+        if credentials is not None
+        else None
+    )
+    return {**data, "credentials": credentials_data}
+
+
 class PassportFile(TelegramObject):
     """
     This object represents a file uploaded to Telegram Passport. Currently all Telegram Passport
@@ -120,9 +134,7 @@ class PassportFile(TelegramObject):
             :class:`telegram.PassportFile`:
 
         """
-        data = cls._parse_data(data)
-
-        data["credentials"] = credentials
+        data = with_file_credentials(data, credentials)
 
         return super().de_json(data=data, bot=bot)
 

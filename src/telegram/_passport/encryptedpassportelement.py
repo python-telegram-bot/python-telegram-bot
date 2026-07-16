@@ -23,17 +23,34 @@ from typing import TYPE_CHECKING
 
 from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
-from telegram._passport.passportfile import PassportFile
+from telegram._passport.passportfile import PassportFile, with_file_credentials
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import (
-    de_json_decrypted_optional,
-    de_list_decrypted_optional,
-    parse_sequence_arg,
-)
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, Credentials
+    from telegram import Bot, Credentials, FileCredentials
+
+
+def _add_file_credentials(
+    data: JSONDict | None, credentials: "FileCredentials | None"
+) -> JSONDict | None:
+    if data is None:
+        return None
+
+    return with_file_credentials(data, credentials)
+
+
+def _add_file_credentials_to_list(
+    data: list[JSONDict] | None, credentials: Sequence["FileCredentials"]
+) -> list[JSONDict] | None:
+    if data is None:
+        return None
+
+    return [
+        with_file_credentials(passport_file, credentials[index])
+        for index, passport_file in enumerate(data)
+    ]
 
 
 class EncryptedPassportElement(TelegramObject):
@@ -240,24 +257,18 @@ class EncryptedPassportElement(TelegramObject):
                 elif data["type"] == "address":
                     data["data"] = ResidentialAddress.de_json(data["data"], bot=bot)
 
-            data["files"] = (
-                de_list_decrypted_optional(data.get("files"), PassportFile, bot, secure_data.files)
-                or None
+            # Keep the file values as dictionaries so that the generic de_json plan performs
+            # their one and only conversion to PassportFile objects.
+            data["files"] = _add_file_credentials_to_list(data.get("files"), secure_data.files)
+            data["front_side"] = _add_file_credentials(
+                data.get("front_side"), secure_data.front_side
             )
-            data["front_side"] = de_json_decrypted_optional(
-                data.get("front_side"), PassportFile, bot, secure_data.front_side
+            data["reverse_side"] = _add_file_credentials(
+                data.get("reverse_side"), secure_data.reverse_side
             )
-            data["reverse_side"] = de_json_decrypted_optional(
-                data.get("reverse_side"), PassportFile, bot, secure_data.reverse_side
-            )
-            data["selfie"] = de_json_decrypted_optional(
-                data.get("selfie"), PassportFile, bot, secure_data.selfie
-            )
-            data["translation"] = (
-                de_list_decrypted_optional(
-                    data.get("translation"), PassportFile, bot, secure_data.translation
-                )
-                or None
+            data["selfie"] = _add_file_credentials(data.get("selfie"), secure_data.selfie)
+            data["translation"] = _add_file_credentials_to_list(
+                data.get("translation"), secure_data.translation
             )
 
         return super().de_json(data=data, bot=bot)

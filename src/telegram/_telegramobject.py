@@ -88,14 +88,28 @@ def _make_seq_transform(
         inner_fn = _make_seq_transform(inner_args[0], globalns, tg_ns)
         if inner_fn is None:
             return None
-        return lambda v, b, _f=inner_fn: (  # type: ignore[misc]
-            [_f(row, b) for row in v] if isinstance(v, list) else v
-        )
+        transform = cast("Callable[[object, Bot | None], object]", inner_fn)
+
+        def transform_fn_de_json(
+            value: object,
+            bot: "Bot | None",
+            fn: "Callable[[object, Bot | None], object]" = transform,
+        ) -> object:
+            return [fn(row, bot) for row in value] if isinstance(value, list) else value
+
+        return transform_fn_de_json
 
     if isinstance(item_type, type) and issubclass(item_type, TelegramObject):
-        return lambda v, b, _c=item_type: (  # type: ignore[misc]
-            _c.de_list(v, b) if isinstance(v, list) else v
-        )
+        tg_class = cast("type[TelegramObject]", item_type)
+
+        def transform_fn_de_list(
+            value: object,
+            bot: "Bot | None",
+            tg_class: "type[TelegramObject]" = tg_class,
+        ) -> object:
+            return tg_class.de_list(value, bot) if isinstance(value, list) else value
+
+        return transform_fn_de_list
 
     return None
 
@@ -632,11 +646,9 @@ class TelegramObject:
                 if key in plan and data[key] is not None:  # Should we transform this field?
                     target = plan[key]  # The transform target for this field
                     if target is _DATETIME_FIELD:  # timestamp → datetime
-                        if not isinstance(data[key], dtm.datetime):  # Avoid retransformations
-                            data[key] = from_timestamp(data[key], tzinfo=tz)
+                        data[key] = from_timestamp(data[key], tzinfo=tz)
                     elif isinstance(target, type):  # Target is a TelegramObject subclass → de_json
-                        if not isinstance(data[key], target):  # Avoid retransformations
-                            data[key] = target.de_json(data[key], bot)  # type: ignore[attr-defined]
+                        data[key] = target.de_json(data[key], bot)  # type: ignore[attr-defined]
                     else:
                         # Sequence transform callable (e.g. de_list)
                         data[key] = target(data[key], bot)
