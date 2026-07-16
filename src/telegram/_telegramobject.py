@@ -20,98 +20,32 @@
 
 import contextlib
 import datetime as dtm
-import importlib
 import inspect
 import json
 from collections.abc import Iterator, Mapping, Sequence, Sized
 from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
-from types import MappingProxyType, UnionType
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast, get_args, get_origin
 
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
+from telegram._utils.de_json import (
+    build_sequence_transformer,
+    get_telegram_namespace,
+    resolve_annotation,
+    unwrap_optional,
+)
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from telegram import Bot
 
 Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
 Tele = TypeVar("Tele", bound="TelegramObject")
-_DATETIME_FIELD = object()  # sentinel value to mark datetime fields in the de_json plan
-
-
-def _telegram_ns() -> dict[str, object]:
-    """Return the full ``telegram`` package namespace for annotation resolution."""
-    return vars(importlib.import_module("telegram"))
-
-
-def _unwrap_optional(ann: object) -> object:
-    """``X | None``  →  ``X``.  Any other annotation is returned unchanged."""
-    if isinstance(ann, UnionType):
-        non_none = [a for a in ann.__args__ if a is not type(None)]  # pylint: disable=unidiomatic-typecheck
-        if len(non_none) == 1:
-            return non_none[0]
-    return ann
-
-
-def _make_seq_transform(
-    item_type: object,
-    globalns: dict[str, object],
-    tg_ns: dict[str, object],
-) -> "Callable[[object, Bot | None], object] | None":
-    """Recursively build a ``(value, bot) → transformed_value`` lambda for a Sequence item type.
-
-    Args:
-        item_type: The unwrapped type annotation of the items in the Sequence.
-        globalns: The global namespace for evaluating string annotations.
-        tg_ns: The telegram namespace for evaluating string annotations.
-
-    Returns:
-        - :obj:`None` if the item type does not require any transformation.
-        - a lambda (value, bot) -> transformation
-    """
-    # inspect.signature does not resolve forward refs in Sequence's despite eval_str=True for some
-    # reason:
-    if isinstance(item_type, str):
-        item_type = eval(item_type, globalns, tg_ns)  # pylint: disable=eval-used # noqa: S307
-
-    item_origin = get_origin(item_type)
-    if item_origin is Sequence:
-        inner_args = get_args(item_type)
-        if not inner_args:
-            return None
-        inner_fn = _make_seq_transform(inner_args[0], globalns, tg_ns)
-        if inner_fn is None:
-            return None
-        transform = cast("Callable[[object, Bot | None], object]", inner_fn)
-
-        def transform_fn_de_json(
-            value: object,
-            bot: "Bot | None",
-            fn: "Callable[[object, Bot | None], object]" = transform,
-        ) -> object:
-            return [fn(row, bot) for row in value] if isinstance(value, list) else value
-
-        return transform_fn_de_json
-
-    if isinstance(item_type, type) and issubclass(item_type, TelegramObject):
-        tg_class = cast("type[TelegramObject]", item_type)
-
-        def transform_fn_de_list(
-            value: object,
-            bot: "Bot | None",
-            tg_class: "type[TelegramObject]" = tg_class,
-        ) -> object:
-            return tg_class.de_list(value, bot) if isinstance(value, list) else value
-
-        return transform_fn_de_list
-
-    return None
+_DATETIME_FIELD = object()  # Sentinel that marks datetime fields in the de_json plan.
 
 
 class TelegramObject:
@@ -153,29 +87,22 @@ class TelegramObject:
 
     __slots__ = ("_bot", "_frozen", "_id_attrs", "api_kwargs")
 
-    # Used to cache the names of the parameters of the __init__ method of the class
-    # Must be a private attribute to avoid name clashes between subclasses
+    # Names accepted by this class' __init__. Built alongside the transformation plan.
     __INIT_PARAMS: ClassVar[set[str]] = set()
-    # Used to check if __INIT_PARAMS has been set for the current class. Unfortunately, we can't
-    # just check if `__INIT_PARAMS is None`, since subclasses use the parent class' __INIT_PARAMS
-    # unless it's overridden
-    __INIT_PARAMS_CHECK: type["TelegramObject"] | None = None
 
     # Per-class de_json plan built once by _build_plan().
     # Maps parameter name → transform target:
     #   _DATETIME_FIELD sentinel  → from_timestamp(value, tzinfo)
     #   TelegramObject subclass   → cls.de_json(value, bot)
-    #   callable(value, bot)      → Sequence transform (from _make_seq_transform)
+    #   callable(value, bot)      → Sequence transform (from build_sequence_transformer)
     __DE_JSON_PLAN__: ClassVar[dict[str, Any]] = {}
 
-    # Forward-compatibility: names of Sequence-typed __init__ params.
-    # If the Telegram API stops sending a field that PTB's __init__ still
-    # requires (i.e. the API made it optional), _de_json defaults sequences
-    # to () and everything else to None so the library doesn't crash.
-    __DE_JSON_COMPAT__: ClassVar[frozenset[str]] = frozenset()
+    # Forward-compatibility defaults for required __init__ parameters. If the Bot API stops
+    # sending one of them, _de_json uses () for sequences and None for every other type.
+    __DE_JSON_COMPAT__: ClassVar[Mapping[str, object]] = MappingProxyType({})
 
     # Subclasses may declare field names that Telegram still returns for backwards
-    # compatibility but that are no longer part of the PTB model.  Those fields will
+    # compatibility but that are no longer part of the PTB model. Those fields will
     # be intercepted by de_json and forwarded into api_kwargs before construction.
     __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset()
 
@@ -487,8 +414,8 @@ class TelegramObject:
     def _build_plan(cls) -> dict[str, Any]:
         """Build the de_json transformation plan from ``__init__`` type annotations.
 
-        Called once per class on the first :meth:`de_json` invocation. By that time
-        every module is fully loaded so forward-reference resolution always succeeds.
+        Called once per class on the first :meth:`de_json` invocation. By that time, runtime
+        imports are available for resolving the annotations that describe incoming fields.
 
         The resulting ``dict`` maps parameter names to their transform targets.
         Four kinds of transforms are recognised:
@@ -504,15 +431,17 @@ class TelegramObject:
             parent = cast("type[TelegramObject]", cls.__mro__[1])
             if "__DE_JSON_PLAN__" not in parent.__dict__:
                 parent._build_plan()  # pylint: disable=protected-access, no-member
+            cls.__INIT_PARAMS = parent.__INIT_PARAMS  # pylint: disable=no-member,protected-access
             cls.__DE_JSON_PLAN__ = parent.__DE_JSON_PLAN__  # pylint: disable=no-member
             cls.__DE_JSON_COMPAT__ = parent.__DE_JSON_COMPAT__  # pylint: disable=no-member
             return cls.__DE_JSON_PLAN__
 
         plan: dict[str, Any] = {}
-        seq_fields: set[str] = set()
+        compatibility_defaults: dict[str, object] = {}
         globalns: dict[str, object] = getattr(init_fn, "__globals__", {})
-        tg_ns = _telegram_ns()
-        sig = inspect.signature(init_fn, eval_str=True, globals=globalns, locals=tg_ns)
+        tg_ns = get_telegram_namespace()
+        sig = inspect.signature(init_fn)
+        cls.__INIT_PARAMS = set(sig.parameters) - {"self"}
 
         for name, param in sig.parameters.items():
             if name in ("self", "api_kwargs") or param.kind in (
@@ -521,9 +450,12 @@ class TelegramObject:
             ):
                 continue
 
-            ann = param.annotation
-            inner = _unwrap_optional(ann)
+            ann = resolve_annotation(param.annotation, globalns, tg_ns)
+            inner = unwrap_optional(ann)
             origin = get_origin(inner)
+
+            if param.default is inspect.Parameter.empty:
+                compatibility_defaults[name] = () if origin is Sequence else None
 
             if inner is dtm.datetime:
                 plan[name] = _DATETIME_FIELD
@@ -533,13 +465,12 @@ class TelegramObject:
                 args = get_args(inner)
                 if not args:
                     continue
-                fn = _make_seq_transform(args[0], globalns, tg_ns)
+                fn = build_sequence_transformer(args[0], globalns, tg_ns, TelegramObject)
                 if fn is not None:
                     plan[name] = fn
-                    seq_fields.add(name)
 
         cls.__DE_JSON_PLAN__ = plan
-        cls.__DE_JSON_COMPAT__ = frozenset(seq_fields)
+        cls.__DE_JSON_COMPAT__ = MappingProxyType(compatibility_defaults)
 
         # Pre-resolve any string class names in the dispatch mapping so that
         # de_json() can look up the target class directly without string checks.
@@ -561,17 +492,11 @@ class TelegramObject:
         # try-except is significantly faster in case we already have a correct argument set
         try:
             obj = cls(**data, api_kwargs=api_kwargs)
-        except TypeError as exc:
-            exc_str = str(exc)
-            if (
-                "unexpected keyword argument" not in exc_str
-                and "required positional argument" not in exc_str
-            ):
+        except TypeError:
+            unknown_field_names = data.keys() - cls.__INIT_PARAMS
+            missing_required_parameter_names = cls.__DE_JSON_COMPAT__.keys() - data.keys()
+            if not unknown_field_names and not missing_required_parameter_names:
                 raise
-
-            if cls.__INIT_PARAMS_CHECK is not cls:
-                cls.__INIT_PARAMS = set(inspect.signature(cls).parameters.keys())
-                cls.__INIT_PARAMS_CHECK = cls
 
             api_kwargs = api_kwargs or {}
             existing_kwargs: JSONDict = {}
@@ -580,9 +505,8 @@ class TelegramObject:
 
             # Forward-compat: if the API stopped sending a field PTB requires,
             # default sequences to () and everything else to None.
-            compat = cls.__dict__.get("__DE_JSON_COMPAT__", frozenset())
-            for key in cls.__INIT_PARAMS - existing_kwargs.keys() - {"self", "api_kwargs"}:
-                existing_kwargs[key] = () if key in compat else None
+            for key in missing_required_parameter_names:
+                existing_kwargs[key] = cls.__DE_JSON_COMPAT__[key]
 
             obj = cls(api_kwargs=api_kwargs, **existing_kwargs)
 
