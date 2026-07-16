@@ -45,6 +45,7 @@ FALLBACKS = (
 )
 
 BOTS = os.getenv("BOTS", None)
+print("BOTS ENCODED: ", BOTS)
 JOB_INDEX = os.getenv("JOB_INDEX", None)
 if GITHUB_ACTIONS and BOTS is not None and JOB_INDEX is not None:
     BOTS = json.loads(base64.b64decode(BOTS).decode(TextEncoding.UTF_8))
