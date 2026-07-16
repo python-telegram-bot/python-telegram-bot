@@ -137,6 +137,21 @@ class TestDeJsonWithoutRequest:
 
         assert [[item.value for item in row] for row in container.rows] == [[1], [2, 3]]
 
+    def test_unparameterized_sequence_is_left_unchanged(self):
+        class Container(TelegramObject):
+            def __init__(
+                self,
+                values: Sequence,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.values = values
+
+        values = [1, 2]
+
+        assert Container.de_json({"values": values}).values is values
+
     def test_none_is_not_deserialized_as_nested_object(self):
         class Container(TelegramObject):
             def __init__(
@@ -195,12 +210,19 @@ class TestDeJsonWithoutRequest:
                 super().__init__(api_kwargs=api_kwargs)
                 self.child = child
 
-        class Child(Parent):
+        class FirstChild(Parent):
             pass
 
-        child = Child.de_json({"child": {"value": 1}})
+        class SecondChild(Parent):
+            pass
 
-        assert isinstance(child.child, _DeJsonTestObject)
+        first_child = FirstChild.de_json({"child": {"value": 1}})
+        second_child = SecondChild.de_json({"child": {"value": 2}})
+
+        assert isinstance(first_child.child, _DeJsonTestObject)
+        assert first_child.child.value == 1
+        assert isinstance(second_child.child, _DeJsonTestObject)
+        assert second_child.child.value == 2
 
     def test_removed_field_is_preserved_in_api_kwargs(self):
         class ObjectWithRemovedField(TelegramObject):
