@@ -225,7 +225,7 @@ class PaidMediaLivePhoto(PaidMedia):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`live_photo` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.LIVE_PHOTO`

@@ -26,6 +26,7 @@ Warning:
     the changelog.
 """
 
+import sys
 from collections import UserDict
 from collections.abc import Mapping
 from typing import Final, Generic, TypeVar
@@ -110,6 +111,13 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
         if isinstance(default, DefaultValue):
             return super().pop(key)
         return super().pop(key, default)
+
+    # Python 3.15 added a popitem() to UserDict, which does LIFO instead of the FIFO behaviour
+    # of MutableMapping.popitem(). So we keep it consistent across versions by overriding here.
+    if sys.version_info >= (3, 15):
+
+        def popitem(self) -> tuple[_KT, _VT]:
+            return super(UserDict, self).popitem()
 
     def clear(self) -> None:
         self.__track_write(set(super().keys()))

@@ -1527,7 +1527,7 @@ class BaseInputMediaType(StringEnum):
     :class:`telegram.InputPollMedia` and :class:`telegram.InputPollOptionMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     __slots__ = ()
@@ -1556,7 +1556,7 @@ class InputMediaType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 22.8
         Use :class:`telegram.constants.BaseInputMediaType` instead.
 
     .. versionadded:: 20.0
@@ -1577,7 +1577,7 @@ class InputMediaType(StringEnum):
     LIVE_PHOTO = "live_photo"
     """:obj:`str`: Type of :class:`telegram.InputMediaLivePhoto`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
 
@@ -1597,7 +1597,7 @@ class InputPaidMediaType(StringEnum):
     LIVE_PHOTO = "live_photo"
     """:obj:`str`: Type of :class:`telegram.InputPaidMediaLivePhoto`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
 
@@ -2014,7 +2014,7 @@ class MessageAttachmentType(StringEnum):
     LIVE_PHOTO = "live_photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
@@ -2401,7 +2401,7 @@ class MessageType(StringEnum):
     LIVE_PHOTO = "live_photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.live_photo`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
@@ -2430,12 +2430,12 @@ class MessageType(StringEnum):
     POLL_OPTION_ADDED = "poll_option_added"
     """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_added`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     POLL_OPTION_DELETED = "poll_option_deleted"
     """:obj:`str`: Messages with :attr:`telegram.Message.poll_option_deleted`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     SUGGESTED_POST_APPROVAL_FAILED = "suggested_post_approval_failed"
     """:obj:`str`: Messages with :attr:`telegram.Message.suggested_post_approval_failed`.
@@ -2627,7 +2627,7 @@ class PaidMediaType(StringEnum):
     LIVE_PHOTO = "live_photo"
     """:obj:`str`: The type of :class:`telegram.PaidMediaLivePhoto`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
 
@@ -2636,7 +2636,7 @@ class PersonalChatMessagesLimit(IntEnum):
     :paramref:`telegram.Bot.get_user_personal_chat_messages.limit`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     __slots__ = ()
@@ -3512,7 +3512,7 @@ class PollLimit(IntEnum):
     to the :paramref:`~telegram.Bot.send_poll.options` parameter of
     :meth:`telegram.Bot.send_poll`.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.8
         Bot API 10.0 decreased this value from ``2`` to ``1``.
     """
     MAX_OPTION_NUMBER = 12
@@ -3545,27 +3545,27 @@ class PollLimit(IntEnum):
     Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
     :meth:`telegram.Bot.send_poll`.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 22.8
         Changed from ``600`` to ``2628000`` since Bot API 9.6.
     """
     MAX_DESCRIPTION_CHARACTERS = 1024
     """:obj:`int`: Maximum value allowed for the
     :paramref:`~telegram.Bot.send_poll.description` parameter of :meth:`telegram.Bot.send_poll`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     MIN_MEMBERSHIP_HOURS = 24
     """:obj:`int`: Minimum number of hours a user must have been a member of the chat
     before they can vote in a members-only poll.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     MAX_COUNTRY_CODES = 12
     """:obj:`int`: Maximum number of two-letter ``ISO 3166-1 alpha-2`` country codes passed in a
     :obj:`list` to the :paramref:`~telegram.Bot.send_poll.country_codes` parameter of
     :meth:`telegram.Bot.send_poll`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
 
@@ -3719,12 +3719,12 @@ class UpdateType(StringEnum):
     MANAGED_BOT = "managed_bot"
     """:obj:`str`: Updates with :attr:`telegram.Update.managed_bot`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
     GUEST_MESSAGE = "guest_message"
     """:obj:`str`: Updates with :attr:`telegram.Update.guest_message`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
 
@@ -4149,7 +4149,7 @@ class ManagedBotAccessLimit(IntEnum):
     """This enum contains limitations for :meth:`~telegram.Bot.set_managed_bot_access_settings`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     __slots__ = ()

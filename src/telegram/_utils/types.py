@@ -91,11 +91,9 @@ HTTPVersion: TypeAlias = Literal["1.1", "2.0", "2"]
 
 .. versionadded:: 20.4"""
 
-CorrectOptionID: TypeAlias = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # pylint: disable=invalid-name
-
 CorrectOptionIds: TypeAlias = Sequence[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]]
 """
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 22.8
 """
 
 MarkdownVersion: TypeAlias = Literal[1, 2]

@@ -496,7 +496,7 @@ class ChatMemberRestricted(ChatMember):
         can_react_to_messages (:obj:`bool`): :obj:`True`, if the user is allowed to react to
             messages.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         tag (:obj:`str`, optional): Tag of the member.
 
             .. versionadded:: 22.7
@@ -557,7 +557,7 @@ class ChatMemberRestricted(ChatMember):
         can_react_to_messages (:obj:`bool`): :obj:`True`, if the user is allowed to react to
             messages.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         tag (:obj:`str`): Optional. Tag of the member.
 
             .. versionadded:: 22.7
@@ -608,17 +608,12 @@ class ChatMemberRestricted(ChatMember):
         can_send_video_notes: bool,
         can_send_voice_notes: bool,
         can_edit_tag: bool,
+        can_react_to_messages: bool,
         tag: str | None = None,
-        # tags: NEXT.VERSION
-        # temporarily optional to make it not breaking
-        can_react_to_messages: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
-
-        if can_react_to_messages is None:
-            raise TypeError("`can_react_to_messages` is required and cannot be None")
 
         with self._unfrozen():
             self.is_member: bool = is_member

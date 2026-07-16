@@ -109,6 +109,7 @@ def cached_type_hints(obj: Any, is_class: bool) -> dict[str, Any]:
 @functools.cache
 def resolve_forward_refs_in_type(obj: type) -> type:
     """Resolves forward references in a type hint."""
+    # TODO: Refactor test_official to properly use annotationlib
     return _eval_type(obj, localns=tg_objects, globalns=None)
 
 

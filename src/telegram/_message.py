@@ -81,7 +81,6 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.strings import TextEncoding
 from telegram._utils.types import (
-    CorrectOptionID,
     CorrectOptionIds,
     JSONDict,
     MarkdownVersion,
@@ -694,46 +693,46 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 22.7
         sender_tag (:obj:`str`, optional): Tag or custom title of the sender of the message; for
-            supergroups only
+            supergroups only.
 
             .. versionadded:: 22.7
         poll_option_added (:class:`telegram.PollOptionAdded`, optional): Service message:
             answer option was added to a poll.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         poll_option_deleted (:class:`telegram.PollOptionDeleted`, optional): Service message:
             answer option was deleted from a poll.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         reply_to_poll_option_id (:obj:`str`, optional): Persistent
             identifier of the specific poll option that is being replied to.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
         managed_bot_created (:class:`telegram.ManagedBotCreated`, optional): Service message: user
             created a bot that will be managed by the current bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         guest_bot_caller_user (:class:`telegram.User`, optional): For a message sent by a guest
             bot, this is the user whose original message triggered the bot's response.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         guest_bot_caller_chat (:class:`telegram.Chat`, optional): For a message sent by a guest
             bot, this is the chat whose original message triggered the bot's response.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         guest_query_id (:obj:`str`, optional): The unique identifier for the guest query. Use this
             identifier with the method :meth:`telegram.Bot.answer_guest_query` to send a response
             message. If non-empty, the message belongs to the chat where the guest bot was
             summoned, which may not coincide with other existing bot chats sharing the same
             identifier.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         live_photo (:class:`telegram.LivePhoto`, optional): Message is a live photo, information
             about the live photo. For backward compatibility, when this field is set, the photo
             field will also be set.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat. In specific instances
@@ -1147,45 +1146,45 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 22.7
         sender_tag (:obj:`str`): Optional. Tag or custom title of the sender of the message; for
-            supergroups only
+            supergroups only.
 
             .. versionadded:: 22.7
         poll_option_added (:class:`telegram.PollOptionAdded`): Optional. Service message:
             answer option was added to a poll.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         poll_option_deleted (:class:`telegram.PollOptionDeleted`): Optional. Service message:
             answer option was deleted from a poll.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         reply_to_poll_option_id (:obj:`str`): Optional. Persistent
             identifier of the specific poll option that is being replied to.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         managed_bot_created (:class:`telegram.ManagedBotCreated`): Optional. Service message: user
             created a bot that will be managed by the current bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         guest_bot_caller_user (:class:`telegram.User`): Optional. For a message sent by a guest
             bot, this is the user whose original message triggered the bot's response.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         guest_bot_caller_chat (:class:`telegram.Chat`): Optional. For a message sent by a guest
             bot, this is the chat whose original message triggered the bot's response.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         guest_query_id (:obj:`str`): Optional. The unique identifier for the guest query. Use this
             identifier with the method :meth:`telegram.Bot.answer_guest_query` to send a response
             message. If non-empty, the message belongs to the chat where the guest bot was
             summoned, which may not coincide with other existing bot chats sharing the same
             identifier.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
         live_photo (:class:`telegram.LivePhoto`): Optional. Message is a live photo, information
             about the live photo. For backward compatibility, when this field is set, the photo
             field will also be set.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 22.8
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -2063,7 +2062,7 @@ class Message(MaybeInaccessibleMessage):
 
         .. versionadded:: 22.6
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.8
             Bot API 10.0 makes the ``text`` argument optional.
 
         Returns:
@@ -2540,7 +2539,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_live_photo`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Keyword Args:
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
@@ -3447,7 +3446,6 @@ class Message(MaybeInaccessibleMessage):
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -3523,7 +3521,6 @@ class Message(MaybeInaccessibleMessage):
             is_anonymous=is_anonymous,
             type=type,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
             allows_revoting=allows_revoting,
             shuffle_options=shuffle_options,
             correct_option_ids=correct_option_ids,
@@ -5184,7 +5181,7 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.delete_message_reaction`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -5220,7 +5217,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.answer_guest_query`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Returns:
             :class:`telegram.SentGuestMessage`: On success, a

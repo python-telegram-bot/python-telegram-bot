@@ -671,7 +671,13 @@ class TestFilters:
         assert not filters.Document.AUDIO.check_update(update)
 
         update.message.document.mime_type = "application/octet-stream"
-        assert filters.Document.EXE.check_update(update)
+        # Python 3.15 changes the "exe" mime type to application/vnd.microsoft.portable-executable
+        if int(platform.python_version_tuple()[1]) <= 14:
+            assert filters.Document.EXE.check_update(update)
+        else:
+            assert not filters.Document.EXE.check_update(update)
+            update.message.document.mime_type = "application/vnd.microsoft.portable-executable"
+            assert filters.Document.EXE.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.DOCX.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)

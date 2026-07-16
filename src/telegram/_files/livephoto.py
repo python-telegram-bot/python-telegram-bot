@@ -37,7 +37,7 @@ class LivePhoto(_BaseMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         file_id	(:obj:`str`): Identifier for the video file which can be used to download or reuse

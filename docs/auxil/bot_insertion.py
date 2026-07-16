@@ -83,6 +83,13 @@ get_updates_read_timeout_addition = [
     "           ``2``.",
 ]
 
+RAISES_BLOCK = [
+    "Raises:",
+    "",
+    "    :class:`telegram.error.TelegramError`",
+    "",
+]
+
 
 def find_insert_pos_for_kwargs(lines: list[str]) -> int:
     """Finds the correct position to insert the keyword arguments and returns the index."""
@@ -90,6 +97,13 @@ def find_insert_pos_for_kwargs(lines: list[str]) -> int:
         if value.startswith("Returns"):
             return idx
     return False
+
+
+def find_insert_pos_for_raises(lines: list[str]) -> int:
+    """Finds the correct position to insert the Raises block and returns the index."""
+    if "Raises:" in lines:
+        return -1  # Don't insert if there's already a Raises block
+    return len(lines)  # Insert at the end if there's no Raises block
 
 
 def check_timeout_and_api_kwargs_presence(obj: object) -> int:

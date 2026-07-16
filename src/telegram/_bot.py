@@ -106,7 +106,6 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.strings import to_camel_case
 from telegram._utils.types import (
     BaseUrl,
-    CorrectOptionID,
     CorrectOptionIds,
     FileInput,
     JSONDict,
@@ -120,7 +119,7 @@ from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -926,13 +925,24 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 instances of this class. If not specified, the raw result of the API call will be
                 returned.
 
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
         Returns:
             The result of the API call. If :paramref:`return_type` is not specified, this is a
             :obj:`dict` or :obj:`bool`, otherwise an instance of :paramref:`return_type` or a
             tuple of :paramref:`return_type`.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         if hasattr(self, endpoint):
             self._warn(
@@ -990,10 +1000,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.User`: A :class:`telegram.User` instance representing that bot if the
             credentials are valid, :obj:`None` otherwise.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         result = await self._post(
             "getMe",
@@ -1194,10 +1200,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "message_id": message_id}
         return await self._post(
@@ -1244,7 +1246,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing. Pass an empty text to show a "Thinking..." placeholder.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 22.8
                     Bot API 10.0 now makes this an optional parameter.
 
             message_thread_id (:obj:`int`, optional): Unique identifier for the target
@@ -1258,10 +1260,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1308,9 +1306,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"chat_id": chat_id, "message_ids": message_ids}
         return await self._post(
@@ -1387,9 +1382,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1458,9 +1450,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
             is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1609,9 +1598,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
 
         """
         data: JSONDict = {
@@ -1785,9 +1771,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
 
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1953,9 +1936,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
 
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -2091,10 +2071,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -2284,10 +2260,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -2456,10 +2428,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -2636,10 +2604,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -2808,10 +2772,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -2961,9 +2921,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             tuple[:class:`telegram.Message`]: An array of the sent Messages.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         if caption and any(
             [
@@ -3146,10 +3103,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         if not ((latitude is not None and longitude is not None) or location):
             raise ValueError(
@@ -3473,10 +3426,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         # The venue parameter is a convenience functionality added by us, so enforcing the
         # mutual exclusivity here is nothing that Telegram would handle anyway
@@ -3631,10 +3580,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         # The contact parameter is a convenience functionality added by us, so enforcing the
         # mutual exclusivity here is nothing that Telegram would handle anyway
@@ -3759,10 +3704,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "game_short_name": game_short_name}
 
@@ -3819,10 +3760,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`:  On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -3999,10 +3936,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         effective_results, next_offset = self._effective_inline_results(
             results=results, next_offset=next_offset, current_offset=current_offset
@@ -4066,9 +3999,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.PreparedInlineMessage`: On success, the prepared message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -4116,10 +4046,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.UserProfilePhotos`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"user_id": user_id, "offset": offset, "limit": limit}
 
@@ -4182,10 +4108,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.File`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         # Try to get the file_id from the object, if it fails, assume it's a string
         with contextlib.suppress(AttributeError):
@@ -4248,10 +4170,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -4296,10 +4214,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "sender_chat_id": sender_chat_id}
 
@@ -4340,10 +4254,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id, "only_if_banned": only_if_banned}
 
@@ -4380,10 +4290,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "sender_chat_id": sender_chat_id}
 
@@ -4443,10 +4349,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "callback_query_id": callback_query_id,
@@ -4626,10 +4528,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited message is returned, otherwise :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -4700,9 +4598,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited Message is returned, otherwise :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "media": media,
@@ -4761,10 +4656,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited message is returned, otherwise :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -4845,10 +4736,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             tuple[:class:`telegram.Update`]
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "timeout": timeout,
@@ -4995,8 +4882,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
 
-        Raises:
-            :class:`telegram.error.TelegramError`
+
 
         .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
@@ -5041,10 +4927,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data = {"drop_pending_updates": drop_pending_updates}
 
@@ -5075,10 +4957,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
 
@@ -5114,10 +4992,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.ChatFullInfo`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
 
@@ -5156,15 +5030,13 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 that are administrators of the chat. By default, bots other than the current bot
                 are omitted.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
 
         Returns:
             tuple[:class:`telegram.ChatMember`]: On success, returns a tuple of ``ChatMember``
-            objects that contains information about all chat administrators.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
+            objects that contains information about all chat administrators except
+            other bots. If the chat is a group or a supergroup and no administrators were
+            appointed, only the creator will be returned.
         """
         data: JSONDict = {"chat_id": chat_id, "return_bots": return_bots}
         result = await self._post(
@@ -5197,10 +5069,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`int`: Number of members in the chat.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
         return await self._post(
@@ -5233,10 +5101,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.ChatMember`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
         result = await self._post(
@@ -5445,10 +5309,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             tuple[:class:`telegram.GameHighScore`]
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -5652,10 +5512,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -5739,10 +5595,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "shipping_query_id": shipping_query_id,
@@ -5796,10 +5648,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "pre_checkout_query_id": pre_checkout_query_id,
@@ -5841,10 +5689,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.SentWebAppMessage`: On success, a sent
             :class:`telegram.SentWebAppMessage` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "web_app_query_id": web_app_query_id,
@@ -5876,7 +5720,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
     ) -> SentGuestMessage:
         """Use this method to reply to a received guest message.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             guest_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -5886,10 +5730,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         Returns:
             :class:`telegram.SentGuestMessage`: On success, a
             :class:`telegram.SentGuestMessage` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "guest_query_id": guest_query_id,
@@ -5957,9 +5797,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -6081,10 +5918,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -6156,10 +5989,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -6201,10 +6030,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id, "custom_title": custom_title}
 
@@ -6245,10 +6070,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`str`: New invite link on success.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
         return await self._post(
@@ -6311,10 +6132,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.ChatInviteLink`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -6388,10 +6205,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.ChatInviteLink`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         link = invite_link.invite_link if isinstance(invite_link, ChatInviteLink) else invite_link
         data: JSONDict = {
@@ -6442,10 +6255,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.ChatInviteLink`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         link = invite_link.invite_link if isinstance(invite_link, ChatInviteLink) else invite_link
         data: JSONDict = {"chat_id": chat_id, "invite_link": link}
@@ -6486,9 +6295,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
 
@@ -6526,9 +6332,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
 
@@ -6572,10 +6375,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "photo": self._parse_file_input(photo)}
         return await self._post(
@@ -6608,10 +6407,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
         return await self._post(
@@ -6648,10 +6443,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "title": title}
         return await self._post(
@@ -6688,10 +6479,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "description": description}
 
@@ -6735,10 +6522,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -6788,10 +6571,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -6841,10 +6620,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -6884,10 +6659,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
         return await self._post(
@@ -6917,10 +6688,6 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         Returns:
             :class:`telegram.StickerSet`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"name": name}
         result = await self._post(
@@ -6960,10 +6727,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             tuple[:class:`telegram.Sticker`]
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"custom_emoji_ids": custom_emoji_ids}
         result = await self._post(
@@ -7016,10 +6779,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.File`: On success, the uploaded File is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -7075,10 +6834,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -7119,10 +6874,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "sticker": sticker if isinstance(sticker, str) else sticker.file_id,
@@ -7207,9 +6958,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -7251,10 +6999,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"sticker": sticker if isinstance(sticker, str) else sticker.file_id}
         return await self._post(
@@ -7287,10 +7031,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"name": name}
         return await self._post(
@@ -7360,10 +7100,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "name": name,
@@ -7406,10 +7142,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"name": name, "title": title}
         return await self._post(
@@ -7452,9 +7184,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "sticker": sticker if isinstance(sticker, str) else sticker.file_id,
@@ -7500,9 +7229,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "sticker": sticker if isinstance(sticker, str) else sticker.file_id,
@@ -7547,9 +7273,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "sticker": sticker if isinstance(sticker, str) else sticker.file_id,
@@ -7589,10 +7312,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"name": name, "custom_emoji_id": custom_emoji_id}
 
@@ -7636,10 +7355,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"user_id": user_id, "errors": errors}
         return await self._post(
@@ -7660,9 +7375,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        # tags: deprecated in NEXT.VERSION, to be removed
-        # replaced by `correct_option_ids`
-        correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -7727,12 +7439,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.REGULAR`, defaults to :tg-const:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): :obj:`True`, if the poll allows
                 multiple answers, defaults to :obj:`False`.
-            correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
-                option, required for polls in quiz mode.
-
-                .. deprecated:: NEXT.VERSION
-                    Bot API 9.6 replaces this with :paramref:`correct_option_ids` instead.
-
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
                 answer or taps on the lamp icon in a quiz-style poll,
                 0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
@@ -7801,44 +7507,44 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 change the chosen answer options, defaults to :obj:`False`
                 for quizzes and to :obj:`True` for regular polls
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             allow_adding_options (:obj:`bool`, optional): :obj:`True`, if answer options can be
                 added to the poll after creation; not supported for anonymous polls and quizzes
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             hide_results_until_closes (:obj:`bool`, optional): :obj:`True`, if poll results
                 must be shown only after the poll closes
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             correct_option_ids (Sequence[:class:`int`], optional): A list of monotonically
                 increasing 0-based identifiers of the correct answer options,
                 required for polls in quiz mode.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description (:obj:`str`, optional): Description of the poll to be sent,
                 0-:tg-const:`telegram.Poll.MAX_DESCRIPTION_CHARACTERS` characters
                 after entities parsing.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description_parse_mode (:obj:`str`, optional): Mode for parsing entities
                 in the poll description. See the constants
                 in :class:`telegram.constants.ParseMode`
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             description_entities (Sequence[:class:`telegram.MessageEntity`], optional): A
                 JSON-serialized list of special entities that appear in the poll description,
                 which can be specified instead of :paramref:`description_parse_mode`
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             shuffle_options (:obj:`bool`, optional): :obj:`True`, if the poll options must be
                 shown in random order
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             members_only (:obj:`bool`, optional): :obj:`True`, if voting is limited to users who
                 have been members of the chat where the poll is being sent for more than
                 :tg-const:`telegram.Poll.MIN_MEMBERSHIP_HOURS` hours; for channel chats only
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             country_codes (Sequence[:obj:`str`], optional): A list of
                 0-:tg-const:`telegram.constants.PollLimit.MAX_COUNTRY_CODES` two-letter
                 ``ISO 3166-1 alpha-2`` country codes indicating the countries from which users can
@@ -7846,15 +7552,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 users with anonymous numbers to vote. If omitted or empty, then users from any
                 country can participate in the poll.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             explanation_media (:class:`telegram.InputPollMedia`, optional): Media added to the quiz
                 explanation
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
             media (:class:`telegram.InputPollMedia`, optional): Media added to the poll
                 description.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 22.8
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7878,23 +7584,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
-
-        if correct_option_id is not None:
-            warn(
-                PTBDeprecationWarning(
-                    version="NEXT.VERSION",
-                    message="Bot API 9.6 deprecated `correct_option_id` in favour of "
-                    "`correct_option_ids`, please use that.",
-                ),
-                stacklevel=2,
-            )
-            if correct_option_ids is None:
-                correct_option_ids = [correct_option_id]
 
         data: JSONDict = {
             "chat_id": chat_id,
@@ -7975,10 +7665,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.Poll`: On success, the stopped Poll is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -8044,10 +7730,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -8102,10 +7784,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -8222,10 +7900,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "emoji": emoji}
 
@@ -8274,9 +7948,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.ChatAdministratorRights`: On success.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"for_channels": for_channels}
 
@@ -8322,9 +7993,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: Returns :obj:`True` on success.
-
-        Raises:
-            :exc:`telegram.error.TelegramError`
         """
         data: JSONDict = {"rights": rights, "for_channels": for_channels}
 
@@ -8372,10 +8040,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns:
             tuple[:class:`telegram.BotCommand`]: On success, the commands set for the bot. An empty
             tuple is returned if commands are not set.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"scope": scope, "language_code": language_code}
 
@@ -8437,10 +8101,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
         data: JSONDict = {"commands": cmds, "scope": scope, "language_code": language_code}
@@ -8486,9 +8146,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"scope": scope, "language_code": language_code}
 
@@ -8520,10 +8177,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`True`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         return await self._post(
             "logOut",
@@ -8551,10 +8204,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`True`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         return await self._post(
             "close",
@@ -8673,10 +8322,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns:
             :class:`telegram.MessageId`: On success, the :class:`telegram.MessageId` of the sent
                 message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         if allow_sending_without_reply is not DEFAULT_NONE and reply_parameters is not None:
             raise ValueError(
@@ -8747,7 +8392,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         found or copied, they are skipped. Service messages, paid media messages, giveaway
         messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can
         be copied only if the value
-        of the field :attr:`telegram.Poll.correct_option_id` is known to the bot. The method is
+        of the field :attr:`telegram.Poll.correct_option_ids` is known to the bot. The method is
         analogous to the method :meth:`forward_messages`, but the copied messages don't have a
         link to the original message. Album grouping is kept for copied messages.
 
@@ -8777,10 +8422,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns:
             tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -9057,10 +8698,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             tuple[:class:`telegram.Sticker`]
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         result = await self._post(
             "getForumTopicIconStickers",
@@ -9110,9 +8747,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.ForumTopic`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -9167,10 +8801,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -9213,10 +8843,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -9257,10 +8883,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -9301,10 +8923,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -9346,10 +8964,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -9388,9 +9002,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"chat_id": chat_id}
 
@@ -9430,10 +9041,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id, "name": name}
 
@@ -9469,10 +9076,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
 
@@ -9509,10 +9112,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
 
@@ -9549,10 +9148,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
 
@@ -9588,10 +9183,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"chat_id": chat_id}
 
@@ -9633,10 +9224,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"description": description, "language_code": language_code}
 
@@ -9678,10 +9265,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"short_description": short_description, "language_code": language_code}
 
@@ -9714,10 +9297,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.BotDescription`: On success, the bot description is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data = {"language_code": language_code}
         return BotDescription.de_json(
@@ -9753,10 +9332,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns:
             :class:`telegram.BotShortDescription`: On success, the bot short description is
                 returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data = {"language_code": language_code}
         return BotShortDescription.de_json(
@@ -9803,10 +9378,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {"name": name, "language_code": language_code}
 
@@ -9839,10 +9410,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.BotName`: On success, the bot name is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data = {"language_code": language_code}
         return BotName.de_json(
@@ -9882,9 +9449,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns:
             :class:`telegram.UserChatBoosts`: On success, the object containing the list of boosts
                 is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
         return UserChatBoosts.de_json(
@@ -9945,9 +9509,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         allowed_reactions: set[str] = set(ReactionEmoji)
         parsed_reaction = (
@@ -10041,9 +9602,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -10084,9 +9642,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns:
             :class:`telegram.BusinessConnection`: On success, the object containing the business
                 connection information is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"business_connection_id": business_connection_id}
         return BusinessConnection.de_json(
@@ -10167,9 +9722,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.OwnedGifts`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10218,9 +9770,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
             :class:`telegram.StarAmount`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"business_connection_id": business_connection_id}
         return StarAmount.de_json(
@@ -10265,9 +9814,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10315,9 +9861,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10397,9 +9940,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :class:`Story`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10477,9 +10017,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :class:`Story`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10525,9 +10062,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10572,9 +10106,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10615,9 +10146,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10657,9 +10185,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10704,9 +10229,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10751,10 +10273,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10798,9 +10316,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10841,9 +10356,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10896,9 +10408,6 @@ MAX_UNIQUE_GIFT_AREAS` of :class:`telegram.StoryAreaTypeUniqueGift`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10953,9 +10462,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -10999,9 +10505,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -11050,9 +10553,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -11092,10 +10592,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -11136,9 +10632,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.StarTransactions`: On success.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {"offset": offset, "limit": limit}
@@ -11184,9 +10677,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -11216,7 +10706,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to get the access settings of a managed bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose access settings will be
@@ -11224,9 +10714,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.BotAccessSettings`: The access settings of the managed bot.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {
@@ -11261,7 +10748,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to change the access settings of a managed bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose access settings will be
@@ -11275,9 +10762,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {
@@ -11311,7 +10795,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Use this method to get the last messages from the personal chat (i.e., the chat currently
         added to their profile) of a given user.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.
@@ -11322,9 +10806,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Returns:
             tuple[:class:`telegram.Message`, ...]: On success, a tuple of
             :class:`telegram.Message` objects is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {"user_id": user_id, "limit": limit}
@@ -11429,9 +10910,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {
@@ -11506,10 +10984,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.ChatInviteLink`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -11559,10 +11033,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.ChatInviteLink`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         link = invite_link.invite_link if isinstance(invite_link, ChatInviteLink) else invite_link
         data: JSONDict = {
@@ -11599,9 +11069,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.Gifts`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         return Gifts.de_json(
             await self._post(
@@ -11674,9 +11141,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -11721,9 +11185,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -11763,9 +11224,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -11801,9 +11259,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -11838,9 +11293,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -11870,9 +11322,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.StarAmount`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         return StarAmount.de_json(
             await self._post(
@@ -11917,9 +11366,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -11964,9 +11410,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -12026,9 +11469,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.Story`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "business_connection_id": business_connection_id,
@@ -12097,9 +11537,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.OwnedGifts`: The owned gifts for the user.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -12180,9 +11617,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.OwnedGifts`: The owned gifts for the chat.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data: JSONDict = {
@@ -12230,10 +11664,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "photo": photo,
@@ -12264,10 +11694,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
 
         return await self._post(
@@ -12307,9 +11733,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.UserProfileAudios`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
 
         data = {
@@ -12358,9 +11781,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -12391,16 +11811,13 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to get the token of a managed bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose token will be returned.
 
         Returns:
             :obj:`str`: The token of the managed bot.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -12429,16 +11846,13 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Use this method to revoke the current token of a managed bot and generate a new one.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): User identifier of the managed bot whose token will be replaced.
 
         Returns:
             :obj:`str`: The new token of the managed bot.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -12468,7 +11882,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         """
         Stores a keyboard button that can be used by a user within a Mini App.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user that can use the button.
@@ -12480,9 +11894,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :class:`telegram.PreparedKeyboardButton`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
@@ -12537,7 +11948,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -12600,9 +12011,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
 
-        Raises:
-            :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -12655,7 +12063,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         The bot must have the :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
         administrator right in the chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
@@ -12666,9 +12074,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                 removed, if the reaction were added by a chat.
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,
@@ -12705,7 +12110,7 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
         :attr:`~telegram.ChatMemberAdministrator.can_delete_messages` administrator right in the
         chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 22.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
@@ -12716,9 +12121,6 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "chat_id": chat_id,

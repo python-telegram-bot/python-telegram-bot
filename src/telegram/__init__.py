@@ -343,19 +343,7 @@ __all__ = (
     "warnings",
 )
 
-from telegram._inputchecklist import InputChecklist, InputChecklistTask
-from telegram._payment.stars.staramount import StarAmount
-from telegram._payment.stars.startransactions import StarTransaction, StarTransactions
-from telegram._payment.stars.transactionpartner import (
-    TransactionPartner,
-    TransactionPartnerAffiliateProgram,
-    TransactionPartnerChat,
-    TransactionPartnerFragment,
-    TransactionPartnerOther,
-    TransactionPartnerTelegramAds,
-    TransactionPartnerTelegramApi,
-    TransactionPartnerUser,
-)
+__lazy_modules__: list[str] = ["constants", "error", "helpers", "request", "warnings"]
 
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
@@ -431,11 +419,6 @@ from ._copytextbutton import CopyTextButton
 from ._dice import Dice
 from ._directmessagepricechanged import DirectMessagePriceChanged
 from ._directmessagestopic import DirectMessagesTopic
-from ._files._inputstorycontent import (
-    InputStoryContent,
-    InputStoryContentPhoto,
-    InputStoryContentVideo,
-)
 from ._files.animation import Animation
 from ._files.audio import Audio
 from ._files.chatphoto import ChatPhoto
@@ -467,6 +450,11 @@ from ._files.inputprofilephoto import (
     InputProfilePhotoStatic,
 )
 from ._files.inputsticker import InputSticker
+from ._files.inputstorycontent import (
+    InputStoryContent,
+    InputStoryContentPhoto,
+    InputStoryContentVideo,
+)
 from ._files.livephoto import LivePhoto
 from ._files.location import Location
 from ._files.photosize import PhotoSize
@@ -523,6 +511,7 @@ from ._inline.inputmessagecontent import InputMessageContent
 from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._inline.preparedinlinemessage import PreparedInlineMessage
+from ._inputchecklist import InputChecklist, InputChecklistTask
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._keyboardbuttonrequest import (
@@ -595,6 +584,18 @@ from ._payment.stars.revenuewithdrawalstate import (
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
     RevenueWithdrawalStateSucceeded,
+)
+from ._payment.stars.staramount import StarAmount
+from ._payment.stars.startransactions import StarTransaction, StarTransactions
+from ._payment.stars.transactionpartner import (
+    TransactionPartner,
+    TransactionPartnerAffiliateProgram,
+    TransactionPartnerChat,
+    TransactionPartnerFragment,
+    TransactionPartnerOther,
+    TransactionPartnerTelegramAds,
+    TransactionPartnerTelegramApi,
+    TransactionPartnerUser,
 )
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import (

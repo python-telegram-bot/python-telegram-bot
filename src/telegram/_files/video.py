@@ -101,7 +101,7 @@ class Video(_BaseThumbedMedium):
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        qualities (Sequence[:class:`telegram.VideoQuality`]): Optional. List of available qualities
+        qualities (tuple[:class:`telegram.VideoQuality`]): Optional. List of available qualities
             of the video
 
             .. versionadded:: 22.7

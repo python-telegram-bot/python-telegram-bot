@@ -274,7 +274,7 @@ class BaseFilter:
             :attr:`~telegram.Update.business_message`
             or :attr:`~telegram.Update.edited_business_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 22.8
             This filter now also returns :obj:`True` if the update contains
             :attr:`~telegram.Update.guest_message`.
 
@@ -1668,7 +1668,7 @@ class _LivePhoto(MessageFilter):
 LIVE_PHOTO = _LivePhoto(name="filters.LIVE_PHOTO")
 """Messages that contain :attr:`telegram.Message.live_photo`.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 22.8
 """
 
 
@@ -2374,7 +2374,7 @@ class StatusUpdate:
 
     POLL_OPTION_ADDED = _PollOptionAdded(name="filters.StatusUpdate.POLL_OPTION_ADDED")
     """Messages that contain :attr:`telegram.Message.poll_option_added`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     class _PollOptionDeleted(MessageFilter):
@@ -2385,7 +2385,7 @@ class StatusUpdate:
 
     POLL_OPTION_DELETED = _PollOptionDeleted(name="filters.StatusUpdate.POLL_OPTION_DELETED")
     """Messages that contain :attr:`telegram.Message.poll_option_deleted`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
     class _ProximityAlertTriggered(MessageFilter):
@@ -2924,7 +2924,7 @@ class UpdateType:
     GUEST_MESSAGE = _GuestMessage(name="filters.UpdateType.GUEST_MESSAGE")
     """Updates with :attr:`telegram.Update.guest_message`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
     """
 
 

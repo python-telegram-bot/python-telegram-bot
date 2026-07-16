@@ -28,7 +28,7 @@ class SentGuestMessage(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`inline_message_id` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 22.8
 
     Args:
         inline_message_id (:obj:`str`): Identifier of the sent inline message.
