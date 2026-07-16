@@ -97,6 +97,11 @@ class TestInputTextMessageContentWithoutRequest(InputTextMessageContentTestBase)
             InputTextMessageContent(
                 "text", disable_web_page_preview=True, link_preview_options=LinkPreviewOptions()
             )
+        # disable_web_page_preview=False is also an explicit value and must conflict
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
+            InputTextMessageContent(
+                "text", disable_web_page_preview=False, link_preview_options=LinkPreviewOptions()
+            )
 
     def test_disable_web_page_preview_deprecation(self):
         itmc = InputTextMessageContent("text", disable_web_page_preview=True)

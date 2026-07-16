@@ -325,6 +325,16 @@ class TestBotWithoutRequest:
         offline_bot = Bot(token="some_token", base_file_url="")
         assert repr(offline_bot) == "Bot[token=some_token]"
 
+    async def test_pytest_bot_repr_hides_token(self):
+        token = "12345:secret-token"
+        pytest_bot = PytestBot(token=token, base_file_url="")
+        pytest_ext_bot = PytestExtBot(token=token, base_file_url="")
+
+        assert repr(pytest_bot) == "PytestBot[token=<redacted>]"
+        assert repr(pytest_ext_bot) == "PytestExtBot[token=<redacted>]"
+        assert token not in repr(pytest_bot)
+        assert token not in repr(pytest_ext_bot)
+
     async def test_to_dict(self, offline_bot):
         to_dict_bot = offline_bot.to_dict()
 
