@@ -106,7 +106,6 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.strings import to_camel_case
 from telegram._utils.types import (
     BaseUrl,
-    CorrectOptionID,
     CorrectOptionIds,
     FileInput,
     JSONDict,
@@ -120,7 +119,7 @@ from telegram.error import EndPointNotFound, InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -7376,9 +7375,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        # tags: deprecated in 22.8, to be removed
-        # replaced by `correct_option_ids`
-        correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -7443,12 +7439,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.REGULAR`, defaults to :tg-const:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): :obj:`True`, if the poll allows
                 multiple answers, defaults to :obj:`False`.
-            correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
-                option, required for polls in quiz mode.
-
-                .. deprecated:: 22.8
-                    Bot API 9.6 replaces this with :paramref:`correct_option_ids` instead.
-
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
                 answer or taps on the lamp icon in a quiz-style poll,
                 0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
@@ -7595,18 +7585,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
         """
-
-        if correct_option_id is not None:
-            warn(
-                PTBDeprecationWarning(
-                    version="22.8",
-                    message="Bot API 9.6 deprecated `correct_option_id` in favour of "
-                    "`correct_option_ids`, please use that.",
-                ),
-                stacklevel=2,
-            )
-            if correct_option_ids is None:
-                correct_option_ids = [correct_option_id]
 
         data: JSONDict = {
             "chat_id": chat_id,
@@ -8414,7 +8392,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         found or copied, they are skipped. Service messages, paid media messages, giveaway
         messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can
         be copied only if the value
-        of the field :attr:`telegram.Poll.correct_option_id` is known to the bot. The method is
+        of the field :attr:`telegram.Poll.correct_option_ids` is known to the bot. The method is
         analogous to the method :meth:`forward_messages`, but the copied messages don't have a
         link to the original message. Album grouping is kept for copied messages.
 
