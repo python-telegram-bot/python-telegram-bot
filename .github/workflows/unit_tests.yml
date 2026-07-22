@@ -1,12 +1,14 @@
 name: Unit Tests
 on:
-  pull_request:
+  pull_request:  # Runs on the PR merge commit, has no access to repo secrets for forks
     types: [synchronize, reopened, ready_for_review]
     paths:
       - src/telegram/**
       - tests/**
       - .github/workflows/unit_tests.yml
       - pyproject.toml
+  pull_request_target:  # Runs on base branch, has access to repo secrets for forks
+    types: [labeled]
   push:
     branches:
       - master
@@ -15,6 +17,18 @@ permissions: {}
 
 jobs:
   pytest:
+    # Only run on repo pushes, and on PR's labeled `contrib: safe for tests`.
+    if: >-
+        github.event_name == 'push' ||
+        (
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        ) ||
+        (
+          github.event_name == 'pull_request_target' &&
+          github.event.label.name == 'contrib: safe for tests' &&
+          github.event.pull_request.head.repo.full_name != github.repository
+        )
     name: pytest
     runs-on: ${{matrix.os}}
     strategy:
@@ -28,6 +42,14 @@ jobs:
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          repository: >-
+            ${{ github.event_name == 'pull_request_target'
+                && github.event.pull_request.head.repo.full_name
+                || github.repository }}
+          ref: >-
+            ${{ github.event_name == 'pull_request_target'
+                && github.event.pull_request.head.sha
+                || github.sha }}
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
