@@ -1,4 +1,4 @@
-internal = "Workflow contrib"
+internal = "Run test workflow on contrib PR with many labels"
 [[pull_requests]]
 uid = "5303"
 author_uids = ["harshil21"]
