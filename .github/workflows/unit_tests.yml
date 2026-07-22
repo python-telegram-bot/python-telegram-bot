@@ -17,7 +17,7 @@ permissions: {}
 
 jobs:
   pytest:
-    # Only run on repo pushes, and on PR's labeled `contrib: safe for tests`.
+    # Only run on repo pushes, and on PRs carrying the `contrib: safe for tests` label.
     if: >-
         github.event_name == 'push' ||
         (
@@ -26,7 +26,7 @@ jobs:
         ) ||
         (
           github.event_name == 'pull_request_target' &&
-          github.event.label.name == 'contrib: safe for tests' &&
+          contains(github.event.pull_request.labels.*.name, 'contrib: safe for tests') &&
           github.event.pull_request.head.repo.full_name != github.repository
         )
     name: pytest
