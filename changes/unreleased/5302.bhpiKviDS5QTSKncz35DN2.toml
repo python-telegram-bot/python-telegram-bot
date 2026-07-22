@@ -1,0 +1,5 @@
+internal = "Use PR label to pass repo secrets to contributor forks"
+[[pull_requests]]
+uid = "5302"
+author_uids = ["harshil21"]
+closes_threads = []
