@@ -77,55 +77,57 @@ class StickerTestBase:
 
 
 class TestStickerWithoutRequest(StickerTestBase):
-    def test_slot_behaviour(self, sticker):
-        for attr in sticker.__slots__:
-            assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(sticker)) == len(set(mro_slots(sticker))), "duplicate slot"
+    def test_slot_behaviour(self, offline_sticker):
+        for attr in offline_sticker.__slots__:
+            assert getattr(offline_sticker, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_sticker)) == len(set(mro_slots(offline_sticker))), (
+            "duplicate slot"
+        )
 
-    def test_creation(self, sticker):
+    def test_creation(self, offline_sticker):
         # Make sure file has been uploaded.
-        assert isinstance(sticker, Sticker)
-        assert isinstance(sticker.file_id, str)
-        assert isinstance(sticker.file_unique_id, str)
-        assert sticker.file_id
-        assert sticker.file_unique_id
-        assert isinstance(sticker.thumbnail, PhotoSize)
-        assert isinstance(sticker.thumbnail.file_id, str)
-        assert isinstance(sticker.thumbnail.file_unique_id, str)
-        assert sticker.thumbnail.file_id
-        assert sticker.thumbnail.file_unique_id
-        assert isinstance(sticker.needs_repainting, bool)
+        assert isinstance(offline_sticker, Sticker)
+        assert isinstance(offline_sticker.file_id, str)
+        assert isinstance(offline_sticker.file_unique_id, str)
+        assert offline_sticker.file_id
+        assert offline_sticker.file_unique_id
+        assert isinstance(offline_sticker.thumbnail, PhotoSize)
+        assert isinstance(offline_sticker.thumbnail.file_id, str)
+        assert isinstance(offline_sticker.thumbnail.file_unique_id, str)
+        assert offline_sticker.thumbnail.file_id
+        assert offline_sticker.thumbnail.file_unique_id
+        assert isinstance(offline_sticker.needs_repainting, bool)
 
-    def test_expected_values(self, sticker):
-        assert sticker.width == self.width
-        assert sticker.height == self.height
-        assert sticker.is_animated == self.is_animated
-        assert sticker.is_video == self.is_video
-        assert sticker.file_size == self.file_size
-        assert sticker.thumbnail.width == self.thumb_width
-        assert sticker.thumbnail.height == self.thumb_height
-        assert sticker.thumbnail.file_size == self.thumb_file_size
-        assert sticker.type == self.type
-        assert sticker.needs_repainting == self.needs_repainting
+    def test_expected_values(self, offline_sticker):
+        assert offline_sticker.width == self.width
+        assert offline_sticker.height == self.height
+        assert offline_sticker.is_animated == self.is_animated
+        assert offline_sticker.is_video == self.is_video
+        assert offline_sticker.file_size == self.file_size
+        assert offline_sticker.thumbnail.width == self.thumb_width
+        assert offline_sticker.thumbnail.height == self.thumb_height
+        assert offline_sticker.thumbnail.file_size == self.thumb_file_size
+        assert offline_sticker.type == self.type
+        assert offline_sticker.needs_repainting == self.needs_repainting
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
 
-    def test_to_dict(self, sticker):
-        sticker_dict = sticker.to_dict()
+    def test_to_dict(self, offline_sticker):
+        sticker_dict = offline_sticker.to_dict()
 
         assert isinstance(sticker_dict, dict)
-        assert sticker_dict["file_id"] == sticker.file_id
-        assert sticker_dict["file_unique_id"] == sticker.file_unique_id
-        assert sticker_dict["width"] == sticker.width
-        assert sticker_dict["height"] == sticker.height
-        assert sticker_dict["is_animated"] == sticker.is_animated
-        assert sticker_dict["is_video"] == sticker.is_video
-        assert sticker_dict["file_size"] == sticker.file_size
-        assert sticker_dict["thumbnail"] == sticker.thumbnail.to_dict()
-        assert sticker_dict["type"] == sticker.type
-        assert sticker_dict["needs_repainting"] == sticker.needs_repainting
+        assert sticker_dict["file_id"] == offline_sticker.file_id
+        assert sticker_dict["file_unique_id"] == offline_sticker.file_unique_id
+        assert sticker_dict["width"] == offline_sticker.width
+        assert sticker_dict["height"] == offline_sticker.height
+        assert sticker_dict["is_animated"] == offline_sticker.is_animated
+        assert sticker_dict["is_video"] == offline_sticker.is_video
+        assert sticker_dict["file_size"] == offline_sticker.file_size
+        assert sticker_dict["thumbnail"] == offline_sticker.thumbnail.to_dict()
+        assert sticker_dict["type"] == offline_sticker.type
+        assert sticker_dict["needs_repainting"] == offline_sticker.needs_repainting
 
-    def test_de_json(self, offline_bot, sticker):
+    def test_de_json(self, offline_bot, offline_sticker):
         json_dict = {
             "file_id": self.sticker_file_id,
             "file_unique_id": self.sticker_file_unique_id,
@@ -133,7 +135,7 @@ class TestStickerWithoutRequest(StickerTestBase):
             "height": self.height,
             "is_animated": self.is_animated,
             "is_video": self.is_video,
-            "thumbnail": sticker.thumbnail.to_dict(),
+            "thumbnail": offline_sticker.thumbnail.to_dict(),
             "emoji": self.emoji,
             "file_size": self.file_size,
             "premium_animation": self.premium_animation.to_dict(),
@@ -152,7 +154,7 @@ class TestStickerWithoutRequest(StickerTestBase):
         assert json_sticker.is_video == self.is_video
         assert json_sticker.emoji == self.emoji
         assert json_sticker.file_size == self.file_size
-        assert json_sticker.thumbnail == sticker.thumbnail
+        assert json_sticker.thumbnail == offline_sticker.thumbnail
         assert json_sticker.premium_animation == self.premium_animation
         assert json_sticker.type == self.type
         assert json_sticker.custom_emoji_id == self.custom_emoji_id
@@ -186,10 +188,10 @@ class TestStickerWithoutRequest(StickerTestBase):
             == "unknown"
         )
 
-    def test_equality(self, sticker):
+    def test_equality(self, offline_sticker):
         a = Sticker(
-            sticker.file_id,
-            sticker.file_unique_id,
+            offline_sticker.file_id,
+            offline_sticker.file_unique_id,
             self.width,
             self.height,
             self.is_animated,
@@ -198,7 +200,7 @@ class TestStickerWithoutRequest(StickerTestBase):
         )
         b = Sticker(
             "",
-            sticker.file_unique_id,
+            offline_sticker.file_unique_id,
             self.width,
             self.height,
             self.is_animated,
@@ -206,8 +208,8 @@ class TestStickerWithoutRequest(StickerTestBase):
             self.type,
         )
         c = Sticker(
-            sticker.file_id,
-            sticker.file_unique_id,
+            offline_sticker.file_id,
+            offline_sticker.file_unique_id,
             0,
             0,
             False,
@@ -224,8 +226,8 @@ class TestStickerWithoutRequest(StickerTestBase):
             self.type,
         )
         e = PhotoSize(
-            sticker.file_id,
-            sticker.file_unique_id,
+            offline_sticker.file_id,
+            offline_sticker.file_unique_id,
             self.width,
             self.height,
             self.is_animated,
@@ -248,12 +250,12 @@ class TestStickerWithoutRequest(StickerTestBase):
         with pytest.raises(TypeError):
             await offline_bot.send_sticker(chat_id)
 
-    async def test_send_with_sticker(self, monkeypatch, offline_bot, chat_id, sticker):
+    async def test_send_with_sticker(self, monkeypatch, offline_bot, chat_id, offline_sticker):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["sticker"] == sticker.file_id
+            return request_data.json_parameters["sticker"] == offline_sticker.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.send_sticker(sticker=sticker, chat_id=chat_id)
+        assert await offline_bot.send_sticker(sticker=offline_sticker, chat_id=chat_id)
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_sticker_local_files(
@@ -290,7 +292,7 @@ class TestStickerWithoutRequest(StickerTestBase):
         indirect=["default_bot"],
     )
     async def test_send_sticker_default_quote_parse_mode(
-        self, default_bot, chat_id, sticker, custom, monkeypatch
+        self, default_bot, chat_id, offline_sticker, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -304,7 +306,7 @@ class TestStickerWithoutRequest(StickerTestBase):
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.send_sticker(
-            chat_id, sticker, reply_parameters=ReplyParameters(**kwargs)
+            chat_id, offline_sticker, reply_parameters=ReplyParameters(**kwargs)
         )
 
 
@@ -503,13 +505,13 @@ class TestStickerSetWithoutRequest(StickerSetTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, sticker):
+    def test_de_json(self, offline_bot, offline_sticker):
         name = f"test_by_{offline_bot.username}"
         json_dict = {
             "name": name,
             "title": self.title,
             "stickers": [x.to_dict() for x in self.stickers],
-            "thumbnail": sticker.thumbnail.to_dict(),
+            "thumbnail": offline_sticker.thumbnail.to_dict(),
             "sticker_type": self.sticker_type,
             "contains_masks": self.contains_masks,
         }
@@ -518,7 +520,7 @@ class TestStickerSetWithoutRequest(StickerSetTestBase):
         assert sticker_set.name == name
         assert sticker_set.title == self.title
         assert sticker_set.stickers == tuple(self.stickers)
-        assert sticker_set.thumbnail == sticker.thumbnail
+        assert sticker_set.thumbnail == offline_sticker.thumbnail
         assert sticker_set.sticker_type == self.sticker_type
         assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}
 
@@ -700,64 +702,76 @@ class TestStickerSetWithoutRequest(StickerSetTestBase):
         finally:
             offline_bot._local_mode = False
 
-    async def test_get_file_instance_method(self, monkeypatch, sticker):
+    async def test_get_file_instance_method(self, monkeypatch, offline_sticker):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == sticker.file_id
+            return kwargs["file_id"] == offline_sticker.file_id
 
         assert check_shortcut_signature(Sticker.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(sticker.get_file, sticker.get_bot(), "get_file")
-        assert await check_defaults_handling(sticker.get_file, sticker.get_bot())
+        assert await check_shortcut_call(
+            offline_sticker.get_file, offline_sticker.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(offline_sticker.get_file, offline_sticker.get_bot())
 
-        monkeypatch.setattr(sticker.get_bot(), "get_file", make_assertion)
-        assert await sticker.get_file()
+        monkeypatch.setattr(offline_sticker.get_bot(), "get_file", make_assertion)
+        assert await offline_sticker.get_file()
 
-    async def test_delete_sticker_from_set_sticker_input(self, offline_bot, sticker, monkeypatch):
+    async def test_delete_sticker_from_set_sticker_input(
+        self, offline_bot, offline_sticker, monkeypatch
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["sticker"] == sticker.file_id
+            return request_data.json_parameters["sticker"] == offline_sticker.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.delete_sticker_from_set(sticker)
+        assert await offline_bot.delete_sticker_from_set(offline_sticker)
 
-    async def test_replace_sticker_in_set_sticker_input(self, offline_bot, sticker, monkeypatch):
+    async def test_replace_sticker_in_set_sticker_input(
+        self, offline_bot, offline_sticker, monkeypatch
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["old_sticker"] == sticker.file_id
+            return request_data.json_parameters["old_sticker"] == offline_sticker.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
         assert await offline_bot.replace_sticker_in_set(
-            user_id=1, name="name", sticker="sticker", old_sticker=sticker
+            user_id=1, name="name", sticker="sticker", old_sticker=offline_sticker
         )
 
-    async def test_set_sticker_emoji_list_sticker_input(self, offline_bot, sticker, monkeypatch):
+    async def test_set_sticker_emoji_list_sticker_input(
+        self, offline_bot, offline_sticker, monkeypatch
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["sticker"] == sticker.file_id
+            return request_data.json_parameters["sticker"] == offline_sticker.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.set_sticker_emoji_list(sticker, ["emoji"])
+        assert await offline_bot.set_sticker_emoji_list(offline_sticker, ["emoji"])
 
     async def test_set_sticker_mask_position_sticker_input(
-        self, offline_bot, sticker, monkeypatch
+        self, offline_bot, offline_sticker, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["sticker"] == sticker.file_id
+            return request_data.json_parameters["sticker"] == offline_sticker.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.set_sticker_mask_position(sticker, MaskPosition("eyes", 1, 2, 3))
+        assert await offline_bot.set_sticker_mask_position(
+            offline_sticker, MaskPosition("eyes", 1, 2, 3)
+        )
 
     async def test_set_sticker_position_in_set_sticker_input(
-        self, offline_bot, sticker, monkeypatch
+        self, offline_bot, offline_sticker, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["sticker"] == sticker.file_id
+            return request_data.json_parameters["sticker"] == offline_sticker.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.set_sticker_position_in_set(sticker, 1)
+        assert await offline_bot.set_sticker_position_in_set(offline_sticker, 1)
 
-    async def test_set_sticker_keywords_sticker_input(self, offline_bot, sticker, monkeypatch):
+    async def test_set_sticker_keywords_sticker_input(
+        self, offline_bot, offline_sticker, monkeypatch
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["sticker"] == sticker.file_id
+            return request_data.json_parameters["sticker"] == offline_sticker.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.set_sticker_keywords(sticker, ["keyword"])
+        assert await offline_bot.set_sticker_keywords(offline_sticker, ["keyword"])
 
 
 class TestStickerSetWithRequest:

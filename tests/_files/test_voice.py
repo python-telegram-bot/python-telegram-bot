@@ -46,6 +46,19 @@ def voice_file():
 
 
 @pytest.fixture(scope="module")
+def offline_voice(offline_bot):
+    value = Voice(
+        file_id=VoiceTestBase.voice_file_id,
+        file_unique_id=VoiceTestBase.voice_file_unique_id,
+        duration=VoiceTestBase.duration,
+        mime_type=VoiceTestBase.mime_type,
+        file_size=VoiceTestBase.file_size,
+    )
+    value.set_bot(offline_bot)
+    return value
+
+
+@pytest.fixture(scope="module")
 async def voice(bot, chat_id):
     with data_file("telegram.ogg").open("rb") as f:
         return (await bot.send_voice(chat_id, voice=f, read_timeout=50)).voice
@@ -62,23 +75,25 @@ class VoiceTestBase:
 
 
 class TestVoiceWithoutRequest(VoiceTestBase):
-    def test_slot_behaviour(self, voice):
-        for attr in voice.__slots__:
-            assert getattr(voice, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(voice)) == len(set(mro_slots(voice))), "duplicate slot"
+    def test_slot_behaviour(self, offline_voice):
+        for attr in offline_voice.__slots__:
+            assert getattr(offline_voice, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_voice)) == len(set(mro_slots(offline_voice))), (
+            "duplicate slot"
+        )
 
-    async def test_creation(self, voice):
+    async def test_creation(self, offline_voice):
         # Make sure file has been uploaded.
-        assert isinstance(voice, Voice)
-        assert isinstance(voice.file_id, str)
-        assert isinstance(voice.file_unique_id, str)
-        assert voice.file_id
-        assert voice.file_unique_id
+        assert isinstance(offline_voice, Voice)
+        assert isinstance(offline_voice.file_id, str)
+        assert isinstance(offline_voice.file_unique_id, str)
+        assert offline_voice.file_id
+        assert offline_voice.file_unique_id
 
-    def test_expected_values(self, voice):
-        assert voice._duration == self.duration
-        assert voice.mime_type == self.mime_type
-        assert voice.file_size == self.file_size
+    def test_expected_values(self, offline_voice):
+        assert offline_voice._duration == self.duration
+        assert offline_voice.mime_type == self.mime_type
+        assert offline_voice.file_size == self.file_size
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -97,27 +112,27 @@ class TestVoiceWithoutRequest(VoiceTestBase):
         assert json_voice.mime_type == self.mime_type
         assert json_voice.file_size == self.file_size
 
-    def test_to_dict(self, voice):
-        voice_dict = voice.to_dict()
+    def test_to_dict(self, offline_voice):
+        voice_dict = offline_voice.to_dict()
 
         assert isinstance(voice_dict, dict)
-        assert voice_dict["file_id"] == voice.file_id
-        assert voice_dict["file_unique_id"] == voice.file_unique_id
+        assert voice_dict["file_id"] == offline_voice.file_id
+        assert voice_dict["file_unique_id"] == offline_voice.file_unique_id
         assert voice_dict["duration"] == int(self.duration.total_seconds())
         assert isinstance(voice_dict["duration"], int)
-        assert voice_dict["mime_type"] == voice.mime_type
-        assert voice_dict["file_size"] == voice.file_size
+        assert voice_dict["mime_type"] == offline_voice.mime_type
+        assert voice_dict["file_size"] == offline_voice.file_size
 
-    def test_time_period_properties(self, PTB_TIMEDELTA, voice):
+    def test_time_period_properties(self, PTB_TIMEDELTA, offline_voice):
         if PTB_TIMEDELTA:
-            assert voice.duration == self.duration
-            assert isinstance(voice.duration, dtm.timedelta)
+            assert offline_voice.duration == self.duration
+            assert isinstance(offline_voice.duration, dtm.timedelta)
         else:
-            assert voice.duration == int(self.duration.total_seconds())
-            assert isinstance(voice.duration, int)
+            assert offline_voice.duration == int(self.duration.total_seconds())
+            assert isinstance(offline_voice.duration, int)
 
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, voice):
-        voice.duration
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, offline_voice):
+        offline_voice.duration
 
         if PTB_TIMEDELTA:
             assert len(recwarn) == 0
@@ -126,12 +141,12 @@ class TestVoiceWithoutRequest(VoiceTestBase):
             assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
-    def test_equality(self, voice):
-        a = Voice(voice.file_id, voice.file_unique_id, self.duration)
-        b = Voice("", voice.file_unique_id, self.duration)
-        c = Voice(voice.file_id, voice.file_unique_id, 0)
+    def test_equality(self, offline_voice):
+        a = Voice(offline_voice.file_id, offline_voice.file_unique_id, self.duration)
+        b = Voice("", offline_voice.file_unique_id, self.duration)
+        c = Voice(offline_voice.file_id, offline_voice.file_unique_id, 0)
         d = Voice("", "", self.duration)
-        e = Audio(voice.file_id, voice.file_unique_id, self.duration)
+        e = Audio(offline_voice.file_id, offline_voice.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -158,12 +173,12 @@ class TestVoiceWithoutRequest(VoiceTestBase):
 
         assert await offline_bot.send_voice(chat_id, voice_file, filename="custom_filename")
 
-    async def test_send_with_voice(self, monkeypatch, offline_bot, chat_id, voice):
+    async def test_send_with_voice(self, monkeypatch, offline_bot, chat_id, offline_voice):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["voice"] == voice.file_id
+            return request_data.json_parameters["voice"] == offline_voice.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.send_voice(chat_id, voice=voice)
+        assert await offline_bot.send_voice(chat_id, voice=offline_voice)
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_voice_local_files(
@@ -190,16 +205,18 @@ class TestVoiceWithoutRequest(VoiceTestBase):
         finally:
             offline_bot._local_mode = False
 
-    async def test_get_file_instance_method(self, monkeypatch, voice):
+    async def test_get_file_instance_method(self, monkeypatch, offline_voice):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == voice.file_id
+            return kwargs["file_id"] == offline_voice.file_id
 
         assert check_shortcut_signature(Voice.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(voice.get_file, voice.get_bot(), "get_file")
-        assert await check_defaults_handling(voice.get_file, voice.get_bot())
+        assert await check_shortcut_call(
+            offline_voice.get_file, offline_voice.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(offline_voice.get_file, offline_voice.get_bot())
 
-        monkeypatch.setattr(voice.get_bot(), "get_file", make_assertion)
-        assert await voice.get_file()
+        monkeypatch.setattr(offline_voice.get_bot(), "get_file", make_assertion)
+        assert await offline_voice.get_file()
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
@@ -211,7 +228,7 @@ class TestVoiceWithoutRequest(VoiceTestBase):
         indirect=["default_bot"],
     )
     async def test_send_voice_default_quote_parse_mode(
-        self, default_bot, chat_id, voice, custom, monkeypatch
+        self, default_bot, chat_id, offline_voice, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -224,7 +241,9 @@ class TestVoiceWithoutRequest(VoiceTestBase):
             kwargs["quote_parse_mode"] = custom
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
-        await default_bot.send_voice(chat_id, voice, reply_parameters=ReplyParameters(**kwargs))
+        await default_bot.send_voice(
+            chat_id, offline_voice, reply_parameters=ReplyParameters(**kwargs)
+        )
 
 
 class TestVoiceWithRequest(VoiceTestBase):

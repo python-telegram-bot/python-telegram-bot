@@ -29,6 +29,10 @@ can run the following command:
 
     $ pytest -m no_req
 
+Tests selected by ``no_req`` run with network sockets disabled, including while fixtures are set
+up. Request-backed fixtures keep their descriptive name (for example, ``animation``), while
+constructed fixtures use the ``offline_`` prefix (for example, ``offline_animation``).
+
 Or alternatively, you can run the following command to run only the tests that require a connection:
 
 .. code-block:: bash
