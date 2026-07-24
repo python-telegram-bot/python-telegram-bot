@@ -1,0 +1,5 @@
+other = "Centralize `de_json` into `TelegramObject`"
+[[pull_requests]]
+uid = "5186"
+author_uids = ["harshil21"]
+closes_threads = []

@@ -19,15 +19,11 @@
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.markup import check_keyboard_type
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class InlineKeyboardMarkup(TelegramObject):
@@ -90,21 +86,6 @@ class InlineKeyboardMarkup(TelegramObject):
         self._id_attrs = (self.inline_keyboard,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InlineKeyboardMarkup":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-
-        keyboard = []
-        for row in data["inline_keyboard"]:
-            tmp = []
-            for col in row:
-                btn = InlineKeyboardButton.de_json(col, bot)
-                if btn:
-                    tmp.append(btn)
-            keyboard.append(tmp)
-
-        return cls(keyboard)
 
     @classmethod
     def from_button(cls, button: InlineKeyboardButton, **kwargs: object) -> "InlineKeyboardMarkup":

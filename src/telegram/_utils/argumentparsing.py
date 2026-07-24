@@ -26,16 +26,10 @@ Warning:
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Protocol, TypeVar, overload
+from typing import TypeVar, overload
 
 from telegram._linkpreviewoptions import LinkPreviewOptions
-from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict, ODVInput
-
-if TYPE_CHECKING:
-    from typing import type_check_only
-
-    from telegram import Bot, FileCredentials
+from telegram._utils.types import ODVInput
 
 T = TypeVar("T")
 
@@ -96,75 +90,3 @@ def parse_lpo_and_dwpp(
         link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
 
     return link_preview_options
-
-
-Tele_co = TypeVar("Tele_co", bound=TelegramObject, covariant=True)
-TeleCrypto_co = TypeVar("TeleCrypto_co", bound="HasDecryptMethod", covariant=True)
-
-if TYPE_CHECKING:
-
-    @type_check_only
-    class HasDecryptMethod(Protocol):
-        __slots__ = ()
-
-        @classmethod
-        def de_json_decrypted(
-            cls: type[TeleCrypto_co],
-            data: JSONDict,
-            bot: "Bot | None",
-            credentials: list["FileCredentials"],
-        ) -> TeleCrypto_co: ...
-
-        @classmethod
-        def de_list_decrypted(
-            cls: type[TeleCrypto_co],
-            data: list[JSONDict],
-            bot: "Bot | None",
-            credentials: list["FileCredentials"],
-        ) -> tuple[TeleCrypto_co, ...]: ...
-
-
-def de_json_optional(
-    data: JSONDict | None, cls: type[Tele_co], bot: "Bot | None"
-) -> Tele_co | None:
-    """Wrapper around TO.de_json that returns None if data is None."""
-    if data is None:
-        return None
-
-    return cls.de_json(data, bot)
-
-
-def de_json_decrypted_optional(
-    data: JSONDict | None,
-    cls: type[TeleCrypto_co],
-    bot: "Bot | None",
-    credentials: list["FileCredentials"],
-) -> TeleCrypto_co | None:
-    """Wrapper around TO.de_json_decrypted that returns None if data is None."""
-    if data is None:
-        return None
-
-    return cls.de_json_decrypted(data, bot, credentials)
-
-
-def de_list_optional(
-    data: list[JSONDict] | None, cls: type[Tele_co], bot: "Bot | None"
-) -> tuple[Tele_co, ...]:
-    """Wrapper around TO.de_list that returns an empty list if data is None."""
-    if data is None:
-        return ()
-
-    return cls.de_list(data, bot)
-
-
-def de_list_decrypted_optional(
-    data: list[JSONDict] | None,
-    cls: type[TeleCrypto_co],
-    bot: "Bot | None",
-    credentials: list["FileCredentials"],
-) -> tuple[TeleCrypto_co, ...]:
-    """Wrapper around TO.de_list_decrypted that returns an empty list if data is None."""
-    if data is None:
-        return ()
-
-    return cls.de_list_decrypted(data, bot, credentials)

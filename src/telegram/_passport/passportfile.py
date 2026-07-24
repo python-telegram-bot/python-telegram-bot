@@ -22,12 +22,25 @@ import datetime as dtm
 from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials
+
+
+def with_file_credentials(data: JSONDict, credentials: "FileCredentials | None") -> JSONDict:
+    """Return a copy of passport file data with serialized credentials attached."""
+    credentials_data = (
+        {
+            **credentials.api_kwargs,
+            "file_hash": credentials.file_hash,
+            "secret": credentials.secret,
+        }
+        if credentials is not None
+        else None
+    )
+    return {**data, "credentials": credentials_data}
 
 
 class PassportFile(TelegramObject):
@@ -99,17 +112,6 @@ class PassportFile(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PassportFile":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["file_date"] = from_timestamp(data.get("file_date"), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)
-
-    @classmethod
     def de_json_decrypted(
         cls, data: JSONDict, bot: "Bot | None", credentials: "FileCredentials"
     ) -> "PassportFile":
@@ -132,9 +134,7 @@ class PassportFile(TelegramObject):
             :class:`telegram.PassportFile`:
 
         """
-        data = cls._parse_data(data)
-
-        data["credentials"] = credentials
+        data = with_file_credentials(data, credentials)
 
         return super().de_json(data=data, bot=bot)
 

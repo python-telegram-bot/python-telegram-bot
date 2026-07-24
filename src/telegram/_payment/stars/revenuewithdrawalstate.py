@@ -20,16 +20,12 @@
 """This module contains the classes for Telegram Stars Revenue Withdrawals."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final
+from typing import ClassVar, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class RevenueWithdrawalState(TelegramObject):
@@ -54,6 +50,15 @@ class RevenueWithdrawalState(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "pending": "RevenueWithdrawalStatePending",
+            "succeeded": "RevenueWithdrawalStateSucceeded",
+            "failed": "RevenueWithdrawalStateFailed",
+        },
+    )
+
     PENDING: Final[str] = constants.RevenueWithdrawalStateType.PENDING
     """:const:`telegram.constants.RevenueWithdrawalStateType.PENDING`"""
     SUCCEEDED: Final[str] = constants.RevenueWithdrawalStateType.SUCCEEDED
@@ -67,32 +72,6 @@ class RevenueWithdrawalState(TelegramObject):
 
         self._id_attrs = (self.type,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "RevenueWithdrawalState":
-        """Converts JSON data to the appropriate :class:`RevenueWithdrawalState` object, i.e. takes
-        care of selecting the correct subclass.
-
-        Args:
-            data (dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
-
-        Returns:
-            The Telegram object.
-
-        """
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[RevenueWithdrawalState]] = {
-            cls.PENDING: RevenueWithdrawalStatePending,
-            cls.SUCCEEDED: RevenueWithdrawalStateSucceeded,
-            cls.FAILED: RevenueWithdrawalStateFailed,
-        }
-
-        if cls is RevenueWithdrawalState and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class RevenueWithdrawalStatePending(RevenueWithdrawalState):
@@ -149,19 +128,6 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
                 self.type,
                 self.date,
             )
-
-    @classmethod
-    def de_json(
-        cls, data: JSONDict, bot: "Bot | None" = None
-    ) -> "RevenueWithdrawalStateSucceeded":
-        """See :meth:`telegram.RevenueWithdrawalState.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
