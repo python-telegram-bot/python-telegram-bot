@@ -88,8 +88,9 @@ def pytest_collection_modifyitems(items: list[pytest.Item]):
 
         if item.get_closest_marker(name="no_req"):
             # Applying this marker here instead of through a function-scoped fixture ensures that
-            # network access is already blocked while higher-scoped fixtures are being set up.
-            item.add_marker(pytest.mark.disable_socket)
+            # external network access is already blocked while higher-scoped fixtures are being
+            # set up. Loopback must remain available because some tests use it
+            item.add_marker(pytest.mark.allow_hosts(["localhost", "127.0.0.1", "::1"]))
 
 
 @pytest.fixture(scope="module", params=["true", "1", "false", "gibberish", None])
