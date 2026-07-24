@@ -101,7 +101,7 @@ tests = [
     # For the test suite
     "pytest==9.1.1",
     # needed because pytest doesn't come with native support for coroutines as tests
-    "pytest-asyncio==0.21.2",
+    "pytest-asyncio==1.4.0",
     # xdist runs tests in parallel
     "pytest-xdist==3.8.0",
     # no_req tests must be fully offline, including during higher-scoped fixture setup
@@ -231,6 +231,8 @@ markers = [
     "req",
 ]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 log_cli_format = "%(funcName)s - Line %(lineno)d - %(message)s"
 # log_cli_level = "DEBUG"  # uncomment to see DEBUG logs
 
