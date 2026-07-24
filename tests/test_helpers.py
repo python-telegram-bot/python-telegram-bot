@@ -113,8 +113,10 @@ class TestHelpers:
 
         with pytest.raises(ValueError, match="valid bot_username"):
             helpers.create_deep_linked_url(None, None)
-        with pytest.raises(ValueError, match="valid bot_username"):  # too short username, 4 is min
+        with pytest.raises(ValueError, match="valid bot_username"):  # too short username, 5 is min
             helpers.create_deep_linked_url("abc", None)
+        with pytest.raises(ValueError, match="valid bot_username"):  # 4 chars is still too short
+            helpers.create_deep_linked_url("abcd", None)
 
     @pytest.mark.parametrize("message_type", list(MessageType))
     @pytest.mark.parametrize("entity_type", [Update, Message])

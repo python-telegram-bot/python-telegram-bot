@@ -1,0 +1,5 @@
+bugfixes = "Fixed ``create_deep_linked_url`` silently accepting 4-character bot usernames, which are invalid per Telegram's 5-character minimum."
+[[pull_requests]]
+uid = "5285"
+author_uids = ["JSap0914"]
+closes_threads = ["5284"]
