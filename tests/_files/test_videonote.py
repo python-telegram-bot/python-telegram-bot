@@ -45,6 +45,28 @@ def video_note_file():
 
 
 @pytest.fixture(scope="module")
+def offline_video_note(offline_bot):
+    thumbnail = PhotoSize(
+        "thumbnail-file-id",
+        "thumbnail-file-unique-id",
+        width=VideoNoteTestBase.thumb_width,
+        height=VideoNoteTestBase.thumb_height,
+        file_size=VideoNoteTestBase.thumb_file_size,
+    )
+    thumbnail.set_bot(offline_bot)
+    value = VideoNote(
+        file_id=VideoNoteTestBase.videonote_file_id,
+        file_unique_id=VideoNoteTestBase.videonote_file_unique_id,
+        length=VideoNoteTestBase.length,
+        duration=VideoNoteTestBase.duration,
+        file_size=VideoNoteTestBase.file_size,
+        thumbnail=thumbnail,
+    )
+    value.set_bot(offline_bot)
+    return value
+
+
+@pytest.fixture(scope="module")
 async def video_note(bot, chat_id):
     with data_file("telegram2.mp4").open("rb") as f:
         return (await bot.send_video_note(chat_id, video_note=f, read_timeout=50)).video_note
@@ -63,24 +85,26 @@ class VideoNoteTestBase:
 
 
 class TestVideoNoteWithoutRequest(VideoNoteTestBase):
-    def test_slot_behaviour(self, video_note):
-        for attr in video_note.__slots__:
-            assert getattr(video_note, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(video_note)) == len(set(mro_slots(video_note))), "duplicate slot"
+    def test_slot_behaviour(self, offline_video_note):
+        for attr in offline_video_note.__slots__:
+            assert getattr(offline_video_note, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_video_note)) == len(set(mro_slots(offline_video_note))), (
+            "duplicate slot"
+        )
 
-    def test_creation(self, video_note):
+    def test_creation(self, offline_video_note):
         # Make sure file has been uploaded.
-        assert isinstance(video_note, VideoNote)
-        assert isinstance(video_note.file_id, str)
-        assert isinstance(video_note.file_unique_id, str)
-        assert video_note.file_id
-        assert video_note.file_unique_id
+        assert isinstance(offline_video_note, VideoNote)
+        assert isinstance(offline_video_note.file_id, str)
+        assert isinstance(offline_video_note.file_unique_id, str)
+        assert offline_video_note.file_id
+        assert offline_video_note.file_unique_id
 
-        assert isinstance(video_note.thumbnail, PhotoSize)
-        assert isinstance(video_note.thumbnail.file_id, str)
-        assert isinstance(video_note.thumbnail.file_unique_id, str)
-        assert video_note.thumbnail.file_id
-        assert video_note.thumbnail.file_unique_id
+        assert isinstance(offline_video_note.thumbnail, PhotoSize)
+        assert isinstance(offline_video_note.thumbnail.file_id, str)
+        assert isinstance(offline_video_note.thumbnail.file_unique_id, str)
+        assert offline_video_note.thumbnail.file_id
+        assert offline_video_note.thumbnail.file_unique_id
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -99,27 +123,27 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         assert json_video_note._duration == self.duration
         assert json_video_note.file_size == self.file_size
 
-    def test_to_dict(self, video_note):
-        video_note_dict = video_note.to_dict()
+    def test_to_dict(self, offline_video_note):
+        video_note_dict = offline_video_note.to_dict()
 
         assert isinstance(video_note_dict, dict)
-        assert video_note_dict["file_id"] == video_note.file_id
-        assert video_note_dict["file_unique_id"] == video_note.file_unique_id
-        assert video_note_dict["length"] == video_note.length
+        assert video_note_dict["file_id"] == offline_video_note.file_id
+        assert video_note_dict["file_unique_id"] == offline_video_note.file_unique_id
+        assert video_note_dict["length"] == offline_video_note.length
         assert video_note_dict["duration"] == int(self.duration.total_seconds())
         assert isinstance(video_note_dict["duration"], int)
-        assert video_note_dict["file_size"] == video_note.file_size
+        assert video_note_dict["file_size"] == offline_video_note.file_size
 
-    def test_time_period_properties(self, PTB_TIMEDELTA, video_note):
+    def test_time_period_properties(self, PTB_TIMEDELTA, offline_video_note):
         if PTB_TIMEDELTA:
-            assert video_note.duration == self.duration
-            assert isinstance(video_note.duration, dtm.timedelta)
+            assert offline_video_note.duration == self.duration
+            assert isinstance(offline_video_note.duration, dtm.timedelta)
         else:
-            assert video_note.duration == int(self.duration.total_seconds())
-            assert isinstance(video_note.duration, int)
+            assert offline_video_note.duration == int(self.duration.total_seconds())
+            assert isinstance(offline_video_note.duration, int)
 
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, video_note):
-        video_note.duration
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, offline_video_note):
+        offline_video_note.duration
 
         if PTB_TIMEDELTA:
             assert len(recwarn) == 0
@@ -128,12 +152,17 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
             assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
-    def test_equality(self, video_note):
-        a = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)
-        b = VideoNote("", video_note.file_unique_id, self.length, self.duration)
-        c = VideoNote(video_note.file_id, video_note.file_unique_id, 0, 0)
+    def test_equality(self, offline_video_note):
+        a = VideoNote(
+            offline_video_note.file_id,
+            offline_video_note.file_unique_id,
+            self.length,
+            self.duration,
+        )
+        b = VideoNote("", offline_video_note.file_unique_id, self.length, self.duration)
+        c = VideoNote(offline_video_note.file_id, offline_video_note.file_unique_id, 0, 0)
         d = VideoNote("", "", self.length, self.duration)
-        e = Voice(video_note.file_id, video_note.file_unique_id, self.duration)
+        e = Voice(offline_video_note.file_id, offline_video_note.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -152,12 +181,14 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         with pytest.raises(TypeError):
             await offline_bot.send_video_note(chat_id=chat_id)
 
-    async def test_send_with_video_note(self, monkeypatch, offline_bot, chat_id, video_note):
+    async def test_send_with_video_note(
+        self, monkeypatch, offline_bot, chat_id, offline_video_note
+    ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["video_note"] == video_note.file_id
+            return request_data.json_parameters["video_note"] == offline_video_note.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.send_video_note(chat_id, video_note=video_note)
+        assert await offline_bot.send_video_note(chat_id, video_note=offline_video_note)
 
     async def test_send_video_note_custom_filename(
         self, offline_bot, chat_id, video_note_file, monkeypatch
@@ -200,16 +231,20 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         finally:
             offline_bot._local_mode = False
 
-    async def test_get_file_instance_method(self, monkeypatch, video_note):
+    async def test_get_file_instance_method(self, monkeypatch, offline_video_note):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == video_note.file_id
+            return kwargs["file_id"] == offline_video_note.file_id
 
         assert check_shortcut_signature(VideoNote.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(video_note.get_file, video_note.get_bot(), "get_file")
-        assert await check_defaults_handling(video_note.get_file, video_note.get_bot())
+        assert await check_shortcut_call(
+            offline_video_note.get_file, offline_video_note.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(
+            offline_video_note.get_file, offline_video_note.get_bot()
+        )
 
-        monkeypatch.setattr(video_note.get_bot(), "get_file", make_assertion)
-        assert await video_note.get_file()
+        monkeypatch.setattr(offline_video_note.get_bot(), "get_file", make_assertion)
+        assert await offline_video_note.get_file()
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
@@ -221,7 +256,7 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         indirect=["default_bot"],
     )
     async def test_send_video_note_default_quote_parse_mode(
-        self, default_bot, chat_id, video_note, custom, monkeypatch
+        self, default_bot, chat_id, offline_video_note, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -235,7 +270,7 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.send_video_note(
-            chat_id, video_note, reply_parameters=ReplyParameters(**kwargs)
+            chat_id, offline_video_note, reply_parameters=ReplyParameters(**kwargs)
         )
 
 

@@ -104,6 +104,8 @@ tests = [
     "pytest-asyncio==0.21.2",
     # xdist runs tests in parallel
     "pytest-xdist==3.8.0",
+    # no_req tests must be fully offline, including during higher-scoped fixture setup
+    "pytest-socket==0.8.0",
     # Used for flaky tests (flaky decorator)
     "flaky>=3.8.1",
     # used in test_official for parsing tg docs
@@ -173,7 +175,7 @@ typing-extensions = false
 ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203", "ASYNC240"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
           "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
-          "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB", "DOC", "TRY", 
+          "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB", "DOC", "TRY",
           "D100", "D101", "D102", "D103", "D300", "D418", "D419", "S"]
 # Add "A (flake8-builtins)" after we drop pylint
 
@@ -212,7 +214,7 @@ exclude-protected = ["_unfrozen"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = "--no-success-flaky-report -rX"
+addopts = "--no-flaky-report -rX --allow-unix-socket"
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning",
