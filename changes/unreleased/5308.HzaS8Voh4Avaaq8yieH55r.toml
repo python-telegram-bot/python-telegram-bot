@@ -1,4 +1,4 @@
-bugfixes = "Handle caption='' correctly ``copy_message`` when using ``telegram.ext.Defaults``"
+bugfixes = "Handle caption='' correctly for ``copy_message`` when using ``telegram.ext.Defaults``"
 [[pull_requests]]
 uid = "5308"
 author_uids = ["harshil21"]
