@@ -169,7 +169,7 @@ Feel free to copy (parts of) the checklist to the PR description to remind you o
     - [ ] Created new or adapted existing unit tests
     - [ ] Documented code changes according to the [CSI standard](https://standards.mousepawmedia.com/en/stable/csi.html)
     - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
-    - [ ] Added new classes & modules to the docs and all suitable ``__all__`` s
+    - [ ] Added new public classes to all suitable ``__all__`` s (their API pages are generated automatically) and new modules to the docs
     - [ ] Checked the [Stability Policy](https://docs.python-telegram-bot.org/stability_policy.html) in case of deprecations or changes to documented behavior
 
     **If the PR contains API changes (otherwise, you can ignore this passage)**
@@ -231,7 +231,18 @@ or, if you don't have ``make`` available (e.g. on Windows):
 
 Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
 
+- Reference pages for public objects exported in the ``__all__`` of ``telegram``, ``telegram.ext`` and
+  ``telegram.request`` are generated automatically during the Sphinx build. Do not add a
+  ``docs/source/telegram.<class>.rst`` file for a normal class. New objects are added to their
+  package's default toctree automatically. To list an object in one of the specialized sections
+  instead, add its lower-case document name to the corresponding ``*-tree.rst`` file.
+  An object that cannot be rendered correctly by the shared template may keep a manual RST page.
+  Such a page must start with the manual-page marker defined in ``docs/auxil/api_docs.py`` and be
+  explicitly unignored in ``.gitignore``. Rare custom autodoc options are also configured in
+  ``docs/auxil/api_docs.py``.
+
 - Add ``.. versionadded:: NEXT.VERSION``, ``.. versionchanged:: NEXT.VERSION`` or ``.. deprecated:: NEXT.VERSION`` to the associated documentation of your changes, depending on what kind of change you made. This only applies if the change you made is visible to an end user. The directives should be added to class/method descriptions if their general behaviour changed and to the description of all arguments & attributes that changed.
+  For a new class, put ``.. versionadded:: NEXT.VERSION`` in the class docstring.
 
 Dev facing documentation
 ------------------------

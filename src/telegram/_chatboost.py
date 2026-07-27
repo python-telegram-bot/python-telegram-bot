@@ -351,6 +351,8 @@ class ChatBoostRemoved(TelegramObject):
     considered equal, if their :attr:`chat`, :attr:`boost_id`, :attr:`remove_date`, and
     :attr:`source` are equal.
 
+    .. versionadded:: 20.8
+
     Args:
         chat (:class:`telegram.Chat`): Chat which was boosted.
         boost_id (:obj:`str`): Unique identifier of the boost.
