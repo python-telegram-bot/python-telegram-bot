@@ -201,7 +201,7 @@ If the resources mentioned above don't answer your questions or simply overwhelm
 Concurrency
 ~~~~~~~~~~~
 
-Since v20.0, ``python-telegram-bot`` is built on top of Pythons ``asyncio`` module.
+Since v20.0, ``python-telegram-bot`` is built on top of Python's ``asyncio`` module.
 Because ``asyncio`` is in general single-threaded, ``python-telegram-bot`` currently does not aim to be thread-safe.
 Noteworthy parts of ``python-telegram-bots`` API that are likely to cause issues (e.g. race conditions) when used in a multi-threaded setting include:
 
