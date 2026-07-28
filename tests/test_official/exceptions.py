@@ -86,10 +86,7 @@ class ParamTypeCheckingExceptions:
     # too complex to compare/predict with official API
     # structure: class/method_name: {param_name: reduced form of annotation}
     COMPLEX_TYPES = {
-        "send_poll": {
-            # "correct_option_id": int,
-            "correct_option_ids": Sequence[int]
-        },
+        "send_poll": {"correct_option_ids": Sequence[int]},
         "get_file": {
             "file_id": str,  # actual: Union[str, objs_with_file_id_attr]
         },
@@ -185,10 +182,6 @@ PTB_EXTRA_PARAMS = {
     "InputProfilePhoto": {"type"},  # attributes common to all subclasses
     "InputPollOptionMedia": {"args", "kwargs"},  # UnionType's __init__ signature
     "InputPollMedia": {"args", "kwargs"},  # UnionType's __init__ signature
-    # backwards compatibility for api 10.0 changes
-    # tags: deprecated NEXT.VERSION, bot api 10.0
-    "Poll": {"correct_option_id"},
-    "send_poll": {"correct_option_id"},
 }
 
 
@@ -244,13 +237,7 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
-    "PollOption": {"persistent_id"},
-    "PollAnswer": {"option_persistent_ids"},
-    "Poll": {"allows_revoting", "members_only"},
-    "ChatMemberRestricted": {"can_react_to_messages"},
-    "send_poll": {"correct_option_id"},
-}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:

@@ -1,0 +1,5 @@
+bugfixes = "Fixed ``PicklePersistence.flush`` not writing empty in-memory data, which could restore stale data after restarting the bot."
+[[pull_requests]]
+uid = "5297"
+author_uids = ["xsneh"]
+closes_threads = []

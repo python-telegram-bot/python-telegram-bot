@@ -78,30 +78,6 @@ class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
             "duplicate slot"
         )
 
-    # tags: deprecated NEXT.VERSION
-    def test_de_json(self):
-        json_dict = {
-            "text": self.text,
-            "text_parse_mode": self.text_parse_mode,
-            "text_entities": [e.to_dict() for e in self.text_entities],
-        }
-        input_poll_option = InputPollOption.de_json(json_dict, None)
-        assert input_poll_option.api_kwargs == {}
-
-        assert input_poll_option.text == self.text
-        assert input_poll_option.text_parse_mode == self.text_parse_mode
-        assert input_poll_option.text_entities == tuple(self.text_entities)
-
-    def test_de_json_deprecated(self, recwarn):
-        InputPollOption.de_json({"text": self.text}, None)
-
-        assert len(recwarn) == 1
-        assert "`InputPollOption.de_json` is deprecated" in str(recwarn[0].message)
-        assert "The `media` field will not be included for deserialization" in str(
-            recwarn[0].message
-        )
-        assert recwarn[0].category is PTBDeprecationWarning
-
     def test_to_dict(self, input_poll_option):
         input_poll_option_dict = input_poll_option.to_dict()
 
@@ -343,11 +319,6 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
         assert poll_option.parse_entities(MessageEntity.BOLD) == {entity: "test"}
         assert poll_option.parse_entities() == {entity: "test", entity_2: "option"}
 
-    def test_persistent_id_required_workaround(self):
-        # tags: deprecated NEXT.VERSION, bot api 9.6
-        with pytest.raises(TypeError, match="`persistent_id` is a required"):
-            PollOption(self.text, self.voter_count)
-
     def test_equality(self):
         a = PollOption("text", 1, persistent_id="persistent_id")
         b = PollOption("text", 1, persistent_id="persistent_id")
@@ -388,9 +359,9 @@ def poll_answer():
     return PollAnswer(
         PollAnswerTestBase.poll_id,
         PollAnswerTestBase.option_ids,
+        PollAnswerTestBase.option_persistent_ids,
         PollAnswerTestBase.user,
         PollAnswerTestBase.voter_chat,
-        PollAnswerTestBase.option_persistent_ids,
     )
 
 
@@ -430,19 +401,12 @@ class TestPollAnswerWithoutRequest(PollAnswerTestBase):
         assert poll_answer_dict["voter_chat"] == poll_answer.voter_chat.to_dict()
         assert poll_answer_dict["option_persistent_ids"] == list(poll_answer.option_persistent_ids)
 
-    def test_persistent_id_required_workaround(self):
-        # tags: deprecated NEXT.VERSION, bot api 9.6
-        with pytest.raises(TypeError, match="`option_persistent_ids` is a required"):
-            PollAnswer(poll_id=123, option_ids=[2], user=self.user, voter_chat=self.voter_chat)
-
     def test_equality(self):
-        a = PollAnswer(123, [2], self.user, self.voter_chat, option_persistent_ids=["2"])
-        b = PollAnswer(123, [2], self.user, Chat(1, ""), option_persistent_ids=["2"])
-        c = PollAnswer(
-            123, [2], User(1, "first", False), self.voter_chat, option_persistent_ids=["2"]
-        )
-        d = PollAnswer(123, [1, 2], self.user, self.voter_chat, option_persistent_ids=["1", "2"])
-        e = PollAnswer(456, [2], self.user, self.voter_chat, option_persistent_ids=["2"])
+        a = PollAnswer(123, [2], ["2"], self.user, self.voter_chat)
+        b = PollAnswer(123, [2], ["2"], self.user, Chat(1, ""))
+        c = PollAnswer(123, [2], ["2"], User(1, "first", False), self.voter_chat)
+        d = PollAnswer(123, [1, 2], ["1", "2"], self.user, self.voter_chat)
+        e = PollAnswer(456, [2], ["2"], self.user, self.voter_chat)
         f = PollOption("Text", 1, persistent_id="persistent_id")
 
         assert a == b
@@ -662,58 +626,6 @@ class TestPollWithoutRequest(PollTestBase):
             assert len(recwarn) == 1
             assert "`open_period` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
-
-    def test_correct_option_id_deprecated(self, recwarn, poll):
-        poll.correct_option_id
-
-        assert len(recwarn) == 1
-        assert "The attribute `correct_option_id` is deprecated" in str(recwarn[0].message)
-        assert recwarn[0].category is PTBDeprecationWarning
-
-        poll = Poll(
-            PollTestBase.id_,
-            PollTestBase.question,
-            PollTestBase.options,
-            PollTestBase.total_voter_count,
-            PollTestBase.is_closed,
-            PollTestBase.is_anonymous,
-            PollTestBase.type,
-            PollTestBase.allows_multiple_answers,
-            correct_option_id=1,
-            allows_revoting=PollTestBase.allows_revoting,
-            members_only=PollTestBase.members_only,
-        )
-        assert poll.correct_option_ids == (1,)
-
-    def test_allows_revoting_required_workaround(self):
-        # tags: deprecated NEXT.VERSION, bot api 9.6
-        with pytest.raises(TypeError, match="`allows_revoting` is a required"):
-            Poll(
-                self.id_,
-                self.question,
-                self.options,
-                self.total_voter_count,
-                self.is_closed,
-                self.is_anonymous,
-                self.type,
-                self.allows_multiple_answers,
-                members_only=self.members_only,
-            )
-
-    def test_members_only_required_workaround(self):
-        # tags: deprecated NEXT.VERSION, bot api 10.0
-        with pytest.raises(TypeError, match="`members_only` is a required"):
-            Poll(
-                self.id_,
-                self.question,
-                self.options,
-                self.total_voter_count,
-                self.is_closed,
-                self.is_anonymous,
-                self.type,
-                self.allows_multiple_answers,
-                allows_revoting=self.allows_revoting,
-            )
 
     def test_equality(self):
         a = Poll(

@@ -1,0 +1,5 @@
+breaking = "Remove functionality deprecated in Bot API 10.0"
+[[pull_requests]]
+uid = "5271"
+author_uids = ["harshil21"]
+closes_threads = []

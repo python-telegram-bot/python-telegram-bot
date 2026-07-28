@@ -101,7 +101,6 @@ from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
     BaseUrl,
-    CorrectOptionID,
     CorrectOptionIds,
     FileInput,
     JSONDict,
@@ -520,8 +519,10 @@ class ExtBot(Bot, Generic[RLARGS]):
                 data[key] = new_value
 
             # 6)
-            elif isinstance(val, Sequence) and all(
-                isinstance(obj, InputPollOption) for obj in val
+            elif (
+                isinstance(val, Sequence)
+                and val  # Check that the sequence is not empty, as all() returns True for []
+                and all(isinstance(obj, InputPollOption) for obj in val)
             ):
                 new_val = []
                 for option in val:
@@ -3269,7 +3270,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         is_anonymous: bool | None = None,
         type: str | None = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool | None = None,
-        correct_option_id: CorrectOptionID | None = None,
         is_closed: bool | None = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: "ReplyMarkup | None" = None,
@@ -3315,7 +3315,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             is_anonymous=is_anonymous,
             type=type,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,

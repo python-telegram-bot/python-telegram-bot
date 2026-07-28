@@ -121,6 +121,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Riko Naka <https://github.com/rikonaka>`_
 - `Rizlas <https://github.com/rizlas>`_
+- `Sneh <https://github.com/xsneh>`_
 - Snehashish Biswas
 - `Sahil Sharma <https://github.com/sahilsharma811>`_
 - `Sam Mosleh <https://github.com/sam-mosleh>`_

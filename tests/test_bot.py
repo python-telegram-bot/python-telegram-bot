@@ -105,7 +105,7 @@ from telegram.error import BadRequest, EndPointNotFound, InvalidToken, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTIONS
@@ -324,6 +324,16 @@ class TestBotWithoutRequest:
     async def test_repr(self):
         offline_bot = Bot(token="some_token", base_file_url="")
         assert repr(offline_bot) == "Bot[token=some_token]"
+
+    async def test_pytest_bot_repr_hides_token(self):
+        token = "12345:secret-token"
+        pytest_bot = PytestBot(token=token, base_file_url="")
+        pytest_ext_bot = PytestExtBot(token=token, base_file_url="")
+
+        assert repr(pytest_bot) == "PytestBot[token=<redacted>]"
+        assert repr(pytest_ext_bot) == "PytestExtBot[token=<redacted>]"
+        assert token not in repr(pytest_bot)
+        assert token not in repr(pytest_ext_bot)
 
     async def test_to_dict(self, offline_bot):
         to_dict_bot = offline_bot.to_dict()
@@ -2510,6 +2520,20 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.copy_message(chat_id, 1, 1, reply_parameters=ReplyParameters(**kwargs))
 
+    @pytest.mark.parametrize("default_bot", [{"allow_sending_without_reply": True}], indirect=True)
+    async def test_copy_message_empty_caption_with_defaults(
+        self, default_bot, chat_id, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["caption"] == ""
+            assert request_data.json_parameters["caption"] == ""
+            return {"message_id": 1}
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        message_id = await default_bot.copy_message(chat_id, chat_id, 1, caption="")
+
+        assert message_id.message_id == 1
+
     async def test_do_api_request_camel_case_conversion(self, offline_bot, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return url.endswith("camelCase")
@@ -3003,40 +3027,6 @@ class TestBotWithoutRequest:
 
         await offline_bot.set_chat_member_tag(1234, 5678, "This is a tag")
 
-    async def test_send_poll_warn_correct_option_id(self, offline_bot, monkeypatch, recwarn):
-        async def make_first_assert(url, request_data: RequestData, *args, **kwargs):
-            assert request_data.parameters.get("correct_option_ids") == [1]
-            assert request_data.parameters.get("correct_option_id") is None
-            return make_message("dummy reply").to_dict()
-
-        async def make_second_assert(url, request_data: RequestData, *args, **kwargs):
-            assert request_data.parameters.get("correct_option_ids") == [1, 2]
-            assert request_data.parameters.get("correct_option_id") is None
-            return make_message("dummy reply").to_dict()
-
-        monkeypatch.setattr(offline_bot.request, "post", make_first_assert)
-
-        await offline_bot.send_poll(
-            1,
-            question="question",
-            options=["option1", "option2"],
-            correct_option_id=1,
-        )
-
-        w = recwarn.pop()
-        assert issubclass(w.category, PTBDeprecationWarning)
-        assert "correct_option_id" in str(w.message)
-
-        # Test that correct_option_ids takes priority when both correct_option_id(s) are given
-        monkeypatch.setattr(offline_bot.request, "post", make_second_assert)
-        assert await offline_bot.send_poll(
-            1,
-            question="question",
-            options=["option1", "option2"],
-            correct_option_id=1,
-            correct_option_ids=[1, 2],
-        )
-
     # TODO: If we create a managed bot, we could test this for real
     async def test_get_managed_bot_token(self, offline_bot, monkeypatch):
 
@@ -3349,7 +3339,7 @@ class TestBotWithRequest:
                 question=question,
                 options=answers,
                 type=Poll.QUIZ,
-                correct_option_id=2,
+                correct_option_ids=[2],
                 is_closed=True,
                 explanation=explanation,
                 explanation_parse_mode=ParseMode.MARKDOWN_V2,
@@ -3388,7 +3378,7 @@ class TestBotWithRequest:
         assert poll.total_voter_count == 0
 
         message_quiz = await quiz_task
-        assert message_quiz.poll.correct_option_id == 2
+        assert message_quiz.poll.correct_option_ids == (2,)
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
         assert message_quiz.poll.explanation == "Here is a link"
@@ -3475,7 +3465,7 @@ class TestBotWithRequest:
             chat_id,
             "question",
             options=["a", "b"],
-            correct_option_id=0,
+            correct_option_ids=[0],
             type=Poll.QUIZ,
             explanation=test_string,
             explanation_entities=entities,
@@ -3526,7 +3516,7 @@ class TestBotWithRequest:
                     question=question,
                     options=answers,
                     type=Poll.QUIZ,
-                    correct_option_id=2,
+                    correct_option_ids=[2],
                     is_closed=True,
                     explanation=explanation_markdown,
                     **i,

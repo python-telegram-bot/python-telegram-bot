@@ -86,7 +86,7 @@ def parse_lpo_and_dwpp(
     """Wrapper around warn_about_deprecated_arg_return_new_arg. Takes care of converting
     disable_web_page_preview to LinkPreviewOptions.
     """
-    if disable_web_page_preview and link_preview_options:
+    if disable_web_page_preview is not None and link_preview_options:
         raise ValueError(
             "Parameters `disable_web_page_preview` and `link_preview_options` are mutually "
             "exclusive."
