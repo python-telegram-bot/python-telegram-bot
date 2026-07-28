@@ -89,32 +89,6 @@ class ChatInviteLink(TelegramObject):
             .. versionadded:: 21.5
 
     Attributes:
-        invite_link (:obj:`str`): The invite link. If the link was created by another chat
-            administrator, then the second part of the link will be replaced with ``'…'``.
-        creator (:class:`telegram.User`): Creator of the link.
-        creates_join_request (:obj:`bool`): :obj:`True`, if users joining the chat via
-            the link need to be approved by chat administrators.
-
-            .. versionadded:: 13.8
-        is_primary (:obj:`bool`): :obj:`True`, if the link is primary.
-        is_revoked (:obj:`bool`): :obj:`True`, if the link is revoked.
-        expire_date (:class:`datetime.datetime`): Optional. Date when the link will expire or
-            has been expired.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-        member_limit (:obj:`int`): Optional. Maximum number of users that can be members
-            of the chat simultaneously after joining the chat via this invite link;
-            :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
-            :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
-        name (:obj:`str`): Optional. Invite link name.
-            0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
-
-            .. versionadded:: 13.8
-        pending_join_request_count (:obj:`int`): Optional. Number of pending join requests
-            created using this link.
-
-            .. versionadded:: 13.8
         subscription_period (:obj:`int` | :class:`datetime.timedelta`): Optional. The number of
             seconds the subscription will be active for before the next payment.
 
@@ -122,12 +96,6 @@ class ChatInviteLink(TelegramObject):
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        subscription_price (:obj:`int`): Optional. The amount of Telegram Stars a user must pay
-            initially and after each subsequent subscription period to be a member of the chat
-            using the link.
-
-            .. versionadded:: 21.5
-
     """
 
     __slots__ = (

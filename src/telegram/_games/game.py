@@ -46,10 +46,6 @@ class Game(TelegramObject):
         description (:obj:`str`): Description of the game.
         photo (Sequence[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game
             message in chats.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         text (:obj:`str`, optional): Brief description of the game or high scores included in the
             game message. Can be automatically edited to include current high scores for the game
             when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
@@ -57,37 +53,8 @@ class Game(TelegramObject):
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         animation (:class:`telegram.Animation`, optional): Animation that will be displayed in the
             game message in chats. Upload via `BotFather <https://t.me/BotFather>`_.
-
-    Attributes:
-        title (:obj:`str`): Title of the game.
-        description (:obj:`str`): Description of the game.
-        photo (tuple[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game
-            message in chats.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
-        text (:obj:`str`): Optional. Brief description of the game or high scores included in the
-            game message. Can be automatically edited to include current high scores for the game
-            when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
-            using :meth:`telegram.Bot.edit_message_text`.
-            0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
-        text_entities (tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that
-            appear in text, such as usernames, URLs, bot commands, etc.
-            This tuple is empty if the message does not contain text entities.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
-        animation (:class:`telegram.Animation`): Optional. Animation that will be displayed in the
-            game message in chats. Upload via `BotFather <https://t.me/BotFather>`_.
-
     """
 
     __slots__ = (

@@ -54,18 +54,6 @@ class InlineKeyboardMarkup(TelegramObject):
         inline_keyboard (Sequence[Sequence[:class:`telegram.InlineKeyboardButton`]]): Sequence of
             button rows, each represented by a sequence of :class:`~telegram.InlineKeyboardButton`
             objects.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
-    Attributes:
-        inline_keyboard (tuple[tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of
-            button rows, each represented by a tuple of :class:`~telegram.InlineKeyboardButton`
-            objects.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
     """
 
     __slots__ = ("inline_keyboard",)

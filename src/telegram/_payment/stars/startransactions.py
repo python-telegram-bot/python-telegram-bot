@@ -58,30 +58,11 @@ class StarTransaction(TelegramObject):
 
             .. versionadded:: 21.9
         date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
+            |datetime_localization|
         source (:class:`telegram.TransactionPartner`, optional): Source of an incoming transaction
             (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
             Only for incoming transactions.
         receiver (:class:`telegram.TransactionPartner`, optional): Receiver of an outgoing
-            transaction (e.g., a user for a purchase refund, Fragment for a withdrawal). Only for
-            outgoing transactions.
-
-    Attributes:
-        id (:obj:`str`): Unique identifier of the transaction. Coincides with the identifer
-            of the original transaction for refund transactions.
-            Coincides with :attr:`SuccessfulPayment.telegram_payment_charge_id` for
-            successful incoming payments from users.
-        amount (:obj:`int`): Integer amount of Telegram Stars transferred by the transaction.
-        nanostar_amount (:obj:`int`): Optional. The number of
-            :tg-const:`~telegram.constants.Nanostar.VALUE` shares of Telegram
-            Stars transferred by the transaction; from 0 to
-            :tg-const:`~telegram.constants.NanostarLimit.MAX_AMOUNT`
-
-            .. versionadded:: 21.9
-        date (:obj:`datetime.datetime`): Date the transaction was created as a datetime object.
-        source (:class:`telegram.TransactionPartner`): Optional. Source of an incoming transaction
-            (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
-            Only for incoming transactions.
-        receiver (:class:`telegram.TransactionPartner`): Optional. Receiver of an outgoing
             transaction (e.g., a user for a purchase refund, Fragment for a withdrawal). Only for
             outgoing transactions.
     """
@@ -140,9 +121,6 @@ class StarTransactions(TelegramObject):
 
     Args:
         transactions (Sequence[:class:`telegram.StarTransaction`]): The list of transactions.
-
-    Attributes:
-        transactions (tuple[:class:`telegram.StarTransaction`]): The list of transactions.
     """
 
     __slots__ = ("transactions",)

@@ -39,12 +39,6 @@ class GameHighScore(TelegramObject):
         position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
         score (:obj:`int`): Score.
-
-    Attributes:
-        position (:obj:`int`): Position in high score table for the game.
-        user (:class:`telegram.User`): User.
-        score (:obj:`int`): Score.
-
     """
 
     __slots__ = ("position", "score", "user")

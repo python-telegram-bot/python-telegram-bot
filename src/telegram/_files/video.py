@@ -77,38 +77,17 @@ class Video(_BaseThumbedMedium):
             .. versionadded:: 22.7
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file, which can be used to download
-            or reuse the file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        width (:obj:`int`): Video width as defined by the sender.
-        height (:obj:`int`): Video height as defined by the sender.
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in seconds
             as defined by the sender.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        file_name (:obj:`str`): Optional. Original filename as defined by the sender.
-        mime_type (:obj:`str`): Optional. MIME type of a file as defined by the sender.
-        file_size (:obj:`int`): Optional. File size in bytes.
-        thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
-
-            .. versionadded:: 20.2
-        cover (tuple[:class:`telegram.PhotoSize`]): Optional, Available sizes of the cover of
-            the video in the message.
-
-            .. versionadded:: 21.11
         start_timestamp (:obj:`int` | :class:`datetime.timedelta`): Optional. Timestamp in seconds
             from which the video will play in the message
             .. versionadded:: 21.11
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        qualities (tuple[:class:`telegram.VideoQuality`]): Optional. List of available qualities
-            of the video
-
-            .. versionadded:: 22.7
     """
 
     __slots__ = (

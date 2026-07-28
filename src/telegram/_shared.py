@@ -59,13 +59,6 @@ class UsersShared(TelegramObject):
 
             .. versionchanged:: 21.2
                This argument is now required.
-
-    Attributes:
-        request_id (:obj:`int`): Identifier of the request.
-        users (tuple[:class:`telegram.SharedUser`]): Information about users shared with the
-            bot.
-
-            .. versionadded:: 21.1
     """
 
     __slots__ = ("request_id", "users")
@@ -113,10 +106,7 @@ class ChatShared(TelegramObject):
 
     Args:
         request_id (:obj:`int`): Identifier of the request.
-        chat_id (:obj:`int`): Identifier of the shared user. This number may be greater than 32
-            bits and some programming languages may have difficulty/silent defects in interpreting
-            it. But it is smaller than 52 bits, so a signed 64-bit integer or double-precision
-            float type are safe for storing this identifier.
+        chat_id (:obj:`int`): Identifier of the shared user.
         title (:obj:`str`, optional): Title of the chat, if the title was requested by the bot.
 
             .. versionadded:: 21.1
@@ -125,24 +115,6 @@ class ChatShared(TelegramObject):
 
             .. versionadded:: 21.1
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Available sizes of the chat photo,
-            if the photo was requested by the bot
-
-            .. versionadded:: 21.1
-
-    Attributes:
-        request_id (:obj:`int`): Identifier of the request.
-        chat_id (:obj:`int`): Identifier of the shared user. This number may be greater than 32
-            bits and some programming languages may have difficulty/silent defects in interpreting
-            it. But it is smaller than 52 bits, so a signed 64-bit integer or double-precision
-            float type are safe for storing this identifier.
-        title (:obj:`str`): Optional. Title of the chat, if the title was requested by the bot.
-
-            .. versionadded:: 21.1
-        username (:obj:`str`): Optional. Username of the chat, if the username was requested by
-            the bot and available.
-
-            .. versionadded:: 21.1
-        photo (tuple[:class:`telegram.PhotoSize`]): Optional. Available sizes of the chat photo,
             if the photo was requested by the bot
 
             .. versionadded:: 21.1
@@ -200,10 +172,7 @@ class SharedUser(TelegramObject):
     .. versionadded:: 21.1
 
     Args:
-        user_id (:obj:`int`): Identifier of the shared user. This number may have 32 significant
-            bits and some programming languages may have difficulty/silent defects in interpreting
-            it. But it has atmost 52 significant bits, so 64-bit integers or double-precision
-            float types are safe for storing these identifiers. The bot may not have access to the
+        user_id (:obj:`int`): Identifier of the shared user. The bot may not have access to the
             user and could be unable to use this identifier, unless the user is already known to
             the bot by some other means.
         first_name (:obj:`str`, optional): First name of the user, if the name was requested by the
@@ -214,22 +183,6 @@ class SharedUser(TelegramObject):
             bot.
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Available sizes of the chat photo,
             if the photo was requested by the bot.
-
-    Attributes:
-        user_id (:obj:`int`): Identifier of the shared user. This number may have 32 significant
-            bits and some programming languages may have difficulty/silent defects in interpreting
-            it. But it has atmost 52 significant bits, so 64-bit integers or double-precision
-            float types are safe for storing these identifiers. The bot may not have access to the
-            user and could be unable to use this identifier, unless the user is already known to
-            the bot by some other means.
-        first_name (:obj:`str`): Optional. First name of the user, if the name was requested by the
-            bot.
-        last_name (:obj:`str`): Optional. Last name of the user, if the name was requested by the
-            bot.
-        username (:obj:`str`): Optional. Username of the user, if the username was requested by the
-            bot.
-        photo (tuple[:class:`telegram.PhotoSize`]): Available sizes of the chat photo, if
-            the photo was requested by the bot. This list is empty if the photo was not requsted.
     """
 
     __slots__ = ("first_name", "last_name", "photo", "user_id", "username")

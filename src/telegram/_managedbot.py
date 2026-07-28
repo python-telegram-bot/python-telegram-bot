@@ -43,9 +43,6 @@ class ManagedBotCreated(TelegramObject):
     Args:
         bot (:class:`telegram.User`): Information about the bot. The bot's token can be fetched
             using the method :meth:`~telegram.Bot.get_managed_bot_token`.
-    Attributes:
-        bot (:class:`telegram.User`): Information about the bot. The bot's token can be fetched
-            using the method :meth:`~telegram.Bot.get_managed_bot_token`.
     """
 
     __slots__ = ("bot",)
@@ -82,11 +79,6 @@ class ManagedBotUpdated(TelegramObject):
     .. versionadded:: 22.8
 
     Args:
-        user (:class:`telegram.User`): User that created the bot.
-        bot (:class:`telegram.User`): Information about the bot. Token of the bot can be fetched
-            using the method :meth:`~telegram.Bot.get_managed_bot_token`.
-
-    Attributes:
         user (:class:`telegram.User`): User that created the bot.
         bot (:class:`telegram.User`): Information about the bot. Token of the bot can be fetched
             using the method :meth:`~telegram.Bot.get_managed_bot_token`.

@@ -50,19 +50,6 @@ class Venue(TelegramObject):
         google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
             `supported types <https://developers.google.com/maps/documentation/places/web-service\
             /place-types>`_.)
-
-    Attributes:
-        location (:class:`telegram.Location`): Venue location.
-        title (:obj:`str`): Name of the venue.
-        address (:obj:`str`): Address of the venue.
-        foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue.
-        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue. (For example,
-            "arts_entertainment/default", "arts_entertainment/aquarium" or "food/icecream".)
-        google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
-        google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See
-            `supported types <https://developers.google.com/maps/documentation/places/web-service\
-            /place-types>`_.)
-
     """
 
     __slots__ = (

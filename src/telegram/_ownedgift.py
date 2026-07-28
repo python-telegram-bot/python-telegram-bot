@@ -52,9 +52,6 @@ class OwnedGift(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of the owned gift.
-
-    Attributes:
-        type (:obj:`str`): Type of the owned gift.
     """
 
     __slots__ = ("type",)
@@ -114,12 +111,6 @@ class OwnedGifts(TelegramObject):
         total_count (:obj:`int`): The total number of gifts owned by the user or the chat.
         gifts (Sequence[:class:`telegram.OwnedGift`]): The list of gifts.
         next_offset (:obj:`str`, optional): Offset for the next request. If empty,
-            then there are no more results.
-
-    Attributes:
-        total_count (:obj:`int`): The total number of gifts owned by the user or the chat.
-        gifts (Sequence[:class:`telegram.OwnedGift`]): The list of gifts.
-        next_offset (:obj:`str`): Optional. Offset for the next request. If empty,
             then there are no more results.
     """
 
@@ -197,37 +188,6 @@ class OwnedGiftRegular(OwnedGift):
 
     Attributes:
         type (:obj:`str`): Type of the gift, always :attr:`~telegram.OwnedGift.REGULAR`.
-        gift (:class:`telegram.Gift`): Information about the regular gift.
-        owned_gift_id (:obj:`str`): Optional. Unique identifier of the gift for the bot; for
-            gifts received on behalf of business accounts only.
-        sender_user (:class:`telegram.User`): Optional. Sender of the gift if it is a known user.
-        send_date (:obj:`datetime.datetime`): Date the gift was sent as :class:`datetime.datetime`.
-            |datetime_localization|.
-        text (:obj:`str`): Optional. Text of the message that was added to the gift.
-        entities (Sequence[:class:`telegram.MessageEntity`]): Optional. Special entities that
-            appear in the text.
-        is_private (:obj:`bool`): Optional. :obj:`True`, if the sender and gift text are shown
-            only to the gift receiver; otherwise, everyone will be able to see them.
-        is_saved (:obj:`bool`): Optional. :obj:`True`, if the gift is displayed on the account's
-            profile page; for gifts received on behalf of business accounts only.
-        can_be_upgraded (:obj:`bool`): Optional. :obj:`True`, if the gift can be upgraded to a
-            unique gift; for gifts received on behalf of business accounts only.
-        was_refunded (:obj:`bool`): Optional. :obj:`True`, if the gift was refunded and isn't
-            available anymore.
-        convert_star_count (:obj:`int`): Optional. Number of Telegram Stars that can be
-            claimed by the receiver instead of the gift; omitted if the gift cannot be converted
-            to Telegram Stars; for gifts received on behalf of business accounts only.
-        prepaid_upgrade_star_count (:obj:`int`): Optional. Number of Telegram Stars that were
-            paid for the ability to upgrade the gift.
-        is_upgrade_separate (:obj:`bool`): Optional. :obj:`True`, if the gift's upgrade was
-            purchased after the gift was sent; for gifts received on behalf of business accounts
-
-            .. versionadded:: 22.6
-        unique_gift_number (:obj:`int`): Optional. Unique number reserved for this gift when
-            upgraded. See the number field in :class:`~telegram.UniqueGift`
-
-            ... versionadded:: 22.6
-
     """
 
     __slots__ = (
@@ -383,22 +343,6 @@ class OwnedGiftUnique(OwnedGift):
 
     Attributes:
         type (:obj:`str`): Type of the owned gift, always :tg-const:`~telegram.OwnedGift.UNIQUE`.
-        gift (:class:`telegram.UniqueGift`): Information about the unique gift.
-        owned_gift_id (:obj:`str`): Optional. Unique identifier of the received gift for the
-            bot; for gifts received on behalf of business accounts only.
-        sender_user (:class:`telegram.User`): Optional. Sender of the gift if it is a known user.
-        send_date (:obj:`datetime.datetime`): Date the gift was sent as :class:`datetime.datetime`.
-            |datetime_localization|
-        is_saved (:obj:`bool`): Optional. :obj:`True`, if the gift is displayed on the account's
-            profile page; for gifts received on behalf of business accounts only.
-        can_be_transferred (:obj:`bool`): Optional. :obj:`True`, if the gift can be transferred to
-            another owner; for gifts received on behalf of business accounts only.
-        transfer_star_count (:obj:`int`): Optional. Number of Telegram Stars that must be paid
-            to transfer the gift; omitted if the bot cannot transfer the gift.
-        next_transfer_date (:obj:`datetime.datetime`): Optional. Date when the gift can be
-            transferred. If it's in the past, then the gift can be transferred now.
-            |datetime_localization|
-            .. versionadded:: 22.3
     """
 
     __slots__ = (

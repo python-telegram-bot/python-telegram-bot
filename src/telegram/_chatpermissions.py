@@ -47,13 +47,13 @@ class ChatPermissions(TelegramObject):
           :attr:`can_send_videos`, :attr:`can_send_video_notes` and :attr:`can_send_voice_notes`
           are considered as well when comparing objects of this type in terms of equality.
         * Removed deprecated argument and attribute ``can_send_media_messages``.
+
     .. versionchanged:: 22.7
         :attr:`can_edit_tag` is considered as well when comparing objects of
         this type in terms of equality.
     .. versionchanged:: 22.8
         :attr:`can_react_to_messages` is considered as well when comparing objects of
         this type in terms of equality.
-
 
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
@@ -103,60 +103,11 @@ class ChatPermissions(TelegramObject):
             tag.
 
             .. versionadded:: 22.7
+
         can_react_to_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to react
             to messages. If omitted, defaults to the value of :attr:`can_send_messages`.
 
             .. versionadded:: 22.8
-
-    Attributes:
-        can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send text
-            messages, contacts, locations and venues.
-        can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send polls,
-            implies :attr:`can_send_messages`.
-        can_send_other_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
-            send animations, games, stickers and use inline bots.
-        can_add_web_page_previews (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
-            add web page previews to their messages.
-        can_change_info (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to change the
-            chat title, photo and other settings. Ignored in public supergroups.
-        can_invite_users (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to invite
-            new users to the chat.
-        can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
-            messages. Ignored in public supergroups.
-        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
-            to create forum topics. If omitted defaults to the value of
-            :attr:`can_pin_messages`.
-
-            .. versionadded:: 20.0
-        can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
-
-            .. versionadded:: 20.1
-        can_send_documents (:obj:`bool`): :obj:`True`, if the user is allowed to send documents.
-
-            .. versionadded:: 20.1
-        can_send_photos (:obj:`bool`): :obj:`True`, if the user is allowed to send photos.
-
-            .. versionadded:: 20.1
-        can_send_videos (:obj:`bool`): :obj:`True`, if the user is allowed to send videos.
-
-            .. versionadded:: 20.1
-        can_send_video_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send video
-            notes.
-
-            .. versionadded:: 20.1
-        can_send_voice_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send voice
-            notes.
-
-            .. versionadded:: 20.1
-        can_edit_tag (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to edit their own
-            tag.
-
-            .. versionadded:: 22.7
-        can_react_to_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to react
-            to messages. If omitted, defaults to the value of :attr:`can_send_messages`.
-
-            .. versionadded:: 22.8
-
     """
 
     __slots__ = (

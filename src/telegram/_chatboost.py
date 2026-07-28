@@ -47,10 +47,6 @@ class ChatBoostAdded(TelegramObject):
 
     Args:
         boost_count (:obj:`int`): Number of boosts added by the user.
-
-    Attributes:
-        boost_count (:obj:`int`): Number of boosts added by the user.
-
     """
 
     __slots__ = ("boost_count",)
@@ -82,11 +78,6 @@ class ChatBoostSource(TelegramObject):
     .. versionadded:: 20.8
 
     Args:
-        source (:obj:`str`): The source of the chat boost. Can be one of:
-            :attr:`~telegram.ChatBoostSource.PREMIUM`, :attr:`~telegram.ChatBoostSource.GIFT_CODE`,
-            or :attr:`~telegram.ChatBoostSource.GIVEAWAY`.
-
-    Attributes:
         source (:obj:`str`): The source of the chat boost. Can be one of:
             :attr:`~telegram.ChatBoostSource.PREMIUM`, :attr:`~telegram.ChatBoostSource.GIFT_CODE`,
             or :attr:`~telegram.ChatBoostSource.GIVEAWAY`.
@@ -143,7 +134,6 @@ class ChatBoostSourcePremium(ChatBoostSource):
     Attributes:
         source (:obj:`str`): The source of the chat boost. Always
             :attr:`~telegram.ChatBoostSource.PREMIUM`.
-        user (:class:`telegram.User`): User that boosted the chat.
     """
 
     __slots__ = ("user",)
@@ -169,7 +159,6 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
     Attributes:
         source (:obj:`str`): The source of the chat boost. Always
             :attr:`~telegram.ChatBoostSource.GIFT_CODE`.
-        user (:class:`telegram.User`): User for which the gift code was created.
     """
 
     __slots__ = ("user",)
@@ -205,15 +194,6 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
     Attributes:
         source (:obj:`str`): Source of the boost. Always
             :attr:`~telegram.ChatBoostSource.GIVEAWAY`.
-        giveaway_message_id (:obj:`int`): Identifier of a message in the chat with the giveaway;
-            the message could have been deleted already. May be 0 if the message isn't sent yet.
-        user (:class:`telegram.User`): Optional. User that won the prize in the giveaway if any.
-        prize_star_count (:obj:`int`): Optional. The number of Telegram Stars to be split between
-            giveaway winners; for Telegram Star giveaways only.
-
-            .. versionadded:: 21.6
-        is_unclaimed (:obj:`bool`): Optional. :obj:`True`, if the giveaway was completed, but
-            there was no user to win the prize.
     """
 
     __slots__ = ("giveaway_message_id", "is_unclaimed", "prize_star_count", "user")
@@ -247,14 +227,6 @@ class ChatBoost(TelegramObject):
     .. versionadded:: 20.8
 
     Args:
-        boost_id (:obj:`str`): Unique identifier of the boost.
-        add_date (:obj:`datetime.datetime`): Point in time when the chat was boosted.
-        expiration_date (:obj:`datetime.datetime`): Point in time when the boost
-            will automatically expire, unless the booster's Telegram Premium subscription is
-            prolonged.
-        source (:class:`telegram.ChatBoostSource`): Source of the added boost.
-
-    Attributes:
         boost_id (:obj:`str`): Unique identifier of the boost.
         add_date (:obj:`datetime.datetime`): Point in time when the chat was boosted.
             |datetime_localization|
@@ -309,10 +281,6 @@ class ChatBoostUpdated(TelegramObject):
     Args:
         chat (:class:`telegram.Chat`): Chat which was boosted.
         boost (:class:`telegram.ChatBoost`): Information about the chat boost.
-
-    Attributes:
-        chat (:class:`telegram.Chat`): Chat which was boosted.
-        boost (:class:`telegram.ChatBoost`): Information about the chat boost.
     """
 
     __slots__ = ("boost", "chat")
@@ -352,12 +320,6 @@ class ChatBoostRemoved(TelegramObject):
     :attr:`source` are equal.
 
     Args:
-        chat (:class:`telegram.Chat`): Chat which was boosted.
-        boost_id (:obj:`str`): Unique identifier of the boost.
-        remove_date (:obj:`datetime.datetime`): Point in time when the boost was removed.
-        source (:class:`telegram.ChatBoostSource`): Source of the removed boost.
-
-    Attributes:
         chat (:class:`telegram.Chat`): Chat which was boosted.
         boost_id (:obj:`str`): Unique identifier of the boost.
         remove_date (:obj:`datetime.datetime`): Point in time when the boost was removed.
@@ -410,9 +372,6 @@ class UserChatBoosts(TelegramObject):
     Args:
         boosts (Sequence[:class:`telegram.ChatBoost`]): List of boosts added to the chat by the
             user.
-
-    Attributes:
-        boosts (tuple[:class:`telegram.ChatBoost`]): List of boosts added to the chat by the user.
     """
 
     __slots__ = ("boosts",)

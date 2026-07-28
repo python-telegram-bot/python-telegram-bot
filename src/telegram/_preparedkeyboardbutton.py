@@ -35,9 +35,6 @@ class PreparedKeyboardButton(TelegramObject):
 
     Args:
         id (:obj:`str`): Unique identifier of the keyboard button.
-
-    Attributes:
-        id (:obj:`str`): Unique identifier of the keyboard button.
     """
 
     __slots__ = ("id",)

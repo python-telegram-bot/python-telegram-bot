@@ -47,14 +47,6 @@ class ShippingQuery(TelegramObject):
         from_user (:class:`telegram.User`): User who sent the query.
         invoice_payload (:obj:`str`): Bot-specified invoice payload.
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
-
-    Attributes:
-        id (:obj:`str`): Unique query identifier.
-        from_user (:class:`telegram.User`): User who sent the query.
-        invoice_payload (:obj:`str`): Bot-specified invoice payload.
-        shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
-
-
     """
 
     __slots__ = ("from_user", "id", "invoice_payload", "shipping_address")

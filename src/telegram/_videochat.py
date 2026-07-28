@@ -120,16 +120,6 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     Args:
         users (Sequence[:class:`telegram.User`]): New members that were invited to the video chat.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
-    Attributes:
-        users (tuple[:class:`telegram.User`]): New members that were invited to the video chat.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
     """
 
     __slots__ = ("users",)
@@ -165,18 +155,11 @@ class VideoChatScheduled(TelegramObject):
         This class was renamed from ``VoiceChatScheduled`` in accordance to Bot API 6.0.
 
     Args:
-        start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
-            chat is supposed to be started by a chat administrator
+        start_date (:obj:`datetime.datetime`): Point in time when the video
+            chat is supposed to be started by a chat administrator.
 
             .. versionchanged:: 20.3
                 |datetime_localization|
-    Attributes:
-        start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
-            chat is supposed to be started by a chat administrator
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-
     """
 
     __slots__ = ("start_date",)

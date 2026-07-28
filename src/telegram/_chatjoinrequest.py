@@ -62,10 +62,7 @@ class ChatJoinRequest(TelegramObject):
             .. versionchanged:: 20.3
                 |datetime_localization|
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
-            request. This number may have more than 32 significant bits and some programming
-            languages may have difficulty/silent defects in interpreting it. But it has at most 52
-            significant bits, so a 64-bit integer or double-precision float type are safe for
-            storing this identifier. The bot can use this identifier for 5 minutes to send messages
+            request. The bot can use this identifier for 5 minutes to send messages
             until the join request is processed, assuming no other administrator contacted the
             user.
 
@@ -75,28 +72,12 @@ class ChatJoinRequest(TelegramObject):
             by the user to send the join request.
 
     Attributes:
-        chat (:class:`telegram.Chat`): Chat to which the request was sent.
-        from_user (:class:`telegram.User`): User that sent the join request.
-        date (:class:`datetime.datetime`): Date the request was sent.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
-        user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
-            request. This number may have more than 32 significant bits and some programming
-            languages may have difficulty/silent defects in interpreting it. But it has at most 52
-            significant bits, so a 64-bit integer or double-precision float type are safe for
-            storing this identifier. The bot can use this identifier for 5 minutes to send messages
-            until the join request is processed, assuming no other administrator contacted the
-            user.
-
-            .. versionadded:: 20.1
-        bio (:obj:`str`): Optional. Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link that was used
             by the user to send the join request.
 
             Note:
                 When a user joins a *public* group via an invite link, this attribute may not
-                be present. However, this behavior is undocument and may be subject to change.
+                be present. However, this behavior is undocumented and may be subject to change.
                 See `this GitHub thread <https://github.com/tdlib/telegram-bot-api/issues/428>`_
                 for some discussion.
 

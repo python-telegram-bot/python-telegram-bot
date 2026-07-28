@@ -47,9 +47,6 @@ class RevenueWithdrawalState(TelegramObject):
 
     Args:
         type (:obj:`str`): The type of the state.
-
-    Attributes:
-        type (:obj:`str`): The type of the state.
     """
 
     __slots__ = ("type",)
@@ -127,8 +124,6 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
     Attributes:
         type (:obj:`str`): The type of the state, always
             :tg-const:`telegram.RevenueWithdrawalState.SUCCEEDED`.
-        date (:obj:`datetime.datetime`): Date the withdrawal was completed as a datetime object.
-        url (:obj:`str`): An HTTPS URL that can be used to see transaction details.
     """
 
     __slots__ = ("date", "url")

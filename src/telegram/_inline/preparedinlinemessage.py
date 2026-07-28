@@ -42,12 +42,6 @@ class PreparedInlineMessage(TelegramObject):
         expiration_date (:class:`datetime.datetime`): Expiration date of the prepared message.
             Expired prepared messages can no longer be used.
             |datetime_localization|
-
-    Attributes:
-        id (:obj:`str`): Unique identifier of the prepared message
-        expiration_date (:class:`datetime.datetime`): Expiration date of the prepared message.
-            Expired prepared messages can no longer be used.
-            |datetime_localization|
     """
 
     __slots__ = ("expiration_date", "id")

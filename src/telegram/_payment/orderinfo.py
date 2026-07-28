@@ -41,13 +41,6 @@ class OrderInfo(TelegramObject):
         phone_number (:obj:`str`, optional): User's phone number.
         email (:obj:`str`, optional): User email.
         shipping_address (:class:`telegram.ShippingAddress`, optional): User shipping address.
-
-    Attributes:
-        name (:obj:`str`): Optional. User name.
-        phone_number (:obj:`str`): Optional. User's phone number.
-        email (:obj:`str`): Optional. User email.
-        shipping_address (:class:`telegram.ShippingAddress`): Optional. User shipping address.
-
     """
 
     __slots__ = ("email", "name", "phone_number", "shipping_address")

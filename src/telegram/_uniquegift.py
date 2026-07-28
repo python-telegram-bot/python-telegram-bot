@@ -56,16 +56,6 @@ class UniqueGiftColors(TelegramObject):
         dark_theme_main_color (:obj:`int`): Main color used in dark themes; RGB format.
         dark_theme_other_colors (Sequence[:obj:`int`]): List of 1-3 additional colors used in dark
             themes; RGB format. |sequenceclassargs|
-
-    Attributes:
-        model_custom_emoji_id (:obj:`str`): Custom emoji identifier of the unique gift's model.
-        symbol_custom_emoji_id (:obj:`str`): Custom emoji identifier of the unique gift's symbol.
-        light_theme_main_color (:obj:`int`): Main color used in light themes; RGB format.
-        light_theme_other_colors (Tuple[:obj:`int`]): Tuple of 1-3 additional colors used in
-            light themes; RGB format.
-        dark_theme_main_color (:obj:`int`): Main color used in dark themes; RGB format.
-        dark_theme_other_colors (Tuple[:obj:`int`]): Tuple of 1-3 additional colors used in dark
-            themes; RGB format.
     """
 
     __slots__ = (
@@ -130,19 +120,6 @@ class UniqueGiftModel(TelegramObject):
             or :tg-const:`telegram.constants.UniqueGiftModelRarity.LEGENDARY`.
 
             .. versionadded:: 22.7
-
-    Attributes:
-        name (:obj:`str`): Name of the model.
-        sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
-        rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
-            model for every ``1000`` gifts upgraded. Always ``0`` for crafted gifts.
-        rarity (:obj:`str`): Optional. Rarity of the model if it is a crafted model.
-            Currently, can be :tg-const:`telegram.constants.UniqueGiftModelRarity.UNCOMMON`,
-            :tg-const:`telegram.constants.UniqueGiftModelRarity.RARE`,
-            :tg-const:`telegram.constants.UniqueGiftModelRarity.EPIC`,
-            or :tg-const:`telegram.constants.UniqueGiftModelRarity.LEGENDARY`.
-
-            .. versionadded:: 22.7
     """
 
     __slots__ = (
@@ -196,13 +173,6 @@ class UniqueGiftSymbol(TelegramObject):
         sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
         rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
             model for every ``1000`` gifts upgraded.
-
-    Attributes:
-        name (:obj:`str`): Name of the symbol.
-        sticker (:class:`telegram.Sticker`): The sticker that represents the unique gift.
-        rarity_per_mille (:obj:`int`): The number of unique gifts that receive this
-            model for every ``1000`` gifts upgraded.
-
     """
 
     __slots__ = (
@@ -252,13 +222,6 @@ class UniqueGiftBackdropColors(TelegramObject):
         edge_color (:obj:`int`): The color on the edges of the backdrop in RGB format.
         symbol_color (:obj:`int`): The color to be applied to the symbol in RGB format.
         text_color (:obj:`int`): The color for the text on the backdrop in RGB format.
-
-    Attributes:
-        center_color (:obj:`int`): The color in the center of the backdrop in RGB format.
-        edge_color (:obj:`int`): The color on the edges of the backdrop in RGB format.
-        symbol_color (:obj:`int`): The color to be applied to the symbol in RGB format.
-        text_color (:obj:`int`): The color for the text on the backdrop in RGB format.
-
     """
 
     __slots__ = (
@@ -301,13 +264,6 @@ class UniqueGiftBackdrop(TelegramObject):
         colors (:class:`telegram.UniqueGiftBackdropColors`): Colors of the backdrop.
         rarity_per_mille (:obj:`int`): The number of unique gifts that receive this backdrop
             for every ``1000`` gifts upgraded.
-
-    Attributes:
-        name (:obj:`str`): Name of the backdrop.
-        colors (:class:`telegram.UniqueGiftBackdropColors`): Colors of the backdrop.
-        rarity_per_mille (:obj:`int`): The number of unique gifts that receive this backdrop
-            for every ``1000`` gifts upgraded.
-
     """
 
     __slots__ = (
@@ -386,41 +342,6 @@ class UniqueGift(TelegramObject):
 
             .. versionadded:: 22.6
         is_burned (:obj:`bool`, optional): :obj:`True`, if the gift was used to craft another
-            gift and isn't available anymore.
-
-            .. versionadded:: 22.7
-
-    Attributes:
-        gift_id (:obj:`str`): Identifier of the regular gift from which the gift was upgraded.
-
-            .. versionadded:: 22.6
-        base_name (:obj:`str`): Human-readable name of the regular gift from which this unique
-            gift was upgraded.
-        name (:obj:`str`): Unique name of the gift. This name can be used
-            in ``https://t.me/nft/...`` links and story areas.
-        number (:obj:`int`): Unique number of the upgraded gift among gifts upgraded from the
-            same regular gift.
-        model (:class:`telegram.UniqueGiftModel`): Model of the gift.
-        symbol (:class:`telegram.UniqueGiftSymbol`): Symbol of the gift.
-        backdrop (:class:`telegram.UniqueGiftBackdrop`): Backdrop of the gift.
-        publisher_chat (:class:`telegram.Chat`): Optional. Information about the chat that
-            published the gift.
-
-            .. versionadded:: 22.4
-        is_premium (:obj:`bool`): Optional. :obj:`True`, if the original regular gift was
-            exclusively purchaseable by Telegram Premium subscribers.
-
-            .. versionadded:: 22.6
-        is_from_blockchain (:obj:`bool`): Optional. :obj:`True`, if the gift is assigned from the
-            TON blockchain and can't be resold or transferred in Telegram.
-
-            .. versionadded:: 22.6
-        colors (:class:`telegram.UniqueGiftColors`): Optional. The color scheme that can be used
-            by the gift's owner for the chat's name, replies to messages and link previews; for
-            business account gifts and gifts that are currently on sale only.
-
-            .. versionadded:: 22.6
-        is_burned (:obj:`bool`): Optional. :obj:`True`, if the gift was used to craft another
             gift and isn't available anymore.
 
             .. versionadded:: 22.7
@@ -520,7 +441,7 @@ class UniqueGiftInfo(TelegramObject):
                 The :attr:`RESALE` origin was added.
             .. versionchanged:: 22.6
                 Bot API 9.3 added the :attr:`GIFTED_UPGRADE` and :attr:`OFFER` origins.
-        owned_gift_id (:obj:`str`, optional) Unique identifier of the received gift for the
+        owned_gift_id (:obj:`str`, optional): Unique identifier of the received gift for the
             bot; only present for gifts received on behalf of business accounts.
         transfer_star_count (:obj:`int`, optional): Number of Telegram Stars that must be paid
             to transfer the gift; omitted if the bot cannot transfer the gift.
@@ -539,36 +460,6 @@ class UniqueGiftInfo(TelegramObject):
 
             .. versionadded:: 22.3
 
-    Attributes:
-        gift (:class:`UniqueGift`): Information about the gift.
-        origin (:obj:`str`): Origin of the gift. Currently, either :attr:`UPGRADE` for gifts
-            upgraded from regular gifts, :attr:`TRANSFER` for gifts transferred from other users
-            or channels, :attr:`RESALE` for gifts bought from other users,
-            :attr:`GIFTED_UPGRADE` for upgrades purchased after the gift was sent, or :attr:`OFFER`
-            for gifts bought or sold through gift purchase offers
-
-            .. versionchanged:: 22.3
-                The :attr:`RESALE` origin was added.
-            .. versionchanged:: 22.6
-                Bot API 9.3 added the :attr:`GIFTED_UPGRADE` and :attr:`OFFER` origins.
-        owned_gift_id (:obj:`str`) Optional. Unique identifier of the received gift for the
-            bot; only present for gifts received on behalf of business accounts.
-        transfer_star_count (:obj:`int`): Optional. Number of Telegram Stars that must be paid
-            to transfer the gift; omitted if the bot cannot transfer the gift.
-        last_resale_currency (:obj:`str`): Optional. For gifts bought from other users, the
-            currency in which the payment for the gift was done. Currently, one of ``XTR`` for
-            Telegram Stars or ``TON`` for toncoins.
-
-            .. versionadded:: 22.6
-        last_resale_amount (:obj:`int`): Optional. For gifts bought from other users, the price
-            paid for the gift in either Telegram Stars or nanotoncoins.
-
-            .. versionadded:: 22.6
-        next_transfer_date (:obj:`datetime.datetime`): Optional. Date when the gift can be
-            transferred. If it's in the past, then the gift can be transferred now.
-            |datetime_localization|
-
-            .. versionadded:: 22.3
     """
 
     GIFTED_UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.GIFTED_UPGRADE
