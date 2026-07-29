@@ -178,10 +178,10 @@ def create_deep_linked_url(
     Raises:
         :exc:`ValueError`: If the length of the :paramref:`payload` exceeds \
         :tg-const:`telegram.constants.MessageLimit.DEEP_LINK_LENGTH` characters,
-            contains invalid characters, or if the :paramref:`bot_username` is less than 4
+            contains invalid characters, or if the :paramref:`bot_username` is less than 5
             characters.
     """
-    if bot_username is None or len(bot_username) <= 3:
+    if bot_username is None or len(bot_username) < 5:
         raise ValueError("You must provide a valid bot_username.")
 
     base_url = f"https://t.me/{bot_username}"
