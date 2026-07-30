@@ -23,13 +23,11 @@ from typing import TYPE_CHECKING
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     import datetime as dtm
-
-    from telegram import Bot
 
 
 class LivePhoto(_BaseMedium):
@@ -108,12 +106,3 @@ class LivePhoto(_BaseMedium):
             # Optional
             self.photo: Sequence[PhotoSize] | None = parse_sequence_arg(photo)
             self.mime_type: str | None = mime_type
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "LivePhoto":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
-
-        return super().de_json(data=data, bot=bot)

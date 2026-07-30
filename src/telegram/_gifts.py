@@ -20,18 +20,14 @@
 """This module contains classes related to gifs sent by bots."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._files.sticker import Sticker
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class GiftBackground(TelegramObject):
@@ -228,16 +224,6 @@ class Gift(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Gift":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
-        data["publisher_chat"] = de_json_optional(data.get("publisher_chat"), Chat, bot)
-        data["background"] = de_json_optional(data.get("background"), GiftBackground, bot)
-        return super().de_json(data=data, bot=bot)
-
 
 class Gifts(TelegramObject):
     """This object represent a list of gifts.
@@ -269,14 +255,6 @@ class Gifts(TelegramObject):
         self._id_attrs = (self.gifts,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Gifts":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["gifts"] = de_list_optional(data.get("gifts"), Gift, bot)
-        return super().de_json(data=data, bot=bot)
 
 
 class GiftInfo(TelegramObject):
@@ -384,16 +362,6 @@ class GiftInfo(TelegramObject):
         self._id_attrs = (self.gift,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "GiftInfo":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
-        data["entities"] = de_list_optional(data.get("entities"), MessageEntity, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`text`

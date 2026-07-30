@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from telegram import constants
 from telegram._copytextbutton import CopyTextButton
@@ -26,12 +26,8 @@ from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
 from telegram._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class InlineKeyboardButton(TelegramObject):
@@ -343,21 +339,6 @@ class InlineKeyboardButton(TelegramObject):
             self.style,
             self.icon_custom_emoji_id,
         )
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "InlineKeyboardButton":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["login_url"] = de_json_optional(data.get("login_url"), LoginUrl, bot)
-        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
-        data["callback_game"] = de_json_optional(data.get("callback_game"), CallbackGame, bot)
-        data["switch_inline_query_chosen_chat"] = de_json_optional(
-            data.get("switch_inline_query_chosen_chat"), SwitchInlineQueryChosenChat, bot
-        )
-        data["copy_text"] = de_json_optional(data.get("copy_text"), CopyTextButton, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     def update_callback_data(self, callback_data: str | object) -> None:
         """

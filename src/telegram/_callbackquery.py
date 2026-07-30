@@ -27,13 +27,11 @@ from telegram._inputchecklist import InputChecklist
 from telegram._message import MaybeInaccessibleMessage, Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import (
-        Bot,
         GameHighScore,
         InlineKeyboardMarkup,
         InputMedia,
@@ -152,16 +150,6 @@ class CallbackQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "CallbackQuery":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
-        data["message"] = de_json_optional(data.get("message"), Message, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     async def answer(
         self,

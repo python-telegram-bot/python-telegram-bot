@@ -18,17 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
 
-from typing import TYPE_CHECKING, Final
+from typing import ClassVar, Final
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class MenuButton(TelegramObject):
@@ -57,6 +53,15 @@ class MenuButton(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "commands": "MenuButtonCommands",
+            "web_app": "MenuButtonWebApp",
+            "default": "MenuButtonDefault",
+        },
+    )
+
     def __init__(
         self,
         type: str,
@@ -69,35 +74,6 @@ class MenuButton(TelegramObject):
         self._id_attrs = (self.type,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MenuButton":
-        """Converts JSON data to the appropriate :class:`MenuButton` object, i.e. takes
-        care of selecting the correct subclass.
-
-        Args:
-            data (dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`, optional): The bot associated with this object. Defaults to
-                :obj:`None`, in which case shortcut methods will not be available.
-
-                .. versionchanged:: 21.4
-                   :paramref:`bot` is now optional and defaults to :obj:`None`
-
-        Returns:
-            The Telegram object.
-
-        """
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[MenuButton]] = {
-            cls.COMMANDS: MenuButtonCommands,
-            cls.WEB_APP: MenuButtonWebApp,
-            cls.DEFAULT: MenuButtonDefault,
-        }
-
-        if cls is MenuButton and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data, bot=bot)
-        return super().de_json(data=data, bot=bot)
 
     COMMANDS: Final[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""
@@ -164,15 +140,6 @@ class MenuButtonWebApp(MenuButton):
             self.web_app: WebAppInfo = web_app
 
             self._id_attrs = (self.type, self.text, self.web_app)
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "MenuButtonWebApp":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["web_app"] = de_json_optional(data.get("web_app"), WebAppInfo, bot)
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class MenuButtonDefault(MenuButton):
