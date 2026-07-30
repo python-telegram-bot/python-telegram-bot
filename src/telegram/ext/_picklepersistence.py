@@ -544,21 +544,21 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """Will save all data in memory to pickle file(s)."""
         if self.single_file:
             if (
-                self.user_data
-                or self.chat_data
-                or self.bot_data
-                or self.callback_data
-                or self.conversations
+                self.user_data is not None
+                or self.chat_data is not None
+                or self.bot_data is not None
+                or self.callback_data is not None
+                or self.conversations is not None
             ):
                 self._dump_singlefile()
         else:
-            if self.user_data:
+            if self.user_data is not None:
                 self._dump_file(Path(f"{self.filepath}_user_data"), self.user_data)
-            if self.chat_data:
+            if self.chat_data is not None:
                 self._dump_file(Path(f"{self.filepath}_chat_data"), self.chat_data)
-            if self.bot_data:
+            if self.bot_data is not None:
                 self._dump_file(Path(f"{self.filepath}_bot_data"), self.bot_data)
-            if self.callback_data:
+            if self.callback_data is not None:
                 self._dump_file(Path(f"{self.filepath}_callback_data"), self.callback_data)
-            if self.conversations:
+            if self.conversations is not None:
                 self._dump_file(Path(f"{self.filepath}_conversations"), self.conversations)
