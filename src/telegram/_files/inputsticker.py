@@ -68,26 +68,6 @@ class InputSticker(TelegramObject):
 
     Attributes:
         sticker (:obj:`str` | :class:`telegram.InputFile`): The added sticker.
-        emoji_list (tuple[:obj:`str`]): Tuple of
-            :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI` -
-            :tg-const:`telegram.constants.StickerLimit.MAX_STICKER_EMOJI` emoji associated with the
-            sticker.
-        mask_position (:class:`telegram.MaskPosition`): Optional. Position where the mask should be
-            placed on faces. For ":tg-const:`telegram.constants.StickerType.MASK`" stickers only.
-        keywords (tuple[:obj:`str`]): Optional. Tuple of
-            0-:tg-const:`telegram.constants.StickerLimit.MAX_SEARCH_KEYWORDS` search keywords
-            for the sticker with the total length of up to
-            :tg-const:`telegram.constants.StickerLimit.MAX_KEYWORD_LENGTH` characters. For
-            ":tg-const:`telegram.constants.StickerType.REGULAR`" and
-            ":tg-const:`telegram.constants.StickerType.CUSTOM_EMOJI`" stickers only.
-            ":tg-const:`telegram.constants.StickerType.CUSTOM_EMOJI`" stickers only.
-        format (:obj:`str`): Format of the added sticker, must be one of
-            :tg-const:`telegram.constants.StickerFormat.STATIC` for a
-            ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
-            for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a
-            ``.WEBM`` video.
-
-            .. versionadded:: 21.1
     """
 
     __slots__ = ("emoji_list", "format", "keywords", "mask_position", "sticker")

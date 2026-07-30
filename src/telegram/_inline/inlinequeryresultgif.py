@@ -49,7 +49,7 @@ class InlineQueryResultGif(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file.
         gif_width (:obj:`int`, optional): Width of the GIF.
         gif_height (:obj:`int`, optional): Height of the GIF.
@@ -76,26 +76,16 @@ class InlineQueryResultGif(InlineQueryResult):
             after entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the GIF animation.
-        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+        show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
 
             .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GIF`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        gif_url (:obj:`str`): A valid URL for the GIF file.
-        gif_width (:obj:`int`): Optional. Width of the GIF.
-        gif_height (:obj:`int`): Optional. Height of the GIF.
         gif_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Duration of the GIF
             in seconds.
 
@@ -105,29 +95,6 @@ class InlineQueryResultGif(InlineQueryResult):
             for the result.
 
             .. versionadded:: 20.2
-        thumbnail_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
-            ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
-
-            .. versionadded:: 20.2
-        title (:obj:`str`): Optional. Title for the result.
-        caption (:obj:`str`): Optional. Caption of the GIF file to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the GIF animation.
-        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
-
-            .. versionadded:: 21.3
-
     """
 
     __slots__ = (

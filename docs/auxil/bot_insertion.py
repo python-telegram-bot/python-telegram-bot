@@ -91,14 +91,6 @@ RAISES_BLOCK = [
 ]
 
 
-def find_insert_pos_for_kwargs(lines: list[str]) -> int:
-    """Finds the correct position to insert the keyword arguments and returns the index."""
-    for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
-        if value.startswith("Returns"):
-            return idx
-    return False
-
-
 def find_insert_pos_for_raises(lines: list[str]) -> int:
     """Finds the correct position to insert the Raises block and returns the index."""
     if "Raises:" in lines:
@@ -106,7 +98,7 @@ def find_insert_pos_for_raises(lines: list[str]) -> int:
     return len(lines)  # Insert at the end if there's no Raises block
 
 
-def check_timeout_and_api_kwargs_presence(obj: object) -> int:
+def check_timeout_and_api_kwargs_presence(obj: object) -> bool:
     """Checks if the method has timeout and api_kwargs keyword only parameters."""
     sig = inspect.signature(obj)
     params_to_check = (

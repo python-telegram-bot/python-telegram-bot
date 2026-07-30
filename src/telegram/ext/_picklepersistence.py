@@ -185,6 +185,21 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             in the ``context`` interface.
 
             .. versionadded:: 13.6
+        user_data (dict[:obj:`int`, :obj:`dict`]): A dictionary mapping user ids to their
+            respective user data. This attribute is only populated after :meth:`get_user_data`
+            has been called.
+        chat_data (dict[:obj:`int`, :obj:`dict`]): A dictionary mapping chat ids to their
+            respective chat data. This attribute is only populated after :meth:`get_chat_data`
+            has been called.
+        bot_data (:attr:`telegram.ext.ContextTypes.bot_data`): The bot data. This
+            attribute is only populated after :meth:`get_bot_data` has been called.
+        callback_data (tuple[list[tuple[:obj:`str`, :obj:`float`, \
+            dict[:obj:`str`, :class:`object`]]], dict[:obj:`str`, :obj:`str`]]): The data relevant
+            for restoring :class:`telegram.ext.CallbackDataCache`. This attribute is only
+            populated after :meth:`get_callback_data` has been called.
+        conversations (dict[:obj:`str`, dict[tuple[:obj:`int` | :obj:`str`, ...],\
+            :obj:`object`]]]): A dictionary mapping handler names to their conversations.
+            This attribute is only populated after :meth:`get_conversations` has been called.
     """
 
     __slots__ = (
