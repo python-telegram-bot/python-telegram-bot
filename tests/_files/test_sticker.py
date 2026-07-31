@@ -537,9 +537,8 @@ class TestStickerSetWithoutRequest(StickerSetTestBase):
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot, offline_sticker):
-        name = f"test_by_{offline_bot.username}"
         json_dict = {
-            "name": name,
+            "name": self.name,
             "title": self.title,
             "stickers": [x.to_dict() for x in self.stickers],
             "thumbnail": offline_sticker.thumbnail.to_dict(),
