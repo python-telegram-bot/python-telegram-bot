@@ -20,18 +20,14 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._files.livephoto import LivePhoto
-from telegram._files.photosize import PhotoSize
 from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
-from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import (
-    de_json_optional,
-    de_list_optional,
     parse_sequence_arg,
     to_timedelta,
 )
@@ -39,7 +35,8 @@ from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram._files.photosize import PhotoSize
+    from telegram._user import User
 
 
 class PaidMedia(TelegramObject):
@@ -63,6 +60,16 @@ class PaidMedia(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "preview": "PaidMediaPreview",
+            "photo": "PaidMediaPhoto",
+            "video": "PaidMediaVideo",
+            "live_photo": "PaidMediaLivePhoto",
+        },
+    )
+
     PREVIEW: Final[str] = constants.PaidMediaType.PREVIEW
     """:const:`telegram.constants.PaidMediaType.PREVIEW`"""
     PHOTO: Final[str] = constants.PaidMediaType.PHOTO
@@ -83,36 +90,6 @@ class PaidMedia(TelegramObject):
 
         self._id_attrs = (self.type,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMedia":
-        """Converts JSON data to the appropriate :class:`PaidMedia` object, i.e. takes
-        care of selecting the correct subclass.
-
-        Args:
-            data (dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`, optional): The bot associated with this object.
-
-        Returns:
-            The Telegram object.
-
-        """
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[PaidMedia]] = {
-            cls.PREVIEW: PaidMediaPreview,
-            cls.PHOTO: PaidMediaPhoto,
-            cls.VIDEO: PaidMediaVideo,
-            cls.LIVE_PHOTO: PaidMediaLivePhoto,
-        }
-
-        if cls is PaidMedia and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        if "duration" in data:
-            data["duration"] = dtm.timedelta(seconds=s) if (s := data.get("duration")) else None
-
-        return super().de_json(data=data, bot=bot)
 
 
 class PaidMediaPreview(PaidMedia):
@@ -206,13 +183,6 @@ class PaidMediaPhoto(PaidMedia):
 
             self._id_attrs = (self.type, self.photo)
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaPhoto":
-        data = cls._parse_data(data)
-
-        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
-
 
 class PaidMediaVideo(PaidMedia):
     """
@@ -247,13 +217,6 @@ class PaidMediaVideo(PaidMedia):
 
             self._id_attrs = (self.type, self.video)
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaVideo":
-        data = cls._parse_data(data)
-
-        data["video"] = de_json_optional(data.get("video"), Video, bot)
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
-
 
 class PaidMediaLivePhoto(PaidMedia):
     """
@@ -287,13 +250,6 @@ class PaidMediaLivePhoto(PaidMedia):
         with self._unfrozen():
             self.live_photo: LivePhoto = live_photo
             self._id_attrs = (self.type, self.live_photo)
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaLivePhoto":
-        data = cls._parse_data(data)
-
-        data["live_photo"] = de_json_optional(data.get("live_photo"), LivePhoto, bot)
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class PaidMediaInfo(TelegramObject):
@@ -332,13 +288,6 @@ class PaidMediaInfo(TelegramObject):
         self._id_attrs = (self.star_count, self.paid_media)
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaInfo":
-        data = cls._parse_data(data)
-
-        data["paid_media"] = de_list_optional(data.get("paid_media"), PaidMedia, bot)
-        return super().de_json(data=data, bot=bot)
-
 
 class PaidMediaPurchased(TelegramObject):
     """This object contains information about a paid media purchase.
@@ -375,10 +324,3 @@ class PaidMediaPurchased(TelegramObject):
 
         self._id_attrs = (self.from_user, self.paid_media_payload)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PaidMediaPurchased":
-        data = cls._parse_data(data)
-
-        data["from_user"] = User.de_json(data=data.pop("from"), bot=bot)
-        return super().de_json(data=data, bot=bot)

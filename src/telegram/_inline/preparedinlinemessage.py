@@ -19,14 +19,9 @@
 """This module contains an object that represents a Telegram Prepared inline Message."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class PreparedInlineMessage(TelegramObject):
@@ -66,14 +61,3 @@ class PreparedInlineMessage(TelegramObject):
         self._id_attrs = (self.id,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "PreparedInlineMessage":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["expiration_date"] = from_timestamp(data.get("expiration_date"), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)

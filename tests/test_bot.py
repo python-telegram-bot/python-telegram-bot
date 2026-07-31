@@ -2541,6 +2541,20 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.copy_message(chat_id, 1, 1, reply_parameters=ReplyParameters(**kwargs))
 
+    @pytest.mark.parametrize("default_bot", [{"allow_sending_without_reply": True}], indirect=True)
+    async def test_copy_message_empty_caption_with_defaults(
+        self, default_bot, chat_id, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["caption"] == ""
+            assert request_data.json_parameters["caption"] == ""
+            return {"message_id": 1}
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        message_id = await default_bot.copy_message(chat_id, chat_id, 1, caption="")
+
+        assert message_id.message_id == 1
+
     async def test_do_api_request_camel_case_conversion(self, offline_bot, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return url.endswith("camelCase")

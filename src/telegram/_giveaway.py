@@ -25,12 +25,11 @@ from typing import TYPE_CHECKING
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional, de_list_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, Message
+    from telegram import Message
 
 
 class Giveaway(TelegramObject):
@@ -136,21 +135,6 @@ class Giveaway(TelegramObject):
         )
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "Giveaway":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["chats"] = de_list_optional(data.get("chats"), Chat, bot)
-        data["winners_selection_date"] = from_timestamp(
-            data.get("winners_selection_date"), tzinfo=loc_tzinfo
-        )
-
-        return super().de_json(data=data, bot=bot)
 
 
 class GiveawayCreated(TelegramObject):
@@ -292,22 +276,6 @@ class GiveawayWinners(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "GiveawayWinners":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-        data["winners"] = de_list_optional(data.get("winners"), User, bot)
-        data["winners_selection_date"] = from_timestamp(
-            data.get("winners_selection_date"), tzinfo=loc_tzinfo
-        )
-
-        return super().de_json(data=data, bot=bot)
-
 
 class GiveawayCompleted(TelegramObject):
     """This object represents a service message about the completion of a giveaway without public
@@ -363,17 +331,3 @@ class GiveawayCompleted(TelegramObject):
         )
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "GiveawayCompleted":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Unfortunately, this needs to be here due to cyclic imports
-        from telegram._message import (  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
-            Message,
-        )
-
-        data["giveaway_message"] = de_json_optional(data.get("giveaway_message"), Message, bot)
-
-        return super().de_json(data=data, bot=bot)

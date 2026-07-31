@@ -69,11 +69,35 @@ class StickerTestBase:
     type = Sticker.REGULAR
     custom_emoji_id = "ThisIsSuchACustomEmojiID"
     needs_repainting = True
+    mask_position = MaskPosition(point="forehead", x_shift=0.1, y_shift=-0.1, scale=1.0)
+    thumbnail = PhotoSize(
+        file_id="1",
+        file_unique_id="1",
+        width=thumb_width,
+        height=thumb_height,
+        file_size=thumb_file_size,
+    )
 
     sticker_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
     sticker_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
     premium_animation = File("this_is_an_id", "this_is_an_unique_id")
+    sticker = Sticker(
+        file_id=sticker_file_id,
+        file_unique_id=sticker_file_unique_id,
+        width=width,
+        height=height,
+        is_animated=is_animated,
+        is_video=is_video,
+        type=type,
+        emoji=emoji,
+        file_size=file_size,
+        mask_position=mask_position,
+        premium_animation=premium_animation,
+        custom_emoji_id=custom_emoji_id,
+        thumbnail=thumbnail,
+        needs_repainting=needs_repainting,
+    )
 
 
 class TestStickerWithoutRequest(StickerTestBase):
@@ -496,6 +520,13 @@ class StickerSetTestBase:
     sticker_type = Sticker.REGULAR
     contains_masks = True
     thumbnail = PhotoSize("thumb_file_id", "thumb_file_un_id", 100, 100, False)
+    sticker_set = StickerSet(
+        name,
+        title=title,
+        stickers=stickers,
+        sticker_type=sticker_type,
+        thumbnail=thumbnail,
+    )
 
 
 class TestStickerSetWithoutRequest(StickerSetTestBase):
@@ -517,7 +548,7 @@ class TestStickerSetWithoutRequest(StickerSetTestBase):
         }
         sticker_set = StickerSet.de_json(json_dict, offline_bot)
 
-        assert sticker_set.name == name
+        assert sticker_set.name == self.name
         assert sticker_set.title == self.title
         assert sticker_set.stickers == tuple(self.stickers)
         assert sticker_set.thumbnail == offline_sticker.thumbnail
