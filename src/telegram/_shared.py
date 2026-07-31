@@ -208,7 +208,7 @@ class SharedUser(TelegramObject):
         username (:obj:`str`): Optional. Username of the user, if the username was requested by the
             bot.
         photo (tuple[:class:`telegram.PhotoSize`]): Available sizes of the chat photo, if
-            the photo was requested by the bot. This list is empty if the photo was not requsted.
+            the photo was requested by the bot. This list is empty if the photo was not requested.
     """
 
     __slots__ = ("first_name", "last_name", "photo", "user_id", "username")

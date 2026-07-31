@@ -513,7 +513,7 @@ class TestBotWithoutRequest:
             assert a != e
             assert hash(a) != hash(e)
 
-            # We cant check equality for unintialized Bot object
+            # We cant check equality for uninitialized Bot object
             assert hash(a) != hash(f)
 
     @pytest.mark.parametrize(

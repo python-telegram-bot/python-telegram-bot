@@ -184,7 +184,7 @@ class MessageEntity(TelegramObject):
         Unicode (:obj:`str`) to UTF-16 (``utf-16-le`` encoded :obj:`bytes`).
 
         Tip:
-            Only the offsets and lengths calulated in UTF-16 is acceptable by the Telegram Bot API.
+            Only the offsets and lengths calculated in UTF-16 is acceptable by the Telegram Bot API.
             If they are calculated using the Unicode string (:obj:`str` object), errors may occur
             when the text contains characters that are not in the Basic Multilingual Plane (BMP).
             For more information, see `Unicode <https://en.wikipedia.org/wiki/Unicode>`_ and
