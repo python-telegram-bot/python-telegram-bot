@@ -48,7 +48,7 @@ jobs:
       # Run `chango release` if applicable - needs some additional setup.
       - name: Set up Python
         if: steps.check_title.outputs.IS_RELEASE_PR == 'true'
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.x"
 
