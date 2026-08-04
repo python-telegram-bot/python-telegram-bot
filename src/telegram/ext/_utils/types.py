@@ -88,7 +88,7 @@ BD = TypeVar("BD")
 
 .. versionadded:: 13.6
 """
-JQ = TypeVar("JQ", bound="None | JobQueue")
+JQ = TypeVar("JQ", bound="JobQueue | None")
 """Type of the job queue.
 
 .. versionadded:: 20.0"""

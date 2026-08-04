@@ -161,5 +161,5 @@ class Video(_BaseThumbedMedium):
         )
 
     @property
-    def start_timestamp(self) -> dtm.timedelta | None | int:
+    def start_timestamp(self) -> dtm.timedelta | int | None:
         return get_timedelta_value(self._start_timestamp, attribute="start_timestamp")
