@@ -198,7 +198,7 @@ class Update(TelegramObject):
         callback_query (:class:`telegram.CallbackQuery`): Optional. New incoming callback query.
 
             Examples:
-                :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
+                :doc:`Arbitrary Callback Data Bot </examples/arbitrarycallbackdatabot>`
         shipping_query (:class:`telegram.ShippingQuery`): Optional. New incoming shipping query.
             Only for invoices with flexible price.
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New incoming

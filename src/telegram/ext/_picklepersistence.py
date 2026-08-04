@@ -134,7 +134,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :attr:`~BasePersistence.bot` will be inserted back when loading the data.
 
     Examples:
-        :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
+        :doc:`Persistent Conversation Bot </examples/persistentconversationbot>`
 
     .. seealso:: :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`
 

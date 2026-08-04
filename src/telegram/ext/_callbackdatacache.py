@@ -49,7 +49,7 @@ class InvalidCallbackData(TelegramError):
     Raised when the received callback data has been tampered with or deleted from cache.
 
     Examples:
-        :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
+        :doc:`Arbitrary Callback Data Bot </examples/arbitrarycallbackdatabot>`
 
     .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
@@ -127,7 +127,7 @@ class CallbackDataCache:
            pip install "python-telegram-bot[callback-data]"
 
     Examples:
-        :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
+        :doc:`Arbitrary Callback Data Bot </examples/arbitrarycallbackdatabot>`
 
     .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`

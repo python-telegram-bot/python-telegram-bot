@@ -166,7 +166,7 @@ class ExtBot(Bot, Generic[RLARGS]):
           additional argument, as this method will never be rate limited.
 
     Examples:
-        :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
+        :doc:`Arbitrary Callback Data Bot </examples/arbitrarycallbackdatabot>`
 
     .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
@@ -303,7 +303,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         objects passed as callback data for :class:`telegram.InlineKeyboardButton`.
 
         Examples:
-            :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
+            :doc:`Arbitrary Callback Data Bot </examples/arbitrarycallbackdatabot>`
 
         .. versionchanged:: 20.0
            * This property is now read-only.

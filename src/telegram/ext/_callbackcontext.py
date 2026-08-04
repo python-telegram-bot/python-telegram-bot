@@ -73,8 +73,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     4. The type of :attr:`bot_data` (if :attr:`bot_data` is not :obj:`None`).
 
     Examples:
-        * :any:`Context Types Bot <examples.contexttypesbot>`
-        * :any:`Custom Webhook Bot <examples.customwebhookbot>`
+        * :doc:`Context Types Bot </examples/contexttypesbot>`
+        * :doc:`Custom Webhook Bot </examples/customwebhookbot>`
 
     .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`,
         :wiki:`Job Queue <Extensions---JobQueue>`

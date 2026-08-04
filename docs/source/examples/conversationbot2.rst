@@ -3,7 +3,7 @@
 ``conversationbot2.py``
 =======================
 
-.. literalinclude:: ../../examples/conversationbot2.py
+.. literalinclude:: ../../../examples/conversationbot2.py
    :language: python
    :linenos:
 
@@ -12,4 +12,4 @@
 State Diagram
 -------------
 
-.. mermaid:: ../../examples/conversationbot2.mmd
+.. mermaid:: ../../../examples/conversationbot2.mmd

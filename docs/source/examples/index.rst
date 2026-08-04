@@ -8,7 +8,7 @@ In this section we display small examples to show what a bot written with
 Some bots focus on one specific
 aspect of the Telegram Bot API while others focus on one of the
 mechanics of this library. Except for the
-:any:`examples.rawapibot` example, they all use the high-level
+:doc:`rawapibot` example, they all use the high-level
 framework this library provides with the
 :mod:`telegram.ext` submodule.
 
@@ -24,14 +24,14 @@ local variable in those callbacks. However, since these are examples and
 not having a name for that argument confuses beginners, we decided to
 have it present.
 
-:any:`examples.echobot`
+:doc:`echobot`
 -----------------------
 
 This is probably the base for most of the bots made with
 ``python-telegram-bot``. It simply replies to each text message with a
 message that contains the same text.
 
-:any:`examples.timerbot`
+:doc:`timerbot`
 ------------------------
 
 This bot uses the
@@ -43,7 +43,7 @@ also cancel the timer by sending ``/unset``. To learn more about the
 ``JobQueue``, read `this wiki article <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions---JobQueue>`__.
 Note: To use ``JobQueue``, you must install PTB via ``pip install "python-telegram-bot[job-queue]"``
 
-:any:`examples.conversationbot`
+:doc:`conversationbot`
 -------------------------------
 
 A common task for a bot is to ask information from the user. In v5.0 of
@@ -53,14 +53,14 @@ for that exact purpose. This example uses it to retrieve
 user-information in a conversation-like style. To get a better
 understanding, take a look at the :ref:`state diagram <conversationbot-diagram>`.
 
-:any:`examples.conversationbot2`
+:doc:`conversationbot2`
 --------------------------------
 
 A more complex example of a bot that uses the ``ConversationHandler``.
 It is also more confusing. Good thing there is a :ref:`fancy state diagram <conversationbot2-diagram>`.
 for this one, too!
 
-:any:`examples.nestedconversationbot`
+:doc:`nestedconversationbot`
 -------------------------------------
 
 An even more complex example of a bot that uses the nested
@@ -70,45 +70,45 @@ gives a good impression on how to work with them. Of course, there is a
 :ref:`fancy state diagram <nestedconversationbot-diagram>`
 for this example, too!
 
-:any:`examples.persistentconversationbot`
+:doc:`persistentconversationbot`
 -----------------------------------------
 
 A basic example of a bot store conversation state and user_data over
 multiple restarts.
 
-:any:`examples.inlinekeyboard`
+:doc:`inlinekeyboard`
 ------------------------------
 
 This example sheds some light on inline keyboards, callback queries and
 message editing. A wiki site explaining this examples lives
 `here <https://github.com/python-telegram-bot/python-telegram-bot/wiki/InlineKeyboard-Example>`__.
 
-:any:`examples.inlinekeyboard2`
+:doc:`inlinekeyboard2`
 -------------------------------
 
 A more complex example about inline keyboards, callback queries and
 message editing. This example showcases how an interactive menu could be
 build using inline keyboards.
 
-:any:`examples.deeplinking`
+:doc:`deeplinking`
 ---------------------------
 
 A basic example on how to use deeplinking with inline keyboards.
 
-:any:`examples.inlinebot`
+:doc:`inlinebot`
 -------------------------
 
 A basic example of an `inline
 bot <https://core.telegram.org/bots/inline>`__. Don’t forget to enable
 inline mode with `@BotFather <https://telegram.me/BotFather>`_.
 
-:any:`examples.pollbot`
+:doc:`pollbot`
 -----------------------
 
 This example sheds some light on polls, poll answers and the
 corresponding handlers.
 
-:any:`examples.passportbot`
+:doc:`passportbot`
 ---------------------------
 
 A basic example of a bot that can accept passports. Use in combination
@@ -119,24 +119,24 @@ Don’t forget to enable and configure payments with
 on Telegram passports in PTB.
 Note: To use Telegram Passport, you must install PTB via ``pip install "python-telegram-bot[passport]"``
 
-:any:`examples.paymentbot`
+:doc:`paymentbot`
 --------------------------
 
 A basic example of a bot that can accept payments. Don’t forget to
 enable and configure payments with
 `@BotFather <https://telegram.me/BotFather>`_.
 
-:any:`examples.errorhandlerbot`
+:doc:`errorhandlerbot`
 -------------------------------
 
 A basic example on how to set up a custom error handler.
 
-:any:`examples.chatmemberbot`
+:doc:`chatmemberbot`
 -----------------------------
 
 A basic example on how ``(my_)chat_member`` updates can be used.
 
-:any:`examples.webappbot`
+:doc:`webappbot`
 -------------------------
 
 A basic example of how `Telegram
@@ -148,19 +148,19 @@ don’t need to host it yourself. Uses the
 user interface that is hard to achieve with native Telegram
 functionality.
 
-:any:`examples.contexttypesbot`
+:doc:`contexttypesbot`
 -------------------------------
 
 This example showcases how ``telegram.ext.ContextTypes`` can be used to
 customize the ``context`` argument of handler and job callbacks.
 
-:any:`examples.customwebhookbot`
+:doc:`customwebhookbot`
 --------------------------------
 
 This example showcases how a custom webhook setup can be used in
 combination with ``telegram.ext.Application``.
 
-:any:`examples.arbitrarycallbackdatabot`
+:doc:`arbitrarycallbackdatabot`
 ----------------------------------------
 
 This example showcases how PTBs “arbitrary callback data” feature can be
@@ -170,28 +170,28 @@ Note: To use arbitrary callback data, you must install PTB via ``pip install "py
 Pure API
 --------
 
-The :any:`examples.rawapibot` example example uses only the pure, “bare-metal” API wrapper.
+The :doc:`rawapibot` example example uses only the pure, “bare-metal” API wrapper.
 
 .. toctree::
    :hidden:
 
-   examples.arbitrarycallbackdatabot
-   examples.chatmemberbot
-   examples.contexttypesbot
-   examples.conversationbot
-   examples.conversationbot2
-   examples.customwebhookbot
-   examples.deeplinking
-   examples.echobot
-   examples.errorhandlerbot
-   examples.inlinebot
-   examples.inlinekeyboard
-   examples.inlinekeyboard2
-   examples.nestedconversationbot
-   examples.passportbot
-   examples.paymentbot
-   examples.persistentconversationbot
-   examples.pollbot
-   examples.rawapibot
-   examples.timerbot
-   examples.webappbot
+   arbitrarycallbackdatabot
+   chatmemberbot
+   contexttypesbot
+   conversationbot
+   conversationbot2
+   customwebhookbot
+   deeplinking
+   echobot
+   errorhandlerbot
+   inlinebot
+   inlinekeyboard
+   inlinekeyboard2
+   nestedconversationbot
+   passportbot
+   paymentbot
+   persistentconversationbot
+   pollbot
+   rawapibot
+   timerbot
+   webappbot

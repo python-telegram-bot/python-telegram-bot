@@ -33,7 +33,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     interface.
 
     Examples:
-        :any:`ContextTypes Bot <examples.contexttypesbot>`
+        :doc:`ContextTypes Bot </examples/contexttypesbot>`
 
     .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Storing Bot, User and Chat Related Data <Storing-bot%2C-user-and-chat-related-data>`

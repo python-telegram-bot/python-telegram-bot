@@ -49,7 +49,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT, RT]):
           updates won't be handled, if :attr:`chat_types` is passed.
 
     Examples:
-        :any:`Inline Bot <examples.inlinebot>`
+        :doc:`Inline Bot </examples/inlinebot>`
 
 
     Args:

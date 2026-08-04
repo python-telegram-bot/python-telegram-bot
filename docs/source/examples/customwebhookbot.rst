@@ -21,24 +21,24 @@ You can select your preferred framework by opening one of the tabs above the cod
 
 .. tab:: ``starlette``
 
-    .. literalinclude:: ../../examples/customwebhookbot/starlettebot.py
+    .. literalinclude:: ../../../examples/customwebhookbot/starlettebot.py
        :language: python
        :linenos:
 
 .. tab:: ``flask``
 
-    .. literalinclude:: ../../examples/customwebhookbot/flaskbot.py
+    .. literalinclude:: ../../../examples/customwebhookbot/flaskbot.py
        :language: python
        :linenos:
 
 .. tab:: ``quart``
 
-    .. literalinclude:: ../../examples/customwebhookbot/quartbot.py
+    .. literalinclude:: ../../../examples/customwebhookbot/quartbot.py
        :language: python
        :linenos:
 
 .. tab:: ``Django``
 
-    .. literalinclude:: ../../examples/customwebhookbot/djangobot.py
+    .. literalinclude:: ../../../examples/customwebhookbot/djangobot.py
        :language: python
        :linenos:

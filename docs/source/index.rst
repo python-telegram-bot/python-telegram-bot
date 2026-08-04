@@ -32,7 +32,7 @@ This is just here to get furo to display the right sidebar.
    :hidden:
    :caption: Resources
 
-   examples
+   examples/index
    Wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki>
 
 .. toctree::

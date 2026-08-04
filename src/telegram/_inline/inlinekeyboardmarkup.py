@@ -47,8 +47,8 @@ class InlineKeyboardMarkup(TelegramObject):
         Another kind of keyboard would be the :class:`telegram.ReplyKeyboardMarkup`.
 
     Examples:
-        * :any:`Inline Keyboard 1 <examples.inlinekeyboard>`
-        * :any:`Inline Keyboard 2 <examples.inlinekeyboard2>`
+        * :doc:`Inline Keyboard 1 </examples/inlinekeyboard>`
+        * :doc:`Inline Keyboard 2 </examples/inlinekeyboard2>`
 
     Args:
         inline_keyboard (Sequence[Sequence[:class:`telegram.InlineKeyboardButton`]]): Sequence of

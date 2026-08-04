@@ -33,7 +33,7 @@ class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
     Examples:
-        :any:`Inline Bot <examples.inlinebot>`
+        :doc:`Inline Bot </examples/inlinebot>`
 
     .. versionchanged:: 20.5
       Removed the deprecated arguments and attributes ``thumb_*``.

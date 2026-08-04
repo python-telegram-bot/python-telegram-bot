@@ -163,7 +163,7 @@ def create_deep_linked_url(
 
     Examples:
         * ``create_deep_linked_url(bot.get_me().username, "some-params")``
-        * :any:`Deep Linking <examples.deeplinking>`
+        * :doc:`Deep Linking </examples/deeplinking>`
 
     Args:
         bot_username (:obj:`str`): The username to link to.

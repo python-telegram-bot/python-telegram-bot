@@ -3,7 +3,7 @@
 ``passportbot.py``
 ==================
 
-.. literalinclude:: ../../examples/passportbot.py
+.. literalinclude:: ../../../examples/passportbot.py
    :language: python
    :linenos:
 
@@ -12,6 +12,6 @@
 HTML Page
 ---------
 
-.. literalinclude:: ../../examples/passportbot.html
+.. literalinclude:: ../../../examples/passportbot.html
    :language: html
    :linenos:

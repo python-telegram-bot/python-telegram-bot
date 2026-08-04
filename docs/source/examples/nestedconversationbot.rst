@@ -3,7 +3,7 @@
 ``nestedconversationbot.py``
 ============================
 
-.. literalinclude:: ../../examples/nestedconversationbot.py
+.. literalinclude:: ../../../examples/nestedconversationbot.py
    :language: python
    :linenos:
 
@@ -12,4 +12,4 @@
 State Diagram
 -------------
 
-.. mermaid:: ../../examples/nestedconversationbot.mmd
+.. mermaid:: ../../../examples/nestedconversationbot.mmd

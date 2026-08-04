@@ -36,7 +36,7 @@ class ShippingOption(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Examples:
-        :any:`Payment Bot <examples.paymentbot>`
+        :doc:`Payment Bot </examples/paymentbot>`
 
     Args:
         id (:obj:`str`): Shipping option identifier.

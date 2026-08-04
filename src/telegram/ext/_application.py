@@ -158,7 +158,7 @@ class Application(
        of that or :obj:`None`.
 
     Examples:
-        :any:`Echo Bot <examples.echobot>`
+        :doc:`Echo Bot </examples/echobot>`
 
     .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Architecture Overview <Architecture>`
@@ -1804,7 +1804,7 @@ class Application(
             Attempts to add the same callback multiple times will be ignored.
 
         Examples:
-            :any:`Errorhandler Bot <examples.errorhandlerbot>`
+            :doc:`Errorhandler Bot </examples/errorhandlerbot>`
 
         Hint:
             This method currently has no influence on calls to :meth:`process_error` that are

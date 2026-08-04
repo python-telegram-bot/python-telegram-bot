@@ -31,7 +31,7 @@ class ShippingQueryHandler(BaseHandler[Update, CCT, RT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Examples:
-        :any:`Payment Bot <examples.paymentbot>`
+        :doc:`Payment Bot </examples/paymentbot>`
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

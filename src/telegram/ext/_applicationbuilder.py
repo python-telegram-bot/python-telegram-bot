@@ -900,7 +900,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         for :attr:`telegram.ext.Application.bot`.
 
         Examples:
-            :any:`Passport Bot <examples.passportbot>`
+            :doc:`Passport Bot </examples/passportbot>`
 
         .. seealso:: :wiki:`Telegram Passports <Telegram-Passport>`
 
@@ -962,7 +962,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                pip install "python-telegram-bot[callback-data]"
 
         Examples:
-            :any:`Arbitrary callback_data Bot <examples.arbitrarycallbackdatabot>`
+            :doc:`Arbitrary callback_data Bot </examples/arbitrarycallbackdatabot>`
 
         .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
@@ -1093,7 +1093,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         instantiated if the requirements of :class:`telegram.ext.JobQueue` are installed.
 
         Examples:
-            :any:`Timer Bot <examples.timerbot>`
+            :doc:`Timer Bot </examples/timerbot>`
 
         .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
 
@@ -1133,7 +1133,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             to the persistence in order to avoid race conditions.
 
         Examples:
-            :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
+            :doc:`Persistent Conversation Bot </examples/persistentconversationbot>`
 
         .. seealso:: :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`
 
@@ -1158,7 +1158,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :attr:`telegram.ext.Application.context_types`.
 
         Examples:
-            :any:`Context Types Bot <examples.contexttypesbot>`
+            :doc:`Context Types Bot </examples/contexttypesbot>`
 
         Args:
             context_types (:class:`telegram.ext.ContextTypes`): The context types.

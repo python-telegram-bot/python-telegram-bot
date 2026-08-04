@@ -210,7 +210,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
           :exc:`TypeError`.
 
     Examples:
-        :any:`Raw API Bot <examples.rawapibot>`
+        :doc:`Raw API Bot </examples/rawapibot>`
 
     .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
@@ -4835,7 +4835,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             :meth:`telegram.ext.Updater.start_webhook`
 
         Examples:
-            :any:`Custom Webhook Bot <examples.customwebhookbot>`
+            :doc:`Custom Webhook Bot </examples/customwebhookbot>`
 
         Args:
             url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook

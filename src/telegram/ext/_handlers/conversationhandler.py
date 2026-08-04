@@ -171,13 +171,13 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         states to continue the parent conversation after the child conversation has ended or even
         map a state to :attr:`END` to end the *parent* conversation from within the child
         conversation. For an example on nested :class:`ConversationHandler` s, see
-        :any:`examples.nestedconversationbot`.
+        :doc:`/examples/nestedconversationbot`.
 
     Examples:
-        * :any:`Conversation Bot <examples.conversationbot>`
-        * :any:`Conversation Bot 2 <examples.conversationbot2>`
-        * :any:`Nested Conversation Bot <examples.nestedconversationbot>`
-        * :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
+        * :doc:`Conversation Bot </examples/conversationbot>`
+        * :doc:`Conversation Bot 2 </examples/conversationbot2>`
+        * :doc:`Nested Conversation Bot </examples/nestedconversationbot>`
+        * :doc:`Persistent Conversation Bot </examples/persistentconversationbot>`
 
     Args:
         entry_points (list[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`

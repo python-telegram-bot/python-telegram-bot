@@ -3,7 +3,7 @@
 ``webappbot.py``
 ================
 
-.. literalinclude:: ../../examples/webappbot.py
+.. literalinclude:: ../../../examples/webappbot.py
    :language: python
    :linenos:
 
@@ -12,6 +12,6 @@
 HTML Page
 ---------
 
-.. literalinclude:: ../../examples/webappbot.html
+.. literalinclude:: ../../../examples/webappbot.html
    :language: html
    :linenos:

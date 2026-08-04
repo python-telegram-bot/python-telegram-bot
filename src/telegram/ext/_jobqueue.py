@@ -81,7 +81,7 @@ class JobQueue(Generic[CCT]):
            pip install "python-telegram-bot[job-queue]"
 
     Examples:
-        :any:`Timer Bot <examples.timerbot>`
+        :doc:`Timer Bot </examples/timerbot>`
 
     .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Job Queue <Extensions---JobQueue>`

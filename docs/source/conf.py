@@ -82,8 +82,8 @@ templates_path = ["_templates"]
 # You can specify multiple suffix as a list of string:
 source_suffix = ".rst"
 
-# These maintained fragments are included by generated documents with the historic dotted names.
-exclude_patterns = ["examples/**", "telegram/**", "telegram_auxil/**"]
+# API fragments are included by generated dotted-name wrappers. Example pages are read in place.
+exclude_patterns = ["telegram/**", "telegram_auxil/**"]
 
 # The master toctree document.
 master_doc = "index"
