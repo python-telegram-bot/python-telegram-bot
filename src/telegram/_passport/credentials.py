@@ -57,8 +57,6 @@ def decrypt(secret, hash, data):
             base64 encoded string.
         data (:obj:`str` or :obj:`bytes`): The data to decrypt, either as bytes or as a
             base64 encoded string.
-        file (:obj:`bool`): Force data to be treated as raw data, instead of trying to
-            b64decode it.
 
     Raises:
         :class:`PassportDecryptionError`: Given hash does not match hash of decrypted data.
