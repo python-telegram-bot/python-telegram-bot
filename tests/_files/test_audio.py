@@ -58,30 +58,32 @@ class AudioTestBase:
 
 
 class TestAudioWithoutRequest(AudioTestBase):
-    def test_slot_behaviour(self, audio):
-        for attr in audio.__slots__:
-            assert getattr(audio, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(audio)) == len(set(mro_slots(audio))), "duplicate slot"
+    def test_slot_behaviour(self, offline_audio):
+        for attr in offline_audio.__slots__:
+            assert getattr(offline_audio, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_audio)) == len(set(mro_slots(offline_audio))), (
+            "duplicate slot"
+        )
 
-    def test_creation(self, audio):
+    def test_creation(self, offline_audio):
         # Make sure file has been uploaded.
-        assert isinstance(audio, Audio)
-        assert isinstance(audio.file_id, str)
-        assert isinstance(audio.file_unique_id, str)
-        assert audio.file_id
-        assert audio.file_unique_id
+        assert isinstance(offline_audio, Audio)
+        assert isinstance(offline_audio.file_id, str)
+        assert isinstance(offline_audio.file_unique_id, str)
+        assert offline_audio.file_id
+        assert offline_audio.file_unique_id
 
-    def test_expected_values(self, audio):
-        assert audio._duration == self.duration
-        assert audio.performer is None
-        assert audio.title is None
-        assert audio.mime_type == self.mime_type
-        assert audio.file_size == self.file_size
-        assert audio.thumbnail.file_size in [self.thumb_file_size, 1395]
-        assert audio.thumbnail.width == self.thumb_width
-        assert audio.thumbnail.height == self.thumb_height
+    def test_expected_values(self, offline_audio):
+        assert offline_audio._duration == self.duration
+        assert offline_audio.performer is None
+        assert offline_audio.title is None
+        assert offline_audio.mime_type == self.mime_type
+        assert offline_audio.file_size == self.file_size
+        assert offline_audio.thumbnail.file_size in [self.thumb_file_size, 1395]
+        assert offline_audio.thumbnail.width == self.thumb_width
+        assert offline_audio.thumbnail.height == self.thumb_height
 
-    def test_de_json(self, offline_bot, audio):
+    def test_de_json(self, offline_bot, offline_audio):
         json_dict = {
             "file_id": self.audio_file_id,
             "file_unique_id": self.audio_file_unique_id,
@@ -91,7 +93,7 @@ class TestAudioWithoutRequest(AudioTestBase):
             "file_name": self.file_name,
             "mime_type": self.mime_type,
             "file_size": self.file_size,
-            "thumbnail": audio.thumbnail.to_dict(),
+            "thumbnail": offline_audio.thumbnail.to_dict(),
         }
         json_audio = Audio.de_json(json_dict, offline_bot)
         assert json_audio.api_kwargs == {}
@@ -104,30 +106,30 @@ class TestAudioWithoutRequest(AudioTestBase):
         assert json_audio.file_name == self.file_name
         assert json_audio.mime_type == self.mime_type
         assert json_audio.file_size == self.file_size
-        assert json_audio.thumbnail == audio.thumbnail
+        assert json_audio.thumbnail == offline_audio.thumbnail
 
-    def test_to_dict(self, audio):
-        audio_dict = audio.to_dict()
+    def test_to_dict(self, offline_audio):
+        audio_dict = offline_audio.to_dict()
 
         assert isinstance(audio_dict, dict)
-        assert audio_dict["file_id"] == audio.file_id
-        assert audio_dict["file_unique_id"] == audio.file_unique_id
+        assert audio_dict["file_id"] == offline_audio.file_id
+        assert audio_dict["file_unique_id"] == offline_audio.file_unique_id
         assert audio_dict["duration"] == int(self.duration.total_seconds())
         assert isinstance(audio_dict["duration"], int)
-        assert audio_dict["mime_type"] == audio.mime_type
-        assert audio_dict["file_size"] == audio.file_size
-        assert audio_dict["file_name"] == audio.file_name
+        assert audio_dict["mime_type"] == offline_audio.mime_type
+        assert audio_dict["file_size"] == offline_audio.file_size
+        assert audio_dict["file_name"] == offline_audio.file_name
 
-    def test_time_period_properties(self, PTB_TIMEDELTA, audio):
+    def test_time_period_properties(self, PTB_TIMEDELTA, offline_audio):
         if PTB_TIMEDELTA:
-            assert audio.duration == self.duration
-            assert isinstance(audio.duration, dtm.timedelta)
+            assert offline_audio.duration == self.duration
+            assert isinstance(offline_audio.duration, dtm.timedelta)
         else:
-            assert audio.duration == int(self.duration.total_seconds())
-            assert isinstance(audio.duration, int)
+            assert offline_audio.duration == int(self.duration.total_seconds())
+            assert isinstance(offline_audio.duration, int)
 
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, audio):
-        audio.duration
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, offline_audio):
+        offline_audio.duration
 
         if PTB_TIMEDELTA:
             assert len(recwarn) == 0
@@ -136,12 +138,12 @@ class TestAudioWithoutRequest(AudioTestBase):
             assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
-    def test_equality(self, audio):
-        a = Audio(audio.file_id, audio.file_unique_id, audio.duration)
-        b = Audio("", audio.file_unique_id, audio.duration)
-        c = Audio(audio.file_id, audio.file_unique_id, 0)
-        d = Audio("", "", audio.duration)
-        e = Voice(audio.file_id, audio.file_unique_id, audio.duration)
+    def test_equality(self, offline_audio):
+        a = Audio(offline_audio.file_id, offline_audio.file_unique_id, offline_audio.duration)
+        b = Audio("", offline_audio.file_unique_id, offline_audio.duration)
+        c = Audio(offline_audio.file_id, offline_audio.file_unique_id, 0)
+        d = Audio("", "", offline_audio.duration)
+        e = Voice(offline_audio.file_id, offline_audio.file_unique_id, offline_audio.duration)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -156,12 +158,12 @@ class TestAudioWithoutRequest(AudioTestBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_send_with_audio(self, monkeypatch, offline_bot, chat_id, audio):
+    async def test_send_with_audio(self, monkeypatch, offline_bot, chat_id, offline_audio):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["audio"] == audio.file_id
+            return request_data.json_parameters["audio"] == offline_audio.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.send_audio(audio=audio, chat_id=chat_id)
+        assert await offline_bot.send_audio(audio=offline_audio, chat_id=chat_id)
 
     async def test_send_audio_custom_filename(self, offline_bot, chat_id, audio_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -197,16 +199,18 @@ class TestAudioWithoutRequest(AudioTestBase):
         finally:
             offline_bot._local_mode = False
 
-    async def test_get_file_instance_method(self, monkeypatch, audio):
+    async def test_get_file_instance_method(self, monkeypatch, offline_audio):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == audio.file_id
+            return kwargs["file_id"] == offline_audio.file_id
 
         assert check_shortcut_signature(Audio.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(audio.get_file, audio.get_bot(), "get_file")
-        assert await check_defaults_handling(audio.get_file, audio.get_bot())
+        assert await check_shortcut_call(
+            offline_audio.get_file, offline_audio.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(offline_audio.get_file, offline_audio.get_bot())
 
-        monkeypatch.setattr(audio._bot, "get_file", make_assertion)
-        assert await audio.get_file()
+        monkeypatch.setattr(offline_audio._bot, "get_file", make_assertion)
+        assert await offline_audio.get_file()
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
@@ -218,7 +222,7 @@ class TestAudioWithoutRequest(AudioTestBase):
         indirect=["default_bot"],
     )
     async def test_send_audio_default_quote_parse_mode(
-        self, default_bot, chat_id, audio, custom, monkeypatch
+        self, default_bot, chat_id, offline_audio, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -231,7 +235,9 @@ class TestAudioWithoutRequest(AudioTestBase):
             kwargs["quote_parse_mode"] = custom
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
-        await default_bot.send_audio(chat_id, audio, reply_parameters=ReplyParameters(**kwargs))
+        await default_bot.send_audio(
+            chat_id, offline_audio, reply_parameters=ReplyParameters(**kwargs)
+        )
 
 
 class TestAudioWithRequest(AudioTestBase):

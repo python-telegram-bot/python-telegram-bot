@@ -30,10 +30,29 @@ def video_quality_message_id():
 
 
 @pytest.fixture(scope="module")
+def offline_video_quality_list(offline_bot):
+    quality = VideoQuality(
+        file_id="video-quality-file-id",
+        file_unique_id="video-quality-file-unique-id",
+        width=VideoQualityTestBase.width,
+        height=VideoQualityTestBase.height,
+        codec=VideoQualityTestBase.codec,
+        file_size=VideoQualityTestBase.file_size,
+    )
+    quality.set_bot(offline_bot)
+    return (quality,)
+
+
+@pytest.fixture(scope="module")
 async def video_quality_list(bot, chat_id, channel_id, video_quality_message_id):
     return (
         await bot.forward_message(chat_id, channel_id, video_quality_message_id, read_timeout=50)
     ).video.qualities
+
+
+@pytest.fixture(scope="module")
+def offline_video_quality(offline_video_quality_list):
+    return offline_video_quality_list[-1]
 
 
 @pytest.fixture(scope="module")
@@ -50,36 +69,36 @@ class VideoQualityTestBase:
 
 
 class TestVideoQualityWithoutRequest(VideoQualityTestBase):
-    def test_qualities_available(self, video_quality_list):
-        assert isinstance(video_quality_list, tuple)
+    def test_qualities_available(self, offline_video_quality_list):
+        assert isinstance(offline_video_quality_list, tuple)
         # Subsequent tests relie on the forwarded video
         # having exactly one video quality.
-        assert len(video_quality_list) == 1
+        assert len(offline_video_quality_list) == 1
 
-    def test_slot_behaviour(self, video_quality):
-        for attr in video_quality.__slots__:
-            assert getattr(video_quality, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(video_quality)) == len(set(mro_slots(video_quality))), (
-            "duplicate slot"
-        )
+    def test_slot_behaviour(self, offline_video_quality):
+        for attr in offline_video_quality.__slots__:
+            assert getattr(offline_video_quality, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_video_quality)) == len(
+            set(mro_slots(offline_video_quality))
+        ), "duplicate slot"
 
-    def test_creation(self, video_quality):
-        assert isinstance(video_quality, VideoQuality)
-        assert isinstance(video_quality.file_id, str)
-        assert isinstance(video_quality.file_unique_id, str)
-        assert video_quality.file_id
-        assert video_quality.file_unique_id
+    def test_creation(self, offline_video_quality):
+        assert isinstance(offline_video_quality, VideoQuality)
+        assert isinstance(offline_video_quality.file_id, str)
+        assert isinstance(offline_video_quality.file_unique_id, str)
+        assert offline_video_quality.file_id
+        assert offline_video_quality.file_unique_id
 
-    def test_expected_values(self, video_quality):
-        assert video_quality.width == self.width
-        assert video_quality.height == self.height
-        assert video_quality.codec == self.codec
-        assert video_quality.file_size == self.file_size
+    def test_expected_values(self, offline_video_quality):
+        assert offline_video_quality.width == self.width
+        assert offline_video_quality.height == self.height
+        assert offline_video_quality.codec == self.codec
+        assert offline_video_quality.file_size == self.file_size
 
-    def test_de_json(self, offline_bot, video_quality):
+    def test_de_json(self, offline_bot, offline_video_quality):
         json_dict = {
-            "file_id": video_quality.file_id,
-            "file_unique_id": video_quality.file_unique_id,
+            "file_id": offline_video_quality.file_id,
+            "file_unique_id": offline_video_quality.file_unique_id,
             "width": self.width,
             "height": self.height,
             "codec": self.codec,
@@ -88,38 +107,42 @@ class TestVideoQualityWithoutRequest(VideoQualityTestBase):
         json_videoquality = VideoQuality.de_json(json_dict, offline_bot)
         assert json_videoquality.api_kwargs == {}
 
-        assert json_videoquality.file_id == video_quality.file_id
-        assert json_videoquality.file_unique_id == video_quality.file_unique_id
+        assert json_videoquality.file_id == offline_video_quality.file_id
+        assert json_videoquality.file_unique_id == offline_video_quality.file_unique_id
         assert json_videoquality.width == self.width
         assert json_videoquality.height == self.height
         assert json_videoquality.codec == self.codec
         assert json_videoquality.file_size == self.file_size
 
-    def test_to_dict(self, video_quality):
-        videoquality_dict = video_quality.to_dict()
+    def test_to_dict(self, offline_video_quality):
+        videoquality_dict = offline_video_quality.to_dict()
 
         assert isinstance(videoquality_dict, dict)
-        assert videoquality_dict["file_id"] == video_quality.file_id
-        assert videoquality_dict["file_unique_id"] == video_quality.file_unique_id
-        assert videoquality_dict["width"] == video_quality.width
-        assert videoquality_dict["height"] == video_quality.height
-        assert videoquality_dict["codec"] == video_quality.codec
-        assert videoquality_dict["file_size"] == video_quality.file_size
+        assert videoquality_dict["file_id"] == offline_video_quality.file_id
+        assert videoquality_dict["file_unique_id"] == offline_video_quality.file_unique_id
+        assert videoquality_dict["width"] == offline_video_quality.width
+        assert videoquality_dict["height"] == offline_video_quality.height
+        assert videoquality_dict["codec"] == offline_video_quality.codec
+        assert videoquality_dict["file_size"] == offline_video_quality.file_size
 
-    def test_equality(self, video_quality):
+    def test_equality(self, offline_video_quality):
         a = VideoQuality(
-            video_quality.file_id,
-            video_quality.file_unique_id,
+            offline_video_quality.file_id,
+            offline_video_quality.file_unique_id,
             self.width,
             self.height,
             self.codec,
         )
-        b = VideoQuality("", video_quality.file_unique_id, self.width, self.height, self.codec)
-        c = VideoQuality(video_quality.file_id, video_quality.file_unique_id, 0, 0, self.codec)
+        b = VideoQuality(
+            "", offline_video_quality.file_unique_id, self.width, self.height, self.codec
+        )
+        c = VideoQuality(
+            offline_video_quality.file_id, offline_video_quality.file_unique_id, 0, 0, self.codec
+        )
         d = VideoQuality("", "", self.width, self.height, self.codec)
         e = PhotoSize(
-            video_quality.file_id,
-            video_quality.file_unique_id,
+            offline_video_quality.file_id,
+            offline_video_quality.file_unique_id,
             self.width,
             self.height,
         )
