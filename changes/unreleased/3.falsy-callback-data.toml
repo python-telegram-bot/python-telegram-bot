@@ -1,0 +1,5 @@
+bugfixes = "Fixed ``CallbackQueryHandler`` incorrectly ignoring falsy ``callback_data`` values when a ``pattern`` is configured."
+[[pull_requests]]
+uid = "3"
+author_uids = ["Vamp1reAchao"]
+closes_threads = []
