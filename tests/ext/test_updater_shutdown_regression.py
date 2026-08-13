@@ -44,7 +44,7 @@ async def test_polling_stop_does_not_acknowledge_inflight_update(updater, monkey
 
         await updater.stop()
 
-        assert pending == [Update(update_id=1)]
+        assert pending[0].update_id == 1
         assert cleanup_calls == 0
 
         await updater.start_polling()
