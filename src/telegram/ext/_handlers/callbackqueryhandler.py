@@ -170,7 +170,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
 
         # we check for .data or .game_short_name from update to filter based on whats coming
         # this gives xor-like behavior
-        if callback_data:
+        if callback_data is not None:
             if not self.pattern:
                 return False
             if isinstance(self.pattern, type):
