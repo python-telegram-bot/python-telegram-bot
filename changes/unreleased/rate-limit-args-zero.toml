@@ -1,0 +1,1 @@
+bugfixes = "Respect an explicit rate_limit_args=0 in AIORateLimiter"

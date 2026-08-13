@@ -238,6 +238,19 @@ class TestAIORateLimiter:
         delays = [j - i for i, j in itertools.pairwise(times)]
         assert delays == pytest.approx([1.1 for _ in range(max_retries)], rel=0.05)
 
+    async def test_rate_limit_args_zero_overrides_default_max_retries(self, bot):
+        bot = ExtBot(
+            token=bot.token,
+            request=self.CountRequest(retry_after=1),
+            rate_limiter=AIORateLimiter(
+                max_retries=1, overall_max_rate=0, group_max_rate=0
+            ),
+        )
+        with pytest.raises(RetryAfter):
+            await bot.get_me(rate_limit_args=0)
+
+        assert TestAIORateLimiter.count == 1
+
     async def test_delay_all_pending_on_retry(self, bot):
         # Makes sure that a RetryAfter blocks *all* pending requests
         bot = ExtBot(
@@ -344,7 +357,6 @@ class TestAIORateLimiter:
                 assert all(task.done() for task in non_chat_tasks.values())
                 assert all(task.done() for task in chat_tasks.values())
         finally:
-            # cleanup
             await asyncio.gather(*non_chat_tasks.values(), *chat_tasks.values())
             TestAIORateLimiter.count = 0
             TestAIORateLimiter.call_times = []
