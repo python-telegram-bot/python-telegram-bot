@@ -145,6 +145,34 @@ class TestCallbackQueryHandler:
         callback_query.callback_query.data = InvalidCallbackData()
         assert not handler.check_update(callback_query)
 
+    @pytest.mark.parametrize(
+        ("data", "pattern"),
+        [
+            (False, str),
+            (0, str),
+            ("", ".+"),
+        ],
+    )
+    def test_falsy_callback_data_is_filtered(self, callback_query, data, pattern):
+        handler = CallbackQueryHandler(self.callback_basic, pattern=pattern)
+
+        callback_query.callback_query.data = data
+
+        assert not handler.check_update(callback_query)
+
+    def test_falsy_callback_data_is_passed_to_callable_pattern(self, callback_query):
+        seen = []
+
+        def pattern(callback_data):
+            seen.append(callback_data)
+            return False
+
+        handler = CallbackQueryHandler(self.callback_basic, pattern=pattern)
+        callback_query.callback_query.data = False
+
+        assert not handler.check_update(callback_query)
+        assert seen == [False]
+
     def test_with_callable_pattern(self, callback_query):
         class CallbackData:
             pass
