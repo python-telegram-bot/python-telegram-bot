@@ -334,6 +334,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         )
 
         _LOGGER.debug("Bootstrap done")
+        polling_start_offset = self._last_update_id
 
         async def polling_action_cb() -> None:
             try:
@@ -393,6 +394,17 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         # so we do not receive them again on the next startup
         # We define this here so that we can use the same parameters as in the polling task
         async def _get_updates_cleanup() -> None:
+            # If polling was stopped while get_updates was still in flight, the action task is
+            # cancelled before it can advance `_last_update_id`. In that case the cleanup request
+            # would acknowledge an update that was fetched but never enqueued, causing it to be
+            # lost on the next polling start.
+            if self._last_update_id == polling_start_offset:
+                _LOGGER.debug(
+                    "Skipping polling cleanup because no update was confirmed during this "
+                    "polling cycle."
+                )
+                return
+
             _LOGGER.debug(
                 "Calling `get_updates` one more time to mark all fetched updates as read."
             )
@@ -443,8 +455,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
             If you want to use this method, you must install PTB with the optional requirement
             ``webhooks``, i.e.
 
-            .. code-block:: bash
-
                pip install "python-telegram-bot[webhooks]"
 
         .. seealso:: :wiki:`Webhooks`
@@ -483,14 +493,13 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
             ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
                 Defaults to :obj:`None`.
 
-                .. versionadded :: 13.4
+                .. versionadded:: 13.4
             allowed_updates (Sequence[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`. Defaults to :obj:`None`.
 
                 .. versionchanged:: 21.9
                     Accepts any :class:`collections.abc.Sequence` as input instead of just a list
-            max_connections (:obj:`int`, optional): Passed to
-                :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
+            max_connections (:obj:`int`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
 
                 .. versionadded:: 13.6
             secret_token (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
@@ -505,24 +514,16 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
             unix (:class:`pathlib.Path` | :obj:`str` | :class:`socket.socket`, optional): Can be
                 either:
 
-                * the path to the unix socket file as :class:`pathlib.Path` or :obj:`str`. This
-                  will be passed to `tornado.netutil.bind_unix_socket <https://www.tornadoweb.org/
-                  en/stable/netutil.html#tornado.netutil.bind_unix_socket>`_ to create the socket.
-                  If the Path does not exist, the file will be created.
+                * the path to the unix socket as :class:`pathlib.Path` or :obj:`str`. This
+                  will be passed to `tornado.netutil.bind_unix_socket` to create the socket.
 
-                * or the socket itself. This option allows you to e.g. restrict the permissions of
-                  the socket for improved security. Note that you need to pass the correct family,
-                  type and socket options yourself.
+                * or the socket itself.
 
                 Caution:
                     This parameter is a replacement for the default TCP bind. Therefore, it is
-                    mutually exclusive with :paramref:`listen` and :paramref:`port`. When using
-                    this param, you must also run a reverse proxy to the unix socket and set the
-                    appropriate :paramref:`webhook_url`.
+                    mutually exclusive with :paramref:`listen` and :paramref:`port`.
 
                 .. versionadded:: 20.8
-                .. versionchanged:: 21.1
-                    Added support to pass a socket instance itself.
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
 
