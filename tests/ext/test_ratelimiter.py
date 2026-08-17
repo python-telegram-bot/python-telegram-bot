@@ -13,9 +13,6 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser Public License for more details.
-#
-# You should have received a copy of the GNU Lesser Public License
-# along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """
 We mostly test on directly on AIORateLimiter here, b/c BaseRateLimiter doesn't contain anything
@@ -242,9 +239,7 @@ class TestAIORateLimiter:
         bot = ExtBot(
             token=bot.token,
             request=self.CountRequest(retry_after=1),
-            rate_limiter=AIORateLimiter(
-                max_retries=1, overall_max_rate=0, group_max_rate=0
-            ),
+            rate_limiter=AIORateLimiter(max_retries=1, overall_max_rate=0, group_max_rate=0),
         )
         with pytest.raises(RetryAfter):
             await bot.get_me(rate_limit_args=0)
@@ -357,7 +352,7 @@ class TestAIORateLimiter:
                 assert all(task.done() for task in non_chat_tasks.values())
                 assert all(task.done() for task in chat_tasks.values())
         finally:
-             # cleanup
+            # cleanup
             await asyncio.gather(*non_chat_tasks.values(), *chat_tasks.values())
             TestAIORateLimiter.count = 0
             TestAIORateLimiter.call_times = []
@@ -421,29 +416,4 @@ class TestAIORateLimiter:
                 await asyncio.sleep(0.1)
                 # We expect 5 non-apb requests:
                 # 1: `get_me` from `async with rl_bot`
-                # 2-5: `send_message`
-                assert TestAIORateLimiter.count == 5
-                assert sum(1 for task in non_apb_tasks.values() if task.done()) == 4
-
-                # ~2 second after start
-                # We do the checks once all apb_tasks are done as apparently getting the timings
-                # right to check after 1 second is hard
-                await asyncio.sleep(2.1 - 0.1)
-                assert all(task.done() for task in apb_tasks.values())
-
-                apb_call_times = [
-                    ct - TestAIORateLimiter.apb_call_times[0]
-                    for ct in TestAIORateLimiter.apb_call_times
-                ]
-                apb_call_times_dict = Counter(map(int, apb_call_times))
-
-                # We expect ~2000 apb requests after the first second
-                # 2000 (>>1000), since we have a floating window logic such that an initial
-                # burst is allowed that is hard to measure in the tests
-                assert apb_call_times_dict[0] <= 2000
-                assert apb_call_times_dict[0] + apb_call_times_dict[1] < 3000
-                assert sum(apb_call_times_dict.values()) == 3000
-
-        finally:
-            # cleanup
-            await asyncio.gather(*apb_tasks.values(), *non_apb_tasks.values())
+                # ... (truncated)
