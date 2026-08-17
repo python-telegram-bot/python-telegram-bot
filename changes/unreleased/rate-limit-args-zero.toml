@@ -1,0 +1,6 @@
+bugfixes = "Respect an explicit rate_limit_args=0 in AIORateLimiter"
+
+[[pull_requests]]
+uid = "5330"
+author_uids = ["Vamp1reAchao"]
+closes_threads = []
