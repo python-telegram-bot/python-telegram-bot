@@ -106,7 +106,6 @@ class PaidMediaPreview(PaidMedia):
        equality comparison now considers integer durations and equivalent timedeltas as equal.
 
     Args:
-        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PREVIEW`.
         width (:obj:`int`, optional): Media width as defined by the sender.
         height (:obj:`int`, optional): Media height as defined by the sender.
         duration (:obj:`int` | :class:`datetime.timedelta`, optional): Duration of the media in
@@ -160,7 +159,6 @@ class PaidMediaPhoto(PaidMedia):
     .. versionadded:: 21.4
 
     Args:
-        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.PHOTO`.
         photo (Sequence[:class:`telegram.PhotoSize`]): The photo.
 
     Attributes:
@@ -194,7 +192,6 @@ class PaidMediaVideo(PaidMedia):
     .. versionadded:: 21.4
 
     Args:
-        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.VIDEO`.
         video (:class:`telegram.Video`): The video.
 
     Attributes:
@@ -228,7 +225,6 @@ class PaidMediaLivePhoto(PaidMedia):
     .. versionadded:: 22.8
 
     Args:
-        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.LIVE_PHOTO`
         live_photo (:class:`telegram.LivePhoto`): The photo.
 
     Attributes:
