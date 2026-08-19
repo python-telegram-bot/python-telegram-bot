@@ -40,7 +40,8 @@ classifiers = [
 ]
 dependencies = [
     "httpx >=0.27,<0.29",
-    "httpcore >=1.0.9; python_version >= '3.14'"  # httpx doesn't pin this as of 0.28.1
+    "httpcore >=1.0.9; python_version >= '3.14'",  # httpx doesn't pin this as of 0.28.1
+    "typing-extensions~=4.16",
 ]
 
 [project.urls]
@@ -169,7 +170,7 @@ line-length = 99
 show-fixes = true
 
 [tool.ruff.lint]
-typing-extensions = false
+typing-extensions = true
 ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203", "ASYNC240", "PLR0917"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
           "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
