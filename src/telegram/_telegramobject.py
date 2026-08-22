@@ -362,7 +362,7 @@ class TelegramObject:
 
         plan: dict[str, Any] = {}
         compatibility_defaults: dict[str, object] = {}
-        globalns: dict[str, object] = getattr(init_fn, "__globals__", {})
+        globalns: dict[str, object] = getattr(inspect.unwrap(init_fn), "__globals__", {})
         tg_ns = get_telegram_namespace()
         sig = inspect.signature(init_fn)
         cls.__INIT_PARAMS = set(sig.parameters) - {"self"}
