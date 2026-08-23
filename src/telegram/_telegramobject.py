@@ -734,11 +734,14 @@ class TelegramObject:
         Raises:
             RuntimeError: If no :class:`telegram.Bot` instance was set for this object.
         """
-        if self._bot is None:
+        # FIXME: This is a pylint hack without it pylint thinks the return type
+        # of get_bot() (i.e type of self._bot) is dataclasses.Field
+        bot = cast("Bot | None", object.__getattribute__(self, "_bot"))
+        if bot is None:
             raise RuntimeError(
                 "This object has no bot associated with it. Shortcuts cannot be used."
             )
-        return self._bot
+        return bot
 
     def set_bot(self, bot: "Bot | None") -> None:
         """Sets the :class:`telegram.Bot` instance associated with this object.

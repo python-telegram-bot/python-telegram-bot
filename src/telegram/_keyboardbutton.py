@@ -25,10 +25,11 @@ from telegram._keyboardbuttonrequest import (
     KeyboardButtonRequestUsers,
 )
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._webappinfo import WebAppInfo
 
 
+@tg_dataclass()
 class KeyboardButton(TelegramObject):
     """
     This object represents one button of the reply keyboard. At most one of the optional fields
@@ -182,65 +183,22 @@ class KeyboardButton(TelegramObject):
             .. versionadded:: 22.8
     """
 
-    __slots__ = (
-        "icon_custom_emoji_id",
-        "request_chat",
-        "request_contact",
-        "request_location",
-        "request_managed_bot",
-        "request_poll",
-        "request_users",
-        "style",
-        "text",
-        "web_app",
-    )
-
     __REMOVED_API_FIELDS__ = frozenset(
         {
             "request_user",
         }
     )
 
-    def __init__(
-        self,
-        text: str,
-        request_contact: bool | None = None,
-        request_location: bool | None = None,
-        request_poll: KeyboardButtonPollType | None = None,
-        web_app: WebAppInfo | None = None,
-        request_chat: KeyboardButtonRequestChat | None = None,
-        request_users: KeyboardButtonRequestUsers | None = None,
-        style: str | None = None,
-        icon_custom_emoji_id: str | None = None,
-        request_managed_bot: KeyboardButtonRequestManagedBot | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
+    # Required
+    text: str = tg_field(compare=True)
 
-        # Required
-        self.text: str = text
-        # Optionals
-        self.request_contact: bool | None = request_contact
-        self.request_location: bool | None = request_location
-        self.request_poll: KeyboardButtonPollType | None = request_poll
-        self.web_app: WebAppInfo | None = web_app
-        self.request_users: KeyboardButtonRequestUsers | None = request_users
-        self.request_chat: KeyboardButtonRequestChat | None = request_chat
-        self.style: str | None = style
-        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
-        self.request_managed_bot: KeyboardButtonRequestManagedBot | None = request_managed_bot
-
-        self._id_attrs = (
-            self.text,
-            self.request_contact,
-            self.request_location,
-            self.request_poll,
-            self.web_app,
-            self.request_users,
-            self.request_chat,
-            self.style,
-            self.icon_custom_emoji_id,
-        )
-
-        self._freeze()
+    # Optionals
+    request_contact: bool | None = tg_field(compare=True, default=None)
+    request_location: bool | None = tg_field(compare=True, default=None)
+    request_poll: KeyboardButtonPollType | None = tg_field(compare=True, default=None)
+    web_app: WebAppInfo | None = tg_field(compare=True, default=None)
+    request_chat: KeyboardButtonRequestChat | None = tg_field(compare=True, default=None)
+    request_users: KeyboardButtonRequestUsers | None = tg_field(compare=True, default=None)
+    style: str | None = tg_field(compare=True, default=None)
+    icon_custom_emoji_id: str | None = tg_field(compare=True, default=None)
+    request_managed_bot: KeyboardButtonRequestManagedBot | None = tg_field(default=None)

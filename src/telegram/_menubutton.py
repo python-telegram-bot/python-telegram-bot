@@ -18,15 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
 
-from typing import ClassVar, Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._webappinfo import WebAppInfo
 
 
+@tg_dataclass()
 class MenuButton(TelegramObject):
     """This object describes the bot's menu button in a private chat. It should be one of
 
@@ -51,8 +52,6 @@ class MenuButton(TelegramObject):
         type (:obj:`str`): Type of menu button that the instance represents.
     """
 
-    __slots__ = ("type",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -62,27 +61,21 @@ class MenuButton(TelegramObject):
         },
     )
 
-    def __init__(
-        self,
-        type: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):  # pylint: disable=redefined-builtin
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.MenuButtonType, type, type)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.MenuButtonType, value, value)
 
-        self._id_attrs = (self.type,)
+    type: str = tg_field(compare=True, converter=_type_converter)
 
-        self._freeze()
-
-    COMMANDS: Final[str] = constants.MenuButtonType.COMMANDS
+    COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""
-    WEB_APP: Final[str] = constants.MenuButtonType.WEB_APP
+    WEB_APP: ClassVar[str] = constants.MenuButtonType.WEB_APP
     """:const:`telegram.constants.MenuButtonType.WEB_APP`"""
-    DEFAULT: Final[str] = constants.MenuButtonType.DEFAULT
+    DEFAULT: ClassVar[str] = constants.MenuButtonType.DEFAULT
     """:const:`telegram.constants.MenuButtonType.DEFAULT`"""
 
 
+@tg_dataclass()
 class MenuButtonCommands(MenuButton):
     """Represents a menu button, which opens the bot's list of commands.
 
@@ -93,13 +86,11 @@ class MenuButtonCommands(MenuButton):
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.COMMANDS`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=constants.MenuButtonType.COMMANDS, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=MenuButton.COMMANDS)
 
 
+@tg_dataclass()
 class MenuButtonWebApp(MenuButton):
     """Represents a menu button, which launches a
     `Web App <https://core.telegram.org/bots/webapps>`_.
@@ -131,17 +122,14 @@ class MenuButtonWebApp(MenuButton):
             will be opened as if the user pressed the link.
     """
 
-    __slots__ = ("text", "web_app")
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=MenuButton.WEB_APP)
 
-    def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=constants.MenuButtonType.WEB_APP, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.text: str = text
-            self.web_app: WebAppInfo = web_app
-
-            self._id_attrs = (self.type, self.text, self.web_app)
+    text: str = tg_field(compare=True)
+    web_app: WebAppInfo = tg_field(compare=True)
 
 
+@tg_dataclass()
 class MenuButtonDefault(MenuButton):
     """Describes that no specific value for the menu button was set.
 
@@ -150,8 +138,5 @@ class MenuButtonDefault(MenuButton):
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.DEFAULT`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=constants.MenuButtonType.DEFAULT, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=MenuButton.DEFAULT)

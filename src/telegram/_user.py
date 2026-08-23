@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
     CorrectOptionIds,
@@ -77,6 +78,7 @@ if TYPE_CHECKING:
     from telegram._utils.types import FileInput, ReplyMarkup
 
 
+@tg_dataclass()
 class User(TelegramObject):
     """This object represents a Telegram user or bot.
 
@@ -192,72 +194,25 @@ class User(TelegramObject):
         case so far, but Telegram does not guarantee that this stays this way.
     """
 
-    __slots__ = (
-        "added_to_attachment_menu",
-        "allows_users_to_create_topics",
-        "can_connect_to_business",
-        "can_join_groups",
-        "can_manage_bots",
-        "can_read_all_group_messages",
-        "first_name",
-        "has_main_web_app",
-        "has_topics_enabled",
-        "id",
-        "is_bot",
-        "is_premium",
-        "language_code",
-        "last_name",
-        "supports_guest_queries",
-        "supports_inline_queries",
-        "username",
-    )
-
-    def __init__(
-        self,
-        id: int,
-        first_name: str,
-        is_bot: bool,
-        last_name: str | None = None,
-        username: str | None = None,
-        language_code: str | None = None,
-        can_join_groups: bool | None = None,
-        can_read_all_group_messages: bool | None = None,
-        supports_inline_queries: bool | None = None,
-        is_premium: bool | None = None,
-        added_to_attachment_menu: bool | None = None,
-        can_connect_to_business: bool | None = None,
-        has_main_web_app: bool | None = None,
-        has_topics_enabled: bool | None = None,
-        allows_users_to_create_topics: bool | None = None,
-        can_manage_bots: bool | None = None,
-        supports_guest_queries: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.id: int = id
-        self.first_name: str = first_name
-        self.is_bot: bool = is_bot
-        # Optionals
-        self.last_name: str | None = last_name
-        self.username: str | None = username
-        self.language_code: str | None = language_code
-        self.can_join_groups: bool | None = can_join_groups
-        self.can_read_all_group_messages: bool | None = can_read_all_group_messages
-        self.supports_inline_queries: bool | None = supports_inline_queries
-        self.is_premium: bool | None = is_premium
-        self.added_to_attachment_menu: bool | None = added_to_attachment_menu
-        self.can_connect_to_business: bool | None = can_connect_to_business
-        self.has_main_web_app: bool | None = has_main_web_app
-        self.has_topics_enabled: bool | None = has_topics_enabled
-        self.allows_users_to_create_topics: bool | None = allows_users_to_create_topics
-        self.can_manage_bots: bool | None = can_manage_bots
-        self.supports_guest_queries: bool | None = supports_guest_queries
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    # Required
+    id: int = tg_field(compare=True)
+    first_name: str = tg_field()
+    is_bot: bool = tg_field()
+    # Optional
+    last_name: str | None = tg_field(default=None)
+    username: str | None = tg_field(default=None)
+    language_code: str | None = tg_field(default=None)
+    can_join_groups: bool | None = tg_field(default=None)
+    can_read_all_group_messages: bool | None = tg_field(default=None)
+    supports_inline_queries: bool | None = tg_field(default=None)
+    is_premium: bool | None = tg_field(default=None)
+    added_to_attachment_menu: bool | None = tg_field(default=None)
+    can_connect_to_business: bool | None = tg_field(default=None)
+    has_main_web_app: bool | None = tg_field(default=None)
+    has_topics_enabled: bool | None = tg_field(default=None)
+    allows_users_to_create_topics: bool | None = tg_field(default=None)
+    can_manage_bots: bool | None = tg_field(default=None)
+    supports_guest_queries: bool | None = tg_field(default=None)
 
     @property
     def name(self) -> str:

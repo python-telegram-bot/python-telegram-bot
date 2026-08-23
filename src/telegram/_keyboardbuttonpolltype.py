@@ -20,10 +20,11 @@
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram.constants import PollType
 
 
+@tg_dataclass()
 class KeyboardButtonPollType(TelegramObject):
     """This object represents type of a poll, which is allowed to be created
     and sent when the corresponding button is pressed.
@@ -46,17 +47,8 @@ class KeyboardButtonPollType(TelegramObject):
             Otherwise, the user will be allowed to create a poll of any type.
     """
 
-    __slots__ = ("type",)
+    @staticmethod
+    def _type_converter(value: str | None) -> str | None:
+        return enum.get_member(PollType, value, value)
 
-    def __init__(
-        self,
-        type: str | None = None,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str | None = enum.get_member(PollType, type, type)
-
-        self._id_attrs = (self.type,)
-
-        self._freeze()
+    type: str | None = tg_field(compare=True, default=None, converter=_type_converter)

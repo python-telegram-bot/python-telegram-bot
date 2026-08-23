@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._business import BusinessConnection, BusinessMessagesDeleted
@@ -36,13 +36,14 @@ from telegram._payment.precheckoutquery import PreCheckoutQuery
 from telegram._payment.shippingquery import ShippingQuery
 from telegram._poll import Poll, PollAnswer
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram import Chat, User
 
 
+@tg_dataclass()
 class Update(TelegramObject):
     """This object represents an incoming update.
 
@@ -296,219 +297,150 @@ class Update(TelegramObject):
             .. versionadded:: 22.8
     """
 
-    __slots__ = (
-        "_effective_chat",
-        "_effective_message",
-        "_effective_sender",
-        "_effective_user",
-        "business_connection",
-        "business_message",
-        "callback_query",
-        "channel_post",
-        "chat_boost",
-        "chat_join_request",
-        "chat_member",
-        "chosen_inline_result",
-        "deleted_business_messages",
-        "edited_business_message",
-        "edited_channel_post",
-        "edited_message",
-        "guest_message",
-        "inline_query",
-        "managed_bot",
-        "message",
-        "message_reaction",
-        "message_reaction_count",
-        "my_chat_member",
-        "poll",
-        "poll_answer",
-        "pre_checkout_query",
-        "purchased_paid_media",
-        "removed_chat_boost",
-        "shipping_query",
-        "update_id",
-    )
-
-    MESSAGE: Final[str] = constants.UpdateType.MESSAGE
+    MESSAGE: ClassVar[str] = constants.UpdateType.MESSAGE
     """:const:`telegram.constants.UpdateType.MESSAGE`
 
     .. versionadded:: 13.5"""
-    EDITED_MESSAGE: Final[str] = constants.UpdateType.EDITED_MESSAGE
+    EDITED_MESSAGE: ClassVar[str] = constants.UpdateType.EDITED_MESSAGE
     """:const:`telegram.constants.UpdateType.EDITED_MESSAGE`
 
     .. versionadded:: 13.5"""
-    CHANNEL_POST: Final[str] = constants.UpdateType.CHANNEL_POST
+    CHANNEL_POST: ClassVar[str] = constants.UpdateType.CHANNEL_POST
     """:const:`telegram.constants.UpdateType.CHANNEL_POST`
 
     .. versionadded:: 13.5"""
-    EDITED_CHANNEL_POST: Final[str] = constants.UpdateType.EDITED_CHANNEL_POST
+    EDITED_CHANNEL_POST: ClassVar[str] = constants.UpdateType.EDITED_CHANNEL_POST
     """:const:`telegram.constants.UpdateType.EDITED_CHANNEL_POST`
 
     .. versionadded:: 13.5"""
-    INLINE_QUERY: Final[str] = constants.UpdateType.INLINE_QUERY
+    INLINE_QUERY: ClassVar[str] = constants.UpdateType.INLINE_QUERY
     """:const:`telegram.constants.UpdateType.INLINE_QUERY`
 
     .. versionadded:: 13.5"""
-    CHOSEN_INLINE_RESULT: Final[str] = constants.UpdateType.CHOSEN_INLINE_RESULT
+    CHOSEN_INLINE_RESULT: ClassVar[str] = constants.UpdateType.CHOSEN_INLINE_RESULT
     """:const:`telegram.constants.UpdateType.CHOSEN_INLINE_RESULT`
 
     .. versionadded:: 13.5"""
-    CALLBACK_QUERY: Final[str] = constants.UpdateType.CALLBACK_QUERY
+    CALLBACK_QUERY: ClassVar[str] = constants.UpdateType.CALLBACK_QUERY
     """:const:`telegram.constants.UpdateType.CALLBACK_QUERY`
 
     .. versionadded:: 13.5"""
-    SHIPPING_QUERY: Final[str] = constants.UpdateType.SHIPPING_QUERY
+    SHIPPING_QUERY: ClassVar[str] = constants.UpdateType.SHIPPING_QUERY
     """:const:`telegram.constants.UpdateType.SHIPPING_QUERY`
 
     .. versionadded:: 13.5"""
-    PRE_CHECKOUT_QUERY: Final[str] = constants.UpdateType.PRE_CHECKOUT_QUERY
+    PRE_CHECKOUT_QUERY: ClassVar[str] = constants.UpdateType.PRE_CHECKOUT_QUERY
     """:const:`telegram.constants.UpdateType.PRE_CHECKOUT_QUERY`
 
     .. versionadded:: 13.5"""
-    POLL: Final[str] = constants.UpdateType.POLL
+    POLL: ClassVar[str] = constants.UpdateType.POLL
     """:const:`telegram.constants.UpdateType.POLL`
 
     .. versionadded:: 13.5"""
-    POLL_ANSWER: Final[str] = constants.UpdateType.POLL_ANSWER
+    POLL_ANSWER: ClassVar[str] = constants.UpdateType.POLL_ANSWER
     """:const:`telegram.constants.UpdateType.POLL_ANSWER`
 
     .. versionadded:: 13.5"""
-    MY_CHAT_MEMBER: Final[str] = constants.UpdateType.MY_CHAT_MEMBER
+    MY_CHAT_MEMBER: ClassVar[str] = constants.UpdateType.MY_CHAT_MEMBER
     """:const:`telegram.constants.UpdateType.MY_CHAT_MEMBER`
 
     .. versionadded:: 13.5"""
-    CHAT_MEMBER: Final[str] = constants.UpdateType.CHAT_MEMBER
+    CHAT_MEMBER: ClassVar[str] = constants.UpdateType.CHAT_MEMBER
     """:const:`telegram.constants.UpdateType.CHAT_MEMBER`
 
     .. versionadded:: 13.5"""
-    CHAT_JOIN_REQUEST: Final[str] = constants.UpdateType.CHAT_JOIN_REQUEST
+    CHAT_JOIN_REQUEST: ClassVar[str] = constants.UpdateType.CHAT_JOIN_REQUEST
     """:const:`telegram.constants.UpdateType.CHAT_JOIN_REQUEST`
 
     .. versionadded:: 13.8"""
-    CHAT_BOOST: Final[str] = constants.UpdateType.CHAT_BOOST
+    CHAT_BOOST: ClassVar[str] = constants.UpdateType.CHAT_BOOST
     """:const:`telegram.constants.UpdateType.CHAT_BOOST`
 
     .. versionadded:: 20.8"""
-    REMOVED_CHAT_BOOST: Final[str] = constants.UpdateType.REMOVED_CHAT_BOOST
+    REMOVED_CHAT_BOOST: ClassVar[str] = constants.UpdateType.REMOVED_CHAT_BOOST
     """:const:`telegram.constants.UpdateType.REMOVED_CHAT_BOOST`
 
     .. versionadded:: 20.8"""
-    MESSAGE_REACTION: Final[str] = constants.UpdateType.MESSAGE_REACTION
+    MESSAGE_REACTION: ClassVar[str] = constants.UpdateType.MESSAGE_REACTION
     """:const:`telegram.constants.UpdateType.MESSAGE_REACTION`
 
     .. versionadded:: 20.8"""
-    MESSAGE_REACTION_COUNT: Final[str] = constants.UpdateType.MESSAGE_REACTION_COUNT
+    MESSAGE_REACTION_COUNT: ClassVar[str] = constants.UpdateType.MESSAGE_REACTION_COUNT
     """:const:`telegram.constants.UpdateType.MESSAGE_REACTION_COUNT`
 
     .. versionadded:: 20.8"""
-    BUSINESS_CONNECTION: Final[str] = constants.UpdateType.BUSINESS_CONNECTION
+    BUSINESS_CONNECTION: ClassVar[str] = constants.UpdateType.BUSINESS_CONNECTION
     """:const:`telegram.constants.UpdateType.BUSINESS_CONNECTION`
 
     .. versionadded:: 21.1"""
-    BUSINESS_MESSAGE: Final[str] = constants.UpdateType.BUSINESS_MESSAGE
+    BUSINESS_MESSAGE: ClassVar[str] = constants.UpdateType.BUSINESS_MESSAGE
     """:const:`telegram.constants.UpdateType.BUSINESS_MESSAGE`
 
     .. versionadded:: 21.1"""
-    EDITED_BUSINESS_MESSAGE: Final[str] = constants.UpdateType.EDITED_BUSINESS_MESSAGE
+    EDITED_BUSINESS_MESSAGE: ClassVar[str] = constants.UpdateType.EDITED_BUSINESS_MESSAGE
     """:const:`telegram.constants.UpdateType.EDITED_BUSINESS_MESSAGE`
 
     .. versionadded:: 21.1"""
-    DELETED_BUSINESS_MESSAGES: Final[str] = constants.UpdateType.DELETED_BUSINESS_MESSAGES
+    DELETED_BUSINESS_MESSAGES: ClassVar[str] = constants.UpdateType.DELETED_BUSINESS_MESSAGES
     """:const:`telegram.constants.UpdateType.DELETED_BUSINESS_MESSAGES`
 
     .. versionadded:: 21.1"""
 
-    PURCHASED_PAID_MEDIA: Final[str] = constants.UpdateType.PURCHASED_PAID_MEDIA
+    PURCHASED_PAID_MEDIA: ClassVar[str] = constants.UpdateType.PURCHASED_PAID_MEDIA
     """:const:`telegram.constants.UpdateType.PURCHASED_PAID_MEDIA`
 
     .. versionadded:: 21.6
     """
 
-    MANAGED_BOT: Final[str] = constants.UpdateType.MANAGED_BOT
+    MANAGED_BOT: ClassVar[str] = constants.UpdateType.MANAGED_BOT
     """:const:`telegram.constants.UpdateType.MANAGED_BOT`
 
     .. versionadded:: 22.8
     """
-    GUEST_MESSAGE: Final[str] = constants.UpdateType.GUEST_MESSAGE
+    GUEST_MESSAGE: ClassVar[str] = constants.UpdateType.GUEST_MESSAGE
     """:const:`telegram.constants.UpdateType.GUEST_MESSAGE`
 
     .. versionadded:: 22.8
     """
 
-    ALL_TYPES: Final[list[str]] = list(constants.UpdateType)
+    ALL_TYPES: ClassVar[list[str]] = list(constants.UpdateType)
     """list[:obj:`str`]: A list of all available update types.
 
     .. versionadded:: 13.5"""
 
-    def __init__(
-        self,
-        update_id: int,
-        message: Message | None = None,
-        edited_message: Message | None = None,
-        channel_post: Message | None = None,
-        edited_channel_post: Message | None = None,
-        inline_query: InlineQuery | None = None,
-        chosen_inline_result: ChosenInlineResult | None = None,
-        callback_query: CallbackQuery | None = None,
-        shipping_query: ShippingQuery | None = None,
-        pre_checkout_query: PreCheckoutQuery | None = None,
-        poll: Poll | None = None,
-        poll_answer: PollAnswer | None = None,
-        my_chat_member: ChatMemberUpdated | None = None,
-        chat_member: ChatMemberUpdated | None = None,
-        chat_join_request: ChatJoinRequest | None = None,
-        chat_boost: ChatBoostUpdated | None = None,
-        removed_chat_boost: ChatBoostRemoved | None = None,
-        message_reaction: MessageReactionUpdated | None = None,
-        message_reaction_count: MessageReactionCountUpdated | None = None,
-        business_connection: BusinessConnection | None = None,
-        business_message: Message | None = None,
-        edited_business_message: Message | None = None,
-        deleted_business_messages: BusinessMessagesDeleted | None = None,
-        purchased_paid_media: PaidMediaPurchased | None = None,
-        managed_bot: ManagedBotUpdated | None = None,
-        guest_message: Message | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.update_id: int = update_id
-        # Optionals
-        self.message: Message | None = message
-        self.edited_message: Message | None = edited_message
-        self.inline_query: InlineQuery | None = inline_query
-        self.chosen_inline_result: ChosenInlineResult | None = chosen_inline_result
-        self.callback_query: CallbackQuery | None = callback_query
-        self.shipping_query: ShippingQuery | None = shipping_query
-        self.pre_checkout_query: PreCheckoutQuery | None = pre_checkout_query
-        self.channel_post: Message | None = channel_post
-        self.edited_channel_post: Message | None = edited_channel_post
-        self.poll: Poll | None = poll
-        self.poll_answer: PollAnswer | None = poll_answer
-        self.my_chat_member: ChatMemberUpdated | None = my_chat_member
-        self.chat_member: ChatMemberUpdated | None = chat_member
-        self.chat_join_request: ChatJoinRequest | None = chat_join_request
-        self.chat_boost: ChatBoostUpdated | None = chat_boost
-        self.removed_chat_boost: ChatBoostRemoved | None = removed_chat_boost
-        self.message_reaction: MessageReactionUpdated | None = message_reaction
-        self.message_reaction_count: MessageReactionCountUpdated | None = message_reaction_count
-        self.business_connection: BusinessConnection | None = business_connection
-        self.business_message: Message | None = business_message
-        self.edited_business_message: Message | None = edited_business_message
-        self.deleted_business_messages: BusinessMessagesDeleted | None = deleted_business_messages
-        self.purchased_paid_media: PaidMediaPurchased | None = purchased_paid_media
-        self.managed_bot: ManagedBotUpdated | None = managed_bot
-        self.guest_message: Message | None = guest_message
+    # Required
+    update_id: int = tg_field(compare=True)
+    # Optional
+    message: Message | None = tg_field(default=None)
+    edited_message: Message | None = tg_field(default=None)
+    channel_post: Message | None = tg_field(default=None)
+    edited_channel_post: Message | None = tg_field(default=None)
+    inline_query: InlineQuery | None = tg_field(default=None)
+    chosen_inline_result: ChosenInlineResult | None = tg_field(default=None)
+    callback_query: CallbackQuery | None = tg_field(default=None)
+    shipping_query: ShippingQuery | None = tg_field(default=None)
+    pre_checkout_query: PreCheckoutQuery | None = tg_field(default=None)
+    poll: Poll | None = tg_field(default=None)
+    poll_answer: PollAnswer | None = tg_field(default=None)
+    my_chat_member: ChatMemberUpdated | None = tg_field(default=None)
+    chat_member: ChatMemberUpdated | None = tg_field(default=None)
+    chat_join_request: ChatJoinRequest | None = tg_field(default=None)
+    chat_boost: ChatBoostUpdated | None = tg_field(default=None)
+    removed_chat_boost: ChatBoostRemoved | None = tg_field(default=None)
+    message_reaction: MessageReactionUpdated | None = tg_field(default=None)
+    message_reaction_count: MessageReactionCountUpdated | None = tg_field(default=None)
+    business_connection: BusinessConnection | None = tg_field(default=None)
+    business_message: Message | None = tg_field(default=None)
+    edited_business_message: Message | None = tg_field(default=None)
+    deleted_business_messages: BusinessMessagesDeleted | None = tg_field(default=None)
+    purchased_paid_media: PaidMediaPurchased | None = tg_field(default=None)
+    managed_bot: ManagedBotUpdated | None = tg_field(default=None)
+    guest_message: Message | None = tg_field(default=None)
 
-        self._effective_user: User | None = None
-        self._effective_sender: User | Chat | None = None
-        self._effective_chat: Chat | None = None
-        self._effective_message: Message | None = None
-
-        self._id_attrs = (self.update_id,)
-
-        self._freeze()
+    _effective_user: "User | None" = tg_field(init=False, default=None)
+    _effective_sender: "User | Chat | None" = tg_field(init=False, default=None)
+    _effective_chat: "Chat | None" = tg_field(init=False, default=None)
+    _effective_message: Message | None = tg_field(init=False, default=None)
 
     @property
     def effective_user(self) -> "User | None":
@@ -601,7 +533,7 @@ class Update(TelegramObject):
         elif self.managed_bot:
             user = self.managed_bot.user
 
-        self._effective_user = user
+        object.__setattr__(self, "_effective_user", user)
         return user
 
     @property
@@ -663,7 +595,7 @@ class Update(TelegramObject):
         if sender is None:
             sender = self.effective_user
 
-        self._effective_sender = sender
+        object.__setattr__(self, "_effective_sender", sender)
         return sender
 
     @property
@@ -730,7 +662,7 @@ class Update(TelegramObject):
         elif self.message_reaction_count:
             chat = self.message_reaction_count.chat
 
-        self._effective_chat = chat
+        object.__setattr__(self, "_effective_chat", chat)
         return chat
 
     @property
@@ -800,5 +732,5 @@ class Update(TelegramObject):
         elif self.guest_message:
             message = self.guest_message
 
-        self._effective_message = message
+        object.__setattr__(self, "_effective_message", message)
         return message

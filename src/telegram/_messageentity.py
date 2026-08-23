@@ -22,18 +22,19 @@ import copy
 import datetime as dtm
 import itertools
 from collections.abc import Sequence
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.strings import TextEncoding
-from telegram._utils.types import JSONDict
 
 _SEM = Sequence["MessageEntity"]
 
 
+@tg_dataclass()
 class MessageEntity(TelegramObject):
     """
     This object represents one special entity in a text message. For example, hashtags,
@@ -135,48 +136,21 @@ class MessageEntity(TelegramObject):
 
     """
 
-    __slots__ = (
-        "custom_emoji_id",
-        "date_time_format",
-        "language",
-        "length",
-        "offset",
-        "type",
-        "unix_time",
-        "url",
-        "user",
-    )
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.MessageEntityType, value, value)
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        offset: int,
-        length: int,
-        url: str | None = None,
-        user: User | None = None,
-        language: str | None = None,
-        custom_emoji_id: str | None = None,
-        date_time_format: str | None = None,
-        unix_time: dtm.datetime | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.type: str = enum.get_member(constants.MessageEntityType, type, type)
-        self.offset: int = offset
-        self.length: int = length
-        # Optionals
-        self.url: str | None = url
-        self.user: User | None = user
-        self.language: str | None = language
-        self.custom_emoji_id: str | None = custom_emoji_id
-        self.date_time_format: str | None = date_time_format
-        self.unix_time: dtm.datetime | None = unix_time
-
-        self._id_attrs = (self.type, self.offset, self.length)
-
-        self._freeze()
+    # Required
+    type: str = tg_field(compare=True, converter=_type_converter)
+    offset: int = tg_field(compare=True)
+    length: int = tg_field(compare=True)
+    # Optionals
+    url: str | None = tg_field(default=None)
+    user: User | None = tg_field(default=None)
+    language: str | None = tg_field(default=None)
+    custom_emoji_id: str | None = tg_field(default=None)
+    date_time_format: str | None = tg_field(default=None)
+    unix_time: dtm.datetime | None = tg_field(default=None)
 
     @staticmethod
     def adjust_message_entities_to_utf_16(text: str, entities: _SEM) -> _SEM:
@@ -388,60 +362,60 @@ class MessageEntity(TelegramObject):
 
         return output_text, output_entities
 
-    ALL_TYPES: Final[list[str]] = list(constants.MessageEntityType)
+    ALL_TYPES: ClassVar[list[str]] = list(constants.MessageEntityType)
     """list[:obj:`str`]: A list of all available message entity types."""
-    BLOCKQUOTE: Final[str] = constants.MessageEntityType.BLOCKQUOTE
+    BLOCKQUOTE: ClassVar[str] = constants.MessageEntityType.BLOCKQUOTE
     """:const:`telegram.constants.MessageEntityType.BLOCKQUOTE`
 
     .. versionadded:: 20.8
     """
-    BOLD: Final[str] = constants.MessageEntityType.BOLD
+    BOLD: ClassVar[str] = constants.MessageEntityType.BOLD
     """:const:`telegram.constants.MessageEntityType.BOLD`"""
-    BOT_COMMAND: Final[str] = constants.MessageEntityType.BOT_COMMAND
+    BOT_COMMAND: ClassVar[str] = constants.MessageEntityType.BOT_COMMAND
     """:const:`telegram.constants.MessageEntityType.BOT_COMMAND`"""
-    CASHTAG: Final[str] = constants.MessageEntityType.CASHTAG
+    CASHTAG: ClassVar[str] = constants.MessageEntityType.CASHTAG
     """:const:`telegram.constants.MessageEntityType.CASHTAG`"""
-    CODE: Final[str] = constants.MessageEntityType.CODE
+    CODE: ClassVar[str] = constants.MessageEntityType.CODE
     """:const:`telegram.constants.MessageEntityType.CODE`"""
-    CUSTOM_EMOJI: Final[str] = constants.MessageEntityType.CUSTOM_EMOJI
+    CUSTOM_EMOJI: ClassVar[str] = constants.MessageEntityType.CUSTOM_EMOJI
     """:const:`telegram.constants.MessageEntityType.CUSTOM_EMOJI`
 
     .. versionadded:: 20.0
     """
-    DATE_TIME: Final[str] = constants.MessageEntityType.DATE_TIME
+    DATE_TIME: ClassVar[str] = constants.MessageEntityType.DATE_TIME
     """:const:`telegram.constants.MessageEntityType.DATE_TIME`
 
     .. versionadded:: 22.7
     """
-    EMAIL: Final[str] = constants.MessageEntityType.EMAIL
+    EMAIL: ClassVar[str] = constants.MessageEntityType.EMAIL
     """:const:`telegram.constants.MessageEntityType.EMAIL`"""
-    EXPANDABLE_BLOCKQUOTE: Final[str] = constants.MessageEntityType.EXPANDABLE_BLOCKQUOTE
+    EXPANDABLE_BLOCKQUOTE: ClassVar[str] = constants.MessageEntityType.EXPANDABLE_BLOCKQUOTE
     """:const:`telegram.constants.MessageEntityType.EXPANDABLE_BLOCKQUOTE`
 
     .. versionadded:: 21.3
     """
-    HASHTAG: Final[str] = constants.MessageEntityType.HASHTAG
+    HASHTAG: ClassVar[str] = constants.MessageEntityType.HASHTAG
     """:const:`telegram.constants.MessageEntityType.HASHTAG`"""
-    ITALIC: Final[str] = constants.MessageEntityType.ITALIC
+    ITALIC: ClassVar[str] = constants.MessageEntityType.ITALIC
     """:const:`telegram.constants.MessageEntityType.ITALIC`"""
-    MENTION: Final[str] = constants.MessageEntityType.MENTION
+    MENTION: ClassVar[str] = constants.MessageEntityType.MENTION
     """:const:`telegram.constants.MessageEntityType.MENTION`"""
-    PHONE_NUMBER: Final[str] = constants.MessageEntityType.PHONE_NUMBER
+    PHONE_NUMBER: ClassVar[str] = constants.MessageEntityType.PHONE_NUMBER
     """:const:`telegram.constants.MessageEntityType.PHONE_NUMBER`"""
-    PRE: Final[str] = constants.MessageEntityType.PRE
+    PRE: ClassVar[str] = constants.MessageEntityType.PRE
     """:const:`telegram.constants.MessageEntityType.PRE`"""
-    SPOILER: Final[str] = constants.MessageEntityType.SPOILER
+    SPOILER: ClassVar[str] = constants.MessageEntityType.SPOILER
     """:const:`telegram.constants.MessageEntityType.SPOILER`
 
     .. versionadded:: 13.10
     """
-    STRIKETHROUGH: Final[str] = constants.MessageEntityType.STRIKETHROUGH
+    STRIKETHROUGH: ClassVar[str] = constants.MessageEntityType.STRIKETHROUGH
     """:const:`telegram.constants.MessageEntityType.STRIKETHROUGH`"""
-    TEXT_LINK: Final[str] = constants.MessageEntityType.TEXT_LINK
+    TEXT_LINK: ClassVar[str] = constants.MessageEntityType.TEXT_LINK
     """:const:`telegram.constants.MessageEntityType.TEXT_LINK`"""
-    TEXT_MENTION: Final[str] = constants.MessageEntityType.TEXT_MENTION
+    TEXT_MENTION: ClassVar[str] = constants.MessageEntityType.TEXT_MENTION
     """:const:`telegram.constants.MessageEntityType.TEXT_MENTION`"""
-    UNDERLINE: Final[str] = constants.MessageEntityType.UNDERLINE
+    UNDERLINE: ClassVar[str] = constants.MessageEntityType.UNDERLINE
     """:const:`telegram.constants.MessageEntityType.UNDERLINE`"""
-    URL: Final[str] = constants.MessageEntityType.URL
+    URL: ClassVar[str] = constants.MessageEntityType.URL
     """:const:`telegram.constants.MessageEntityType.URL`"""

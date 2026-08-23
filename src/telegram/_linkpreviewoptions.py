@@ -19,10 +19,12 @@
 """This module contains the LinkPreviewOptions class."""
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import ODVInput
 
 
+@tg_dataclass()
 class LinkPreviewOptions(TelegramObject):
     """
     Describes the options used for link preview generation.
@@ -62,39 +64,9 @@ class LinkPreviewOptions(TelegramObject):
             text.
     """
 
-    __slots__ = (
-        "is_disabled",
-        "prefer_large_media",
-        "prefer_small_media",
-        "show_above_text",
-        "url",
-    )
-
-    def __init__(
-        self,
-        is_disabled: ODVInput[bool] = DEFAULT_NONE,
-        url: ODVInput[str] = DEFAULT_NONE,
-        prefer_small_media: ODVInput[bool] = DEFAULT_NONE,
-        prefer_large_media: ODVInput[bool] = DEFAULT_NONE,
-        show_above_text: ODVInput[bool] = DEFAULT_NONE,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Optionals
-
-        self.is_disabled: ODVInput[bool] = is_disabled
-        self.url: ODVInput[str] = url
-        self.prefer_small_media: ODVInput[bool] = prefer_small_media
-        self.prefer_large_media: ODVInput[bool] = prefer_large_media
-        self.show_above_text: ODVInput[bool] = show_above_text
-
-        self._id_attrs = (
-            self.is_disabled,
-            self.url,
-            self.prefer_small_media,
-            self.prefer_large_media,
-            self.show_above_text,
-        )
-        self._freeze()
+    # Optionals
+    is_disabled: ODVInput[bool] = tg_field(compare=True, default=DEFAULT_NONE)
+    url: ODVInput[str] = tg_field(compare=True, default=DEFAULT_NONE)
+    prefer_small_media: ODVInput[bool] = tg_field(compare=True, default=DEFAULT_NONE)
+    prefer_large_media: ODVInput[bool] = tg_field(compare=True, default=DEFAULT_NONE)
+    show_above_text: ODVInput[bool] = tg_field(compare=True, default=DEFAULT_NONE)

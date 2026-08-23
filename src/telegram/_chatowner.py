@@ -20,9 +20,10 @@
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ChatOwnerChanged(TelegramObject):
     """This object represents a service message about an ownership change in the chat.
 
@@ -39,22 +40,10 @@ class ChatOwnerChanged(TelegramObject):
 
     """
 
-    __slots__ = ("new_owner",)
-
-    def __init__(
-        self,
-        new_owner: User,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.new_owner: User = new_owner
-
-        self._id_attrs = (self.new_owner,)
-
-        self._freeze()
+    new_owner: User = tg_field(compare=True)
 
 
+@tg_dataclass()
 class ChatOwnerLeft(TelegramObject):
     """This object represents a service message about the chat owner leaving the chat.
 
@@ -73,17 +62,4 @@ class ChatOwnerLeft(TelegramObject):
 
     """
 
-    __slots__ = ("new_owner",)
-
-    def __init__(
-        self,
-        new_owner: User | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.new_owner: User | None = new_owner
-
-        self._id_attrs = (self.new_owner,)
-
-        self._freeze()
+    new_owner: User | None = tg_field(compare=True, default=None)
