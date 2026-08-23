@@ -28,7 +28,7 @@ import dataclasses
 import functools
 import inspect
 from collections.abc import Callable
-from dataclasses import MISSING, dataclass, field
+from dataclasses import MISSING, dataclass, field, is_dataclass
 from typing import Any, TypeVar
 
 from typing_extensions import dataclass_transform
@@ -59,7 +59,13 @@ def _apply_aliases(cls: type[_T]) -> type[_T]:
     Returns:
         :obj:`type`:
             `cls` *Modified In Place*
+
+    Raises:
+        TypeError: If :paramref:`cls` is not a dataclass.
     """
+    if not is_dataclass(cls):
+        raise TypeError(f"{cls!r} is not a dataclass")
+
     aliases = {
         dataclass_field.name: alias
         for dataclass_field in dataclasses.fields(cls)
@@ -98,8 +104,8 @@ def _apply_aliases(cls: type[_T]) -> type[_T]:
     ]
     signature = generated_signature.replace(parameters=parameters)
 
-    aliased_init.__signature__ = signature
-    cls.__init__ = aliased_init
+    aliased_init.__signature__ = signature  # type: ignore[attr-defined]
+    cls.__init__ = aliased_init  # type: ignore[method-assign]
     return cls
 
 
@@ -113,10 +119,7 @@ def tg_field(
     converter: Callable[[Any], Any] | None = None,
     alias: str | None = None,
 ) -> Any:
-    field_metadata = None
-
-    if any((converter, alias)):
-        field_metadata = {}
+    field_metadata: dict[Any, Any] = {}
 
     if converter is not None:
         field_metadata[CONVERTER_KEY] = converter
@@ -130,7 +133,7 @@ def tg_field(
         init=init,
         default=default,
         default_factory=default_factory,
-        metadata=field_metadata,
+        metadata=field_metadata or None,
         kw_only=kw_only,
     )
 
