@@ -60,6 +60,7 @@ __all__ = (
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
+    "IS_BOT",
     "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
     "LIVE_PHOTO",
@@ -1590,6 +1591,31 @@ IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name="filters.IS_AUTOMATIC_FORWARD")
 """Messages that contain :attr:`telegram.Message.is_automatic_forward`.
 
     .. versionadded:: 13.9
+"""
+
+
+class _IsBot(UpdateFilter):
+    __slots__ = ()
+
+    def filter(self, update: Update) -> bool:
+        # Updates without a user, e.g. channel posts, are not sent by a bot
+        return bool(update.effective_user) and bool(
+            update.effective_user.is_bot  # type: ignore
+        )
+
+
+IS_BOT = _IsBot(name="filters.IS_BOT")
+"""This filter filters *any* message that has a :attr:`bot <telegram.User.is_bot>` as
+:attr:`telegram.Update.effective_user`.
+
+Note:
+    In groups, a bot only receives messages sent by other bots if
+    :attr:`telegram.User.can_read_all_group_messages` is :obj:`True` for it, i.e. if privacy
+    mode is disabled.
+
+.. seealso:: :attr:`telegram.ext.filters.VIA_BOT`
+
+.. versionadded:: NEXT.VERSION
 """
 
 
