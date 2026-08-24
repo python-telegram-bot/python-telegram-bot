@@ -239,7 +239,7 @@ class RetryAfter(TelegramError):
 
     @property
     def retry_after(self) -> int | dtm.timedelta:  # noqa: D102
-        # Diableing D102 because docstring for `retry_after` is present at the class's level
+        # Disabling D102 because docstring for `retry_after` is present at the class's level
         return get_timedelta_value(  # type: ignore[return-value]
             self._retry_after, attribute="retry_after"
         )

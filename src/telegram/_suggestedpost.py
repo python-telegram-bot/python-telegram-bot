@@ -31,7 +31,7 @@ from telegram._utils.types import JSONDict
 
 class SuggestedPostPrice(TelegramObject):
     """
-    Desribes the price of a suggested post.
+    Describes the price of a suggested post.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`currency` and :attr:`amount` are equal.

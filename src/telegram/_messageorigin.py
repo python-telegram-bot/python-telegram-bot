@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram MessageOigin."""
+"""This module contains the classes that represent Telegram MessageOrigin."""
 
 import datetime as dtm
 from typing import ClassVar, Final
