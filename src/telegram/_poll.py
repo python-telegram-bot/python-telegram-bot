@@ -328,7 +328,7 @@ class PollAnswer(TelegramObject):
         20.5 as the latter one became optional.
 
     .. versionchanged:: 20.6
-       Backward compatiblity for changed order of :paramref:`option_ids` and :paramref:`user`
+       Backward compatibility for changed order of :paramref:`option_ids` and :paramref:`user`
        was removed.
 
     Args:
