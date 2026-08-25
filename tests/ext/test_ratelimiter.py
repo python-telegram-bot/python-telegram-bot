@@ -259,6 +259,92 @@ class TestAIORateLimiter:
         await asyncio.sleep(1.1)
         assert isinstance(task_2.exception(), RetryAfter)
 
+    class ScriptedRequest(BaseRequest):
+        """Per-chat scripted behaviour, as ``chat_id -> (latency, retry_after)``.
+
+        A chat with a ``retry_after`` raises :exc:`RetryAfter` on its first call only, and
+        only after ``latency`` has passed - mimicking a flood limit that is reported by
+        Telegram once the request has actually been on the wire.
+        """
+
+        def __init__(self, script):
+            self.script = script
+            self.flooded = set()
+
+        async def initialize(self) -> None:
+            pass
+
+        async def shutdown(self) -> None:
+            pass
+
+        @property
+        def read_timeout(self):
+            return 1
+
+        async def do_request(self, *args, **kwargs):
+            chat_id = kwargs.get("request_data").parameters.get("chat_id")
+            latency, retry_after = self.script.get(chat_id, (0, None))
+            if latency:
+                await asyncio.sleep(latency)
+            if retry_after is not None and chat_id not in self.flooded:
+                self.flooded.add(chat_id)
+                raise RetryAfter(retry_after=retry_after)
+            return (
+                HTTPStatus.OK,
+                json.dumps(
+                    {
+                        "ok": True,
+                        "result": Message(
+                            message_id=1, date=dtm.datetime.now(), chat=Chat(1, "chat")
+                        ).to_dict(),
+                    }
+                ).encode(),
+            )
+
+    async def test_retry_after_not_released_by_in_flight_request(self, bot):
+        # A request that is already in flight when another request hits a RetryAfter must not
+        # lift the resulting halt when it completes - it never established that halt.
+        bot = ExtBot(
+            token=bot.token,
+            request=self.ScriptedRequest({1: (0, 1), 2: (0.5, None)}),
+            rate_limiter=AIORateLimiter(max_retries=1, overall_max_rate=0, group_max_rate=0),
+        )
+        # Both are past the rate limiter's internal wait before either one halts the bot.
+        in_flight = asyncio.create_task(bot.send_message(chat_id=2, text="in flight"))
+        flooding = asyncio.create_task(bot.send_message(chat_id=1, text="floods"))
+
+        await asyncio.sleep(0.6)
+        # The in-flight request has completed; the flooding one is still backing off.
+        assert in_flight.done()
+        assert not flooding.done()
+
+        probe = asyncio.create_task(bot.send_message(chat_id=3, text="probe"))
+        await asyncio.sleep(0.2)
+        assert not probe.done(), "the halt was lifted by an unrelated request completing"
+
+        await asyncio.gather(flooding, probe)
+
+    async def test_retry_after_not_released_by_shorter_backoff(self, bot):
+        # When two requests are backing off at the same time, the shorter backoff expiring
+        # must not lift the halt that the longer one is still waiting out.
+        bot = ExtBot(
+            token=bot.token,
+            request=self.ScriptedRequest({1: (0.2, 2), 2: (0.25, 0.5)}),
+            rate_limiter=AIORateLimiter(max_retries=1, overall_max_rate=0, group_max_rate=0),
+        )
+        long_backoff = asyncio.create_task(bot.send_message(chat_id=1, text="long"))
+        short_backoff = asyncio.create_task(bot.send_message(chat_id=2, text="short"))
+
+        await asyncio.sleep(1)
+        # The short backoff (0.5 + 0.1 seconds) is over, the long one (2 + 0.1) is not.
+        assert not long_backoff.done()
+
+        probe = asyncio.create_task(bot.send_message(chat_id=3, text="probe"))
+        await asyncio.sleep(0.3)
+        assert not probe.done(), "the halt was lifted by a shorter backoff expiring"
+
+        await asyncio.gather(long_backoff, short_backoff, probe)
+
     @pytest.mark.parametrize("group_id", [-1, "-1", "@username"])
     @pytest.mark.parametrize("chat_id", [1, "1"])
     async def test_basic_rate_limiting(self, bot, group_id, chat_id):
