@@ -28,7 +28,7 @@ from random import randrange
 import pytest
 
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
+from telegram.error import InvalidToken, PoolTimeout, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from tests.auxil.build_messages import make_message, make_message_update
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
@@ -492,10 +492,11 @@ class TestUpdater:
         ("error", "callback_should_be_called"),
         argvalues=[
             (TelegramError("TestMessage"), True),
+            (PoolTimeout("TestMessage"), True),
             (RetryAfter(1), False),
             (TimedOut("TestMessage"), False),
         ],
-        ids=("TelegramError", "RetryAfter", "TimedOut"),
+        ids=("TelegramError", "PoolTimeout", "RetryAfter", "TimedOut"),
     )
     @pytest.mark.parametrize("custom_error_callback", [True, False])
     async def test_start_polling_exceptions_and_error_callback(

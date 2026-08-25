@@ -43,6 +43,7 @@ from telegram.error import (
     Forbidden,
     InvalidToken,
     NetworkError,
+    PoolTimeout,
     RetryAfter,
     TelegramError,
     TimedOut,
@@ -658,13 +659,14 @@ class TestHTTPXRequestWithoutRequest:
         monkeypatch.setattr(httpx.AsyncClient, "request", request)
 
         async with HTTPXRequest(pool_timeout=0.02) as httpx_request:
-            with pytest.raises(TimedOut, match="Pool timeout") as exc_info:
+            with pytest.raises(PoolTimeout, match="Pool timeout") as exc_info:
                 await asyncio.gather(
                     httpx_request.do_request(method="GET", url="URL"),
                     httpx_request.do_request(method="GET", url="URL"),
                 )
 
             assert exc_info.value.__cause__ is pool_timeout
+            assert isinstance(exc_info.value, TimedOut)
 
     @pytest.mark.parametrize("media", [True, False])
     async def test_do_request_write_timeout(

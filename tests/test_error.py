@@ -31,6 +31,7 @@ from telegram.error import (
     InvalidToken,
     NetworkError,
     PassportDecryptionError,
+    PoolTimeout,
     RetryAfter,
     TelegramError,
     TimedOut,
@@ -89,6 +90,10 @@ class TestErrors:
         with pytest.raises(TimedOut, match=r"^Timed out$"):
             raise TimedOut
 
+    def test_pool_timeout(self):
+        with pytest.raises(PoolTimeout, match=r"^Pool timed out$"):
+            raise PoolTimeout
+
     def test_chat_migrated(self):
         with pytest.raises(ChatMigrated, match="New chat id: 1234") as e:
             raise ChatMigrated(1234)
@@ -130,6 +135,7 @@ class TestErrors:
             (NetworkError("test message"), ["message"]),
             (BadRequest("test message"), ["message"]),
             (TimedOut(), ["message"]),
+            (PoolTimeout(), ["message"]),
             (ChatMigrated(1234), ["message", "new_chat_id"]),
             (RetryAfter(12), ["message", "retry_after"]),
             (RetryAfter(dtm.timedelta(seconds=12)), ["message", "retry_after"]),
@@ -157,6 +163,7 @@ class TestErrors:
             (NetworkError("test message")),
             (BadRequest("test message")),
             (TimedOut()),
+            (PoolTimeout()),
             (ChatMigrated(1234)),
             (RetryAfter(dtm.timedelta(seconds=12))),
             (Conflict("test message")),
@@ -198,6 +205,7 @@ class TestErrors:
                     EndPointNotFound,
                 },
                 NetworkError: {BadRequest, TimedOut},
+                TimedOut: {PoolTimeout},
             }
         )
 

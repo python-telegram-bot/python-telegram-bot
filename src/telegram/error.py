@@ -37,6 +37,7 @@ __all__ = (
     "InvalidToken",
     "NetworkError",
     "PassportDecryptionError",
+    "PoolTimeout",
     "RetryAfter",
     "TelegramError",
     "TimedOut",
@@ -177,6 +178,24 @@ class TimedOut(NetworkError):
 
     def __init__(self, message: str | None = None) -> None:
         super().__init__(message or "Timed out")
+
+
+class PoolTimeout(TimedOut):
+    """Raised when a request could not acquire a connection from the connection pool in time.
+
+    This is a subclass of :class:`TimedOut` to preserve compatibility with code handling all
+    request timeouts.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        message (:obj:`str`, optional): Any additional information about the exception.
+    """
+
+    __slots__ = ()
+
+    def __init__(self, message: str | None = None) -> None:
+        super().__init__(message or "Pool timed out")
 
 
 class ChatMigrated(TelegramError):

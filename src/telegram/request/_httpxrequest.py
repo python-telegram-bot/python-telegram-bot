@@ -26,7 +26,7 @@ import httpx
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.types import HTTPVersion, ODVInput, SocketOpt
-from telegram.error import NetworkError, TimedOut
+from telegram.error import NetworkError, PoolTimeout, TimedOut
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
 
@@ -79,9 +79,13 @@ class HTTPXRequest(BaseRequest):
             Defaults to ``1``.
 
             Warning:
-                With a finite pool timeout, you must expect :exc:`telegram.error.TimedOut`
+                With a finite pool timeout, you must expect :exc:`telegram.error.PoolTimeout`
                 exceptions to be thrown when more requests are made simultaneously than there are
                 connections in the connection pool!
+
+                .. versionchanged:: NEXT.VERSION
+                    Raises :exc:`telegram.error.PoolTimeout`, a subclass of
+                    :exc:`telegram.error.TimedOut`, instead of :exc:`telegram.error.TimedOut`.
         http_version (:obj:`str`, optional): If ``"2"`` or ``"2.0"``, HTTP/2 will be used instead
             of HTTP/1.1. Defaults to ``"1.1"``.
 
@@ -286,7 +290,7 @@ class HTTPXRequest(BaseRequest):
             )
         except httpx.TimeoutException as err:
             if isinstance(err, httpx.PoolTimeout):
-                raise TimedOut(
+                raise PoolTimeout(
                     message=(
                         "Pool timeout: All connections in the connection pool are occupied. "
                         "Request was *not* sent to Telegram. Consider adjusting the connection "

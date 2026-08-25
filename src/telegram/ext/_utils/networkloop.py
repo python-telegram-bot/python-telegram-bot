@@ -36,7 +36,7 @@ import contextlib
 from collections.abc import Callable, Coroutine
 
 from telegram._utils.logging import get_logger
-from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
+from telegram.error import InvalidToken, PoolTimeout, RetryAfter, TelegramError, TimedOut
 
 _LOGGER = get_logger(__name__)
 
@@ -169,6 +169,17 @@ async def network_retry_loop(
             exception_info = f"{exc}. Adding {slack_time} seconds to the specified time."
 
             # Check max_retries for RetryAfter as well
+            if check_max_retries_and_log(retries, exception_info):
+                raise
+        except PoolTimeout as pool_timeout:
+            # Unlike regular request timeouts, pool exhaustion should be observable by callers.
+            if on_err_cb:
+                on_err_cb(pool_timeout)
+
+            # If failure is due to timeout, we should retry asap.
+            cur_interval = 0
+            exception_info = f"Pool timed out: {pool_timeout}."
+
             if check_max_retries_and_log(retries, exception_info):
                 raise
         except TimedOut as toe:

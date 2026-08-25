@@ -26,7 +26,7 @@ Note:
 
 import pytest
 
-from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
+from telegram.error import InvalidToken, PoolTimeout, RetryAfter, TelegramError, TimedOut
 from telegram.ext._utils.networkloop import network_retry_loop
 
 
@@ -193,6 +193,30 @@ class TestNetworkRetryLoop:
         # Should be called 3 times (initial + 2 retries)
         assert error_callback_count == 3
         assert isinstance(caught_exception, TelegramError)
+
+    async def test_error_callback_called_for_pool_timeout(self):
+        """Test that pool timeouts are observable while regular timeouts remain silent."""
+        pool_timeout = PoolTimeout("Test pool timeout")
+        error_callback_count = 0
+
+        def error_callback(exc):
+            nonlocal error_callback_count
+            error_callback_count += 1
+            assert exc is pool_timeout
+
+        async def action_with_pool_timeout():
+            raise pool_timeout
+
+        with pytest.raises(PoolTimeout):
+            await network_retry_loop(
+                action_cb=action_with_pool_timeout,
+                on_err_cb=error_callback,
+                description="Test PoolTimeout callback",
+                interval=0,
+                max_retries=2,
+            )
+
+        assert error_callback_count == 3
 
     async def test_success_after_retries(self):
         """Test that action succeeds after some retries."""
