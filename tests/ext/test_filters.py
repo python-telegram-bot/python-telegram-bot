@@ -2161,6 +2161,11 @@ class TestFilters:
         update.message.is_automatic_forward = True
         assert filters.IS_AUTOMATIC_FORWARD.check_update(update)
 
+    def test_filters_is_bot(self, update):
+        assert not filters.IS_BOT.check_update(update)
+        update.message.from_user.is_bot = True
+        assert filters.IS_BOT.check_update(update) 
+
     def test_filters_is_from_offline(self, update):
         assert not filters.IS_FROM_OFFLINE.check_update(update)
         update.message.is_from_offline = True

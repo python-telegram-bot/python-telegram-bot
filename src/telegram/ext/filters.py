@@ -60,6 +60,7 @@ __all__ = (
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
+    "IS_BOT",
     "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
     "LIVE_PHOTO",
@@ -1591,6 +1592,16 @@ IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name="filters.IS_AUTOMATIC_FORWARD")
 
     .. versionadded:: 13.9
 """
+class _IsBot(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.from_user and message.from_user.is_bot)
+
+
+IS_BOT = _IsBot(name="filters.IS_BOT")
+"""Messages that are sent by a bot.
+""" 
 
 
 class _IsTopicMessage(MessageFilter):
