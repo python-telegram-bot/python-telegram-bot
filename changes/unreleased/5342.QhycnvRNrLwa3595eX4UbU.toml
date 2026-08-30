@@ -1,0 +1,5 @@
+internal = "Update Ruff to v0.16.4"
+[[pull_requests]]
+uid = "5342"
+author_uids = ["renovate[bot]"]
+closes_threads = []
