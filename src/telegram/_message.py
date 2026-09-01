@@ -242,18 +242,6 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
 
 
 class Message(MaybeInaccessibleMessage):
-    __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset(
-        {
-            "user_shared",
-            "forward_from",
-            "forward_from_chat",
-            "forward_from_message_id",
-            "forward_signature",
-            "forward_sender_name",
-            "forward_date",
-        }
-    )
-
     # fmt: off
     """This object represents a message.
 
@@ -740,6 +728,18 @@ class Message(MaybeInaccessibleMessage):
     """
 
     # fmt: on
+    __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset(
+        {
+            "user_shared",
+            "forward_from",
+            "forward_from_chat",
+            "forward_from_message_id",
+            "forward_signature",
+            "forward_sender_name",
+            "forward_date",
+        }
+    )
+
     __slots__ = (
         "_effective_attachment",
         "animation",

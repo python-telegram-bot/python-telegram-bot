@@ -25,6 +25,7 @@ included in the main suite while older versions of Python are supported.
 """
 
 import pytest
+from sphinx.util.docstrings import prepare_docstring
 
 from docs.auxil.attribute_inserter import (
     ENTRY_PATTERN,
@@ -35,6 +36,7 @@ from docs.auxil.attribute_inserter import (
     _is_col0_noncontent,
     _is_section_header,
 )
+from telegram import Message
 
 
 @pytest.fixture
@@ -146,8 +148,10 @@ class TestDocstringEntry:
             type_str="Sequence[:class:`telegram.MessageEntity`]",
             is_optional=True,
             all_lines=(
-                "    caption_entities "
-                "(Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|",
+                (
+                    "    caption_entities "
+                    "(Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|"
+                ),
                 "",
                 "        .. versionchanged:: 20.0",
                 "                |sequenceclassargs|",
@@ -355,6 +359,15 @@ class TestDocstringParser:
 
 
 class TestAttributeInserter:
+    def test_message_docstring_documents_all_slots(self, inserter):
+        """The Message docstring must remain the first statement in the class body."""
+        assert Message.__doc__ is not None
+
+        lines = prepare_docstring(Message.__doc__)
+        inserter.insert_attributes(Message, lines)
+
+        assert any(line.startswith("    suggested_post_paid ") for line in lines)
+
     def test_no_args_section_noop(self, inserter):
         """If there is no Args section, lines must not be modified."""
         lines = ["Just a description."]
