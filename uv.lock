@@ -1654,7 +1654,7 @@ all = [
     { name = "sphinx-copybutton", specifier = "==0.5.2" },
     { name = "sphinx-inline-tabs", specifier = "==2025.12.21.14" },
     { name = "sphinx-paramlinks", specifier = "==0.6.0" },
-    { name = "sphinxcontrib-mermaid", specifier = "==2.0.2" },
+    { name = "sphinxcontrib-mermaid", specifier = "==2.1.0" },
     { name = "tzdata" },
 ]
 docs = [
@@ -1666,7 +1666,7 @@ docs = [
     { name = "sphinx-copybutton", specifier = "==0.5.2" },
     { name = "sphinx-inline-tabs", specifier = "==2025.12.21.14" },
     { name = "sphinx-paramlinks", specifier = "==0.6.0" },
-    { name = "sphinxcontrib-mermaid", specifier = "==2.0.2" },
+    { name = "sphinxcontrib-mermaid", specifier = "==2.1.0" },
 ]
 linting = [
     { name = "mypy", specifier = "==1.20.2" },
@@ -2066,7 +2066,7 @@ wheels = [
 
 [[package]]
 name = "sphinxcontrib-mermaid"
-version = "2.0.2"
+version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2" },
@@ -2075,9 +2075,9 @@ dependencies = [
     { name = "sphinx", version = "9.0.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "sphinx", version = "9.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/19/75/3a1cc926da8c563c58ddc124a7b3fe5ccadcae96c96e3a6f8ac3653a210a/sphinxcontrib_mermaid-2.0.2.tar.gz", hash = "sha256:f09576c78ca93fa0e3034fd9c45aaffa7c44ab449de9c43b8b8d262afe52bc66", size = 19265, upload-time = "2026-05-05T13:59:02.959Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/07/9d/bf3a48a657682c7e0445c71d916bca7ab8194454276cc22b16e7f974e502/sphinxcontrib_mermaid-2.1.0.tar.gz", hash = "sha256:13c5f9ac395cb6abf403eca34e228dc9fb3a30c9d960dbf3e40e9a8cef969549", size = 21695, upload-time = "2026-07-18T23:08:11.265Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/16/8d/93be7e0f7fa915a576859b3bfac7a7baa3303181c44d7db7eefbd3e8a69f/sphinxcontrib_mermaid-2.0.2-py3-none-any.whl", hash = "sha256:d862e514991279fb4816302c5cfe167d2557bf3ce7125ae0cb47dac80a0f46ce", size = 14094, upload-time = "2026-05-05T13:59:01.585Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/bd/d3348d62296e73a91420f0edf671450c9003ecd8704da40b1e3d9b868459/sphinxcontrib_mermaid-2.1.0-py3-none-any.whl", hash = "sha256:417cd144ec4b28852f46ba653f02ce8e538881c812111671a4c30344e87f2112", size = 16190, upload-time = "2026-07-18T23:08:10.098Z" },
 ]
 
 [[package]]
