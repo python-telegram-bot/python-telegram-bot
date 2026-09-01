@@ -218,7 +218,6 @@ class PaidMediaLivePhoto(PaidMedia):
     .. versionadded:: 22.8
 
     Args:
-        type (:obj:`str`): Type of the paid media, always :tg-const:`telegram.PaidMedia.LIVE_PHOTO`
         live_photo (:class:`telegram.LivePhoto`): The photo.
 
     Attributes:
