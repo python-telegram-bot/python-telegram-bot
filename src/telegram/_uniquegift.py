@@ -21,19 +21,15 @@
 
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from telegram import constants
 from telegram._chat import Chat
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional, parse_sequence_arg
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class UniqueGiftColors(TelegramObject):
@@ -150,15 +146,6 @@ class UniqueGiftModel(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftModel":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class UniqueGiftSymbol(TelegramObject):
     """This object describes the symbol shown on the pattern of a unique gift.
@@ -197,15 +184,6 @@ class UniqueGiftSymbol(TelegramObject):
         self._id_attrs = (self.name, self.sticker, self.rarity_per_mille)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftSymbol":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class UniqueGiftBackdropColors(TelegramObject):
@@ -288,15 +266,6 @@ class UniqueGiftBackdrop(TelegramObject):
         self._id_attrs = (self.name, self.colors, self.rarity_per_mille)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftBackdrop":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["colors"] = de_json_optional(data.get("colors"), UniqueGiftBackdropColors, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class UniqueGift(TelegramObject):
@@ -404,19 +373,6 @@ class UniqueGift(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGift":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["model"] = de_json_optional(data.get("model"), UniqueGiftModel, bot)
-        data["symbol"] = de_json_optional(data.get("symbol"), UniqueGiftSymbol, bot)
-        data["backdrop"] = de_json_optional(data.get("backdrop"), UniqueGiftBackdrop, bot)
-        data["publisher_chat"] = de_json_optional(data.get("publisher_chat"), Chat, bot)
-        data["colors"] = de_json_optional(data.get("colors"), UniqueGiftColors, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class UniqueGiftInfo(TelegramObject):
     """Describes a service message about a unique gift that was sent or received.
@@ -518,16 +474,3 @@ class UniqueGiftInfo(TelegramObject):
         self._id_attrs = (self.gift, self.origin)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UniqueGiftInfo":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-        data["gift"] = de_json_optional(data.get("gift"), UniqueGift, bot)
-        data["next_transfer_date"] = from_timestamp(
-            data.get("next_transfer_date"), tzinfo=loc_tzinfo
-        )
-
-        return super().de_json(data=data, bot=bot)

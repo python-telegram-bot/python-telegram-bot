@@ -121,7 +121,7 @@ docs = [
     "sphinx==9.1.0; python_version >= '3.12'",
     "furo==2025.12.19",
     "sphinx-paramlinks==0.6.0",
-    "sphinxcontrib-mermaid==2.0.2",
+    "sphinxcontrib-mermaid==2.1.0",
     "sphinx-copybutton==0.5.2",
     "sphinx-inline-tabs==2025.12.21.14",
     # Temporary. See #4387
@@ -134,9 +134,9 @@ docs = [
 ]
 linting = [
     "prek",
-    "ruff==0.15.22",
+    "ruff==0.16.4",
     "mypy==1.20.2",
-    "pylint==4.0.6"
+    "pylint==4.0.7"
 ]
 all = [{ include-group = "tests" }, { include-group = "docs" }, { include-group = "linting"}]
 
@@ -170,7 +170,7 @@ show-fixes = true
 
 [tool.ruff.lint]
 typing-extensions = false
-ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203", "ASYNC240"]
+ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203", "ASYNC240", "PLR0917"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
           "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
           "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB", "DOC", "TRY", 

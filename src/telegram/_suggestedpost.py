@@ -19,19 +19,14 @@
 """This module contains objects related to Telegram suggested posts."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final, Optional
+from typing import Final
 
 from telegram import constants
 from telegram._message import Message
 from telegram._payment.stars.staramount import StarAmount
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class SuggestedPostPrice(TelegramObject):
@@ -114,20 +109,6 @@ class SuggestedPostParameters(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuggestedPostParameters":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["price"] = de_json_optional(data.get("price"), SuggestedPostPrice, bot)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["send_date"] = from_timestamp(data.get("send_date"), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class SuggestedPostInfo(TelegramObject):
     """
@@ -181,19 +162,6 @@ class SuggestedPostInfo(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuggestedPostInfo":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["price"] = de_json_optional(data.get("price"), SuggestedPostPrice, bot)
-        data["send_date"] = from_timestamp(data.get("send_date"), tzinfo=loc_tzinfo)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class SuggestedPostDeclined(TelegramObject):
     """
@@ -229,17 +197,6 @@ class SuggestedPostDeclined(TelegramObject):
         self._id_attrs = (self.suggested_post_message, self.comment)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuggestedPostDeclined":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["suggested_post_message"] = de_json_optional(
-            data.get("suggested_post_message"), Message, bot
-        )
-
-        return super().de_json(data=data, bot=bot)
 
 
 class SuggestedPostPaid(TelegramObject):
@@ -295,18 +252,6 @@ class SuggestedPostPaid(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuggestedPostPaid":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["suggested_post_message"] = de_json_optional(
-            data.get("suggested_post_message"), Message, bot
-        )
-        data["star_amount"] = de_json_optional(data.get("star_amount"), StarAmount, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class SuggestedPostRefunded(TelegramObject):
     """
@@ -348,17 +293,6 @@ class SuggestedPostRefunded(TelegramObject):
         self._id_attrs = (self.reason, self.suggested_post_message)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuggestedPostRefunded":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["suggested_post_message"] = de_json_optional(
-            data.get("suggested_post_message"), Message, bot
-        )
-
-        return super().de_json(data=data, bot=bot)
 
 
 class SuggestedPostApproved(TelegramObject):
@@ -403,22 +337,6 @@ class SuggestedPostApproved(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuggestedPostApproved":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["send_date"] = from_timestamp(data.get("send_date"), tzinfo=loc_tzinfo)
-        data["price"] = de_json_optional(data.get("price"), SuggestedPostPrice, bot)
-        data["suggested_post_message"] = de_json_optional(
-            data.get("suggested_post_message"), Message, bot
-        )
-
-        return super().de_json(data=data, bot=bot)
-
 
 class SuggestedPostApprovalFailed(TelegramObject):
     """
@@ -457,15 +375,3 @@ class SuggestedPostApprovalFailed(TelegramObject):
         self._id_attrs = (self.price, self.suggested_post_message)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: Optional["Bot"] = None) -> "SuggestedPostApprovalFailed":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["price"] = de_json_optional(data.get("price"), SuggestedPostPrice, bot)
-        data["suggested_post_message"] = de_json_optional(
-            data.get("suggested_post_message"), Message, bot
-        )
-
-        return super().de_json(data=data, bot=bot)

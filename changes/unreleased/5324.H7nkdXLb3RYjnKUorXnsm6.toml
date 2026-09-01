@@ -1,0 +1,5 @@
+dependencies = "Update dependency cryptography to v50 [SECURITY]"
+[[pull_requests]]
+uid = "5324"
+author_uids = ["renovate[bot]"]
+closes_threads = []

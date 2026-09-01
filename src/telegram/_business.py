@@ -25,24 +25,19 @@ from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 from telegram._chat import Chat
-from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
-from telegram._user import User
 from telegram._utils.argumentparsing import (
-    de_json_optional,
-    de_list_optional,
     parse_sequence_arg,
 )
 from telegram._utils.datetime import (
-    extract_tzinfo_from_defaults,
-    from_timestamp,
     get_zone_info,
 )
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram._files.location import Location
+    from telegram._user import User
 
 
 class BusinessBotRights(TelegramObject):
@@ -224,20 +219,6 @@ class BusinessConnection(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessConnection":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
-        data["user"] = de_json_optional(data.get("user"), User, bot)
-        data["rights"] = de_json_optional(data.get("rights"), BusinessBotRights, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class BusinessMessagesDeleted(TelegramObject):
     """
@@ -284,15 +265,6 @@ class BusinessMessagesDeleted(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessMessagesDeleted":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class BusinessIntro(TelegramObject):
     """
@@ -333,15 +305,6 @@ class BusinessIntro(TelegramObject):
 
         self._freeze()
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessIntro":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["sticker"] = de_json_optional(data.get("sticker"), Sticker, bot)
-
-        return super().de_json(data=data, bot=bot)
-
 
 class BusinessLocation(TelegramObject):
     """
@@ -377,15 +340,6 @@ class BusinessLocation(TelegramObject):
         self._id_attrs = (self.address,)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessLocation":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["location"] = de_json_optional(data.get("location"), Location, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class BusinessOpeningHoursInterval(TelegramObject):
@@ -606,14 +560,3 @@ class BusinessOpeningHours(TelegramObject):
                 return True
 
         return False
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "BusinessOpeningHours":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["opening_hours"] = de_list_optional(
-            data.get("opening_hours"), BusinessOpeningHoursInterval, bot
-        )
-
-        return super().de_json(data=data, bot=bot)
