@@ -43,6 +43,18 @@ def chatphoto_file():
 
 
 @pytest.fixture(scope="module")
+def offline_chat_photo(offline_bot):
+    value = ChatPhoto(
+        small_file_id=ChatPhotoTestBase.chatphoto_small_file_id,
+        small_file_unique_id=ChatPhotoTestBase.chatphoto_small_file_unique_id,
+        big_file_id=ChatPhotoTestBase.chatphoto_big_file_id,
+        big_file_unique_id=ChatPhotoTestBase.chatphoto_big_file_unique_id,
+    )
+    value.set_bot(offline_bot)
+    return value
+
+
+@pytest.fixture(scope="module")
 async def chat_photo(bot, super_group_id):
     async def func():
         return (await bot.get_chat(super_group_id, read_timeout=50)).photo
@@ -61,33 +73,35 @@ class ChatPhotoTestBase:
 
 
 class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
-    def test_slot_behaviour(self, chat_photo):
-        for attr in chat_photo.__slots__:
-            assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
+    def test_slot_behaviour(self, offline_chat_photo):
+        for attr in offline_chat_photo.__slots__:
+            assert getattr(offline_chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_chat_photo)) == len(set(mro_slots(offline_chat_photo))), (
+            "duplicate slot"
+        )
 
-    def test_de_json(self, offline_bot, chat_photo):
+    def test_de_json(self, offline_bot):
         json_dict = {
             "small_file_id": self.chatphoto_small_file_id,
             "big_file_id": self.chatphoto_big_file_id,
             "small_file_unique_id": self.chatphoto_small_file_unique_id,
             "big_file_unique_id": self.chatphoto_big_file_unique_id,
         }
-        chat_photo = ChatPhoto.de_json(json_dict, offline_bot)
-        assert chat_photo.api_kwargs == {}
-        assert chat_photo.small_file_id == self.chatphoto_small_file_id
-        assert chat_photo.big_file_id == self.chatphoto_big_file_id
-        assert chat_photo.small_file_unique_id == self.chatphoto_small_file_unique_id
-        assert chat_photo.big_file_unique_id == self.chatphoto_big_file_unique_id
+        offline_chat_photo = ChatPhoto.de_json(json_dict, offline_bot)
+        assert offline_chat_photo.api_kwargs == {}
+        assert offline_chat_photo.small_file_id == self.chatphoto_small_file_id
+        assert offline_chat_photo.big_file_id == self.chatphoto_big_file_id
+        assert offline_chat_photo.small_file_unique_id == self.chatphoto_small_file_unique_id
+        assert offline_chat_photo.big_file_unique_id == self.chatphoto_big_file_unique_id
 
-    async def test_to_dict(self, chat_photo):
-        chat_photo_dict = chat_photo.to_dict()
+    async def test_to_dict(self, offline_chat_photo):
+        chat_photo_dict = offline_chat_photo.to_dict()
 
         assert isinstance(chat_photo_dict, dict)
-        assert chat_photo_dict["small_file_id"] == chat_photo.small_file_id
-        assert chat_photo_dict["big_file_id"] == chat_photo.big_file_id
-        assert chat_photo_dict["small_file_unique_id"] == chat_photo.small_file_unique_id
-        assert chat_photo_dict["big_file_unique_id"] == chat_photo.big_file_unique_id
+        assert chat_photo_dict["small_file_id"] == offline_chat_photo.small_file_id
+        assert chat_photo_dict["big_file_id"] == offline_chat_photo.big_file_id
+        assert chat_photo_dict["small_file_unique_id"] == offline_chat_photo.small_file_unique_id
+        assert chat_photo_dict["big_file_unique_id"] == offline_chat_photo.big_file_unique_id
 
     def test_equality(self):
         a = ChatPhoto(
@@ -122,38 +136,46 @@ class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
         assert hash(a) != hash(e)
 
     async def test_send_with_chat_photo(
-        self, monkeypatch, offline_bot, super_group_id, chat_photo
+        self, monkeypatch, offline_bot, super_group_id, offline_chat_photo
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.parameters["photo"] == chat_photo.to_dict()
+            return request_data.parameters["photo"] == offline_chat_photo.to_dict()
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        message = await offline_bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
+        message = await offline_bot.set_chat_photo(
+            photo=offline_chat_photo, chat_id=super_group_id
+        )
         assert message
 
-    async def test_get_small_file_instance_method(self, monkeypatch, chat_photo):
+    async def test_get_small_file_instance_method(self, monkeypatch, offline_chat_photo):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == chat_photo.small_file_id
+            return kwargs["file_id"] == offline_chat_photo.small_file_id
 
         assert check_shortcut_signature(ChatPhoto.get_small_file, Bot.get_file, ["file_id"], [])
         assert await check_shortcut_call(
-            chat_photo.get_small_file, chat_photo.get_bot(), "get_file"
+            offline_chat_photo.get_small_file, offline_chat_photo.get_bot(), "get_file"
         )
-        assert await check_defaults_handling(chat_photo.get_small_file, chat_photo.get_bot())
+        assert await check_defaults_handling(
+            offline_chat_photo.get_small_file, offline_chat_photo.get_bot()
+        )
 
-        monkeypatch.setattr(chat_photo.get_bot(), "get_file", make_assertion)
-        assert await chat_photo.get_small_file()
+        monkeypatch.setattr(offline_chat_photo.get_bot(), "get_file", make_assertion)
+        assert await offline_chat_photo.get_small_file()
 
-    async def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
+    async def test_get_big_file_instance_method(self, monkeypatch, offline_chat_photo):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == chat_photo.big_file_id
+            return kwargs["file_id"] == offline_chat_photo.big_file_id
 
         assert check_shortcut_signature(ChatPhoto.get_big_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(chat_photo.get_big_file, chat_photo.get_bot(), "get_file")
-        assert await check_defaults_handling(chat_photo.get_big_file, chat_photo.get_bot())
+        assert await check_shortcut_call(
+            offline_chat_photo.get_big_file, offline_chat_photo.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(
+            offline_chat_photo.get_big_file, offline_chat_photo.get_bot()
+        )
 
-        monkeypatch.setattr(chat_photo.get_bot(), "get_file", make_assertion)
-        assert await chat_photo.get_big_file()
+        monkeypatch.setattr(offline_chat_photo.get_bot(), "get_file", make_assertion)
+        assert await offline_chat_photo.get_big_file()
 
 
 class TestChatPhotoWithRequest:

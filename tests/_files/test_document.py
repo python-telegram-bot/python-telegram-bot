@@ -51,31 +51,33 @@ class DocumentTestBase:
 
 
 class TestDocumentWithoutRequest(DocumentTestBase):
-    def test_slot_behaviour(self, document):
-        for attr in document.__slots__:
-            assert getattr(document, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(document)) == len(set(mro_slots(document))), "duplicate slot"
+    def test_slot_behaviour(self, offline_document):
+        for attr in offline_document.__slots__:
+            assert getattr(offline_document, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_document)) == len(set(mro_slots(offline_document))), (
+            "duplicate slot"
+        )
 
-    def test_creation(self, document):
-        assert isinstance(document, Document)
-        assert isinstance(document.file_id, str)
-        assert isinstance(document.file_unique_id, str)
-        assert document.file_id
-        assert document.file_unique_id
+    def test_creation(self, offline_document):
+        assert isinstance(offline_document, Document)
+        assert isinstance(offline_document.file_id, str)
+        assert isinstance(offline_document.file_unique_id, str)
+        assert offline_document.file_id
+        assert offline_document.file_unique_id
 
-    def test_expected_values(self, document):
-        assert document.file_size == self.file_size
-        assert document.mime_type == self.mime_type
-        assert document.file_name == self.file_name
-        assert document.thumbnail.file_size in [self.thumb_file_size, 7980]
-        assert document.thumbnail.width == self.thumb_width
-        assert document.thumbnail.height == self.thumb_height
+    def test_expected_values(self, offline_document):
+        assert offline_document.file_size == self.file_size
+        assert offline_document.mime_type == self.mime_type
+        assert offline_document.file_name == self.file_name
+        assert offline_document.thumbnail.file_size in [self.thumb_file_size, 7980]
+        assert offline_document.thumbnail.width == self.thumb_width
+        assert offline_document.thumbnail.height == self.thumb_height
 
-    def test_de_json(self, offline_bot, document):
+    def test_de_json(self, offline_bot, offline_document):
         json_dict = {
             "file_id": self.document_file_id,
             "file_unique_id": self.document_file_unique_id,
-            "thumbnail": document.thumbnail.to_dict(),
+            "thumbnail": offline_document.thumbnail.to_dict(),
             "file_name": self.file_name,
             "mime_type": self.mime_type,
             "file_size": self.file_size,
@@ -85,26 +87,26 @@ class TestDocumentWithoutRequest(DocumentTestBase):
 
         assert test_document.file_id == self.document_file_id
         assert test_document.file_unique_id == self.document_file_unique_id
-        assert test_document.thumbnail == document.thumbnail
+        assert test_document.thumbnail == offline_document.thumbnail
         assert test_document.file_name == self.file_name
         assert test_document.mime_type == self.mime_type
         assert test_document.file_size == self.file_size
 
-    def test_to_dict(self, document):
-        document_dict = document.to_dict()
+    def test_to_dict(self, offline_document):
+        document_dict = offline_document.to_dict()
 
         assert isinstance(document_dict, dict)
-        assert document_dict["file_id"] == document.file_id
-        assert document_dict["file_unique_id"] == document.file_unique_id
-        assert document_dict["file_name"] == document.file_name
-        assert document_dict["mime_type"] == document.mime_type
-        assert document_dict["file_size"] == document.file_size
+        assert document_dict["file_id"] == offline_document.file_id
+        assert document_dict["file_unique_id"] == offline_document.file_unique_id
+        assert document_dict["file_name"] == offline_document.file_name
+        assert document_dict["mime_type"] == offline_document.mime_type
+        assert document_dict["file_size"] == offline_document.file_size
 
-    def test_equality(self, document):
-        a = Document(document.file_id, document.file_unique_id)
-        b = Document("", document.file_unique_id)
+    def test_equality(self, offline_document):
+        a = Document(offline_document.file_id, offline_document.file_unique_id)
+        b = Document("", offline_document.file_unique_id)
         d = Document("", "")
-        e = Voice(document.file_id, document.file_unique_id, 0)
+        e = Voice(offline_document.file_id, offline_document.file_unique_id, 0)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -122,19 +124,19 @@ class TestDocumentWithoutRequest(DocumentTestBase):
 
     @pytest.mark.parametrize("disable_content_type_detection", [True, False, None])
     async def test_send_with_document(
-        self, monkeypatch, offline_bot, chat_id, document, disable_content_type_detection
+        self, monkeypatch, offline_bot, chat_id, offline_document, disable_content_type_detection
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.parameters
             type_detection = (
                 data.get("disable_content_type_detection") == disable_content_type_detection
             )
-            return data["document"] == document.file_id and type_detection
+            return data["document"] == offline_document.file_id and type_detection
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
 
         message = await offline_bot.send_document(
-            document=document,
+            document=offline_document,
             chat_id=chat_id,
             disable_content_type_detection=disable_content_type_detection,
         )
@@ -151,7 +153,7 @@ class TestDocumentWithoutRequest(DocumentTestBase):
         indirect=["default_bot"],
     )
     async def test_send_document_default_quote_parse_mode(
-        self, default_bot, chat_id, document, custom, monkeypatch
+        self, default_bot, chat_id, offline_document, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -165,7 +167,7 @@ class TestDocumentWithoutRequest(DocumentTestBase):
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.send_document(
-            chat_id, document, reply_parameters=ReplyParameters(**kwargs)
+            chat_id, offline_document, reply_parameters=ReplyParameters(**kwargs)
         )
 
     @pytest.mark.parametrize("local_mode", [True, False])
@@ -197,16 +199,18 @@ class TestDocumentWithoutRequest(DocumentTestBase):
         finally:
             offline_bot._local_mode = False
 
-    async def test_get_file_instance_method(self, monkeypatch, document):
+    async def test_get_file_instance_method(self, monkeypatch, offline_document):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == document.file_id
+            return kwargs["file_id"] == offline_document.file_id
 
         assert check_shortcut_signature(Document.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(document.get_file, document.get_bot(), "get_file")
-        assert await check_defaults_handling(document.get_file, document.get_bot())
+        assert await check_shortcut_call(
+            offline_document.get_file, offline_document.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(offline_document.get_file, offline_document.get_bot())
 
-        monkeypatch.setattr(document.get_bot(), "get_file", make_assertion)
-        assert await document.get_file()
+        monkeypatch.setattr(offline_document.get_bot(), "get_file", make_assertion)
+        assert await offline_document.get_file()
 
 
 class TestDocumentWithRequest(DocumentTestBase):

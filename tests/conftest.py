@@ -38,9 +38,9 @@ from telegram import (
 )
 from telegram.ext import Defaults
 from tests.auxil.build_messages import DATE, make_message
-from tests.auxil.ci_bots import BOT_INFO_PROVIDER, JOB_INDEX
+from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
-from tests.auxil.envvars import GITHUB_ACTIONS, TEST_WITH_OPT_DEPS, env_var_2_bool
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS, env_var_2_bool
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestBot, make_bot
@@ -86,38 +86,11 @@ def pytest_collection_modifyitems(items: list[pytest.Item]):
         ):
             parent.add_marker(pytest.mark.no_req)
 
-
-if GITHUB_ACTIONS and JOB_INDEX == 0:
-    # let's not slow down the tests too much with these additional checks
-    # that's why we run them only in GitHub actions and only on *one* of the several test
-    # matrix entries
-    @pytest.fixture(autouse=True)
-    def _disallow_requests_in_without_request_tests(request):
-        """This fixture prevents tests that don't require requests from using the online-bot.
-        This is a sane-effort approach on trying to prevent requests from being made in the
-        *WithoutRequest classes. Note that we can not prevent all requests, as one can still
-        manually build a `Bot` object or use `httpx` directly. See #4317 and #4465 for some
-        discussion.
-        """
-
-        if type(request).__name__ == "SubRequest":
-            # Some fixtures used in the *WithoutRequests test classes do use requests, e.g.
-            # `animation`. Separating that would be too much effort, hence we allow that.
-            # Unfortunately the `SubRequest` class is not public, so we check only the name for
-            # less dependency on pytest's internal structure.
-            return
-
-        if not request.cls:
-            return
-        name = request.cls.__name__
-        if not name.endswith("WithoutRequest") or not request.fixturenames:
-            return
-
-        if "bot" in request.fixturenames:
-            pytest.fail(
-                f"Test function {request.function} in test class {name} should not have a `bot` "
-                f"fixture. Use `offline_bot` instead."
-            )
+        if item.get_closest_marker(name="no_req"):
+            # Applying this marker here instead of through a function-scoped fixture ensures that
+            # external network access is already blocked while higher-scoped fixtures are being
+            # set up. Loopback must remain available because some tests use it
+            item.add_marker(pytest.mark.allow_hosts(["localhost", "127.0.0.1", "::1"]))
 
 
 @pytest.fixture(scope="module", params=["true", "1", "false", "gibberish", None])
@@ -263,6 +236,11 @@ def thumb_file():
 def class_thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
+
+
+@pytest.fixture(scope="session")
+def offline_emoji_id():
+    return "5368324170671202286"
 
 
 @pytest.fixture(scope="session")
