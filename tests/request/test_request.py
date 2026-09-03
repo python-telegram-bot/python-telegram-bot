@@ -29,9 +29,17 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Any
 
-import httpx
+try:
+    import httpx2 as httpx  # HTTPXodus: tests use the same httpx the SUT imports
+except ModuleNotFoundError:
+    import httpx
+
 import pytest
-from httpx import AsyncHTTPTransport
+
+try:
+    from httpx2 import AsyncHTTPTransport  # HTTPXodus
+except ModuleNotFoundError:
+    from httpx import AsyncHTTPTransport
 
 from telegram import InputFile
 from telegram._utils.defaultvalue import DEFAULT_NONE

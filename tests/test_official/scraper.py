@@ -22,7 +22,10 @@ import asyncio
 from dataclasses import dataclass
 from typing import Literal, overload
 
-import httpx
+try:
+    import httpx2 as httpx  # HTTPXodus: tests use the same httpx the SUT imports
+except ModuleNotFoundError:
+    import httpx
 from bs4 import BeautifulSoup, Tag
 
 from tests.test_official.exceptions import IGNORED_OBJECTS

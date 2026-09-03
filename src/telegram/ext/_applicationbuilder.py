@@ -23,7 +23,10 @@ from collections.abc import Callable, Collection, Coroutine
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-import httpx
+try:
+    import httpx2 as httpx  # HTTPXodus: prefer httpx2 (actively maintained fork)
+except ModuleNotFoundError:
+    import httpx  # type: ignore[no-redef]  # HTTPXodus: fall back to the original httpx if httpx2 is not installed
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue

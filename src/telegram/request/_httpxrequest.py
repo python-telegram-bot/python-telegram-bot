@@ -21,7 +21,10 @@
 from collections.abc import Collection
 from typing import Any
 
-import httpx
+try:
+    import httpx2 as httpx  # HTTPXodus: prefer httpx2 (actively maintained fork)
+except ModuleNotFoundError:
+    import httpx  # type: ignore[no-redef]  # HTTPXodus: fall back to the original httpx if httpx2 is not installed
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger

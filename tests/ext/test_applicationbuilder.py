@@ -22,7 +22,10 @@ import inspect
 from dataclasses import dataclass
 from http import HTTPStatus
 
-import httpx
+try:
+    import httpx2 as httpx  # HTTPXodus: tests use the same httpx the SUT imports
+except ModuleNotFoundError:
+    import httpx
 import pytest
 
 from telegram import Bot

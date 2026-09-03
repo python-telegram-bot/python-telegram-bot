@@ -28,7 +28,10 @@ from collections import defaultdict
 from http import HTTPStatus
 from io import BytesIO
 
-import httpx
+try:
+    import httpx2 as httpx  # HTTPXodus: tests use the same httpx the SUT imports
+except ModuleNotFoundError:
+    import httpx
 import pytest
 
 from telegram import (
