@@ -20,8 +20,7 @@
 """This module contains classes related to unique gifs."""
 
 import datetime as dtm
-from collections.abc import Sequence
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._chat import Chat
@@ -29,9 +28,10 @@ from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class UniqueGiftColors(TelegramObject):
     """This object contains information about the color scheme for a user's name, message replies
     and link previews based on a unique gift.
@@ -64,48 +64,17 @@ class UniqueGiftColors(TelegramObject):
             themes; RGB format.
     """
 
-    __slots__ = (
-        "dark_theme_main_color",
-        "dark_theme_other_colors",
-        "light_theme_main_color",
-        "light_theme_other_colors",
-        "model_custom_emoji_id",
-        "symbol_custom_emoji_id",
+    model_custom_emoji_id: str = tg_field(compare=True)
+    symbol_custom_emoji_id: str = tg_field(compare=True)
+    light_theme_main_color: int = tg_field(compare=True)
+    light_theme_other_colors: tuple[int, ...] = tg_field(
+        compare=True, converter=parse_sequence_arg
     )
-
-    def __init__(
-        self,
-        model_custom_emoji_id: str,
-        symbol_custom_emoji_id: str,
-        light_theme_main_color: int,
-        light_theme_other_colors: Sequence[int],
-        dark_theme_main_color: int,
-        dark_theme_other_colors: Sequence[int],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.model_custom_emoji_id: str = model_custom_emoji_id
-        self.symbol_custom_emoji_id: str = symbol_custom_emoji_id
-        self.light_theme_main_color: int = light_theme_main_color
-        self.light_theme_other_colors: tuple[int, ...] = parse_sequence_arg(
-            light_theme_other_colors
-        )
-        self.dark_theme_main_color: int = dark_theme_main_color
-        self.dark_theme_other_colors: tuple[int, ...] = parse_sequence_arg(dark_theme_other_colors)
-
-        self._id_attrs = (
-            self.model_custom_emoji_id,
-            self.symbol_custom_emoji_id,
-            self.light_theme_main_color,
-            self.light_theme_other_colors,
-            self.dark_theme_main_color,
-            self.dark_theme_other_colors,
-        )
-
-        self._freeze()
+    dark_theme_main_color: int = tg_field(compare=True)
+    dark_theme_other_colors: tuple[int, ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class UniqueGiftModel(TelegramObject):
     """This object describes the model of a unique gift.
 
@@ -141,35 +110,19 @@ class UniqueGiftModel(TelegramObject):
             .. versionadded:: 22.7
     """
 
-    __slots__ = (
-        "name",
-        "rarity",
-        "rarity_per_mille",
-        "sticker",
-    )
+    @staticmethod
+    def _rarity_converter(value: str | None) -> str | None:
+        return enum.get_member(constants.UniqueGiftModelRarity, value, value)
 
-    def __init__(
-        self,
-        name: str,
-        sticker: Sticker,
-        rarity_per_mille: int,
-        rarity: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.name: str = name
-        self.sticker: Sticker = sticker
-        self.rarity_per_mille: int = rarity_per_mille
-        # Optional
-        self.rarity: str | None = enum.get_member(constants.UniqueGiftModelRarity, rarity, rarity)
-
-        self._id_attrs = (self.name, self.sticker, self.rarity_per_mille)
-
-        self._freeze()
+    # Required
+    name: str = tg_field(compare=True)
+    sticker: Sticker = tg_field(compare=True)
+    rarity_per_mille: int = tg_field(compare=True)
+    # Optional
+    rarity: str | None = tg_field(default=None, converter=_rarity_converter)
 
 
+@tg_dataclass()
 class UniqueGiftSymbol(TelegramObject):
     """This object describes the symbol shown on the pattern of a unique gift.
 
@@ -192,30 +145,12 @@ class UniqueGiftSymbol(TelegramObject):
 
     """
 
-    __slots__ = (
-        "name",
-        "rarity_per_mille",
-        "sticker",
-    )
-
-    def __init__(
-        self,
-        name: str,
-        sticker: Sticker,
-        rarity_per_mille: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.name: str = name
-        self.sticker: Sticker = sticker
-        self.rarity_per_mille: int = rarity_per_mille
-
-        self._id_attrs = (self.name, self.sticker, self.rarity_per_mille)
-
-        self._freeze()
+    name: str = tg_field(compare=True)
+    sticker: Sticker = tg_field(compare=True)
+    rarity_per_mille: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class UniqueGiftBackdropColors(TelegramObject):
     """This object describes the colors of the backdrop of a unique gift.
 
@@ -239,33 +174,13 @@ class UniqueGiftBackdropColors(TelegramObject):
 
     """
 
-    __slots__ = (
-        "center_color",
-        "edge_color",
-        "symbol_color",
-        "text_color",
-    )
-
-    def __init__(
-        self,
-        center_color: int,
-        edge_color: int,
-        symbol_color: int,
-        text_color: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.center_color: int = center_color
-        self.edge_color: int = edge_color
-        self.symbol_color: int = symbol_color
-        self.text_color: int = text_color
-
-        self._id_attrs = (self.center_color, self.edge_color, self.symbol_color, self.text_color)
-
-        self._freeze()
+    center_color: int = tg_field(compare=True)
+    edge_color: int = tg_field(compare=True)
+    symbol_color: int = tg_field(compare=True)
+    text_color: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class UniqueGiftBackdrop(TelegramObject):
     """This object describes the backdrop of a unique gift.
 
@@ -288,30 +203,12 @@ class UniqueGiftBackdrop(TelegramObject):
 
     """
 
-    __slots__ = (
-        "colors",
-        "name",
-        "rarity_per_mille",
-    )
-
-    def __init__(
-        self,
-        name: str,
-        colors: UniqueGiftBackdropColors,
-        rarity_per_mille: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.name: str = name
-        self.colors: UniqueGiftBackdropColors = colors
-        self.rarity_per_mille: int = rarity_per_mille
-
-        self._id_attrs = (self.name, self.colors, self.rarity_per_mille)
-
-        self._freeze()
+    name: str = tg_field(compare=True)
+    colors: UniqueGiftBackdropColors = tg_field(compare=True)
+    rarity_per_mille: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class UniqueGift(TelegramObject):
     """This object describes a unique gift that was upgraded from a regular gift.
 
@@ -395,64 +292,23 @@ class UniqueGift(TelegramObject):
             .. versionadded:: 22.7
     """
 
-    __slots__ = (
-        "backdrop",
-        "base_name",
-        "colors",
-        "gift_id",
-        "is_burned",
-        "is_from_blockchain",
-        "is_premium",
-        "model",
-        "name",
-        "number",
-        "publisher_chat",
-        "symbol",
-    )
-
-    def __init__(
-        self,
-        gift_id: str,
-        base_name: str,
-        name: str,
-        number: int,
-        model: UniqueGiftModel,
-        symbol: UniqueGiftSymbol,
-        backdrop: UniqueGiftBackdrop,
-        publisher_chat: Chat | None = None,
-        is_from_blockchain: bool | None = None,
-        is_premium: bool | None = None,
-        colors: UniqueGiftColors | None = None,
-        is_burned: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.gift_id: str = gift_id
-        self.base_name: str = base_name
-        self.name: str = name
-        self.number: int = number
-        self.model: UniqueGiftModel = model
-        self.symbol: UniqueGiftSymbol = symbol
-        self.backdrop: UniqueGiftBackdrop = backdrop
-        self.publisher_chat: Chat | None = publisher_chat
-        self.is_from_blockchain: bool | None = is_from_blockchain
-        self.is_premium: bool | None = is_premium
-        self.colors: UniqueGiftColors | None = colors
-        self.is_burned: bool | None = is_burned
-
-        self._id_attrs = (
-            self.base_name,
-            self.name,
-            self.number,
-            self.model,
-            self.symbol,
-            self.backdrop,
-        )
-
-        self._freeze()
+    # Required
+    gift_id: str = tg_field()
+    base_name: str = tg_field(compare=True)
+    name: str = tg_field(compare=True)
+    number: int = tg_field(compare=True)
+    model: UniqueGiftModel = tg_field(compare=True)
+    symbol: UniqueGiftSymbol = tg_field(compare=True)
+    backdrop: UniqueGiftBackdrop = tg_field(compare=True)
+    # Optional
+    publisher_chat: Chat | None = tg_field(default=None)
+    is_from_blockchain: bool | None = tg_field(default=None)
+    is_premium: bool | None = tg_field(default=None)
+    colors: UniqueGiftColors | None = tg_field(default=None)
+    is_burned: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class UniqueGiftInfo(TelegramObject):
     """Describes a service message about a unique gift that was sent or received.
 
@@ -527,59 +383,36 @@ class UniqueGiftInfo(TelegramObject):
             .. versionadded:: 22.3
     """
 
-    GIFTED_UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.GIFTED_UPGRADE
+    GIFTED_UPGRADE: ClassVar[str] = constants.UniqueGiftInfoOrigin.GIFTED_UPGRADE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.GIFTED_UPGRADE`
 
     .. versionadded:: 22.6
     """
-    OFFER: Final[str] = constants.UniqueGiftInfoOrigin.OFFER
+    OFFER: ClassVar[str] = constants.UniqueGiftInfoOrigin.OFFER
     """:const:`telegram.constants.UniqueGiftInfoOrigin.OFFER`
 
     .. versionadded:: 22.6
     """
-    RESALE: Final[str] = constants.UniqueGiftInfoOrigin.RESALE
+    RESALE: ClassVar[str] = constants.UniqueGiftInfoOrigin.RESALE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.RESALE`
 
     .. versionadded:: 22.3
     """
-    TRANSFER: Final[str] = constants.UniqueGiftInfoOrigin.TRANSFER
+    TRANSFER: ClassVar[str] = constants.UniqueGiftInfoOrigin.TRANSFER
     """:const:`telegram.constants.UniqueGiftInfoOrigin.TRANSFER`"""
-    UPGRADE: Final[str] = constants.UniqueGiftInfoOrigin.UPGRADE
+    UPGRADE: ClassVar[str] = constants.UniqueGiftInfoOrigin.UPGRADE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.UPGRADE`"""
 
-    __slots__ = (
-        "gift",
-        "last_resale_amount",
-        "last_resale_currency",
-        "next_transfer_date",
-        "origin",
-        "owned_gift_id",
-        "transfer_star_count",
-    )
+    @staticmethod
+    def _origin_converter(value: str) -> str:
+        return enum.get_member(constants.UniqueGiftInfoOrigin, value, value)
 
-    def __init__(
-        self,
-        gift: UniqueGift,
-        origin: str,
-        owned_gift_id: str | None = None,
-        transfer_star_count: int | None = None,
-        next_transfer_date: dtm.datetime | None = None,
-        last_resale_currency: str | None = None,
-        last_resale_amount: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.gift: UniqueGift = gift
-        self.origin: str = enum.get_member(constants.UniqueGiftInfoOrigin, origin, origin)
-        # Optional
-        self.owned_gift_id: str | None = owned_gift_id
-        self.transfer_star_count: int | None = transfer_star_count
-        self.next_transfer_date: dtm.datetime | None = next_transfer_date
-        self.last_resale_currency: str | None = last_resale_currency
-        self.last_resale_amount: int | None = last_resale_amount
-
-        self._id_attrs = (self.gift, self.origin)
-
-        self._freeze()
+    # Required
+    gift: UniqueGift = tg_field(compare=True)
+    origin: str = tg_field(compare=True, converter=_origin_converter)
+    # Optional
+    owned_gift_id: str | None = tg_field(default=None)
+    transfer_star_count: int | None = tg_field(default=None)
+    next_transfer_date: dtm.datetime | None = tg_field(default=None)
+    last_resale_currency: str | None = tg_field(default=None)
+    last_resale_amount: int | None = tg_field(default=None)

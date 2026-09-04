@@ -18,10 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class which represents a Telegram ChatAdministratorRights."""
 
+import dataclasses
+
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ChatAdministratorRights(TelegramObject):
     """Represents the rights of an administrator in a chat.
 
@@ -174,90 +177,25 @@ class ChatAdministratorRights(TelegramObject):
             .. versionadded:: 22.7
     """
 
-    __slots__ = (
-        "can_change_info",
-        "can_delete_messages",
-        "can_delete_stories",
-        "can_edit_messages",
-        "can_edit_stories",
-        "can_invite_users",
-        "can_manage_chat",
-        "can_manage_direct_messages",
-        "can_manage_tags",
-        "can_manage_topics",
-        "can_manage_video_chats",
-        "can_pin_messages",
-        "can_post_messages",
-        "can_post_stories",
-        "can_promote_members",
-        "can_restrict_members",
-        "is_anonymous",
-    )
-
-    def __init__(
-        self,
-        is_anonymous: bool,
-        can_manage_chat: bool,
-        can_delete_messages: bool,
-        can_manage_video_chats: bool,
-        can_restrict_members: bool,
-        can_promote_members: bool,
-        can_change_info: bool,
-        can_invite_users: bool,
-        can_post_stories: bool,
-        can_edit_stories: bool,
-        can_delete_stories: bool,
-        can_post_messages: bool | None = None,
-        can_edit_messages: bool | None = None,
-        can_pin_messages: bool | None = None,
-        can_manage_topics: bool | None = None,
-        can_manage_direct_messages: bool | None = None,
-        can_manage_tags: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.is_anonymous: bool = is_anonymous
-        self.can_manage_chat: bool = can_manage_chat
-        self.can_delete_messages: bool = can_delete_messages
-        self.can_manage_video_chats: bool = can_manage_video_chats
-        self.can_restrict_members: bool = can_restrict_members
-        self.can_promote_members: bool = can_promote_members
-        self.can_change_info: bool = can_change_info
-        self.can_invite_users: bool = can_invite_users
-        self.can_post_stories: bool = can_post_stories
-        self.can_edit_stories: bool = can_edit_stories
-        self.can_delete_stories: bool = can_delete_stories
-        # Optionals
-        self.can_post_messages: bool | None = can_post_messages
-        self.can_edit_messages: bool | None = can_edit_messages
-        self.can_pin_messages: bool | None = can_pin_messages
-        self.can_manage_topics: bool | None = can_manage_topics
-        self.can_manage_direct_messages: bool | None = can_manage_direct_messages
-        self.can_manage_tags: bool | None = can_manage_tags
-
-        self._id_attrs = (
-            self.is_anonymous,
-            self.can_manage_chat,
-            self.can_delete_messages,
-            self.can_manage_video_chats,
-            self.can_restrict_members,
-            self.can_promote_members,
-            self.can_change_info,
-            self.can_invite_users,
-            self.can_post_messages,
-            self.can_edit_messages,
-            self.can_pin_messages,
-            self.can_manage_topics,
-            self.can_post_stories,
-            self.can_edit_stories,
-            self.can_delete_stories,
-            self.can_manage_direct_messages,
-            self.can_manage_tags,
-        )
-
-        self._freeze()
+    # Required
+    is_anonymous: bool = tg_field(compare=True)
+    can_manage_chat: bool = tg_field(compare=True)
+    can_delete_messages: bool = tg_field(compare=True)
+    can_manage_video_chats: bool = tg_field(compare=True)
+    can_restrict_members: bool = tg_field(compare=True)
+    can_promote_members: bool = tg_field(compare=True)
+    can_change_info: bool = tg_field(compare=True)
+    can_invite_users: bool = tg_field(compare=True)
+    can_post_stories: bool = tg_field(compare=True)
+    can_edit_stories: bool = tg_field(compare=True)
+    can_delete_stories: bool = tg_field(compare=True)
+    # Optionals
+    can_post_messages: bool | None = tg_field(compare=True, default=None)
+    can_edit_messages: bool | None = tg_field(compare=True, default=None)
+    can_pin_messages: bool | None = tg_field(compare=True, default=None)
+    can_manage_topics: bool | None = tg_field(compare=True, default=None)
+    can_manage_direct_messages: bool | None = tg_field(compare=True, default=None)
+    can_manage_tags: bool | None = tg_field(compare=True, default=None)
 
     @classmethod
     def all_rights(cls) -> "ChatAdministratorRights":
@@ -268,7 +206,9 @@ class ChatAdministratorRights(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(*(True,) * len(cls.__slots__))
+        return cls(
+            *(True for field in dataclasses.fields(cls) if field.init and not field.kw_only)
+        )
 
     @classmethod
     def no_rights(cls) -> "ChatAdministratorRights":
@@ -278,4 +218,6 @@ class ChatAdministratorRights(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(*(False,) * len(cls.__slots__))
+        return cls(
+            *(False for field in dataclasses.fields(cls) if field.init and not field.kw_only)
+        )

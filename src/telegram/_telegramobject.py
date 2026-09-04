@@ -19,16 +19,17 @@
 """Base class for Telegram Objects."""
 
 import contextlib
+import dataclasses
 import datetime as dtm
 import inspect
 import json
-from collections.abc import Iterator, Mapping, Sequence, Sized
-from contextlib import contextmanager
+from collections.abc import Iterator, Mapping, Sized
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast, get_args, get_origin
 
+from telegram._utils.dataclass import CONVERTER_KEY, tg_dataclass, tg_field
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.de_json import (
     build_sequence_transformer,
@@ -38,22 +39,25 @@ from telegram._utils.de_json import (
 )
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
-Tele = TypeVar("Tele", bound="TelegramObject")
 _DATETIME_FIELD = object()  # Sentinel that marks datetime fields in the de_json plan.
 
 
+@tg_dataclass(eq=False)
 class TelegramObject:
     """Base class for most Telegram objects.
 
     Objects of this type are subscriptable with strings. See :meth:`__getitem__` for more details.
     The :mod:`pickle` and :func:`~copy.deepcopy` behavior of objects of this type are defined by
     :meth:`__getstate__`, :meth:`__setstate__` and :meth:`__deepcopy__`.
+
+    .. versionchanged:: NEXT.VERSION
+       Objects loaded from pickled data are now always immutable, even if they were mutable
+       when pickled.
 
     Tip:
         Objects of this type can be serialized via Python's :mod:`pickle` module and pickled
@@ -85,8 +89,6 @@ class TelegramObject:
 
     """
 
-    __slots__ = ("_bot", "_frozen", "_id_attrs", "api_kwargs")
-
     # Names accepted by this class' __init__. Built alongside the transformation plan.
     __INIT_PARAMS: ClassVar[set[str]] = set()
 
@@ -113,94 +115,33 @@ class TelegramObject:
     # The values are class name strings, e.g. "TransactionPartnerChat".
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = None
 
-    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
-        # Setting _frozen to `False` here means that classes without arguments still need to
-        # implement __init__. However, with `True` would mean increased usage of
-        # `with self._unfrozen()` in the `__init__` of subclasses and we have fewer empty
-        # classes than classes with arguments.
-        self._frozen: bool = False
-        self._id_attrs: tuple[object, ...] = ()
-        self._bot: Bot | None = None
-        # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
-        self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
+    @staticmethod
+    def _to_mapping_proxy(
+        value: JSONDict | None,
+    ) -> Mapping[str, Any]:
+        return MappingProxyType(value or {})
 
-    def __eq__(self, other: object) -> bool:
-        """Compares this object with :paramref:`other` in terms of equality.
-        If this object and :paramref:`other` are `not` objects of the same class,
-        this comparison will fall back to Python's default implementation of :meth:`object.__eq__`.
-        Otherwise, both objects may be compared in terms of equality, if the corresponding
-        subclass of :class:`TelegramObject` has defined a set of attributes to compare and
-        the objects are considered to be equal, if all of these attributes are equal.
-        If the subclass has not defined a set of attributes to compare, a warning will be issued.
+    # see docstring of _apply_api_kwargs
+    api_kwargs: Mapping[str, Any] = tg_field(
+        kw_only=True, default=None, converter=_to_mapping_proxy
+    )
+    _bot: "Bot | None" = tg_field(init=False, default=None)
 
-        Tip:
-            If instances of a class in the :mod:`telegram` module are comparable in terms of
-            equality, the documentation of the class will state the attributes that will be used
-            for this comparison.
+    if TYPE_CHECKING:
+        # FIXME: not sure what to do about this
+        # mypy doesn't recognize converters currently
+        # https://github.com/python/mypy/issues/17547
+        def __init__(self, *, api_kwargs: JSONDict | None = None) -> None: ...  # pylint: disable=unused-argument
 
-        Args:
-            other (:obj:`object`): The object to compare with.
-
-        Returns:
-            :obj:`bool`
-
-        """
-        if isinstance(other, self.__class__):
-            if not self._id_attrs:
-                warn(
-                    f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
-                    " equivalence.",
-                    stacklevel=2,
+    def __post_init__(self) -> None:
+        for dataclass_field in dataclasses.fields(self):
+            converter = dataclass_field.metadata.get(CONVERTER_KEY)
+            if converter is not None:
+                object.__setattr__(
+                    self,
+                    dataclass_field.name,
+                    converter(getattr(self, dataclass_field.name)),
                 )
-            if not other._id_attrs:
-                warn(
-                    f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
-                    " for equivalence.",
-                    stacklevel=2,
-                )
-            return self._id_attrs == other._id_attrs
-        return super().__eq__(other)
-
-    def __hash__(self) -> int:
-        """Builds a hash value for this object such that the hash of two objects is equal if and
-        only if the objects are equal in terms of :meth:`__eq__`.
-
-        Returns:
-            :obj:`int`
-        """
-        if self._id_attrs:
-            return hash((self.__class__, self._id_attrs))
-        return super().__hash__()
-
-    def __setattr__(self, key: str, value: object) -> None:
-        """Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
-
-        Raises:
-            :exc:`AttributeError`
-        """
-        # protected attributes can always be set for convenient internal use
-        if key[0] == "_" or not self._frozen:
-            super().__setattr__(key, value)
-            return
-
-        raise AttributeError(
-            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be set!"
-        )
-
-    def __delattr__(self, key: str) -> None:
-        """Overrides :meth:`object.__delattr__` to prevent the deletion of attributes.
-
-        Raises:
-            :exc:`AttributeError`
-        """
-        # protected attributes can always be set for convenient internal use
-        if key[0] == "_" or not self._frozen:
-            super().__delattr__(key)
-            return
-
-        raise AttributeError(
-            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be deleted!"
-        )
 
     def __repr__(self) -> str:
         """Gives a string representation of this object in the form
@@ -309,27 +250,23 @@ class TelegramObject:
         Args:
             state (:obj:`dict`): The data to set as attributes of this object.
         """
-        self._unfreeze()
-
         # Make sure that we have a `_bot` attribute. This is necessary, since __getstate__ omits
         # this as Bots are not pickable.
-        self._bot = None
+        self.set_bot(None)
 
         # get api_kwargs first because we may need to add entries to it (see try-except below)
         api_kwargs = cast("dict[str, object]", state.pop("api_kwargs", {}))
-        # get _frozen before the loop to avoid setting it to True in the loop
-        frozen = state.pop("_frozen", False)
 
         for key, val in state.items():
             try:
-                setattr(self, key, val)
+                object.__setattr__(self, key, val)
             except AttributeError:
                 # So an attribute was deprecated and removed from the class. Let's handle this:
                 # 1) Is the attribute now a property with no setter? Let's check that:
                 if isinstance(getattr(self.__class__, key, None), property):
                     # It is, so let's try to set the "private attribute" instead
                     try:
-                        setattr(self, f"_{key}", val)
+                        object.__setattr__(self, f"_{key}", val)
                     # If this fails as well, guess we've completely removed it. Let's add it to
                     # api_kwargs as fallback
                     except AttributeError:
@@ -344,13 +281,7 @@ class TelegramObject:
         # and then set the rest as MappingProxyType attribute. Converting to MappingProxyType
         # is necessary, since __getstate__ converts it to a dict as MPT is not pickable.
         self._apply_api_kwargs(api_kwargs)
-        self.api_kwargs = MappingProxyType(api_kwargs)
-
-        # Apply freezing if necessary
-        # we .get(…) the setting for backwards compatibility with objects that were pickled
-        # before the freeze feature was introduced
-        if frozen:
-            self._freeze()
+        object.__setattr__(self, "api_kwargs", MappingProxyType(api_kwargs))
 
     def __deepcopy__(self: Tele_co, memodict: dict[int, object]) -> Tele_co:
         """
@@ -373,30 +304,23 @@ class TelegramObject:
         result = cls.__new__(cls)  # create a new instance
         memodict[id(self)] = result  # save the id of the object in the dict
 
-        result._frozen = False  # unfreeze the new object for setting the attributes
-
         # now we set the attributes in the deepcopied object
         for k in self._get_attrs_names(include_private=True):
-            if k == "_frozen":
-                # Setting the frozen status to True would prevent the attributes from being set
-                continue
             if k == "api_kwargs":
                 # Need to copy api_kwargs manually, since it's a MappingProxyType is not
                 # pickable and deepcopy uses the pickle interface
-                setattr(result, k, MappingProxyType(deepcopy(dict(self.api_kwargs), memodict)))
+                object.__setattr__(
+                    result, k, MappingProxyType(deepcopy(dict(self.api_kwargs), memodict))
+                )
                 continue
 
             try:
-                setattr(result, k, deepcopy(getattr(self, k), memodict))
+                object.__setattr__(result, k, deepcopy(getattr(self, k), memodict))
             except AttributeError:
                 # Skip missing attributes. This can happen if the object was loaded from a pickle
                 # file that was created with an older version of the library, where the class
                 # did not have the attribute yet.
                 continue
-
-        # Apply freezing if necessary
-        if self._frozen:
-            result._freeze()
 
         result.set_bot(bot)  # Assign the bots back
         self.set_bot(bot)
@@ -438,7 +362,7 @@ class TelegramObject:
 
         plan: dict[str, Any] = {}
         compatibility_defaults: dict[str, object] = {}
-        globalns: dict[str, object] = getattr(init_fn, "__globals__", {})
+        globalns: dict[str, object] = getattr(inspect.unwrap(init_fn), "__globals__", {})
         tg_ns = get_telegram_namespace()
         sig = inspect.signature(init_fn)
         cls.__INIT_PARAMS = set(sig.parameters) - {"self"}
@@ -455,13 +379,15 @@ class TelegramObject:
             origin = get_origin(inner)
 
             if param.default is inspect.Parameter.empty:
-                compatibility_defaults[name] = () if origin is Sequence else None
+                # We check for `is tuple` instead of `Sequence`
+                # because the inspected annotation returns the type declared in the field
+                compatibility_defaults[name] = () if origin is tuple else None
 
             if inner is dtm.datetime:
                 plan[name] = _DATETIME_FIELD
             elif isinstance(inner, type) and issubclass(inner, TelegramObject):
                 plan[name] = inner
-            elif origin is Sequence:
+            elif origin is tuple:
                 args = get_args(inner)
                 if not args:
                     continue
@@ -604,24 +530,6 @@ class TelegramObject:
         """
         return tuple(cls.de_json(d, bot) for d in data)
 
-    @contextmanager
-    def _unfrozen(self: Tele) -> Iterator[Tele]:
-        """Context manager to temporarily unfreeze the object. For internal use only.
-
-        Note:
-            with to._unfrozen() as other_to:
-                assert to is other_to
-        """
-        self._unfreeze()
-        yield self
-        self._freeze()
-
-    def _freeze(self) -> None:
-        self._frozen = True
-
-    def _unfreeze(self) -> None:
-        self._frozen = False
-
     def _apply_api_kwargs(self, api_kwargs: JSONDict) -> None:
         """Loops through the api kwargs and for every key that exists as attribute of the
         object (and is None), it moves the value from `api_kwargs` to the attribute.
@@ -643,9 +551,9 @@ class TelegramObject:
             if isinstance(getattr(self.__class__, key, None), property):
                 # if setattr fails, we'll just leave the value in api_kwargs:
                 with contextlib.suppress(AttributeError):
-                    setattr(self, f"_{key}", api_kwargs.pop(key))
+                    object.__setattr__(self, f"_{key}", api_kwargs.pop(key))
             elif getattr(self, key, True) is None:
-                setattr(self, key, api_kwargs.pop(key))
+                object.__setattr__(self, key, api_kwargs.pop(key))
 
     def _is_deprecated_attr(self, attr: str) -> bool:
         """Checks whether `attr` is in the list of deprecated time period attributes."""
@@ -667,7 +575,11 @@ class TelegramObject:
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
-        all_slots = (s for c in self.__class__.__mro__[:-1] for s in c.__slots__)  # type: ignore
+        all_slots = (
+            slot
+            for cls in self.__class__.__mro__[:-1]
+            for slot in cls.__dict__.get("__slots__", ())
+        )
         # chain the class's slots with the user defined subclass __dict__ (class has no slots)
         all_attrs = (
             chain(all_slots, self.__dict__.keys()) if hasattr(self, "__dict__") else all_slots
@@ -822,11 +734,14 @@ class TelegramObject:
         Raises:
             RuntimeError: If no :class:`telegram.Bot` instance was set for this object.
         """
-        if self._bot is None:
+        # FIXME: This is a pylint hack without it pylint thinks the return type
+        # of get_bot() (i.e type of self._bot) is dataclasses.Field
+        bot = cast("Bot | None", object.__getattribute__(self, "_bot"))
+        if bot is None:
             raise RuntimeError(
                 "This object has no bot associated with it. Shortcuts cannot be used."
             )
-        return self._bot
+        return bot
 
     def set_bot(self, bot: "Bot | None") -> None:
         """Sets the :class:`telegram.Bot` instance associated with this object.
@@ -838,7 +753,7 @@ class TelegramObject:
         Arguments:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
         """
-        self._bot = bot
+        object.__setattr__(self, "_bot", bot)
 
 
 # We use str keys to avoid importing which causes circular dependencies

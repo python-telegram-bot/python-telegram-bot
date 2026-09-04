@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=redefined-builtin
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2026
@@ -20,7 +19,6 @@
 """This module contains an object that represents a Telegram ChatFullInfo."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._birthdate import Birthdate
@@ -37,15 +35,16 @@ from telegram._utils.argumentparsing import (
     parse_sequence_arg,
     to_timedelta,
 )
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import (
     get_timedelta_value,
 )
-from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import BusinessIntro, BusinessLocation, BusinessOpeningHours, Message
 
 
+@tg_dataclass()
 class ChatFullInfo(_ChatBase):
     """
     This object contains full information about a chat.
@@ -443,172 +442,71 @@ class ChatFullInfo(_ChatBase):
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """
 
-    __slots__ = (
-        "_message_auto_delete_time",
-        "_slow_mode_delay",
-        "accent_color_id",
-        "accepted_gift_types",
-        "active_usernames",
-        "available_reactions",
-        "background_custom_emoji_id",
-        "bio",
-        "birthdate",
-        "business_intro",
-        "business_location",
-        "business_opening_hours",
-        "can_send_paid_media",
-        "can_set_sticker_set",
-        "custom_emoji_sticker_set_name",
-        "description",
-        "emoji_status_custom_emoji_id",
-        "emoji_status_expiration_date",
-        "first_profile_audio",
-        "has_aggressive_anti_spam_enabled",
-        "has_hidden_members",
-        "has_private_forwards",
-        "has_protected_content",
-        "has_restricted_voice_and_video_messages",
-        "has_visible_history",
-        "invite_link",
-        "join_by_request",
-        "join_to_send_messages",
-        "linked_chat_id",
-        "location",
-        "max_reaction_count",
-        "paid_message_star_count",
-        "parent_chat",
-        "permissions",
-        "personal_chat",
-        "photo",
-        "pinned_message",
-        "profile_accent_color_id",
-        "profile_background_custom_emoji_id",
-        "rating",
-        "sticker_set_name",
-        "unique_gift_colors",
-        "unrestrict_boost_count",
-    )
+    accent_color_id: int = tg_field(compare=True)
+    max_reaction_count: int = tg_field(compare=True)
+    accepted_gift_types: AcceptedGiftTypes = tg_field(compare=True)
 
-    def __init__(
-        self,
-        id: int,
-        type: str,
-        accent_color_id: int,
-        max_reaction_count: int,
-        accepted_gift_types: AcceptedGiftTypes,
-        title: str | None = None,
-        username: str | None = None,
-        first_name: str | None = None,
-        last_name: str | None = None,
-        is_forum: bool | None = None,
-        photo: ChatPhoto | None = None,
-        active_usernames: Sequence[str] | None = None,
-        birthdate: Birthdate | None = None,
-        business_intro: "BusinessIntro | None" = None,
-        business_location: "BusinessLocation | None" = None,
-        business_opening_hours: "BusinessOpeningHours | None" = None,
-        personal_chat: "Chat | None" = None,
-        available_reactions: Sequence[ReactionType] | None = None,
-        background_custom_emoji_id: str | None = None,
-        profile_accent_color_id: int | None = None,
-        profile_background_custom_emoji_id: str | None = None,
-        emoji_status_custom_emoji_id: str | None = None,
-        emoji_status_expiration_date: dtm.datetime | None = None,
-        bio: str | None = None,
-        has_private_forwards: bool | None = None,
-        has_restricted_voice_and_video_messages: bool | None = None,
-        join_to_send_messages: bool | None = None,
-        join_by_request: bool | None = None,
-        description: str | None = None,
-        invite_link: str | None = None,
-        pinned_message: "Message | None" = None,
-        permissions: ChatPermissions | None = None,
-        slow_mode_delay: TimePeriod | None = None,
-        unrestrict_boost_count: int | None = None,
-        message_auto_delete_time: TimePeriod | None = None,
-        has_aggressive_anti_spam_enabled: bool | None = None,
-        has_hidden_members: bool | None = None,
-        has_protected_content: bool | None = None,
-        has_visible_history: bool | None = None,
-        sticker_set_name: str | None = None,
-        can_set_sticker_set: bool | None = None,
-        custom_emoji_sticker_set_name: str | None = None,
-        linked_chat_id: int | None = None,
-        location: ChatLocation | None = None,
-        can_send_paid_media: bool | None = None,
-        is_direct_messages: bool | None = None,
-        parent_chat: Chat | None = None,
-        rating: UserRating | None = None,
-        unique_gift_colors: UniqueGiftColors | None = None,
-        paid_message_star_count: int | None = None,
-        first_profile_audio: Audio | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            id=id,
-            type=type,
-            title=title,
-            username=username,
-            first_name=first_name,
-            last_name=last_name,
-            is_forum=is_forum,
-            is_direct_messages=is_direct_messages,
-            api_kwargs=api_kwargs,
-        )
-        # Required and unique to this class-
-        with self._unfrozen():
-            self.max_reaction_count: int = max_reaction_count
-            self.photo: ChatPhoto | None = photo
-            self.bio: str | None = bio
-            self.has_private_forwards: bool | None = has_private_forwards
-            self.description: str | None = description
-            self.invite_link: str | None = invite_link
-            self.pinned_message: Message | None = pinned_message
-            self.permissions: ChatPermissions | None = permissions
-            self._slow_mode_delay: dtm.timedelta | None = to_timedelta(slow_mode_delay)
-            self._message_auto_delete_time: dtm.timedelta | None = to_timedelta(
-                message_auto_delete_time
-            )
-            self.has_protected_content: bool | None = has_protected_content
-            self.has_visible_history: bool | None = has_visible_history
-            self.sticker_set_name: str | None = sticker_set_name
-            self.can_set_sticker_set: bool | None = can_set_sticker_set
-            self.linked_chat_id: int | None = linked_chat_id
-            self.location: ChatLocation | None = location
-            self.join_to_send_messages: bool | None = join_to_send_messages
-            self.join_by_request: bool | None = join_by_request
-            self.has_restricted_voice_and_video_messages: bool | None = (
-                has_restricted_voice_and_video_messages
-            )
-            self.active_usernames: tuple[str, ...] = parse_sequence_arg(active_usernames)
-            self.emoji_status_custom_emoji_id: str | None = emoji_status_custom_emoji_id
-            self.emoji_status_expiration_date: dtm.datetime | None = emoji_status_expiration_date
-            self.has_aggressive_anti_spam_enabled: bool | None = has_aggressive_anti_spam_enabled
-            self.has_hidden_members: bool | None = has_hidden_members
-            self.available_reactions: tuple[ReactionType, ...] | None = parse_sequence_arg(
-                available_reactions
-            )
-            self.accent_color_id: int | None = accent_color_id
-            self.background_custom_emoji_id: str | None = background_custom_emoji_id
-            self.profile_accent_color_id: int | None = profile_accent_color_id
-            self.profile_background_custom_emoji_id: str | None = (
-                profile_background_custom_emoji_id
-            )
-            self.unrestrict_boost_count: int | None = unrestrict_boost_count
-            self.custom_emoji_sticker_set_name: str | None = custom_emoji_sticker_set_name
-            self.birthdate: Birthdate | None = birthdate
-            self.personal_chat: Chat | None = personal_chat
-            self.business_intro: BusinessIntro | None = business_intro
-            self.business_location: BusinessLocation | None = business_location
-            self.business_opening_hours: BusinessOpeningHours | None = business_opening_hours
-            self.can_send_paid_media: bool | None = can_send_paid_media
-            self.accepted_gift_types: AcceptedGiftTypes = accepted_gift_types
-            self.parent_chat: Chat | None = parent_chat
-            self.rating: UserRating | None = rating
-            self.unique_gift_colors: UniqueGiftColors | None = unique_gift_colors
-            self.paid_message_star_count: int | None = paid_message_star_count
-            self.first_profile_audio: Audio | None = first_profile_audio
+    title: str | None = tg_field(compare=True, default=None)
+    username: str | None = tg_field(compare=True, default=None)
+    first_name: str | None = tg_field(compare=True, default=None)
+    last_name: str | None = tg_field(compare=True, default=None)
+    is_forum: bool | None = tg_field(compare=True, default=None)
+
+    photo: ChatPhoto | None = tg_field(compare=True, default=None)
+    active_usernames: tuple[str, ...] = tg_field(
+        compare=True, default=None, converter=parse_sequence_arg
+    )
+    birthdate: Birthdate | None = tg_field(compare=True, default=None)
+    business_intro: "BusinessIntro | None" = tg_field(compare=True, default=None)
+    business_location: "BusinessLocation | None" = tg_field(compare=True, default=None)
+    business_opening_hours: "BusinessOpeningHours | None" = tg_field(compare=True, default=None)
+    personal_chat: "Chat | None" = tg_field(compare=True, default=None)
+    available_reactions: tuple[ReactionType, ...] = tg_field(
+        compare=True, default=None, converter=parse_sequence_arg
+    )
+    background_custom_emoji_id: str | None = tg_field(compare=True, default=None)
+    profile_accent_color_id: int | None = tg_field(compare=True, default=None)
+    profile_background_custom_emoji_id: str | None = tg_field(compare=True, default=None)
+    emoji_status_custom_emoji_id: str | None = tg_field(compare=True, default=None)
+    emoji_status_expiration_date: dtm.datetime | None = tg_field(compare=True, default=None)
+    bio: str | None = tg_field(compare=True, default=None)
+    has_private_forwards: bool | None = tg_field(compare=True, default=None)
+    has_restricted_voice_and_video_messages: bool | None = tg_field(compare=True, default=None)
+    join_to_send_messages: bool | None = tg_field(compare=True, default=None)
+    join_by_request: bool | None = tg_field(compare=True, default=None)
+    description: str | None = tg_field(compare=True, default=None)
+    invite_link: str | None = tg_field(compare=True, default=None)
+    pinned_message: "Message | None" = tg_field(compare=True, default=None)
+    permissions: ChatPermissions | None = tg_field(compare=True, default=None)
+    _slow_mode_delay: dtm.timedelta | None = tg_field(
+        compare=True,
+        default=None,
+        alias="slow_mode_delay",
+        converter=to_timedelta,
+    )
+    unrestrict_boost_count: int | None = tg_field(compare=True, default=None)
+    _message_auto_delete_time: dtm.timedelta | None = tg_field(
+        compare=True,
+        default=None,
+        alias="message_auto_delete_time",
+        converter=to_timedelta,
+    )
+    has_aggressive_anti_spam_enabled: bool | None = tg_field(compare=True, default=None)
+    has_hidden_members: bool | None = tg_field(compare=True, default=None)
+    has_protected_content: bool | None = tg_field(compare=True, default=None)
+    has_visible_history: bool | None = tg_field(compare=True, default=None)
+    sticker_set_name: str | None = tg_field(compare=True, default=None)
+    can_set_sticker_set: bool | None = tg_field(compare=True, default=None)
+    custom_emoji_sticker_set_name: str | None = tg_field(compare=True, default=None)
+    linked_chat_id: int | None = tg_field(compare=True, default=None)
+    location: ChatLocation | None = tg_field(compare=True, default=None)
+    can_send_paid_media: bool | None = tg_field(compare=True, default=None)
+    is_direct_messages: bool | None = tg_field(compare=True, default=None)
+    parent_chat: Chat | None = tg_field(compare=True, default=None)
+    rating: UserRating | None = tg_field(compare=True, default=None)
+    unique_gift_colors: UniqueGiftColors | None = tg_field(compare=True, default=None)
+    paid_message_star_count: int | None = tg_field(compare=True, default=None)
+    first_profile_audio: Audio | None = tg_field(compare=True, default=None)
 
     @property
     def slow_mode_delay(self) -> int | dtm.timedelta | None:

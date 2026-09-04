@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=too-many-instance-attributes, too-many-arguments
+# pylint: disable=too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2026
@@ -19,11 +19,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 
+import dataclasses
 import datetime as dtm
 import re
 from collections.abc import Sequence
 from html import escape
-from typing import TYPE_CHECKING, ClassVar, TypedDict
+from typing import TYPE_CHECKING, Any, ClassVar, TypedDict
 
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
@@ -76,6 +77,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._uniquegift import UniqueGiftInfo
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.entities import parse_message_entities, parse_message_entity
@@ -143,6 +145,7 @@ class _ReplyKwargs(TypedDict):
     reply_parameters: ReplyParameters
 
 
+@tg_dataclass()
 class MaybeInaccessibleMessage(TelegramObject):
     """Base class for Telegram Message Objects.
 
@@ -173,24 +176,9 @@ class MaybeInaccessibleMessage(TelegramObject):
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
     """
 
-    __slots__ = ("chat", "date", "message_id")
-
-    def __init__(
-        self,
-        chat: Chat,
-        message_id: int,
-        date: dtm.datetime,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.chat: Chat = chat
-        self.message_id: int = message_id
-        self.date: dtm.datetime = date
-
-        self._id_attrs = (self.message_id, self.chat)
-
-        self._freeze()
+    chat: Chat = tg_field(compare=True)
+    message_id: int = tg_field(compare=True)
+    date: dtm.datetime = tg_field()
 
     @property
     def is_accessible(self) -> bool:
@@ -217,6 +205,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
 
+@tg_dataclass()
 class InaccessibleMessage(MaybeInaccessibleMessage):
     """This object represents an inaccessible message.
 
@@ -238,19 +227,10 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
         chat (:class:`telegram.Chat`): Chat the message belongs to.
     """
 
-    __slots__ = ()
-
-    def __init__(
-        self,
-        chat: Chat,
-        message_id: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(chat=chat, message_id=message_id, date=ZERO_DATE, api_kwargs=api_kwargs)
-        self._freeze()
+    date: dtm.datetime = tg_field(init=False, default=ZERO_DATE)
 
 
+@tg_dataclass()
 class Message(MaybeInaccessibleMessage):
     __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset(
         {
@@ -1202,379 +1182,131 @@ class Message(MaybeInaccessibleMessage):
     """
 
     # fmt: on
-    __slots__ = (
-        "_effective_attachment",
-        "animation",
-        "audio",
-        "author_signature",
-        "boost_added",
-        "business_connection_id",
-        "caption",
-        "caption_entities",
-        "channel_chat_created",
-        "chat_background_set",
-        "chat_owner_changed",
-        "chat_owner_left",
-        "chat_shared",
-        "checklist",
-        "checklist_tasks_added",
-        "checklist_tasks_done",
-        "connected_website",
-        "contact",
-        "delete_chat_photo",
-        "dice",
-        "direct_message_price_changed",
-        "direct_messages_topic",
-        "document",
-        "edit_date",
-        "effect_id",
-        "entities",
-        "external_reply",
-        "forum_topic_closed",
-        "forum_topic_created",
-        "forum_topic_edited",
-        "forum_topic_reopened",
-        "forward_origin",
-        "from_user",
-        "game",
-        "general_forum_topic_hidden",
-        "general_forum_topic_unhidden",
-        "gift",
-        "gift_upgrade_sent",
-        "giveaway",
-        "giveaway_completed",
-        "giveaway_created",
-        "giveaway_winners",
-        "group_chat_created",
-        "guest_bot_caller_chat",
-        "guest_bot_caller_user",
-        "guest_query_id",
-        "has_media_spoiler",
-        "has_protected_content",
-        "invoice",
-        "is_automatic_forward",
-        "is_from_offline",
-        "is_paid_post",
-        "is_topic_message",
-        "left_chat_member",
-        "link_preview_options",
-        "live_photo",
-        "location",
-        "managed_bot_created",
-        "media_group_id",
-        "message_auto_delete_timer_changed",
-        "message_thread_id",
-        "migrate_from_chat_id",
-        "migrate_to_chat_id",
-        "new_chat_members",
-        "new_chat_photo",
-        "new_chat_title",
-        "paid_media",
-        "paid_message_price_changed",
-        "paid_star_count",
-        "passport_data",
-        "photo",
-        "pinned_message",
-        "poll",
-        "poll_option_added",
-        "poll_option_deleted",
-        "proximity_alert_triggered",
-        "quote",
-        "refunded_payment",
-        "reply_markup",
-        "reply_to_checklist_task_id",
-        "reply_to_message",
-        "reply_to_poll_option_id",
-        "reply_to_story",
-        "sender_boost_count",
-        "sender_business_bot",
-        "sender_chat",
-        "sender_tag",
-        "show_caption_above_media",
-        "sticker",
-        "story",
-        "successful_payment",
-        "suggested_post_approval_failed",
-        "suggested_post_approved",
-        "suggested_post_declined",
-        "suggested_post_info",
-        "suggested_post_paid",
-        "suggested_post_refunded",
-        "supergroup_chat_created",
-        "text",
-        "unique_gift",
-        "users_shared",
-        "venue",
-        "via_bot",
-        "video",
-        "video_chat_ended",
-        "video_chat_participants_invited",
-        "video_chat_scheduled",
-        "video_chat_started",
-        "video_note",
-        "voice",
-        "web_app_data",
-        "write_access_allowed",
+
+    # tags: deprecated NEXT.VERSION
+    # Remove these fields since they're inherited from parent
+    # and are only here to perseve previous (pre-dataclasses) ordering
+    message_id: int = tg_field(compare=True)
+    date: dtm.datetime = tg_field()
+    chat: Chat = tg_field(compare=True)
+
+    from_user: User | None = tg_field(default=None)
+    reply_to_message: "Message | None" = tg_field(default=None)
+    edit_date: dtm.datetime | None = tg_field(default=None)
+    text: str | None = tg_field(default=None)
+    entities: tuple["MessageEntity", ...] = tg_field(default=None, converter=parse_sequence_arg)
+    caption_entities: tuple["MessageEntity", ...] = tg_field(
+        default=None, converter=parse_sequence_arg
     )
+    audio: Audio | None = tg_field(default=None)
+    document: Document | None = tg_field(default=None)
+    game: Game | None = tg_field(default=None)
+    photo: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    sticker: Sticker | None = tg_field(default=None)
+    video: Video | None = tg_field(default=None)
+    voice: Voice | None = tg_field(default=None)
+    video_note: VideoNote | None = tg_field(default=None)
+    new_chat_members: tuple[User, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    caption: str | None = tg_field(default=None)
+    contact: "Contact | None" = tg_field(default=None)
+    location: "Location | None" = tg_field(default=None)
+    venue: Venue | None = tg_field(default=None)
+    left_chat_member: User | None = tg_field(default=None)
+    new_chat_title: str | None = tg_field(default=None)
+    new_chat_photo: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    delete_chat_photo: bool | None = tg_field(default=None)
+    group_chat_created: bool | None = tg_field(default=None)
+    supergroup_chat_created: bool | None = tg_field(default=None)
+    channel_chat_created: bool | None = tg_field(default=None)
+    migrate_to_chat_id: int | None = tg_field(default=None)
+    migrate_from_chat_id: int | None = tg_field(default=None)
+    pinned_message: MaybeInaccessibleMessage | None = tg_field(default=None)
+    invoice: Invoice | None = tg_field(default=None)
+    successful_payment: SuccessfulPayment | None = tg_field(default=None)
+    author_signature: str | None = tg_field(default=None)
+    media_group_id: str | None = tg_field(default=None)
+    connected_website: str | None = tg_field(default=None)
+    animation: Animation | None = tg_field(default=None)
+    passport_data: PassportData | None = tg_field(default=None)
+    poll: Poll | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    dice: Dice | None = tg_field(default=None)
+    via_bot: User | None = tg_field(default=None)
+    proximity_alert_triggered: ProximityAlertTriggered | None = tg_field(default=None)
+    sender_chat: Chat | None = tg_field(default=None)
+    video_chat_started: VideoChatStarted | None = tg_field(default=None)
+    video_chat_ended: VideoChatEnded | None = tg_field(default=None)
+    video_chat_participants_invited: VideoChatParticipantsInvited | None = tg_field(default=None)
+    message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged | None = tg_field(
+        default=None
+    )
+    video_chat_scheduled: VideoChatScheduled | None = tg_field(default=None)
+    is_automatic_forward: bool | None = tg_field(default=None)
+    has_protected_content: bool | None = tg_field(default=None)
+    web_app_data: WebAppData | None = tg_field(default=None)
+    is_topic_message: bool | None = tg_field(default=None)
+    message_thread_id: int | None = tg_field(default=None)
+    forum_topic_created: ForumTopicCreated | None = tg_field(default=None)
+    forum_topic_closed: ForumTopicClosed | None = tg_field(default=None)
+    forum_topic_reopened: ForumTopicReopened | None = tg_field(default=None)
+    forum_topic_edited: ForumTopicEdited | None = tg_field(default=None)
+    general_forum_topic_hidden: GeneralForumTopicHidden | None = tg_field(default=None)
+    general_forum_topic_unhidden: GeneralForumTopicUnhidden | None = tg_field(default=None)
+    write_access_allowed: WriteAccessAllowed | None = tg_field(default=None)
+    has_media_spoiler: bool | None = tg_field(default=None)
+    chat_shared: ChatShared | None = tg_field(default=None)
+    story: Story | None = tg_field(default=None)
+    giveaway: "Giveaway | None" = tg_field(default=None)
+    giveaway_completed: "GiveawayCompleted | None" = tg_field(default=None)
+    giveaway_created: "GiveawayCreated | None" = tg_field(default=None)
+    giveaway_winners: "GiveawayWinners | None" = tg_field(default=None)
+    users_shared: UsersShared | None = tg_field(default=None)
+    link_preview_options: LinkPreviewOptions | None = tg_field(default=None)
+    external_reply: "ExternalReplyInfo | None" = tg_field(default=None)
+    quote: "TextQuote | None" = tg_field(default=None)
+    forward_origin: "MessageOrigin | None" = tg_field(default=None)
+    reply_to_story: Story | None = tg_field(default=None)
+    boost_added: ChatBoostAdded | None = tg_field(default=None)
+    sender_boost_count: int | None = tg_field(default=None)
+    business_connection_id: str | None = tg_field(default=None)
+    sender_business_bot: User | None = tg_field(default=None)
+    is_from_offline: bool | None = tg_field(default=None)
+    chat_background_set: ChatBackground | None = tg_field(default=None)
+    effect_id: str | None = tg_field(default=None)
+    show_caption_above_media: bool | None = tg_field(default=None)
+    paid_media: PaidMediaInfo | None = tg_field(default=None)
+    refunded_payment: RefundedPayment | None = tg_field(default=None)
+    gift: GiftInfo | None = tg_field(default=None)
+    unique_gift: UniqueGiftInfo | None = tg_field(default=None)
+    paid_message_price_changed: PaidMessagePriceChanged | None = tg_field(default=None)
+    paid_star_count: int | None = tg_field(default=None)
+    direct_message_price_changed: DirectMessagePriceChanged | None = tg_field(default=None)
+    checklist: Checklist | None = tg_field(default=None)
+    checklist_tasks_done: ChecklistTasksDone | None = tg_field(default=None)
+    checklist_tasks_added: ChecklistTasksAdded | None = tg_field(default=None)
+    is_paid_post: bool | None = tg_field(default=None)
+    direct_messages_topic: DirectMessagesTopic | None = tg_field(default=None)
+    reply_to_checklist_task_id: int | None = tg_field(default=None)
+    suggested_post_declined: "SuggestedPostDeclined | None" = tg_field(default=None)
+    suggested_post_paid: "SuggestedPostPaid | None" = tg_field(default=None)
+    suggested_post_refunded: "SuggestedPostRefunded | None" = tg_field(default=None)
+    suggested_post_info: "SuggestedPostInfo | None" = tg_field(default=None)
+    suggested_post_approved: "SuggestedPostApproved | None" = tg_field(default=None)
+    suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = tg_field(default=None)
+    gift_upgrade_sent: GiftInfo | None = tg_field(default=None)
+    chat_owner_changed: ChatOwnerChanged | None = tg_field(default=None)
+    chat_owner_left: ChatOwnerLeft | None = tg_field(default=None)
+    sender_tag: str | None = tg_field(default=None)
+    poll_option_added: PollOptionAdded | None = tg_field(default=None)
+    poll_option_deleted: PollOptionDeleted | None = tg_field(default=None)
+    reply_to_poll_option_id: str | None = tg_field(default=None)
+    managed_bot_created: ManagedBotCreated | None = tg_field(default=None)
+    guest_bot_caller_user: User | None = tg_field(default=None)
+    guest_bot_caller_chat: Chat | None = tg_field(default=None)
+    guest_query_id: str | None = tg_field(default=None)
+    live_photo: LivePhoto | None = tg_field(default=None)
 
-    def __init__(
-        self,
-        message_id: int,
-        date: dtm.datetime,
-        chat: Chat,
-        from_user: User | None = None,
-        reply_to_message: "Message | None" = None,
-        edit_date: dtm.datetime | None = None,
-        text: str | None = None,
-        entities: Sequence["MessageEntity"] | None = None,
-        caption_entities: Sequence["MessageEntity"] | None = None,
-        audio: Audio | None = None,
-        document: Document | None = None,
-        game: Game | None = None,
-        photo: Sequence[PhotoSize] | None = None,
-        sticker: Sticker | None = None,
-        video: Video | None = None,
-        voice: Voice | None = None,
-        video_note: VideoNote | None = None,
-        new_chat_members: Sequence[User] | None = None,
-        caption: str | None = None,
-        contact: "Contact | None" = None,
-        location: "Location | None" = None,
-        venue: Venue | None = None,
-        left_chat_member: User | None = None,
-        new_chat_title: str | None = None,
-        new_chat_photo: Sequence[PhotoSize] | None = None,
-        delete_chat_photo: bool | None = None,
-        group_chat_created: bool | None = None,
-        supergroup_chat_created: bool | None = None,
-        channel_chat_created: bool | None = None,
-        migrate_to_chat_id: int | None = None,
-        migrate_from_chat_id: int | None = None,
-        pinned_message: MaybeInaccessibleMessage | None = None,
-        invoice: Invoice | None = None,
-        successful_payment: SuccessfulPayment | None = None,
-        author_signature: str | None = None,
-        media_group_id: str | None = None,
-        connected_website: str | None = None,
-        animation: Animation | None = None,
-        passport_data: PassportData | None = None,
-        poll: Poll | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        dice: Dice | None = None,
-        via_bot: User | None = None,
-        proximity_alert_triggered: ProximityAlertTriggered | None = None,
-        sender_chat: Chat | None = None,
-        video_chat_started: VideoChatStarted | None = None,
-        video_chat_ended: VideoChatEnded | None = None,
-        video_chat_participants_invited: VideoChatParticipantsInvited | None = None,
-        message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged | None = None,
-        video_chat_scheduled: VideoChatScheduled | None = None,
-        is_automatic_forward: bool | None = None,
-        has_protected_content: bool | None = None,
-        web_app_data: WebAppData | None = None,
-        is_topic_message: bool | None = None,
-        message_thread_id: int | None = None,
-        forum_topic_created: ForumTopicCreated | None = None,
-        forum_topic_closed: ForumTopicClosed | None = None,
-        forum_topic_reopened: ForumTopicReopened | None = None,
-        forum_topic_edited: ForumTopicEdited | None = None,
-        general_forum_topic_hidden: GeneralForumTopicHidden | None = None,
-        general_forum_topic_unhidden: GeneralForumTopicUnhidden | None = None,
-        write_access_allowed: WriteAccessAllowed | None = None,
-        has_media_spoiler: bool | None = None,
-        chat_shared: ChatShared | None = None,
-        story: Story | None = None,
-        giveaway: "Giveaway | None" = None,
-        giveaway_completed: "GiveawayCompleted | None" = None,
-        giveaway_created: "GiveawayCreated | None" = None,
-        giveaway_winners: "GiveawayWinners | None" = None,
-        users_shared: UsersShared | None = None,
-        link_preview_options: LinkPreviewOptions | None = None,
-        external_reply: "ExternalReplyInfo | None" = None,
-        quote: "TextQuote | None" = None,
-        forward_origin: "MessageOrigin | None" = None,
-        reply_to_story: Story | None = None,
-        boost_added: ChatBoostAdded | None = None,
-        sender_boost_count: int | None = None,
-        business_connection_id: str | None = None,
-        sender_business_bot: User | None = None,
-        is_from_offline: bool | None = None,
-        chat_background_set: ChatBackground | None = None,
-        effect_id: str | None = None,
-        show_caption_above_media: bool | None = None,
-        paid_media: PaidMediaInfo | None = None,
-        refunded_payment: RefundedPayment | None = None,
-        gift: GiftInfo | None = None,
-        unique_gift: UniqueGiftInfo | None = None,
-        paid_message_price_changed: PaidMessagePriceChanged | None = None,
-        paid_star_count: int | None = None,
-        direct_message_price_changed: DirectMessagePriceChanged | None = None,
-        checklist: Checklist | None = None,
-        checklist_tasks_done: ChecklistTasksDone | None = None,
-        checklist_tasks_added: ChecklistTasksAdded | None = None,
-        is_paid_post: bool | None = None,
-        direct_messages_topic: DirectMessagesTopic | None = None,
-        reply_to_checklist_task_id: int | None = None,
-        suggested_post_declined: "SuggestedPostDeclined | None" = None,
-        suggested_post_paid: "SuggestedPostPaid | None" = None,
-        suggested_post_refunded: "SuggestedPostRefunded | None" = None,
-        suggested_post_info: "SuggestedPostInfo | None" = None,
-        suggested_post_approved: "SuggestedPostApproved | None" = None,
-        suggested_post_approval_failed: "SuggestedPostApprovalFailed | None" = None,
-        gift_upgrade_sent: GiftInfo | None = None,
-        chat_owner_changed: ChatOwnerChanged | None = None,
-        chat_owner_left: ChatOwnerLeft | None = None,
-        sender_tag: str | None = None,
-        poll_option_added: PollOptionAdded | None = None,
-        poll_option_deleted: PollOptionDeleted | None = None,
-        reply_to_poll_option_id: str | None = None,
-        managed_bot_created: ManagedBotCreated | None = None,
-        guest_bot_caller_user: User | None = None,
-        guest_bot_caller_chat: Chat | None = None,
-        guest_query_id: str | None = None,
-        live_photo: LivePhoto | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(chat=chat, message_id=message_id, date=date, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            # Required
-            self.message_id: int = message_id
-            # Optionals
-            self.from_user: User | None = from_user
-            self.sender_chat: Chat | None = sender_chat
-            self.date: dtm.datetime = date
-            self.chat: Chat = chat
-            self.is_automatic_forward: bool | None = is_automatic_forward
-            self.reply_to_message: Message | None = reply_to_message
-            self.edit_date: dtm.datetime | None = edit_date
-            self.has_protected_content: bool | None = has_protected_content
-            self.text: str | None = text
-            self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.audio: Audio | None = audio
-            self.game: Game | None = game
-            self.document: Document | None = document
-            self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
-            self.sticker: Sticker | None = sticker
-            self.video: Video | None = video
-            self.voice: Voice | None = voice
-            self.video_note: VideoNote | None = video_note
-            self.caption: str | None = caption
-            self.contact: Contact | None = contact
-            self.location: Location | None = location
-            self.venue: Venue | None = venue
-            self.new_chat_members: tuple[User, ...] = parse_sequence_arg(new_chat_members)
-            self.left_chat_member: User | None = left_chat_member
-            self.new_chat_title: str | None = new_chat_title
-            self.new_chat_photo: tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
-            self.delete_chat_photo: bool | None = bool(delete_chat_photo)
-            self.group_chat_created: bool | None = bool(group_chat_created)
-            self.supergroup_chat_created: bool | None = bool(supergroup_chat_created)
-            self.migrate_to_chat_id: int | None = migrate_to_chat_id
-            self.migrate_from_chat_id: int | None = migrate_from_chat_id
-            self.channel_chat_created: bool | None = bool(channel_chat_created)
-            self.message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged | None = (
-                message_auto_delete_timer_changed
-            )
-            self.pinned_message: MaybeInaccessibleMessage | None = pinned_message
-            self.invoice: Invoice | None = invoice
-            self.successful_payment: SuccessfulPayment | None = successful_payment
-            self.connected_website: str | None = connected_website
-            self.author_signature: str | None = author_signature
-            self.media_group_id: str | None = media_group_id
-            self.animation: Animation | None = animation
-            self.passport_data: PassportData | None = passport_data
-            self.poll: Poll | None = poll
-            self.dice: Dice | None = dice
-            self.via_bot: User | None = via_bot
-            self.proximity_alert_triggered: ProximityAlertTriggered | None = (
-                proximity_alert_triggered
-            )
-            self.video_chat_scheduled: VideoChatScheduled | None = video_chat_scheduled
-            self.video_chat_started: VideoChatStarted | None = video_chat_started
-            self.video_chat_ended: VideoChatEnded | None = video_chat_ended
-            self.video_chat_participants_invited: VideoChatParticipantsInvited | None = (
-                video_chat_participants_invited
-            )
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.web_app_data: WebAppData | None = web_app_data
-            self.is_topic_message: bool | None = is_topic_message
-            self.message_thread_id: int | None = message_thread_id
-            self.forum_topic_created: ForumTopicCreated | None = forum_topic_created
-            self.forum_topic_closed: ForumTopicClosed | None = forum_topic_closed
-            self.forum_topic_reopened: ForumTopicReopened | None = forum_topic_reopened
-            self.forum_topic_edited: ForumTopicEdited | None = forum_topic_edited
-            self.general_forum_topic_hidden: GeneralForumTopicHidden | None = (
-                general_forum_topic_hidden
-            )
-            self.general_forum_topic_unhidden: GeneralForumTopicUnhidden | None = (
-                general_forum_topic_unhidden
-            )
-            self.write_access_allowed: WriteAccessAllowed | None = write_access_allowed
-            self.has_media_spoiler: bool | None = has_media_spoiler
-            self.checklist: Checklist | None = checklist
-            self.users_shared: UsersShared | None = users_shared
-            self.chat_shared: ChatShared | None = chat_shared
-            self.story: Story | None = story
-            self.giveaway: Giveaway | None = giveaway
-            self.giveaway_completed: GiveawayCompleted | None = giveaway_completed
-            self.giveaway_created: GiveawayCreated | None = giveaway_created
-            self.giveaway_winners: GiveawayWinners | None = giveaway_winners
-            self.link_preview_options: LinkPreviewOptions | None = link_preview_options
-            self.external_reply: ExternalReplyInfo | None = external_reply
-            self.quote: TextQuote | None = quote
-            self.forward_origin: MessageOrigin | None = forward_origin
-            self.reply_to_story: Story | None = reply_to_story
-            self.boost_added: ChatBoostAdded | None = boost_added
-            self.sender_boost_count: int | None = sender_boost_count
-            self.business_connection_id: str | None = business_connection_id
-            self.sender_business_bot: User | None = sender_business_bot
-            self.is_from_offline: bool | None = is_from_offline
-            self.chat_background_set: ChatBackground | None = chat_background_set
-            self.checklist_tasks_done: ChecklistTasksDone | None = checklist_tasks_done
-            self.checklist_tasks_added: ChecklistTasksAdded | None = checklist_tasks_added
-            self.effect_id: str | None = effect_id
-            self.show_caption_above_media: bool | None = show_caption_above_media
-            self.paid_media: PaidMediaInfo | None = paid_media
-            self.refunded_payment: RefundedPayment | None = refunded_payment
-            self.gift: GiftInfo | None = gift
-            self.unique_gift: UniqueGiftInfo | None = unique_gift
-            self.paid_message_price_changed: PaidMessagePriceChanged | None = (
-                paid_message_price_changed
-            )
-            self.paid_star_count: int | None = paid_star_count
-            self.direct_message_price_changed: DirectMessagePriceChanged | None = (
-                direct_message_price_changed
-            )
-            self.is_paid_post: bool | None = is_paid_post
-            self.direct_messages_topic: DirectMessagesTopic | None = direct_messages_topic
-            self.reply_to_checklist_task_id: int | None = reply_to_checklist_task_id
-            self.suggested_post_declined: SuggestedPostDeclined | None = suggested_post_declined
-            self.suggested_post_paid: SuggestedPostPaid | None = suggested_post_paid
-            self.suggested_post_refunded: SuggestedPostRefunded | None = suggested_post_refunded
-            self.suggested_post_info: SuggestedPostInfo | None = suggested_post_info
-            self.suggested_post_approved: SuggestedPostApproved | None = suggested_post_approved
-            self.suggested_post_approval_failed: SuggestedPostApprovalFailed | None = (
-                suggested_post_approval_failed
-            )
-            self.gift_upgrade_sent: GiftInfo | None = gift_upgrade_sent
-            self.chat_owner_changed: ChatOwnerChanged | None = chat_owner_changed
-            self.chat_owner_left: ChatOwnerLeft | None = chat_owner_left
-            self.sender_tag: str | None = sender_tag
-            self.poll_option_added: PollOptionAdded | None = poll_option_added
-            self.poll_option_deleted: PollOptionDeleted | None = poll_option_deleted
-            self.reply_to_poll_option_id: str | None = reply_to_poll_option_id
-            self.managed_bot_created: ManagedBotCreated | None = managed_bot_created
-            self.guest_bot_caller_user: User | None = guest_bot_caller_user
-            self.guest_bot_caller_chat: Chat | None = guest_bot_caller_chat
-            self.guest_query_id: str | None = guest_query_id
-            self.live_photo: LivePhoto | None = live_photo
-
-            self._effective_attachment = DEFAULT_NONE
-
-            self._id_attrs = (self.message_id, self.chat)
+    _effective_attachment: Any = tg_field(init=False, default=DEFAULT_NONE)
 
     @property
     def chat_id(self) -> int:
@@ -1680,7 +1412,7 @@ class Message(MaybeInaccessibleMessage):
 
         for attachment_type in MessageAttachmentType:
             if self[attachment_type]:
-                self._effective_attachment = self[attachment_type]  # type: ignore[assignment]
+                object.__setattr__(self, "_effective_attachment", self[attachment_type])
                 if attachment_type == MessageAttachmentType.SUCCESSFUL_PAYMENT:
                     warn(
                         PTBDeprecationWarning(
@@ -1692,7 +1424,7 @@ class Message(MaybeInaccessibleMessage):
                     )
                 break
         else:
-            self._effective_attachment = None
+            object.__setattr__(self, "_effective_attachment", None)
 
         return self._effective_attachment  # type: ignore[return-value]
 
@@ -1789,12 +1521,13 @@ class Message(MaybeInaccessibleMessage):
                     continue
 
                 # create a new entity with the correct offset and length
-                # looping over slots rather manually accessing the attributes
-                # is more future-proof
-                kwargs = {attr: getattr(entity, attr) for attr in entity.__slots__}
-                kwargs["offset"] = offset
-                kwargs["length"] = e_length
-                entities.append(MessageEntity(**kwargs))
+                entities.append(
+                    dataclasses.replace(
+                        entity,
+                        offset=offset,
+                        length=e_length,
+                    )
+                )
 
         return position, tuple(entities) or None
 

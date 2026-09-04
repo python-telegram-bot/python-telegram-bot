@@ -18,13 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represent a Telegram bots name."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class BotName(TelegramObject):
     """This object represents the bot's name.
 
@@ -41,15 +42,7 @@ class BotName(TelegramObject):
 
     """
 
-    __slots__ = ("name",)
+    name: str = tg_field(compare=True)
 
-    def __init__(self, name: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.name: str = name
-
-        self._id_attrs = (self.name,)
-
-        self._freeze()
-
-    MAX_LENGTH: Final[int] = constants.BotNameLimit.MAX_NAME_LENGTH
+    MAX_LENGTH: ClassVar[int] = constants.BotNameLimit.MAX_NAME_LENGTH
     """:const:`telegram.constants.BotNameLimit.MAX_NAME_LENGTH`"""
