@@ -29,9 +29,8 @@ from http import HTTPStatus
 from io import BytesIO
 
 try:
-    import httpx2 as httpx  # HTTPXodus: tests use the same httpx the SUT imports
+import httpx2
 except ModuleNotFoundError:
-    import httpx
 import pytest
 
 from telegram import (
@@ -480,7 +479,7 @@ class TestBotWithoutRequest:
 
     async def test_shutdown_at_error_in_request_in_init(self, monkeypatch, offline_bot):
         async def get_me_error():
-            raise httpx.HTTPError("BadRequest wrong token sry :(")
+            raise httpx2.HTTPError("BadRequest wrong token sry :(")
 
         async def shutdown(*args):
             self.test_flag = "stop"
@@ -1852,7 +1851,7 @@ class TestBotWithoutRequest:
 
             return 200, b'{"ok": true, "result": []}'
 
-        monkeypatch.setattr(httpx.AsyncClient, "request", request)
+        monkeypatch.setattr(httpx2.AsyncClient, "request", request)
         monkeypatch.setattr(offline_bot, "_request", (object(), HTTPXRequest()))
 
         # Test file uploading

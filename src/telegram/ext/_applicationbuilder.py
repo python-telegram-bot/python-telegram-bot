@@ -24,9 +24,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 try:
-    import httpx2 as httpx  # HTTPXodus: prefer httpx2 (actively maintained fork)
+import httpx2
 except ModuleNotFoundError:
-    import httpx  # type: ignore[no-redef]  # HTTPXodus: fall back to the original httpx if httpx2 is not installed
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
@@ -180,7 +179,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._base_url: DVType[BaseUrl] = DefaultValue("https://api.telegram.org/bot")
         self._base_file_url: DVType[BaseUrl] = DefaultValue("https://api.telegram.org/file/bot")
         self._connection_pool_size: DVInput[int] = DEFAULT_NONE
-        self._proxy: DVInput[str | httpx.Proxy | httpx.URL] = DEFAULT_NONE
+        self._proxy: DVInput[str | httpx2.Proxy | httpx2.URL] = DEFAULT_NONE
         self._socket_options: DVInput[Collection[SocketOpt]] = DEFAULT_NONE
         self._connect_timeout: ODVInput[float] = DEFAULT_NONE
         self._read_timeout: ODVInput[float] = DEFAULT_NONE
@@ -189,7 +188,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._pool_timeout: ODVInput[float] = DEFAULT_NONE
         self._request: DVInput[BaseRequest] = DEFAULT_NONE
         self._get_updates_connection_pool_size: DVInput[int] = DEFAULT_NONE
-        self._get_updates_proxy: DVInput[str | httpx.Proxy | httpx.URL] = DEFAULT_NONE
+        self._get_updates_proxy: DVInput[str | httpx2.Proxy | httpx2.URL] = DEFAULT_NONE
         self._get_updates_socket_options: DVInput[Collection[SocketOpt]] = DEFAULT_NONE
         self._get_updates_connect_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_read_timeout: ODVInput[float] = DEFAULT_NONE
@@ -521,7 +520,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._connection_pool_size = connection_pool_size
         return self
 
-    def proxy(self: BuilderType, proxy: str | httpx.Proxy | httpx.URL) -> BuilderType:
+    def proxy(self: BuilderType, proxy: str | httpx2.Proxy | httpx2.URL) -> BuilderType:
         """Sets the proxy for the :paramref:`~telegram.request.HTTPXRequest.proxy`
         parameter of :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
 
@@ -530,8 +529,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. versionadded:: 20.7
 
         Args:
-            proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): The URL to a proxy
-                server, a ``httpx.Proxy`` object or a ``httpx.URL`` object. See
+            proxy (:obj:`str` | ``httpx2.Proxy`` | ``httpx2.URL``): The URL to a proxy
+                server, a ``httpx2.Proxy`` object or a ``httpx2.URL`` object. See
                 :paramref:`telegram.request.HTTPXRequest.proxy` for more information.
 
         Returns:
@@ -673,7 +672,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                pip install "python-telegram-bot[http2]"
 
             Keep in mind that the HTTP/1.1 implementation may be considered the `"more
-            robust option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
+            robust option at this time" <https://www.python-httpx2.org/http2#enabling-http2>`_.
 
         .. versionadded:: 20.1
         .. versionchanged:: 20.2
@@ -730,7 +729,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def get_updates_proxy(
-        self: BuilderType, get_updates_proxy: str | httpx.Proxy | httpx.URL
+        self: BuilderType, get_updates_proxy: str | httpx2.Proxy | httpx2.URL
     ) -> BuilderType:
         """Sets the proxy for the :paramref:`telegram.request.HTTPXRequest.proxy`
         parameter which is used for :meth:`telegram.Bot.get_updates`. Defaults to :obj:`None`.
@@ -740,8 +739,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. versionadded:: 20.7
 
         Args:
-            proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): The URL to a proxy server,
-                a ``httpx.Proxy`` object or a ``httpx.URL`` object. See
+            proxy (:obj:`str` | ``httpx2.Proxy`` | ``httpx2.URL``): The URL to a proxy server,
+                a ``httpx2.Proxy`` object or a ``httpx2.URL`` object. See
                 :paramref:`telegram.request.HTTPXRequest.proxy` for more information.
 
         Returns:
@@ -869,7 +868,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             You will also need to install the http2 dependency. Keep in mind that the HTTP/1.1
             implementation may be considered the `"more robust option at this time"
-            <https://www.python-httpx.org/http2#enabling-http2>`_.
+            <https://www.python-httpx2.org/http2#enabling-http2>`_.
 
             .. code-block:: bash
 

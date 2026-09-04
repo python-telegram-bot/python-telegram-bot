@@ -20,10 +20,7 @@ from pathlib import Path
 
 import pytest
 
-try:
-    from httpx2 import AsyncClient, AsyncHTTPTransport, Response  # HTTPXodus
-except ModuleNotFoundError:
-    from httpx import AsyncClient, AsyncHTTPTransport, Response
+from httpx2 import AsyncClient, AsyncHTTPTransport, Response
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import TextEncoding

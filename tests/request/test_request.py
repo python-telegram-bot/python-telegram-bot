@@ -30,16 +30,15 @@ from http import HTTPStatus
 from typing import Any
 
 try:
-    import httpx2 as httpx  # HTTPXodus: tests use the same httpx the SUT imports
+import httpx2
 except ModuleNotFoundError:
-    import httpx
 
 import pytest
 
 try:
     from httpx2 import AsyncHTTPTransport  # HTTPXodus
 except ModuleNotFoundError:
-    from httpx import AsyncHTTPTransport
+    from httpx2 import AsyncHTTPTransport
 
 from telegram import InputFile
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -131,7 +130,7 @@ class TestRequestWithoutRequest:
         def __init__(self, *args, **kwargs):
             raise ImportError("Other Error Message")
 
-        monkeypatch.setattr(httpx.AsyncClient, "__init__", __init__)
+        monkeypatch.setattr(httpx2.AsyncClient, "__init__", __init__)
 
         # Make sure that other exceptions are forwarded
         with pytest.raises(ImportError, match=r"Other Error Message"):
@@ -147,9 +146,9 @@ class TestRequestWithoutRequest:
     def test_httpx_kwargs(self, monkeypatch):
         self.test_flag = {}
 
-        orig_init = httpx.AsyncClient.__init__
+        orig_init = httpx2.AsyncClient.__init__
 
-        class Client(httpx.AsyncClient):
+        class Client(httpx2.AsyncClient):
             def __init__(*args, **kwargs):
                 orig_init(*args, **kwargs)
                 self.test_flag["args"] = args
@@ -162,8 +161,8 @@ class TestRequestWithoutRequest:
             connection_pool_size=42,
             http_version="2",
             httpx_kwargs={
-                "timeout": httpx.Timeout(7),
-                "limits": httpx.Limits(max_connections=7),
+                "timeout": httpx2.Timeout(7),
+                "limits": httpx2.Limits(max_connections=7),
                 "http1": True,
                 "verify": False,
             },
@@ -445,9 +444,9 @@ class TestHTTPXRequestWithoutRequest:
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
         request = HTTPXRequest()
-        assert request._client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
+        assert request._client.timeout == httpx2.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
         assert request._client.proxy is None
-        assert request._client.limits == httpx.Limits(max_connections=256)
+        assert request._client.limits == httpx2.Limits(max_connections=256)
         assert request._client.http1 is True
         assert not request._client.http2
 
@@ -460,16 +459,16 @@ class TestHTTPXRequestWithoutRequest:
             pool_timeout=46,
         )
         assert request._client.proxy == "proxy"
-        assert request._client.limits == httpx.Limits(max_connections=42)
-        assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
+        assert request._client.limits == httpx2.Limits(max_connections=42)
+        assert request._client.timeout == httpx2.Timeout(connect=43, read=44, write=45, pool=46)
 
     async def test_multiple_inits_and_shutdowns(self, monkeypatch):
         self.test_flag = defaultdict(int)
 
-        orig_init = httpx.AsyncClient.__init__
-        orig_aclose = httpx.AsyncClient.aclose
+        orig_init = httpx2.AsyncClient.__init__
+        orig_aclose = httpx2.AsyncClient.aclose
 
-        class Client(httpx.AsyncClient):
+        class Client(httpx2.AsyncClient):
             def __init__(*args, **kwargs):
                 orig_init(*args, **kwargs)
                 self.test_flag["init"] += 1
@@ -512,7 +511,7 @@ class TestHTTPXRequestWithoutRequest:
         httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
-        monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)
+        monkeypatch.setattr(httpx2.AsyncClient, "aclose", aclose)
 
         async with httpx_request:
             pass
@@ -529,7 +528,7 @@ class TestHTTPXRequestWithoutRequest:
         httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
-        monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)
+        monkeypatch.setattr(httpx2.AsyncClient, "aclose", aclose)
 
         with pytest.raises(RuntimeError, match="initialize"):
             async with httpx_request:
@@ -538,11 +537,11 @@ class TestHTTPXRequestWithoutRequest:
         assert self.test_flag == "stop"
 
     async def test_do_request_default_timeouts(self, monkeypatch):
-        default_timeouts = httpx.Timeout(connect=42, read=43, write=44, pool=45)
+        default_timeouts = httpx2.Timeout(connect=42, read=43, write=44, pool=45)
 
         async def make_assertion(_, **kwargs):
             self.test_flag = kwargs.get("timeout") == default_timeouts
-            return httpx.Response(HTTPStatus.OK)
+            return httpx2.Response(HTTPStatus.OK)
 
         async with HTTPXRequest(
             connect_timeout=default_timeouts.connect,
@@ -550,18 +549,18 @@ class TestHTTPXRequestWithoutRequest:
             write_timeout=default_timeouts.write,
             pool_timeout=default_timeouts.pool,
         ) as httpx_request:
-            monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
+            monkeypatch.setattr(httpx2.AsyncClient, "request", make_assertion)
             await httpx_request.do_request(method="GET", url="URL")
 
         assert self.test_flag
 
     async def test_do_request_manual_timeouts(self, monkeypatch, httpx_request):
-        default_timeouts = httpx.Timeout(connect=42, read=43, write=44, pool=45)
-        manual_timeouts = httpx.Timeout(connect=52, read=53, write=54, pool=55)
+        default_timeouts = httpx2.Timeout(connect=42, read=43, write=44, pool=45)
+        manual_timeouts = httpx2.Timeout(connect=52, read=53, write=54, pool=55)
 
         async def make_assertion(_, **kwargs):
             self.test_flag = kwargs.get("timeout") == manual_timeouts
-            return httpx.Response(HTTPStatus.OK)
+            return httpx2.Response(HTTPStatus.OK)
 
         async with HTTPXRequest(
             connect_timeout=default_timeouts.connect,
@@ -569,7 +568,7 @@ class TestHTTPXRequestWithoutRequest:
             write_timeout=default_timeouts.write,
             pool_timeout=default_timeouts.pool,
         ) as httpx_request_ctx:
-            monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
+            monkeypatch.setattr(httpx2.AsyncClient, "request", make_assertion)
             await httpx_request_ctx.do_request(
                 method="GET",
                 url="URL",
@@ -588,10 +587,10 @@ class TestHTTPXRequestWithoutRequest:
             files_assertion = kwargs.get("files") is None
             data_assertion = kwargs.get("data") is None
             if method_assertion and url_assertion and files_assertion and data_assertion:
-                return httpx.Response(HTTPStatus.OK)
-            return httpx.Response(HTTPStatus.BAD_REQUEST)
+                return httpx2.Response(HTTPStatus.OK)
+            return httpx2.Response(HTTPStatus.BAD_REQUEST)
 
-        monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
+        monkeypatch.setattr(httpx2.AsyncClient, "request", make_assertion)
         code, _ = await httpx_request.do_request(method="method", url="url")
         assert code == HTTPStatus.OK
 
@@ -607,10 +606,10 @@ class TestHTTPXRequestWithoutRequest:
             files_assertion = kwargs.get("files") == mixed_rqs.multipart_data
             data_assertion = kwargs.get("data") == mixed_rqs.json_parameters
             if method_assertion and url_assertion and files_assertion and data_assertion:
-                return httpx.Response(HTTPStatus.OK)
-            return httpx.Response(HTTPStatus.BAD_REQUEST)
+                return httpx2.Response(HTTPStatus.OK)
+            return httpx2.Response(HTTPStatus.BAD_REQUEST)
 
-        monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
+        monkeypatch.setattr(httpx2.AsyncClient, "request", make_assertion)
         code, _ = await httpx_request.do_request(
             method="method",
             url="url",
@@ -620,9 +619,9 @@ class TestHTTPXRequestWithoutRequest:
 
     async def test_do_request_return_value(self, monkeypatch, httpx_request):
         async def make_assertion(self, method, url, headers, timeout, files, data):
-            return httpx.Response(123, content=b"content")
+            return httpx2.Response(123, content=b"content")
 
-        monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
+        monkeypatch.setattr(httpx2.AsyncClient, "request", make_assertion)
         code, content = await httpx_request.do_request(
             "method",
             "url",
@@ -633,8 +632,8 @@ class TestHTTPXRequestWithoutRequest:
     @pytest.mark.parametrize(
         ("raised_exception", "expected_class", "expected_message"),
         [
-            (httpx.TimeoutException("timeout"), TimedOut, "Timed out"),
-            (httpx.ReadError("read_error"), NetworkError, "httpx.ReadError: read_error"),
+            (httpx2.TimeoutException("timeout"), TimedOut, "Timed out"),
+            (httpx2.ReadError("read_error"), NetworkError, "httpx2.ReadError: read_error"),
         ],
     )
     async def test_do_request_exceptions(
@@ -643,7 +642,7 @@ class TestHTTPXRequestWithoutRequest:
         async def make_assertion(self, method, url, headers, timeout, files, data):
             raise raised_exception
 
-        monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
+        monkeypatch.setattr(httpx2.AsyncClient, "request", make_assertion)
 
         with pytest.raises(expected_class, match=expected_message) as exc_info:
             await httpx_request.do_request(
@@ -654,16 +653,16 @@ class TestHTTPXRequestWithoutRequest:
         assert exc_info.value.__cause__ is raised_exception
 
     async def test_do_request_pool_timeout(self, monkeypatch):
-        pool_timeout = httpx.PoolTimeout("pool timeout")
+        pool_timeout = httpx2.PoolTimeout("pool timeout")
 
         async def request(_, **kwargs):
             if self.test_flag is None:
                 self.test_flag = True
             else:
                 raise pool_timeout
-            return httpx.Response(HTTPStatus.OK)
+            return httpx2.Response(HTTPStatus.OK)
 
-        monkeypatch.setattr(httpx.AsyncClient, "request", request)
+        monkeypatch.setattr(httpx2.AsyncClient, "request", request)
 
         async with HTTPXRequest(pool_timeout=0.02) as httpx_request:
             with pytest.raises(TimedOut, match="Pool timeout") as exc_info:
@@ -684,9 +683,9 @@ class TestHTTPXRequestWithoutRequest:
     ):
         async def request(_, **kwargs):
             self.test_flag = kwargs.get("timeout")
-            return httpx.Response(HTTPStatus.OK, content=b'{"ok": "True", "result": {}}')
+            return httpx2.Response(HTTPStatus.OK, content=b'{"ok": "True", "result": {}}')
 
-        monkeypatch.setattr(httpx.AsyncClient, "request", request)
+        monkeypatch.setattr(httpx2.AsyncClient, "request", request)
 
         data = {"string": "string", "int": 1, "float": 1.0}
         if media:
@@ -699,11 +698,11 @@ class TestHTTPXRequestWithoutRequest:
         await httpx_request.post(
             "url", request_data, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
         )
-        assert self.test_flag == httpx.Timeout(read=1, connect=2, write=3, pool=4)
+        assert self.test_flag == httpx2.Timeout(read=1, connect=2, write=3, pool=4)
 
         # Now also ensure that the default timeout for media requests is 20 seconds
         await httpx_request.post("url", request_data)
-        assert self.test_flag == httpx.Timeout(read=5, connect=5, write=20 if media else 5, pool=1)
+        assert self.test_flag == httpx2.Timeout(read=5, connect=5, write=20 if media else 5, pool=1)
 
     @pytest.mark.parametrize("init", [True, False])
     async def test_setting_media_write_timeout(
@@ -717,9 +716,9 @@ class TestHTTPXRequestWithoutRequest:
 
         async def request(_, **kwargs):
             self.test_flag = kwargs["timeout"].write
-            return httpx.Response(HTTPStatus.OK, content=b'{"ok": "True", "result": {}}')
+            return httpx2.Response(HTTPStatus.OK, content=b'{"ok": "True", "result": {}}')
 
-        monkeypatch.setattr(httpx.AsyncClient, "request", request)
+        monkeypatch.setattr(httpx2.AsyncClient, "request", request)
 
         data = {"string": "string", "int": 1, "float": 1.0, "media": input_media_photo}
         request_data = RequestData(
