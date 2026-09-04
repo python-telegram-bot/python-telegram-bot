@@ -2161,6 +2161,16 @@ class TestFilters:
         update.message.is_automatic_forward = True
         assert filters.IS_AUTOMATIC_FORWARD.check_update(update)
 
+    def test_filters_is_bot(self, update):
+        assert not filters.IS_BOT.check_update(update)
+        update.message.from_user.is_bot = True
+        assert filters.IS_BOT.check_update(update)
+
+    def test_filters_is_bot_without_user(self):
+        # channel posts have no `from_user`, so there is no user to look at
+        update = Update(0, channel_post=Message(0, dtm.datetime.utcnow(), Chat(0, Chat.CHANNEL)))
+        assert not filters.IS_BOT.check_update(update)
+
     def test_filters_is_from_offline(self, update):
         assert not filters.IS_FROM_OFFLINE.check_update(update)
         update.message.is_from_offline = True
