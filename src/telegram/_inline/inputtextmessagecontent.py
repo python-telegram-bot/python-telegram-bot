@@ -48,10 +48,6 @@ class InputTextMessageContent(InputMessageContent):
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         link_preview_options (:obj:`LinkPreviewOptions`, optional): Link preview generation
             options for the message. Mutually exclusive with
             :paramref:`disable_web_page_preview`.
@@ -70,24 +66,6 @@ class InputTextMessageContent(InputMessageContent):
 
             .. versionchanged:: 21.0
                 |keyword_only_arg|
-
-    Attributes:
-        message_text (:obj:`str`): Text of the message to be sent,
-            :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
-            :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
-            parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        link_preview_options (:obj:`LinkPreviewOptions`): Optional. Link preview generation
-            options for the message.
-
-            .. versionadded:: 20.8
-
     """
 
     __slots__ = ("entities", "link_preview_options", "message_text", "parse_mode")

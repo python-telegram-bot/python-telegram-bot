@@ -33,10 +33,6 @@ class ChatOwnerChanged(TelegramObject):
 
     Args:
         new_owner (:class:`telegram.User`): The new owner of the chat
-
-    Attributes:
-        new_owner (:class:`telegram.User`): The new owner of the chat
-
     """
 
     __slots__ = ("new_owner",)
@@ -66,11 +62,6 @@ class ChatOwnerLeft(TelegramObject):
     Args:
         new_owner (:class:`telegram.User`, optional): The user who will become the new owner of the
             chat if the previous owner does not return to the chat
-
-    Attributes:
-        new_owner (:class:`telegram.User`): Optional. The user who will become the new owner of the
-            chat if the previous owner does not return to the chat
-
     """
 
     __slots__ = ("new_owner",)

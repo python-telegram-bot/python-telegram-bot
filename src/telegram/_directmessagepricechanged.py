@@ -41,15 +41,6 @@ class DirectMessagePriceChanged(TelegramObject):
             The new number of Telegram Stars that must be paid by users for each direct message
             sent to the channel. Does not apply to users who have been exempted by administrators.
             Defaults to ``0``.
-
-    Attributes:
-        are_direct_messages_enabled (:obj:`bool`):
-            :obj:`True`, if direct messages are enabled for the channel chat; :obj:`False`
-            otherwise.
-        direct_message_star_count (:obj:`int`):
-            Optional. The new number of Telegram Stars that must be paid by users for each direct
-            message sent to the channel. Does not apply to users who have been exempted by
-            administrators. Defaults to ``0``.
     """
 
     __slots__ = ("are_direct_messages_enabled", "direct_message_star_count")

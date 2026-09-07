@@ -27,11 +27,10 @@ from sphinx.application import Sphinx
 import telegram
 import telegram.ext
 from docs.auxil.admonition_inserter import AdmonitionInserter
+from docs.auxil.attribute_inserter import AttributeInserter, DocstringParser
 from docs.auxil.bot_insertion import (
     RAISES_BLOCK,
     check_timeout_and_api_kwargs_presence,
-    find_insert_pos_for_kwargs,
-    find_insert_pos_for_raises,
     get_updates_read_timeout_addition,
     keyword_args,
     media_write_timeout_change,
@@ -44,6 +43,7 @@ if TYPE_CHECKING:
 
 
 ADMONITION_INSERTER = AdmonitionInserter()
+ATTRIBUTE_INSERTER = AttributeInserter()
 
 # Some base classes are implementation detail
 # We want to instead show *their* base class
@@ -93,8 +93,9 @@ def autodoc_process_docstring(
     2) Use this method to automatically insert "Returned in" admonition into classes
        that are returned from the Bot methods
 
-    3) Use this method to automatically insert "Available in" admonition into classes
-       whose instances are available as attributes of other classes
+    3) Use this method to automatically insert the Attributes block, wherever applicable,
+       for Telegram objects. The "Available in" admonition is then also inserted. These are
+       instances of a class which are available as attributes of other classes.
 
     4) Use this method to automatically insert "Use in" admonition into classes
        whose instances can be used as arguments of the Bot methods
@@ -103,7 +104,7 @@ def autodoc_process_docstring(
        to the actual object here.
     """
 
-    # 1) Insert the Keyword Args and "Shortcuts" admonitions for the Bot methods
+    # 1) Insert the Keyword Args, "Shortcuts" admonitions, and "Raises" block for the Bot methods
     method_name = name.rsplit(".", maxsplit=1)[-1]
     if (
         name.startswith("telegram.Bot.")
@@ -111,13 +112,15 @@ def autodoc_process_docstring(
         and method_name.islower()
         and check_timeout_and_api_kwargs_presence(obj)
     ):
+        parser = DocstringParser(lines)
         # Logic for inserting keyword args into docstrings:
         # -------------------------------------------------
-        insert_index = find_insert_pos_for_kwargs(lines)
-        if not insert_index:
+        returns_section = parser.get_section("Returns")
+        if not returns_section:
             raise ValueError(
                 f"Couldn't find the correct position to insert the keyword args for {obj}."
             )
+        insert_index = returns_section.start_idx
 
         get_updates: bool = method_name == "get_updates"
         # The below can be done in 1 line with itertools.chain, but this must be modified in-place
@@ -141,10 +144,8 @@ def autodoc_process_docstring(
         # Logic for inserting Raises:
         # -------------------------------------------------
         # We will only insert the Raises block if there isn't already one.
-
-        insert_index = find_insert_pos_for_raises(lines)
-        if insert_index != -1:
-            lines[insert_index:insert_index] = RAISES_BLOCK
+        if parser.get_section("Raises") is None:
+            lines.extend(RAISES_BLOCK)
 
         # Logic for inserting "Shortcuts" admonition:
         # -------------------------------------------
@@ -155,7 +156,12 @@ def autodoc_process_docstring(
 
     # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
     # (where applicable)
-    if what == "class":
+    if what in ("class", "exception"):
+        # Auto-generate Attributes section entries from Args before admonitions are inserted
+        ATTRIBUTE_INSERTER.insert_attributes(
+            obj=typing.cast("type", obj),
+            lines=lines,
+        )
         ADMONITION_INSERTER.insert_admonitions(
             obj=typing.cast("type", obj),  # since "what" == class, we know it's not just object
             docstring_lines=lines,

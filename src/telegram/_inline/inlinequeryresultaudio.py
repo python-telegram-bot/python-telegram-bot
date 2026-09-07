@@ -46,7 +46,7 @@ class InlineQueryResultAudio(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` bytes.
         audio_url (:obj:`str`): A valid URL for the audio file.
         title (:obj:`str`): Title.
         performer (:obj:`str`, optional): Performer.
@@ -60,9 +60,6 @@ class InlineQueryResultAudio(InlineQueryResult):
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -70,32 +67,11 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.AUDIO`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        audio_url (:obj:`str`): A valid URL for the audio file.
-        title (:obj:`str`): Title.
-        performer (:obj:`str`): Optional. Performer.
         audio_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Audio duration
             in seconds.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        caption (:obj:`str`): Optional. Caption,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
-            parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the audio.
-
     """
 
     __slots__ = (

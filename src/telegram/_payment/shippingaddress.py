@@ -36,15 +36,6 @@ class ShippingAddress(TelegramObject):
         street_line1 (:obj:`str`): First line for the address.
         street_line2 (:obj:`str`): Second line for the address.
         post_code (:obj:`str`): Address post code.
-
-    Attributes:
-        country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
-        state (:obj:`str`): State, if applicable.
-        city (:obj:`str`): City.
-        street_line1 (:obj:`str`): First line for the address.
-        street_line2 (:obj:`str`): Second line for the address.
-        post_code (:obj:`str`): Address post code.
-
     """
 
     __slots__ = (

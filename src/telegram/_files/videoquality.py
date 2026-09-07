@@ -41,19 +41,6 @@ class VideoQuality(_BaseMedium):
         codec (:obj:`str`): Codec that was used to encode the video,
             for example, ``h264``, ``h265``, or ``av01``
         file_size (:obj:`int`, optional):  File size in bytes.
-
-    Attributes:
-        file_id (:obj:`str`): Identifier for this file, which can be used
-            to download or reuse the file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        width (:obj:`int`): Video width.
-        height (:obj:`int`): Video height.
-        codec (:obj:`str`): Codec that was used to encode the video,
-            for example, ``h264``, ``h265``, or ``av01``
-        file_size (:obj:`int`): Optional. File size in bytes.
-
     """
 
     __slots__ = ("codec", "height", "width")

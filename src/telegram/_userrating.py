@@ -40,17 +40,6 @@ class UserRating(TelegramObject):
         current_level_rating (:obj:`int`): The rating value required to get the current level
         next_level_rating (:obj:`int`, optional): The rating value required to get to the next
             level; omitted if the maximum level was reached
-
-    Attributes:
-        level (:obj:`int`): Current level of the user, indicating their reliability when purchasing
-            digital goods and services. A higher level suggests a more trustworthy customer; a
-            negative level is likely reason for concern.
-        rating (:obj:`int`): Numerical value of the user's rating; the higher the rating, the
-            better
-        current_level_rating (:obj:`int`): The rating value required to get the current level
-        next_level_rating (:obj:`int`): Optional. The rating value required to get to the next
-            level; omitted if the maximum level was reached
-
     """
 
     __slots__ = ("current_level_rating", "level", "next_level_rating", "rating")
