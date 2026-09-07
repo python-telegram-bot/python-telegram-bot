@@ -259,6 +259,109 @@ class TestAIORateLimiter:
         await asyncio.sleep(1.1)
         assert isinstance(task_2.exception(), RetryAfter)
 
+    @staticmethod
+    async def _process_request(rate_limiter, callback, chat_id):
+        return await rate_limiter.process_request(
+            callback=callback,
+            args=(),
+            kwargs={},
+            endpoint="sendMessage",
+            data={"chat_id": chat_id},
+            rate_limit_args=None,
+        )
+
+    async def test_retry_after_not_released_by_concurrent_request(self):
+        # A request that was already in flight when the halt began must not release the halt
+        # when it completes. See #5338.
+        rate_limiter = AIORateLimiter(overall_max_rate=0, group_max_rate=0, max_retries=1)
+
+        flooded_hit = False
+
+        async def flooded():
+            nonlocal flooded_hit
+            if not flooded_hit:
+                flooded_hit = True
+                raise RetryAfter(dtm.timedelta(seconds=1))
+            return True
+
+        async def slow():
+            await asyncio.sleep(0.3)
+            return True
+
+        async def fast():
+            return True
+
+        start = time.monotonic()
+        slow_task = asyncio.create_task(self._process_request(rate_limiter, slow, 2))
+        await asyncio.sleep(0.05)
+        flooded_task = asyncio.create_task(self._process_request(rate_limiter, flooded, 1))
+        await asyncio.sleep(0.05)
+        await slow_task
+        await self._process_request(rate_limiter, fast, 3)
+        # The halt began ~0.05s in and lasts 1.1s; without the fix, `slow` finishing at
+        # ~0.35s releases the halt and this is ~0.35
+        assert time.monotonic() - start == pytest.approx(1.15, rel=0.1)
+        await flooded_task
+
+    async def test_concurrent_retry_after_keeps_longest_halt(self):
+        # When two requests back off concurrently, the shorter backoff expiring must not
+        # release the longer halt. See #5338.
+        rate_limiter = AIORateLimiter(overall_max_rate=0, group_max_rate=0, max_retries=1)
+
+        def make_flooding_callback(retry_after):
+            hit = False
+
+            async def callback():
+                nonlocal hit
+                # Yield control so that both callbacks are in flight before either raises
+                await asyncio.sleep(0)
+                if not hit:
+                    hit = True
+                    raise RetryAfter(retry_after)
+                return True
+
+            return callback
+
+        async def fast():
+            return True
+
+        start = time.monotonic()
+        long_task = asyncio.create_task(
+            self._process_request(
+                rate_limiter, make_flooding_callback(dtm.timedelta(seconds=2)), 1
+            )
+        )
+        short_task = asyncio.create_task(
+            self._process_request(
+                rate_limiter, make_flooding_callback(dtm.timedelta(seconds=0.5)), 2
+            )
+        )
+        # Wait past the short backoff (0.6s), still inside the long halt (2.1s)
+        await asyncio.sleep(0.7)
+        await self._process_request(rate_limiter, fast, 3)
+        # Without the fix, the short backoff expiring releases the halt and this is ~0.7
+        assert time.monotonic() - start == pytest.approx(2.1, rel=0.1)
+        await long_task
+        await short_task
+
+    async def test_retry_after_halts_also_when_reraised(self):
+        # A RetryAfter halts all requests also when it is re-raised because max_retries
+        # is exhausted - in particular with the default max_retries=0. See #5338.
+        rate_limiter = AIORateLimiter(overall_max_rate=0, group_max_rate=0, max_retries=0)
+
+        async def flooded():
+            raise RetryAfter(dtm.timedelta(seconds=1))
+
+        async def fast():
+            return True
+
+        start = time.monotonic()
+        with pytest.raises(RetryAfter):
+            await self._process_request(rate_limiter, flooded, 1)
+        await self._process_request(rate_limiter, fast, 2)
+        # Without the fix, the halt is never established and this is ~0
+        assert time.monotonic() - start == pytest.approx(1.1, rel=0.1)
+
     @pytest.mark.parametrize("group_id", [-1, "-1", "@username"])
     @pytest.mark.parametrize("chat_id", [1, "1"])
     async def test_basic_rate_limiting(self, bot, group_id, chat_id):

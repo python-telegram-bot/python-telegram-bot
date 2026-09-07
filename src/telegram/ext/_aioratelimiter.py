@@ -22,6 +22,7 @@ library.
 
 import asyncio
 import contextlib
+import time
 from collections.abc import Callable, Coroutine
 from typing import Any
 
@@ -134,7 +135,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         "_group_max_rate",
         "_group_time_period",
         "_max_retries",
-        "_retry_after_event",
+        "_retry_after_deadline",
     )
 
     def __init__(
@@ -169,8 +170,9 @@ class AIORateLimiter(BaseRateLimiter[int]):
             max_rate=constants.FloodLimit.PAID_MESSAGES_PER_SECOND, time_period=1
         )
         self._max_retries: int = max_retries
-        self._retry_after_event = asyncio.Event()
-        self._retry_after_event.set()
+        # Monotonic timestamp until which all requests are halted after a RetryAfter.
+        # Initialized to 0, i.e. in the past, so no halt is active.
+        self._retry_after_deadline: float = 0
 
     async def initialize(self) -> None:
         """Does nothing."""
@@ -206,10 +208,19 @@ class AIORateLimiter(BaseRateLimiter[int]):
         callback: Callable[..., Coroutine[Any, Any, bool | JSONDict | list[JSONDict]]],
         args: Any,
         kwargs: dict[str, Any],
+        wait_for_halt: bool,
     ) -> bool | JSONDict | list[JSONDict]:
         async def inner() -> bool | JSONDict | list[JSONDict]:
-            # In case a retry_after was hit, we wait with processing the request
-            await self._retry_after_event.wait()
+            # In case a retry_after was hit, we wait with processing the request.
+            # The deadline may be extended by another RetryAfter while we sleep, so re-check.
+            # Retries skip this: their own backoff sleep already covered the halt.
+            # This is not a poll loop (we sleep exactly until the deadline; one extra iteration
+            # only if the deadline moved), and unlike an event, an expired deadline can't be
+            # "released" by the wrong task - which is exactly the bug this fixes (#5338).
+            while (  # noqa: ASYNC110
+                wait_for_halt and (delay := self._retry_after_deadline - time.monotonic()) > 0
+            ):
+                await asyncio.sleep(delay)
             return await callback(*args, **kwargs)
 
         if allow_paid_broadcast:
@@ -274,20 +285,22 @@ class AIORateLimiter(BaseRateLimiter[int]):
                     callback=callback,
                     args=args,
                     kwargs=kwargs,
+                    wait_for_halt=i == 0,
                 )
             except RetryAfter as exc:
+                sleep = exc._retry_after.total_seconds() + 0.1  # pylint: disable=protected-access
+                # Halt all requests until then. Don't shorten a longer halt established by a
+                # concurrent request; the halt simply expires, so nothing needs to release it.
+                self._retry_after_deadline = max(
+                    self._retry_after_deadline, time.monotonic() + sleep
+                )
+
                 if i == max_retries:
                     _LOGGER.exception(
                         "Rate limit hit after maximum of %d retries", max_retries, exc_info=exc
                     )
                     raise
 
-                sleep = exc._retry_after.total_seconds() + 0.1  # pylint: disable=protected-access
                 _LOGGER.info("Rate limit hit. Retrying after %f seconds", sleep)
-                # Make sure we don't allow other requests to be processed
-                self._retry_after_event.clear()
                 await asyncio.sleep(sleep)
-            finally:
-                # Allow other requests to be processed
-                self._retry_after_event.set()
         return None  # type: ignore[return-value]
