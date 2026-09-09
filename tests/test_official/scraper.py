@@ -22,9 +22,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Literal, overload
 
-try:
 import httpx2
-except ModuleNotFoundError:
 from bs4 import BeautifulSoup, Tag
 
 from tests.test_official.exceptions import IGNORED_OBJECTS

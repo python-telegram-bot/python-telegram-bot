@@ -39,8 +39,7 @@ classifiers = [
     "Programming Language :: Python :: 3.15",
 ]
 dependencies = [
-    "httpx2 >= 2.12.0; python_version >= '3.10'",
-    "httpcore >=1.0.9; python_version >= '3.14'"  # httpx doesn't pin this as of 0.28.1
+    "httpx2 >= 2.12.0"
 ]
 
 [project.urls]
@@ -72,7 +71,7 @@ ext = [
     "python-telegram-bot[callback-data,job-queue,rate-limiter,webhooks]",
 ]
 http2 = [
-    "httpx[http2]",
+    "httpx2[http2]",
 ]
 job-queue = [
     # APS doesn't have a strict stability policy. Let's be cautious for now.
@@ -87,7 +86,7 @@ rate-limiter = [
     "aiolimiter>=1.1,<1.3",
 ]
 socks = [
-    "httpx[socks]",
+    "httpx2[socks]",
 ]
 webhooks = [
     # tornado is rather stable, but let's not allow the next major release without prior testing

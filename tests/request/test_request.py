@@ -29,9 +29,7 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Any
 
-try:
 import httpx2
-except ModuleNotFoundError:
 
 import pytest
 
@@ -154,7 +152,7 @@ class TestRequestWithoutRequest:
                 self.test_flag["args"] = args
                 self.test_flag["kwargs"] = kwargs
 
-        monkeypatch.setattr(httpx, "AsyncClient", Client)
+        monkeypatch.setattr(httpx2, "AsyncClient", Client)
 
         HTTPXRequest(
             connect_timeout=1,
@@ -441,7 +439,7 @@ class TestHTTPXRequestWithoutRequest:
             http2: object
             transport: object = None
 
-        monkeypatch.setattr(httpx, "AsyncClient", Client)
+        monkeypatch.setattr(httpx2, "AsyncClient", Client)
 
         request = HTTPXRequest()
         assert request._client.timeout == httpx2.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
@@ -477,7 +475,7 @@ class TestHTTPXRequestWithoutRequest:
                 await orig_aclose(*args, **kwargs)
                 self.test_flag["shutdown"] += 1
 
-        monkeypatch.setattr(httpx, "AsyncClient", Client)
+        monkeypatch.setattr(httpx2, "AsyncClient", Client)
 
         # Create a new one instead of using the fixture so that the mocking can work
         httpx_request = HTTPXRequest()

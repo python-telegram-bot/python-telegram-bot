@@ -28,9 +28,7 @@ from collections import defaultdict
 from http import HTTPStatus
 from io import BytesIO
 
-try:
 import httpx2
-except ModuleNotFoundError:
 import pytest
 
 from telegram import (

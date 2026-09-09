@@ -22,9 +22,7 @@ import inspect
 from dataclasses import dataclass
 from http import HTTPStatus
 
-try:
 import httpx2
-except ModuleNotFoundError:
 import pytest
 
 from telegram import Bot
@@ -131,7 +129,7 @@ class TestApplicationBuilder:
             http2: object
             transport: object = None
 
-        monkeypatch.setattr(httpx, "AsyncClient", Client)
+        monkeypatch.setattr(httpx2, "AsyncClient", Client)
 
         app = builder.token(bot.token).build()
 
@@ -380,7 +378,7 @@ class TestApplicationBuilder:
             media_write_timeout.append(kwargs.get("media_write_timeout"))
             original_init(self_, *args, **kwargs)
 
-        monkeypatch.setattr(httpx, "AsyncClient", Client)
+        monkeypatch.setattr(httpx2, "AsyncClient", Client)
         monkeypatch.setattr(HTTPXRequest, "__init__", init_httpx_request)
 
         builder = ApplicationBuilder().token(bot.token)

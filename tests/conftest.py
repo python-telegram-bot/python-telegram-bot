@@ -96,7 +96,7 @@ if GITHUB_ACTIONS and JOB_INDEX == 0:
         """This fixture prevents tests that don't require requests from using the online-bot.
         This is a sane-effort approach on trying to prevent requests from being made in the
         *WithoutRequest classes. Note that we can not prevent all requests, as one can still
-        manually build a `Bot` object or use `httpx` directly. See #4317 and #4465 for some
+        manually build a `Bot` object or use `httpx2` directly. See #4317 and #4465 for some
         discussion.
         """
 

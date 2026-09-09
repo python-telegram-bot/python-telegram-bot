@@ -23,9 +23,7 @@ from collections.abc import Callable, Collection, Coroutine
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-try:
 import httpx2
-except ModuleNotFoundError:
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
@@ -672,7 +670,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                pip install "python-telegram-bot[http2]"
 
             Keep in mind that the HTTP/1.1 implementation may be considered the `"more
-            robust option at this time" <https://www.python-httpx2.org/http2#enabling-http2>`_.
+            robust option at this time" <https://github.com/pydantic/httpx2`_.
 
         .. versionadded:: 20.1
         .. versionchanged:: 20.2
@@ -868,11 +866,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             You will also need to install the http2 dependency. Keep in mind that the HTTP/1.1
             implementation may be considered the `"more robust option at this time"
-            <https://www.python-httpx2.org/http2#enabling-http2>`_.
+            <https://github.com/pydantic/httpx2`_.
 
             .. code-block:: bash
 
-               pip install httpx[http2]
+               pip install httpx2[http2]
 
         .. versionadded:: 20.1
         .. versionchanged:: 20.2

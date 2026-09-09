@@ -16,14 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains methods to make POST and GET requests using the httpx library."""
+"""This module contains methods to make POST and GET requests using the httpx2 library."""
 
 from collections.abc import Collection
 from typing import Any
 
-try:
 import httpx2
-except ModuleNotFoundError:
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
@@ -33,8 +31,8 @@ from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
 
 # Note to future devs:
-# Proxies are currently only tested manually. The httpx development docs have a nice guide on that:
-# https://www.python-httpx2.org/contributing/#development-proxy-setup (also saved on archive.org)
+# Proxies are currently only tested manually. The httpx2 development docs have a nice guide on that:
+# https://github.com/pydantic/httpx2 (also saved on archive.org)
 # That also works with socks5. Just pass `--mode socks5` to mitmproxy
 
 _LOGGER = get_logger(__name__, "HTTPXRequest")
@@ -42,7 +40,7 @@ _LOGGER = get_logger(__name__, "HTTPXRequest")
 
 class HTTPXRequest(BaseRequest):
     """Implementation of :class:`~telegram.request.BaseRequest` using the library
-    `httpx <https://www.python-httpx2.org>`_.
+    `httpx2 <https://github.com/pydantic/httpx2>`_.
 
     .. versionadded:: 20.0
 
@@ -57,7 +55,7 @@ class HTTPXRequest(BaseRequest):
                 Set the default to ``256``.
                 Stopped applying to ``httpx2.Limits.max_keepalive_connections``. Now only applies to
                 ``httpx2.Limits.max_connections``. See `Resource Limits
-                <https://www.python-httpx2.org/advanced/resource-limits/>`_
+                <https://github.com/pydantic/httpx2`_
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server.
             This value is used unless a different value is passed to :meth:`do_request`.
@@ -109,14 +107,14 @@ class HTTPXRequest(BaseRequest):
 
             Note:
                 * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
-                  ``ALL_PROXY``. See `the docs of httpx`_ for more info.
+                  ``ALL_PROXY``. See `the docs of httpx2`_ for more info.
                 * HTTPS proxies can be configured by passing a ``httpx2.Proxy`` object with
                   a corresponding ``ssl_context``.
                 * For Socks5 support, additional dependencies are required. Make sure to install
                   PTB via :command:`pip install "python-telegram-bot[socks]"` in this case.
                 * Socks5 proxies can not be set via environment variables.
 
-            .. _the docs of httpx: https://www.python-httpx2.org/environment_variables/#proxies
+            .. _the docs of httpx: https://github.com/pydantic/httpx2
 
             .. versionadded:: 20.7
         media_write_timeout (:obj:`float` | :obj:`None`, optional): Like :paramref:`write_timeout`,
@@ -126,12 +124,12 @@ class HTTPXRequest(BaseRequest):
 
             .. versionadded:: 21.0
         httpx_kwargs (dict[:obj:`str`, Any], optional): Additional keyword arguments to be passed
-            to the `httpx2.AsyncClient <https://www.python-httpx2.org/api/#asyncclient>`_
+            to the `httpx2.AsyncClient <https://github.com/pydantic/httpx2`_
             constructor.
 
             Warning:
                 This parameter is intended for advanced users that want to fine-tune the behavior
-                of the underlying ``httpx`` client. The values passed here will override all the
+                of the underlying ``httpx2`` client. The values passed here will override all the
                 defaults set by ``python-telegram-bot`` and all other parameters passed to
                 :class:`HTTPXRequest`. The only exception is the :paramref:`media_write_timeout`
                 parameter, which is not passed to the client constructor.
