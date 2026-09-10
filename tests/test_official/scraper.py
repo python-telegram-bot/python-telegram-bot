@@ -22,7 +22,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Literal, overload
 
-import httpx
+import httpx2
 from bs4 import BeautifulSoup, Tag
 
 from tests.test_official.exceptions import IGNORED_OBJECTS
@@ -66,11 +66,11 @@ class TelegramMethod:
 
 @dataclass(slots=True, frozen=False)
 class Scraper:
-    request: httpx.Response | None = None
+    request: httpx2.Response | None = None
     soup: BeautifulSoup | None = None
 
     async def make_request(self) -> None:
-        async with httpx.AsyncClient() as client:
+        async with httpx2.AsyncClient() as client:
             self.request = await client.get("https://core.telegram.org/bots/api", timeout=10)
         self.soup = BeautifulSoup(self.request.text, "html.parser")
 
