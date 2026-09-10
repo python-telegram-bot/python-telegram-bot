@@ -18,17 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Game."""
 
-from collections.abc import Sequence
-
 from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.strings import TextEncoding
-from telegram._utils.types import JSONDict
 
 
+@tg_dataclass()
 class Game(TelegramObject):
     """
     This object represents a game. Use `BotFather <https://t.me/BotFather>`_ to create and edit
@@ -86,39 +85,14 @@ class Game(TelegramObject):
 
     """
 
-    __slots__ = (
-        "animation",
-        "description",
-        "photo",
-        "text",
-        "text_entities",
-        "title",
-    )
-
-    def __init__(
-        self,
-        title: str,
-        description: str,
-        photo: Sequence[PhotoSize],
-        text: str | None = None,
-        text_entities: Sequence[MessageEntity] | None = None,
-        animation: Animation | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.title: str = title
-        self.description: str = description
-        self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
-        # Optionals
-        self.text: str | None = text
-        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
-        self.animation: Animation | None = animation
-
-        self._id_attrs = (self.title, self.description, self.photo)
-
-        self._freeze()
+    # Required
+    title: str = tg_field(compare=True)
+    description: str = tg_field(compare=True)
+    photo: tuple[PhotoSize, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    # Optional
+    text: str | None = tg_field(default=None)
+    text_entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    animation: Animation | None = tg_field(default=None)
 
     def parse_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.

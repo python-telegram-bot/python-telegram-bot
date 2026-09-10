@@ -22,6 +22,7 @@ import datetime as dtm
 from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -43,6 +44,7 @@ def with_file_credentials(data: JSONDict, credentials: "FileCredentials | None")
     return {**data, "credentials": credentials_data}
 
 
+@tg_dataclass()
 class PassportFile(TelegramObject):
     """
     This object represents a file uploaded to Telegram Passport. Currently all Telegram Passport
@@ -78,38 +80,13 @@ class PassportFile(TelegramObject):
                 |datetime_localization|
     """
 
-    __slots__ = (
-        "_credentials",
-        "file_date",
-        "file_id",
-        "file_size",
-        "file_unique_id",
-    )
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        file_date: dtm.datetime,
-        file_size: int,
-        credentials: "FileCredentials | None" = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required
-        self.file_id: str = file_id
-        self.file_unique_id: str = file_unique_id
-        self.file_size: int = file_size
-        self.file_date: dtm.datetime = file_date
-        # Optionals
-
-        self._credentials: FileCredentials | None = credentials
-
-        self._id_attrs = (self.file_unique_id,)
-
-        self._freeze()
+    # Required
+    file_id: str = tg_field()
+    file_unique_id: str = tg_field(compare=True)
+    file_date: dtm.datetime = tg_field()
+    file_size: int = tg_field()
+    # Optionals
+    _credentials: "FileCredentials | None" = tg_field(default=None, alias="credentials")
 
     @classmethod
     def de_json_decrypted(
@@ -136,7 +113,7 @@ class PassportFile(TelegramObject):
         """
         data = with_file_credentials(data, credentials)
 
-        return super().de_json(data=data, bot=bot)
+        return super(PassportFile, cls).de_json(data=data, bot=bot)  # noqa: UP008
 
     @classmethod
     def de_list_decrypted(

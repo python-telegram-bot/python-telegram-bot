@@ -16,11 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars transaction partners."""
 
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, ClassVar, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._chat import Chat
@@ -32,7 +30,7 @@ from telegram._utils.argumentparsing import (
     parse_sequence_arg,
     to_timedelta,
 )
-from telegram._utils.types import JSONDict, TimePeriod
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 from .affiliateinfo import AffiliateInfo
 
@@ -44,6 +42,7 @@ if TYPE_CHECKING:
     from .revenuewithdrawalstate import RevenueWithdrawalState
 
 
+@tg_dataclass()
 class TransactionPartner(TelegramObject):
     """This object describes the source of a transaction, or its recipient for outgoing
     transactions. Currently, it can be one of:
@@ -71,8 +70,6 @@ class TransactionPartner(TelegramObject):
         type (:obj:`str`): The type of the transaction partner.
     """
 
-    __slots__ = ("type",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -86,35 +83,35 @@ class TransactionPartner(TelegramObject):
         },
     )
 
-    AFFILIATE_PROGRAM: Final[str] = constants.TransactionPartnerType.AFFILIATE_PROGRAM
+    AFFILIATE_PROGRAM: ClassVar[str] = constants.TransactionPartnerType.AFFILIATE_PROGRAM
     """:const:`telegram.constants.TransactionPartnerType.AFFILIATE_PROGRAM`
 
     .. versionadded:: 21.9
     """
-    CHAT: Final[str] = constants.TransactionPartnerType.CHAT
+    CHAT: ClassVar[str] = constants.TransactionPartnerType.CHAT
     """:const:`telegram.constants.TransactionPartnerType.CHAT`
 
     .. versionadded:: 21.11
     """
-    FRAGMENT: Final[str] = constants.TransactionPartnerType.FRAGMENT
+    FRAGMENT: ClassVar[str] = constants.TransactionPartnerType.FRAGMENT
     """:const:`telegram.constants.TransactionPartnerType.FRAGMENT`"""
-    OTHER: Final[str] = constants.TransactionPartnerType.OTHER
+    OTHER: ClassVar[str] = constants.TransactionPartnerType.OTHER
     """:const:`telegram.constants.TransactionPartnerType.OTHER`"""
-    TELEGRAM_ADS: Final[str] = constants.TransactionPartnerType.TELEGRAM_ADS
+    TELEGRAM_ADS: ClassVar[str] = constants.TransactionPartnerType.TELEGRAM_ADS
     """:const:`telegram.constants.TransactionPartnerType.TELEGRAM_ADS`"""
-    TELEGRAM_API: Final[str] = constants.TransactionPartnerType.TELEGRAM_API
+    TELEGRAM_API: ClassVar[str] = constants.TransactionPartnerType.TELEGRAM_API
     """:const:`telegram.constants.TransactionPartnerType.TELEGRAM_API`"""
-    USER: Final[str] = constants.TransactionPartnerType.USER
+    USER: ClassVar[str] = constants.TransactionPartnerType.USER
     """:const:`telegram.constants.TransactionPartnerType.USER`"""
 
-    def __init__(self, type: str, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.TransactionPartnerType, type, type)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.TransactionPartnerType, value, value)
 
-        self._id_attrs = (self.type,)
-        self._freeze()
+    type: str = tg_field(compare=True, converter=_type_converter)
 
 
+@tg_dataclass()
 class TransactionPartnerAffiliateProgram(TransactionPartner):
     """Describes the affiliate program that issued the affiliate commission received via this
     transaction.
@@ -139,26 +136,15 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
             each 1000 Telegram Stars received by the affiliate program sponsor from referred users.
     """
 
-    __slots__ = ("commission_per_mille", "sponsor_user")
-
-    def __init__(
-        self,
-        commission_per_mille: int,
-        sponsor_user: "User | None" = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=TransactionPartner.AFFILIATE_PROGRAM, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.sponsor_user: User | None = sponsor_user
-            self.commission_per_mille: int = commission_per_mille
-            self._id_attrs = (
-                self.type,
-                self.commission_per_mille,
-            )
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=TransactionPartner.AFFILIATE_PROGRAM)
+    # Required
+    commission_per_mille: int = tg_field(compare=True)
+    # Optional
+    sponsor_user: "User | None" = tg_field(default=None)
 
 
+@tg_dataclass()
 class TransactionPartnerChat(TransactionPartner):
     """Describes a transaction with a chat.
 
@@ -179,30 +165,15 @@ class TransactionPartnerChat(TransactionPartner):
 
     """
 
-    __slots__ = (
-        "chat",
-        "gift",
-    )
-
-    def __init__(
-        self,
-        chat: Chat,
-        gift: Gift | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=TransactionPartner.CHAT, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.chat: Chat = chat
-            self.gift: Gift | None = gift
-
-            self._id_attrs = (
-                self.type,
-                self.chat,
-            )
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=TransactionPartner.CHAT)
+    # Required
+    chat: Chat = tg_field(compare=True)
+    # Optional
+    gift: Gift | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class TransactionPartnerFragment(TransactionPartner):
     """Describes a withdrawal transaction with Fragment.
 
@@ -219,20 +190,13 @@ class TransactionPartnerFragment(TransactionPartner):
             transaction if the transaction is outgoing.
     """
 
-    __slots__ = ("withdrawal_state",)
-
-    def __init__(
-        self,
-        withdrawal_state: "RevenueWithdrawalState | None" = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=TransactionPartner.FRAGMENT, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.withdrawal_state: RevenueWithdrawalState | None = withdrawal_state
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=TransactionPartner.FRAGMENT)
+    # Optional
+    withdrawal_state: "RevenueWithdrawalState | None" = tg_field(default=None)
 
 
+@tg_dataclass()
 class TransactionPartnerUser(TransactionPartner):
     """Describes a transaction with a user.
 
@@ -352,52 +316,22 @@ class TransactionPartnerUser(TransactionPartner):
 
     """
 
-    __slots__ = (
-        "affiliate",
-        "gift",
-        "invoice_payload",
-        "paid_media",
-        "paid_media_payload",
-        "premium_subscription_duration",
-        "subscription_period",
-        "transaction_type",
-        "user",
-    )
-
-    def __init__(
-        self,
-        transaction_type: str,
-        user: "User",
-        invoice_payload: str | None = None,
-        paid_media: Sequence[PaidMedia] | None = None,
-        paid_media_payload: str | None = None,
-        subscription_period: TimePeriod | None = None,
-        gift: Gift | None = None,
-        affiliate: AffiliateInfo | None = None,
-        premium_subscription_duration: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=TransactionPartner.USER, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.user: User = user
-            self.affiliate: AffiliateInfo | None = affiliate
-            self.invoice_payload: str | None = invoice_payload
-            self.paid_media: tuple[PaidMedia, ...] | None = parse_sequence_arg(paid_media)
-            self.paid_media_payload: str | None = paid_media_payload
-            self.subscription_period: dtm.timedelta | None = to_timedelta(subscription_period)
-            self.gift: Gift | None = gift
-            self.premium_subscription_duration: int | None = premium_subscription_duration
-            self.transaction_type: str = transaction_type
-
-            self._id_attrs = (
-                self.type,
-                self.user,
-                self.transaction_type,
-            )
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=TransactionPartner.USER)
+    # Required
+    transaction_type: str = tg_field(compare=True)
+    user: "User" = tg_field(compare=True)
+    # Optional
+    invoice_payload: str | None = tg_field(default=None)
+    paid_media: tuple[PaidMedia, ...] | None = tg_field(default=None, converter=parse_sequence_arg)
+    paid_media_payload: str | None = tg_field(default=None)
+    subscription_period: "dtm.timedelta | None" = tg_field(default=None, converter=to_timedelta)
+    gift: Gift | None = tg_field(default=None)
+    affiliate: AffiliateInfo | None = tg_field(default=None)
+    premium_subscription_duration: int | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class TransactionPartnerOther(TransactionPartner):
     """Describes a transaction with an unknown partner.
 
@@ -408,13 +342,11 @@ class TransactionPartnerOther(TransactionPartner):
             always :tg-const:`telegram.TransactionPartner.OTHER`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(type=TransactionPartner.OTHER, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=TransactionPartner.OTHER)
 
 
+@tg_dataclass()
 class TransactionPartnerTelegramAds(TransactionPartner):
     """Describes a withdrawal transaction to the Telegram Ads platform.
 
@@ -425,13 +357,11 @@ class TransactionPartnerTelegramAds(TransactionPartner):
             always :tg-const:`telegram.TransactionPartner.TELEGRAM_ADS`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(type=TransactionPartner.TELEGRAM_ADS, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=TransactionPartner.TELEGRAM_ADS)
 
 
+@tg_dataclass()
 class TransactionPartnerTelegramApi(TransactionPartner):
     """Describes a transaction with payment for
     `paid broadcasting <https://core.telegram.org/bots/api#paid-broadcasts>`_.
@@ -452,10 +382,7 @@ class TransactionPartnerTelegramApi(TransactionPartner):
             and were therefore billed.
     """
 
-    __slots__ = ("request_count",)
-
-    def __init__(self, request_count: int, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(type=TransactionPartner.TELEGRAM_API, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.request_count: int = request_count
-            self._id_attrs = (self.request_count,)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=TransactionPartner.TELEGRAM_API)
+    # Required
+    request_count: int = tg_field(compare=True)

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._copytextbutton import CopyTextButton
@@ -26,10 +26,11 @@ from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
 from telegram._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._webappinfo import WebAppInfo
 
 
+@tg_dataclass()
 class InlineKeyboardButton(TelegramObject):
     """This object represents one button of an inline keyboard.
 
@@ -267,78 +268,23 @@ class InlineKeyboardButton(TelegramObject):
             .. versionadded:: 22.7
     """
 
-    __slots__ = (
-        "callback_data",
-        "callback_game",
-        "copy_text",
-        "icon_custom_emoji_id",
-        "login_url",
-        "pay",
-        "style",
-        "switch_inline_query",
-        "switch_inline_query_chosen_chat",
-        "switch_inline_query_current_chat",
-        "text",
-        "url",
-        "web_app",
+    # Required
+    text: str = tg_field(
+        compare=True,
     )
-
-    def __init__(
-        self,
-        text: str,
-        url: str | None = None,
-        callback_data: str | object | None = None,
-        switch_inline_query: str | None = None,
-        switch_inline_query_current_chat: str | None = None,
-        callback_game: CallbackGame | None = None,
-        pay: bool | None = None,
-        login_url: LoginUrl | None = None,
-        web_app: WebAppInfo | None = None,
-        switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = None,
-        copy_text: CopyTextButton | None = None,
-        style: str | None = None,
-        icon_custom_emoji_id: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.text: str = text
-
-        # Optionals
-        self.url: str | None = url
-        self.login_url: LoginUrl | None = login_url
-        self.callback_data: str | object | None = callback_data
-        self.switch_inline_query: str | None = switch_inline_query
-        self.switch_inline_query_current_chat: str | None = switch_inline_query_current_chat
-        self.callback_game: CallbackGame | None = callback_game
-        self.pay: bool | None = pay
-        self.web_app: WebAppInfo | None = web_app
-        self.switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = (
-            switch_inline_query_chosen_chat
-        )
-        self.copy_text: CopyTextButton | None = copy_text
-        self.style: str | None = style
-        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
-        self._id_attrs = ()
-        self._set_id_attrs()
-
-        self._freeze()
-
-    def _set_id_attrs(self) -> None:
-        self._id_attrs = (
-            self.text,
-            self.url,
-            self.login_url,
-            self.callback_data,
-            self.web_app,
-            self.switch_inline_query,
-            self.switch_inline_query_current_chat,
-            self.callback_game,
-            self.pay,
-            self.style,
-            self.icon_custom_emoji_id,
-        )
+    # Optional
+    url: str | None = tg_field(compare=True, default=None)
+    callback_data: str | object | None = tg_field(compare=True, default=None)
+    switch_inline_query: str | None = tg_field(compare=True, default=None)
+    switch_inline_query_current_chat: str | None = tg_field(compare=True, default=None)
+    callback_game: CallbackGame | None = tg_field(compare=True, default=None)
+    pay: bool | None = tg_field(compare=True, default=None)
+    login_url: LoginUrl | None = tg_field(compare=True, default=None)
+    web_app: WebAppInfo | None = tg_field(compare=True, default=None)
+    switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = tg_field(default=None)
+    copy_text: CopyTextButton | None = tg_field(default=None)
+    style: str | None = tg_field(compare=True, default=None)
+    icon_custom_emoji_id: str | None = tg_field(compare=True, default=None)
 
     def update_callback_data(self, callback_data: str | object) -> None:
         """
@@ -350,16 +296,15 @@ class InlineKeyboardButton(TelegramObject):
         Args:
             callback_data (:class:`object`): The new callback data.
         """
-        with self._unfrozen():
-            self.callback_data = callback_data
-            self._set_id_attrs()
 
-    MIN_CALLBACK_DATA: Final[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
+        object.__setattr__(self, "callback_data", callback_data)
+
+    MIN_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA`
 
     .. versionadded:: 20.0
     """
-    MAX_CALLBACK_DATA: Final[int] = constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA
+    MAX_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA`
 
     .. versionadded:: 20.0

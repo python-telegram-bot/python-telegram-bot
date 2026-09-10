@@ -22,10 +22,11 @@ from collections.abc import Sequence
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.markup import check_keyboard_type
-from telegram._utils.types import JSONDict
 
 
+@tg_dataclass()
 class InlineKeyboardMarkup(TelegramObject):
     """
     This object represents an inline keyboard that appears right next to the message it belongs to.
@@ -64,28 +65,21 @@ class InlineKeyboardMarkup(TelegramObject):
 
     """
 
-    __slots__ = ("inline_keyboard",)
-
-    def __init__(
-        self,
-        inline_keyboard: Sequence[Sequence[InlineKeyboardButton]],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        if not check_keyboard_type(inline_keyboard):
+    @staticmethod
+    def _inline_keyboard_converter(
+        value: Sequence[Sequence[InlineKeyboardButton]],
+    ) -> tuple[tuple[InlineKeyboardButton, ...], ...]:
+        if not check_keyboard_type(value):
             raise ValueError(
                 "The parameter `inline_keyboard` should be a sequence of sequences of "
                 "InlineKeyboardButtons"
             )
-        # Required
-        self.inline_keyboard: tuple[tuple[InlineKeyboardButton, ...], ...] = tuple(
-            tuple(row) for row in inline_keyboard
-        )
+        return tuple(tuple(row) for row in value)
 
-        self._id_attrs = (self.inline_keyboard,)
-
-        self._freeze()
+    # Required
+    inline_keyboard: tuple[tuple[InlineKeyboardButton, ...], ...] = tg_field(
+        compare=True, converter=_inline_keyboard_converter
+    )
 
     @classmethod
     def from_button(cls, button: InlineKeyboardButton, **kwargs: object) -> "InlineKeyboardMarkup":

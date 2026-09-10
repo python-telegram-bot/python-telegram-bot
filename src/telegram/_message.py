@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 
-import dataclasses
+import copy
 import datetime as dtm
 import re
 from collections.abc import Sequence
@@ -176,9 +176,24 @@ class MaybeInaccessibleMessage(TelegramObject):
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
     """
 
-    chat: Chat = tg_field(compare=True)
     message_id: int = tg_field(compare=True)
     date: dtm.datetime = tg_field()
+    chat: Chat = tg_field(compare=True)
+
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
+    def __init__(
+        self,
+        chat: Chat,
+        message_id: int,
+        date: dtm.datetime,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ) -> None:
+        object.__setattr__(self, "chat", chat)
+        object.__setattr__(self, "message_id", message_id)
+        object.__setattr__(self, "date", date)
+        TelegramObject.__init__(self, api_kwargs=api_kwargs)
 
     @property
     def is_accessible(self) -> bool:
@@ -202,7 +217,7 @@ class MaybeInaccessibleMessage(TelegramObject):
             if data.get("date") == 0:
                 return InaccessibleMessage.de_json(data=data, bot=bot)
             return Message.de_json(data=data, bot=bot)
-        return super().de_json(data=data, bot=bot)
+        return super(MaybeInaccessibleMessage, cls).de_json(data=data, bot=bot)  # noqa: UP008
 
 
 @tg_dataclass()
@@ -228,6 +243,23 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
     """
 
     date: dtm.datetime = tg_field(init=False, default=ZERO_DATE)
+
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
+    def __init__(
+        self,
+        chat: Chat,
+        message_id: int,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ) -> None:
+        MaybeInaccessibleMessage.__init__(
+            self,
+            chat,
+            message_id,
+            ZERO_DATE,
+            api_kwargs=api_kwargs,
+        )
 
 
 @tg_dataclass()
@@ -1183,12 +1215,9 @@ class Message(MaybeInaccessibleMessage):
 
     # fmt: on
 
-    # tags: deprecated NEXT.VERSION
-    # Remove these fields since they're inherited from parent
-    # and are only here to perseve previous (pre-dataclasses) ordering
-    message_id: int = tg_field(compare=True)
-    date: dtm.datetime = tg_field()
-    chat: Chat = tg_field(compare=True)
+    @staticmethod
+    def _to_bool(value: bool | None) -> bool:
+        return bool(value)
 
     from_user: User | None = tg_field(default=None)
     reply_to_message: "Message | None" = tg_field(default=None)
@@ -1214,10 +1243,10 @@ class Message(MaybeInaccessibleMessage):
     left_chat_member: User | None = tg_field(default=None)
     new_chat_title: str | None = tg_field(default=None)
     new_chat_photo: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
-    delete_chat_photo: bool | None = tg_field(default=None)
-    group_chat_created: bool | None = tg_field(default=None)
-    supergroup_chat_created: bool | None = tg_field(default=None)
-    channel_chat_created: bool | None = tg_field(default=None)
+    delete_chat_photo: bool | None = tg_field(default=None, converter=_to_bool)
+    group_chat_created: bool | None = tg_field(default=None, converter=_to_bool)
+    supergroup_chat_created: bool | None = tg_field(default=None, converter=_to_bool)
+    channel_chat_created: bool | None = tg_field(default=None, converter=_to_bool)
     migrate_to_chat_id: int | None = tg_field(default=None)
     migrate_from_chat_id: int | None = tg_field(default=None)
     pinned_message: MaybeInaccessibleMessage | None = tg_field(default=None)
@@ -1521,13 +1550,10 @@ class Message(MaybeInaccessibleMessage):
                     continue
 
                 # create a new entity with the correct offset and length
-                entities.append(
-                    dataclasses.replace(
-                        entity,
-                        offset=offset,
-                        length=e_length,
-                    )
-                )
+                new_entity = copy.copy(entity)
+                object.__setattr__(new_entity, "offset", offset)
+                object.__setattr__(new_entity, "length", e_length)
+                entities.append(new_entity)
 
         return position, tuple(entities) or None
 

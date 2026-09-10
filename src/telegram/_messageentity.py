@@ -219,9 +219,8 @@ class MessageEntity(TelegramObject):
                 position_translation[entity.offset + entity.length] - translated_positions
             )
             new_entity = copy.copy(entity)
-            with new_entity._unfrozen():
-                new_entity.offset = translated_positions
-                new_entity.length = translated_length
+            object.__setattr__(new_entity, "offset", translated_positions)
+            object.__setattr__(new_entity, "length", translated_length)
             out.append(new_entity)
         return out
 
@@ -283,8 +282,7 @@ class MessageEntity(TelegramObject):
         out = []
         for entity in entities:
             new_entity = copy.copy(entity)
-            with new_entity._unfrozen():
-                new_entity.offset += effective_shift
+            object.__setattr__(new_entity, "offset", entity.offset + effective_shift)
             out.append(new_entity)
         return out
 

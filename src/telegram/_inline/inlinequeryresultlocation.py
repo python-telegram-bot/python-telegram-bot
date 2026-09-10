@@ -19,19 +19,20 @@
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultLocation(InlineQueryResult):
     """
     Represents a location on a map. By default, the location will be sent by the user.
@@ -126,94 +127,60 @@ class InlineQueryResultLocation(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "_live_period",
-        "heading",
-        "horizontal_accuracy",
-        "input_message_content",
-        "latitude",
-        "longitude",
-        "proximity_alert_radius",
-        "reply_markup",
-        "thumbnail_height",
-        "thumbnail_url",
-        "thumbnail_width",
-        "title",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=constants.InlineQueryResultType.LOCATION)
+    # Required
+    latitude: float = tg_field()
+    longitude: float = tg_field()
+    title: str = tg_field()
+    # Optional
+    _live_period: dtm.timedelta | None = tg_field(
+        default=None, alias="live_period", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        latitude: float,
-        longitude: float,
-        title: str,
-        live_period: TimePeriod | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        horizontal_accuracy: float | None = None,
-        heading: int | None = None,
-        proximity_alert_radius: int | None = None,
-        thumbnail_url: str | None = None,
-        thumbnail_width: int | None = None,
-        thumbnail_height: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(constants.InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.latitude: float = latitude
-            self.longitude: float = longitude
-            self.title: str = title
-
-            # Optionals
-            self._live_period: dtm.timedelta | None = to_timedelta(live_period)
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
-            self.thumbnail_url: str | None = thumbnail_url
-            self.thumbnail_width: int | None = thumbnail_width
-            self.thumbnail_height: int | None = thumbnail_height
-            self.horizontal_accuracy: float | None = horizontal_accuracy
-            self.heading: int | None = heading
-            self.proximity_alert_radius: int | None = (
-                int(proximity_alert_radius) if proximity_alert_radius else None
-            )
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    horizontal_accuracy: float | None = tg_field(default=None)
+    heading: int | None = tg_field(default=None)
+    proximity_alert_radius: int | None = tg_field(default=None)
+    thumbnail_url: str | None = tg_field(default=None)
+    thumbnail_width: int | None = tg_field(default=None)
+    thumbnail_height: int | None = tg_field(default=None)
 
     @property
     def live_period(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._live_period, attribute="live_period")
 
-    HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
+    HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
 
     .. versionadded:: 20.0
     """
-    MIN_HEADING: Final[int] = constants.LocationLimit.MIN_HEADING
+    MIN_HEADING: ClassVar[int] = constants.LocationLimit.MIN_HEADING
     """:const:`telegram.constants.LocationLimit.MIN_HEADING`
 
     .. versionadded:: 20.0
     """
-    MAX_HEADING: Final[int] = constants.LocationLimit.MAX_HEADING
+    MAX_HEADING: ClassVar[int] = constants.LocationLimit.MAX_HEADING
     """:const:`telegram.constants.LocationLimit.MAX_HEADING`
 
     .. versionadded:: 20.0
     """
-    MIN_LIVE_PERIOD: Final[int] = constants.LocationLimit.MIN_LIVE_PERIOD
+    MIN_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MIN_LIVE_PERIOD
     """:const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD`
 
     .. versionadded:: 20.0
     """
-    MAX_LIVE_PERIOD: Final[int] = constants.LocationLimit.MAX_LIVE_PERIOD
+    MAX_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MAX_LIVE_PERIOD
     """:const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`
 
     .. versionadded:: 20.0
     """
-    MIN_PROXIMITY_ALERT_RADIUS: Final[int] = constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS
+    MIN_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS
     """:const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
 
     .. versionadded:: 20.0
     """
-    MAX_PROXIMITY_ALERT_RADIUS: Final[int] = constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS
+    MAX_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS
     """:const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
 
     .. versionadded:: 20.0
