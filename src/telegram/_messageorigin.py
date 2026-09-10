@@ -19,16 +19,17 @@
 """This module contains the classes that represent Telegram MessageOigin."""
 
 import datetime as dtm
-from typing import ClassVar, Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class MessageOrigin(TelegramObject):
     """
     Base class for telegram MessageOrigin object, it can be one of:
@@ -58,11 +59,6 @@ class MessageOrigin(TelegramObject):
             |datetime_localization|
     """
 
-    __slots__ = (
-        "date",
-        "type",
-    )
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -73,34 +69,25 @@ class MessageOrigin(TelegramObject):
         },
     )
 
-    USER: Final[str] = constants.MessageOriginType.USER
+    USER: ClassVar[str] = constants.MessageOriginType.USER
     """:const:`telegram.constants.MessageOriginType.USER`"""
-    HIDDEN_USER: Final[str] = constants.MessageOriginType.HIDDEN_USER
+    HIDDEN_USER: ClassVar[str] = constants.MessageOriginType.HIDDEN_USER
     """:const:`telegram.constants.MessageOriginType.HIDDEN_USER`"""
-    CHAT: Final[str] = constants.MessageOriginType.CHAT
+    CHAT: ClassVar[str] = constants.MessageOriginType.CHAT
     """:const:`telegram.constants.MessageOriginType.CHAT`"""
-    CHANNEL: Final[str] = constants.MessageOriginType.CHANNEL
+    CHANNEL: ClassVar[str] = constants.MessageOriginType.CHANNEL
     """:const:`telegram.constants.MessageOriginType.CHANNEL`"""
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=W0622
-        date: dtm.datetime,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required by all subclasses
-        self.type: str = enum.get_member(constants.MessageOriginType, type, type)
-        self.date: dtm.datetime = date
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.MessageOriginType, value, value)
 
-        self._id_attrs = (
-            self.type,
-            self.date,
-        )
-        self._freeze()
+    # Required by all subclasses
+    type: str = tg_field(compare=True, converter=_type_converter)
+    date: dtm.datetime = tg_field(compare=True)
 
 
+@tg_dataclass()
 class MessageOriginUser(MessageOrigin):
     """
     The message was originally sent by a known user.
@@ -120,21 +107,13 @@ class MessageOriginUser(MessageOrigin):
         sender_user (:class:`telegram.User`): User that sent the message originally.
     """
 
-    __slots__ = ("sender_user",)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=MessageOrigin.USER)
 
-    def __init__(
-        self,
-        date: dtm.datetime,
-        sender_user: User,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.USER, date=date, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.sender_user: User = sender_user
+    sender_user: User = tg_field()
 
 
+@tg_dataclass()
 class MessageOriginHiddenUser(MessageOrigin):
     """
     The message was originally sent by an unknown user.
@@ -154,21 +133,13 @@ class MessageOriginHiddenUser(MessageOrigin):
         sender_user_name (:obj:`str`): Name of the user that sent the message originally.
     """
 
-    __slots__ = ("sender_user_name",)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=MessageOrigin.HIDDEN_USER)
 
-    def __init__(
-        self,
-        date: dtm.datetime,
-        sender_user_name: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.HIDDEN_USER, date=date, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.sender_user_name: str = sender_user_name
+    sender_user_name: str = tg_field()
 
 
+@tg_dataclass()
 class MessageOriginChat(MessageOrigin):
     """
     The message was originally sent on behalf of a chat to a group chat.
@@ -192,26 +163,14 @@ class MessageOriginChat(MessageOrigin):
             administrator, original message author signature
     """
 
-    __slots__ = (
-        "author_signature",
-        "sender_chat",
-    )
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=MessageOrigin.CHAT)
 
-    def __init__(
-        self,
-        date: dtm.datetime,
-        sender_chat: Chat,
-        author_signature: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.CHAT, date=date, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.sender_chat: Chat = sender_chat
-            self.author_signature: str | None = author_signature
+    sender_chat: Chat = tg_field()
+    author_signature: str | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class MessageOriginChannel(MessageOrigin):
     """
     The message was originally sent to a channel chat.
@@ -235,24 +194,9 @@ class MessageOriginChannel(MessageOrigin):
         author_signature (:obj:`str`): Optional. Signature of the original post author.
     """
 
-    __slots__ = (
-        "author_signature",
-        "chat",
-        "message_id",
-    )
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=MessageOrigin.CHANNEL)
 
-    def __init__(
-        self,
-        date: dtm.datetime,
-        chat: Chat,
-        message_id: int,
-        author_signature: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.CHANNEL, date=date, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.chat: Chat = chat
-            self.message_id: int = message_id
-            self.author_signature: str | None = author_signature
+    chat: Chat = tg_field()
+    message_id: int = tg_field()
+    author_signature: str | None = tg_field(default=None)

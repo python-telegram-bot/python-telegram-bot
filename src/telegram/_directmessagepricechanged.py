@@ -19,9 +19,10 @@
 """This module contains an object that represents a Direct Message Price."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class DirectMessagePriceChanged(TelegramObject):
     """
     Describes a service message about a change in the price of direct messages sent to a channel
@@ -52,19 +53,5 @@ class DirectMessagePriceChanged(TelegramObject):
             administrators. Defaults to ``0``.
     """
 
-    __slots__ = ("are_direct_messages_enabled", "direct_message_star_count")
-
-    def __init__(
-        self,
-        are_direct_messages_enabled: bool,
-        direct_message_star_count: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.are_direct_messages_enabled: bool = are_direct_messages_enabled
-        self.direct_message_star_count: int | None = direct_message_star_count
-
-        self._id_attrs = (self.are_direct_messages_enabled, self.direct_message_star_count)
-
-        self._freeze()
+    are_direct_messages_enabled: bool = tg_field(compare=True)
+    direct_message_star_count: int | None = tg_field(compare=True, default=None)

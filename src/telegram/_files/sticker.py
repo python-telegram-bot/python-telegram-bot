@@ -18,22 +18,22 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
 
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
-from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 if TYPE_CHECKING:
     from telegram._files.file import File
 
 
-class Sticker(_BaseThumbedMedium):
+@tg_dataclass()
+class Sticker(_BaseMedium):
     """This object represents a sticker.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -130,75 +130,41 @@ class Sticker(_BaseThumbedMedium):
             .. versionadded:: 20.2
     """
 
-    __slots__ = (
-        "custom_emoji_id",
-        "emoji",
-        "height",
-        "is_animated",
-        "is_video",
-        "mask_position",
-        "needs_repainting",
-        "premium_animation",
-        "set_name",
-        "type",
-        "width",
-    )
     __REMOVED_API_FIELDS__ = frozenset(
         {
             "thumb",
         }
     )
 
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        width: int,
-        height: int,
-        is_animated: bool,
-        is_video: bool,
-        type: str,  # pylint: disable=redefined-builtin
-        emoji: str | None = None,
-        file_size: int | None = None,
-        set_name: str | None = None,
-        mask_position: "MaskPosition | None" = None,
-        premium_animation: "File | None" = None,
-        custom_emoji_id: str | None = None,
-        thumbnail: PhotoSize | None = None,
-        needs_repainting: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            thumbnail=thumbnail,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            # Required
-            self.width: int = width
-            self.height: int = height
-            self.is_animated: bool = is_animated
-            self.is_video: bool = is_video
-            self.type: str = enum.get_member(constants.StickerType, type, type)
-            # Optional
-            self.emoji: str | None = emoji
-            self.set_name: str | None = set_name
-            self.mask_position: MaskPosition | None = mask_position
-            self.premium_animation: File | None = premium_animation
-            self.custom_emoji_id: str | None = custom_emoji_id
-            self.needs_repainting: bool | None = needs_repainting
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.StickerType, value, value)
 
-    REGULAR: Final[str] = constants.StickerType.REGULAR
+    # Required
+    width: int = tg_field()
+    height: int = tg_field()
+    is_animated: bool = tg_field()
+    is_video: bool = tg_field()
+    type: str = tg_field(converter=_type_converter)
+    # Optional
+    emoji: str | None = tg_field(default=None)
+    file_size: int | None = tg_field(default=None)
+    set_name: str | None = tg_field(default=None)
+    mask_position: "MaskPosition | None" = tg_field(default=None)
+    premium_animation: "File | None" = tg_field(default=None)
+    custom_emoji_id: str | None = tg_field(default=None)
+    thumbnail: PhotoSize | None = tg_field(default=None)
+    needs_repainting: bool | None = tg_field(default=None)
+
+    REGULAR: ClassVar[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""
-    MASK: Final[str] = constants.StickerType.MASK
+    MASK: ClassVar[str] = constants.StickerType.MASK
     """:const:`telegram.constants.StickerType.MASK`"""
-    CUSTOM_EMOJI: Final[str] = constants.StickerType.CUSTOM_EMOJI
+    CUSTOM_EMOJI: ClassVar[str] = constants.StickerType.CUSTOM_EMOJI
     """:const:`telegram.constants.StickerType.CUSTOM_EMOJI`"""
 
 
+@tg_dataclass()
 class StickerSet(TelegramObject):
     """This object represents a sticker set.
 
@@ -261,37 +227,18 @@ class StickerSet(TelegramObject):
             .. versionadded:: 20.2
     """
 
-    __slots__ = (
-        "name",
-        "sticker_type",
-        "stickers",
-        "thumbnail",
-        "title",
-    )
     __REMOVED_API_FIELDS__ = frozenset({"contains_masks", "is_animated", "is_video", "thumb"})
 
-    def __init__(
-        self,
-        name: str,
-        title: str,
-        stickers: Sequence[Sticker],
-        sticker_type: str,
-        thumbnail: PhotoSize | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.name: str = name
-        self.title: str = title
-        self.stickers: tuple[Sticker, ...] = parse_sequence_arg(stickers)
-        self.sticker_type: str = sticker_type
-        # Optional
-        self.thumbnail: PhotoSize | None = thumbnail
-        self._id_attrs = (self.name,)
-
-        self._freeze()
+    # Required
+    name: str = tg_field(compare=True)
+    title: str = tg_field()
+    stickers: tuple[Sticker, ...] = tg_field(converter=parse_sequence_arg)
+    sticker_type: str = tg_field()
+    # Optional
+    thumbnail: PhotoSize | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class MaskPosition(TelegramObject):
     """This object describes the position on faces where a mask should be placed by default.
 
@@ -323,32 +270,16 @@ class MaskPosition(TelegramObject):
 
     """
 
-    __slots__ = ("point", "scale", "x_shift", "y_shift")
-
-    FOREHEAD: Final[str] = constants.MaskPosition.FOREHEAD
+    FOREHEAD: ClassVar[str] = constants.MaskPosition.FOREHEAD
     """:const:`telegram.constants.MaskPosition.FOREHEAD`"""
-    EYES: Final[str] = constants.MaskPosition.EYES
+    EYES: ClassVar[str] = constants.MaskPosition.EYES
     """:const:`telegram.constants.MaskPosition.EYES`"""
-    MOUTH: Final[str] = constants.MaskPosition.MOUTH
+    MOUTH: ClassVar[str] = constants.MaskPosition.MOUTH
     """:const:`telegram.constants.MaskPosition.MOUTH`"""
-    CHIN: Final[str] = constants.MaskPosition.CHIN
+    CHIN: ClassVar[str] = constants.MaskPosition.CHIN
     """:const:`telegram.constants.MaskPosition.CHIN`"""
 
-    def __init__(
-        self,
-        point: str,
-        x_shift: float,
-        y_shift: float,
-        scale: float,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.point: str = point
-        self.x_shift: float = x_shift
-        self.y_shift: float = y_shift
-        self.scale: float = scale
-
-        self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
-
-        self._freeze()
+    point: str = tg_field(compare=True)
+    x_shift: float = tg_field(compare=True)
+    y_shift: float = tg_field(compare=True)
+    scale: float = tg_field(compare=True)

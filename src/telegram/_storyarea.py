@@ -18,15 +18,16 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent story areas."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._reaction import ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class StoryAreaPosition(TelegramObject):
     """Describes the position of a clickable area within a story.
 
@@ -65,45 +66,15 @@ class StoryAreaPosition(TelegramObject):
 
     """
 
-    __slots__ = (
-        "corner_radius_percentage",
-        "height_percentage",
-        "rotation_angle",
-        "width_percentage",
-        "x_percentage",
-        "y_percentage",
-    )
-
-    def __init__(
-        self,
-        x_percentage: float,
-        y_percentage: float,
-        width_percentage: float,
-        height_percentage: float,
-        rotation_angle: float,
-        corner_radius_percentage: float,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.x_percentage: float = x_percentage
-        self.y_percentage: float = y_percentage
-        self.width_percentage: float = width_percentage
-        self.height_percentage: float = height_percentage
-        self.rotation_angle: float = rotation_angle
-        self.corner_radius_percentage: float = corner_radius_percentage
-
-        self._id_attrs = (
-            self.x_percentage,
-            self.y_percentage,
-            self.width_percentage,
-            self.height_percentage,
-            self.rotation_angle,
-            self.corner_radius_percentage,
-        )
-        self._freeze()
+    x_percentage: float = tg_field(compare=True)
+    y_percentage: float = tg_field(compare=True)
+    width_percentage: float = tg_field(compare=True)
+    height_percentage: float = tg_field(compare=True)
+    rotation_angle: float = tg_field(compare=True)
+    corner_radius_percentage: float = tg_field(compare=True)
 
 
+@tg_dataclass()
 class LocationAddress(TelegramObject):
     """Describes the physical address of a location.
 
@@ -129,27 +100,13 @@ class LocationAddress(TelegramObject):
 
     """
 
-    __slots__ = ("city", "country_code", "state", "street")
-
-    def __init__(
-        self,
-        country_code: str,
-        state: str | None = None,
-        city: str | None = None,
-        street: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.country_code: str = country_code
-        self.state: str | None = state
-        self.city: str | None = city
-        self.street: str | None = street
-
-        self._id_attrs = (self.country_code, self.state, self.city, self.street)
-        self._freeze()
+    country_code: str = tg_field(compare=True)
+    state: str | None = tg_field(compare=True, default=None)
+    city: str | None = tg_field(compare=True, default=None)
+    street: str | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class StoryAreaType(TelegramObject):
     """Describes the type of a clickable area on a story. Currently, it can be one of:
 
@@ -172,32 +129,25 @@ class StoryAreaType(TelegramObject):
 
     """
 
-    __slots__ = ("type",)
-
-    LOCATION: Final[str] = constants.StoryAreaTypeType.LOCATION
+    LOCATION: ClassVar[str] = constants.StoryAreaTypeType.LOCATION
     """:const:`telegram.constants.StoryAreaTypeType.LOCATION`"""
-    SUGGESTED_REACTION: Final[str] = constants.StoryAreaTypeType.SUGGESTED_REACTION
+    SUGGESTED_REACTION: ClassVar[str] = constants.StoryAreaTypeType.SUGGESTED_REACTION
     """:const:`telegram.constants.StoryAreaTypeType.SUGGESTED_REACTION`"""
-    LINK: Final[str] = constants.StoryAreaTypeType.LINK
+    LINK: ClassVar[str] = constants.StoryAreaTypeType.LINK
     """:const:`telegram.constants.StoryAreaTypeType.LINK`"""
-    WEATHER: Final[str] = constants.StoryAreaTypeType.WEATHER
+    WEATHER: ClassVar[str] = constants.StoryAreaTypeType.WEATHER
     """:const:`telegram.constants.StoryAreaTypeType.WEATHER`"""
-    UNIQUE_GIFT: Final[str] = constants.StoryAreaTypeType.UNIQUE_GIFT
+    UNIQUE_GIFT: ClassVar[str] = constants.StoryAreaTypeType.UNIQUE_GIFT
     """:const:`telegram.constants.StoryAreaTypeType.UNIQUE_GIFT`"""
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.StoryAreaTypeType, type, type)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.StoryAreaTypeType, value, value)
 
-        self._id_attrs = (self.type,)
-        self._freeze()
+    type: str = tg_field(compare=True, converter=_type_converter)
 
 
+@tg_dataclass()
 class StoryAreaTypeLocation(StoryAreaType):
     """Describes a story area pointing to a location. Currently, a story can have up to
     :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LOCATION_AREAS` location areas.
@@ -220,26 +170,16 @@ class StoryAreaTypeLocation(StoryAreaType):
 
     """
 
-    __slots__ = ("address", "latitude", "longitude")
-
-    def __init__(
-        self,
-        latitude: float,
-        longitude: float,
-        address: LocationAddress | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=StoryAreaType.LOCATION, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.latitude: float = latitude
-            self.longitude: float = longitude
-            self.address: LocationAddress | None = address
-
-            self._id_attrs = (self.type, self.latitude, self.longitude)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=StoryAreaType.LOCATION)
+    # Required
+    latitude: float = tg_field(compare=True)
+    longitude: float = tg_field(compare=True)
+    # Optional
+    address: LocationAddress | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class StoryAreaTypeSuggestedReaction(StoryAreaType):
     """
     Describes a story area pointing to a suggested reaction. Currently, a story can have up to
@@ -268,26 +208,16 @@ class StoryAreaTypeSuggestedReaction(StoryAreaType):
 
     """
 
-    __slots__ = ("is_dark", "is_flipped", "reaction_type")
-
-    def __init__(
-        self,
-        reaction_type: ReactionType,
-        is_dark: bool | None = None,
-        is_flipped: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=StoryAreaType.SUGGESTED_REACTION, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.reaction_type: ReactionType = reaction_type
-            self.is_dark: bool | None = is_dark
-            self.is_flipped: bool | None = is_flipped
-
-            self._id_attrs = (self.type, self.reaction_type, self.is_dark, self.is_flipped)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=StoryAreaType.SUGGESTED_REACTION)
+    # Required
+    reaction_type: ReactionType = tg_field(compare=True)
+    # Optional
+    is_dark: bool | None = tg_field(compare=True, default=None)
+    is_flipped: bool | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class StoryAreaTypeLink(StoryAreaType):
     """Describes a story area pointing to an ``HTTP`` or ``tg://`` link. Currently, a story can
     have up to :tg-const:`~telegram.constants.StoryAreaTypeLimit.MAX_LINK_AREAS` link areas.
@@ -306,22 +236,13 @@ class StoryAreaTypeLink(StoryAreaType):
 
     """
 
-    __slots__ = ("url",)
-
-    def __init__(
-        self,
-        url: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=StoryAreaType.LINK, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.url: str = url
-
-            self._id_attrs = (self.type, self.url)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=StoryAreaType.LINK)
+    # Required
+    url: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class StoryAreaTypeWeather(StoryAreaType):
     """
     Describes a story area containing weather information. Currently, a story can have up to
@@ -347,26 +268,15 @@ class StoryAreaTypeWeather(StoryAreaType):
 
     """
 
-    __slots__ = ("background_color", "emoji", "temperature")
-
-    def __init__(
-        self,
-        temperature: float,
-        emoji: str,
-        background_color: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=StoryAreaType.WEATHER, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.temperature: float = temperature
-            self.emoji: str = emoji
-            self.background_color: int = background_color
-
-            self._id_attrs = (self.type, self.temperature, self.emoji, self.background_color)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=StoryAreaType.WEATHER)
+    # Required
+    temperature: float = tg_field(compare=True)
+    emoji: str = tg_field(compare=True)
+    background_color: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class StoryAreaTypeUniqueGift(StoryAreaType):
     """
     Describes a story area pointing to a unique gift. Currently, a story can have at most
@@ -387,22 +297,13 @@ class StoryAreaTypeUniqueGift(StoryAreaType):
 
     """
 
-    __slots__ = ("name",)
-
-    def __init__(
-        self,
-        name: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=StoryAreaType.UNIQUE_GIFT, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.name: str = name
-
-            self._id_attrs = (self.type, self.name)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=StoryAreaType.UNIQUE_GIFT)
+    # Required
+    name: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class StoryArea(TelegramObject):
     """Describes a clickable area on a story media.
 
@@ -421,18 +322,5 @@ class StoryArea(TelegramObject):
 
     """
 
-    __slots__ = ("position", "type")
-
-    def __init__(
-        self,
-        position: StoryAreaPosition,
-        type: StoryAreaType,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.position: StoryAreaPosition = position
-        self.type: StoryAreaType = type
-        self._id_attrs = (self.position, self.type)
-
-        self._freeze()
+    position: StoryAreaPosition = tg_field(compare=True)
+    type: StoryAreaType = tg_field(compare=True)

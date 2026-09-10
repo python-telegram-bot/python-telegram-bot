@@ -19,7 +19,6 @@
 # pylint: disable=missing-module-docstring,  redefined-builtin
 import json
 from base64 import b64decode
-from collections.abc import Sequence
 from typing import no_type_check
 
 try:
@@ -40,8 +39,8 @@ except ImportError:
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.strings import TextEncoding
-from telegram._utils.types import JSONDict
 from telegram.error import PassportDecryptionError
 
 
@@ -100,6 +99,7 @@ def decrypt_json(secret, hash, data):
     return json.loads(decrypt(secret, hash, data).decode(TextEncoding.UTF_8))
 
 
+@tg_dataclass()
 class EncryptedCredentials(TelegramObject):
     """Contains data required for decrypting and authenticating EncryptedPassportElement. See the
     Telegram Passport Documentation for a complete description of the data decryption and
@@ -128,34 +128,14 @@ class EncryptedCredentials(TelegramObject):
 
     """
 
-    __slots__ = (
-        "_decrypted_data",
-        "_decrypted_secret",
-        "data",
-        "hash",
-        "secret",
-    )
+    # Required
+    data: str = tg_field(compare=True)
+    hash: str = tg_field(compare=True)
+    secret: str = tg_field(compare=True)
 
-    def __init__(
-        self,
-        data: str,
-        hash: str,
-        secret: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.data: str = data
-        self.hash: str = hash
-        self.secret: str = secret
-
-        self._id_attrs = (self.data, self.hash, self.secret)
-
-        self._decrypted_secret: bytes | None = None
-        self._decrypted_data: Credentials | None = None
-
-        self._freeze()
+    # Attribute only (init=False)
+    _decrypted_secret: bytes | None = tg_field(init=False, default=None)
+    _decrypted_data: "Credentials | None" = tg_field(init=False, default=None)
 
     @property
     def decrypted_secret(self) -> bytes:
@@ -166,7 +146,8 @@ class EncryptedCredentials(TelegramObject):
             telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
-        if self._decrypted_secret is None:
+        secret: bytes | None = self._decrypted_secret
+        if secret is None:
             if not CRYPTO_INSTALLED:
                 raise RuntimeError(
                     "To use Telegram Passports, PTB must be installed via `pip install "
@@ -179,14 +160,16 @@ class EncryptedCredentials(TelegramObject):
             # is the default for OAEP, the algorithm is the default for PHP which is what
             # Telegram's backend servers run.
             try:
-                self._decrypted_secret = self.get_bot().private_key.decrypt(  # type: ignore
+                secret = self.get_bot().private_key.decrypt(  # type: ignore
                     b64decode(self.secret),
                     OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),  # skipcq
                 )
+
+                object.__setattr__(self, "_decrypted_secret", secret)
             except ValueError as exception:
                 # If decryption fails raise exception
                 raise PassportDecryptionError(exception) from exception
-        return self._decrypted_secret
+        return secret
 
     @property
     def decrypted_data(self) -> "Credentials":
@@ -199,14 +182,17 @@ class EncryptedCredentials(TelegramObject):
             telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
-        if self._decrypted_data is None:
-            self._decrypted_data = Credentials.de_json(
+        data: Credentials | None = self._decrypted_data
+        if data is None:
+            data = Credentials.de_json(
                 decrypt_json(self.decrypted_secret, b64decode(self.hash), b64decode(self.data)),
                 self.get_bot(),
             )
-        return self._decrypted_data
+            object.__setattr__(self, "_decrypted_data", data)
+        return data
 
 
+@tg_dataclass()
 class Credentials(TelegramObject):
     """
     Attributes:
@@ -214,23 +200,11 @@ class Credentials(TelegramObject):
         nonce (:obj:`str`): Bot-specified nonce
     """
 
-    __slots__ = ("nonce", "secure_data")
-
-    def __init__(
-        self,
-        secure_data: "SecureData",
-        nonce: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.secure_data: SecureData = secure_data
-        self.nonce: str = nonce
-
-        self._freeze()
+    secure_data: "SecureData" = tg_field()
+    nonce: str = tg_field()
 
 
+@tg_dataclass()
 class SecureData(TelegramObject):
     """
     This object represents the credentials that were used to decrypt the encrypted data.
@@ -281,54 +255,21 @@ class SecureData(TelegramObject):
             temporary registration.
     """
 
-    __slots__ = (
-        "address",
-        "bank_statement",
-        "driver_license",
-        "identity_card",
-        "internal_passport",
-        "passport",
-        "passport_registration",
-        "personal_details",
-        "rental_agreement",
-        "temporary_registration",
-        "utility_bill",
-    )
-
-    def __init__(
-        self,
-        personal_details: "SecureValue | None" = None,
-        passport: "SecureValue | None" = None,
-        internal_passport: "SecureValue | None" = None,
-        driver_license: "SecureValue | None" = None,
-        identity_card: "SecureValue | None" = None,
-        address: "SecureValue | None" = None,
-        utility_bill: "SecureValue | None" = None,
-        bank_statement: "SecureValue | None" = None,
-        rental_agreement: "SecureValue | None" = None,
-        passport_registration: "SecureValue | None" = None,
-        temporary_registration: "SecureValue | None" = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Optionals
-        self.temporary_registration: SecureValue | None = temporary_registration
-        self.passport_registration: SecureValue | None = passport_registration
-        self.rental_agreement: SecureValue | None = rental_agreement
-        self.bank_statement: SecureValue | None = bank_statement
-        self.utility_bill: SecureValue | None = utility_bill
-        self.address: SecureValue | None = address
-        self.identity_card: SecureValue | None = identity_card
-        self.driver_license: SecureValue | None = driver_license
-        self.internal_passport: SecureValue | None = internal_passport
-        self.passport: SecureValue | None = passport
-        self.personal_details: SecureValue | None = personal_details
-
-        self._freeze()
+    # Optionals
+    personal_details: "SecureValue | None" = tg_field(default=None)
+    passport: "SecureValue | None" = tg_field(default=None)
+    internal_passport: "SecureValue | None" = tg_field(default=None)
+    driver_license: "SecureValue | None" = tg_field(default=None)
+    identity_card: "SecureValue | None" = tg_field(default=None)
+    address: "SecureValue | None" = tg_field(default=None)
+    utility_bill: "SecureValue | None" = tg_field(default=None)
+    bank_statement: "SecureValue | None" = tg_field(default=None)
+    rental_agreement: "SecureValue | None" = tg_field(default=None)
+    passport_registration: "SecureValue | None" = tg_field(default=None)
+    temporary_registration: "SecureValue | None" = tg_field(default=None)
 
 
+@tg_dataclass()
 class SecureValue(TelegramObject):
     """
     This object represents the credentials that were used to decrypt the encrypted value.
@@ -385,52 +326,34 @@ class SecureValue(TelegramObject):
 
     """
 
-    __slots__ = ("data", "files", "front_side", "reverse_side", "selfie", "translation")
-
-    def __init__(
-        self,
-        data: "DataCredentials | None" = None,
-        front_side: "FileCredentials | None" = None,
-        reverse_side: "FileCredentials | None" = None,
-        selfie: "FileCredentials | None" = None,
-        files: Sequence["FileCredentials"] | None = None,
-        translation: Sequence["FileCredentials"] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.data: DataCredentials | None = data
-        self.front_side: FileCredentials | None = front_side
-        self.reverse_side: FileCredentials | None = reverse_side
-        self.selfie: FileCredentials | None = selfie
-        self.files: tuple[FileCredentials, ...] = parse_sequence_arg(files)
-        self.translation: tuple[FileCredentials, ...] = parse_sequence_arg(translation)
-
-        self._freeze()
+    data: "DataCredentials | None" = tg_field(default=None)
+    front_side: "FileCredentials | None" = tg_field(default=None)
+    reverse_side: "FileCredentials | None" = tg_field(default=None)
+    selfie: "FileCredentials | None" = tg_field(default=None)
+    files: tuple["FileCredentials", ...] = tg_field(default=None, converter=parse_sequence_arg)
+    translation: tuple["FileCredentials", ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
 
 
+@tg_dataclass()
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
-    __slots__ = ("data_hash", "file_hash", "hash", "secret")
+    hash: str = tg_field()
+    secret: str = tg_field()
 
-    def __init__(
-        self,
-        hash: str,
-        secret: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.hash: str = hash
-            self.secret: str = secret
+    # Aliases just to be sure
+    @property
+    def file_hash(self) -> str:
+        return self.hash
 
-            # Aliases just to be sure
-            self.file_hash: str = self.hash
-            self.data_hash: str = self.hash
+    @property
+    def data_hash(self) -> str:
+        return self.hash
 
 
+@tg_dataclass()
 class DataCredentials(_CredentialsBase):
     """
     These credentials can be used to decrypt encrypted data from the data field in
@@ -445,13 +368,10 @@ class DataCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted data
     """
 
-    __slots__ = ()
-
-    def __init__(self, data_hash: str, secret: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(hash=data_hash, secret=secret, api_kwargs=api_kwargs)
-        self._freeze()
+    hash: str = tg_field(alias="data_hash")
 
 
+@tg_dataclass()
 class FileCredentials(_CredentialsBase):
     """
     These credentials can be used to decrypt encrypted files from the front_side,
@@ -466,8 +386,4 @@ class FileCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted file
     """
 
-    __slots__ = ()
-
-    def __init__(self, file_hash: str, secret: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(hash=file_hash, secret=secret, api_kwargs=api_kwargs)
-        self._freeze()
+    hash: str = tg_field(alias="file_hash")

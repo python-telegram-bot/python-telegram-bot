@@ -20,14 +20,15 @@
 
 import datetime as dtm
 
-from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
-class VideoNote(_BaseThumbedMedium):
+@tg_dataclass()
+class VideoNote(_BaseMedium):
     """This object represents a video message (available in Telegram apps as of v.4.0).
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -74,30 +75,12 @@ class VideoNote(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ("_duration", "length")
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        length: int,
-        duration: TimePeriod,
-        file_size: int | None = None,
-        thumbnail: PhotoSize | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            thumbnail=thumbnail,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            # Required
-            self.length: int = length
-            self._duration: dtm.timedelta = to_timedelta(duration)
+    # Required
+    length: int = tg_field()
+    _duration: dtm.timedelta = tg_field(alias="duration", converter=to_timedelta)
+    # Optional
+    file_size: int | None = tg_field(default=None)
+    thumbnail: PhotoSize | None = tg_field(default=None)
 
     @property
     def duration(self) -> int | dtm.timedelta:

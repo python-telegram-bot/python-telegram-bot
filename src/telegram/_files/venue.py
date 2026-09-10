@@ -20,9 +20,10 @@
 
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class Venue(TelegramObject):
     """This object represents a venue.
 
@@ -59,40 +60,12 @@ class Venue(TelegramObject):
 
     """
 
-    __slots__ = (
-        "address",
-        "foursquare_id",
-        "foursquare_type",
-        "google_place_id",
-        "google_place_type",
-        "location",
-        "title",
-    )
-
-    def __init__(
-        self,
-        location: Location,
-        title: str,
-        address: str,
-        foursquare_id: str | None = None,
-        foursquare_type: str | None = None,
-        google_place_id: str | None = None,
-        google_place_type: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required
-        self.location: Location = location
-        self.title: str = title
-        self.address: str = address
-        # Optionals
-        self.foursquare_id: str | None = foursquare_id
-        self.foursquare_type: str | None = foursquare_type
-        self.google_place_id: str | None = google_place_id
-        self.google_place_type: str | None = google_place_type
-
-        self._id_attrs = (self.location, self.title)
-
-        self._freeze()
+    # Required
+    location: Location = tg_field(compare=True)
+    title: str = tg_field(compare=True)
+    address: str = tg_field()
+    # Optional
+    foursquare_id: str | None = tg_field(default=None)
+    foursquare_type: str | None = tg_field(default=None)
+    google_place_id: str | None = tg_field(default=None)
+    google_place_type: str | None = tg_field(default=None)

@@ -18,13 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ForceReply."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ForceReply(TelegramObject):
     """
     Upon receiving a message with this object, Telegram clients will display a reply interface to
@@ -76,30 +77,18 @@ class ForceReply(TelegramObject):
 
     """
 
-    __slots__ = ("force_reply", "input_field_placeholder", "selective")
+    # Attribute only (init=False)
+    force_reply: bool = tg_field(init=False, default=True)
 
-    def __init__(
-        self,
-        selective: bool | None = None,
-        input_field_placeholder: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.force_reply: bool = True
-        self.selective: bool | None = selective
-        self.input_field_placeholder: str | None = input_field_placeholder
+    selective: bool | None = tg_field(compare=True)
+    input_field_placeholder: str | None = tg_field(default=None)
 
-        self._id_attrs = (self.selective,)
-
-        self._freeze()
-
-    MIN_INPUT_FIELD_PLACEHOLDER: Final[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`
 
     .. versionadded:: 20.0
     """
-    MAX_INPUT_FIELD_PLACEHOLDER: Final[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER`
 
     .. versionadded:: 20.0

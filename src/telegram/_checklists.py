@@ -19,7 +19,6 @@
 """This module contains an objects related to Telegram checklists."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
@@ -27,13 +26,14 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.entities import parse_message_entities, parse_message_entity
-from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Message
 
 
+@tg_dataclass()
 class ChecklistTask(TelegramObject):
     """
     Describes a task in a checklist.
@@ -78,37 +78,12 @@ class ChecklistTask(TelegramObject):
             |datetime_localization|
     """
 
-    __slots__ = (
-        "completed_by_chat",
-        "completed_by_user",
-        "completion_date",
-        "id",
-        "text",
-        "text_entities",
-    )
-
-    def __init__(
-        self,
-        id: int,  # pylint: disable=redefined-builtin
-        text: str,
-        text_entities: Sequence[MessageEntity] | None = None,
-        completed_by_user: User | None = None,
-        completion_date: dtm.datetime | None = None,
-        completed_by_chat: Chat | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: int = id
-        self.text: str = text
-        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
-        self.completed_by_user: User | None = completed_by_user
-        self.completed_by_chat: Chat | None = completed_by_chat
-        self.completion_date: dtm.datetime | None = completion_date
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    id: int = tg_field(compare=True)
+    text: str = tg_field()
+    text_entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    completed_by_user: User | None = tg_field(default=None)
+    completion_date: dtm.datetime | None = tg_field(default=None)
+    completed_by_chat: Chat | None = tg_field(default=None)
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`text`
@@ -151,6 +126,7 @@ class ChecklistTask(TelegramObject):
         return parse_message_entities(self.text, self.text_entities, types)
 
 
+@tg_dataclass()
 class Checklist(TelegramObject):
     """
     Describes a checklist.
@@ -181,34 +157,13 @@ class Checklist(TelegramObject):
             creator of the list can mark tasks as done or not done
     """
 
-    __slots__ = (
-        "others_can_add_tasks",
-        "others_can_mark_tasks_as_done",
-        "tasks",
-        "title",
-        "title_entities",
+    title: str = tg_field()
+    tasks: tuple[ChecklistTask, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    title_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
     )
-
-    def __init__(
-        self,
-        title: str,
-        tasks: Sequence[ChecklistTask],
-        title_entities: Sequence[MessageEntity] | None = None,
-        others_can_add_tasks: bool | None = None,
-        others_can_mark_tasks_as_done: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.title: str = title
-        self.title_entities: tuple[MessageEntity, ...] = parse_sequence_arg(title_entities)
-        self.tasks: tuple[ChecklistTask, ...] = parse_sequence_arg(tasks)
-        self.others_can_add_tasks: bool | None = others_can_add_tasks
-        self.others_can_mark_tasks_as_done: bool | None = others_can_mark_tasks_as_done
-
-        self._id_attrs = (self.tasks,)
-
-        self._freeze()
+    others_can_add_tasks: bool | None = tg_field(default=None)
+    others_can_mark_tasks_as_done: bool | None = tg_field(default=None)
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`title`
@@ -251,6 +206,7 @@ class Checklist(TelegramObject):
         return parse_message_entities(self.title, self.title_entities, types)
 
 
+@tg_dataclass()
 class ChecklistTasksDone(TelegramObject):
     """
     Describes a service message about checklist tasks marked as done or not done.
@@ -282,32 +238,16 @@ class ChecklistTasksDone(TelegramObject):
             were marked as not done
     """
 
-    __slots__ = (
-        "checklist_message",
-        "marked_as_done_task_ids",
-        "marked_as_not_done_task_ids",
+    checklist_message: "Message | None" = tg_field(default=None)
+    marked_as_done_task_ids: tuple[int, ...] = tg_field(
+        compare=True, default=None, converter=parse_sequence_arg
+    )
+    marked_as_not_done_task_ids: tuple[int, ...] = tg_field(
+        compare=True, default=None, converter=parse_sequence_arg
     )
 
-    def __init__(
-        self,
-        checklist_message: "Message | None" = None,
-        marked_as_done_task_ids: Sequence[int] | None = None,
-        marked_as_not_done_task_ids: Sequence[int] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.checklist_message: Message | None = checklist_message
-        self.marked_as_done_task_ids: tuple[int, ...] = parse_sequence_arg(marked_as_done_task_ids)
-        self.marked_as_not_done_task_ids: tuple[int, ...] = parse_sequence_arg(
-            marked_as_not_done_task_ids
-        )
 
-        self._id_attrs = (self.marked_as_done_task_ids, self.marked_as_not_done_task_ids)
-
-        self._freeze()
-
-
+@tg_dataclass()
 class ChecklistTasksAdded(TelegramObject):
     """
     Describes a service message about tasks added to a checklist.
@@ -332,19 +272,5 @@ class ChecklistTasksAdded(TelegramObject):
         tasks (Tuple[:class:`telegram.ChecklistTask`]): List of tasks added to the checklist
     """
 
-    __slots__ = ("checklist_message", "tasks")
-
-    def __init__(
-        self,
-        tasks: Sequence[ChecklistTask],
-        checklist_message: "Message | None" = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.checklist_message: Message | None = checklist_message
-        self.tasks: tuple[ChecklistTask, ...] = parse_sequence_arg(tasks)
-
-        self._id_attrs = (self.tasks,)
-
-        self._freeze()
+    tasks: tuple[ChecklistTask, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    checklist_message: "Message | None" = tg_field(default=None)

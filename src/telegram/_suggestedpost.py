@@ -19,16 +19,17 @@
 """This module contains objects related to Telegram suggested posts."""
 
 import datetime as dtm
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._message import Message
 from telegram._payment.stars.staramount import StarAmount
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class SuggestedPostPrice(TelegramObject):
     """
     Desribes the price of a suggested post.
@@ -65,24 +66,11 @@ class SuggestedPostPrice(TelegramObject):
             and :tg-const:`telegram.constants.SuggestedPost.MAX_PRICE_NANOTONCOINS`.
     """
 
-    __slots__ = ("amount", "currency")
-
-    def __init__(
-        self,
-        currency: str,
-        amount: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.currency: str = currency
-        self.amount: int = amount
-
-        self._id_attrs = (self.currency, self.amount)
-
-        self._freeze()
+    currency: str = tg_field(compare=True)
+    amount: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class SuggestedPostParameters(TelegramObject):
     """
     Contains parameters of a post that is being suggested by the bot.
@@ -119,24 +107,12 @@ class SuggestedPostParameters(TelegramObject):
 
     """
 
-    __slots__ = ("price", "send_date")
-
-    def __init__(
-        self,
-        price: SuggestedPostPrice | None = None,
-        send_date: dtm.datetime | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.price: SuggestedPostPrice | None = price
-        self.send_date: dtm.datetime | None = send_date
-
-        self._id_attrs = (self.price, self.send_date)
-
-        self._freeze()
+    # Optional
+    price: SuggestedPostPrice | None = tg_field(compare=True, default=None)
+    send_date: dtm.datetime | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class SuggestedPostInfo(TelegramObject):
     """
     Contains information about a suggested post.
@@ -176,35 +152,25 @@ class SuggestedPostInfo(TelegramObject):
 
     """
 
-    __slots__ = ("price", "send_date", "state")
-
-    PENDING: Final[str] = constants.SuggestedPostInfoState.PENDING
+    PENDING: ClassVar[str] = constants.SuggestedPostInfoState.PENDING
     """:const:`telegram.constants.SuggestedPostInfoState.PENDING`"""
-    APPROVED: Final[str] = constants.SuggestedPostInfoState.APPROVED
+    APPROVED: ClassVar[str] = constants.SuggestedPostInfoState.APPROVED
     """:const:`telegram.constants.SuggestedPostInfoState.APPROVED`"""
-    DECLINED: Final[str] = constants.SuggestedPostInfoState.DECLINED
+    DECLINED: ClassVar[str] = constants.SuggestedPostInfoState.DECLINED
     """:const:`telegram.constants.SuggestedPostInfoState.DECLINED`"""
 
-    def __init__(
-        self,
-        state: str,
-        price: SuggestedPostPrice | None = None,
-        send_date: dtm.datetime | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.state: str = enum.get_member(constants.SuggestedPostInfoState, state, state)
-        # Optionals
-        self.price: SuggestedPostPrice | None = price
-        self.send_date: dtm.datetime | None = send_date
+    @staticmethod
+    def _state_converter(value: str) -> str:
+        return enum.get_member(constants.SuggestedPostInfoState, value, value)
 
-        self._id_attrs = (self.state, self.price)
-
-        self._freeze()
+    # Required
+    state: str = tg_field(compare=True, converter=_state_converter)
+    # Optional
+    price: SuggestedPostPrice | None = tg_field(compare=True, default=None)
+    send_date: dtm.datetime | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class SuggestedPostDeclined(TelegramObject):
     """
     Describes a service message about the rejection of a suggested post.
@@ -232,24 +198,11 @@ class SuggestedPostDeclined(TelegramObject):
 
     """
 
-    __slots__ = ("comment", "suggested_post_message")
-
-    def __init__(
-        self,
-        suggested_post_message: Message | None = None,
-        comment: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.suggested_post_message: Message | None = suggested_post_message
-        self.comment: str | None = comment
-
-        self._id_attrs = (self.suggested_post_message, self.comment)
-
-        self._freeze()
+    suggested_post_message: Message | None = tg_field(compare=True, default=None)
+    comment: str | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class SuggestedPostPaid(TelegramObject):
     """
     Describes a service message about a successful payment for a suggested post.
@@ -292,35 +245,15 @@ class SuggestedPostPaid(TelegramObject):
 
     """
 
-    __slots__ = ("amount", "currency", "star_amount", "suggested_post_message")
-
-    def __init__(
-        self,
-        currency: str,
-        suggested_post_message: Message | None = None,
-        amount: int | None = None,
-        star_amount: StarAmount | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.currency: str = currency
-        # Optionals
-        self.suggested_post_message: Message | None = suggested_post_message
-        self.amount: int | None = amount
-        self.star_amount: StarAmount | None = star_amount
-
-        self._id_attrs = (
-            self.currency,
-            self.suggested_post_message,
-            self.amount,
-            self.star_amount,
-        )
-
-        self._freeze()
+    # Required
+    currency: str = tg_field(compare=True)
+    # Optional
+    suggested_post_message: Message | None = tg_field(compare=True, default=None)
+    amount: int | None = tg_field(compare=True, default=None)
+    star_amount: StarAmount | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class SuggestedPostRefunded(TelegramObject):
     """
     Describes a service message about a payment refund for a suggested post.
@@ -356,26 +289,13 @@ class SuggestedPostRefunded(TelegramObject):
 
     """
 
-    __slots__ = ("reason", "suggested_post_message")
-
-    def __init__(
-        self,
-        reason: str,
-        suggested_post_message: Message | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.reason: str = reason
-        # Optionals
-        self.suggested_post_message: Message | None = suggested_post_message
-
-        self._id_attrs = (self.reason, self.suggested_post_message)
-
-        self._freeze()
+    # Required
+    reason: str = tg_field(compare=True)
+    # Optional
+    suggested_post_message: Message | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class SuggestedPostApproved(TelegramObject):
     """
     Describes a service message about the approval of a suggested post.
@@ -409,28 +329,14 @@ class SuggestedPostApproved(TelegramObject):
 
     """
 
-    __slots__ = ("price", "send_date", "suggested_post_message")
-
-    def __init__(
-        self,
-        send_date: dtm.datetime,
-        suggested_post_message: Message | None = None,
-        price: SuggestedPostPrice | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.send_date: dtm.datetime = send_date
-        # Optionals
-        self.suggested_post_message: Message | None = suggested_post_message
-        self.price: SuggestedPostPrice | None = price
-
-        self._id_attrs = (self.send_date, self.suggested_post_message, self.price)
-
-        self._freeze()
+    # Rrequired
+    send_date: dtm.datetime = tg_field(compare=True)
+    # Optional
+    suggested_post_message: Message | None = tg_field(compare=True, default=None)
+    price: SuggestedPostPrice | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class SuggestedPostApprovalFailed(TelegramObject):
     """
     Describes a service message about the failed approval of a suggested post. Currently, only
@@ -459,21 +365,7 @@ class SuggestedPostApprovalFailed(TelegramObject):
 
     """
 
-    __slots__ = ("price", "suggested_post_message")
-
-    def __init__(
-        self,
-        price: SuggestedPostPrice,
-        suggested_post_message: Message | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.price: SuggestedPostPrice = price
-        # Optionals
-        self.suggested_post_message: Message | None = suggested_post_message
-
-        self._id_attrs = (self.price, self.suggested_post_message)
-
-        self._freeze()
+    # Required
+    price: SuggestedPostPrice = tg_field(compare=True)
+    # Optional
+    suggested_post_message: Message | None = tg_field(compare=True, default=None)

@@ -19,15 +19,15 @@
 """This module contains objects related to Telegram video chats."""
 
 import datetime as dtm
-from collections.abc import Sequence
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
+@tg_dataclass()
 class VideoChatStarted(TelegramObject):
     """
     This object represents a service message about a video
@@ -38,14 +38,8 @@ class VideoChatStarted(TelegramObject):
         This class was renamed from ``VoiceChatStarted`` in accordance to Bot API 6.0.
     """
 
-    __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-
-        self._freeze()
-
-
+@tg_dataclass()
 class VideoChatEnded(TelegramObject):
     """
     This object represents a service message about a
@@ -78,19 +72,7 @@ class VideoChatEnded(TelegramObject):
 
     """
 
-    __slots__ = ("_duration",)
-
-    def __init__(
-        self,
-        duration: TimePeriod,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self._duration: dtm.timedelta = to_timedelta(duration)
-        self._id_attrs = (self._duration,)
-
-        self._freeze()
+    _duration: dtm.timedelta = tg_field(compare=True, alias="duration", converter=to_timedelta)
 
     @property
     def duration(self) -> int | dtm.timedelta:
@@ -99,6 +81,7 @@ class VideoChatEnded(TelegramObject):
         )
 
 
+@tg_dataclass()
 class VideoChatParticipantsInvited(TelegramObject):
     """
     This object represents a service message about new members invited to a video chat.
@@ -124,21 +107,10 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     """
 
-    __slots__ = ("users",)
-
-    def __init__(
-        self,
-        users: Sequence[User],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.users: tuple[User, ...] = parse_sequence_arg(users)
-        self._id_attrs = (self.users,)
-
-        self._freeze()
+    users: tuple[User, ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class VideoChatScheduled(TelegramObject):
     """This object represents a service message about a video chat scheduled in the chat.
 
@@ -163,17 +135,4 @@ class VideoChatScheduled(TelegramObject):
 
     """
 
-    __slots__ = ("start_date",)
-
-    def __init__(
-        self,
-        start_date: dtm.datetime,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.start_date: dtm.datetime = start_date
-
-        self._id_attrs = (self.start_date,)
-
-        self._freeze()
+    start_date: dtm.datetime = tg_field(compare=True)

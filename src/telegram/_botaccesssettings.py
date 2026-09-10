@@ -18,14 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Access Settings."""
 
-from collections.abc import Sequence
-
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class BotAccessSettings(TelegramObject):
     """
     This object describes the access settings of a bot.
@@ -48,18 +47,5 @@ class BotAccessSettings(TelegramObject):
             have access to the bot if the access is restricted.
     """
 
-    __slots__ = ("added_users", "is_access_restricted")
-
-    def __init__(
-        self,
-        is_access_restricted: bool,
-        added_users: Sequence[User] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.is_access_restricted: bool = is_access_restricted
-        self.added_users: tuple[User, ...] = parse_sequence_arg(added_users)
-
-        self._id_attrs = (self.is_access_restricted, self.added_users)
-        self._freeze()
+    is_access_restricted: bool = tg_field(compare=True)
+    added_users: tuple[User, ...] = tg_field(compare=True, converter=parse_sequence_arg)

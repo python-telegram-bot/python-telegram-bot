@@ -390,8 +390,7 @@ class CallbackDataCache:
 
             # Get the cached callback data for the CallbackQuery
             keyboard_uuid, button_data = self.__get_keyboard_uuid_and_button_data(data)
-            with callback_query._unfrozen():
-                callback_query.data = button_data  # type: ignore[assignment]
+            object.__setattr__(callback_query, "data", button_data)
 
             # Map the callback queries ID to the keyboards UUID for later use
             if not mapped and not isinstance(button_data, InvalidCallbackData):

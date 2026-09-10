@@ -19,9 +19,10 @@
 """This module contains objects related to the write access allowed service message."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class WriteAccessAllowed(TelegramObject):
     """
     This object represents a service message about a user allowing a bot to write messages after
@@ -67,21 +68,6 @@ class WriteAccessAllowed(TelegramObject):
 
     """
 
-    __slots__ = ("from_attachment_menu", "from_request", "web_app_name")
-
-    def __init__(
-        self,
-        web_app_name: str | None = None,
-        from_request: bool | None = None,
-        from_attachment_menu: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.web_app_name: str | None = web_app_name
-        self.from_request: bool | None = from_request
-        self.from_attachment_menu: bool | None = from_attachment_menu
-
-        self._id_attrs = (self.web_app_name,)
-
-        self._freeze()
+    web_app_name: str | None = tg_field(compare=True, default=None)
+    from_request: bool | None = tg_field(default=None)
+    from_attachment_menu: bool | None = tg_field(default=None)

@@ -16,18 +16,18 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars Revenue Withdrawals."""
 
 import datetime as dtm
-from typing import ClassVar, Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class RevenueWithdrawalState(TelegramObject):
     """This object describes the state of a revenue withdrawal operation. Currently, it can be one
     of:
@@ -48,8 +48,6 @@ class RevenueWithdrawalState(TelegramObject):
         type (:obj:`str`): The type of the state.
     """
 
-    __slots__ = ("type",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -59,21 +57,21 @@ class RevenueWithdrawalState(TelegramObject):
         },
     )
 
-    PENDING: Final[str] = constants.RevenueWithdrawalStateType.PENDING
+    PENDING: ClassVar[str] = constants.RevenueWithdrawalStateType.PENDING
     """:const:`telegram.constants.RevenueWithdrawalStateType.PENDING`"""
-    SUCCEEDED: Final[str] = constants.RevenueWithdrawalStateType.SUCCEEDED
+    SUCCEEDED: ClassVar[str] = constants.RevenueWithdrawalStateType.SUCCEEDED
     """:const:`telegram.constants.RevenueWithdrawalStateType.SUCCEEDED`"""
-    FAILED: Final[str] = constants.RevenueWithdrawalStateType.FAILED
+    FAILED: ClassVar[str] = constants.RevenueWithdrawalStateType.FAILED
     """:const:`telegram.constants.RevenueWithdrawalStateType.FAILED`"""
 
-    def __init__(self, type: str, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.RevenueWithdrawalStateType, type, type)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.RevenueWithdrawalStateType, value, value)
 
-        self._id_attrs = (self.type,)
-        self._freeze()
+    type: str = tg_field(compare=True, converter=_type_converter)
 
 
+@tg_dataclass()
 class RevenueWithdrawalStatePending(RevenueWithdrawalState):
     """The withdrawal is in progress.
 
@@ -84,13 +82,11 @@ class RevenueWithdrawalStatePending(RevenueWithdrawalState):
             :tg-const:`telegram.RevenueWithdrawalState.PENDING`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(type=RevenueWithdrawalState.PENDING, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=RevenueWithdrawalState.PENDING)
 
 
+@tg_dataclass()
 class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
     """The withdrawal succeeded.
 
@@ -110,26 +106,14 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
         url (:obj:`str`): An HTTPS URL that can be used to see transaction details.
     """
 
-    __slots__ = ("date", "url")
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=RevenueWithdrawalState.SUCCEEDED)
 
-    def __init__(
-        self,
-        date: dtm.datetime,
-        url: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=RevenueWithdrawalState.SUCCEEDED, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.date: dtm.datetime = date
-            self.url: str = url
-            self._id_attrs = (
-                self.type,
-                self.date,
-            )
+    date: dtm.datetime = tg_field(compare=True)
+    url: str = tg_field()
 
 
+@tg_dataclass()
 class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
     """The withdrawal failed and the transaction was refunded.
 
@@ -140,8 +124,5 @@ class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
             :tg-const:`telegram.RevenueWithdrawalState.FAILED`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(type=RevenueWithdrawalState.FAILED, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=RevenueWithdrawalState.FAILED)

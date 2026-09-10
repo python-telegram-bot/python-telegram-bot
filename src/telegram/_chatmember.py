@@ -19,15 +19,16 @@
 """This module contains an object that represents a Telegram ChatMember."""
 
 import datetime as dtm
-from typing import ClassVar, Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ChatMember(TelegramObject):
     """Base class for Telegram ChatMember Objects.
     Currently, the following 6 types of chat members are supported:
@@ -70,8 +71,6 @@ class ChatMember(TelegramObject):
 
     """
 
-    __slots__ = ("status", "user")
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "status",
         {
@@ -84,36 +83,29 @@ class ChatMember(TelegramObject):
         },
     )
 
-    ADMINISTRATOR: Final[str] = constants.ChatMemberStatus.ADMINISTRATOR
+    ADMINISTRATOR: ClassVar[str] = constants.ChatMemberStatus.ADMINISTRATOR
     """:const:`telegram.constants.ChatMemberStatus.ADMINISTRATOR`"""
-    OWNER: Final[str] = constants.ChatMemberStatus.OWNER
+    OWNER: ClassVar[str] = constants.ChatMemberStatus.OWNER
     """:const:`telegram.constants.ChatMemberStatus.OWNER`"""
-    BANNED: Final[str] = constants.ChatMemberStatus.BANNED
+    BANNED: ClassVar[str] = constants.ChatMemberStatus.BANNED
     """:const:`telegram.constants.ChatMemberStatus.BANNED`"""
-    LEFT: Final[str] = constants.ChatMemberStatus.LEFT
+    LEFT: ClassVar[str] = constants.ChatMemberStatus.LEFT
     """:const:`telegram.constants.ChatMemberStatus.LEFT`"""
-    MEMBER: Final[str] = constants.ChatMemberStatus.MEMBER
+    MEMBER: ClassVar[str] = constants.ChatMemberStatus.MEMBER
     """:const:`telegram.constants.ChatMemberStatus.MEMBER`"""
-    RESTRICTED: Final[str] = constants.ChatMemberStatus.RESTRICTED
+    RESTRICTED: ClassVar[str] = constants.ChatMemberStatus.RESTRICTED
     """:const:`telegram.constants.ChatMemberStatus.RESTRICTED`"""
 
-    def __init__(
-        self,
-        user: User,
-        status: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required by all subclasses
-        self.user: User = user
-        self.status: str = enum.get_member(constants.ChatMemberStatus, status, status)
+    @staticmethod
+    def _status_converter(value: str) -> str:
+        return enum.get_member(constants.BotCommandScopeType, value, value)
 
-        self._id_attrs = (self.user, self.status)
-
-        self._freeze()
+    # Required by all subclasses
+    user: User = tg_field(compare=True)
+    status: str = tg_field(compare=True, converter=_status_converter)
 
 
+@tg_dataclass()
 class ChatMemberOwner(ChatMember):
     """
     Represents a chat member that owns the chat
@@ -137,22 +129,14 @@ class ChatMemberOwner(ChatMember):
             this user.
     """
 
-    __slots__ = ("custom_title", "is_anonymous")
+    # Attribute only (init=False)
+    status: str = tg_field(init=False, default=ChatMember.OWNER)
 
-    def __init__(
-        self,
-        user: User,
-        is_anonymous: bool,
-        custom_title: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.is_anonymous: bool = is_anonymous
-            self.custom_title: str | None = custom_title
+    is_anonymous: bool = tg_field()
+    custom_title: str | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class ChatMemberAdministrator(ChatMember):
     """
     Represents a chat member that has some additional privileges.
@@ -308,77 +292,33 @@ class ChatMemberAdministrator(ChatMember):
             .. versionadded:: 22.7
     """
 
-    __slots__ = (
-        "can_be_edited",
-        "can_change_info",
-        "can_delete_messages",
-        "can_delete_stories",
-        "can_edit_messages",
-        "can_edit_stories",
-        "can_invite_users",
-        "can_manage_chat",
-        "can_manage_direct_messages",
-        "can_manage_tags",
-        "can_manage_topics",
-        "can_manage_video_chats",
-        "can_pin_messages",
-        "can_post_messages",
-        "can_post_stories",
-        "can_promote_members",
-        "can_restrict_members",
-        "custom_title",
-        "is_anonymous",
-    )
+    # Attribute only (init=False)
+    status: str = tg_field(init=False, default=ChatMember.ADMINISTRATOR)
 
-    def __init__(
-        self,
-        user: User,
-        can_be_edited: bool,
-        is_anonymous: bool,
-        can_manage_chat: bool,
-        can_delete_messages: bool,
-        can_manage_video_chats: bool,
-        can_restrict_members: bool,
-        can_promote_members: bool,
-        can_change_info: bool,
-        can_invite_users: bool,
-        can_post_stories: bool,
-        can_edit_stories: bool,
-        can_delete_stories: bool,
-        can_post_messages: bool | None = None,
-        can_edit_messages: bool | None = None,
-        can_pin_messages: bool | None = None,
-        can_manage_topics: bool | None = None,
-        custom_title: str | None = None,
-        can_manage_direct_messages: bool | None = None,
-        can_manage_tags: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.can_be_edited: bool = can_be_edited
-            self.is_anonymous: bool = is_anonymous
-            self.can_manage_chat: bool = can_manage_chat
-            self.can_delete_messages: bool = can_delete_messages
-            self.can_manage_video_chats: bool = can_manage_video_chats
-            self.can_restrict_members: bool = can_restrict_members
-            self.can_promote_members: bool = can_promote_members
-            self.can_change_info: bool = can_change_info
-            self.can_invite_users: bool = can_invite_users
-            self.can_post_stories: bool = can_post_stories
-            self.can_edit_stories: bool = can_edit_stories
-            self.can_delete_stories: bool = can_delete_stories
-            # Optionals
-            self.can_post_messages: bool | None = can_post_messages
-            self.can_edit_messages: bool | None = can_edit_messages
-            self.can_pin_messages: bool | None = can_pin_messages
-            self.can_manage_topics: bool | None = can_manage_topics
-            self.custom_title: str | None = custom_title
-            self.can_manage_direct_messages: bool | None = can_manage_direct_messages
-            self.can_manage_tags: bool | None = can_manage_tags
+    can_be_edited: bool = tg_field()
+    is_anonymous: bool = tg_field()
+    can_manage_chat: bool = tg_field()
+    can_delete_messages: bool = tg_field()
+    can_manage_video_chats: bool = tg_field()
+    can_restrict_members: bool = tg_field()
+    can_promote_members: bool = tg_field()
+    can_change_info: bool = tg_field()
+    can_invite_users: bool = tg_field()
+    can_post_stories: bool = tg_field()
+    can_edit_stories: bool = tg_field()
+    can_delete_stories: bool = tg_field()
+
+    # Optionals
+    can_post_messages: bool | None = tg_field(default=None)
+    can_edit_messages: bool | None = tg_field(default=None)
+    can_pin_messages: bool | None = tg_field(default=None)
+    can_manage_topics: bool | None = tg_field(default=None)
+    custom_title: str | None = tg_field(default=None)
+    can_manage_direct_messages: bool | None = tg_field(default=None)
+    can_manage_tags: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class ChatMemberMember(ChatMember):
     """
     Represents a chat member that has no additional
@@ -410,25 +350,14 @@ class ChatMemberMember(ChatMember):
 
     """
 
-    __slots__ = (
-        "tag",
-        "until_date",
-    )
+    # Attribute only (init=False)
+    status: str = tg_field(init=False, default=ChatMember.MEMBER)
 
-    def __init__(
-        self,
-        user: User,
-        until_date: dtm.datetime | None = None,
-        tag: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.until_date: dtm.datetime | None = until_date
-            self.tag: str | None = tag
+    until_date: dtm.datetime | None = tg_field()
+    tag: str | None = tg_field()
 
 
+@tg_dataclass()
 class ChatMemberRestricted(ChatMember):
     """
     Represents a chat member that is under certain restrictions
@@ -564,79 +493,33 @@ class ChatMemberRestricted(ChatMember):
 
     """
 
-    __slots__ = (
-        "can_add_web_page_previews",
-        "can_change_info",
-        "can_edit_tag",
-        "can_invite_users",
-        "can_manage_topics",
-        "can_pin_messages",
-        "can_react_to_messages",
-        "can_send_audios",
-        "can_send_documents",
-        "can_send_messages",
-        "can_send_other_messages",
-        "can_send_photos",
-        "can_send_polls",
-        "can_send_video_notes",
-        "can_send_videos",
-        "can_send_voice_notes",
-        "is_member",
-        "tag",
-        "until_date",
-    )
-
     __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset({"can_send_media_messages"})
 
-    def __init__(
-        self,
-        user: User,
-        is_member: bool,
-        can_change_info: bool,
-        can_invite_users: bool,
-        can_pin_messages: bool,
-        can_send_messages: bool,
-        can_send_polls: bool,
-        can_send_other_messages: bool,
-        can_add_web_page_previews: bool,
-        can_manage_topics: bool,
-        until_date: dtm.datetime,
-        can_send_audios: bool,
-        can_send_documents: bool,
-        can_send_photos: bool,
-        can_send_videos: bool,
-        can_send_video_notes: bool,
-        can_send_voice_notes: bool,
-        can_edit_tag: bool,
-        can_react_to_messages: bool,
-        tag: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
+    # Attribute only (init=False)
+    status: str = tg_field(init=False, default=ChatMember.RESTRICTED)
 
-        with self._unfrozen():
-            self.is_member: bool = is_member
-            self.can_change_info: bool = can_change_info
-            self.can_invite_users: bool = can_invite_users
-            self.can_pin_messages: bool = can_pin_messages
-            self.can_send_messages: bool = can_send_messages
-            self.can_send_polls: bool = can_send_polls
-            self.can_send_other_messages: bool = can_send_other_messages
-            self.can_add_web_page_previews: bool = can_add_web_page_previews
-            self.can_manage_topics: bool = can_manage_topics
-            self.until_date: dtm.datetime = until_date
-            self.can_send_audios: bool = can_send_audios
-            self.can_send_documents: bool = can_send_documents
-            self.can_send_photos: bool = can_send_photos
-            self.can_send_videos: bool = can_send_videos
-            self.can_send_video_notes: bool = can_send_video_notes
-            self.can_send_voice_notes: bool = can_send_voice_notes
-            self.can_edit_tag: bool = can_edit_tag
-            self.can_react_to_messages: bool = can_react_to_messages
-            self.tag: str | None = tag
+    is_member: bool = tg_field()
+    can_change_info: bool = tg_field()
+    can_invite_users: bool = tg_field()
+    can_pin_messages: bool = tg_field()
+    can_send_messages: bool = tg_field()
+    can_send_polls: bool = tg_field()
+    can_send_other_messages: bool = tg_field()
+    can_add_web_page_previews: bool = tg_field()
+    can_manage_topics: bool = tg_field()
+    until_date: dtm.datetime = tg_field()
+    can_send_audios: bool = tg_field()
+    can_send_documents: bool = tg_field()
+    can_send_photos: bool = tg_field()
+    can_send_videos: bool = tg_field()
+    can_send_video_notes: bool = tg_field()
+    can_send_voice_notes: bool = tg_field()
+    can_edit_tag: bool = tg_field()
+    can_react_to_messages: bool = tg_field()
+    tag: str | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class ChatMemberLeft(ChatMember):
     """
     Represents a chat member that isn't currently a member of the chat,
@@ -653,18 +536,11 @@ class ChatMemberLeft(ChatMember):
         user (:class:`telegram.User`): Information about the user.
     """
 
-    __slots__ = ()
-
-    def __init__(
-        self,
-        user: User,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    status: str = tg_field(init=False, default=ChatMember.LEFT)
 
 
+@tg_dataclass()
 class ChatMemberBanned(ChatMember):
     """
     Represents a chat member that was banned in the chat and
@@ -692,15 +568,7 @@ class ChatMemberBanned(ChatMember):
 
     """
 
-    __slots__ = ("until_date",)
+    # Attribute only (init=False)
+    status: str = tg_field(init=False, default=ChatMember.BANNED)
 
-    def __init__(
-        self,
-        user: User,
-        until_date: dtm.datetime,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.until_date: dtm.datetime = until_date
+    until_date: dtm.datetime = tg_field()

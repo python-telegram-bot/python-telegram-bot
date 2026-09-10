@@ -16,17 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains objects representing Telegram bot command scopes."""
 
-from typing import ClassVar, Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class BotCommandScope(TelegramObject):
     """Base class for objects that represent the scope to which bot commands are applied.
     Currently, the following 7 scopes are supported:
@@ -57,8 +57,6 @@ class BotCommandScope(TelegramObject):
         type (:obj:`str`): Scope type.
     """
 
-    __slots__ = ("type",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -72,29 +70,34 @@ class BotCommandScope(TelegramObject):
         },
     )
 
-    DEFAULT: Final[str] = constants.BotCommandScopeType.DEFAULT
+    # TODO: https://docs.python.org/3.13/library/typing.html#typing.ClassVar
+    DEFAULT: ClassVar[str] = constants.BotCommandScopeType.DEFAULT
     """:const:`telegram.constants.BotCommandScopeType.DEFAULT`"""
-    ALL_PRIVATE_CHATS: Final[str] = constants.BotCommandScopeType.ALL_PRIVATE_CHATS
+    ALL_PRIVATE_CHATS: ClassVar[str] = constants.BotCommandScopeType.ALL_PRIVATE_CHATS
     """:const:`telegram.constants.BotCommandScopeType.ALL_PRIVATE_CHATS`"""
-    ALL_GROUP_CHATS: Final[str] = constants.BotCommandScopeType.ALL_GROUP_CHATS
+    ALL_GROUP_CHATS: ClassVar[str] = constants.BotCommandScopeType.ALL_GROUP_CHATS
     """:const:`telegram.constants.BotCommandScopeType.ALL_GROUP_CHATS`"""
-    ALL_CHAT_ADMINISTRATORS: Final[str] = constants.BotCommandScopeType.ALL_CHAT_ADMINISTRATORS
+    ALL_CHAT_ADMINISTRATORS: ClassVar[str] = constants.BotCommandScopeType.ALL_CHAT_ADMINISTRATORS
     """:const:`telegram.constants.BotCommandScopeType.ALL_CHAT_ADMINISTRATORS`"""
-    CHAT: Final[str] = constants.BotCommandScopeType.CHAT
+    CHAT: ClassVar[str] = constants.BotCommandScopeType.CHAT
     """:const:`telegram.constants.BotCommandScopeType.CHAT`"""
-    CHAT_ADMINISTRATORS: Final[str] = constants.BotCommandScopeType.CHAT_ADMINISTRATORS
+    CHAT_ADMINISTRATORS: ClassVar[str] = constants.BotCommandScopeType.CHAT_ADMINISTRATORS
     """:const:`telegram.constants.BotCommandScopeType.CHAT_ADMINISTRATORS`"""
-    CHAT_MEMBER: Final[str] = constants.BotCommandScopeType.CHAT_MEMBER
+    CHAT_MEMBER: ClassVar[str] = constants.BotCommandScopeType.CHAT_MEMBER
     """:const:`telegram.constants.BotCommandScopeType.CHAT_MEMBER`"""
 
-    def __init__(self, type: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.BotCommandScopeType, type, type)
-        self._id_attrs = (self.type,)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.BotCommandScopeType, value, value)
 
-        self._freeze()
+    @staticmethod
+    def _chat_id_converter(value: str | int) -> str | int:
+        return value if isinstance(value, str) and value.startswith("@") else int(value)
+
+    type: str = tg_field(compare=True, converter=_type_converter)
 
 
+@tg_dataclass()
 class BotCommandScopeDefault(BotCommandScope):
     """Represents the default scope of bot commands. Default commands are used if no commands with
     a `narrower scope`_ are specified for the user.
@@ -106,13 +109,11 @@ class BotCommandScopeDefault(BotCommandScope):
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.DEFAULT`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=BotCommandScope.DEFAULT, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BotCommandScope.DEFAULT)
 
 
+@tg_dataclass()
 class BotCommandScopeAllPrivateChats(BotCommandScope):
     """Represents the scope of bot commands, covering all private chats.
 
@@ -122,13 +123,11 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_PRIVATE_CHATS`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=BotCommandScope.ALL_PRIVATE_CHATS, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BotCommandScope.ALL_PRIVATE_CHATS)
 
 
+@tg_dataclass()
 class BotCommandScopeAllGroupChats(BotCommandScope):
     """Represents the scope of bot commands, covering all group and supergroup chats.
 
@@ -137,13 +136,10 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_GROUP_CHATS`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=BotCommandScope.ALL_GROUP_CHATS, api_kwargs=api_kwargs)
-        self._freeze()
+    type: str = tg_field(init=False, default=BotCommandScope.ALL_GROUP_CHATS)
 
 
+@tg_dataclass()
 class BotCommandScopeAllChatAdministrators(BotCommandScope):
     """Represents the scope of bot commands, covering all group and supergroup chat administrators.
 
@@ -152,13 +148,11 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_CHAT_ADMINISTRATORS`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=BotCommandScope.ALL_CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BotCommandScope.ALL_CHAT_ADMINISTRATORS)
 
 
+@tg_dataclass()
 class BotCommandScopeChat(BotCommandScope):
     """Represents the scope of bot commands, covering a specific chat.
 
@@ -175,17 +169,13 @@ class BotCommandScopeChat(BotCommandScope):
         chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
     """
 
-    __slots__ = ("chat_id",)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=BotCommandScope.CHAT)
 
-    def __init__(self, chat_id: str | int, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=BotCommandScope.CHAT, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.chat_id: str | int = (
-                chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
-            )
-            self._id_attrs = (self.type, self.chat_id)
+    chat_id: str | int = tg_field(compare=True, converter=BotCommandScope._chat_id_converter)
 
 
+@tg_dataclass()
 class BotCommandScopeChatAdministrators(BotCommandScope):
     """Represents the scope of bot commands, covering all administrators of a specific group or
     supergroup chat.
@@ -202,17 +192,13 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
         chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
     """
 
-    __slots__ = ("chat_id",)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=BotCommandScope.CHAT_ADMINISTRATORS)
 
-    def __init__(self, chat_id: str | int, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.chat_id: str | int = (
-                chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
-            )
-            self._id_attrs = (self.type, self.chat_id)
+    chat_id: str | int = tg_field(compare=True, converter=BotCommandScope._chat_id_converter)
 
 
+@tg_dataclass()
 class BotCommandScopeChatMember(BotCommandScope):
     """Represents the scope of bot commands, covering a specific member of a group or supergroup
     chat.
@@ -232,13 +218,8 @@ class BotCommandScopeChatMember(BotCommandScope):
         user_id (:obj:`int`): Unique identifier of the target user.
     """
 
-    __slots__ = ("chat_id", "user_id")
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=BotCommandScope.CHAT_MEMBER)
 
-    def __init__(self, chat_id: str | int, user_id: int, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=BotCommandScope.CHAT_MEMBER, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.chat_id: str | int = (
-                chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
-            )
-            self.user_id: int = user_id
-            self._id_attrs = (self.type, self.chat_id, self.user_id)
+    chat_id: str | int = tg_field(compare=True, converter=BotCommandScope._chat_id_converter)
+    user_id: int = tg_field(compare=True)

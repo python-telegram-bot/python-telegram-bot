@@ -19,8 +19,7 @@
 """This module contains objects that represent paid media in Telegram."""
 
 import datetime as dtm
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, ClassVar, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._files.livephoto import LivePhoto
@@ -31,14 +30,15 @@ from telegram._utils.argumentparsing import (
     parse_sequence_arg,
     to_timedelta,
 )
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 if TYPE_CHECKING:
     from telegram._files.photosize import PhotoSize
     from telegram._user import User
 
 
+@tg_dataclass()
 class PaidMedia(TelegramObject):
     """Describes the paid media added to a message. Currently, it can be one of:
 
@@ -58,8 +58,6 @@ class PaidMedia(TelegramObject):
         type (:obj:`str`): Type of the paid media.
     """
 
-    __slots__ = ("type",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -70,28 +68,23 @@ class PaidMedia(TelegramObject):
         },
     )
 
-    PREVIEW: Final[str] = constants.PaidMediaType.PREVIEW
+    PREVIEW: ClassVar[str] = constants.PaidMediaType.PREVIEW
     """:const:`telegram.constants.PaidMediaType.PREVIEW`"""
-    PHOTO: Final[str] = constants.PaidMediaType.PHOTO
+    PHOTO: ClassVar[str] = constants.PaidMediaType.PHOTO
     """:const:`telegram.constants.PaidMediaType.PHOTO`"""
-    VIDEO: Final[str] = constants.PaidMediaType.VIDEO
+    VIDEO: ClassVar[str] = constants.PaidMediaType.VIDEO
     """:const:`telegram.constants.PaidMediaType.VIDEO`"""
-    LIVE_PHOTO: Final[str] = constants.PaidMediaType.LIVE_PHOTO
+    LIVE_PHOTO: ClassVar[str] = constants.PaidMediaType.LIVE_PHOTO
     """:const:`telegram.constants.PaidMediaType.LIVE_PHOTO`"""
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.PaidMediaType, type, type)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.PaidMediaType, value, value)
 
-        self._id_attrs = (self.type,)
-        self._freeze()
+    type: str = tg_field(compare=True, converter=_type_converter)
 
 
+@tg_dataclass()
 class PaidMediaPreview(PaidMedia):
     """The paid media isn't available before the payment.
 
@@ -126,30 +119,21 @@ class PaidMediaPreview(PaidMedia):
                 |time-period-int-deprecated|
     """
 
-    __slots__ = ("_duration", "height", "width")
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=PaidMedia.PREVIEW)
 
-    def __init__(
-        self,
-        width: int | None = None,
-        height: int | None = None,
-        duration: TimePeriod | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=PaidMedia.PREVIEW, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.width: int | None = width
-            self.height: int | None = height
-            self._duration: dtm.timedelta | None = to_timedelta(duration)
-
-            self._id_attrs = (self.type, self.width, self.height, self._duration)
+    width: int | None = tg_field(compare=True, default=None)
+    height: int | None = tg_field(compare=True, default=None)
+    _duration: dtm.timedelta | None = tg_field(
+        compare=True, alias="duration", default=None, converter=to_timedelta
+    )
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
+@tg_dataclass()
 class PaidMediaPhoto(PaidMedia):
     """
     The paid media is a photo.
@@ -168,22 +152,13 @@ class PaidMediaPhoto(PaidMedia):
         photo (tuple[:class:`telegram.PhotoSize`]): The photo.
     """
 
-    __slots__ = ("photo",)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=PaidMedia.PHOTO)
 
-    def __init__(
-        self,
-        photo: Sequence["PhotoSize"],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=PaidMedia.PHOTO, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
-
-            self._id_attrs = (self.type, self.photo)
+    photo: tuple["PhotoSize", ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class PaidMediaVideo(PaidMedia):
     """
     The paid media is a video.
@@ -202,22 +177,13 @@ class PaidMediaVideo(PaidMedia):
         video (:class:`telegram.Video`): The video.
     """
 
-    __slots__ = ("video",)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=PaidMedia.VIDEO)
 
-    def __init__(
-        self,
-        video: Video,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=PaidMedia.VIDEO, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.video: Video = video
-
-            self._id_attrs = (self.type, self.video)
+    video: Video = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PaidMediaLivePhoto(PaidMedia):
     """
     The paid media is a live photo.
@@ -237,21 +203,13 @@ class PaidMediaLivePhoto(PaidMedia):
 
     """
 
-    __slots__ = ("live_photo",)
+    # Attribute only (init=False)
+    type: str = tg_field(compare=True, init=False, default=PaidMedia.VIDEO)
 
-    def __init__(
-        self,
-        live_photo: LivePhoto,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=PaidMedia.LIVE_PHOTO, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.live_photo: LivePhoto = live_photo
-            self._id_attrs = (self.type, self.live_photo)
+    live_photo: LivePhoto = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PaidMediaInfo(TelegramObject):
     """
     Describes the paid media added to a message.
@@ -272,23 +230,11 @@ class PaidMediaInfo(TelegramObject):
         paid_media (tuple[:class:`telegram.PaidMedia`]): Information about the paid media.
     """
 
-    __slots__ = ("paid_media", "star_count")
-
-    def __init__(
-        self,
-        star_count: int,
-        paid_media: Sequence[PaidMedia],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.star_count: int = star_count
-        self.paid_media: tuple[PaidMedia, ...] = parse_sequence_arg(paid_media)
-
-        self._id_attrs = (self.star_count, self.paid_media)
-        self._freeze()
+    star_count: int = tg_field(compare=True)
+    paid_media: tuple[PaidMedia, ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class PaidMediaPurchased(TelegramObject):
     """This object contains information about a paid media purchase.
 
@@ -309,18 +255,5 @@ class PaidMediaPurchased(TelegramObject):
         paid_media_payload (:obj:`str`): Bot-specified paid media payload.
     """
 
-    __slots__ = ("from_user", "paid_media_payload")
-
-    def __init__(
-        self,
-        from_user: "User",
-        paid_media_payload: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.from_user: User = from_user
-        self.paid_media_payload: str = paid_media_payload
-
-        self._id_attrs = (self.from_user, self.paid_media_payload)
-        self._freeze()
+    from_user: "User" = tg_field(compare=True)
+    paid_media_payload: str = tg_field(compare=True)
