@@ -55,69 +55,73 @@ class AnimationTestBase:
 
 
 class TestAnimationWithoutRequest(AnimationTestBase):
-    def test_slot_behaviour(self, animation):
-        for attr in animation.__slots__:
-            assert getattr(animation, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(animation)) == len(set(mro_slots(animation))), "duplicate slot"
+    def test_slot_behaviour(self, offline_animation):
+        for attr in offline_animation.__slots__:
+            assert getattr(offline_animation, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_animation)) == len(set(mro_slots(offline_animation))), (
+            "duplicate slot"
+        )
 
-    def test_creation(self, animation):
-        assert isinstance(animation, Animation)
-        assert isinstance(animation.file_id, str)
-        assert isinstance(animation.file_unique_id, str)
-        assert animation.file_id
-        assert animation.file_unique_id
+    def test_creation(self, offline_animation):
+        assert isinstance(offline_animation, Animation)
+        assert isinstance(offline_animation.file_id, str)
+        assert isinstance(offline_animation.file_unique_id, str)
+        assert offline_animation.file_id
+        assert offline_animation.file_unique_id
 
-    def test_expected_values(self, animation):
-        assert animation.mime_type == self.mime_type
-        assert animation.file_name.startswith("game.gif") == self.file_name.startswith("game.gif")
-        assert isinstance(animation.thumbnail, PhotoSize)
+    def test_expected_values(self, offline_animation):
+        assert offline_animation.mime_type == self.mime_type
+        assert offline_animation.file_name.startswith("game.gif") == self.file_name.startswith(
+            "game.gif"
+        )
+        assert isinstance(offline_animation.thumbnail, PhotoSize)
 
-    def test_de_json(self, offline_bot, animation):
+    def test_de_json(self, offline_bot, offline_animation):
         json_dict = {
             "file_id": self.animation_file_id,
             "file_unique_id": self.animation_file_unique_id,
             "width": self.width,
             "height": self.height,
             "duration": self.duration.total_seconds(),
-            "thumbnail": animation.thumbnail.to_dict(),
+            "thumbnail": offline_animation.thumbnail.to_dict(),
             "file_name": self.file_name,
             "mime_type": self.mime_type,
             "file_size": self.file_size,
         }
-        animation = Animation.de_json(json_dict, offline_bot)
-        assert animation.api_kwargs == {}
-        assert animation.file_id == self.animation_file_id
-        assert animation.file_unique_id == self.animation_file_unique_id
-        assert animation.file_name == self.file_name
-        assert animation.mime_type == self.mime_type
-        assert animation.file_size == self.file_size
-        assert animation._duration == self.duration
+        offline_animation = Animation.de_json(json_dict, offline_bot)
+        assert offline_animation.api_kwargs == {}
+        assert offline_animation.file_id == self.animation_file_id
+        assert offline_animation.file_unique_id == self.animation_file_unique_id
+        assert offline_animation.file_name == self.file_name
+        assert offline_animation.mime_type == self.mime_type
+        assert offline_animation.file_size == self.file_size
+        assert offline_animation._duration == self.duration
 
-    def test_to_dict(self, animation):
-        animation_dict = animation.to_dict()
+    def test_to_dict(self, offline_animation):
+        animation_dict = offline_animation.to_dict()
 
         assert isinstance(animation_dict, dict)
-        assert animation_dict["file_id"] == animation.file_id
-        assert animation_dict["file_unique_id"] == animation.file_unique_id
-        assert animation_dict["width"] == animation.width
-        assert animation_dict["height"] == animation.height
+        assert animation_dict["file_id"] == offline_animation.file_id
+        assert animation_dict["file_unique_id"] == offline_animation.file_unique_id
+        assert animation_dict["width"] == offline_animation.width
+        assert animation_dict["height"] == offline_animation.height
         assert animation_dict["duration"] == int(self.duration.total_seconds())
         assert isinstance(animation_dict["duration"], int)
-        assert animation_dict["thumbnail"] == animation.thumbnail.to_dict()
-        assert animation_dict["file_name"] == animation.file_name
-        assert animation_dict["mime_type"] == animation.mime_type
-        assert animation_dict["file_size"] == animation.file_size
+        assert animation_dict["thumbnail"] == offline_animation.thumbnail.to_dict()
+        assert animation_dict["file_name"] == offline_animation.file_name
+        assert animation_dict["mime_type"] == offline_animation.mime_type
+        assert animation_dict["file_size"] == offline_animation.file_size
 
-    def test_time_period_properties(self, PTB_TIMEDELTA, animation):
+    def test_time_period_properties(self, PTB_TIMEDELTA, offline_animation):
         if PTB_TIMEDELTA:
-            assert animation.duration == self.duration
-            assert isinstance(animation.duration, dtm.timedelta)
+            assert offline_animation.duration == self.duration
+            assert isinstance(offline_animation.duration, dtm.timedelta)
         else:
-            assert animation.duration == int(self.duration.total_seconds())
-            assert isinstance(animation.duration, int)
+            assert offline_animation.duration == int(self.duration.total_seconds())
+            assert isinstance(offline_animation.duration, int)
 
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, animation):
-        animation.duration
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, offline_animation):
+        offline_animation.duration
 
         if PTB_TIMEDELTA:
             assert len(recwarn) == 0
@@ -188,23 +192,27 @@ class TestAnimationWithoutRequest(AnimationTestBase):
         finally:
             offline_bot._local_mode = False
 
-    async def test_send_with_animation(self, monkeypatch, offline_bot, chat_id, animation):
+    async def test_send_with_animation(self, monkeypatch, offline_bot, chat_id, offline_animation):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["animation"] == animation.file_id
+            return request_data.json_parameters["animation"] == offline_animation.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.send_animation(animation=animation, chat_id=chat_id)
+        assert await offline_bot.send_animation(animation=offline_animation, chat_id=chat_id)
 
-    async def test_get_file_instance_method(self, monkeypatch, animation):
+    async def test_get_file_instance_method(self, monkeypatch, offline_animation):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == animation.file_id
+            return kwargs["file_id"] == offline_animation.file_id
 
         assert check_shortcut_signature(Animation.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(animation.get_file, animation.get_bot(), "get_file")
-        assert await check_defaults_handling(animation.get_file, animation.get_bot())
+        assert await check_shortcut_call(
+            offline_animation.get_file, offline_animation.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(
+            offline_animation.get_file, offline_animation.get_bot()
+        )
 
-        monkeypatch.setattr(animation.get_bot(), "get_file", make_assertion)
-        assert await animation.get_file()
+        monkeypatch.setattr(offline_animation.get_bot(), "get_file", make_assertion)
+        assert await offline_animation.get_file()
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
@@ -216,7 +224,7 @@ class TestAnimationWithoutRequest(AnimationTestBase):
         indirect=["default_bot"],
     )
     async def test_send_animation_default_quote_parse_mode(
-        self, default_bot, chat_id, animation, custom, monkeypatch
+        self, default_bot, chat_id, offline_animation, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -230,7 +238,7 @@ class TestAnimationWithoutRequest(AnimationTestBase):
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.send_animation(
-            chat_id, animation, reply_parameters=ReplyParameters(**kwargs)
+            chat_id, offline_animation, reply_parameters=ReplyParameters(**kwargs)
         )
 
 

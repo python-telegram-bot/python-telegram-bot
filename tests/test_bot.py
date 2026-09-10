@@ -136,6 +136,11 @@ async def static_message(bot, chat_id):
 
 
 @pytest.fixture
+def offline_media_message(offline_bot):
+    return make_message("", bot=offline_bot, caption="my caption")
+
+
+@pytest.fixture
 async def media_message(bot, chat_id):
     # mostly used in tests for edit_message and hence can't be reused
     with data_file("telegram.ogg").open("rb") as f:
@@ -494,7 +499,11 @@ class TestBotWithoutRequest:
         async with (
             make_bot(token=FALLBACKS[0]["token"]) as a,
             make_bot(token=FALLBACKS[0]["token"]) as b,
-            Bot(token=FALLBACKS[0]["token"]) as c,
+            PytestBot(
+                token=FALLBACKS[0]["token"],
+                request=OfflineRequest(),
+                get_updates_request=OfflineRequest(),
+            ) as c,
             make_bot(token=FALLBACKS[1]["token"]) as d,
         ):
             e = Update(123456789)
@@ -539,7 +548,7 @@ class TestBotWithoutRequest:
             await bot.shutdown()
 
     async def test_get_me_and_properties(self, offline_bot):
-        get_me_bot = await ExtBot(offline_bot.token).get_me()
+        get_me_bot = await offline_bot.get_me()
 
         assert isinstance(get_me_bot, User)
         assert get_me_bot.id == offline_bot.id
@@ -563,8 +572,20 @@ class TestBotWithoutRequest:
     @pytest.mark.parametrize(
         ("cls", "logger_name"), [(Bot, "telegram.Bot"), (ExtBot, "telegram.ext.ExtBot")]
     )
-    async def test_bot_method_logging(self, offline_bot: PytestExtBot, cls, logger_name, caplog):
-        instance = cls(offline_bot.token)
+    async def test_bot_method_logging(
+        self, monkeypatch, offline_bot: PytestExtBot, cls, logger_name, caplog
+    ):
+        request = OfflineRequest()
+        instance = cls(
+            offline_bot.token,
+            request=request,
+            get_updates_request=OfflineRequest(),
+        )
+
+        async def post(*args, **kwargs):
+            return offline_bot.bot.to_dict()
+
+        monkeypatch.setattr(request, "post", post)
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
             await instance.get_me()
@@ -1877,7 +1898,7 @@ class TestBotWithoutRequest:
     @pytest.mark.parametrize("json_keyboard", [True, False])
     @pytest.mark.parametrize("caption", ["<b>Test</b>", "", None])
     async def test_copy_message(
-        self, monkeypatch, offline_bot, chat_id, media_message, json_keyboard, caption
+        self, monkeypatch, offline_bot, chat_id, offline_media_message, json_keyboard, caption
     ):
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton(text="test", callback_data="test2")]]
@@ -1889,11 +1910,11 @@ class TestBotWithoutRequest:
                 [
                     data["chat_id"] == chat_id,
                     data["from_chat_id"] == chat_id,
-                    data["message_id"] == media_message.message_id,
+                    data["message_id"] == offline_media_message.message_id,
                     data.get("caption") == caption,
                     data["parse_mode"] == ParseMode.HTML,
                     data["reply_parameters"]
-                    == ReplyParameters(message_id=media_message.message_id).to_dict(),
+                    == ReplyParameters(message_id=offline_media_message.message_id).to_dict(),
                     (
                         data["reply_markup"] == keyboard.to_json()
                         if json_keyboard
@@ -1914,12 +1935,12 @@ class TestBotWithoutRequest:
         await offline_bot.copy_message(
             chat_id,
             from_chat_id=chat_id,
-            message_id=media_message.message_id,
+            message_id=offline_media_message.message_id,
             caption=caption,
             video_start_timestamp=999,
             caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 4)],
             parse_mode=ParseMode.HTML,
-            reply_to_message_id=media_message.message_id,
+            reply_to_message_id=offline_media_message.message_id,
             reply_markup=keyboard.to_json() if json_keyboard else keyboard,
             disable_notification=True,
             protect_content=True,

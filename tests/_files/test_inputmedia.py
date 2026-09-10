@@ -304,14 +304,14 @@ class TestInputMediaVideoWithoutRequest(InputMediaVideoTestBase):
             assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
-    def test_with_video(self, video, PTB_TIMEDELTA):
+    def test_with_video(self, offline_video):
         # fixture found in test_video
-        input_media_video = InputMediaVideo(video, caption="test 3")
+        input_media_video = InputMediaVideo(offline_video, caption="test 3")
         assert input_media_video.type == self.type_
-        assert input_media_video.media == video.file_id
-        assert input_media_video.width == video.width
-        assert input_media_video.height == video.height
-        assert input_media_video.duration == video.duration
+        assert input_media_video.media == offline_video.file_id
+        assert input_media_video.width == offline_video.width
+        assert input_media_video.height == offline_video.height
+        assert input_media_video.duration == offline_video.duration
         assert input_media_video.caption == "test 3"
 
     def test_with_video_file(self, video_file):
@@ -467,11 +467,11 @@ class TestInputMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
             == input_media_photo.show_caption_above_media
         )
 
-    def test_with_photo(self, photo):
+    def test_with_photo(self, offline_photo):
         # fixture found in test_photo
-        input_media_photo = InputMediaPhoto(photo, caption="test 2")
+        input_media_photo = InputMediaPhoto(offline_photo, caption="test 2")
         assert input_media_photo.type == self.type_
-        assert input_media_photo.media == photo.file_id
+        assert input_media_photo.media == offline_photo.file_id
         assert input_media_photo.caption == "test 2"
 
     def test_with_photo_file(self, photo_file):
@@ -638,11 +638,11 @@ class TestInputMediaAnimationWithoutRequest(InputMediaAnimationTestBase):
             assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
-    def test_with_animation(self, animation):
+    def test_with_animation(self, offline_animation):
         # fixture found in test_animation
-        input_media_animation = InputMediaAnimation(animation, caption="test 2")
+        input_media_animation = InputMediaAnimation(offline_animation, caption="test 2")
         assert input_media_animation.type == self.type_
-        assert input_media_animation.media == animation.file_id
+        assert input_media_animation.media == offline_animation.file_id
         assert input_media_animation.caption == "test 2"
 
     def test_with_animation_file(self, animation_file):
@@ -815,14 +815,14 @@ class TestInputMediaAudioWithoutRequest(InputMediaAudioTestBase):
             assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
-    def test_with_audio(self, audio):
+    def test_with_audio(self, offline_audio):
         # fixture found in test_audio
-        input_media_audio = InputMediaAudio(audio, caption="test 3")
+        input_media_audio = InputMediaAudio(offline_audio, caption="test 3")
         assert input_media_audio.type == self.type_
-        assert input_media_audio.media == audio.file_id
-        assert input_media_audio.duration == audio.duration
-        assert input_media_audio.performer == audio.performer
-        assert input_media_audio.title == audio.title
+        assert input_media_audio.media == offline_audio.file_id
+        assert input_media_audio.duration == offline_audio.duration
+        assert input_media_audio.performer == offline_audio.performer
+        assert input_media_audio.title == offline_audio.title
         assert input_media_audio.caption == "test 3"
 
     def test_with_audio_file(self, audio_file):
@@ -1042,10 +1042,10 @@ class TestInputMediaStickerWithoutRequest(InputMediaStickerTestBase):
         assert input_media_sticker_dict["media"] == input_media_sticker.media
         assert input_media_sticker_dict["emoji"] == input_media_sticker.emoji
 
-    def test_with_sticker(self, sticker):
-        input_media_sticker = InputMediaSticker(sticker, emoji=self.emoji)
+    def test_with_sticker(self, offline_sticker):
+        input_media_sticker = InputMediaSticker(offline_sticker, emoji=self.emoji)
         assert input_media_sticker.type == self.type_
-        assert input_media_sticker.media == sticker.file_id
+        assert input_media_sticker.media == offline_sticker.file_id
         assert input_media_sticker.emoji == self.emoji
 
     def test_with_sticker_file(self, sticker_file):
@@ -1103,11 +1103,11 @@ class TestInputMediaDocumentWithoutRequest(InputMediaDocumentTestBase):
             == input_media_document.disable_content_type_detection
         )
 
-    def test_with_document(self, document):
+    def test_with_document(self, offline_document):
         # fixture found in test_document
-        input_media_document = InputMediaDocument(document, caption="test 3")
+        input_media_document = InputMediaDocument(offline_document, caption="test 3")
         assert input_media_document.type == self.type_
-        assert input_media_document.media == document.file_id
+        assert input_media_document.media == offline_document.file_id
         assert input_media_document.caption == "test 3"
 
     def test_with_document_file(self, document_file):
@@ -1218,11 +1218,11 @@ class TestInputPaidMediaPhotoWithoutRequest(InputMediaPhotoTestBase):
         assert input_paid_media_photo_dict["type"] == input_paid_media_photo.type
         assert input_paid_media_photo_dict["media"] == input_paid_media_photo.media
 
-    def test_with_photo(self, photo):
+    def test_with_photo(self, offline_photo):
         # fixture found in conftest.py
-        input_paid_media_photo = InputPaidMediaPhoto(photo)
+        input_paid_media_photo = InputPaidMediaPhoto(offline_photo)
         assert input_paid_media_photo.type == self.type_
-        assert input_paid_media_photo.media == photo.file_id
+        assert input_paid_media_photo.media == offline_photo.file_id
 
     def test_with_photo_file(self, photo_file):
         # fixture found in conftest.py
@@ -1283,12 +1283,12 @@ class TestInputMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
         )
         assert input_media_live_photo_dict["has_spoiler"] == input_media_live_photo.has_spoiler
 
-    def test_with_photo_and_video(self, video, photo):
+    def test_with_photo_and_video(self, offline_video, offline_photo):
         # fixtures found in conftest.py
-        input_media_live_photo = InputMediaLivePhoto(video, photo)
+        input_media_live_photo = InputMediaLivePhoto(offline_video, offline_photo)
         assert input_media_live_photo.type == self.type_
-        assert input_media_live_photo.media == video.file_id
-        assert input_media_live_photo.photo == photo.file_id
+        assert input_media_live_photo.media == offline_video.file_id
+        assert input_media_live_photo.photo == offline_photo.file_id
 
     def test_with_photo_and_video_files(self, video_file, photo_file):
         # fixture found in conftest.py
@@ -1362,14 +1362,14 @@ class TestInputPaidMediaVideoWithoutRequest(InputMediaVideoTestBase):
             assert "`duration` will be of type `datetime.timedelta`" in str(recwarn[0].message)
             assert recwarn[0].category is PTBDeprecationWarning
 
-    def test_with_video(self, video):
+    def test_with_video(self, offline_video):
         # fixture found in test_video
-        input_paid_media_video = InputPaidMediaVideo(video)
+        input_paid_media_video = InputPaidMediaVideo(offline_video)
         assert input_paid_media_video.type == self.type_
-        assert input_paid_media_video.media == video.file_id
-        assert input_paid_media_video.width == video.width
-        assert input_paid_media_video.height == video.height
-        assert input_paid_media_video.duration == video.duration
+        assert input_paid_media_video.media == offline_video.file_id
+        assert input_paid_media_video.width == offline_video.width
+        assert input_paid_media_video.height == offline_video.height
+        assert input_paid_media_video.duration == offline_video.duration
 
     def test_with_video_file(self, video_file):
         # fixture found in test_video
@@ -1406,12 +1406,12 @@ class TestInputPaidMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
         assert input_paid_media_live_photo_dict["media"] == input_paid_media_live_photo.media
         assert input_paid_media_live_photo_dict["photo"] == input_paid_media_live_photo.photo
 
-    def test_with_photo(self, video, photo):
+    def test_with_photo(self, offline_video, offline_photo):
         # fixtures found in conftest.py
-        input_paid_media_live_photo = InputPaidMediaLivePhoto(video, photo)
+        input_paid_media_live_photo = InputPaidMediaLivePhoto(offline_video, offline_photo)
         assert input_paid_media_live_photo.type == self.type_
-        assert input_paid_media_live_photo.media == video.file_id
-        assert input_paid_media_live_photo.photo == photo.file_id
+        assert input_paid_media_live_photo.media == offline_video.file_id
+        assert input_paid_media_live_photo.photo == offline_photo.file_id
 
     def test_with_photo_file(self, photo_file):
         # fixture found in conftest.py
@@ -1429,19 +1429,63 @@ class TestInputPaidMediaLivePhotoWithoutRequest(InputMediaLivePhotoTestBase):
 
 
 @pytest.fixture(scope="module")
+def offline_media_group(offline_photo, offline_thumb):
+    return [
+        InputMediaPhoto(offline_photo, caption="*photo* 1", parse_mode="Markdown"),
+        InputMediaPhoto(offline_thumb, caption="<b>photo</b> 2", parse_mode="HTML"),
+        InputMediaPhoto(
+            offline_photo,
+            caption="photo 3",
+            caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)],
+        ),
+    ]
+
+
+@pytest.fixture(scope="module")
+def offline_media_group_no_caption_args(offline_photo, offline_thumb):
+    return [
+        InputMediaPhoto(offline_photo),
+        InputMediaPhoto(offline_thumb),
+        InputMediaPhoto(offline_photo),
+    ]
+
+
+@pytest.fixture(scope="module")
+def offline_media_group_no_caption_only_caption_entities(offline_photo):
+    return [
+        InputMediaPhoto(offline_photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
+        InputMediaPhoto(offline_photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
+    ]
+
+
+@pytest.fixture(scope="module")
+def offline_media_group_no_caption_only_parse_mode(offline_photo, offline_thumb):
+    return [
+        InputMediaPhoto(offline_photo, parse_mode="Markdown"),
+        InputMediaPhoto(offline_thumb, parse_mode="HTML"),
+    ]
+
+
+@pytest.fixture(scope="module")
 def media_group(photo, thumb):
     return [
         InputMediaPhoto(photo, caption="*photo* 1", parse_mode="Markdown"),
         InputMediaPhoto(thumb, caption="<b>photo</b> 2", parse_mode="HTML"),
         InputMediaPhoto(
-            photo, caption="photo 3", caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]
+            photo,
+            caption="photo 3",
+            caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)],
         ),
     ]
 
 
 @pytest.fixture(scope="module")
 def media_group_no_caption_args(photo, thumb):
-    return [InputMediaPhoto(photo), InputMediaPhoto(thumb), InputMediaPhoto(photo)]
+    return [
+        InputMediaPhoto(photo),
+        InputMediaPhoto(thumb),
+        InputMediaPhoto(photo),
+    ]
 
 
 @pytest.fixture(scope="module")
@@ -1465,14 +1509,14 @@ class TestSendMediaGroupWithoutRequest:
         self,
         offline_bot,
         chat_id,
-        media_group,
-        media_group_no_caption_only_caption_entities,
-        media_group_no_caption_only_parse_mode,
+        offline_media_group,
+        offline_media_group_no_caption_only_caption_entities,
+        offline_media_group_no_caption_only_parse_mode,
     ):
         for group in (
-            media_group,
-            media_group_no_caption_only_caption_entities,
-            media_group_no_caption_only_parse_mode,
+            offline_media_group,
+            offline_media_group_no_caption_only_caption_entities,
+            offline_media_group_no_caption_only_parse_mode,
         ):
             with pytest.raises(
                 ValueError,
@@ -1558,7 +1602,7 @@ class TestSendMediaGroupWithoutRequest:
         indirect=["default_bot"],
     )
     async def test_send_media_group_default_quote_parse_mode(
-        self, default_bot, chat_id, media_group, custom, monkeypatch
+        self, default_bot, chat_id, offline_media_group, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -1572,7 +1616,7 @@ class TestSendMediaGroupWithoutRequest:
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.send_media_group(
-            chat_id, media_group, reply_parameters=ReplyParameters(**kwargs)
+            chat_id, offline_media_group, reply_parameters=ReplyParameters(**kwargs)
         )
 
 
