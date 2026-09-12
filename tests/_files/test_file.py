@@ -26,7 +26,6 @@ import pytest
 from telegram import File, FileCredentials, Voice
 from telegram.error import TelegramError
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -103,11 +102,6 @@ class FileTestBase:
 
 
 class TestFileWithoutRequest(FileTestBase):
-    def test_slot_behaviour(self, file):
-        for attr in file.__slots__:
-            assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.file_id,

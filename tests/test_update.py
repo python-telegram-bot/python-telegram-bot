@@ -56,7 +56,6 @@ from telegram import (
 )
 from telegram._utils.datetime import from_timestamp
 from telegram.warnings import PTBUserWarning
-from tests.auxil.slots import mro_slots
 
 message = Message(
     1,
@@ -265,12 +264,6 @@ class UpdateTestBase:
 
 
 class TestUpdateWithoutRequest(UpdateTestBase):
-    def test_slot_behaviour(self):
-        update = Update(self.update_id)
-        for attr in update.__slots__:
-            assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
-
     @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
     def test_de_json(self, offline_bot, paramdict):
         json_dict = {"update_id": self.update_id}

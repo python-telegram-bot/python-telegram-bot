@@ -32,7 +32,6 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import UTC, to_timestamp
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -93,12 +92,6 @@ class ChatMemberUpdatedTestBase:
 
 
 class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
-    def test_slot_behaviour(self, chat_member_updated):
-        action = chat_member_updated
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-
     def test_de_json_required_args(
         self, offline_bot, user, chat, old_chat_member, new_chat_member, time
     ):

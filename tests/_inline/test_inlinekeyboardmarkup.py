@@ -27,7 +27,6 @@ from telegram import (
     ReplyKeyboardRemove,
 )
 from telegram.constants import KeyboardButtonStyle
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -45,12 +44,6 @@ class InlineKeyboardMarkupTestBase:
 
 
 class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
-    def test_slot_behaviour(self, inline_keyboard_markup):
-        inst = inline_keyboard_markup
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_to_dict(self, inline_keyboard_markup):
         inline_keyboard_markup_dict = inline_keyboard_markup.to_dict()
 

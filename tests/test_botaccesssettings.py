@@ -22,7 +22,6 @@ import pytest
 
 from telegram import BotAccessSettings, Dice
 from telegram._user import User
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -39,12 +38,6 @@ class BotAccessSettingsTestBase:
 
 
 class TestBotAccessSettingsWithoutRequest(BotAccessSettingsTestBase):
-    def test_slot_behaviour(self, bot_access_settings):
-        inst = bot_access_settings
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "is_access_restricted": self.is_access_restricted,

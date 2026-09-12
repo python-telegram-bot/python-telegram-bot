@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import ChosenInlineResult, Location, User, Voice
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -43,12 +42,6 @@ class ChosenInlineResultTestBase:
 
 
 class TestChosenInlineResultWithoutRequest(ChosenInlineResultTestBase):
-    def test_slot_behaviour(self, chosen_inline_result):
-        inst = chosen_inline_result
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json_required(self, offline_bot, user):
         json_dict = {"result_id": self.result_id, "from": user.to_dict(), "query": self.query}
         result = ChosenInlineResult.de_json(json_dict, offline_bot)

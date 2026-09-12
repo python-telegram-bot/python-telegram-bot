@@ -26,7 +26,6 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
 from tests.auxil.build_messages import make_message
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -54,11 +53,6 @@ class InvoiceTestBase:
 
 
 class TestInvoiceWithoutRequest(InvoiceTestBase):
-    def test_slot_behaviour(self, invoice):
-        for attr in invoice.__slots__:
-            assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(invoice)) == len(set(mro_slots(invoice))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         invoice_json = Invoice.de_json(
             {

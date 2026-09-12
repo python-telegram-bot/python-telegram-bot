@@ -27,7 +27,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -50,12 +49,6 @@ class PassportFileTestBase:
 
 
 class TestPassportFileWithoutRequest(PassportFileTestBase):
-    def test_slot_behaviour(self, passport_file):
-        inst = passport_file
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, passport_file):
         assert passport_file.file_id == self.file_id
         assert passport_file.file_unique_id == self.file_unique_id

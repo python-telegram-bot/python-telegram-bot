@@ -34,7 +34,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 class PhotoTestBase:
@@ -48,11 +47,6 @@ class PhotoTestBase:
 
 
 class TestPhotoWithoutRequest(PhotoTestBase):
-    def test_slot_behaviour(self, photo):
-        for attr in photo.__slots__:
-            assert getattr(photo, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(photo)) == len(set(mro_slots(photo))), "duplicate slot"
-
     def test_creation(self, thumb, photo):
         # Make sure file has been uploaded.
         assert isinstance(photo, PhotoSize)

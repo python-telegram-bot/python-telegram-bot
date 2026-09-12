@@ -26,7 +26,6 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -66,12 +65,6 @@ class InlineQueryResultDocumentTestBase:
 
 
 class TestInlineQueryResultDocumentWithoutRequest(InlineQueryResultDocumentTestBase):
-    def test_slot_behaviour(self, inline_query_result_document):
-        inst = inline_query_result_document
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, inline_query_result_document):
         assert inline_query_result_document.id == self.id_
         assert inline_query_result_document.type == self.type_

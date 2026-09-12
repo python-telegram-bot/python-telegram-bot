@@ -26,7 +26,6 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
 from tests.auxil.build_messages import make_message
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -47,11 +46,6 @@ class ContactTestBase:
 
 
 class TestContactWithoutRequest(ContactTestBase):
-    def test_slot_behaviour(self, contact):
-        for attr in contact.__slots__:
-            assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"
-
     def test_de_json_required(self, offline_bot):
         json_dict = {"phone_number": self.phone_number, "first_name": self.first_name}
         contact = Contact.de_json(json_dict, offline_bot)

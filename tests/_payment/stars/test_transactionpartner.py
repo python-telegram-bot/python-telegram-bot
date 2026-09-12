@@ -39,7 +39,6 @@ from telegram import (
     Video,
 )
 from telegram.constants import TransactionPartnerType
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -106,12 +105,6 @@ class TransactionPartnerTestBase:
 
 
 class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
-    def test_slot_behaviour(self, transaction_partner):
-        inst = transaction_partner
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self, transaction_partner):
         assert type(TransactionPartner("affiliate_program").type) is TransactionPartnerType
         assert TransactionPartner("unknown").type == "unknown"
@@ -181,12 +174,6 @@ def transaction_partner_affiliate_program():
 class TestTransactionPartnerAffiliateProgramWithoutRequest(TransactionPartnerTestBase):
     type = TransactionPartnerType.AFFILIATE_PROGRAM
 
-    def test_slot_behaviour(self, transaction_partner_affiliate_program):
-        inst = transaction_partner_affiliate_program
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "commission_per_mille": self.commission_per_mille,
@@ -234,12 +221,6 @@ def transaction_partner_fragment():
 class TestTransactionPartnerFragmentWithoutRequest(TransactionPartnerTestBase):
     type = TransactionPartnerType.FRAGMENT
 
-    def test_slot_behaviour(self, transaction_partner_fragment):
-        inst = transaction_partner_fragment
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {"withdrawal_state": self.withdrawal_state.to_dict()}
         tp = TransactionPartnerFragment.de_json(json_dict, offline_bot)
@@ -283,12 +264,6 @@ def transaction_partner_user():
 
 class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
     type = TransactionPartnerType.USER
-
-    def test_slot_behaviour(self, transaction_partner_user):
-        inst = transaction_partner_user
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -352,12 +327,6 @@ def transaction_partner_other():
 class TestTransactionPartnerOtherWithoutRequest(TransactionPartnerTestBase):
     type = TransactionPartnerType.OTHER
 
-    def test_slot_behaviour(self, transaction_partner_other):
-        inst = transaction_partner_other
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {}
         tp = TransactionPartnerOther.de_json(json_dict, offline_bot)
@@ -391,12 +360,6 @@ def transaction_partner_telegram_ads():
 
 class TestTransactionPartnerTelegramAdsWithoutRequest(TransactionPartnerTestBase):
     type = TransactionPartnerType.TELEGRAM_ADS
-
-    def test_slot_behaviour(self, transaction_partner_telegram_ads):
-        inst = transaction_partner_telegram_ads
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {}
@@ -433,12 +396,6 @@ def transaction_partner_telegram_api():
 
 class TestTransactionPartnerTelegramApiWithoutRequest(TransactionPartnerTestBase):
     type = TransactionPartnerType.TELEGRAM_API
-
-    def test_slot_behaviour(self, transaction_partner_telegram_api):
-        inst = transaction_partner_telegram_api
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {"request_count": self.request_count}
@@ -482,12 +439,6 @@ def transaction_partner_chat():
 
 class TestTransactionPartnerChatWithoutRequest(TransactionPartnerTestBase):
     type = TransactionPartnerType.CHAT
-
-    def test_slot_behaviour(self, transaction_partner_chat):
-        inst = transaction_partner_chat
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {

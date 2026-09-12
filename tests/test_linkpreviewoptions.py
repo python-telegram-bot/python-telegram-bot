@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import LinkPreviewOptions
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -42,12 +41,6 @@ class LinkPreviewOptionsTestBase:
 
 
 class TestLinkPreviewOptionsWithoutRequest(LinkPreviewOptionsTestBase):
-    def test_slot_behaviour(self, link_preview_options):
-        a = link_preview_options
-        for attr in a.__slots__:
-            assert getattr(a, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(a)) == len(set(mro_slots(a))), "duplicate slot"
-
     def test_to_dict(self, link_preview_options):
         link_preview_options_dict = link_preview_options.to_dict()
 

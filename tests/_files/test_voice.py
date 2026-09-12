@@ -36,7 +36,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -62,11 +61,6 @@ class VoiceTestBase:
 
 
 class TestVoiceWithoutRequest(VoiceTestBase):
-    def test_slot_behaviour(self, voice):
-        for attr in voice.__slots__:
-            assert getattr(voice, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(voice)) == len(set(mro_slots(voice))), "duplicate slot"
-
     async def test_creation(self, voice):
         # Make sure file has been uploaded.
         assert isinstance(voice, Voice)

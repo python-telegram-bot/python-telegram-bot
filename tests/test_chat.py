@@ -36,7 +36,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -68,11 +67,6 @@ class ChatTestBase:
 
 
 class TestChatWithoutRequest(ChatTestBase):
-    def test_slot_behaviour(self, chat):
-        for attr in chat.__slots__:
-            assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,

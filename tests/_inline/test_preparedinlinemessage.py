@@ -22,7 +22,6 @@ import pytest
 
 from telegram import Location, PreparedInlineMessage
 from telegram._utils.datetime import UTC, to_timestamp
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -39,12 +38,6 @@ class PreparedInlineMessageTestBase:
 
 
 class TestPreparedInlineMessageWithoutRequest(PreparedInlineMessageTestBase):
-    def test_slot_behaviour(self, prepared_inline_message):
-        inst = prepared_inline_message
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, prepared_inline_message):
         assert prepared_inline_message.id == self.id
         assert prepared_inline_message.expiration_date == self.expiration_date

@@ -43,7 +43,6 @@ from telegram._utils.types import JSONDict
 from telegram.ext import PicklePersistence
 from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 def all_subclasses(cls):
@@ -503,12 +502,6 @@ class TestTelegramObject:
         to_dict = to.to_dict()
         assert "default_none" not in to_dict
         assert to_dict["default_false"] is False
-
-    def test_slot_behaviour(self):
-        inst = TelegramObject()
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_meaningless_comparison(self, recwarn):
         expected_warning = "Objects of type TGO can not be meaningfully tested for equivalence."

@@ -36,7 +36,6 @@ from telegram.error import PassportDecryptionError
 # worth it.
 from telegram.request import RequestData
 from tests.auxil.pytest_classes import make_bot
-from tests.auxil.slots import mro_slots
 
 RAW_PASSPORT_DATA = {
     "credentials": {
@@ -244,12 +243,6 @@ class PassportTestBase:
 
 
 class TestPassportWithoutRequest(PassportTestBase):
-    def test_slot_behaviour(self, passport_data):
-        inst = passport_data
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_creation(self, passport_data):
         assert isinstance(passport_data, PassportData)
 

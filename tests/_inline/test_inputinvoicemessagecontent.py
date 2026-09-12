@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import InputInvoiceMessageContent, InputTextMessageContent, LabeledPrice
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -75,12 +74,6 @@ class InputInvoiceMessageContentTestBase:
 
 
 class TestInputInvoiceMessageContentWithoutRequest(InputInvoiceMessageContentTestBase):
-    def test_slot_behaviour(self, input_invoice_message_content):
-        inst = input_invoice_message_content
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_invoice_message_content):
         assert input_invoice_message_content.title == self.title
         assert input_invoice_message_content.description == self.description

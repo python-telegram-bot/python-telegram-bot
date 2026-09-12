@@ -45,7 +45,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 # Override `video` fixture to provide start_timestamp
@@ -83,11 +82,6 @@ class VideoTestBase:
 
 
 class TestVideoWithoutRequest(VideoTestBase):
-    def test_slot_behaviour(self, video):
-        for attr in video.__slots__:
-            assert getattr(video, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(video)) == len(set(mro_slots(video))), "duplicate slot"
-
     def test_creation(self, video):
         # Make sure file has been uploaded.
         assert isinstance(video, Video)

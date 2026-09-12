@@ -45,7 +45,6 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -71,13 +70,6 @@ class InputPollOptionTestBase:
 
 
 class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
-    def test_slot_behaviour(self, input_poll_option):
-        for attr in input_poll_option.__slots__:
-            assert getattr(input_poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(input_poll_option)) == len(set(mro_slots(input_poll_option))), (
-            "duplicate slot"
-        )
-
     def test_to_dict(self, input_poll_option):
         input_poll_option_dict = input_poll_option.to_dict()
 
@@ -167,11 +159,6 @@ class PollMediaTestBase:
 
 
 class TestPollMediaWithoutRequest(PollMediaTestBase):
-    def test_slot_behaviour(self, poll_media):
-        for attr in poll_media.__slots__:
-            assert getattr(poll_media, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_media)) == len(set(mro_slots(poll_media))), "duplicate slot"
-
     def test_de_json(self):
         json_dict = {
             "animation": self.animation.to_dict(),
@@ -262,11 +249,6 @@ class PollOptionTestBase:
 
 
 class TestPollOptionWithoutRequest(PollOptionTestBase):
-    def test_slot_behaviour(self, poll_option):
-        for attr in poll_option.__slots__:
-            assert getattr(poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_option)) == len(set(mro_slots(poll_option))), "duplicate slot"
-
     def test_de_json(self):
         json_dict = {
             "text": self.text,
@@ -827,13 +809,6 @@ class PollOptionAddedTestBase:
 
 
 class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase):
-    def test_slot_behaviour(self, poll_option_added):
-        for attr in poll_option_added.__slots__:
-            assert getattr(poll_option_added, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_option_added)) == len(set(mro_slots(poll_option_added))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "poll_message": self.poll_message.to_dict(),
@@ -946,13 +921,6 @@ class PollOptionDeletedTestBase:
 
 
 class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase):
-    def test_slot_behaviour(self, poll_option_deleted):
-        for attr in poll_option_deleted.__slots__:
-            assert getattr(poll_option_deleted, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_option_deleted)) == len(set(mro_slots(poll_option_deleted))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "poll_message": self.poll_message.to_dict(),

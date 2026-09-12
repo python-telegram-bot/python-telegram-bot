@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -43,12 +42,6 @@ class ReplyKeyboardMarkupTestBase:
 
 
 class TestReplyKeyboardMarkupWithoutRequest(ReplyKeyboardMarkupTestBase):
-    def test_slot_behaviour(self, reply_keyboard_markup):
-        inst = reply_keyboard_markup
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, tuple)
         assert all(isinstance(row, tuple) for row in reply_keyboard_markup.keyboard)

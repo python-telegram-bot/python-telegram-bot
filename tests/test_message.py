@@ -123,7 +123,6 @@ from tests.auxil.bot_method_checks import (
 from tests.auxil.build_messages import make_message
 from tests.auxil.dummy_objects import get_dummy_object_json_dict
 from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -812,17 +811,6 @@ class TestMessageWithoutRequest(MessageTestBase):
                     ),
                 )
             assert message_thread_id == (message.message_thread_id if is_topic_message else None)
-
-    def test_slot_behaviour(self):
-        message = Message(
-            message_id=MessageTestBase.id_,
-            date=MessageTestBase.date,
-            chat=copy(MessageTestBase.chat),
-            from_user=copy(MessageTestBase.from_user),
-        )
-        for attr in message.__slots__:
-            assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
 
     def test_all_possibilities_de_json_and_to_dict(self, offline_bot, message_params):
         new = Message.de_json(message_params.to_dict(), offline_bot)

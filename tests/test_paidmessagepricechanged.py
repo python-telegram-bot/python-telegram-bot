@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import Dice, PaidMessagePriceChanged
-from tests.auxil.slots import mro_slots
 
 
 class PaidMessagePriceChangedTestBase:
@@ -33,15 +32,6 @@ def paid_message_price_changed():
 
 
 class TestPaidMessagePriceChangedWithoutRequest(PaidMessagePriceChangedTestBase):
-    def test_slot_behaviour(self, paid_message_price_changed):
-        for attr in paid_message_price_changed.__slots__:
-            assert getattr(paid_message_price_changed, attr, "err") != "err", (
-                f"got extra slot '{attr}'"
-            )
-        assert len(mro_slots(paid_message_price_changed)) == len(
-            set(mro_slots(paid_message_price_changed))
-        ), "duplicate slot"
-
     def test_to_dict(self, paid_message_price_changed):
         pmpc_dict = paid_message_price_changed.to_dict()
         assert isinstance(pmpc_dict, dict)

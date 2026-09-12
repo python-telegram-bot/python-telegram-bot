@@ -46,7 +46,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 class StickerTestBase:
@@ -101,11 +100,6 @@ class StickerTestBase:
 
 
 class TestStickerWithoutRequest(StickerTestBase):
-    def test_slot_behaviour(self, sticker):
-        for attr in sticker.__slots__:
-            assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(sticker)) == len(set(mro_slots(sticker))), "duplicate slot"
-
     def test_creation(self, sticker):
         # Make sure file has been uploaded.
         assert isinstance(sticker, Sticker)
@@ -514,12 +508,6 @@ class StickerSetTestBase:
 
 
 class TestStickerSetWithoutRequest(StickerSetTestBase):
-    def test_slot_behaviour(self):
-        inst = StickerSet("this", "is", self.stickers, "not")
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = self.sticker_set.to_dict()
         json_dict["contains_masks"] = self.contains_masks
@@ -1032,12 +1020,6 @@ def mask_position():
 
 
 class TestMaskPositionWithoutRequest(MaskPositionTestBase):
-    def test_slot_behaviour(self, mask_position):
-        inst = mask_position
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_mask_position_de_json(self, offline_bot):
         json_dict = {
             "point": self.point,

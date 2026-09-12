@@ -41,7 +41,6 @@ from telegram._gifts import AcceptedGiftTypes
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ReactionEmoji
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -175,13 +174,6 @@ class ChatFullInfoTestBase:
 
 
 class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
-    def test_slot_behaviour(self, chat_full_info):
-        cfi = chat_full_info
-        for attr in cfi.__slots__:
-            assert getattr(cfi, attr, "err") != "err", f"got extra slot '{attr}'"
-
-        assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,

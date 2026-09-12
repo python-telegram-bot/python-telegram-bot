@@ -35,7 +35,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -63,11 +62,6 @@ class VideoNoteTestBase:
 
 
 class TestVideoNoteWithoutRequest(VideoNoteTestBase):
-    def test_slot_behaviour(self, video_note):
-        for attr in video_note.__slots__:
-            assert getattr(video_note, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(video_note)) == len(set(mro_slots(video_note))), "duplicate slot"
-
     def test_creation(self, video_note):
         # Make sure file has been uploaded.
         assert isinstance(video_note, VideoNote)

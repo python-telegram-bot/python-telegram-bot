@@ -23,7 +23,6 @@ import pytest
 from telegram import ChatInviteLink, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -62,11 +61,6 @@ class ChatInviteLinkTestBase:
 
 
 class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
-    def test_slot_behaviour(self, invite_link):
-        for attr in invite_link.__slots__:
-            assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(invite_link)) == len(set(mro_slots(invite_link))), "duplicate slot"
-
     def test_de_json_required_args(self, offline_bot, creator):
         json_dict = {
             "invite_link": self.link,

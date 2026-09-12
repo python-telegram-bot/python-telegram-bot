@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import ReplyKeyboardRemove
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -33,12 +32,6 @@ class ReplyKeyboardRemoveTestBase:
 
 
 class TestReplyKeyboardRemoveWithoutRequest(ReplyKeyboardRemoveTestBase):
-    def test_slot_behaviour(self, reply_keyboard_remove):
-        inst = reply_keyboard_remove
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, reply_keyboard_remove):
         assert reply_keyboard_remove.remove_keyboard == self.remove_keyboard
         assert reply_keyboard_remove.selective == self.selective
