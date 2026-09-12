@@ -1180,12 +1180,49 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
     ) -> Message:
-        """Send a structured rich message.
+        """Use this method to send a structured rich message.
 
-        Rich messages support headings, lists, tables, quotations, mathematical expressions,
-        media blocks, details blocks, and advanced formatting. Requires Bot API 10.1 or newer.
+        Rich messages can contain headings, lists, tables, quotations, mathematical expressions,
+        collapsible sections, media blocks, and other advanced formatting. Requires Telegram Bot
+        API 10.1 or later.
 
         .. versionadded:: 22.9
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            rich_message (:class:`telegram.InputRichMessage`): Rich content to send.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            reply_markup (:class:`telegram.InlineKeyboardMarkup` | \
+                :class:`telegram.ReplyKeyboardMarkup` | \
+                :class:`telegram.ReplyKeyboardRemove` | :class:`telegram.ForceReply`, optional):
+                Additional interface options for the message.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+            business_connection_id (:obj:`str`, optional): |business_id_str|
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+            allow_paid_broadcast (:obj:`bool`, optional): |allow_paid_broadcast|
+            direct_messages_topic_id (:obj:`int`, optional): |direct_messages_topic_id|
+            suggested_post_parameters (:class:`telegram.SuggestedPostParameters`, optional):
+                |suggested_post_parameters|
+
+        Keyword Args:
+            read_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`.
+            write_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`.
+            connect_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`.
+            pool_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.Message`: The sent rich message.
+
+        Raises:
+            :class:`telegram.error.TelegramError`: If Telegram rejects the request.
         """
         data: JSONDict = {"chat_id": chat_id, "rich_message": rich_message}
         return await self._send_message(
@@ -1223,12 +1260,47 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
     ) -> bool:
-        """Stream a partial rich message while an AI-style response is generated.
+        """Use this method to stream a partial rich message while content is being generated.
 
-        Drafts are ephemeral. Call :meth:`send_rich_message` with the final content to persist it.
-        Requires Bot API 10.1; ``can_stop`` and ``keep_on_stop`` require Bot API 10.3.
+        The draft is ephemeral and serves as a temporary preview for up to 30 seconds. Call
+        :meth:`send_rich_message` with the complete content to persist the result in the chat.
+        Changes sent with the same :paramref:`draft_id` are animated. Requires Telegram Bot API
+        10.1 or later. The :paramref:`can_stop` and :paramref:`keep_on_stop` parameters require
+        Bot API 10.3 or later.
 
         .. versionadded:: 22.9
+
+        Args:
+            chat_id (:obj:`int`): Unique identifier of the target private chat.
+            draft_id (:obj:`int`): Non-zero identifier for the draft. Reuse the same identifier
+                when updating an existing streamed draft.
+            rich_message (:class:`telegram.InputRichMessage`): Partial rich content to display.
+                New file uploads and explicit media URLs are not supported for drafts.
+            message_thread_id (:obj:`int`, optional): Unique identifier of the target message
+                thread.
+            can_stop (:obj:`bool`, optional): Show a control that allows the recipient to stop
+                further draft updates.
+            keep_on_stop (:obj:`bool`, optional): Keep the latest draft temporarily when the
+                recipient stops generation. To persist it, send a regular rich message.
+
+        Keyword Args:
+            read_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`.
+            write_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`.
+            connect_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`.
+            pool_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            ValueError: If :paramref:`draft_id` is zero.
+            :class:`telegram.error.TelegramError`: If Telegram rejects the request.
         """
         if draft_id == 0:
             raise ValueError("draft_id must be non-zero.")

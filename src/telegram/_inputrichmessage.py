@@ -21,8 +21,17 @@ class InputRichMessage(TelegramObject):
     """Describes a rich message to be sent.
 
     Exactly one of :paramref:`html`, :paramref:`markdown`, or :paramref:`blocks` must be supplied.
-    This initial send-side model accepts block and media dictionaries so applications can use new
-    Bot API block variants without waiting for a library release for every variant.
+    The :paramref:`blocks` and :paramref:`media` parameters accept Bot API objects represented as
+    dictionaries. This preserves compatibility with newly introduced rich block and media variants
+    while dedicated Python classes are added to the library.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal if their :attr:`html`, :attr:`markdown`, and :attr:`blocks` attributes are
+    equal.
+
+    Note:
+        Rich messages require Telegram Bot API 10.1 or later. The :paramref:`media` parameter and
+        block-based input require Bot API 10.2 or later.
 
     .. versionadded:: 22.9
 
@@ -36,8 +45,20 @@ class InputRichMessage(TelegramObject):
         skip_entity_detection (:obj:`bool`, optional): Disable automatic entity detection.
         api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to Telegram.
 
+    Attributes:
+        html (:obj:`str`): Optional. Rich content written using Telegram's rich HTML syntax.
+        markdown (:obj:`str`): Optional. Rich content written using Telegram's rich Markdown
+            syntax.
+        blocks (tuple[:obj:`dict`, ...]): Sequence of structured input-rich-block objects.
+        media (tuple[:obj:`dict`, ...]): Sequence of media objects referenced by rich HTML or
+            Markdown content.
+        is_rtl (:obj:`bool`): Optional. Whether right-to-left layout is requested.
+        skip_entity_detection (:obj:`bool`): Optional. Whether automatic entity detection is
+            disabled.
+
     Raises:
-        ValueError: If not exactly one content representation is supplied.
+        ValueError: If zero or multiple content representations are supplied, or if
+            :paramref:`blocks` is empty.
     """
 
     __slots__ = ("blocks", "html", "is_rtl", "markdown", "media", "skip_entity_detection")

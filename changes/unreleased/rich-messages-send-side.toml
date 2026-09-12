@@ -1,4 +1,4 @@
-features = "Add initial send-side Rich Messages support with `InputRichMessage`, `Bot.send_rich_message`, and `Bot.send_rich_message_draft`."
+features = "Add send-side Rich Messages support with `InputRichMessage`, `Bot.send_rich_message`, and `Bot.send_rich_message_draft`."
 [[pull_requests]]
 uid = "fork-rich-messages"
 author_uids = ["botstelegram7-cmyk"]
