@@ -12318,6 +12318,10 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
     """Alias for :meth:`send_message`"""
     sendMessageDraft = send_message_draft
     """Alias for :meth:`send_message_draft`"""
+    sendRichMessage = send_rich_message
+    """Alias for :meth:`send_rich_message`"""
+    sendRichMessageDraft = send_rich_message_draft
+    """Alias for :meth:`send_rich_message_draft`"""
     deleteMessage = delete_message
     """Alias for :meth:`delete_message`"""
     deleteMessages = delete_messages
