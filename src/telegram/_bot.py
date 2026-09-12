@@ -80,6 +80,7 @@ from telegram._gifts import AcceptedGiftTypes, Gift, Gifts
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._inline.preparedinlinemessage import PreparedInlineMessage
 from telegram._inputchecklist import InputChecklist
+from telegram._inputrichmessage import InputRichMessage
 from telegram._keyboardbutton import KeyboardButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
@@ -1151,6 +1152,97 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def send_rich_message(
+        self,
+        chat_id: int | str,
+        rich_message: InputRichMessage,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        reply_markup: "ReplyMarkup | None" = None,
+        message_thread_id: int | None = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        business_connection_id: str | None = None,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        direct_messages_topic_id: int | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> Message:
+        """Send a structured rich message.
+
+        Rich messages support headings, lists, tables, quotations, mathematical expressions,
+        media blocks, details blocks, and advanced formatting. Requires Bot API 10.1 or newer.
+
+        .. versionadded:: 22.9
+        """
+        data: JSONDict = {"chat_id": chat_id, "rich_message": rich_message}
+        return await self._send_message(
+            "sendRichMessage",
+            data,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            reply_markup=reply_markup,
+            message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
+            business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=direct_messages_topic_id,
+            suggested_post_parameters=suggested_post_parameters,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def send_rich_message_draft(
+        self,
+        chat_id: int,
+        draft_id: int,
+        rich_message: InputRichMessage,
+        message_thread_id: int | None = None,
+        can_stop: bool | None = None,
+        keep_on_stop: bool | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Stream a partial rich message while an AI-style response is generated.
+
+        Drafts are ephemeral. Call :meth:`send_rich_message` with the final content to persist it.
+        Requires Bot API 10.1; ``can_stop`` and ``keep_on_stop`` require Bot API 10.3.
+
+        .. versionadded:: 22.9
+        """
+        if draft_id == 0:
+            raise ValueError("draft_id must be non-zero.")
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "draft_id": draft_id,
+            "rich_message": rich_message,
+            "message_thread_id": message_thread_id,
+            "can_stop": can_stop,
+            "keep_on_stop": keep_on_stop,
+        }
+        return await self._post(
+            "sendRichMessageDraft",
+            data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
