@@ -20,7 +20,7 @@ import datetime as dtm
 
 import pytest
 
-from telegram import Bot, File, PassportElementError, PassportFile
+from telegram import Bot, File, FileCredentials, PassportElementError, PassportFile
 from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
@@ -90,6 +90,23 @@ class TestPassportFileWithoutRequest(PassportFileTestBase):
         assert pf_raw.file_date.tzinfo == UTC
         assert pf.file_date.tzinfo == UTC
         assert date_offset == tz_bot_offset
+
+    def test_de_json_decrypted(self, offline_bot):
+        json_dict = {
+            "file_id": self.file_id,
+            "file_unique_id": self.file_unique_id,
+            "file_size": self.file_size,
+            "file_date": to_timestamp(self.file_date),
+        }
+        credentials = FileCredentials("file_hash", "secret")
+
+        passport_file = PassportFile.de_json_decrypted(json_dict, offline_bot, credentials)
+
+        assert passport_file.file_date == self.file_date
+        assert passport_file._credentials.file_hash == credentials.file_hash
+        assert passport_file._credentials.secret == credentials.secret
+        assert passport_file._credentials.api_kwargs == credentials.api_kwargs
+        assert "credentials" not in json_dict
 
     def test_equality(self):
         a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)

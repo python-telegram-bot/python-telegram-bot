@@ -2329,29 +2329,36 @@ class TestApplication:
         """
 
         def thread_target():
-            asyncio.set_event_loop(asyncio.new_event_loop())
-            app = (
-                ApplicationBuilder().bot(offline_bot).application_class(PytestApplication).build()
-            )
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                app = (
+                    ApplicationBuilder()
+                    .bot(offline_bot)
+                    .application_class(PytestApplication)
+                    .build()
+                )
 
-            async def initialize(*args, **kwargs):
-                self.count += 1
-                raise exception_class(str(self.count))
+                async def initialize(*args, **kwargs):
+                    self.count += 1
+                    raise exception_class(str(self.count))
 
-            monkeypatch.setattr(app, "initialize", initialize)
-            method = functools.partial(
-                getattr(app, method_name),
-                bootstrap_retries=retries,
-                close_loop=False,
-                stop_signals=None,
-            )
+                monkeypatch.setattr(app, "initialize", initialize)
+                method = functools.partial(
+                    getattr(app, method_name),
+                    bootstrap_retries=retries,
+                    close_loop=False,
+                    stop_signals=None,
+                )
 
-            if exception_class == InvalidToken:
-                with pytest.raises(InvalidToken, match="1"):
-                    method()
-            else:
-                with pytest.raises(TelegramError, match=str(retries + 1)):
-                    method()
+                if exception_class == InvalidToken:
+                    with pytest.raises(InvalidToken, match="1"):
+                        method()
+                else:
+                    with pytest.raises(TelegramError, match=str(retries + 1)):
+                        method()
+            finally:
+                loop.close()
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -2368,42 +2375,46 @@ class TestApplication:
         """
 
         def thread_target():
-            asyncio.set_event_loop(asyncio.new_event_loop())
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
 
-            async def post_init(application):
-                application.stop_running()
+                async def post_init(application):
+                    application.stop_running()
 
-            app = (
-                ApplicationBuilder()
-                .bot(offline_bot)
-                .application_class(PytestApplication)
-                .post_init(post_init)
-                .build()
-            )
+                app = (
+                    ApplicationBuilder()
+                    .bot(offline_bot)
+                    .application_class(PytestApplication)
+                    .post_init(post_init)
+                    .build()
+                )
 
-            async def do_pass(*args, **kwargs):
-                pass
+                async def do_pass(*args, **kwargs):
+                    pass
 
-            monkeypatch.setattr(app.bot, "initialize", do_pass)
-            monkeypatch.setattr(app.bot, "delete_webhook", do_pass)
+                monkeypatch.setattr(app.bot, "initialize", do_pass)
+                monkeypatch.setattr(app.bot, "delete_webhook", do_pass)
 
-            original_initialize = app.initialize
+                original_initialize = app.initialize
 
-            async def initialize(*args, **kwargs):
-                if self.count >= 3:
-                    pytest.fail("Should be called only once. Test failed.")
+                async def initialize(*args, **kwargs):
+                    if self.count >= 3:
+                        pytest.fail("Should be called only once. Test failed.")
 
-                self.count += 1
-                if self.count == 1:
-                    raise TelegramError("Test Exception")
-                await original_initialize(*args, **kwargs)
+                    self.count += 1
+                    if self.count == 1:
+                        raise TelegramError("Test Exception")
+                    await original_initialize(*args, **kwargs)
 
-            monkeypatch.setattr(app, "initialize", initialize)
-            getattr(app, method_name)(
-                bootstrap_retries=-1,
-                close_loop=False,
-                stop_signals=None,
-            )
+                monkeypatch.setattr(app, "initialize", initialize)
+                getattr(app, method_name)(
+                    bootstrap_retries=-1,
+                    close_loop=False,
+                    stop_signals=None,
+                )
+            finally:
+                loop.close()
 
         thread = Thread(target=thread_target)
         thread.start()

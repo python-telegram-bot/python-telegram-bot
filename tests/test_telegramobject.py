@@ -20,14 +20,26 @@ import datetime as dtm
 import inspect
 import pickle
 import re
+from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType
 
 import pytest
 
-from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
+from telegram import (
+    Bot,
+    BotCommand,
+    Chat,
+    Message,
+    MessageOrigin,
+    MessageOriginUser,
+    PhotoSize,
+    TelegramObject,
+    User,
+)
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
+from telegram._utils.types import JSONDict
 from telegram.ext import PicklePersistence
 from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
@@ -46,6 +58,276 @@ def all_subclasses(cls):
 
 
 TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
+
+
+class _DeJsonTestObject(TelegramObject):
+    """Small subclass."""
+
+    __slots__ = ("value",)
+
+    def __init__(self, value: int, *, api_kwargs: JSONDict | None = None) -> None:
+        super().__init__(api_kwargs=api_kwargs)
+        self.value = value
+        self._freeze()
+
+
+class TestDeJsonWithoutRequest:
+    def test_timestamp_is_converted_to_datetime(self):
+        class TimestampedObject(TelegramObject):
+            def __init__(
+                self,
+                created_at: dtm.datetime,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.created_at = created_at
+
+        telegram_object = TimestampedObject.de_json({"created_at": 1_700_000_000})
+
+        assert telegram_object.created_at == dtm.datetime(
+            2023, 11, 14, 22, 13, 20, tzinfo=dtm.timezone.utc
+        )
+
+    def test_nested_object_is_deserialized_and_receives_bot(self, offline_bot):
+        class Container(TelegramObject):
+            def __init__(
+                self,
+                child: _DeJsonTestObject,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.child = child
+
+        container = Container.de_json({"child": {"value": 1}}, bot=offline_bot)
+
+        assert isinstance(container.child, _DeJsonTestObject)
+        assert container.child.value == 1
+        assert container.child.get_bot() is offline_bot
+
+    def test_sequence_of_objects_is_deserialized(self):
+        class Container(TelegramObject):
+            def __init__(
+                self,
+                children: Sequence[_DeJsonTestObject],
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.children = tuple(children)
+
+        container = Container.de_json({"children": [{"value": 1}, {"value": 2}]})
+
+        assert [child.value for child in container.children] == [1, 2]
+        assert all(isinstance(child, _DeJsonTestObject) for child in container.children)
+
+    def test_nested_sequences_of_objects_are_deserialized(self):
+        class Container(TelegramObject):
+            def __init__(
+                self,
+                rows: Sequence[Sequence[_DeJsonTestObject]],
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.rows = tuple(tuple(row) for row in rows)
+
+        container = Container.de_json({"rows": [[{"value": 1}], [{"value": 2}, {"value": 3}]]})
+
+        assert [[item.value for item in row] for row in container.rows] == [[1], [2, 3]]
+
+    def test_unparameterized_sequence_is_left_unchanged(self):
+        class Container(TelegramObject):
+            def __init__(
+                self,
+                values: Sequence,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.values = values
+
+        values = [1, 2]
+
+        assert Container.de_json({"values": values}).values is values
+
+    def test_none_is_not_deserialized_as_nested_object(self):
+        class Container(TelegramObject):
+            def __init__(
+                self,
+                child: _DeJsonTestObject | None,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.child = child
+
+        assert Container.de_json({"child": None}).child is None
+
+    def test_non_list_sequence_is_not_retransformed(self):
+        class Container(TelegramObject):
+            def __init__(
+                self,
+                children: Sequence[_DeJsonTestObject],
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.children = tuple(children)
+
+        prepared_child = _DeJsonTestObject(value=1)
+        container = Container.de_json({"children": (prepared_child,)})
+
+        assert container.children[0] is prepared_child
+
+    def test_from_is_renamed_without_mutating_input(self):
+        class Container(TelegramObject):
+            def __init__(
+                self,
+                from_user: _DeJsonTestObject,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.from_user = from_user
+
+        api_response = {"from": {"value": 1}}
+
+        container = Container.de_json(api_response)
+
+        assert container.from_user.value == 1
+        assert api_response == {"from": {"value": 1}}
+
+    def test_subclass_without_constructor_inherits_parent_plan(self):
+        class Parent(TelegramObject):
+            def __init__(
+                self,
+                child: _DeJsonTestObject,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.child = child
+
+        class FirstChild(Parent):
+            pass
+
+        class SecondChild(Parent):
+            pass
+
+        first_child = FirstChild.de_json({"child": {"value": 1}})
+        second_child = SecondChild.de_json({"child": {"value": 2}})
+
+        assert isinstance(first_child.child, _DeJsonTestObject)
+        assert first_child.child.value == 1
+        assert isinstance(second_child.child, _DeJsonTestObject)
+        assert second_child.child.value == 2
+
+    def test_removed_field_is_preserved_in_api_kwargs(self):
+        class ObjectWithRemovedField(TelegramObject):
+            __REMOVED_API_FIELDS__ = frozenset({"removed_field"})
+
+            def __init__(
+                self,
+                current_field: int,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.current_field = current_field
+
+        telegram_object = ObjectWithRemovedField.de_json({"current_field": 1, "removed_field": 2})
+
+        assert telegram_object.current_field == 1
+        assert telegram_object.api_kwargs == {"removed_field": 2}
+
+    def test_unknown_field_is_preserved_in_api_kwargs(self):
+        user = User.de_json(
+            {
+                "id": 1,
+                "is_bot": False,
+                "first_name": "Ada",
+                "future_field": "future value",
+            }
+        )
+
+        assert user.api_kwargs == {"future_field": "future value"}
+
+    def test_unknown_field_does_not_replace_constructor_default(self):
+        class ObjectWithDefault(TelegramObject):
+            def __init__(
+                self,
+                required_field: int,
+                defaulted_field: str = "constructor default",
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.required_field = required_field
+                self.defaulted_field = defaulted_field
+
+        telegram_object = ObjectWithDefault.de_json({"required_field": 1, "future_field": 2})
+
+        assert telegram_object.defaulted_field == "constructor default"
+        assert telegram_object.api_kwargs == {"future_field": 2}
+
+    def test_missing_required_scalar_defaults_to_none(self):
+        class ObjectWithRequiredField(TelegramObject):
+            def __init__(
+                self,
+                required_field: int,
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.required_field = required_field
+
+        telegram_object = ObjectWithRequiredField.de_json({})
+
+        assert telegram_object.required_field is None
+
+    def test_missing_required_sequence_defaults_to_empty_tuple(self):
+        class ObjectWithRequiredSequence(TelegramObject):
+            def __init__(
+                self,
+                required_values: Sequence[int],
+                *,
+                api_kwargs: JSONDict | None = None,
+            ) -> None:
+                super().__init__(api_kwargs=api_kwargs)
+                self.required_values = tuple(required_values)
+
+        telegram_object = ObjectWithRequiredSequence.de_json({})
+
+        assert telegram_object.required_values == ()
+
+    def test_known_type_dispatches_to_subclass(self):
+        origin = MessageOrigin.de_json(
+            {
+                "type": "user",
+                "date": 1_700_000_000,
+                "sender_user": {"id": 1, "is_bot": False, "first_name": "Ada"},
+            }
+        )
+
+        assert isinstance(origin, MessageOriginUser)
+        assert origin.sender_user.id == 1
+
+    def test_unknown_type_stays_on_base_class(self):
+        origin = MessageOrigin.de_json(
+            {"type": "future_origin", "date": 1_700_000_000, "future_field": 1}
+        )
+
+        assert type(origin) is MessageOrigin
+        assert origin.type == "future_origin"
+        assert origin.api_kwargs == {"future_field": 1}
+
+    def test_de_list_returns_deserialized_tuple(self):
+        telegram_objects = _DeJsonTestObject.de_list([{"value": 1}, {"value": 2}])
+
+        assert isinstance(telegram_objects, tuple)
+        assert [telegram_object.value for telegram_object in telegram_objects] == [1, 2]
 
 
 class TestTelegramObject:

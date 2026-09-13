@@ -19,19 +19,13 @@
 """This module contains an object that represents a Telegram ChatJoinRequest."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import de_json_optional
-from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ChatJoinRequest(TelegramObject):
@@ -129,21 +123,6 @@ class ChatJoinRequest(TelegramObject):
         self._id_attrs = (self.chat, self.from_user, self.date)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatJoinRequest":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # Get the local timezone from the bot if it has defaults
-        loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-        data["from_user"] = de_json_optional(data.pop("from", None), User, bot)
-        data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
-        data["invite_link"] = de_json_optional(data.get("invite_link"), ChatInviteLink, bot)
-
-        return super().de_json(data=data, bot=bot)
 
     async def approve(
         self,

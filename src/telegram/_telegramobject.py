@@ -22,14 +22,20 @@ import contextlib
 import datetime as dtm
 import inspect
 import json
-from collections.abc import Iterator, Mapping, Sized
+from collections.abc import Iterator, Mapping, Sequence, Sized
 from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast, get_args, get_origin
 
-from telegram._utils.datetime import to_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
+from telegram._utils.de_json import (
+    build_sequence_transformer,
+    get_telegram_namespace,
+    resolve_annotation,
+    unwrap_optional,
+)
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -39,6 +45,7 @@ if TYPE_CHECKING:
 
 Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
 Tele = TypeVar("Tele", bound="TelegramObject")
+_DATETIME_FIELD = object()  # Sentinel that marks datetime fields in the de_json plan.
 
 
 class TelegramObject:
@@ -80,13 +87,31 @@ class TelegramObject:
 
     __slots__ = ("_bot", "_frozen", "_id_attrs", "api_kwargs")
 
-    # Used to cache the names of the parameters of the __init__ method of the class
-    # Must be a private attribute to avoid name clashes between subclasses
+    # Names accepted by this class' __init__. Built alongside the transformation plan.
     __INIT_PARAMS: ClassVar[set[str]] = set()
-    # Used to check if __INIT_PARAMS has been set for the current class. Unfortunately, we can't
-    # just check if `__INIT_PARAMS is None`, since subclasses use the parent class' __INIT_PARAMS
-    # unless it's overridden
-    __INIT_PARAMS_CHECK: type["TelegramObject"] | None = None
+
+    # Per-class de_json plan built once by _build_plan().
+    # Maps parameter name → transform target:
+    #   _DATETIME_FIELD sentinel  → from_timestamp(value, tzinfo)
+    #   TelegramObject subclass   → cls.de_json(value, bot)
+    #   callable(value, bot)      → Sequence transform (from build_sequence_transformer)
+    __DE_JSON_PLAN__: ClassVar[dict[str, Any]] = {}
+
+    # Forward-compatibility defaults for required __init__ parameters. If the Bot API stops
+    # sending one of them, _de_json uses () for sequences and None for every other type.
+    __DE_JSON_COMPAT__: ClassVar[Mapping[str, object]] = MappingProxyType({})
+
+    # Subclasses may declare field names that Telegram still returns for backwards
+    # compatibility but that are no longer part of the PTB model. Those fields will
+    # be intercepted by de_json and forwarded into api_kwargs before construction.
+    __REMOVED_API_FIELDS__: ClassVar[frozenset[str]] = frozenset()
+
+    # Delegator base classes (e.g. TransactionPartner) may define a dispatch mapping to route
+    # de_json to the correct subclass.
+    # Format: (dispatch_key, {value: "ClassName", ...}).
+    # The dispatch_key is the JSON field name (e.g. "type", "source", "status").
+    # The values are class name strings, e.g. "TransactionPartnerChat".
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = None
 
     def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
         # Setting _frozen to `False` here means that classes without arguments still need to
@@ -386,6 +411,78 @@ class TelegramObject:
         return data.copy()
 
     @classmethod
+    def _build_plan(cls) -> dict[str, Any]:
+        """Build the de_json transformation plan from ``__init__`` type annotations.
+
+        Called once per class on the first :meth:`de_json` invocation. By that time, runtime
+        imports are available for resolving the annotations that describe incoming fields.
+
+        The resulting ``dict`` maps parameter names to their transform targets.
+        Four kinds of transforms are recognised:
+
+        * ``datetime`` fields  → :func:`~telegram._utils.datetime.from_timestamp`
+        * ``TelegramObject`` fields  → ``TargetCls.de_json(...)``
+        * ``Sequence[TelegramObject]`` fields  → ``TargetCls.de_list(...)``
+        * ``Sequence[Sequence[TelegramObject]]`` fields  → nested de_list
+        """
+        init_fn = cls.__dict__.get("__init__")
+        if init_fn is None:
+            # No own __init__: inherit the nearest ancestor's plan. This is true for e.g. Chat
+            parent = cast("type[TelegramObject]", cls.__mro__[1])
+            if "__DE_JSON_PLAN__" not in parent.__dict__:
+                parent._build_plan()  # pylint: disable=protected-access, no-member
+            cls.__INIT_PARAMS = parent.__INIT_PARAMS  # pylint: disable=no-member,protected-access
+            cls.__DE_JSON_PLAN__ = parent.__DE_JSON_PLAN__  # pylint: disable=no-member
+            cls.__DE_JSON_COMPAT__ = parent.__DE_JSON_COMPAT__  # pylint: disable=no-member
+            return cls.__DE_JSON_PLAN__
+
+        plan: dict[str, Any] = {}
+        compatibility_defaults: dict[str, object] = {}
+        globalns: dict[str, object] = getattr(init_fn, "__globals__", {})
+        tg_ns = get_telegram_namespace()
+        sig = inspect.signature(init_fn)
+        cls.__INIT_PARAMS = set(sig.parameters) - {"self"}
+
+        for name, param in sig.parameters.items():
+            if name in ("self", "api_kwargs") or param.kind in (
+                param.VAR_POSITIONAL,
+                param.VAR_KEYWORD,
+            ):
+                continue
+
+            ann = resolve_annotation(param.annotation, globalns, tg_ns)
+            inner = unwrap_optional(ann)
+            origin = get_origin(inner)
+
+            if param.default is inspect.Parameter.empty:
+                compatibility_defaults[name] = () if origin is Sequence else None
+
+            if inner is dtm.datetime:
+                plan[name] = _DATETIME_FIELD
+            elif isinstance(inner, type) and issubclass(inner, TelegramObject):
+                plan[name] = inner
+            elif origin is Sequence:
+                args = get_args(inner)
+                if not args:
+                    continue
+                fn = build_sequence_transformer(args[0], globalns, tg_ns, TelegramObject)
+                if fn is not None:
+                    plan[name] = fn
+
+        cls.__DE_JSON_PLAN__ = plan
+        cls.__DE_JSON_COMPAT__ = MappingProxyType(compatibility_defaults)
+
+        # Pre-resolve any string class names in the dispatch mapping so that
+        # de_json() can look up the target class directly without string checks.
+        if cls.__DE_JSON_DISPATCH__:
+            _, dispatch_mapping = cls.__DE_JSON_DISPATCH__
+            for key, value in dispatch_mapping.items():
+                if isinstance(value, str):
+                    dispatch_mapping[key] = tg_ns[value]  # type: ignore[assignment]
+
+        return plan
+
+    @classmethod
     def _de_json(
         cls: type[Tele_co],
         data: JSONDict,
@@ -395,19 +492,21 @@ class TelegramObject:
         # try-except is significantly faster in case we already have a correct argument set
         try:
             obj = cls(**data, api_kwargs=api_kwargs)
-        except TypeError as exc:
-            if "__init__() got an unexpected keyword argument" not in str(exc):
+        except TypeError:
+            unknown_field_names = data.keys() - cls.__INIT_PARAMS
+            missing_required_parameter_names = cls.__DE_JSON_COMPAT__.keys() - data.keys()
+            if not unknown_field_names and not missing_required_parameter_names:
                 raise
-
-            if cls.__INIT_PARAMS_CHECK is not cls:
-                signature = inspect.signature(cls)
-                cls.__INIT_PARAMS = set(signature.parameters.keys())
-                cls.__INIT_PARAMS_CHECK = cls
 
             api_kwargs = api_kwargs or {}
             existing_kwargs: JSONDict = {}
             for key, value in data.items():
                 (existing_kwargs if key in cls.__INIT_PARAMS else api_kwargs)[key] = value
+
+            # Forward-compat: if the API stopped sending a field PTB requires,
+            # default sequences to () and everything else to None.
+            for key in missing_required_parameter_names:
+                existing_kwargs[key] = cls.__DE_JSON_COMPAT__[key]
 
             obj = cls(api_kwargs=api_kwargs, **existing_kwargs)
 
@@ -430,7 +529,55 @@ class TelegramObject:
             The Telegram object.
 
         """
-        return cls._de_json(data=data, bot=bot)
+        # Build the plan lazily (once per class).
+        if "__DE_JSON_PLAN__" not in cls.__dict__:
+            cls._build_plan()
+        plan = cls.__DE_JSON_PLAN__
+
+        # Fast path: no dispatch, no removed fields, empty plan → skip data.copy()
+        if not plan and not cls.__DE_JSON_DISPATCH__ and not cls.__REMOVED_API_FIELDS__:
+            return cls._de_json(data=data, bot=bot)
+
+        # We'll mutate data below (rename, pop, transform), so copy first.
+        data = cls._parse_data(data)
+
+        # Dispatch to subclass for delegator classes (e.g. TransactionPartner, ChatMember).
+        if cls.__DE_JSON_DISPATCH__:
+            dispatch_key, dispatch_mapping = cls.__DE_JSON_DISPATCH__
+            target_cls: Tele_co = dispatch_mapping.get(  # type: ignore[assignment]
+                data.get(dispatch_key)  # type: ignore[arg-type]
+            )
+            if target_cls is not None:
+                data.pop(dispatch_key)
+                return target_cls.de_json(data=data, bot=bot)
+
+        # Move removed/legacy API fields into api_kwargs
+        api_kwargs: JSONDict | None = None
+        if cls.__REMOVED_API_FIELDS__:
+            removed = {f: data.pop(f) for f in cls.__REMOVED_API_FIELDS__ if f in data}
+            if removed:
+                api_kwargs = removed
+
+        # Rename "from" → "from_user" before the transform loop.
+        if "from_user" in plan and "from" in data:
+            data["from_user"] = data.pop("from")
+
+        # Let's finally apply the transformations:
+        if plan:
+            # Compute tzinfo once for all datetime fields, if any
+            tz = extract_tzinfo_from_defaults(bot)
+            for key in data:  # Only loop through keys returned by the API
+                if key in plan and data[key] is not None:  # Should we transform this field?
+                    target = plan[key]  # The transform target for this field
+                    if target is _DATETIME_FIELD:  # timestamp → datetime
+                        data[key] = from_timestamp(data[key], tzinfo=tz)
+                    elif isinstance(target, type):  # Target is a TelegramObject subclass → de_json
+                        data[key] = target.de_json(data[key], bot)  # type: ignore[attr-defined]
+                    else:
+                        # Sequence transform callable (e.g. de_list)
+                        data[key] = target(data[key], bot)
+
+        return cls._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
     @classmethod
     def de_list(

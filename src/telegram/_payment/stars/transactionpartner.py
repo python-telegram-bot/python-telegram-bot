@@ -20,30 +20,28 @@
 """This module contains the classes for Telegram Stars transaction partners."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._chat import Chat
 from telegram._gifts import Gift
 from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
-from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import (
-    de_json_optional,
-    de_list_optional,
     parse_sequence_arg,
     to_timedelta,
 )
 from telegram._utils.types import JSONDict, TimePeriod
 
 from .affiliateinfo import AffiliateInfo
-from .revenuewithdrawalstate import RevenueWithdrawalState
 
 if TYPE_CHECKING:
     import datetime as dtm
 
-    from telegram import Bot
+    from telegram._user import User
+
+    from .revenuewithdrawalstate import RevenueWithdrawalState
 
 
 class TransactionPartner(TelegramObject):
@@ -75,6 +73,19 @@ class TransactionPartner(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "affiliate_program": "TransactionPartnerAffiliateProgram",
+            "chat": "TransactionPartnerChat",
+            "fragment": "TransactionPartnerFragment",
+            "other": "TransactionPartnerOther",
+            "telegram_ads": "TransactionPartnerTelegramAds",
+            "telegram_api": "TransactionPartnerTelegramApi",
+            "user": "TransactionPartnerUser",
+        },
+    )
+
     AFFILIATE_PROGRAM: Final[str] = constants.TransactionPartnerType.AFFILIATE_PROGRAM
     """:const:`telegram.constants.TransactionPartnerType.AFFILIATE_PROGRAM`
 
@@ -102,36 +113,6 @@ class TransactionPartner(TelegramObject):
 
         self._id_attrs = (self.type,)
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TransactionPartner":
-        """Converts JSON data to the appropriate :class:`TransactionPartner` object, i.e. takes
-        care of selecting the correct subclass.
-
-        Args:
-            data (dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
-
-        Returns:
-            The Telegram object.
-
-        """
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[TransactionPartner]] = {
-            cls.AFFILIATE_PROGRAM: TransactionPartnerAffiliateProgram,
-            cls.CHAT: TransactionPartnerChat,
-            cls.FRAGMENT: TransactionPartnerFragment,
-            cls.USER: TransactionPartnerUser,
-            cls.TELEGRAM_ADS: TransactionPartnerTelegramAds,
-            cls.TELEGRAM_API: TransactionPartnerTelegramApi,
-            cls.OTHER: TransactionPartnerOther,
-        }
-
-        if cls is TransactionPartner and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class TransactionPartnerAffiliateProgram(TransactionPartner):
@@ -177,17 +158,6 @@ class TransactionPartnerAffiliateProgram(TransactionPartner):
                 self.commission_per_mille,
             )
 
-    @classmethod
-    def de_json(
-        cls, data: JSONDict, bot: "Bot | None" = None
-    ) -> "TransactionPartnerAffiliateProgram":
-        """See :meth:`telegram.TransactionPartner.de_json`."""
-        data = cls._parse_data(data)
-
-        data["sponsor_user"] = de_json_optional(data.get("sponsor_user"), User, bot)
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
-
 
 class TransactionPartnerChat(TransactionPartner):
     """Describes a transaction with a chat.
@@ -232,16 +202,6 @@ class TransactionPartnerChat(TransactionPartner):
                 self.chat,
             )
 
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TransactionPartnerChat":
-        """See :meth:`telegram.TransactionPartner.de_json`."""
-        data = cls._parse_data(data)
-
-        data["chat"] = de_json_optional(data.get("chat"), Chat, bot)
-        data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
-
 
 class TransactionPartnerFragment(TransactionPartner):
     """Describes a withdrawal transaction with Fragment.
@@ -271,17 +231,6 @@ class TransactionPartnerFragment(TransactionPartner):
 
         with self._unfrozen():
             self.withdrawal_state: RevenueWithdrawalState | None = withdrawal_state
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TransactionPartnerFragment":
-        """See :meth:`telegram.TransactionPartner.de_json`."""
-        data = cls._parse_data(data)
-
-        data["withdrawal_state"] = de_json_optional(
-            data.get("withdrawal_state"), RevenueWithdrawalState, bot
-        )
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class TransactionPartnerUser(TransactionPartner):
@@ -447,18 +396,6 @@ class TransactionPartnerUser(TransactionPartner):
                 self.user,
                 self.transaction_type,
             )
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "TransactionPartnerUser":
-        """See :meth:`telegram.TransactionPartner.de_json`."""
-        data = cls._parse_data(data)
-
-        data["user"] = de_json_optional(data.get("user"), User, bot)
-        data["affiliate"] = de_json_optional(data.get("affiliate"), AffiliateInfo, bot)
-        data["paid_media"] = de_list_optional(data.get("paid_media"), PaidMedia, bot)
-        data["gift"] = de_json_optional(data.get("gift"), Gift, bot)
-
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
 
 class TransactionPartnerOther(TransactionPartner):

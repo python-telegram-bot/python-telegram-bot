@@ -18,15 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects with thumbnails"""
 
-from typing import TYPE_CHECKING, TypeVar
+from typing import TypeVar
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 # pylint: disable=invalid-name
 ThumbedMT_co = TypeVar("ThumbedMT_co", bound="_BaseThumbedMedium", covariant=True)
@@ -63,6 +59,11 @@ class _BaseThumbedMedium(_BaseMedium):
     """
 
     __slots__ = ("thumbnail",)
+    __REMOVED_API_FIELDS__ = frozenset(
+        {
+            "thumb",
+        }
+    )
 
     def __init__(
         self,
@@ -81,20 +82,3 @@ class _BaseThumbedMedium(_BaseMedium):
         )
 
         self.thumbnail: PhotoSize | None = thumbnail
-
-    @classmethod
-    def de_json(cls: type[ThumbedMT_co], data: JSONDict, bot: "Bot | None" = None) -> ThumbedMT_co:
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        # In case this wasn't already done by the subclass
-        if not isinstance(data.get("thumbnail"), PhotoSize):
-            data["thumbnail"] = de_json_optional(data.get("thumbnail"), PhotoSize, bot)
-
-        api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if data.get("thumb") is not None:
-            api_kwargs["thumb"] = data.pop("thumb")
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)

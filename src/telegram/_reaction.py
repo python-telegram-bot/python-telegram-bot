@@ -19,16 +19,12 @@
 # pylint: disable=redefined-builtin
 """This module contains objects that represents a Telegram ReactionType."""
 
-from typing import TYPE_CHECKING, Final, Literal
+from typing import ClassVar, Final, Literal
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.argumentparsing import de_json_optional
 from telegram._utils.types import JSONDict
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class ReactionType(TelegramObject):
@@ -54,6 +50,15 @@ class ReactionType(TelegramObject):
 
     __slots__ = ("type",)
 
+    __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
+        "type",
+        {
+            "emoji": "ReactionTypeEmoji",
+            "custom_emoji": "ReactionTypeCustomEmoji",
+            "paid": "ReactionTypePaid",
+        },
+    )
+
     EMOJI: Final[constants.ReactionType] = constants.ReactionType.EMOJI
     """:const:`telegram.constants.ReactionType.EMOJI`"""
     CUSTOM_EMOJI: Final[constants.ReactionType] = constants.ReactionType.CUSTOM_EMOJI
@@ -75,22 +80,6 @@ class ReactionType(TelegramObject):
         self.type: str = enum.get_member(constants.ReactionType, type, type)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ReactionType":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        _class_mapping: dict[str, type[ReactionType]] = {
-            cls.EMOJI: ReactionTypeEmoji,
-            cls.CUSTOM_EMOJI: ReactionTypeCustomEmoji,
-            cls.PAID: ReactionTypePaid,
-        }
-
-        if cls is ReactionType and data.get("type") in _class_mapping:
-            return _class_mapping[data.pop("type")].de_json(data, bot)
-
-        return super().de_json(data=data, bot=bot)
 
 
 class ReactionTypeEmoji(ReactionType):
@@ -220,12 +209,3 @@ class ReactionCount(TelegramObject):
             self.total_count,
         )
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ReactionCount":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["type"] = de_json_optional(data.get("type"), ReactionType, bot)
-
-        return super().de_json(data=data, bot=bot)

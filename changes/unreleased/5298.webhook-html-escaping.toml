@@ -1,0 +1,5 @@
+documentation = "Escape user-provided payloads in the custom webhook examples before rendering them with ``ParseMode.HTML``."
+[[pull_requests]]
+uid = "5298"
+author_uids = ["xsneh"]
+closes_threads = []

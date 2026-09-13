@@ -48,7 +48,6 @@ class _BaseMedium(TelegramObject):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): Optional. File size.
 
-
     """
 
     __slots__ = ("file_id", "file_size", "file_unique_id")

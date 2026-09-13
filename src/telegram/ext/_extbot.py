@@ -519,8 +519,10 @@ class ExtBot(Bot, Generic[RLARGS]):
                 data[key] = new_value
 
             # 6)
-            elif isinstance(val, Sequence) and all(
-                isinstance(obj, InputPollOption) for obj in val
+            elif (
+                isinstance(val, Sequence)
+                and val  # Check that the sequence is not empty, as all() returns True for []
+                and all(isinstance(obj, InputPollOption) for obj in val)
             ):
                 new_val = []
                 for option in val:

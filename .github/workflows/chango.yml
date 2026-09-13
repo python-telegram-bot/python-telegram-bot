@@ -20,7 +20,7 @@ jobs:
       IS_RELEASE_PR: ${{ steps.check_title.outputs.IS_RELEASE_PR }}
 
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           # needed for commit and push step at the end
           persist-credentials: true
@@ -48,7 +48,7 @@ jobs:
       # Run `chango release` if applicable - needs some additional setup.
       - name: Set up Python
         if: steps.check_title.outputs.IS_RELEASE_PR == 'true'
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.x"
 

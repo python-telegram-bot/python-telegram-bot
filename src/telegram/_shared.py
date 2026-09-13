@@ -19,16 +19,12 @@
 """This module contains two objects used for request chats/users service messages."""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import de_list_optional, parse_sequence_arg
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 from telegram._utils.usernames import get_full_name, get_link, get_name
-
-if TYPE_CHECKING:
-    from telegram._bot import Bot
 
 
 class UsersShared(TelegramObject):
@@ -70,6 +66,12 @@ class UsersShared(TelegramObject):
 
     __slots__ = ("request_id", "users")
 
+    __REMOVED_API_FIELDS__ = frozenset(
+        {
+            "user_ids",
+        }
+    )
+
     def __init__(
         self,
         request_id: int,
@@ -84,21 +86,6 @@ class UsersShared(TelegramObject):
         self._id_attrs = (self.request_id, self.users)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "UsersShared":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["users"] = de_list_optional(data.get("users"), SharedUser, bot)
-
-        api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if user_ids := data.get("user_ids"):
-            api_kwargs = {"user_ids": user_ids}
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
 
 class ChatShared(TelegramObject):
@@ -170,14 +157,6 @@ class ChatShared(TelegramObject):
         self._id_attrs = (self.request_id, self.chat_id)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "ChatShared":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
-        return super().de_json(data=data, bot=bot)
 
     @property
     def link(self) -> str | None:
@@ -281,11 +260,3 @@ class SharedUser(TelegramObject):
         .. versionadded:: 22.4
         """
         return get_link(self)
-
-    @classmethod
-    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> "SharedUser":
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        data["photo"] = de_list_optional(data.get("photo"), PhotoSize, bot)
-        return super().de_json(data=data, bot=bot)
