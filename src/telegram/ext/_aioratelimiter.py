@@ -135,6 +135,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         "_group_time_period",
         "_max_retries",
         "_retry_after_event",
+        "_retry_after_holds",
     )
 
     def __init__(
@@ -171,6 +172,10 @@ class AIORateLimiter(BaseRateLimiter[int]):
         self._max_retries: int = max_retries
         self._retry_after_event = asyncio.Event()
         self._retry_after_event.set()
+        # Number of requests currently sleeping off a RetryAfter. The halt is lifted only
+        # when this drops back to zero, so that neither an unrelated request finishing nor a
+        # shorter backoff expiring can release a halt that is still in effect.
+        self._retry_after_holds: int = 0
 
     async def initialize(self) -> None:
         """Does nothing."""
@@ -286,8 +291,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
                 _LOGGER.info("Rate limit hit. Retrying after %f seconds", sleep)
                 # Make sure we don't allow other requests to be processed
                 self._retry_after_event.clear()
-                await asyncio.sleep(sleep)
-            finally:
-                # Allow other requests to be processed
-                self._retry_after_event.set()
+                self._retry_after_holds += 1
+                try:
+                    await asyncio.sleep(sleep)
+                finally:
+                    # Allow other requests to be processed, but only once every request
+                    # that hit a rate limit has finished waiting.
+                    self._retry_after_holds -= 1
+                    if self._retry_after_holds == 0:
+                        self._retry_after_event.set()
         return None  # type: ignore[return-value]
