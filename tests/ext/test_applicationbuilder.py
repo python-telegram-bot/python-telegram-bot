@@ -22,7 +22,7 @@ import inspect
 from dataclasses import dataclass
 from http import HTTPStatus
 
-import httpx
+import httpx2
 import pytest
 
 from telegram import Bot
@@ -129,7 +129,7 @@ class TestApplicationBuilder:
             http2: object
             transport: object = None
 
-        monkeypatch.setattr(httpx, "AsyncClient", Client)
+        monkeypatch.setattr(httpx2, "AsyncClient", Client)
 
         app = builder.token(bot.token).build()
 
@@ -150,18 +150,18 @@ class TestApplicationBuilder:
         assert app.bot.local_mode is False
 
         get_updates_client = app.bot._request[0]._client
-        assert get_updates_client.limits == httpx.Limits(max_connections=1)
+        assert get_updates_client.limits == httpx2.Limits(max_connections=1)
         assert get_updates_client.proxy is None
-        assert get_updates_client.timeout == httpx.Timeout(
+        assert get_updates_client.timeout == httpx2.Timeout(
             connect=5.0, read=5.0, write=5.0, pool=1.0
         )
         assert get_updates_client.http1 is True
         assert not get_updates_client.http2
 
         client = app.bot.request._client
-        assert client.limits == httpx.Limits(max_connections=256)
+        assert client.limits == httpx2.Limits(max_connections=256)
         assert client.proxy is None
-        assert client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
+        assert client.timeout == httpx2.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
         assert client.http1 is True
         assert not client.http2
 
@@ -378,7 +378,7 @@ class TestApplicationBuilder:
             media_write_timeout.append(kwargs.get("media_write_timeout"))
             original_init(self_, *args, **kwargs)
 
-        monkeypatch.setattr(httpx, "AsyncClient", Client)
+        monkeypatch.setattr(httpx2, "AsyncClient", Client)
         monkeypatch.setattr(HTTPXRequest, "__init__", init_httpx_request)
 
         builder = ApplicationBuilder().token(bot.token)
@@ -388,8 +388,8 @@ class TestApplicationBuilder:
         app = builder.build()
         client = app.bot.request._client
 
-        assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
-        assert client.limits == httpx.Limits(max_connections=1)
+        assert client.timeout == httpx2.Timeout(pool=3, connect=2, read=4, write=5)
+        assert client.limits == httpx2.Limits(max_connections=1)
         assert client.proxy == "proxy"
         assert client.http1 is True
         assert client.http2 is False
@@ -405,8 +405,8 @@ class TestApplicationBuilder:
         app = builder.build()
         client = app.bot._request[0]._client
 
-        assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
-        assert client.limits == httpx.Limits(max_connections=1)
+        assert client.timeout == httpx2.Timeout(pool=3, connect=2, read=4, write=5)
+        assert client.limits == httpx2.Limits(max_connections=1)
         assert client.proxy == "get_updates_proxy"
         assert client.http1 is True
         assert client.http2 is False

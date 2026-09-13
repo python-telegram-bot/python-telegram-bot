@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains methods to make POST and GET requests using the httpx library."""
+"""This module contains methods to make POST and GET requests using the httpx2 library."""
 
 from collections.abc import Collection
 from typing import Any
 
-import httpx
+import httpx2
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
@@ -31,8 +31,8 @@ from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
 
 # Note to future devs:
-# Proxies are currently only tested manually. The httpx development docs have a nice guide on that:
-# https://www.python-httpx.org/contributing/#development-proxy-setup (also saved on archive.org)
+# Proxies are currently only tested manually. The httpx2 development docs have a nice guide on that:
+# https://github.com/pydantic/httpx2 (also saved on archive.org)
 # That also works with socks5. Just pass `--mode socks5` to mitmproxy
 
 _LOGGER = get_logger(__name__, "HTTPXRequest")
@@ -40,7 +40,7 @@ _LOGGER = get_logger(__name__, "HTTPXRequest")
 
 class HTTPXRequest(BaseRequest):
     """Implementation of :class:`~telegram.request.BaseRequest` using the library
-    `httpx <https://www.python-httpx.org>`_.
+    `httpx2 <https://github.com/pydantic/httpx2>`_.
 
     .. versionadded:: 20.0
 
@@ -53,9 +53,9 @@ class HTTPXRequest(BaseRequest):
 
             .. versionchanged:: 22.4
                 Set the default to ``256``.
-                Stopped applying to ``httpx.Limits.max_keepalive_connections``. Now only applies to
-                ``httpx.Limits.max_connections``. See `Resource Limits
-                <https://www.python-httpx.org/advanced/resource-limits/>`_
+                Stopped applying to ``httpx2.Limits.max_keepalive_connections``. Now only applies to
+                ``httpx2.Limits.max_connections``. See `Resource Limits
+                <https://github.com/pydantic/httpx2`_
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server.
             This value is used unless a different value is passed to :meth:`do_request`.
@@ -101,20 +101,20 @@ class HTTPXRequest(BaseRequest):
                 these concepts.
 
             .. versionadded:: 20.7
-        proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``, optional): The URL to a proxy server,
-            a ``httpx.Proxy`` object or a ``httpx.URL`` object. For example
+        proxy (:obj:`str` | ``httpx2.Proxy`` | ``httpx2.URL``, optional): The URL to a proxy server,
+            a ``httpx2.Proxy`` object or a ``httpx2.URL`` object. For example
             ``'http://127.0.0.1:3128'`` or ``'socks5://127.0.0.1:3128'``. Defaults to :obj:`None`.
 
             Note:
                 * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
-                  ``ALL_PROXY``. See `the docs of httpx`_ for more info.
-                * HTTPS proxies can be configured by passing a ``httpx.Proxy`` object with
+                  ``ALL_PROXY``. See `the docs of httpx2`_ for more info.
+                * HTTPS proxies can be configured by passing a ``httpx2.Proxy`` object with
                   a corresponding ``ssl_context``.
                 * For Socks5 support, additional dependencies are required. Make sure to install
                   PTB via :command:`pip install "python-telegram-bot[socks]"` in this case.
                 * Socks5 proxies can not be set via environment variables.
 
-            .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
+            .. _the docs of httpx: https://github.com/pydantic/httpx2
 
             .. versionadded:: 20.7
         media_write_timeout (:obj:`float` | :obj:`None`, optional): Like :paramref:`write_timeout`,
@@ -124,12 +124,12 @@ class HTTPXRequest(BaseRequest):
 
             .. versionadded:: 21.0
         httpx_kwargs (dict[:obj:`str`, Any], optional): Additional keyword arguments to be passed
-            to the `httpx.AsyncClient <https://www.python-httpx.org/api/#asyncclient>`_
+            to the `httpx2.AsyncClient <https://github.com/pydantic/httpx2`_
             constructor.
 
             Warning:
                 This parameter is intended for advanced users that want to fine-tune the behavior
-                of the underlying ``httpx`` client. The values passed here will override all the
+                of the underlying ``httpx2`` client. The values passed here will override all the
                 defaults set by ``python-telegram-bot`` and all other parameters passed to
                 :class:`HTTPXRequest`. The only exception is the :paramref:`media_write_timeout`
                 parameter, which is not passed to the client constructor.
@@ -151,19 +151,19 @@ class HTTPXRequest(BaseRequest):
         pool_timeout: float | None = 1.0,
         http_version: HTTPVersion = "1.1",
         socket_options: Collection[SocketOpt] | None = None,
-        proxy: str | httpx.Proxy | httpx.URL | None = None,
+        proxy: str | httpx2.Proxy | httpx2.URL | None = None,
         media_write_timeout: float | None = 20.0,
         httpx_kwargs: dict[str, Any] | None = None,
     ):
         self._http_version = http_version
         self._media_write_timeout = media_write_timeout
-        timeout = httpx.Timeout(
+        timeout = httpx2.Timeout(
             connect=connect_timeout,
             read=read_timeout,
             write=write_timeout,
             pool=pool_timeout,
         )
-        limits = httpx.Limits(
+        limits = httpx2.Limits(
             max_connections=connection_pool_size,
         )
 
@@ -173,7 +173,7 @@ class HTTPXRequest(BaseRequest):
         http1 = http_version == "1.1"
         http_kwargs = {"http1": http1, "http2": not http1}
         transport = (
-            httpx.AsyncHTTPTransport(
+            httpx2.AsyncHTTPTransport(
                 socket_options=socket_options,
             )
             if socket_options
@@ -223,8 +223,8 @@ class HTTPXRequest(BaseRequest):
         """
         return self._client.timeout.read
 
-    def _build_client(self) -> httpx.AsyncClient:
-        return httpx.AsyncClient(**self._client_kwargs)
+    def _build_client(self) -> httpx2.AsyncClient:
+        return httpx2.AsyncClient(**self._client_kwargs)
 
     async def initialize(self) -> None:
         """See :meth:`BaseRequest.initialize`."""
@@ -268,7 +268,7 @@ class HTTPXRequest(BaseRequest):
         if isinstance(write_timeout, DefaultValue):
             write_timeout = self._client.timeout.write if not files else self._media_write_timeout
 
-        timeout = httpx.Timeout(
+        timeout = httpx2.Timeout(
             connect=connect_timeout,
             read=read_timeout,
             write=write_timeout,
@@ -284,8 +284,8 @@ class HTTPXRequest(BaseRequest):
                 files=files,
                 data=data,
             )
-        except httpx.TimeoutException as err:
-            if isinstance(err, httpx.PoolTimeout):
+        except httpx2.TimeoutException as err:
+            if isinstance(err, httpx2.PoolTimeout):
                 raise TimedOut(
                     message=(
                         "Pool timeout: All connections in the connection pool are occupied. "
@@ -294,12 +294,12 @@ class HTTPXRequest(BaseRequest):
                     )
                 ) from err
             raise TimedOut from err
-        except httpx.HTTPError as err:
+        except httpx2.HTTPError as err:
             # HTTPError must come last as its the base httpx exception class
             # TODO p4: do something smart here; for now just raise NetworkError
 
             # We include the class name for easier debugging. Especially useful if the error
             # message of `err` is empty.
-            raise NetworkError(f"httpx.{err.__class__.__name__}: {err}") from err
+            raise NetworkError(f"httpx2.{err.__class__.__name__}: {err}") from err
 
         return res.status_code, res.content
