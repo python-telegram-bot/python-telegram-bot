@@ -16,9 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import asyncio
 import os
-import sys
 import zoneinfo
 from pathlib import Path
 from uuid import uuid4
@@ -103,19 +101,6 @@ def PTB_TIMEDELTA(request):
         monkeypatch.delenv("PTB_TIMEDELTA", raising=False)
     yield env_var_2_bool(os.getenv("PTB_TIMEDELTA"))
     monkeypatch.undo()
-
-
-# Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
-# session. See https://github.com/pytest-dev/pytest-asyncio/issues/68 for more details.
-@pytest.fixture(scope="session")
-def event_loop(request):
-    # ever since ProactorEventLoop became the default in Win 3.8+, the app crashes after the loop
-    # is closed. Hence, we use SelectorEventLoop on Windows to avoid this. See
-    # https://github.com/python/cpython/issues/83413, https://github.com/encode/httpx/issues/914
-    if sys.platform.startswith("win"):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    return asyncio.get_event_loop_policy().new_event_loop()
-    # loop.close() # instead of closing here, do that at the every end of the test session
 
 
 @pytest.fixture(scope="session")
