@@ -84,6 +84,6 @@ class LoginUrl(TelegramObject):
     # Required
     url: str = tg_field(compare=True)
     # Optional
-    forward_text: str | None = tg_field()
-    bot_username: str | None = tg_field()
-    request_write_access: bool | None = tg_field()
+    forward_text: str | None = tg_field(default=None)
+    bot_username: str | None = tg_field(default=None)
+    request_write_access: bool | None = tg_field(default=None)

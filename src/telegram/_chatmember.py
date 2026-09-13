@@ -353,8 +353,8 @@ class ChatMemberMember(ChatMember):
     # Attribute only (init=False)
     status: str = tg_field(init=False, default=ChatMember.MEMBER)
 
-    until_date: dtm.datetime | None = tg_field()
-    tag: str | None = tg_field()
+    until_date: dtm.datetime | None = tg_field(default=None)
+    tag: str | None = tg_field(default=None)
 
 
 @tg_dataclass()
