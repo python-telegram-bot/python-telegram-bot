@@ -48,39 +48,41 @@ class PhotoTestBase:
 
 
 class TestPhotoWithoutRequest(PhotoTestBase):
-    def test_slot_behaviour(self, photo):
-        for attr in photo.__slots__:
-            assert getattr(photo, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(photo)) == len(set(mro_slots(photo))), "duplicate slot"
+    def test_slot_behaviour(self, offline_photo):
+        for attr in offline_photo.__slots__:
+            assert getattr(offline_photo, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_photo)) == len(set(mro_slots(offline_photo))), (
+            "duplicate slot"
+        )
 
-    def test_creation(self, thumb, photo):
+    def test_creation(self, offline_thumb, offline_photo):
         # Make sure file has been uploaded.
-        assert isinstance(photo, PhotoSize)
-        assert isinstance(photo.file_id, str)
-        assert isinstance(photo.file_unique_id, str)
-        assert photo.file_id
-        assert photo.file_unique_id
+        assert isinstance(offline_photo, PhotoSize)
+        assert isinstance(offline_photo.file_id, str)
+        assert isinstance(offline_photo.file_unique_id, str)
+        assert offline_photo.file_id
+        assert offline_photo.file_unique_id
 
-        assert isinstance(thumb, PhotoSize)
-        assert isinstance(thumb.file_id, str)
-        assert isinstance(thumb.file_unique_id, str)
-        assert thumb.file_id
-        assert thumb.file_unique_id
+        assert isinstance(offline_thumb, PhotoSize)
+        assert isinstance(offline_thumb.file_id, str)
+        assert isinstance(offline_thumb.file_unique_id, str)
+        assert offline_thumb.file_id
+        assert offline_thumb.file_unique_id
 
-    def test_expected_values(self, photo, thumb):
-        assert photo.width == self.width
-        assert photo.height == self.height
-        assert photo.file_size in self.file_size
-        assert thumb.width == 90
-        assert thumb.height == 90
+    def test_expected_values(self, offline_photo, offline_thumb):
+        assert offline_photo.width == self.width
+        assert offline_photo.height == self.height
+        assert offline_photo.file_size in self.file_size
+        assert offline_thumb.width == 90
+        assert offline_thumb.height == 90
         # File sizes don't seem to be consistent, so we use the values that we have observed
         # so far
-        assert thumb.file_size in [1474, 1475, 1477]
+        assert offline_thumb.file_size in [1474, 1475, 1477]
 
-    def test_de_json(self, offline_bot, photo):
+    def test_de_json(self, offline_bot, offline_photo):
         json_dict = {
-            "file_id": photo.file_id,
-            "file_unique_id": photo.file_unique_id,
+            "file_id": offline_photo.file_id,
+            "file_unique_id": offline_photo.file_unique_id,
             "width": self.width,
             "height": self.height,
             "file_size": self.file_size,
@@ -88,30 +90,30 @@ class TestPhotoWithoutRequest(PhotoTestBase):
         json_photo = PhotoSize.de_json(json_dict, offline_bot)
         assert json_photo.api_kwargs == {}
 
-        assert json_photo.file_id == photo.file_id
-        assert json_photo.file_unique_id == photo.file_unique_id
+        assert json_photo.file_id == offline_photo.file_id
+        assert json_photo.file_unique_id == offline_photo.file_unique_id
         assert json_photo.width == self.width
         assert json_photo.height == self.height
         assert json_photo.file_size == self.file_size
 
-    def test_to_dict(self, photo):
-        photo_dict = photo.to_dict()
+    def test_to_dict(self, offline_photo):
+        photo_dict = offline_photo.to_dict()
 
         assert isinstance(photo_dict, dict)
-        assert photo_dict["file_id"] == photo.file_id
-        assert photo_dict["file_unique_id"] == photo.file_unique_id
-        assert photo_dict["width"] == photo.width
-        assert photo_dict["height"] == photo.height
-        assert photo_dict["file_size"] == photo.file_size
+        assert photo_dict["file_id"] == offline_photo.file_id
+        assert photo_dict["file_unique_id"] == offline_photo.file_unique_id
+        assert photo_dict["width"] == offline_photo.width
+        assert photo_dict["height"] == offline_photo.height
+        assert photo_dict["file_size"] == offline_photo.file_size
 
-    def test_equality(self, photo):
-        a = PhotoSize(photo.file_id, photo.file_unique_id, self.width, self.height)
-        b = PhotoSize("", photo.file_unique_id, self.width, self.height)
-        c = PhotoSize(photo.file_id, photo.file_unique_id, 0, 0)
+    def test_equality(self, offline_photo):
+        a = PhotoSize(offline_photo.file_id, offline_photo.file_unique_id, self.width, self.height)
+        b = PhotoSize("", offline_photo.file_unique_id, self.width, self.height)
+        c = PhotoSize(offline_photo.file_id, offline_photo.file_unique_id, 0, 0)
         d = PhotoSize("", "", self.width, self.height)
         e = Sticker(
-            photo.file_id,
-            photo.file_unique_id,
+            offline_photo.file_id,
+            offline_photo.file_unique_id,
             self.width,
             self.height,
             False,
@@ -168,23 +170,25 @@ class TestPhotoWithoutRequest(PhotoTestBase):
         finally:
             offline_bot._local_mode = False
 
-    async def test_send_with_photosize(self, monkeypatch, offline_bot, chat_id, photo):
+    async def test_send_with_photosize(self, monkeypatch, offline_bot, chat_id, offline_photo):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["photo"] == photo.file_id
+            return request_data.json_parameters["photo"] == offline_photo.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.send_photo(photo=photo, chat_id=chat_id)
+        assert await offline_bot.send_photo(photo=offline_photo, chat_id=chat_id)
 
-    async def test_get_file_instance_method(self, monkeypatch, photo):
+    async def test_get_file_instance_method(self, monkeypatch, offline_photo):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == photo.file_id
+            return kwargs["file_id"] == offline_photo.file_id
 
         assert check_shortcut_signature(PhotoSize.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(photo.get_file, photo.get_bot(), "get_file")
-        assert await check_defaults_handling(photo.get_file, photo.get_bot())
+        assert await check_shortcut_call(
+            offline_photo.get_file, offline_photo.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(offline_photo.get_file, offline_photo.get_bot())
 
-        monkeypatch.setattr(photo.get_bot(), "get_file", make_assertion)
-        assert await photo.get_file()
+        monkeypatch.setattr(offline_photo.get_bot(), "get_file", make_assertion)
+        assert await offline_photo.get_file()
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
@@ -196,7 +200,7 @@ class TestPhotoWithoutRequest(PhotoTestBase):
         indirect=["default_bot"],
     )
     async def test_send_photo_default_quote_parse_mode(
-        self, default_bot, chat_id, photo, custom, monkeypatch
+        self, default_bot, chat_id, offline_photo, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -209,7 +213,9 @@ class TestPhotoWithoutRequest(PhotoTestBase):
             kwargs["quote_parse_mode"] = custom
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
-        await default_bot.send_photo(chat_id, photo, reply_parameters=ReplyParameters(**kwargs))
+        await default_bot.send_photo(
+            chat_id, offline_photo, reply_parameters=ReplyParameters(**kwargs)
+        )
 
 
 class TestPhotoWithRequest(PhotoTestBase):

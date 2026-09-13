@@ -48,20 +48,6 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-# Override `video` fixture to provide start_timestamp
-@pytest.fixture(scope="module")
-async def video(bot, chat_id):
-    # The `video` object returned here does not have the `qualities` attribute.
-    # Tests using actual VideoQuality objects from real Telegram responses
-    # are implemented separately in `test_videoquality`.
-    with data_file("telegram.mp4").open("rb") as f:
-        return (
-            await bot.send_video(
-                chat_id, video=f, start_timestamp=VideoTestBase.start_timestamp, read_timeout=50
-            )
-        ).video
-
-
 class VideoTestBase:
     width = 360
     height = 640
@@ -83,32 +69,34 @@ class VideoTestBase:
 
 
 class TestVideoWithoutRequest(VideoTestBase):
-    def test_slot_behaviour(self, video):
-        for attr in video.__slots__:
-            assert getattr(video, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(video)) == len(set(mro_slots(video))), "duplicate slot"
+    def test_slot_behaviour(self, offline_video):
+        for attr in offline_video.__slots__:
+            assert getattr(offline_video, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(offline_video)) == len(set(mro_slots(offline_video))), (
+            "duplicate slot"
+        )
 
-    def test_creation(self, video):
+    def test_creation(self, offline_video):
         # Make sure file has been uploaded.
-        assert isinstance(video, Video)
-        assert isinstance(video.file_id, str)
-        assert isinstance(video.file_unique_id, str)
-        assert video.file_id
-        assert video.file_unique_id
+        assert isinstance(offline_video, Video)
+        assert isinstance(offline_video.file_id, str)
+        assert isinstance(offline_video.file_unique_id, str)
+        assert offline_video.file_id
+        assert offline_video.file_unique_id
 
-        assert isinstance(video.thumbnail, PhotoSize)
-        assert isinstance(video.thumbnail.file_id, str)
-        assert isinstance(video.thumbnail.file_unique_id, str)
-        assert video.thumbnail.file_id
-        assert video.thumbnail.file_unique_id
+        assert isinstance(offline_video.thumbnail, PhotoSize)
+        assert isinstance(offline_video.thumbnail.file_id, str)
+        assert isinstance(offline_video.thumbnail.file_unique_id, str)
+        assert offline_video.thumbnail.file_id
+        assert offline_video.thumbnail.file_unique_id
 
-    def test_expected_values(self, video):
-        assert video.width == self.width
-        assert video.height == self.height
-        assert video._duration == self.duration
-        assert video.file_size == self.file_size
-        assert video.mime_type == self.mime_type
-        assert video._start_timestamp == self.start_timestamp
+    def test_expected_values(self, offline_video):
+        assert offline_video.width == self.width
+        assert offline_video.height == self.height
+        assert offline_video._duration == self.duration
+        assert offline_video.file_size == self.file_size
+        assert offline_video.mime_type == self.mime_type
+        assert offline_video._start_timestamp == self.start_timestamp
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -139,39 +127,39 @@ class TestVideoWithoutRequest(VideoTestBase):
         assert json_video.cover == self.cover
         assert json_video.qualities == self.qualities
 
-    def test_to_dict(self, video):
-        video_dict = video.to_dict()
+    def test_to_dict(self, offline_video):
+        video_dict = offline_video.to_dict()
 
         assert isinstance(video_dict, dict)
-        assert video_dict["file_id"] == video.file_id
-        assert video_dict["file_unique_id"] == video.file_unique_id
-        assert video_dict["width"] == video.width
-        assert video_dict["height"] == video.height
+        assert video_dict["file_id"] == offline_video.file_id
+        assert video_dict["file_unique_id"] == offline_video.file_unique_id
+        assert video_dict["width"] == offline_video.width
+        assert video_dict["height"] == offline_video.height
         assert video_dict["duration"] == int(self.duration.total_seconds())
         assert isinstance(video_dict["duration"], int)
-        assert video_dict["mime_type"] == video.mime_type
-        assert video_dict["file_size"] == video.file_size
-        assert video_dict["file_name"] == video.file_name
+        assert video_dict["mime_type"] == offline_video.mime_type
+        assert video_dict["file_size"] == offline_video.file_size
+        assert video_dict["file_name"] == offline_video.file_name
         assert video_dict["start_timestamp"] == int(self.start_timestamp.total_seconds())
         assert isinstance(video_dict["start_timestamp"], int)
 
-    def test_time_period_properties(self, PTB_TIMEDELTA, video):
+    def test_time_period_properties(self, PTB_TIMEDELTA, offline_video):
         if PTB_TIMEDELTA:
-            assert video.duration == self.duration
-            assert isinstance(video.duration, dtm.timedelta)
+            assert offline_video.duration == self.duration
+            assert isinstance(offline_video.duration, dtm.timedelta)
 
-            assert video.start_timestamp == self.start_timestamp
-            assert isinstance(video.start_timestamp, dtm.timedelta)
+            assert offline_video.start_timestamp == self.start_timestamp
+            assert isinstance(offline_video.start_timestamp, dtm.timedelta)
         else:
-            assert video.duration == int(self.duration.total_seconds())
-            assert isinstance(video.duration, int)
+            assert offline_video.duration == int(self.duration.total_seconds())
+            assert isinstance(offline_video.duration, int)
 
-            assert video.start_timestamp == int(self.start_timestamp.total_seconds())
-            assert isinstance(video.start_timestamp, int)
+            assert offline_video.start_timestamp == int(self.start_timestamp.total_seconds())
+            assert isinstance(offline_video.start_timestamp, int)
 
-    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, video):
-        video.duration
-        video.start_timestamp
+    def test_time_period_int_deprecated(self, recwarn, PTB_TIMEDELTA, offline_video):
+        offline_video.duration
+        offline_video.start_timestamp
 
         if PTB_TIMEDELTA:
             assert len(recwarn) == 0
@@ -181,12 +169,18 @@ class TestVideoWithoutRequest(VideoTestBase):
                 assert f"`{attr}` will be of type `datetime.timedelta`" in str(recwarn[i].message)
                 assert recwarn[i].category is PTBDeprecationWarning
 
-    def test_equality(self, video):
-        a = Video(video.file_id, video.file_unique_id, self.width, self.height, self.duration)
-        b = Video("", video.file_unique_id, self.width, self.height, self.duration)
-        c = Video(video.file_id, video.file_unique_id, 0, 0, 0)
+    def test_equality(self, offline_video):
+        a = Video(
+            offline_video.file_id,
+            offline_video.file_unique_id,
+            self.width,
+            self.height,
+            self.duration,
+        )
+        b = Video("", offline_video.file_unique_id, self.width, self.height, self.duration)
+        c = Video(offline_video.file_id, offline_video.file_unique_id, 0, 0, 0)
         d = Video("", "", self.width, self.height, self.duration)
-        e = Voice(video.file_id, video.file_unique_id, self.duration)
+        e = Voice(offline_video.file_id, offline_video.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -205,12 +199,12 @@ class TestVideoWithoutRequest(VideoTestBase):
         with pytest.raises(TypeError):
             await offline_bot.send_video(chat_id=chat_id)
 
-    async def test_send_with_video(self, monkeypatch, offline_bot, chat_id, video):
+    async def test_send_with_video(self, monkeypatch, offline_bot, chat_id, offline_video):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["video"] == video.file_id
+            return request_data.json_parameters["video"] == offline_video.file_id
 
         monkeypatch.setattr(offline_bot.request, "post", make_assertion)
-        assert await offline_bot.send_video(chat_id, video=video)
+        assert await offline_bot.send_video(chat_id, video=offline_video)
 
     async def test_send_video_custom_filename(self, offline_bot, chat_id, video_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -247,16 +241,18 @@ class TestVideoWithoutRequest(VideoTestBase):
         finally:
             offline_bot._local_mode = False
 
-    async def test_get_file_instance_method(self, monkeypatch, video):
+    async def test_get_file_instance_method(self, monkeypatch, offline_video):
         async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == video.file_id
+            return kwargs["file_id"] == offline_video.file_id
 
         assert check_shortcut_signature(Video.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(video.get_file, video.get_bot(), "get_file")
-        assert await check_defaults_handling(video.get_file, video.get_bot())
+        assert await check_shortcut_call(
+            offline_video.get_file, offline_video.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(offline_video.get_file, offline_video.get_bot())
 
-        monkeypatch.setattr(video.get_bot(), "get_file", make_assertion)
-        assert await video.get_file()
+        monkeypatch.setattr(offline_video.get_bot(), "get_file", make_assertion)
+        assert await offline_video.get_file()
 
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
@@ -268,7 +264,7 @@ class TestVideoWithoutRequest(VideoTestBase):
         indirect=["default_bot"],
     )
     async def test_send_video_default_quote_parse_mode(
-        self, default_bot, chat_id, video, custom, monkeypatch
+        self, default_bot, chat_id, offline_video, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
@@ -281,7 +277,9 @@ class TestVideoWithoutRequest(VideoTestBase):
             kwargs["quote_parse_mode"] = custom
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
-        await default_bot.send_video(chat_id, video, reply_parameters=ReplyParameters(**kwargs))
+        await default_bot.send_video(
+            chat_id, offline_video, reply_parameters=ReplyParameters(**kwargs)
+        )
 
 
 class TestVideoWithRequest(VideoTestBase):

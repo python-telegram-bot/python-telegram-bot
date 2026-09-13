@@ -20,8 +20,48 @@
 
 import pytest
 
+from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
+
+FILE_ID = "5a3128a4d2a04750b5b58397f3b5e812"
+FILE_UNIQUE_ID = "adc3145fd2e84d95b64d68eaa22aa33e"
+
+
+def _with_bot(file, bot):
+    file.set_bot(bot)
+    return file
+
+
+def _thumbnail(bot, *, width, height, file_size):
+    return _with_bot(
+        PhotoSize(
+            file_id=f"thumbnail-{FILE_ID}",
+            file_unique_id=f"thumbnail-{FILE_UNIQUE_ID}",
+            width=width,
+            height=height,
+            file_size=file_size,
+        ),
+        bot,
+    )
+
+
+@pytest.fixture(scope="session")
+def offline_animation(offline_bot):
+    return _with_bot(
+        Animation(
+            file_id=FILE_ID,
+            file_unique_id=FILE_UNIQUE_ID,
+            width=320,
+            height=180,
+            duration=1,
+            file_name="game.gif.webm",
+            mime_type="video/mp4",
+            file_size=5859,
+            thumbnail=_thumbnail(offline_bot, width=320, height=180, file_size=5859),
+        ),
+        offline_bot,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -51,6 +91,22 @@ def animated_sticker_file():
 
 
 @pytest.fixture(scope="session")
+def offline_audio(offline_bot):
+    return _with_bot(
+        Audio(
+            file_id=FILE_ID,
+            file_unique_id=FILE_UNIQUE_ID,
+            duration=3,
+            file_name="telegram.mp3",
+            mime_type="audio/mpeg",
+            file_size=122920,
+            thumbnail=_thumbnail(offline_bot, width=50, height=50, file_size=1427),
+        ),
+        offline_bot,
+    )
+
+
+@pytest.fixture(scope="session")
 async def audio(bot, chat_id):
     with data_file("telegram.mp3").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
         return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumbnail=thumb)).audio
@@ -60,6 +116,21 @@ async def audio(bot, chat_id):
 def audio_file():
     with data_file("telegram.mp3").open("rb") as f:
         yield f
+
+
+@pytest.fixture(scope="session")
+def offline_document(offline_bot):
+    return _with_bot(
+        Document(
+            file_id=FILE_ID,
+            file_unique_id=FILE_UNIQUE_ID,
+            file_name="telegram.png",
+            mime_type="image/png",
+            file_size=12948,
+            thumbnail=_thumbnail(offline_bot, width=300, height=300, file_size=8090),
+        ),
+        offline_bot,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -75,6 +146,11 @@ def document_file():
 
 
 @pytest.fixture(scope="session")
+def offline_photo(offline_photolist):
+    return offline_photolist[-1]
+
+
+@pytest.fixture(scope="session")
 def photo(photolist):
     return photolist[-1]
 
@@ -86,6 +162,32 @@ def photo_file():
 
 
 @pytest.fixture(scope="session")
+def offline_photolist(offline_bot):
+    return (
+        _with_bot(
+            PhotoSize(
+                file_id=f"small-{FILE_ID}",
+                file_unique_id=f"small-{FILE_UNIQUE_ID}",
+                width=90,
+                height=90,
+                file_size=1474,
+            ),
+            offline_bot,
+        ),
+        _with_bot(
+            PhotoSize(
+                file_id=FILE_ID,
+                file_unique_id=FILE_UNIQUE_ID,
+                width=800,
+                height=800,
+                file_size=29176,
+            ),
+            offline_bot,
+        ),
+    )
+
+
+@pytest.fixture(scope="session")
 async def photolist(bot, chat_id):
     async def func():
         with data_file("telegram.jpg").open("rb") as f:
@@ -93,6 +195,25 @@ async def photolist(bot, chat_id):
 
     return await expect_bad_request(
         func, "Type of file mismatch", "Telegram did not accept the file."
+    )
+
+
+@pytest.fixture(scope="module")
+def offline_sticker(offline_bot):
+    return _with_bot(
+        Sticker(
+            file_id=FILE_ID,
+            file_unique_id=FILE_UNIQUE_ID,
+            width=510,
+            height=512,
+            is_animated=False,
+            is_video=False,
+            type=Sticker.REGULAR,
+            file_size=39518,
+            thumbnail=_thumbnail(offline_bot, width=319, height=320, file_size=21448),
+            needs_repainting=True,
+        ),
+        offline_bot,
     )
 
 
@@ -119,14 +240,38 @@ def sticker_set_thumb_file():
 
 
 @pytest.fixture(scope="session")
+def offline_thumb(offline_photolist):
+    return offline_photolist[0]
+
+
+@pytest.fixture(scope="session")
 def thumb(photolist):
     return photolist[0]
 
 
 @pytest.fixture(scope="session")
+def offline_video(offline_bot):
+    return _with_bot(
+        Video(
+            file_id=FILE_ID,
+            file_unique_id=FILE_UNIQUE_ID,
+            width=360,
+            height=640,
+            duration=5,
+            file_name="telegram.mp4",
+            mime_type="video/mp4",
+            file_size=326534,
+            thumbnail=_thumbnail(offline_bot, width=180, height=320, file_size=1767),
+            start_timestamp=3,
+        ),
+        offline_bot,
+    )
+
+
+@pytest.fixture(scope="session")
 async def video(bot, chat_id):
     with data_file("telegram.mp4").open("rb") as f:
-        return (await bot.send_video(chat_id, video=f, read_timeout=50)).video
+        return (await bot.send_video(chat_id, video=f, start_timestamp=3, read_timeout=50)).video
 
 
 @pytest.fixture
