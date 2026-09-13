@@ -56,7 +56,7 @@ if TYPE_CHECKING:
 # 'In' stands for input - used in parameters of methods below
 # pylint: disable=invalid-name
 InBT = TypeVar("InBT", bound=Bot)
-InJQ = TypeVar("InJQ", bound=None | JobQueue)
+InJQ = TypeVar("InJQ", bound=JobQueue | None)
 InCCT = TypeVar("InCCT", bound="CallbackContext")
 InUD = TypeVar("InUD")
 InCD = TypeVar("InCD")

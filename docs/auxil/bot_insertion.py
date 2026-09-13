@@ -63,13 +63,13 @@ media_write_timeout_change_methods = [
     "upload_sticker_file",
 ]
 media_write_timeout_change = [
-    "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
+    "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "  # noqa: ISC004
     "        :paramref:`telegram.request.BaseRequest.post.write_timeout`. By default, ``20`` "
     "        seconds are used as write timeout."
     "",
     "",
     "       .. versionchanged:: 22.0",
-    "           The default value changed to "
+    "           The default value changed to "  # noqa: ISC004
     "           :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
     "",
     "",
