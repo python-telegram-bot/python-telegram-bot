@@ -142,7 +142,7 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
     """
 
     # Attribute only (init=False)
-    source: str = tg_field(init=False, default=ChatBoostSource.PREMIUM)
+    source: str = tg_field(init=False, default=ChatBoostSource.GIFT_CODE)
 
     user: User = tg_field()
 

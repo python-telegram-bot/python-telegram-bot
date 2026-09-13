@@ -204,7 +204,7 @@ class PaidMediaLivePhoto(PaidMedia):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(compare=True, init=False, default=PaidMedia.VIDEO)
+    type: str = tg_field(compare=True, init=False, default=PaidMedia.LIVE_PHOTO)
 
     live_photo: LivePhoto = tg_field(compare=True)
 

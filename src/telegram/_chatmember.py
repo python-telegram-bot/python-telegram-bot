@@ -98,7 +98,7 @@ class ChatMember(TelegramObject):
 
     @staticmethod
     def _status_converter(value: str) -> str:
-        return enum.get_member(constants.BotCommandScopeType, value, value)
+        return enum.get_member(constants.ChatMemberStatus, value, value)
 
     # Required by all subclasses
     user: User = tg_field(compare=True)

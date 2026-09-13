@@ -71,7 +71,7 @@ class ReactionType(TelegramObject):
     def _type_converter(
         value: Literal["emoji", "custom_emoji", "paid"] | constants.ReactionType,
     ) -> str:
-        return enum.get_member(constants.MessageOriginType, value, value)
+        return enum.get_member(constants.ReactionType, value, value)
 
     # Required by all subclasses
     type: str = tg_field(converter=_type_converter)
