@@ -54,7 +54,7 @@ class InlineQueryResultVideo(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumbnail_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the video.
@@ -70,10 +70,6 @@ class InlineQueryResultVideo(InlineQueryResult):
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         video_width (:obj:`int`, optional): Video width.
         video_height (:obj:`int`, optional): Video height.
         video_duration (:obj:`int` | :class:`datetime.timedelta`, optional): Video duration
@@ -88,51 +84,20 @@ class InlineQueryResultVideo(InlineQueryResult):
             message to be sent instead of the video. This field is required if
             ``InlineQueryResultVideo`` is used to send an HTML-page as a result
             (e.g., a YouTube video).
-        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+        show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
 
             .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        video_url (:obj:`str`): A valid URL for the embedded video player or video file.
-        mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumbnail_url (:obj:`str`): URL of the thumbnail (JPEG only) for the video.
 
             .. versionadded:: 20.2
-        title (:obj:`str`): Title for the result.
-        caption (:obj:`str`): Optional. Caption of the video to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
-            parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional.
-            |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-
-        video_width (:obj:`int`): Optional. Video width.
-        video_height (:obj:`int`): Optional. Video height.
         video_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Video duration
             in seconds.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        description (:obj:`str`): Optional. Short description of the result.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the video. This field is required if
-            ``InlineQueryResultVideo`` is used to send an HTML-page as a result
-            (e.g., a YouTube video).
-        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
-
-            .. versionadded:: 21.3
-
     """
 
     __slots__ = (

@@ -39,12 +39,6 @@ class WebAppData(TelegramObject):
         button_text (:obj:`str`): Text of the :paramref:`~telegram.KeyboardButton.web_app` keyboard
             button, from which the Web App was opened.
 
-    Attributes:
-        data (:obj:`str`): The data. Be aware that a bad client can send arbitrary data in this
-            field.
-        button_text (:obj:`str`): Text of the :paramref:`~telegram.KeyboardButton.web_app` keyboard
-            button, from which the Web App was opened.
-
             Warning:
                 Be aware that a bad client can send arbitrary data in this field.
     """

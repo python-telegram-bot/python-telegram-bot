@@ -34,13 +34,7 @@ class CopyTextButton(TelegramObject):
     Args:
         text (:obj:`str`): The text to be copied to the clipboard;
             :tg-const:`telegram.constants.InlineKeyboardButtonLimit.MIN_COPY_TEXT`-
-            :tg-const:`telegram.constants.InlineKeyboardButtonLimit.MAX_COPY_TEXT` characters
-
-    Attributes:
-        text (:obj:`str`): The text to be copied to the clipboard;
-            :tg-const:`telegram.constants.InlineKeyboardButtonLimit.MIN_COPY_TEXT`-
-            :tg-const:`telegram.constants.InlineKeyboardButtonLimit.MAX_COPY_TEXT` characters
-
+            :tg-const:`telegram.constants.InlineKeyboardButtonLimit.MAX_COPY_TEXT` characters.
     """
 
     __slots__ = ("text",)

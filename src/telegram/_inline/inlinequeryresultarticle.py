@@ -67,26 +67,7 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.ARTICLE`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        title (:obj:`str`): Title of the result.
-        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
-            be sent.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
         url (:obj:`str`): Optional. URL of the result.
-        description (:obj:`str`): Optional. Short description of the result.
-        thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
-
-            .. versionadded:: 20.2
-        thumbnail_width (:obj:`int`): Optional. Thumbnail width.
-
-            .. versionadded:: 20.2
-        thumbnail_height (:obj:`int`): Optional. Thumbnail height.
-
-            .. versionadded:: 20.2
-
     """
 
     __slots__ = (

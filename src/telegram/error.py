@@ -54,6 +54,9 @@ class TelegramError(Exception):
         conversion of the data may be needed on major updates of the library.
 
     .. seealso:: :wiki:`Exceptions, Warnings and Logging <Exceptions%2C-Warnings-and-Logging>`
+
+    Args:
+        message (:obj:`str`): The error message.
     """
 
     __slots__ = ("message",)
@@ -188,10 +191,6 @@ class ChatMigrated(TelegramError):
 
     Args:
         new_chat_id (:obj:`int`): The new chat id of the group.
-
-    Attributes:
-        new_chat_id (:obj:`int`): The new chat id of the group.
-
     """
 
     __slots__ = ("new_chat_id",)
@@ -239,7 +238,7 @@ class RetryAfter(TelegramError):
 
     @property
     def retry_after(self) -> int | dtm.timedelta:  # noqa: D102
-        # Diableing D102 because docstring for `retry_after` is present at the class's level
+        # Disabling D102 because docstring for `retry_after` is present at the class's level
         return get_timedelta_value(  # type: ignore[return-value]
             self._retry_after, attribute="retry_after"
         )
