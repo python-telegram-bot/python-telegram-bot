@@ -24,6 +24,10 @@ Note:
     and the error callback handling, which were added as part of the bug fix in #5030.
 """
 
+import asyncio
+import logging
+import time
+
 import pytest
 
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
@@ -243,3 +247,164 @@ class TestNetworkRetryLoop:
         )
 
         assert call_count == success_after
+
+    async def test_stop_event_interrupts_backoff_sleep(self, caplog):
+        """Regression test for the bug where asyncio.sleep(cur_interval) during backoff was not
+        interrupted by stop_event, causing shutdowns to hang for up to 30 seconds.
+
+        Verifies that setting stop_event while the loop is sleeping between retries causes the
+        loop to exit promptly instead of waiting for the full backoff duration.
+        """
+        caplog.set_level(logging.DEBUG)
+        stop_event = asyncio.Event()
+
+        # Use an interval that is long enough to be detectable but short enough to keep the
+        # test suite fast.  If the fix regresses, the loop would sleep this full duration on
+        # every retry; the wall-clock assertion below would then fail reliably.
+        INTERVAL = 5.0
+        error_handled = asyncio.Event()
+
+        async def failing_action():
+            raise TelegramError("Simulated network outage")
+
+        def on_err(exc):
+            error_handled.set()
+
+        # Deterministically wait until the network_retry_loop has processed the error
+        # and is about to enter its backoff sleep.
+        async def trigger_stop():
+            await error_handled.wait()
+            # Yield to the event loop once more to ensure network_retry_loop has
+            # entered `await asyncio.wait_for(...)` inside the backoff block.
+            await asyncio.sleep(0)
+            stop_event.set()
+
+        trigger_task = asyncio.create_task(trigger_stop())
+        t_start = time.perf_counter()
+        await network_retry_loop(
+            action_cb=failing_action,
+            on_err_cb=on_err,
+            description="test-backoff-interrupt",
+            interval=INTERVAL,
+            stop_event=stop_event,
+            max_retries=-1,
+            repeat_on_success=True,
+        )
+        elapsed = time.perf_counter() - t_start
+        trigger_task.cancel()
+        await asyncio.gather(trigger_task, return_exceptions=True)
+
+        # The loop must exit well before the full INTERVAL; 1 s is a generous threshold.
+        assert elapsed < 1.0, (
+            f"Loop took {elapsed:.2f}s to exit after stop_event was set — "
+            "stop_event is not interrupting the backoff sleep."
+        )
+        # Assert the specific log message to prove the loop broke from inside the backoff wait,
+        # preventing a race condition where the stop_event might trigger an earlier exit check.
+        assert "Stop event set during backoff sleep. Stopping loop." in caplog.text
+
+    async def test_stop_event_breaks_repeat_on_success_loop(self):
+        """Regression test for the bug where network_retry_loop would loop infinitely if
+        repeat_on_success=True and stop_event was set during do_action().
+
+        Verifies that when stop_event is set mid-action, the outer loop breaks cleanly
+        and does not re-enter do_action() despite repeat_on_success being True.
+        """
+        stop_event = asyncio.Event()
+        action_started = asyncio.Event()
+        call_count = 0
+
+        async def action():
+            nonlocal call_count
+            call_count += 1
+            action_started.set()
+            # Wait for cancellation by the stop_event
+            await asyncio.sleep(60)
+
+        async def trigger_stop():
+            await action_started.wait()
+            stop_event.set()
+
+        trigger_task = asyncio.create_task(trigger_stop())
+        await network_retry_loop(
+            action_cb=action,
+            description="test-break-repeat-loop",
+            interval=0,
+            stop_event=stop_event,
+            max_retries=-1,
+            repeat_on_success=True,
+        )
+        trigger_task.cancel()
+        await asyncio.gather(trigger_task, return_exceptions=True)
+
+        # If the bug were present, the loop would restart and call action() again.
+        assert call_count == 1, f"Action was called {call_count} times, expected exactly 1."
+
+    async def test_stop_event_breaks_repeat_on_success_after_successful_action(self):
+        """Verifies that if an action completes successfully but stop_event is set,
+        the loop breaks cleanly and does not repeat despite repeat_on_success=True.
+        """
+        stop_event = asyncio.Event()
+        call_count = 0
+
+        async def action():
+            nonlocal call_count
+            call_count += 1
+            # Action completes successfully.
+            # We set stop_event from within the action to simulate it being set
+            # concurrently just before the action finishes.
+            stop_event.set()
+
+        await network_retry_loop(
+            action_cb=action,
+            description="test-break-repeat-after-success",
+            interval=0,
+            stop_event=stop_event,
+            max_retries=-1,
+            repeat_on_success=True,
+        )
+
+        assert call_count == 1, f"Action was called {call_count} times, expected exactly 1."
+
+    async def test_no_pending_tasks_after_stop_event(self):
+        """Regression test for the bug where pending tasks were only .cancel()ed but never
+        awaited inside do_action(), leaving them in a pending state and producing
+        'Task was destroyed but it is pending!' warnings from the garbage collector.
+
+        Verifies that after stop_event fires mid-action, all asyncio tasks created by the loop
+        are fully completed (not merely cancelled) before network_retry_loop returns.
+        """
+        stop_event = asyncio.Event()
+        action_started = asyncio.Event()
+
+        async def slow_action():
+            action_started.set()
+            # Simulate a slow in-flight HTTP call; will be cancelled via stop_event.
+            await asyncio.sleep(5)
+
+        tasks_before = set(asyncio.all_tasks())
+
+        # Concurrently set stop_event the moment the slow action begins.
+        async def trigger_stop():
+            await action_started.wait()
+            stop_event.set()
+
+        trigger_task = asyncio.create_task(trigger_stop())
+        await network_retry_loop(
+            action_cb=slow_action,
+            description="test-no-pending-tasks",
+            interval=0,
+            stop_event=stop_event,
+            max_retries=-1,
+            repeat_on_success=True,
+        )
+        trigger_task.cancel()
+        await asyncio.gather(trigger_task, return_exceptions=True)
+
+        tasks_after = asyncio.all_tasks() - tasks_before
+        pending = {t for t in tasks_after if not t.done()}
+
+        assert not pending, (
+            f"{len(pending)} task(s) remain pending after network_retry_loop returned with "
+            "stop_event set — cancelled tasks are not being properly awaited."
+        )

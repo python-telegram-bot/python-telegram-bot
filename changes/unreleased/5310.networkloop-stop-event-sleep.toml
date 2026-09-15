@@ -1,0 +1,5 @@
+bugfixes = "Fixed ``network_retry_loop`` hanging up to 30 seconds on shutdown during network outages by interrupting the backoff sleep when ``stop_event`` is set. Also fixed orphaned asyncio tasks (causing ``Task was destroyed but it is pending!`` warnings) by properly awaiting cancelled tasks in ``do_action``."
+[[pull_requests]]
+uid = "5310"
+author_uids = ["xsneh"]
+closes_threads = []

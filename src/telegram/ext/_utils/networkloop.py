@@ -141,9 +141,14 @@ async def network_retry_loop(
         done, pending = await asyncio.wait(
             (action_cb_task, stop_task), return_when=asyncio.FIRST_COMPLETED
         )
-        with contextlib.suppress(asyncio.CancelledError):
-            for task in pending:
-                task.cancel()
+        # Cancel pending tasks and await their completion so they are properly cleaned up.
+        # Merely calling .cancel() schedules cancellation but does not await it, which can
+        # leave tasks in a pending state and cause "Task was destroyed but it is pending!"
+        # warnings from the garbage collector.
+        for task in pending:
+            task.cancel()
+        if pending:
+            await asyncio.gather(*pending, return_exceptions=True)
 
         if stop_task in done:
             _LOGGER.debug("%s Cancelled", log_prefix)
@@ -159,6 +164,9 @@ async def network_retry_loop(
     while effective_is_running():
         try:
             await do_action()
+            if stop_event and stop_event.is_set():
+                _LOGGER.debug("%s Stop event set. Stopping loop.", log_prefix)
+                break
             if not repeat_on_success:
                 _LOGGER.debug("%s Action succeeded. Stopping loop.", log_prefix)
                 break
@@ -197,4 +205,16 @@ async def network_retry_loop(
             retries += 1
 
         if cur_interval:
-            await asyncio.sleep(cur_interval)
+            # If a stop_event is provided, use it to interrupt the backoff sleep early.
+            # A bare asyncio.sleep() would block shutdown for the full backoff duration
+            # (up to 30 s) even after stop_event is set.
+            if stop_event:
+                with contextlib.suppress(asyncio.TimeoutError):
+                    await asyncio.wait_for(stop_event.wait(), timeout=cur_interval)
+                if stop_event.is_set():
+                    _LOGGER.debug(
+                        "%s Stop event set during backoff sleep. Stopping loop.", log_prefix
+                    )
+                    break
+            else:
+                await asyncio.sleep(cur_interval)
