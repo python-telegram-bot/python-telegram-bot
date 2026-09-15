@@ -27,34 +27,53 @@ Warning:
 import dataclasses
 import functools
 import inspect
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import MISSING, dataclass, field, is_dataclass
-from typing import Any, TypeVar
+from typing import Any, TypeVar, get_args, get_origin
 
 from typing_extensions import dataclass_transform
 
+from telegram._utils.de_json import unwrap_optional
+
 _T = TypeVar("_T")
 CONVERTER_KEY = object()
+"""Special marker indicating that an entry was deleted."""
 ALIAS_KEY = object()
+"""Special marker indicating that an entry was deleted."""
 
 
-def _apply_aliases(cls: type[_T]) -> type[_T]:
-    """Provides runtime support for the `alias` parameter of a field specifier (e.g tg_field).
+def to_sequence_annotation(annotation: object) -> object:
+    item_type = get_args(annotation)[0]
+
+    if get_origin(item_type) is tuple:
+        item_type = to_sequence_annotation(item_type)
+
+    return Sequence[item_type]
+
+
+def process_init(cls: type[_T]) -> type[_T]:
+    """Processes the ``__init__`` of a class transformed with :func:`dataclasses.dataclass`.
 
     Args:
-        cls (:obj:`type`): A class transformed with `dataclasses.dataclass`
+        cls (:obj:`type`): A class transformed with :func:`dataclasses.dataclass`.
 
-    The function does two things to the provided class generated `__init__`:
+    The function updates the exposed signature of the provided class' ``__init__``:
 
-    1) Wraps the generated __init__ with a generic one (*args: object, **kwargs: object) that
-    rejects having the unalised field_name in kwargs.
+    1) Replaces field names with their aliases.
 
-    2) Updates the signature of the wrapper __init__ to replace parameter names from raw
-    to aliased.
+    2) Replaces the annotations of fields with converters with the input annotations accepted by
+       those converters.
+
+           - Fields stored as tuples expose the corresponding :class:`collections.abc.Sequence`
+             annotation.
+
+           - Parameter required/optional status is calculated based on :param:`tg_field.default`
+
+    It also provides runtime support for :param:`tg_field.alias`
 
     Note:
-        The aliased name is assumed to exist under the field metadata with
-        the sentinel key `ALIAS_KEY`
+        The aliased name and converter function are assumed to exist under the field metadata with
+        the sentinel keys `ALIAS_KEY`, `CONVERTER_KEY` repectively
 
     Returns:
         :obj:`type`:
@@ -66,43 +85,75 @@ def _apply_aliases(cls: type[_T]) -> type[_T]:
     if not is_dataclass(cls):
         raise TypeError(f"{cls!r} is not a dataclass")
 
-    aliases = {
-        dataclass_field.name: alias
-        for dataclass_field in dataclasses.fields(cls)
-        if dataclass_field.init and (alias := dataclass_field.metadata.get(ALIAS_KEY)) is not None
-    }
-
-    if not aliases:
-        return cls
+    fields = {dataclass_field.name: dataclass_field for dataclass_field in dataclasses.fields(cls)}
+    has_aliases = any(
+        dataclass_field.init and dataclass_field.metadata.get(ALIAS_KEY) is not None
+        for dataclass_field in fields.values()
+    )
 
     generated_init = cls.__init__
     generated_signature = inspect.signature(generated_init)
 
     @functools.wraps(generated_init)
     def aliased_init(self: object, *args: object, **kwargs: object) -> None:
-        for field_name, alias in aliases.items():
-            # 1.1) Reject kwargs keys using the raw (unaliased) field name
+        for field_name, dataclass_field in fields.items():
+            alias = dataclass_field.metadata.get(ALIAS_KEY)
+
+            if not dataclass_field.init or dataclass_field.metadata.get(ALIAS_KEY) is None:
+                continue
+
+            # Reject kwargs keys using the raw (unaliased) field name
             if field_name in kwargs:
                 raise TypeError(
                     f"{cls.__name__}() got an unexpected keyword argument {field_name!r}"
                 )
 
-            # 1.2) Swap the kwargs key from alias to field_name to satisfy runtime signature
+            # Swap the kwargs key from alias to field_name to satisfy runtime signature
             # of generated_init
             if alias in kwargs:
                 kwargs[field_name] = kwargs.pop(alias)
 
         generated_init(self, *args, **kwargs)
 
-    # 2) Now and since inspect.signature(generated_init/aliased_init) would still return parameters
-    # with raw field_names instead of aliased ones, we update those parameters in the signature
-    # This is neccessary because TO._build_plan expect field names to match what
+    # Now we update parameter names (if aliased) and annotations (if a converter is present)
+    # This is neccessary because TO._build_plan expects field names to match what
     # Telegram API returns
-    parameters = [
-        parameter.replace(name=aliases.get(parameter.name) or parameter.name)
-        for parameter in generated_signature.parameters.values()
-    ]
+    parameters = []
+    for param in generated_signature.parameters.values():
+        dataclass_field = fields.get(param.name)
+
+        if dataclass_field is None:
+            parameters.append(param)
+            continue
+
+        alias = dataclass_field.metadata.get(ALIAS_KEY)
+        converter = dataclass_field.metadata.get(CONVERTER_KEY)
+        annotation = param.annotation
+
+        if converter is not None:
+            field_annotation = unwrap_optional(param.annotation)
+
+            if get_origin(field_annotation) is tuple:
+                annotation = to_sequence_annotation(field_annotation)
+
+                if dataclass_field.default is not MISSING:
+                    annotation |= None
+            else:
+                converter_param = next(iter(inspect.signature(converter).parameters.values()))
+                annotation = converter_param.annotation
+
+        parameters.append(
+            param.replace(
+                name=alias or param.name,
+                annotation=annotation,
+            )
+        )
+
     signature = generated_signature.replace(parameters=parameters)
+
+    if not has_aliases:
+        generated_init.__signature__ = signature  # type: ignore[attr-defined]
+        return cls
 
     aliased_init.__signature__ = signature  # type: ignore[attr-defined]
     cls.__init__ = aliased_init  # type: ignore[method-assign]
@@ -158,7 +209,7 @@ def tg_dataclass(
             match_args=False,
             eq=eq,
         )
-        transformed_cls = _apply_aliases(transformed_cls)
+        transformed_cls = process_init(transformed_cls)
 
         if eq:
             compare_fields = tuple(

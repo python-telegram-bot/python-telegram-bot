@@ -23,7 +23,7 @@ import dataclasses
 import datetime as dtm
 import inspect
 import json
-from collections.abc import Iterator, Mapping, Sized
+from collections.abc import Iterator, Mapping, Sequence, Sized
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
@@ -379,15 +379,13 @@ class TelegramObject:
             origin = get_origin(inner)
 
             if param.default is inspect.Parameter.empty:
-                # We check for `is tuple` instead of `Sequence`
-                # because the inspected annotation returns the type declared in the field
-                compatibility_defaults[name] = () if origin is tuple else None
+                compatibility_defaults[name] = () if origin is Sequence else None
 
             if inner is dtm.datetime:
                 plan[name] = _DATETIME_FIELD
             elif isinstance(inner, type) and issubclass(inner, TelegramObject):
                 plan[name] = inner
-            elif origin is tuple:
+            elif origin is Sequence:
                 args = get_args(inner)
                 if not args:
                     continue
