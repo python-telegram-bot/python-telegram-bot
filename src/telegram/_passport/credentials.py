@@ -343,14 +343,14 @@ class _CredentialsBase(TelegramObject):
     hash: str = tg_field()
     secret: str = tg_field()
 
-    # Aliases just to be sure
-    @property
-    def file_hash(self) -> str:
-        return self.hash
+    data_hash: str = tg_field(init=False)
+    file_hash: str = tg_field(init=False)
 
-    @property
-    def data_hash(self) -> str:
-        return self.hash
+    def __post_init__(self) -> None:
+        # Aliases just to be sure
+        object.__setattr__(self, "data_hash", self.hash)
+        object.__setattr__(self, "file_hash", self.hash)
+        TelegramObject.__post_init__(self)
 
 
 @tg_dataclass()
