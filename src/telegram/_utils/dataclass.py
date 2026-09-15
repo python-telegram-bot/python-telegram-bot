@@ -158,6 +158,21 @@ def tg_dataclass(
             match_args=False,
             eq=eq,
         )
-        return _apply_aliases(transformed_cls)
+        transformed_cls = _apply_aliases(transformed_cls)
+
+        if eq:
+            compare_fields = tuple(
+                dataclass_field.name
+                for dataclass_field in dataclasses.fields(transformed_cls)
+                if dataclass_field.compare
+            )
+
+            def __hash__(self: object) -> int:
+                values = tuple(getattr(self, name) for name in compare_fields)
+                return hash((self.__class__, values))
+
+            transformed_cls.__hash__ = __hash__  # type: ignore[method-assign]
+
+        return transformed_cls
 
     return decorate
