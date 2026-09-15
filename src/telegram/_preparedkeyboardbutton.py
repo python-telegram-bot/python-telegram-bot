@@ -19,11 +19,10 @@
 """This module contains an object that represents a Telegram PreparedKeyboardButton."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import (
-    JSONDict,
-)
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class PreparedKeyboardButton(TelegramObject):
     """
     Describes a keyboard button to be used by a user of a Mini App.
@@ -40,15 +39,4 @@ class PreparedKeyboardButton(TelegramObject):
         id (:obj:`str`): Unique identifier of the keyboard button.
     """
 
-    __slots__ = ("id",)
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id
-        self._id_attrs = (self.id,)
-        self._freeze()
+    id: str = tg_field(compare=True)

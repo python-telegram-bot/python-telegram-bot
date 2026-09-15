@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram LoginUrl."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class LoginUrl(TelegramObject):
     """This object represents a parameter of the inline keyboard button used to automatically
     authorize a user. Serves as a great replacement for the Telegram Login Widget when the user is
@@ -80,25 +81,9 @@ class LoginUrl(TelegramObject):
 
     """
 
-    __slots__ = ("bot_username", "forward_text", "request_write_access", "url")
-
-    def __init__(
-        self,
-        url: str,
-        forward_text: str | None = None,
-        bot_username: str | None = None,
-        request_write_access: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.url: str = url
-        # Optional
-        self.forward_text: str | None = forward_text
-        self.bot_username: str | None = bot_username
-        self.request_write_access: bool | None = request_write_access
-
-        self._id_attrs = (self.url,)
-
-        self._freeze()
+    # Required
+    url: str = tg_field(compare=True)
+    # Optional
+    forward_text: str | None = tg_field()
+    bot_username: str | None = tg_field()
+    request_write_access: bool | None = tg_field()

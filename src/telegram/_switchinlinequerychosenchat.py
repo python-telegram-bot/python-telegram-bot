@@ -18,9 +18,10 @@
 """This module contains a class that represents a Telegram SwitchInlineQueryChosenChat."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class SwitchInlineQueryChosenChat(TelegramObject):
     """
     This object represents an inline button that switches the current user to inline mode in a
@@ -62,38 +63,9 @@ class SwitchInlineQueryChosenChat(TelegramObject):
 
     """
 
-    __slots__ = (
-        "allow_bot_chats",
-        "allow_channel_chats",
-        "allow_group_chats",
-        "allow_user_chats",
-        "query",
-    )
-
-    def __init__(
-        self,
-        query: str | None = None,
-        allow_user_chats: bool | None = None,
-        allow_bot_chats: bool | None = None,
-        allow_group_chats: bool | None = None,
-        allow_channel_chats: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Optional
-        self.query: str | None = query
-        self.allow_user_chats: bool | None = allow_user_chats
-        self.allow_bot_chats: bool | None = allow_bot_chats
-        self.allow_group_chats: bool | None = allow_group_chats
-        self.allow_channel_chats: bool | None = allow_channel_chats
-
-        self._id_attrs = (
-            self.query,
-            self.allow_user_chats,
-            self.allow_bot_chats,
-            self.allow_group_chats,
-            self.allow_channel_chats,
-        )
-
-        self._freeze()
+    # Optional
+    query: str | None = tg_field(compare=True, default=None)
+    allow_user_chats: bool | None = tg_field(compare=True, default=None)
+    allow_bot_chats: bool | None = tg_field(compare=True, default=None)
+    allow_group_chats: bool | None = tg_field(compare=True, default=None)
+    allow_channel_chats: bool | None = tg_field(compare=True, default=None)

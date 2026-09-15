@@ -19,8 +19,7 @@
 """This module contains an object that represents a Telegram Poll."""
 
 import datetime as dtm
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from telegram import constants
 from telegram._chat import Chat
@@ -41,16 +40,18 @@ from telegram._utils.argumentparsing import (
     parse_sequence_arg,
     to_timedelta,
 )
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.entities import parse_message_entities, parse_message_entity
-from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import ODVInput
 
 if TYPE_CHECKING:
     from telegram._files.inputmedia import InputPollOptionMedia
     from telegram._message import MaybeInaccessibleMessage
 
 
+@tg_dataclass()
 class PollMedia(TelegramObject):
     """
     At most one of the optional fields can be present in any given object.
@@ -97,58 +98,20 @@ class PollMedia(TelegramObject):
         video (:class:`telegram.Video`): Optional. Media is a video, information about the video
     """
 
-    __slots__ = (
-        "animation",
-        "audio",
-        "document",
-        "live_photo",
-        "location",
-        "photo",
-        "sticker",
-        "venue",
-        "video",
+    animation: Animation | None = tg_field(compare=True, default=None)
+    audio: Audio | None = tg_field(compare=True, default=None)
+    document: Document | None = tg_field(compare=True, default=None)
+    live_photo: LivePhoto | None = tg_field(compare=True, default=None)
+    location: Location | None = tg_field(compare=True, default=None)
+    photo: tuple[PhotoSize, ...] = tg_field(
+        compare=True, default=None, converter=parse_sequence_arg
     )
-
-    def __init__(
-        self,
-        animation: Animation | None = None,
-        audio: Audio | None = None,
-        document: Document | None = None,
-        live_photo: LivePhoto | None = None,
-        location: Location | None = None,
-        photo: Sequence[PhotoSize] | None = None,
-        sticker: Sticker | None = None,
-        venue: Venue | None = None,
-        video: Video | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.animation: Animation | None = animation
-        self.audio: Audio | None = audio
-        self.document: Document | None = document
-        self.live_photo: LivePhoto | None = live_photo
-        self.location: Location | None = location
-        self.photo: tuple[PhotoSize, ...] = parse_sequence_arg(photo)
-        self.sticker: Sticker | None = sticker
-        self.venue: Venue | None = venue
-        self.video: Video | None = video
-
-        self._id_attrs = (
-            self.animation,
-            self.audio,
-            self.document,
-            self.live_photo,
-            self.location,
-            self.photo,
-            self.sticker,
-            self.venue,
-            self.video,
-        )
-
-        self._freeze()
+    sticker: Sticker | None = tg_field(compare=True, default=None)
+    venue: Venue | None = tg_field(compare=True, default=None)
+    video: Video | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class InputPollOption(TelegramObject):
     """
     This object contains information about one answer option in a poll to be sent.
@@ -189,28 +152,13 @@ class InputPollOption(TelegramObject):
             .. versionadded:: 22.8
     """
 
-    __slots__ = ("media", "text", "text_entities", "text_parse_mode")
-
-    def __init__(
-        self,
-        text: str,
-        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        text_entities: Sequence[MessageEntity] | None = None,
-        media: "InputPollOptionMedia | None" = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.text: str = text
-        self.text_parse_mode: ODVInput[str] = text_parse_mode
-        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
-        self.media: InputPollOptionMedia | None = media
-
-        self._id_attrs = (self.text,)
-
-        self._freeze()
+    text: str = tg_field(compare=True)
+    text_parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    text_entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    media: "InputPollOptionMedia | None" = tg_field(default=None)
 
 
+@tg_dataclass()
 class PollOption(TelegramObject):
     """
     This object contains information about one answer option in a poll.
@@ -285,44 +233,17 @@ class PollOption(TelegramObject):
             .. versionadded:: 22.8
     """
 
-    __slots__ = (
-        "added_by_chat",
-        "added_by_user",
-        "addition_date",
-        "media",
-        "persistent_id",
-        "text",
-        "text_entities",
-        "voter_count",
-    )
+    # Required
+    text: str = tg_field(compare=True)
+    voter_count: int = tg_field(compare=True)
+    persistent_id: str = tg_field(compare=True)
 
-    def __init__(
-        self,
-        text: str,
-        voter_count: int,
-        persistent_id: str,
-        text_entities: Sequence[MessageEntity] | None = None,
-        added_by_user: User | None = None,
-        added_by_chat: Chat | None = None,
-        addition_date: dtm.datetime | None = None,
-        media: PollMedia | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.text: str = text
-        self.voter_count: int = voter_count
-        self.added_by_user: User | None = added_by_user
-        self.added_by_chat: Chat | None = added_by_chat
-        self.addition_date: dtm.datetime | None = addition_date
-        self.persistent_id: str = persistent_id
-        self.media: PollMedia | None = media
-
-        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
-
-        self._id_attrs = (self.text, self.voter_count, self.persistent_id)
-
-        self._freeze()
+    # Optional
+    text_entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    added_by_user: User | None = tg_field(default=None)
+    added_by_chat: Chat | None = tg_field(default=None)
+    addition_date: dtm.datetime | None = tg_field(default=None)
+    media: PollMedia | None = tg_field(default=None)
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`text`
@@ -380,6 +301,7 @@ class PollOption(TelegramObject):
     """
 
 
+@tg_dataclass()
 class PollAnswer(TelegramObject):
     """
     This object represents an answer of a user in a non-anonymous poll.
@@ -440,35 +362,16 @@ class PollAnswer(TelegramObject):
             .. versionadded:: 20.5
     """
 
-    __slots__ = ("option_ids", "option_persistent_ids", "poll_id", "user", "voter_chat")
-
-    def __init__(
-        self,
-        poll_id: str,
-        option_ids: Sequence[int],
-        option_persistent_ids: Sequence[str],
-        user: User | None = None,
-        voter_chat: Chat | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.poll_id: str = poll_id
-        self.voter_chat: Chat | None = voter_chat
-        self.option_ids: tuple[int, ...] = parse_sequence_arg(option_ids)
-        self.user: User | None = user
-        self.option_persistent_ids: tuple[str, ...] = parse_sequence_arg(option_persistent_ids)
-
-        self._id_attrs = (
-            self.poll_id,
-            self.option_ids,
-            self.user,
-            self.voter_chat,
-        )
-
-        self._freeze()
+    # Required
+    poll_id: str = tg_field(compare=True)
+    option_ids: tuple[int, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    option_persistent_ids: tuple[str, ...] = tg_field(converter=parse_sequence_arg)
+    # Optional
+    user: User | None = tg_field(compare=True, default=None)
+    voter_chat: Chat | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class PollOptionAdded(TelegramObject):
     """
     Describes a service message about an option added to a poll.
@@ -499,29 +402,14 @@ class PollOptionAdded(TelegramObject):
             entities that appear in the :paramref:`option_text`.
     """
 
-    __slots__ = ("option_persistent_id", "option_text", "option_text_entities", "poll_message")
-
-    def __init__(
-        self,
-        option_persistent_id: str,
-        option_text: str,
-        poll_message: "MaybeInaccessibleMessage | None" = None,
-        option_text_entities: Sequence[MessageEntity] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.option_persistent_id: str = option_persistent_id
-        self.option_text: str = option_text
-        self.poll_message: MaybeInaccessibleMessage | None = poll_message
-
-        self.option_text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
-            option_text_entities
-        )
-
-        self._id_attrs = (self.option_persistent_id, self.option_text)
-
-        self._freeze()
+    # Required
+    option_persistent_id: str = tg_field(compare=True)
+    option_text: str = tg_field(compare=True)
+    # Optional
+    poll_message: "MaybeInaccessibleMessage | None" = tg_field(default=None)
+    option_text_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
 
     def parse_option_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`option_text`
@@ -566,6 +454,7 @@ class PollOptionAdded(TelegramObject):
         return parse_message_entities(self.option_text, self.option_text_entities, types)
 
 
+@tg_dataclass()
 class PollOptionDeleted(TelegramObject):
     """
     Describes a service message about an option deleted from a poll.
@@ -596,29 +485,14 @@ class PollOptionDeleted(TelegramObject):
             entities that appear in the option_text.
     """
 
-    __slots__ = ("option_persistent_id", "option_text", "option_text_entities", "poll_message")
-
-    def __init__(
-        self,
-        option_persistent_id: str,
-        option_text: str,
-        poll_message: "MaybeInaccessibleMessage | None" = None,
-        option_text_entities: Sequence[MessageEntity] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.option_persistent_id: str = option_persistent_id
-        self.option_text: str = option_text
-        self.poll_message: MaybeInaccessibleMessage | None = poll_message
-
-        self.option_text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
-            option_text_entities
-        )
-
-        self._id_attrs = (self.option_persistent_id, self.option_text)
-
-        self._freeze()
+    # Required
+    option_persistent_id: str = tg_field(compare=True)
+    option_text: str = tg_field(compare=True)
+    # Optional
+    poll_message: "MaybeInaccessibleMessage | None" = tg_field(default=None)
+    option_text_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
 
     def parse_option_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`option_text`
@@ -663,6 +537,7 @@ class PollOptionDeleted(TelegramObject):
         return parse_message_entities(self.option_text, self.option_text_entities, types)
 
 
+@tg_dataclass()
 class Poll(TelegramObject):
     """
     This object contains information about a poll.
@@ -829,87 +704,41 @@ class Poll(TelegramObject):
 
     """
 
-    __slots__ = (
-        "_open_period",
-        "allows_multiple_answers",
-        "allows_revoting",
-        "close_date",
-        "correct_option_ids",
-        "country_codes",
-        "description",
-        "description_entities",
-        "explanation",
-        "explanation_entities",
-        "explanation_media",
-        "id",
-        "is_anonymous",
-        "is_closed",
-        "media",
-        "members_only",
-        "options",
-        "question",
-        "question_entities",
-        "total_voter_count",
-        "type",
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.PollType, value, value)
+
+    # Required
+    id: str = tg_field(compare=True)
+    question: str = tg_field()
+    options: tuple[PollOption, ...] = tg_field(converter=parse_sequence_arg)
+    total_voter_count: int = tg_field()
+    is_closed: bool = tg_field()
+    is_anonymous: bool = tg_field()
+    type: str = tg_field(converter=_type_converter)
+    allows_multiple_answers: bool = tg_field()
+    allows_revoting: bool = tg_field()
+    members_only: bool = tg_field()
+    # Optional
+    explanation: str | None = tg_field(default=None)
+    explanation_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
     )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        question: str,
-        options: Sequence[PollOption],
-        total_voter_count: int,
-        is_closed: bool,
-        is_anonymous: bool,
-        type: str,  # pylint: disable=redefined-builtin
-        allows_multiple_answers: bool,
-        allows_revoting: bool,
-        members_only: bool,
-        explanation: str | None = None,
-        explanation_entities: Sequence[MessageEntity] | None = None,
-        open_period: TimePeriod | None = None,
-        close_date: dtm.datetime | None = None,
-        question_entities: Sequence[MessageEntity] | None = None,
-        correct_option_ids: Sequence[int] | None = None,
-        description: str | None = None,
-        description_entities: Sequence[MessageEntity] | None = None,
-        country_codes: Sequence[str] | None = None,
-        media: PollMedia | None = None,
-        explanation_media: PollMedia | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id
-        self.question: str = question
-        self.options: tuple[PollOption, ...] = parse_sequence_arg(options)
-        self.total_voter_count: int = total_voter_count
-        self.is_closed: bool = is_closed
-        self.is_anonymous: bool = is_anonymous
-        self.type: str = enum.get_member(constants.PollType, type, type)
-        self.allows_multiple_answers: bool = allows_multiple_answers
-        self.allows_revoting: bool = allows_revoting
-        self.members_only: bool = members_only
-
-        self.correct_option_ids: tuple[int, ...] = parse_sequence_arg(correct_option_ids)
-        self.description: str | None = description
-        self.description_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
-            description_entities
-        )
-        self.explanation: str | None = explanation
-        self.explanation_entities: tuple[MessageEntity, ...] = parse_sequence_arg(
-            explanation_entities
-        )
-        self._open_period: dtm.timedelta | None = to_timedelta(open_period)
-        self.close_date: dtm.datetime | None = close_date
-        self.question_entities: tuple[MessageEntity, ...] = parse_sequence_arg(question_entities)
-        self.country_codes: tuple[str, ...] = parse_sequence_arg(country_codes)
-        self.media: PollMedia | None = media
-        self.explanation_media: PollMedia | None = explanation_media
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    _open_period: dtm.timedelta | None = tg_field(
+        default=None, alias="open_period", converter=to_timedelta
+    )
+    close_date: dtm.datetime | None = tg_field(default=None)
+    question_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    correct_option_ids: tuple[int, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    description: str | None = tg_field(default=None)
+    description_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    country_codes: tuple[str, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    media: PollMedia | None = tg_field(default=None)
+    explanation_media: PollMedia | None = tg_field(default=None)
 
     @property
     def open_period(self) -> int | dtm.timedelta | None:
@@ -1073,66 +902,66 @@ class Poll(TelegramObject):
 
         return parse_message_entities(self.description, self.description_entities, types)
 
-    REGULAR: Final[str] = constants.PollType.REGULAR
+    REGULAR: ClassVar[str] = constants.PollType.REGULAR
     """:const:`telegram.constants.PollType.REGULAR`"""
-    QUIZ: Final[str] = constants.PollType.QUIZ
+    QUIZ: ClassVar[str] = constants.PollType.QUIZ
     """:const:`telegram.constants.PollType.QUIZ`"""
-    MAX_EXPLANATION_LENGTH: Final[int] = constants.PollLimit.MAX_EXPLANATION_LENGTH
+    MAX_EXPLANATION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_EXPLANATION_LENGTH
     """:const:`telegram.constants.PollLimit.MAX_EXPLANATION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_EXPLANATION_LINE_FEEDS: Final[int] = constants.PollLimit.MAX_EXPLANATION_LINE_FEEDS
+    MAX_EXPLANATION_LINE_FEEDS: ClassVar[int] = constants.PollLimit.MAX_EXPLANATION_LINE_FEEDS
     """:const:`telegram.constants.PollLimit.MAX_EXPLANATION_LINE_FEEDS`
 
     .. versionadded:: 20.0
     """
-    MIN_OPEN_PERIOD: Final[int] = constants.PollLimit.MIN_OPEN_PERIOD
+    MIN_OPEN_PERIOD: ClassVar[int] = constants.PollLimit.MIN_OPEN_PERIOD
     """:const:`telegram.constants.PollLimit.MIN_OPEN_PERIOD`
 
     .. versionadded:: 20.0
     """
-    MAX_OPEN_PERIOD: Final[int] = constants.PollLimit.MAX_OPEN_PERIOD
+    MAX_OPEN_PERIOD: ClassVar[int] = constants.PollLimit.MAX_OPEN_PERIOD
     """:const:`telegram.constants.PollLimit.MAX_OPEN_PERIOD`
 
     .. versionadded:: 20.0
     """
-    MIN_QUESTION_LENGTH: Final[int] = constants.PollLimit.MIN_QUESTION_LENGTH
+    MIN_QUESTION_LENGTH: ClassVar[int] = constants.PollLimit.MIN_QUESTION_LENGTH
     """:const:`telegram.constants.PollLimit.MIN_QUESTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_QUESTION_LENGTH: Final[int] = constants.PollLimit.MAX_QUESTION_LENGTH
+    MAX_QUESTION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_QUESTION_LENGTH
     """:const:`telegram.constants.PollLimit.MAX_QUESTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_OPTION_LENGTH: Final[int] = constants.PollLimit.MIN_OPTION_LENGTH
+    MIN_OPTION_LENGTH: ClassVar[int] = constants.PollLimit.MIN_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MIN_OPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_OPTION_LENGTH: Final[int] = constants.PollLimit.MAX_OPTION_LENGTH
+    MAX_OPTION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MAX_OPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_OPTION_NUMBER: Final[int] = constants.PollLimit.MIN_OPTION_NUMBER
+    MIN_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.MIN_OPTION_NUMBER
     """:const:`telegram.constants.PollLimit.MIN_OPTION_NUMBER`
 
     .. versionadded:: 20.0
     """
-    MAX_OPTION_NUMBER: Final[int] = constants.PollLimit.MAX_OPTION_NUMBER
+    MAX_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.MAX_OPTION_NUMBER
     """:const:`telegram.constants.PollLimit.MAX_OPTION_NUMBER`
 
     .. versionadded:: 20.0
     """
-    MAX_DESCRIPTION_CHARACTERS: Final[int] = constants.PollLimit.MAX_DESCRIPTION_CHARACTERS
+    MAX_DESCRIPTION_CHARACTERS: ClassVar[int] = constants.PollLimit.MAX_DESCRIPTION_CHARACTERS
     """:const:`telegram.constants.PollLimit.MAX_DESCRIPTION_CHARACTERS`
 
     .. versionadded:: 22.8
     """
-    MIN_MEMBERSHIP_HOURS: Final[int] = constants.PollLimit.MIN_MEMBERSHIP_HOURS
+    MIN_MEMBERSHIP_HOURS: ClassVar[int] = constants.PollLimit.MIN_MEMBERSHIP_HOURS
     """:const:`telegram.constants.PollLimit.MIN_MEMBERSHIP_HOURS`
 
     .. versionadded:: 22.8

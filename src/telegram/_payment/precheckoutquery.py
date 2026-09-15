@@ -21,10 +21,12 @@
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
 
+@tg_dataclass()
 class PreCheckoutQuery(TelegramObject):
     """This object contains information about an incoming pre-checkout query.
 
@@ -69,40 +71,13 @@ class PreCheckoutQuery(TelegramObject):
 
     """
 
-    __slots__ = (
-        "currency",
-        "from_user",
-        "id",
-        "invoice_payload",
-        "order_info",
-        "shipping_option_id",
-        "total_amount",
-    )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        from_user: User,
-        currency: str,
-        total_amount: int,
-        invoice_payload: str,
-        shipping_option_id: str | None = None,
-        order_info: OrderInfo | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id
-        self.from_user: User = from_user
-        self.currency: str = currency
-        self.total_amount: int = total_amount
-        self.invoice_payload: str = invoice_payload
-        self.shipping_option_id: str | None = shipping_option_id
-        self.order_info: OrderInfo | None = order_info
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    id: str = tg_field(compare=True)
+    from_user: User = tg_field()
+    currency: str = tg_field()
+    total_amount: int = tg_field()
+    invoice_payload: str = tg_field()
+    shipping_option_id: str | None = tg_field(default=None)
+    order_info: OrderInfo | None = tg_field(default=None)
 
     async def answer(
         self,

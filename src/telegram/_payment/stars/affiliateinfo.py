@@ -21,13 +21,14 @@
 from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 if TYPE_CHECKING:
     from telegram._chat import Chat
     from telegram._user import User
 
 
+@tg_dataclass()
 class AffiliateInfo(TelegramObject):
     """Contains information about the affiliate that received a commission via this transaction.
 
@@ -70,36 +71,8 @@ class AffiliateInfo(TelegramObject):
             can be negative for refunds
     """
 
-    __slots__ = (
-        "affiliate_chat",
-        "affiliate_user",
-        "amount",
-        "commission_per_mille",
-        "nanostar_amount",
-    )
-
-    def __init__(
-        self,
-        commission_per_mille: int,
-        amount: int,
-        affiliate_user: "User | None" = None,
-        affiliate_chat: "Chat | None" = None,
-        nanostar_amount: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.affiliate_user: User | None = affiliate_user
-        self.affiliate_chat: Chat | None = affiliate_chat
-        self.commission_per_mille: int = commission_per_mille
-        self.amount: int = amount
-        self.nanostar_amount: int | None = nanostar_amount
-
-        self._id_attrs = (
-            self.affiliate_user,
-            self.affiliate_chat,
-            self.commission_per_mille,
-            self.amount,
-            self.nanostar_amount,
-        )
-        self._freeze()
+    commission_per_mille: int = tg_field(compare=True)
+    amount: int = tg_field(compare=True)
+    affiliate_user: "User | None" = tg_field(compare=True, default=None)
+    affiliate_chat: "Chat | None" = tg_field(compare=True, default=None)
+    nanostar_amount: int | None = tg_field(compare=True, default=None)

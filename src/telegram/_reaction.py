@@ -16,17 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains objects that represents a Telegram ReactionType."""
 
-from typing import ClassVar, Final, Literal
+from typing import ClassVar, Literal
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ReactionType(TelegramObject):
     """Base class for Telegram ReactionType Objects.
     There exist :class:`telegram.ReactionTypeEmoji`, :class:`telegram.ReactionTypeCustomEmoji`
@@ -48,8 +48,6 @@ class ReactionType(TelegramObject):
 
     """
 
-    __slots__ = ("type",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -59,29 +57,27 @@ class ReactionType(TelegramObject):
         },
     )
 
-    EMOJI: Final[constants.ReactionType] = constants.ReactionType.EMOJI
+    EMOJI: ClassVar[constants.ReactionType] = constants.ReactionType.EMOJI
     """:const:`telegram.constants.ReactionType.EMOJI`"""
-    CUSTOM_EMOJI: Final[constants.ReactionType] = constants.ReactionType.CUSTOM_EMOJI
+    CUSTOM_EMOJI: ClassVar[constants.ReactionType] = constants.ReactionType.CUSTOM_EMOJI
     """:const:`telegram.constants.ReactionType.CUSTOM_EMOJI`"""
-    PAID: Final[constants.ReactionType] = constants.ReactionType.PAID
+    PAID: ClassVar[constants.ReactionType] = constants.ReactionType.PAID
     """:const:`telegram.constants.ReactionType.PAID`
 
     .. versionadded:: 21.5
     """
 
-    def __init__(
-        self,
-        type: Literal["emoji", "custom_emoji", "paid"] | constants.ReactionType,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required by all subclasses
-        self.type: str = enum.get_member(constants.ReactionType, type, type)
+    @staticmethod
+    def _type_converter(
+        value: Literal["emoji", "custom_emoji", "paid"] | constants.ReactionType,
+    ) -> str:
+        return enum.get_member(constants.MessageOriginType, value, value)
 
-        self._freeze()
+    # Required by all subclasses
+    type: str = tg_field(converter=_type_converter)
 
 
+@tg_dataclass()
 class ReactionTypeEmoji(ReactionType):
     """
     Represents a reaction with a normal emoji.
@@ -102,21 +98,13 @@ class ReactionTypeEmoji(ReactionType):
         :const:`telegram.constants.ReactionEmoji`.
     """
 
-    __slots__ = ("emoji",)
-
-    def __init__(
-        self,
-        emoji: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=ReactionType.EMOJI, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.emoji: str = emoji
-            self._id_attrs = (self.emoji,)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=ReactionType.EMOJI)
+    # Required
+    emoji: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class ReactionTypeCustomEmoji(ReactionType):
     """
     Represents a reaction with a custom emoji.
@@ -136,21 +124,13 @@ class ReactionTypeCustomEmoji(ReactionType):
 
     """
 
-    __slots__ = ("custom_emoji_id",)
-
-    def __init__(
-        self,
-        custom_emoji_id: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=ReactionType.CUSTOM_EMOJI, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.custom_emoji_id: str = custom_emoji_id
-            self._id_attrs = (self.custom_emoji_id,)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=ReactionType.CUSTOM_EMOJI)
+    # Required
+    custom_emoji_id: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class ReactionTypePaid(ReactionType):
     """
     The reaction is paid.
@@ -162,13 +142,11 @@ class ReactionTypePaid(ReactionType):
             always :tg-const:`telegram.ReactionType.PAID`.
     """
 
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(type=ReactionType.PAID, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=ReactionType.PAID)
 
 
+@tg_dataclass()
 class ReactionCount(TelegramObject):
     """This class represents a reaction added to a message along with the number of times it was
     added.
@@ -187,25 +165,5 @@ class ReactionCount(TelegramObject):
         total_count (:obj:`int`): Number of times the reaction was added.
     """
 
-    __slots__ = (
-        "total_count",
-        "type",
-    )
-
-    def __init__(
-        self,
-        type: ReactionType,  # pylint: disable=redefined-builtin
-        total_count: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.type: ReactionType = type
-        self.total_count: int = total_count
-
-        self._id_attrs = (
-            self.type,
-            self.total_count,
-        )
-        self._freeze()
+    type: ReactionType = tg_field(compare=True)
+    total_count: int = tg_field(compare=True)

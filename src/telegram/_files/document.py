@@ -18,12 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Document."""
 
-from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
-class Document(_BaseThumbedMedium):
+@tg_dataclass()
+class Document(_BaseMedium):
     """This object represents a general file
     (as opposed to photos, voice messages and audio files).
 
@@ -61,27 +62,7 @@ class Document(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ("file_name", "mime_type")
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        file_name: str | None = None,
-        mime_type: str | None = None,
-        file_size: int | None = None,
-        thumbnail: PhotoSize | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            thumbnail=thumbnail,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            # Optional
-            self.mime_type: str | None = mime_type
-            self.file_name: str | None = file_name
+    file_name: str | None = tg_field(default=None)
+    mime_type: str | None = tg_field(default=None)
+    file_size: int | None = tg_field(default=None)
+    thumbnail: PhotoSize | None = tg_field(default=None)

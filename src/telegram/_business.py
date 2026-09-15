@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=redefined-builtin
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2026
@@ -20,7 +19,6 @@
 """This module contains the Telegram Business related classes."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
@@ -30,16 +28,17 @@ from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import (
     parse_sequence_arg,
 )
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import (
     get_zone_info,
 )
-from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram._files.location import Location
     from telegram._user import User
 
 
+@tg_dataclass()
 class BusinessBotRights(TelegramObject):
     """
     This object represents the rights of a business bot.
@@ -112,78 +111,23 @@ class BusinessBotRights(TelegramObject):
             stories on behalf of the business account.
     """
 
-    __slots__ = (
-        "can_change_gift_settings",
-        "can_convert_gifts_to_stars",
-        "can_delete_all_messages",
-        "can_delete_sent_messages",
-        "can_edit_bio",
-        "can_edit_name",
-        "can_edit_profile_photo",
-        "can_edit_username",
-        "can_manage_stories",
-        "can_read_messages",
-        "can_reply",
-        "can_transfer_and_upgrade_gifts",
-        "can_transfer_stars",
-        "can_view_gifts_and_stars",
-    )
-
-    def __init__(
-        self,
-        can_reply: bool | None = None,
-        can_read_messages: bool | None = None,
-        can_delete_sent_messages: bool | None = None,
-        can_delete_all_messages: bool | None = None,
-        can_edit_name: bool | None = None,
-        can_edit_bio: bool | None = None,
-        can_edit_profile_photo: bool | None = None,
-        can_edit_username: bool | None = None,
-        can_change_gift_settings: bool | None = None,
-        can_view_gifts_and_stars: bool | None = None,
-        can_convert_gifts_to_stars: bool | None = None,
-        can_transfer_and_upgrade_gifts: bool | None = None,
-        can_transfer_stars: bool | None = None,
-        can_manage_stories: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.can_reply: bool | None = can_reply
-        self.can_read_messages: bool | None = can_read_messages
-        self.can_delete_sent_messages: bool | None = can_delete_sent_messages
-        self.can_delete_all_messages: bool | None = can_delete_all_messages
-        self.can_edit_name: bool | None = can_edit_name
-        self.can_edit_bio: bool | None = can_edit_bio
-        self.can_edit_profile_photo: bool | None = can_edit_profile_photo
-        self.can_edit_username: bool | None = can_edit_username
-        self.can_change_gift_settings: bool | None = can_change_gift_settings
-        self.can_view_gifts_and_stars: bool | None = can_view_gifts_and_stars
-        self.can_convert_gifts_to_stars: bool | None = can_convert_gifts_to_stars
-        self.can_transfer_and_upgrade_gifts: bool | None = can_transfer_and_upgrade_gifts
-        self.can_transfer_stars: bool | None = can_transfer_stars
-        self.can_manage_stories: bool | None = can_manage_stories
-
-        self._id_attrs = (
-            self.can_reply,
-            self.can_read_messages,
-            self.can_delete_sent_messages,
-            self.can_delete_all_messages,
-            self.can_edit_name,
-            self.can_edit_bio,
-            self.can_edit_profile_photo,
-            self.can_edit_username,
-            self.can_change_gift_settings,
-            self.can_view_gifts_and_stars,
-            self.can_convert_gifts_to_stars,
-            self.can_transfer_and_upgrade_gifts,
-            self.can_transfer_stars,
-            self.can_manage_stories,
-        )
-
-        self._freeze()
+    can_reply: bool | None = tg_field(compare=True, default=None)
+    can_read_messages: bool | None = tg_field(compare=True, default=None)
+    can_delete_sent_messages: bool | None = tg_field(compare=True, default=None)
+    can_delete_all_messages: bool | None = tg_field(compare=True, default=None)
+    can_edit_name: bool | None = tg_field(compare=True, default=None)
+    can_edit_bio: bool | None = tg_field(compare=True, default=None)
+    can_edit_profile_photo: bool | None = tg_field(compare=True, default=None)
+    can_edit_username: bool | None = tg_field(compare=True, default=None)
+    can_change_gift_settings: bool | None = tg_field(compare=True, default=None)
+    can_view_gifts_and_stars: bool | None = tg_field(compare=True, default=None)
+    can_convert_gifts_to_stars: bool | None = tg_field(compare=True, default=None)
+    can_transfer_and_upgrade_gifts: bool | None = tg_field(compare=True, default=None)
+    can_transfer_stars: bool | None = tg_field(compare=True, default=None)
+    can_manage_stories: bool | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class BusinessConnection(TelegramObject):
     """
     Describes the connection of the bot with a business account.
@@ -222,46 +166,15 @@ class BusinessConnection(TelegramObject):
             .. versionadded:: 22.1
     """
 
-    __slots__ = (
-        "date",
-        "id",
-        "is_enabled",
-        "rights",
-        "user",
-        "user_chat_id",
-    )
-
-    def __init__(
-        self,
-        id: str,
-        user: "User",
-        user_chat_id: int,
-        date: dtm.datetime,
-        is_enabled: bool,
-        rights: BusinessBotRights | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id
-        self.user: User = user
-        self.user_chat_id: int = user_chat_id
-        self.date: dtm.datetime = date
-        self.is_enabled: bool = is_enabled
-        self.rights: BusinessBotRights | None = rights
-
-        self._id_attrs = (
-            self.id,
-            self.user,
-            self.user_chat_id,
-            self.date,
-            self.rights,
-            self.is_enabled,
-        )
-
-        self._freeze()
+    id: str = tg_field(compare=True)
+    user: "User" = tg_field(compare=True)
+    user_chat_id: int = tg_field(compare=True)
+    date: dtm.datetime = tg_field(compare=True)
+    is_enabled: bool = tg_field(compare=True)
+    rights: BusinessBotRights | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class BusinessMessagesDeleted(TelegramObject):
     """
     This object is received when messages are deleted from a connected business account.
@@ -287,34 +200,12 @@ class BusinessMessagesDeleted(TelegramObject):
             chat of the business account.
     """
 
-    __slots__ = (
-        "business_connection_id",
-        "chat",
-        "message_ids",
-    )
-
-    def __init__(
-        self,
-        business_connection_id: str,
-        chat: Chat,
-        message_ids: Sequence[int],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.business_connection_id: str = business_connection_id
-        self.chat: Chat = chat
-        self.message_ids: tuple[int, ...] = parse_sequence_arg(message_ids)
-
-        self._id_attrs = (
-            self.business_connection_id,
-            self.chat,
-            self.message_ids,
-        )
-
-        self._freeze()
+    business_connection_id: str = tg_field(compare=True)
+    chat: Chat = tg_field(compare=True)
+    message_ids: tuple[int, ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class BusinessIntro(TelegramObject):
     """
     This object contains information about the start page settings of a Telegram Business account.
@@ -336,30 +227,12 @@ class BusinessIntro(TelegramObject):
         sticker (:class:`telegram.Sticker`): Optional. Sticker of the business intro.
     """
 
-    __slots__ = (
-        "message",
-        "sticker",
-        "title",
-    )
-
-    def __init__(
-        self,
-        title: str | None = None,
-        message: str | None = None,
-        sticker: Sticker | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.title: str | None = title
-        self.message: str | None = message
-        self.sticker: Sticker | None = sticker
-
-        self._id_attrs = (self.title, self.message, self.sticker)
-
-        self._freeze()
+    title: str | None = tg_field(compare=True, default=None)
+    message: str | None = tg_field(compare=True, default=None)
+    sticker: Sticker | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class BusinessLocation(TelegramObject):
     """
     This object contains information about the location of a Telegram Business account.
@@ -379,27 +252,11 @@ class BusinessLocation(TelegramObject):
         location (:class:`telegram.Location`): Optional. Location of the business.
     """
 
-    __slots__ = (
-        "address",
-        "location",
-    )
-
-    def __init__(
-        self,
-        address: str,
-        location: "Location | None" = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.address: str = address
-        self.location: Location | None = location
-
-        self._id_attrs = (self.address,)
-
-        self._freeze()
+    address: str = tg_field(compare=True)
+    location: "Location | None" = tg_field(default=None)
 
 
+@tg_dataclass()
 class BusinessOpeningHoursInterval(TelegramObject):
     """
     This object describes an interval of time during which a business is open.
@@ -442,25 +299,11 @@ class BusinessOpeningHoursInterval(TelegramObject):
             during which the business is open; 0 - 8 * 24 * 60
     """
 
-    __slots__ = ("_closing_time", "_opening_time", "closing_minute", "opening_minute")
+    opening_minute: int = tg_field(compare=True)
+    closing_minute: int = tg_field(compare=True)
 
-    def __init__(
-        self,
-        opening_minute: int,
-        closing_minute: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.opening_minute: int = opening_minute
-        self.closing_minute: int = closing_minute
-
-        self._opening_time: tuple[int, int, int] | None = None
-        self._closing_time: tuple[int, int, int] | None = None
-
-        self._id_attrs = (self.opening_minute, self.closing_minute)
-
-        self._freeze()
+    _opening_time: tuple[int, int, int] | None = tg_field(init=False, default=None)
+    _closing_time: tuple[int, int, int] | None = tg_field(init=False, default=None)
 
     def _parse_minute(self, minute: int) -> tuple[int, int, int]:
         return (minute // 1440, minute % 1440 // 60, minute % 1440 % 60)
@@ -474,9 +317,11 @@ class BusinessOpeningHoursInterval(TelegramObject):
         Returns:
             tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
         """
-        if self._opening_time is None:
-            self._opening_time = self._parse_minute(self.opening_minute)
-        return self._opening_time
+        opening_time = self._opening_time
+        if opening_time is None:
+            opening_time = self._parse_minute(self.opening_minute)
+            object.__setattr__(self, "_opening_time", opening_time)
+        return opening_time
 
     @property
     def closing_time(self) -> tuple[int, int, int]:
@@ -487,11 +332,14 @@ class BusinessOpeningHoursInterval(TelegramObject):
         Returns:
             tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
         """
-        if self._closing_time is None:
-            self._closing_time = self._parse_minute(self.closing_minute)
-        return self._closing_time
+        closing_time = self._closing_time
+        if closing_time is None:
+            closing_time = self._parse_minute(self.closing_minute)
+            object.__setattr__(self, "_closing_time", closing_time)
+        return closing_time
 
 
+@tg_dataclass()
 class BusinessOpeningHours(TelegramObject):
     """
     This object describes the opening hours of a business.
@@ -515,32 +363,20 @@ class BusinessOpeningHours(TelegramObject):
             time intervals describing business opening hours.
     """
 
-    __slots__ = ("_cached_zone_info", "opening_hours", "time_zone_name")
+    time_zone_name: str = tg_field(compare=True)
+    opening_hours: tuple[BusinessOpeningHoursInterval, ...] = tg_field(
+        compare=True, converter=parse_sequence_arg
+    )
 
-    def __init__(
-        self,
-        time_zone_name: str,
-        opening_hours: Sequence[BusinessOpeningHoursInterval],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.time_zone_name: str = time_zone_name
-        self.opening_hours: Sequence[BusinessOpeningHoursInterval] = parse_sequence_arg(
-            opening_hours
-        )
-
-        self._cached_zone_info: ZoneInfo | None = None
-
-        self._id_attrs = (self.time_zone_name, self.opening_hours)
-
-        self._freeze()
+    _cached_zone_info: ZoneInfo | None = tg_field(init=False, default=None)
 
     @property
     def _zone_info(self) -> ZoneInfo:
-        if self._cached_zone_info is None:
-            self._cached_zone_info = get_zone_info(self.time_zone_name)
-        return self._cached_zone_info
+        cached_zone_info = self._cached_zone_info
+        if cached_zone_info is None:
+            cached_zone_info = get_zone_info(self.time_zone_name)
+            object.__setattr__(self, "_cached_zone_info", cached_zone_info)
+        return cached_zone_info
 
     def get_opening_hours_for_day(
         self, date: dtm.date, time_zone: dtm.tzinfo | str | None = None

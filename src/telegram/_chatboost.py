@@ -19,8 +19,7 @@
 """This module contains the classes that represent Telegram ChatBoosts."""
 
 import datetime as dtm
-from collections.abc import Sequence
-from typing import ClassVar, Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._chat import Chat
@@ -28,9 +27,10 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ChatBoostAdded(TelegramObject):
     """
     This object represents a service message about a user boosting a chat.
@@ -49,21 +49,10 @@ class ChatBoostAdded(TelegramObject):
 
     """
 
-    __slots__ = ("boost_count",)
-
-    def __init__(
-        self,
-        boost_count: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.boost_count: int = boost_count
-        self._id_attrs = (self.boost_count,)
-
-        self._freeze()
+    boost_count: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class ChatBoostSource(TelegramObject):
     """
     Base class for Telegram ChatBoostSource objects. It can be one of:
@@ -88,8 +77,6 @@ class ChatBoostSource(TelegramObject):
             or :attr:`~telegram.ChatBoostSource.GIVEAWAY`.
     """
 
-    __slots__ = ("source",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "source",
         {
@@ -99,23 +86,21 @@ class ChatBoostSource(TelegramObject):
         },
     )
 
-    PREMIUM: Final[str] = constants.ChatBoostSources.PREMIUM
+    PREMIUM: ClassVar[str] = constants.ChatBoostSources.PREMIUM
     """:const:`telegram.constants.ChatBoostSources.PREMIUM`"""
-    GIFT_CODE: Final[str] = constants.ChatBoostSources.GIFT_CODE
+    GIFT_CODE: ClassVar[str] = constants.ChatBoostSources.GIFT_CODE
     """:const:`telegram.constants.ChatBoostSources.GIFT_CODE`"""
-    GIVEAWAY: Final[str] = constants.ChatBoostSources.GIVEAWAY
+    GIVEAWAY: ClassVar[str] = constants.ChatBoostSources.GIVEAWAY
     """:const:`telegram.constants.ChatBoostSources.GIVEAWAY`"""
 
-    def __init__(self, source: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
+    @staticmethod
+    def _source_converter(value: str) -> str:
+        return enum.get_member(constants.ChatBoostSources, value, value)
 
-        # Required by all subclasses:
-        self.source: str = enum.get_member(constants.ChatBoostSources, source, source)
-
-        self._id_attrs = (self.source,)
-        self._freeze()
+    source: str = tg_field(compare=True, default=None, converter=_source_converter)
 
 
+@tg_dataclass()
 class ChatBoostSourcePremium(ChatBoostSource):
     """
     The boost was obtained by subscribing to Telegram Premium or by gifting a Telegram Premium
@@ -132,15 +117,13 @@ class ChatBoostSourcePremium(ChatBoostSource):
         user (:class:`telegram.User`): User that boosted the chat.
     """
 
-    __slots__ = ("user",)
+    # Attribute only (init=False)
+    source: str = tg_field(init=False, default=ChatBoostSource.PREMIUM)
 
-    def __init__(self, user: User, *, api_kwargs: JSONDict | None = None):
-        super().__init__(source=self.PREMIUM, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.user: User = user
+    user: User = tg_field()
 
 
+@tg_dataclass()
 class ChatBoostSourceGiftCode(ChatBoostSource):
     """
     The boost was obtained by the creation of Telegram Premium gift codes to boost a chat. Each
@@ -158,15 +141,13 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
         user (:class:`telegram.User`): User for which the gift code was created.
     """
 
-    __slots__ = ("user",)
+    # Attribute only (init=False)
+    source: str = tg_field(init=False, default=ChatBoostSource.PREMIUM)
 
-    def __init__(self, user: User, *, api_kwargs: JSONDict | None = None):
-        super().__init__(source=self.GIFT_CODE, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.user: User = user
+    user: User = tg_field()
 
 
+@tg_dataclass()
 class ChatBoostSourceGiveaway(ChatBoostSource):
     """
     The boost was obtained by the creation of a Telegram Premium giveaway or a Telegram Star.
@@ -202,26 +183,16 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
             there was no user to win the prize.
     """
 
-    __slots__ = ("giveaway_message_id", "is_unclaimed", "prize_star_count", "user")
+    # Attribute only (init=False)
+    source: str = tg_field(init=False, default=ChatBoostSource.GIVEAWAY)
 
-    def __init__(
-        self,
-        giveaway_message_id: int,
-        user: User | None = None,
-        is_unclaimed: bool | None = None,
-        prize_star_count: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(source=self.GIVEAWAY, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.giveaway_message_id: int = giveaway_message_id
-            self.user: User | None = user
-            self.prize_star_count: int | None = prize_star_count
-            self.is_unclaimed: bool | None = is_unclaimed
+    giveaway_message_id: int = tg_field()
+    user: User | None = tg_field(default=None)
+    is_unclaimed: bool | None = tg_field(default=None)
+    prize_star_count: int | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class ChatBoost(TelegramObject):
     """
     This object contains information about a chat boost.
@@ -250,28 +221,13 @@ class ChatBoost(TelegramObject):
         source (:class:`telegram.ChatBoostSource`): Source of the added boost.
     """
 
-    __slots__ = ("add_date", "boost_id", "expiration_date", "source")
-
-    def __init__(
-        self,
-        boost_id: str,
-        add_date: dtm.datetime,
-        expiration_date: dtm.datetime,
-        source: ChatBoostSource,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.boost_id: str = boost_id
-        self.add_date: dtm.datetime = add_date
-        self.expiration_date: dtm.datetime = expiration_date
-        self.source: ChatBoostSource = source
-
-        self._id_attrs = (self.boost_id, self.add_date, self.expiration_date, self.source)
-        self._freeze()
+    boost_id: str = tg_field(compare=True)
+    add_date: dtm.datetime = tg_field(compare=True)
+    expiration_date: dtm.datetime = tg_field(compare=True)
+    source: ChatBoostSource = tg_field(compare=True)
 
 
+@tg_dataclass()
 class ChatBoostUpdated(TelegramObject):
     """This object represents a boost added to a chat or changed.
 
@@ -289,24 +245,11 @@ class ChatBoostUpdated(TelegramObject):
         boost (:class:`telegram.ChatBoost`): Information about the chat boost.
     """
 
-    __slots__ = ("boost", "chat")
-
-    def __init__(
-        self,
-        chat: Chat,
-        boost: ChatBoost,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.chat: Chat = chat
-        self.boost: ChatBoost = boost
-
-        self._id_attrs = (self.chat.id, self.boost)
-        self._freeze()
+    chat: Chat = tg_field(compare=True)
+    boost: ChatBoost = tg_field(compare=True)
 
 
+@tg_dataclass()
 class ChatBoostRemoved(TelegramObject):
     """
     This object represents a boost removed from a chat.
@@ -329,28 +272,13 @@ class ChatBoostRemoved(TelegramObject):
         source (:class:`telegram.ChatBoostSource`): Source of the removed boost.
     """
 
-    __slots__ = ("boost_id", "chat", "remove_date", "source")
-
-    def __init__(
-        self,
-        chat: Chat,
-        boost_id: str,
-        remove_date: dtm.datetime,
-        source: ChatBoostSource,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.chat: Chat = chat
-        self.boost_id: str = boost_id
-        self.remove_date: dtm.datetime = remove_date
-        self.source: ChatBoostSource = source
-
-        self._id_attrs = (self.chat, self.boost_id, self.remove_date, self.source)
-        self._freeze()
+    chat: Chat = tg_field(compare=True)
+    boost_id: str = tg_field(compare=True)
+    remove_date: dtm.datetime = tg_field(compare=True)
+    source: ChatBoostSource = tg_field(compare=True)
 
 
+@tg_dataclass()
 class UserChatBoosts(TelegramObject):
     """This object represents a list of boosts added to a chat by a user.
 
@@ -367,17 +295,4 @@ class UserChatBoosts(TelegramObject):
         boosts (tuple[:class:`telegram.ChatBoost`]): List of boosts added to the chat by the user.
     """
 
-    __slots__ = ("boosts",)
-
-    def __init__(
-        self,
-        boosts: Sequence[ChatBoost],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.boosts: tuple[ChatBoost, ...] = parse_sequence_arg(boosts)
-
-        self._id_attrs = (self.boosts,)
-        self._freeze()
+    boosts: tuple[ChatBoost, ...] = tg_field(compare=True, converter=parse_sequence_arg)

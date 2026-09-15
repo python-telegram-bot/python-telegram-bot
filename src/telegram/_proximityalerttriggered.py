@@ -20,9 +20,10 @@
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ProximityAlertTriggered(TelegramObject):
     """
     This object represents the content of a service message, sent whenever a user in the chat
@@ -43,21 +44,6 @@ class ProximityAlertTriggered(TelegramObject):
 
     """
 
-    __slots__ = ("distance", "traveler", "watcher")
-
-    def __init__(
-        self,
-        traveler: User,
-        watcher: User,
-        distance: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.traveler: User = traveler
-        self.watcher: User = watcher
-        self.distance: int = distance
-
-        self._id_attrs = (self.traveler, self.watcher, self.distance)
-
-        self._freeze()
+    traveler: User = tg_field(compare=True)
+    watcher: User = tg_field(compare=True)
+    distance: int = tg_field(compare=True)

@@ -25,7 +25,7 @@ Warning:
 """
 
 import importlib
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from functools import lru_cache
 from types import UnionType
 from typing import TYPE_CHECKING, TypeAlias, Union, cast, get_args, get_origin
@@ -91,7 +91,7 @@ def build_sequence_transformer(
     )
     item_origin = get_origin(resolved_item_annotation)
 
-    if item_origin is Sequence:
+    if item_origin is tuple:
         nested_item_annotations = get_args(resolved_item_annotation)
         if not nested_item_annotations:
             return None

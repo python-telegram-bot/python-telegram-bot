@@ -23,9 +23,11 @@ from collections.abc import Sequence
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.types import JSONDict
 
 
+@tg_dataclass()
 class PassportElementError(TelegramObject):
     """Baseclass for the PassportElementError* classes.
 
@@ -47,22 +49,25 @@ class PassportElementError(TelegramObject):
 
     """
 
-    __slots__ = ("message", "source", "type")
+    # Required
+    source: str = tg_field(compare=True)
+    type: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Include in initalizer for next relase
+    message: str = tg_field(init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__
     def __init__(
         self, source: str, type: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.source: str = str(source)
-        self.type: str = str(type)
-        self.message: str = str(message)
-
-        self._id_attrs = (self.source, self.type)
-
-        self._freeze()
+    ) -> None:
+        object.__setattr__(self, "source", str(source))
+        object.__setattr__(self, "type", str(type))
+        object.__setattr__(self, "message", str(message))
+        TelegramObject.__init__(self, api_kwargs=api_kwargs)
 
 
+@tg_dataclass()
 class PassportElementErrorDataField(PassportElementError):
     """
     Represents an issue in one of the data fields that was provided by the user. The error is
@@ -90,8 +95,17 @@ class PassportElementErrorDataField(PassportElementError):
 
     """
 
-    __slots__ = ("data_hash", "field_name")
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="data")
+    # Required
+    field_name: str = tg_field(compare=True)
+    data_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self,
         type: str,
@@ -100,22 +114,13 @@ class PassportElementErrorDataField(PassportElementError):
         message: str,
         *,
         api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__("data", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.field_name: str = field_name
-            self.data_hash: str = data_hash
-
-            self._id_attrs = (
-                self.source,
-                self.type,
-                self.field_name,
-                self.data_hash,
-                self.message,
-            )
+    ) -> None:
+        PassportElementError.__init__(self, "data", type, message, api_kwargs=api_kwargs)
+        object.__setattr__(self, "field_name", field_name)
+        object.__setattr__(self, "data_hash", data_hash)
 
 
+@tg_dataclass()
 class PassportElementErrorFile(PassportElementError):
     """
     Represents an issue with a document scan. The error is considered resolved when the file with
@@ -141,19 +146,24 @@ class PassportElementErrorFile(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="file")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("file", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    ) -> None:
+        PassportElementError.__init__(self, "file", type, message, api_kwargs=api_kwargs)
+        object.__setattr__(self, "file_hash", file_hash)
 
 
+@tg_dataclass()
 class PassportElementErrorFiles(PassportElementError):
     """
     Represents an issue with a list of scans. The error is considered resolved when the list of
@@ -185,8 +195,16 @@ class PassportElementErrorFiles(PassportElementError):
 
     """
 
-    __slots__ = ("file_hashes",)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="files")
+    # Required
+    file_hashes: tuple[str, ...] = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self,
         type: str,
@@ -194,15 +212,12 @@ class PassportElementErrorFiles(PassportElementError):
         message: str,
         *,
         api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__("files", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hashes: tuple[str, ...] = parse_sequence_arg(file_hashes)
-
-            self._id_attrs = (self.source, self.type, self.message, self.file_hashes)
+    ) -> None:
+        PassportElementError.__init__(self, "files", type, message, api_kwargs=api_kwargs)
+        object.__setattr__(self, "file_hashes", parse_sequence_arg(file_hashes))
 
 
+@tg_dataclass()
 class PassportElementErrorFrontSide(PassportElementError):
     """
     Represents an issue with the front side of a document. The error is considered resolved when
@@ -228,19 +243,24 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="front_side")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("front_side", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    ) -> None:
+        PassportElementError.__init__(self, "front_side", type, message, api_kwargs=api_kwargs)
+        object.__setattr__(self, "file_hash", file_hash)
 
 
+@tg_dataclass()
 class PassportElementErrorReverseSide(PassportElementError):
     """
     Represents an issue with the reverse side of a document. The error is considered resolved when
@@ -266,19 +286,24 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="reverse_side")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("reverse_side", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    ) -> None:
+        PassportElementError.__init__(self, "reverse_side", type, message, api_kwargs=api_kwargs)
+        object.__setattr__(self, "file_hash", file_hash)
 
 
+@tg_dataclass()
 class PassportElementErrorSelfie(PassportElementError):
     """
     Represents an issue with the selfie with a document. The error is considered resolved when
@@ -302,19 +327,24 @@ class PassportElementErrorSelfie(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="selfie")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("selfie", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    ) -> None:
+        PassportElementError.__init__(self, "selfie", type, message, api_kwargs=api_kwargs)
+        object.__setattr__(self, "file_hash", file_hash)
 
 
+@tg_dataclass()
 class PassportElementErrorTranslationFile(PassportElementError):
     """
     Represents an issue with one of the files that constitute the translation of a document.
@@ -342,19 +372,26 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="translation_file")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("translation_file", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    ) -> None:
+        PassportElementError.__init__(
+            self, "translation_file", type, message, api_kwargs=api_kwargs
+        )
+        object.__setattr__(self, "file_hash", file_hash)
 
 
+@tg_dataclass()
 class PassportElementErrorTranslationFiles(PassportElementError):
     """
     Represents an issue with the translated version of a document. The error is considered
@@ -388,8 +425,16 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     """
 
-    __slots__ = ("file_hashes",)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="translation_files")
+    # Required
+    file_hashes: tuple[str, ...] = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self,
         type: str,
@@ -397,15 +442,14 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         message: str,
         *,
         api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hashes: tuple[str, ...] = parse_sequence_arg(file_hashes)
-
-            self._id_attrs = (self.source, self.type, self.message, self.file_hashes)
+    ) -> None:
+        PassportElementError.__init__(
+            self, "translation_files", type, message, api_kwargs=api_kwargs
+        )
+        object.__setattr__(self, "file_hashes", parse_sequence_arg(file_hashes))
 
 
+@tg_dataclass()
 class PassportElementErrorUnspecified(PassportElementError):
     """
     Represents an issue in an unspecified place. The error is considered resolved when new
@@ -427,14 +471,18 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     """
 
-    __slots__ = ("element_hash",)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="unspecified")
+    # Required
+    element_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True, init=False)
 
+    # tags: deprecated NEXT.VERSION
+    # Remove manual __init__, present here to preserve ordering
     def __init__(
         self, type: str, element_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("unspecified", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.element_hash: str = element_hash
-
-            self._id_attrs = (self.source, self.type, self.element_hash, self.message)
+    ) -> None:
+        PassportElementError.__init__(self, "unspecified", type, message, api_kwargs=api_kwargs)
+        object.__setattr__(self, "element_hash", element_hash)

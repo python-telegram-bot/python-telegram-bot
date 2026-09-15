@@ -20,10 +20,12 @@
 
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
 
+@tg_dataclass()
 class Story(TelegramObject):
     """
     This object represents a story.
@@ -46,25 +48,9 @@ class Story(TelegramObject):
 
     """
 
-    __slots__ = (
-        "chat",
-        "id",
-    )
-
-    def __init__(
-        self,
-        chat: Chat,
-        id: int,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.chat: Chat = chat
-        self.id: int = id
-
-        self._id_attrs = (self.chat, self.id)
-
-        self._freeze()
+    # Required
+    chat: Chat = tg_field(compare=True)
+    id: int = tg_field(compare=True)
 
     async def repost(
         self,

@@ -1,0 +1,6 @@
+breaking = "Dataclasses"
+internal = "Dataclasses"
+[[pull_requests]]
+uid = "5334"
+author_uids = ["aelkheir"]
+closes_threads = ["5279"]

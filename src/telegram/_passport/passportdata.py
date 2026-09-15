@@ -18,19 +18,19 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 if TYPE_CHECKING:
     from telegram import Credentials
 
 
+@tg_dataclass()
 class PassportData(TelegramObject):
     """Contains information about Telegram Passport data shared with the bot by the user.
 
@@ -63,24 +63,24 @@ class PassportData(TelegramObject):
 
     """
 
-    __slots__ = ("_decrypted_data", "credentials", "data")
+    data: tuple[EncryptedPassportElement, ...] = tg_field(
+        compare=True, converter=parse_sequence_arg
+    )
+    credentials: EncryptedCredentials = tg_field(compare=True)
 
-    def __init__(
-        self,
-        data: Sequence[EncryptedPassportElement],
-        credentials: EncryptedCredentials,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
+    # Attribute only (init=False)
+    _decrypted_data: tuple[EncryptedPassportElement, ...] | None = tg_field(
+        default=None, init=False
+    )
+    _comparison_key: tuple[str, ...] = tg_field(init=False, compare=True)
 
-        self.data: tuple[EncryptedPassportElement, ...] = parse_sequence_arg(data)
-        self.credentials: EncryptedCredentials = credentials
-
-        self._decrypted_data: tuple[EncryptedPassportElement] | None = None
-        self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
-
-        self._freeze()
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "_comparison_key",
+            tuple([x.type for x in self.data] + [self.credentials.hash]),
+        )
+        TelegramObject.__post_init__(self)
 
     @property
     def decrypted_data(self) -> tuple[EncryptedPassportElement, ...]:
@@ -95,14 +95,16 @@ class PassportData(TelegramObject):
             telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
-        if self._decrypted_data is None:
-            self._decrypted_data = tuple(  # type: ignore[assignment]
+        data = self._decrypted_data
+        if data is None:
+            data = tuple(
                 EncryptedPassportElement.de_json_decrypted(
                     element.to_dict(), self.get_bot(), self.decrypted_credentials
                 )
                 for element in self.data
             )
-        return self._decrypted_data  # type: ignore[return-value]
+            object.__setattr__(self, "_decrypted_data", data)
+        return data
 
     @property
     def decrypted_credentials(self) -> "Credentials":

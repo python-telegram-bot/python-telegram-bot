@@ -18,19 +18,21 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
-from collections.abc import Sequence
+from dataclasses import InitVar
 from typing import TYPE_CHECKING
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_lpo_and_dwpp, parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import ODVInput
 
 if TYPE_CHECKING:
     from telegram._linkpreviewoptions import LinkPreviewOptions
 
 
+@tg_dataclass()
 class InputTextMessageContent(InputMessageContent):
     """
     Represents the content of a text message to be sent as the result of an inline query.
@@ -90,28 +92,27 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = ("entities", "link_preview_options", "message_text", "parse_mode")
+    # Required
+    message_text: str = tg_field(compare=True)
+    # Optional
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    link_preview_options: ODVInput["LinkPreviewOptions"] = tg_field(default=DEFAULT_NONE)
+    # Keyword only
+    disable_web_page_preview: InitVar[bool | None] = tg_field(kw_only=True, default=None)
 
-    def __init__(
+    def __post_init__(  # pylint: disable=arguments-differ
         self,
-        message_text: str,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        entities: Sequence[MessageEntity] | None = None,
-        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
-        *,
         disable_web_page_preview: bool | None = None,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
+        /,
+    ) -> None:
+        object.__setattr__(
+            self,
+            "link_preview_options",
+            parse_lpo_and_dwpp(
+                disable_web_page_preview,
+                self.link_preview_options,
+            ),
+        )
 
-        with self._unfrozen():
-            # Required
-            self.message_text: str = message_text
-            # Optionals
-            self.parse_mode: ODVInput[str] = parse_mode
-            self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.link_preview_options: ODVInput[LinkPreviewOptions] = parse_lpo_and_dwpp(
-                disable_web_page_preview, link_preview_options
-            )
-
-            self._id_attrs = (self.message_text,)
+        InputMessageContent.__post_init__(self)

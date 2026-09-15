@@ -22,13 +22,14 @@ from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultCachedSticker(InlineQueryResult):
     """
     Represents a link to a sticker stored on the Telegram servers. By default, this sticker will
@@ -60,22 +61,10 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
 
     """
 
-    __slots__ = ("input_message_content", "reply_markup", "sticker_file_id")
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        sticker_file_id: str,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.STICKER, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.sticker_file_id: str = sticker_file_id
-
-            # Optionals
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.STICKER)
+    # Required
+    sticker_file_id: str = tg_field()
+    # Optional
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)

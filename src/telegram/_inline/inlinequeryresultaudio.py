@@ -19,22 +19,23 @@
 """This module contains the classes that represent Telegram InlineQueryResultAudio."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultAudio(InlineQueryResult):
     """
     Represents a link to an mp3 audio file. By default, this audio file will be sent by the user.
@@ -98,47 +99,23 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "_audio_duration",
-        "audio_url",
-        "caption",
-        "caption_entities",
-        "input_message_content",
-        "parse_mode",
-        "performer",
-        "reply_markup",
-        "title",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.AUDIO)
+    # Required
+    audio_url: str = tg_field()
+    title: str = tg_field()
+    # Optional
+    performer: str | None = tg_field(default=None)
+    _audio_duration: dtm.timedelta | None = tg_field(
+        default=None, alias="audio_duration", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        audio_url: str,
-        title: str,
-        performer: str | None = None,
-        audio_duration: TimePeriod | None = None,
-        caption: str | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.AUDIO, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.audio_url: str = audio_url
-            self.title: str = title
-
-            # Optionals
-            self.performer: str | None = performer
-            self._audio_duration: dtm.timedelta | None = to_timedelta(audio_duration)
-            self.caption: str | None = caption
-            self.parse_mode: ODVInput[str] = parse_mode
-            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
+    caption: str | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
 
     @property
     def audio_duration(self) -> int | dtm.timedelta | None:

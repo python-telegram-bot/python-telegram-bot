@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2026
@@ -23,12 +22,13 @@ from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 if TYPE_CHECKING:
     from telegram._files.location import Location
 
 
+@tg_dataclass()
 class ChosenInlineResult(TelegramObject):
     """
     Represents a result of an inline query that was chosen by the user and sent to their chat
@@ -64,28 +64,10 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
-    __slots__ = ("from_user", "inline_message_id", "location", "query", "result_id")
-
-    def __init__(
-        self,
-        result_id: str,
-        from_user: User,
-        query: str,
-        location: "Location | None" = None,
-        inline_message_id: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required
-        self.result_id: str = result_id
-        self.from_user: User = from_user
-        self.query: str = query
-        # Optionals
-        self.location: Location | None = location
-        self.inline_message_id: str | None = inline_message_id
-
-        self._id_attrs = (self.result_id,)
-
-        self._freeze()
+    # Required
+    result_id: str = tg_field(compare=True)
+    from_user: User = tg_field()
+    query: str = tg_field()
+    # Optionals
+    location: "Location | None" = tg_field(default=None)
+    inline_message_id: str | None = tg_field(default=None)

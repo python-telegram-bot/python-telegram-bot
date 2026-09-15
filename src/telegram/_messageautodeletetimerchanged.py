@@ -24,10 +24,11 @@ import datetime as dtm
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
+@tg_dataclass()
 class MessageAutoDeleteTimerChanged(TelegramObject):
     """This object represents a service message about a change in auto-delete timer settings.
 
@@ -52,20 +53,9 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
 
     """
 
-    __slots__ = ("_message_auto_delete_time",)
-
-    def __init__(
-        self,
-        message_auto_delete_time: TimePeriod,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self._message_auto_delete_time: dtm.timedelta = to_timedelta(message_auto_delete_time)
-
-        self._id_attrs = (self.message_auto_delete_time,)
-
-        self._freeze()
+    _message_auto_delete_time: dtm.timedelta = tg_field(
+        compare=True, alias="message_auto_delete_time", converter=to_timedelta
+    )
 
     @property
     def message_auto_delete_time(self) -> int | dtm.timedelta:
