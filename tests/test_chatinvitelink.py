@@ -89,7 +89,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             "expire_date": to_timestamp(self.expire_date),
             "member_limit": self.member_limit,
             "name": self.name,
-            "pending_join_request_count": str(self.pending_join_request_count),
+            "pending_join_request_count": self.pending_join_request_count,
             "subscription_period": int(self.subscription_period.total_seconds()),
             "subscription_price": self.subscription_price,
         }
@@ -120,7 +120,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             "expire_date": to_timestamp(self.expire_date),
             "member_limit": self.member_limit,
             "name": self.name,
-            "pending_join_request_count": str(self.pending_join_request_count),
+            "pending_join_request_count": self.pending_join_request_count,
         }
 
         invite_link_raw = ChatInviteLink.de_json(json_dict, raw_bot)

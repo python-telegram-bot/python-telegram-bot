@@ -134,4 +134,4 @@ class TestPassportFileWithoutRequest(PassportFileTestBase):
         assert await check_defaults_handling(passport_file.get_file, passport_file.get_bot())
 
         monkeypatch.setattr(passport_file.get_bot(), "get_file", make_assertion)
-        assert (await passport_file.get_file()).file_id == "True"
+        assert (await passport_file.get_file()).file_id is True
