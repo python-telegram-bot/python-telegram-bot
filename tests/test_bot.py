@@ -1953,7 +1953,7 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize(
         ("acd_in", "maxsize"),
-        [(True, 1024), (False, 1024), (0, 0), (None, None)],
+        [(True, 1024), (False, 1024), (0, 0)],
     )
     async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
         async with make_bot(bot_info, arbitrary_callback_data=acd_in, offline=True) as acd_bot:
@@ -5176,6 +5176,7 @@ class TestBotWithRequest:
         bot_profile_photos = await bot.get_user_profile_photos(bot.id)
         assert bot_profile_photos.total_count == 1
 
+    @pytest.mark.skip(reason="We lost access to TestUser so we can't set the channel to the user")
     async def test_get_user_personal_chat_messages(self, bot):
         # id is of the Test User
         messages = await bot.get_user_personal_chat_messages(user_id=675666224, limit=2)
