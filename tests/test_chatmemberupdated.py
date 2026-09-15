@@ -27,6 +27,7 @@ from telegram import (
     ChatMember,
     ChatMemberAdministrator,
     ChatMemberBanned,
+    ChatMemberMember,
     ChatMemberOwner,
     ChatMemberUpdated,
     User,
@@ -46,7 +47,7 @@ def chat():
 
 @pytest.fixture(scope="module")
 def old_chat_member(user):
-    return ChatMember(user, ChatMemberUpdatedTestBase.old_status)
+    return ChatMemberMember(user)
 
 
 @pytest.fixture(scope="module")
@@ -87,7 +88,6 @@ def chat_member_updated(user, chat, old_chat_member, new_chat_member, invite_lin
 
 
 class ChatMemberUpdatedTestBase:
-    old_status = ChatMember.MEMBER
     new_status = ChatMember.ADMINISTRATOR
 
 
