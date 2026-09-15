@@ -82,9 +82,6 @@
   // Increase the number of PR's Renovate can create in a hour. Default is 2.
   "prHourlyLimit": 5,
 
-  // Temporarily disabled:
-  "ignoreDeps": ["pytest-asyncio"],
-
   // schedule to allow PR's from Renovate:
   "schedule": ["* * * * 0"]  // Every Sunday
 

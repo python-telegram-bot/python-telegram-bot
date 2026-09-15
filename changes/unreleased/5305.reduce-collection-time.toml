@@ -1,0 +1,5 @@
+other = "Reduce pytest collection time by 80%"
+[[pull_requests]]
+uid = "5305"
+author_uids = ["harshil21"]
+closes_threads = []

@@ -1,0 +1,5 @@
+bugfixes = "Keep an `AIORateLimiter` `RetryAfter` halt in place until every backoff has finished, instead of releasing it when any concurrent request completes"
+[[pull_requests]]
+uid = "5339"
+author_uids = ["0xSoftBoi"]
+closes_threads = ["5338"]

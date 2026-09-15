@@ -47,6 +47,17 @@ async def forum_topic_object(forum_group_id, emoji_id):
     )
 
 
+@pytest.fixture(scope="module")
+async def offline_forum_topic_object(forum_group_id, offline_emoji_id):
+    return ForumTopic(
+        message_thread_id=forum_group_id,
+        name=ForumTopicTestBase.TEST_TOPIC_NAME,
+        icon_color=ForumTopicTestBase.TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id=offline_emoji_id,
+        is_name_implicit=ForumTopicTestBase.is_name_implicit,
+    )
+
+
 class ForumTopicTestBase:
     TEST_TOPIC_NAME = TEST_TOPIC_NAME
     TEST_TOPIC_ICON_COLOR = TEST_TOPIC_ICON_COLOR
@@ -54,25 +65,27 @@ class ForumTopicTestBase:
 
 
 class TestForumTopicWithoutRequest(ForumTopicTestBase):
-    def test_slot_behaviour(self, forum_topic_object):
-        inst = forum_topic_object
+    def test_slot_behaviour(self, offline_forum_topic_object):
+        inst = offline_forum_topic_object
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    async def test_expected_values(self, emoji_id, forum_group_id, forum_topic_object):
-        assert forum_topic_object.message_thread_id == forum_group_id
-        assert forum_topic_object.icon_color == self.TEST_TOPIC_ICON_COLOR
-        assert forum_topic_object.name == self.TEST_TOPIC_NAME
-        assert forum_topic_object.icon_custom_emoji_id == emoji_id
-        assert forum_topic_object.is_name_implicit == self.is_name_implicit
+    async def test_expected_values(
+        self, offline_emoji_id, forum_group_id, offline_forum_topic_object
+    ):
+        assert offline_forum_topic_object.message_thread_id == forum_group_id
+        assert offline_forum_topic_object.icon_color == self.TEST_TOPIC_ICON_COLOR
+        assert offline_forum_topic_object.name == self.TEST_TOPIC_NAME
+        assert offline_forum_topic_object.icon_custom_emoji_id == offline_emoji_id
+        assert offline_forum_topic_object.is_name_implicit == self.is_name_implicit
 
-    def test_de_json(self, offline_bot, emoji_id, forum_group_id):
+    def test_de_json(self, offline_bot, offline_emoji_id, forum_group_id):
         json_dict = {
             "message_thread_id": forum_group_id,
             "name": self.TEST_TOPIC_NAME,
             "icon_color": self.TEST_TOPIC_ICON_COLOR,
-            "icon_custom_emoji_id": emoji_id,
+            "icon_custom_emoji_id": offline_emoji_id,
             "is_name_implicit": self.is_name_implicit,
         }
         topic = ForumTopic.de_json(json_dict, offline_bot)
@@ -81,20 +94,20 @@ class TestForumTopicWithoutRequest(ForumTopicTestBase):
         assert topic.message_thread_id == forum_group_id
         assert topic.icon_color == self.TEST_TOPIC_ICON_COLOR
         assert topic.name == self.TEST_TOPIC_NAME
-        assert topic.icon_custom_emoji_id == emoji_id
+        assert topic.icon_custom_emoji_id == offline_emoji_id
         assert topic.is_name_implicit == self.is_name_implicit
 
-    def test_to_dict(self, emoji_id, forum_group_id, forum_topic_object):
-        topic_dict = forum_topic_object.to_dict()
+    def test_to_dict(self, offline_emoji_id, forum_group_id, offline_forum_topic_object):
+        topic_dict = offline_forum_topic_object.to_dict()
 
         assert isinstance(topic_dict, dict)
         assert topic_dict["message_thread_id"] == forum_group_id
         assert topic_dict["name"] == self.TEST_TOPIC_NAME
         assert topic_dict["icon_color"] == self.TEST_TOPIC_ICON_COLOR
-        assert topic_dict["icon_custom_emoji_id"] == emoji_id
+        assert topic_dict["icon_custom_emoji_id"] == offline_emoji_id
         assert topic_dict["is_name_implicit"] == self.is_name_implicit
 
-    def test_equality(self, emoji_id, forum_group_id):
+    def test_equality(self, offline_emoji_id, forum_group_id):
         a = ForumTopic(
             message_thread_id=forum_group_id,
             name=TEST_TOPIC_NAME,
@@ -104,7 +117,7 @@ class TestForumTopicWithoutRequest(ForumTopicTestBase):
             message_thread_id=forum_group_id,
             name=TEST_TOPIC_NAME,
             icon_color=TEST_TOPIC_ICON_COLOR,
-            icon_custom_emoji_id=emoji_id,
+            icon_custom_emoji_id=offline_emoji_id,
         )
         c = ForumTopic(
             message_thread_id=forum_group_id,
@@ -347,12 +360,12 @@ class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase):
         assert action_dict["icon_color"] == self.TEST_TOPIC_ICON_COLOR
         assert action_dict["is_name_implicit"] == self.is_name_implicit
 
-    def test_equality(self, emoji_id):
+    def test_equality(self, offline_emoji_id):
         a = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
         b = ForumTopicCreated(
             name=TEST_TOPIC_NAME,
             icon_color=TEST_TOPIC_ICON_COLOR,
-            icon_custom_emoji_id=emoji_id,
+            icon_custom_emoji_id=offline_emoji_id,
         )
         c = ForumTopicCreated(name=f"{TEST_TOPIC_NAME}!", icon_color=TEST_TOPIC_ICON_COLOR)
         d = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=0xFFD67E)
