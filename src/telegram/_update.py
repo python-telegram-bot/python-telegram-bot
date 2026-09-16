@@ -30,6 +30,7 @@ from telegram._choseninlineresult import ChosenInlineResult
 from telegram._inline.inlinequery import InlineQuery
 from telegram._managedbot import ManagedBotUpdated
 from telegram._message import Message
+from telegram._messagegenerationstopped import MessageGenerationStopped
 from telegram._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
 from telegram._paidmedia import PaidMediaPurchased
 from telegram._payment.precheckoutquery import PreCheckoutQuery
@@ -326,6 +327,7 @@ class Update(TelegramObject):
         "purchased_paid_media",
         "removed_chat_boost",
         "shipping_query",
+        "stopped_message_generation",
         "update_id",
     )
 
@@ -434,6 +436,11 @@ class Update(TelegramObject):
 
     .. versionadded:: 22.8
     """
+    STOPPED_MESSAGE_GENERATION: Final[str] = constants.UpdateType.STOPPED_MESSAGE_GENERATION
+    """:const:`telegram.constants.UpdateType.STOPPED_MESSAGE_GENERATION`
+
+    .. versionadded:: 22.9
+    """
 
     ALL_TYPES: Final[list[str]] = list(constants.UpdateType)
     """list[:obj:`str`]: A list of all available update types.
@@ -468,6 +475,7 @@ class Update(TelegramObject):
         purchased_paid_media: PaidMediaPurchased | None = None,
         managed_bot: ManagedBotUpdated | None = None,
         guest_message: Message | None = None,
+        stopped_message_generation: MessageGenerationStopped | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -500,6 +508,9 @@ class Update(TelegramObject):
         self.purchased_paid_media: PaidMediaPurchased | None = purchased_paid_media
         self.managed_bot: ManagedBotUpdated | None = managed_bot
         self.guest_message: Message | None = guest_message
+        self.stopped_message_generation: MessageGenerationStopped | None = (
+            stopped_message_generation
+        )
 
         self._effective_user: User | None = None
         self._effective_sender: User | Chat | None = None
@@ -729,6 +740,9 @@ class Update(TelegramObject):
 
         elif self.message_reaction_count:
             chat = self.message_reaction_count.chat
+
+        elif self.stopped_message_generation:
+            chat = self.stopped_message_generation.chat
 
         self._effective_chat = chat
         return chat

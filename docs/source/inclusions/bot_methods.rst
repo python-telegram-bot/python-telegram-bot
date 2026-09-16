@@ -37,6 +37,10 @@
           - Used for sending text messages
         * - :meth:`~telegram.Bot.send_message_draft`
           - Used for streaming partial text messages
+        * - :meth:`~telegram.Bot.send_rich_message`
+          - Used for sending rich messages
+        * - :meth:`~telegram.Bot.send_rich_message_draft`
+          - Used for streaming partial rich messages
         * - :meth:`~telegram.Bot.send_paid_media`
           - Used for sending paid media to channels
         * - :meth:`~telegram.Bot.send_photo`

@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, Final
 
 from telegram import constants
 from telegram._chatpermissions import ChatPermissions
+from telegram._ephemeral import EphemeralMessageParameters
 from telegram._forumtopic import ForumTopic
 from telegram._menubutton import MenuButton
 from telegram._reaction import ReactionType
@@ -63,6 +64,7 @@ if TYPE_CHECKING:
         InputPaidMedia,
         InputPollMedia,
         InputPollOption,
+        InputRichMessage,
         LabeledPrice,
         LinkPreviewOptions,
         LivePhoto,
@@ -625,6 +627,7 @@ class _ChatBase(TelegramObject):
         can_delete_stories: bool | None = None,
         can_manage_direct_messages: bool | None = None,
         can_manage_tags: bool | None = None,
+        can_send_welcome_messages: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -677,6 +680,7 @@ class _ChatBase(TelegramObject):
             can_delete_stories=can_delete_stories,
             can_manage_direct_messages=can_manage_direct_messages,
             can_manage_tags=can_manage_tags,
+            can_send_welcome_messages=can_send_welcome_messages,
         )
 
     async def restrict_member(
@@ -1043,6 +1047,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1087,6 +1092,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_message_draft(
@@ -1096,6 +1102,8 @@ class _ChatBase(TelegramObject):
         message_thread_id: int | None = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
+        can_stop: bool | None = None,
+        keep_on_stop: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1123,6 +1131,80 @@ class _ChatBase(TelegramObject):
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,
             entities=entities,
+            can_stop=can_stop,
+            keep_on_stop=keep_on_stop,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def send_rich_message(
+        self,
+        rich_message: "InputRichMessage",
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        allow_paid_broadcast: ODVInput[bool] = DEFAULT_NONE,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: ODVInput["ReplyMarkup"] = DEFAULT_NONE,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message":
+        """Shortcut for :meth:`telegram.Bot.send_rich_message`."""
+        return await self.get_bot().send_rich_message(
+            chat_id=self.id,
+            rich_message=rich_message,
+            business_connection_id=business_connection_id,
+            message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=suggested_post_parameters,
+            reply_parameters=reply_parameters,
+            reply_markup=reply_markup,
+            ephemeral_message_parameters=ephemeral_message_parameters,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def send_rich_message_draft(
+        self,
+        draft_id: int,
+        rich_message: "InputRichMessage",
+        message_thread_id: int | None = None,
+        can_stop: bool | None = None,
+        keep_on_stop: bool | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Shortcut for :meth:`telegram.Bot.send_rich_message_draft`."""
+        return await self.get_bot().send_rich_message_draft(
+            chat_id=self.id,
+            draft_id=draft_id,
+            rich_message=rich_message,
+            can_stop=can_stop,
+            keep_on_stop=keep_on_stop,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1308,6 +1390,7 @@ class _ChatBase(TelegramObject):
         show_caption_above_media: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1354,6 +1437,7 @@ class _ChatBase(TelegramObject):
             show_caption_above_media=show_caption_above_media,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_live_photo(
@@ -1442,6 +1526,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1486,6 +1571,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_audio(
@@ -1508,6 +1594,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1556,6 +1643,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_document(
@@ -1576,6 +1664,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1622,6 +1711,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_checklist(
@@ -1685,6 +1775,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1724,6 +1815,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_game(
@@ -1896,6 +1988,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1942,6 +2035,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_animation(
@@ -1966,6 +2060,7 @@ class _ChatBase(TelegramObject):
         show_caption_above_media: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2016,6 +2111,7 @@ class _ChatBase(TelegramObject):
             show_caption_above_media=show_caption_above_media,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_sticker(
@@ -2032,6 +2128,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2072,6 +2169,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_venue(
@@ -2094,6 +2192,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2142,6 +2241,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_video(
@@ -2169,6 +2269,7 @@ class _ChatBase(TelegramObject):
         start_timestamp: int | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2222,6 +2323,7 @@ class _ChatBase(TelegramObject):
             show_caption_above_media=show_caption_above_media,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_video_note(
@@ -2240,6 +2342,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2284,6 +2387,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_voice(
@@ -2303,6 +2407,7 @@ class _ChatBase(TelegramObject):
         allow_paid_broadcast: bool | None = None,
         direct_messages_topic_id: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2348,6 +2453,7 @@ class _ChatBase(TelegramObject):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=direct_messages_topic_id,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_poll(
@@ -2385,6 +2491,7 @@ class _ChatBase(TelegramObject):
         country_codes: Sequence[str] | None = None,
         explanation_media: "InputPollMedia | None" = None,
         media: "InputPollMedia | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2446,6 +2553,7 @@ class _ChatBase(TelegramObject):
             country_codes=country_codes,
             explanation_media=explanation_media,
             media=media,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def send_copy(

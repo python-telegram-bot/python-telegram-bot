@@ -30,9 +30,11 @@ from telegram._chatbackground import ChatBackground
 from telegram._chatboost import ChatBoostAdded
 from telegram._chatowner import ChatOwnerChanged, ChatOwnerLeft
 from telegram._checklists import Checklist, ChecklistTasksAdded, ChecklistTasksDone
+from telegram._community import CommunityChatJoined
 from telegram._dice import Dice
 from telegram._directmessagepricechanged import DirectMessagePriceChanged
 from telegram._directmessagestopic import DirectMessagesTopic
+from telegram._ephemeral import EphemeralMessageParameters
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.contact import Contact
@@ -70,6 +72,7 @@ from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll, PollOptionAdded, PollOptionDeleted
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._reply import ReplyParameters
+from telegram._richmessage import RichMessage
 from telegram._shared import ChatShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
@@ -103,6 +106,7 @@ from telegram.warnings import PTBDeprecationWarning
 if TYPE_CHECKING:
     from telegram import (
         Bot,
+        EphemeralMessageParameters,
         ExternalReplyInfo,
         GameHighScore,
         Giveaway,
@@ -119,10 +123,12 @@ if TYPE_CHECKING:
         InputPaidMedia,
         InputPollMedia,
         InputPollOption,
+        InputRichMessage,
         LabeledPrice,
         MessageId,
         MessageOrigin,
         ReactionType,
+        ReplyMarkup,
         SentGuestMessage,
         SuggestedPostApprovalFailed,
         SuggestedPostApproved,
@@ -1219,6 +1225,7 @@ class Message(MaybeInaccessibleMessage):
         "checklist",
         "checklist_tasks_added",
         "checklist_tasks_done",
+        "community_chat_joined",
         "connected_website",
         "contact",
         "delete_chat_photo",
@@ -1229,6 +1236,7 @@ class Message(MaybeInaccessibleMessage):
         "edit_date",
         "effect_id",
         "entities",
+        "ephemeral_message_id",
         "external_reply",
         "forum_topic_closed",
         "forum_topic_created",
@@ -1280,12 +1288,14 @@ class Message(MaybeInaccessibleMessage):
         "poll_option_deleted",
         "proximity_alert_triggered",
         "quote",
+        "receiver_user",
         "refunded_payment",
         "reply_markup",
         "reply_to_checklist_task_id",
         "reply_to_message",
         "reply_to_poll_option_id",
         "reply_to_story",
+        "rich_message",
         "sender_boost_count",
         "sender_business_bot",
         "sender_chat",
@@ -1433,6 +1443,10 @@ class Message(MaybeInaccessibleMessage):
         guest_bot_caller_chat: Chat | None = None,
         guest_query_id: str | None = None,
         live_photo: LivePhoto | None = None,
+        community_chat_joined: CommunityChatJoined | None = None,
+        receiver_user: User | None = None,
+        ephemeral_message_id: int | None = None,
+        rich_message: RichMessage | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -1571,6 +1585,10 @@ class Message(MaybeInaccessibleMessage):
             self.guest_bot_caller_chat: Chat | None = guest_bot_caller_chat
             self.guest_query_id: str | None = guest_query_id
             self.live_photo: LivePhoto | None = live_photo
+            self.community_chat_joined: CommunityChatJoined | None = community_chat_joined
+            self.receiver_user: User | None = receiver_user
+            self.ephemeral_message_id: int | None = ephemeral_message_id
+            self.rich_message: RichMessage | None = rich_message
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1965,6 +1983,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2030,6 +2049,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_text_draft(
@@ -2039,6 +2059,8 @@ class Message(MaybeInaccessibleMessage):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Sequence["MessageEntity"] | None = None,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        can_stop: bool | None = None,
+        keep_on_stop: bool | None = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2076,6 +2098,86 @@ class Message(MaybeInaccessibleMessage):
             text=text,
             parse_mode=parse_mode,
             entities=entities,
+            can_stop=can_stop,
+            keep_on_stop=keep_on_stop,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def reply_rich_message(
+        self,
+        rich_message: "InputRichMessage",
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        reply_parameters: "ReplyParameters | None" = None,
+        reply_markup: ODVInput["ReplyMarkup"] = DEFAULT_NONE,
+        message_effect_id: str | None = None,
+        allow_paid_broadcast: bool | None = None,
+        suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
+        *,
+        reply_to_message_id: int | None = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        do_quote: bool | (_ReplyKwargs | None) = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> "Message":
+        """Shortcut for :meth:`telegram.Bot.send_rich_message`."""
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, reply_to_message_id, reply_parameters, allow_sending_without_reply
+        )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
+        return await self.get_bot().send_rich_message(
+            chat_id=chat_id,
+            rich_message=rich_message,
+            disable_notification=disable_notification,
+            reply_parameters=effective_reply_parameters,
+            reply_markup=reply_markup,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
+            allow_paid_broadcast=allow_paid_broadcast,
+            direct_messages_topic_id=self._extract_direct_messages_topic_id(),
+            suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
+        )
+
+    async def reply_rich_message_draft(
+        self,
+        draft_id: int,
+        rich_message: "InputRichMessage",
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
+        can_stop: bool | None = None,
+        keep_on_stop: bool | None = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict | None = None,
+    ) -> bool:
+        """Shortcut for :meth:`telegram.Bot.send_rich_message_draft`."""
+        message_thread_id = self._parse_message_thread_id(self.chat_id, message_thread_id)
+        return await self.get_bot().send_rich_message_draft(
+            chat_id=self.chat_id,
+            draft_id=draft_id,
+            rich_message=rich_message,
+            can_stop=can_stop,
+            keep_on_stop=keep_on_stop,
             message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2097,6 +2199,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2168,6 +2271,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_markdown_v2(
@@ -2183,6 +2287,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2250,6 +2355,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_html(
@@ -2265,6 +2371,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2332,6 +2439,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_media_group(
@@ -2429,6 +2537,7 @@ class Message(MaybeInaccessibleMessage):
         allow_paid_broadcast: bool | None = None,
         show_caption_above_media: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2496,6 +2605,7 @@ class Message(MaybeInaccessibleMessage):
             show_caption_above_media=show_caption_above_media,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_live_photo(
@@ -2597,6 +2707,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2666,6 +2777,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_document(
@@ -2684,6 +2796,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2751,6 +2864,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_animation(
@@ -2773,6 +2887,7 @@ class Message(MaybeInaccessibleMessage):
         allow_paid_broadcast: bool | None = None,
         show_caption_above_media: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2844,6 +2959,7 @@ class Message(MaybeInaccessibleMessage):
             show_caption_above_media=show_caption_above_media,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_sticker(
@@ -2858,6 +2974,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2919,6 +3036,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_video(
@@ -2944,6 +3062,7 @@ class Message(MaybeInaccessibleMessage):
         cover: "FileInput | None" = None,
         start_timestamp: int | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3018,6 +3137,7 @@ class Message(MaybeInaccessibleMessage):
             show_caption_above_media=show_caption_above_media,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_video_note(
@@ -3034,6 +3154,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3099,6 +3220,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_voice(
@@ -3116,6 +3238,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3182,6 +3305,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_location(
@@ -3200,6 +3324,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3267,6 +3392,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_venue(
@@ -3287,6 +3413,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3356,6 +3483,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_contact(
@@ -3372,6 +3500,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3437,6 +3566,7 @@ class Message(MaybeInaccessibleMessage):
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             allow_paid_broadcast=allow_paid_broadcast,
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_poll(
@@ -3473,6 +3603,7 @@ class Message(MaybeInaccessibleMessage):
         country_codes: Sequence[str] | None = None,
         explanation_media: "InputPollMedia | None" = None,
         media: "InputPollMedia | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3554,6 +3685,7 @@ class Message(MaybeInaccessibleMessage):
             country_codes=country_codes,
             explanation_media=explanation_media,
             media=media,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_dice(
@@ -3567,6 +3699,7 @@ class Message(MaybeInaccessibleMessage):
         message_effect_id: str | None = None,
         allow_paid_broadcast: bool | None = None,
         suggested_post_parameters: "SuggestedPostParameters | None" = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | None = None,
         *,
         reply_to_message_id: int | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3627,6 +3760,7 @@ class Message(MaybeInaccessibleMessage):
             allow_paid_broadcast=allow_paid_broadcast,
             direct_messages_topic_id=self._extract_direct_messages_topic_id(),
             suggested_post_parameters=suggested_post_parameters,
+            ephemeral_message_parameters=ephemeral_message_parameters,
         )
 
     async def reply_checklist(

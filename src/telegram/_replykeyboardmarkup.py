@@ -122,6 +122,7 @@ class ReplyKeyboardMarkup(TelegramObject):
     """
 
     __slots__ = (
+        "force_reply",
         "input_field_placeholder",
         "is_persistent",
         "keyboard",
@@ -138,6 +139,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         selective: bool | None = None,
         input_field_placeholder: str | None = None,
         is_persistent: bool | None = None,
+        force_reply: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -160,6 +162,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         self.selective: bool | None = selective
         self.input_field_placeholder: str | None = input_field_placeholder
         self.is_persistent: bool | None = is_persistent
+        self.force_reply: bool | None = force_reply
 
         self._id_attrs = (self.keyboard,)
 
@@ -174,45 +177,9 @@ class ReplyKeyboardMarkup(TelegramObject):
         selective: bool = False,
         input_field_placeholder: str | None = None,
         is_persistent: bool | None = None,
+        force_reply: bool | None = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
-        """Shortcut for::
-
-            ReplyKeyboardMarkup([[button]], **kwargs)
-
-        Return a ReplyKeyboardMarkup from a single KeyboardButton.
-
-        Args:
-            button (:class:`telegram.KeyboardButton` | :obj:`str`): The button to use in
-                the markup.
-            resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
-                vertically for optimal fit (e.g., make the keyboard smaller if there are just two
-                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
-                always of the same height as the app's standard keyboard.
-            one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
-                soon as it's been used. The keyboard will still be available, but clients will
-                automatically display the usual letter-keyboard in the chat - the user can press
-                a special button in the input field to see the custom keyboard again.
-                Defaults to :obj:`False`.
-            selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
-                to specific users only. Targets:
-
-                1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply to a message in the same chat and forum topic,
-                    sender of the original message.
-
-                Defaults to :obj:`False`.
-
-            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
-                field when the reply is active.
-
-                .. versionadded:: 13.7
-            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
-                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
-                custom keyboard can be hidden and opened with a keyboard icon.
-
-                .. versionadded:: 20.0
-        """
         return cls(
             [[button]],
             resize_keyboard=resize_keyboard,
@@ -220,6 +187,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             selective=selective,
             input_field_placeholder=input_field_placeholder,
             is_persistent=is_persistent,
+            force_reply=force_reply,
             **kwargs,  # type: ignore[arg-type]
         )
 
@@ -232,49 +200,9 @@ class ReplyKeyboardMarkup(TelegramObject):
         selective: bool = False,
         input_field_placeholder: str | None = None,
         is_persistent: bool | None = None,
+        force_reply: bool | None = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
-        """Shortcut for::
-
-            ReplyKeyboardMarkup([button_row], **kwargs)
-
-        Return a ReplyKeyboardMarkup from a single row of KeyboardButtons.
-
-        Args:
-            button_row (Sequence[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to
-                use in the markup.
-
-                .. versionchanged:: 20.0
-                    |sequenceargs|
-            resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
-                vertically for optimal fit (e.g., make the keyboard smaller if there are just two
-                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
-                always of the same height as the app's standard keyboard.
-            one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
-                soon as it's been used. The keyboard will still be available, but clients will
-                automatically display the usual letter-keyboard in the chat - the user can press
-                a special button in the input field to see the custom keyboard again.
-                Defaults to :obj:`False`.
-            selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
-                to specific users only. Targets:
-
-                1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply to a message in the same chat and forum topic,
-                    sender of the original message.
-
-                Defaults to :obj:`False`.
-
-            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
-                field when the reply is active.
-
-                .. versionadded:: 13.7
-            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
-                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
-                custom keyboard can be hidden and opened with a keyboard icon.
-
-                .. versionadded:: 20.0
-
-        """
         return cls(
             [button_row],
             resize_keyboard=resize_keyboard,
@@ -282,6 +210,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             selective=selective,
             input_field_placeholder=input_field_placeholder,
             is_persistent=is_persistent,
+            force_reply=force_reply,
             **kwargs,  # type: ignore[arg-type]
         )
 
@@ -294,49 +223,9 @@ class ReplyKeyboardMarkup(TelegramObject):
         selective: bool = False,
         input_field_placeholder: str | None = None,
         is_persistent: bool | None = None,
+        force_reply: bool | None = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
-        """Shortcut for::
-
-            ReplyKeyboardMarkup([[button] for button in button_column], **kwargs)
-
-        Return a ReplyKeyboardMarkup from a single column of KeyboardButtons.
-
-        Args:
-            button_column (Sequence[:class:`telegram.KeyboardButton` | :obj:`str`]): The button
-                to use in the markup.
-
-                .. versionchanged:: 20.0
-                    |sequenceargs|
-            resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
-                vertically for optimal fit (e.g., make the keyboard smaller if there are just two
-                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
-                always of the same height as the app's standard keyboard.
-            one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
-                soon as it's been used. The keyboard will still be available, but clients will
-                automatically display the usual letter-keyboard in the chat - the user can press
-                a special button in the input field to see the custom keyboard again.
-                Defaults to :obj:`False`.
-            selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
-                to specific users only. Targets:
-
-                1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply to a message in the same chat and forum topic,
-                    sender of the original message.
-
-                Defaults to :obj:`False`.
-
-            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
-                field when the reply is active.
-
-                .. versionadded:: 13.7
-            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
-                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
-                custom keyboard can be hidden and opened with a keyboard icon.
-
-                .. versionadded:: 20.0
-
-        """
         button_grid = [[button] for button in button_column]
         return cls(
             button_grid,
@@ -345,6 +234,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             selective=selective,
             input_field_placeholder=input_field_placeholder,
             is_persistent=is_persistent,
+            force_reply=force_reply,
             **kwargs,  # type: ignore[arg-type]
         )
 

@@ -64,11 +64,12 @@ class InlineKeyboardMarkup(TelegramObject):
 
     """
 
-    __slots__ = ("inline_keyboard",)
+    __slots__ = ("force_reply", "inline_keyboard")
 
     def __init__(
         self,
         inline_keyboard: Sequence[Sequence[InlineKeyboardButton]],
+        force_reply: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -82,8 +83,10 @@ class InlineKeyboardMarkup(TelegramObject):
         self.inline_keyboard: tuple[tuple[InlineKeyboardButton, ...], ...] = tuple(
             tuple(row) for row in inline_keyboard
         )
+        # Optional
+        self.force_reply: bool | None = force_reply
 
-        self._id_attrs = (self.inline_keyboard,)
+        self._id_attrs = (self.inline_keyboard, self.force_reply)
 
         self._freeze()
 

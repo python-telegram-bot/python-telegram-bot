@@ -15,6 +15,7 @@ Classes in this package
 
     telegram.bot
     telegram.at-tree.rst
+    telegram.richmessage-tree.rst
     telegram.stickers-tree.rst
     telegram.inline-tree.rst
     telegram.payments-tree.rst

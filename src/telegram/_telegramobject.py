@@ -27,11 +27,13 @@ from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast, get_args, get_origin
+from types import UnionType
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, Union, cast, get_args, get_origin
 
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.de_json import (
     build_sequence_transformer,
+    build_union_transformer,
     get_telegram_namespace,
     resolve_annotation,
     unwrap_optional,
@@ -468,6 +470,10 @@ class TelegramObject:
                 fn = build_sequence_transformer(args[0], globalns, tg_ns, TelegramObject)
                 if fn is not None:
                     plan[name] = fn
+            elif origin in (Union, UnionType):
+                fn = build_union_transformer(inner, globalns, tg_ns, TelegramObject)
+                if fn is not None:
+                    plan[name] = fn
 
         cls.__DE_JSON_PLAN__ = plan
         cls.__DE_JSON_COMPAT__ = MappingProxyType(compatibility_defaults)
@@ -706,6 +712,15 @@ class TelegramObject:
         """
         data = {}
 
+        def _convert_value(v: Any) -> Any:
+            if hasattr(v, "to_dict"):
+                return v.to_dict(recursive=True)
+            if isinstance(v, (list, tuple)):
+                return [_convert_value(item) for item in v]
+            if isinstance(v, dict):
+                return {k: _convert_value(val) for k, val in v.items()}
+            return v
+
         for key in self._get_attrs_names(include_private=include_private):
             value = (
                 DefaultValue.get_value(getattr(self, key, None))
@@ -714,8 +729,8 @@ class TelegramObject:
             )
 
             if value is not None:
-                if recursive and hasattr(value, "to_dict"):
-                    data[key] = value.to_dict(recursive=True)
+                if recursive:
+                    data[key] = _convert_value(value)
                 else:
                     data[key] = value
             elif not recursive:

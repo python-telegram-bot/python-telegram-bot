@@ -382,9 +382,13 @@ class ReplyParameters(TelegramObject):
             identifier of the specific poll option to be replied to.
 
             .. versionadded:: 22.8
+        ephemeral_message_id (:obj:`int`, optional): Identifier of the incoming ephemeral message
+            that will be replied to in the current chat.
+
+            .. versionadded:: 22.9
 
     Attributes:
-        message_id (:obj:`int`): Identifier of the message that will be replied to in the current
+        message_id (:obj:`int`): Optional. Identifier of the message that will be replied to in the current
             chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`): Optional. If the message to be replied to is from a
             different chat, |chat_id_channel|
@@ -413,12 +417,17 @@ class ReplyParameters(TelegramObject):
             identifier of the specific poll option to be replied to.
 
             .. versionadded:: 22.8
+        ephemeral_message_id (:obj:`int`): Optional. Identifier of the incoming ephemeral message
+            that will be replied to in the current chat.
+
+            .. versionadded:: 22.9
     """
 
     __slots__ = (
         "allow_sending_without_reply",
         "chat_id",
         "checklist_task_id",
+        "ephemeral_message_id",
         "message_id",
         "poll_option_id",
         "quote",
@@ -429,7 +438,7 @@ class ReplyParameters(TelegramObject):
 
     def __init__(
         self,
-        message_id: int,
+        message_id: int | None = None,
         chat_id: int | str | None = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: str | None = None,
@@ -438,12 +447,13 @@ class ReplyParameters(TelegramObject):
         quote_position: int | None = None,
         checklist_task_id: int | None = None,
         poll_option_id: str | None = None,
+        ephemeral_message_id: int | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.message_id: int = message_id
+        self.message_id: int | None = message_id
         self.chat_id: int | str | None = chat_id
         self.allow_sending_without_reply: ODVInput[bool] = allow_sending_without_reply
         self.quote: str | None = quote
@@ -452,7 +462,8 @@ class ReplyParameters(TelegramObject):
         self.quote_position: int | None = quote_position
         self.checklist_task_id: int | None = checklist_task_id
         self.poll_option_id: str | None = poll_option_id
+        self.ephemeral_message_id: int | None = ephemeral_message_id
 
-        self._id_attrs = (self.message_id,)
+        self._id_attrs = (self.message_id, self.ephemeral_message_id)
 
         self._freeze()

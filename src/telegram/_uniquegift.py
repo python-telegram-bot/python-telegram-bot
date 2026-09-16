@@ -26,6 +26,7 @@ from typing import Final
 from telegram import constants
 from telegram._chat import Chat
 from telegram._files.sticker import Sticker
+from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -548,12 +549,15 @@ class UniqueGiftInfo(TelegramObject):
     """:const:`telegram.constants.UniqueGiftInfoOrigin.UPGRADE`"""
 
     __slots__ = (
+        "entities",
         "gift",
+        "is_private",
         "last_resale_amount",
         "last_resale_currency",
         "next_transfer_date",
         "origin",
         "owned_gift_id",
+        "text",
         "transfer_star_count",
     )
 
@@ -566,6 +570,9 @@ class UniqueGiftInfo(TelegramObject):
         next_transfer_date: dtm.datetime | None = None,
         last_resale_currency: str | None = None,
         last_resale_amount: int | None = None,
+        text: str | None = None,
+        entities: Sequence[MessageEntity] | None = None,
+        is_private: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -579,6 +586,9 @@ class UniqueGiftInfo(TelegramObject):
         self.next_transfer_date: dtm.datetime | None = next_transfer_date
         self.last_resale_currency: str | None = last_resale_currency
         self.last_resale_amount: int | None = last_resale_amount
+        self.text: str | None = text
+        self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+        self.is_private: bool | None = is_private
 
         self._id_attrs = (self.gift, self.origin)
 

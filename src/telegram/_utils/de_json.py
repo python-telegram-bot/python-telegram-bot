@@ -134,3 +134,64 @@ def build_sequence_transformer(
         return transform_object_sequence
 
     return None
+
+
+def build_union_transformer(
+    union_annotation: object,
+    constructor_globals: dict[str, object],
+    telegram_namespace: dict[str, object],
+    telegram_object_base_class: type["TelegramObject"],
+) -> DeJsonValueTransformer | None:
+    """Build a value transformer for a Union annotation containing TelegramObject types."""
+    if get_origin(union_annotation) not in (Union, UnionType):
+        return None
+
+    args = get_args(union_annotation)
+    tg_classes: list[type[TelegramObject]] = []
+    has_sequence = False
+    sequence_item_class: type[TelegramObject] | None = None
+
+    for arg in args:
+        resolved_arg = resolve_annotation(arg, constructor_globals, telegram_namespace)
+        if isinstance(resolved_arg, type) and issubclass(resolved_arg, telegram_object_base_class):
+            tg_classes.append(cast("type[TelegramObject]", resolved_arg))
+        elif get_origin(resolved_arg) is Sequence:
+            has_sequence = True
+            seq_args = get_args(resolved_arg)
+            if seq_args:
+                resolved_item = resolve_annotation(
+                    seq_args[0], constructor_globals, telegram_namespace
+                )
+                if isinstance(resolved_item, type) and issubclass(
+                    resolved_item, telegram_object_base_class
+                ):
+                    sequence_item_class = cast("type[TelegramObject]", resolved_item)
+
+    if not tg_classes and not has_sequence:
+        return None
+
+    def transform_union(
+        raw_value: object,
+        bot: "Bot | None",
+        tg_classes: tuple[type[TelegramObject], ...] = tuple(tg_classes),
+        sequence_item_class: type[TelegramObject] | None = sequence_item_class,
+    ) -> object:
+        if isinstance(raw_value, dict):
+            for cls in tg_classes:
+                if cls.__DE_JSON_DISPATCH__:
+                    dispatch_key, dispatch_mapping = cls.__DE_JSON_DISPATCH__
+                    if raw_value.get(dispatch_key) in dispatch_mapping:
+                        return cls.de_json(raw_value, bot)
+                else:
+                    return cls.de_json(raw_value, bot)
+            if tg_classes:
+                return tg_classes[0].de_json(raw_value, bot)
+        elif isinstance(raw_value, list) and sequence_item_class is not None:
+            return tuple(
+                sequence_item_class.de_json(item, bot) if isinstance(item, dict) else item
+                for item in raw_value
+            )
+        return raw_value
+
+    return transform_union
+

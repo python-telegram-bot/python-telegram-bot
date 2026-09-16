@@ -22,6 +22,7 @@ from typing import Final
 
 from telegram import constants
 from telegram._copytextbutton import CopyTextButton
+from telegram._disabledbutton import DisabledButton
 from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
 from telegram._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
@@ -271,6 +272,7 @@ class InlineKeyboardButton(TelegramObject):
         "callback_data",
         "callback_game",
         "copy_text",
+        "disabled",
         "icon_custom_emoji_id",
         "login_url",
         "pay",
@@ -298,6 +300,7 @@ class InlineKeyboardButton(TelegramObject):
         copy_text: CopyTextButton | None = None,
         style: str | None = None,
         icon_custom_emoji_id: str | None = None,
+        disabled: DisabledButton | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ):
@@ -320,6 +323,7 @@ class InlineKeyboardButton(TelegramObject):
         self.copy_text: CopyTextButton | None = copy_text
         self.style: str | None = style
         self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
+        self.disabled: DisabledButton | None = disabled
         self._id_attrs = ()
         self._set_id_attrs()
 
@@ -338,6 +342,7 @@ class InlineKeyboardButton(TelegramObject):
             self.pay,
             self.style,
             self.icon_custom_emoji_id,
+            self.disabled,
         )
 
     def update_callback_data(self, callback_data: str | object) -> None:

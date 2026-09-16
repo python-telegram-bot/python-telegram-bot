@@ -184,7 +184,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=10, minor=0)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=10, minor=3)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -3725,6 +3725,11 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.guest_message`.
 
     .. versionadded:: 22.8
+    """
+    STOPPED_MESSAGE_GENERATION = "stopped_message_generation"
+    """:obj:`str`: Updates with :attr:`telegram.Update.stopped_message_generation`.
+
+    .. versionadded:: 22.9
     """
 
 

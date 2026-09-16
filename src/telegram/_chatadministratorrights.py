@@ -191,6 +191,7 @@ class ChatAdministratorRights(TelegramObject):
         "can_post_stories",
         "can_promote_members",
         "can_restrict_members",
+        "can_send_welcome_messages",
         "is_anonymous",
     )
 
@@ -213,6 +214,7 @@ class ChatAdministratorRights(TelegramObject):
         can_manage_topics: bool | None = None,
         can_manage_direct_messages: bool | None = None,
         can_manage_tags: bool | None = None,
+        can_send_welcome_messages: bool | None = None,
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
@@ -236,6 +238,7 @@ class ChatAdministratorRights(TelegramObject):
         self.can_manage_topics: bool | None = can_manage_topics
         self.can_manage_direct_messages: bool | None = can_manage_direct_messages
         self.can_manage_tags: bool | None = can_manage_tags
+        self.can_send_welcome_messages: bool | None = can_send_welcome_messages
 
         self._id_attrs = (
             self.is_anonymous,
@@ -255,6 +258,7 @@ class ChatAdministratorRights(TelegramObject):
             self.can_delete_stories,
             self.can_manage_direct_messages,
             self.can_manage_tags,
+            self.can_send_welcome_messages,
         )
 
         self._freeze()
