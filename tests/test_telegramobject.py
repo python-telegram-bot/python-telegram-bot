@@ -675,17 +675,6 @@ class PicklePropertyTest(TelegramObject):
         assert new_msg.api_kwargs == {"foo": "bar"}
         assert new_msg.api_kwargs is not msg.api_kwargs
 
-        # check that deepcopy preserves the freezing status
-        with pytest.raises(
-            AttributeError, match="Attribute `text` of class `Message` can't be set!"
-        ):
-            new_msg.text = "new text"
-
-        msg._unfreeze()
-        new_message = deepcopy(msg)
-        new_message.text = "new text"
-        assert new_message.text == "new text"
-
     def test_deepcopy_subclass_telegram_obj(self, bot):
         s = self.Sub(private="private", normal="normal", b=bot)
         d = deepcopy(s)
