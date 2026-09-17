@@ -211,6 +211,11 @@ def tg_dataclass(
         )
         transformed_cls = process_init(transformed_cls)
 
+        # `dataclass()` generates __[get/set]state__ functions that override our custom ones
+        if cls.__name__ != "TelegramObject":
+            delattr(transformed_cls, "__getstate__")
+            delattr(transformed_cls, "__setstate__")
+
         if eq:
             compare_fields = tuple(
                 dataclass_field.name
