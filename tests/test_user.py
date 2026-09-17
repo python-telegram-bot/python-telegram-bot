@@ -25,6 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -72,8 +73,8 @@ def user(bot):
         supports_guest_queries=UserTestBase.supports_guest_queries,
     )
     user.set_bot(bot)
-    user._unfreeze()
-    return user
+    with unfrozen(user):
+        yield user
 
 
 class UserTestBase:

@@ -90,9 +90,11 @@ from telegram import (
     WebAppInfo,
 )
 from telegram._payment.stars.staramount import StarAmount
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import UTC, from_timestamp, localize, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.strings import to_camel_case
+from telegram._utils.types import ODVInput
 from telegram.constants import (
     ChatAction,
     InlineQueryLimit,
@@ -113,6 +115,7 @@ from tests.auxil.files import data_file
 from tests.auxil.networking import OfflineRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 from .auxil.build_messages import make_message
 from .auxil.dummy_objects import get_dummy_object
@@ -207,6 +210,7 @@ def bot_methods(ext_bot=True, include_camel_case=False, include_do_api_request=F
     )
 
 
+@tg_dataclass()
 class InputMessageContentLPO(InputMessageContent):
     """
     This is here to cover the case of InputMediaContent classes in testing answer_ilq that have
@@ -214,19 +218,8 @@ class InputMessageContentLPO(InputMessageContent):
     than sorry …
     """
 
-    __slots__ = ("entities", "link_preview_options", "message_text", "parse_mode")
-
-    def __init__(
-        self,
-        message_text: str,
-        link_preview_options=DEFAULT_NONE,
-        *,
-        api_kwargs=None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.message_text = message_text
-        self.link_preview_options = link_preview_options
+    message_text: str = tg_field()
+    link_preview_options: ODVInput[LinkPreviewOptions] = tg_field(default=DEFAULT_NONE)
 
 
 class TestBotWithoutRequest:
@@ -1994,9 +1987,10 @@ class TestBotWithoutRequest:
             get_dummy_object(Chat),
             reply_markup=offline_bot.callback_data_cache.process_keyboard(reply_markup),
         )
-        message._unfreeze()
         # We do to_dict -> de_json to make sure those aren't the same objects
-        message.pinned_message = Message.de_json(message.to_dict(), offline_bot)
+        object.__setattr__(
+            message, "pinned_message", Message.de_json(message.to_dict(), offline_bot)
+        )
 
         async def post(*args, **kwargs):
             update = Update(
@@ -3438,10 +3432,10 @@ class TestBotWithRequest:
             close_date=close_date,
             read_timeout=60,
         )
-        msg.poll._unfreeze()
-        # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
-        msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
-        assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
+        with unfrozen(msg.poll):
+            # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
+            msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
+            assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
 
         await asyncio.sleep(5.1)
 

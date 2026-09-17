@@ -350,14 +350,11 @@ class TestUpdateWithoutRequest(UpdateTestBase):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned off
         if message := (update.message or update.edited_message or update.guest_message):
-            message._unfreeze()
-            message.sender_chat = None
+            object.__setattr__(message, "sender_chat", None)
         elif reaction := (update.message_reaction):
-            reaction._unfreeze()
-            reaction.actor_chat = None
+            object.__setattr__(reaction, "actor_chat", None)
         elif answer := (update.poll_answer):
-            answer._unfreeze()
-            answer.voter_chat = None
+            object.__setattr__(answer, "voter_chat", None)
 
         # Test that it's sometimes None per docstring
         sender = update.effective_sender
@@ -383,14 +380,11 @@ class TestUpdateWithoutRequest(UpdateTestBase):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned on
         if message := (update.message or update.edited_message or update.guest_message):
-            message._unfreeze()
-            message.from_user = None
+            object.__setattr__(message, "from_user", None)
         elif reaction := (update.message_reaction):
-            reaction._unfreeze()
-            reaction.user = None
+            object.__setattr__(reaction, "user", None)
         elif answer := (update.poll_answer):
-            answer._unfreeze()
-            answer.user = None
+            object.__setattr__(answer, "user", None)
 
         # Test that it's sometimes None per docstring
         sender = update.effective_sender

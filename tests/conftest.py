@@ -20,6 +20,7 @@ import asyncio
 import os
 import sys
 import zoneinfo
+from contextlib import contextmanager
 from pathlib import Path
 from uuid import uuid4
 
@@ -344,3 +345,30 @@ def dummy_message():
 @pytest.fixture(scope="session")
 def dummy_message_dict(dummy_message):
     return dummy_message.to_dict()
+
+
+@contextmanager
+def unfrozen(obj):
+    """Helper for mutating TelegramObjects duration tests"""
+    cls = type(obj)
+    original_setattr = cls.__setattr__
+    original_delattr = cls.__delattr__
+
+    def set_attribute(instance, name, value):
+        # Identity check is needed so that only that only `obj` is affected
+        if instance is obj:
+            object.__setattr__(instance, name, value)
+        else:
+            original_setattr(instance, name, value)
+
+    def delete_attribute(instance, name):
+        # Identity check is needed so that only that only `obj` is affected
+        if instance is obj:
+            object.__delattr__(instance, name)
+        else:
+            original_delattr(instance, name)
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(cls, "__setattr__", set_attribute)
+        patch.setattr(cls, "__delattr__", delete_attribute)
+        yield obj

@@ -123,6 +123,7 @@ from tests.auxil.bot_method_checks import (
 from tests.auxil.build_messages import make_message
 from tests.auxil.dummy_objects import get_dummy_object_json_dict
 from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
+from tests.conftest import unfrozen
 
 
 @pytest.fixture
@@ -136,10 +137,8 @@ def message(bot):
         guest_query_id="706654132",
     )
     message.set_bot(bot)
-    message._unfreeze()
-    message.chat._unfreeze()
-    message.from_user._unfreeze()
-    return message
+    with unfrozen(message), unfrozen(message.chat), unfrozen(message.from_user):
+        yield message
 
 
 @pytest.fixture(
@@ -3122,7 +3121,8 @@ class TestMessageWithoutRequest(MessageTestBase):
     @pytest.mark.parametrize("business_connection_id", [None, "123456789"])
     async def test_delete(self, monkeypatch, message, business_connection_id):
         message = deepcopy(message)
-        message.business_connection_id = business_connection_id
+        with unfrozen(message):
+            message.business_connection_id = business_connection_id
 
         async def make_assertion(*_, **kwargs):
             url: str = kwargs.get("url")

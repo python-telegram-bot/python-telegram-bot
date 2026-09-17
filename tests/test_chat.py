@@ -36,6 +36,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -51,8 +52,8 @@ def chat(bot):
         is_direct_messages=ChatTestBase.is_direct_messages,
     )
     chat.set_bot(bot)
-    chat._unfreeze()
-    return chat
+    with unfrozen(chat):
+        yield chat
 
 
 class ChatTestBase:

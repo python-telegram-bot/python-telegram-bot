@@ -20,13 +20,14 @@
 import pytest
 
 from telegram import ChosenInlineResult, Location, User, Voice
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
 def user():
     user = User(1, "First name", False)
-    user._unfreeze()
-    return user
+    with unfrozen(user):
+        yield user
 
 
 @pytest.fixture(scope="module")

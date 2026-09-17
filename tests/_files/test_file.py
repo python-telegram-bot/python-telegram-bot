@@ -26,6 +26,7 @@ import pytest
 from telegram import File, FileCredentials, Voice
 from telegram.error import TelegramError
 from tests.auxil.files import data_file
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -37,8 +38,8 @@ def file(bot):
         file_size=FileTestBase.file_size,
     )
     file.set_bot(bot)
-    file._unfreeze()
-    return file
+    with unfrozen(file):
+        yield file
 
 
 @pytest.fixture(scope="module")

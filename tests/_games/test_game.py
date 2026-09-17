@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import Animation, Game, MessageEntity, PhotoSize
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -32,8 +33,8 @@ def game():
         text_entities=GameTestBase.text_entities,
         animation=GameTestBase.animation,
     )
-    game._unfreeze()
-    return game
+    with unfrozen(game):
+        yield game
 
 
 class GameTestBase:

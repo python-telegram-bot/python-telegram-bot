@@ -21,6 +21,7 @@
 import pytest
 
 from telegram import DirectMessagesTopic, User
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -30,8 +31,8 @@ def direct_messages_topic(offline_bot):
         user=DirectMessagesTopicTestBase.user,
     )
     dmt.set_bot(offline_bot)
-    dmt._unfreeze()
-    return dmt
+    with unfrozen(dmt):
+        yield dmt
 
 
 class DirectMessagesTopicTestBase:

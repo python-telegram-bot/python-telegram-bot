@@ -20,7 +20,6 @@ import dataclasses
 import datetime as dtm
 import inspect
 import pickle
-import re
 from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
@@ -46,6 +45,7 @@ from telegram._utils.types import ODVInput
 from telegram.ext import PicklePersistence
 from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
+from tests.conftest import unfrozen
 
 
 def all_subclasses(cls):
@@ -340,11 +340,10 @@ class TestTelegramObject:
 
     def test_api_kwargs_read_only(self):
         tg_object = TelegramObject(api_kwargs={"foo": "bar"})
-        tg_object._freeze()
         assert isinstance(tg_object.api_kwargs, MappingProxyType)
         with pytest.raises(TypeError):
             tg_object.api_kwargs["foo"] = "baz"
-        with pytest.raises(AttributeError, match="can't be set"):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             tg_object.api_kwargs = {"foo": "baz"}
 
     # tags: deprecated next.version
@@ -408,8 +407,8 @@ class TestTelegramObject:
 
     def test_to_dict_missing_attribute(self):
         message = Message(1, dtm.datetime.now(), Chat(1, "private"), from_user=User(1, "", False))
-        message._unfreeze()
-        del message.chat
+        with unfrozen(message):
+            del message.chat
 
         message_dict = message.to_dict()
         assert "chat" not in message_dict
@@ -584,7 +583,7 @@ class TestTelegramObject:
 
         # Ensure that loading objects that were pickled before attributes were made immutable
         # are still mutable
-        chat.id = 7
+        object.__setattr__(chat, "id", 7)
         assert chat.id == 7
 
     def test_pickle_handle_properties(self):
@@ -734,12 +733,8 @@ class PicklePropertyTest(TelegramObject):
 
     @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
     def test_subclasses_are_frozen(self, cls):
-        if cls is TelegramObject or cls.__name__.startswith("_"):
-            # Protected classes don't need to be frozen and neither does the base class
-            return
-
         # instantiating each subclass would be tedious as some attributes require special init
-        # args. So we inspect the code instead.
+        # args. So we check the dataclass type `cls` instead.
 
         source_file = inspect.getsourcefile(cls.__init__)
         parents = Path(source_file).parents
@@ -749,51 +744,5 @@ class PicklePropertyTest(TelegramObject):
             # If the class is defined in a test file, we don't want to test it.
             return
 
-        if source_file.endswith("telegramobject.py"):
-            pytest.fail(
-                f"{cls.__name__} does not have its own `__init__` "
-                "and can therefore not be frozen correctly"
-            )
-
-        source_lines, _ = inspect.getsourcelines(cls.__init__)
-
-        # We use regex matching since a simple "if self._freeze() in source_lines[-1]" would also
-        # allo commented lines.
-        last_line_freezes = re.match(r"\s*self\.\_freeze\(\)", source_lines[-1])
-        uses_with_unfrozen = re.search(
-            r"\n\s*with self\.\_unfrozen\(\)\:", inspect.getsource(cls.__init__)
-        )
-
-        assert last_line_freezes or uses_with_unfrozen, f"{cls.__name__} is not frozen correctly"
-
-    def test_freeze_unfreeze(self):
-        class TestSub(TelegramObject):
-            def __init__(self):
-                super().__init__()
-                self._protected = True
-                self.public = True
-                self._freeze()
-
-        foo = TestSub()
-        foo._protected = False
-        assert foo._protected is False
-
-        with pytest.raises(
-            AttributeError, match="Attribute `public` of class `TestSub` can't be set!"
-        ):
-            foo.public = False
-
-        with pytest.raises(
-            AttributeError, match="Attribute `public` of class `TestSub` can't be deleted!"
-        ):
-            del foo.public
-
-        foo._unfreeze()
-        foo._protected = True
-        assert foo._protected is True
-        foo.public = False
-        assert foo.public is False
-        del foo.public
-        del foo._protected
-        assert not hasattr(foo, "public")
-        assert not hasattr(foo, "_protected")
+        assert dataclasses.is_dataclass(cls)
+        assert cls.__dataclass_params__.frozen

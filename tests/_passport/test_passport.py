@@ -36,6 +36,7 @@ from telegram.error import PassportDecryptionError
 # worth it.
 from telegram.request import RequestData
 from tests.auxil.pytest_classes import make_bot
+from tests.conftest import unfrozen
 
 RAW_PASSPORT_DATA = {
     "credentials": {
@@ -400,8 +401,8 @@ class TestPassportWithoutRequest(PassportTestBase):
         assert a is not b
 
         new_pp_data = deepcopy(passport_data)
-        new_pp_data.credentials._unfreeze()
-        new_pp_data.credentials.hash = "NOTAPROPERHASH"
+        with unfrozen(new_pp_data.credentials):
+            new_pp_data.credentials.hash = "NOTAPROPERHASH"
         c = PassportData(new_pp_data.data, new_pp_data.credentials)
 
         assert a != c
@@ -446,7 +447,9 @@ class TestPassportWithoutRequest(PassportTestBase):
         )
         assert new.api_kwargs == {}
 
-        new.credentials._decrypted_data = Credentials.de_json(credentials, offline_bot)
+        object.__setattr__(
+            new.credentials, "_decrypted_data", Credentials.de_json(credentials, offline_bot)
+        )
         assert new.credentials.api_kwargs == {}
 
         assert isinstance(new, PassportData)

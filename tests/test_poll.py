@@ -45,6 +45,7 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from telegram.warnings import PTBDeprecationWarning
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -55,8 +56,8 @@ def input_poll_option():
         text_entities=InputPollOptionTestBase.text_entities,
         media=InputPollOptionTestBase.media,
     )
-    out._unfreeze()
-    return out
+    with unfrozen(out):
+        yield out
 
 
 class InputPollOptionTestBase:
@@ -230,8 +231,8 @@ def poll_option():
         persistent_id=PollOptionTestBase.persistent_id,
         media=PollOptionTestBase.media,
     )
-    out._unfreeze()
-    return out
+    with unfrozen(out):
+        yield out
 
 
 class PollOptionTestBase:
@@ -432,8 +433,8 @@ def poll():
         media=PollTestBase.media,
         explanation_media=PollTestBase.explanation_media,
     )
-    poll._unfreeze()
-    return poll
+    with unfrozen(poll):
+        yield poll
 
 
 class PollTestBase:
@@ -790,8 +791,8 @@ def poll_option_added():
         option_text=PollOptionAddedTestBase.option_text,
         option_text_entities=PollOptionAddedTestBase.option_text_entities,
     )
-    p._unfreeze()
-    return p
+    with unfrozen(p):
+        yield p
 
 
 class PollOptionAddedTestBase:
@@ -902,8 +903,8 @@ def poll_option_deleted():
         option_text=PollOptionDeletedTestBase.option_text,
         option_text_entities=PollOptionDeletedTestBase.option_text_entities,
     )
-    p._unfreeze()
-    return p
+    with unfrozen(p):
+        yield p
 
 
 class PollOptionDeletedTestBase:
