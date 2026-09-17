@@ -347,8 +347,8 @@ class TestTelegramObject:
         with pytest.raises(AttributeError, match="can't be set"):
             tg_object.api_kwargs = {"foo": "baz"}
 
-    # tags: deprecated NEXT.VERSION
-    # No subclasses other that Bot will have their own init
+    # tags: deprecated next.version
+    # no subclasses other that bot will have their own init
     @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
     def test_subclasses_have_api_kwargs(self, cls):
         """Checks that all subclasses of TelegramObject have an api_kwargs argument that is
