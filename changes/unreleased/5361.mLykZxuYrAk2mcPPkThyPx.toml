@@ -1,0 +1,6 @@
+dependencies = "Update pre-commit hook aiolimiter to v1.3.0"
+internal = "Update pre-commit hook aiolimiter to v1.3.0"
+[[pull_requests]]
+uid = "5361"
+author_uids = ["renovate[bot]"]
+closes_threads = []
