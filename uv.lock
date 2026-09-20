@@ -28,11 +28,11 @@ wheels = [
 
 [[package]]
 name = "aiolimiter"
-version = "1.2.1"
+version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f1/23/b52debf471f7a1e42e362d959a3982bdcb4fe13a5d46e63d28868807a79c/aiolimiter-1.2.1.tar.gz", hash = "sha256:e02a37ea1a855d9e832252a105420ad4d15011505512a1a1d814647451b5cca9", size = 7185, upload-time = "2024-12-08T15:31:51.496Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/26/60/0d16f90083a2f0ae9421d11ad98287f7942414f091ae9ad318389a764f85/aiolimiter-1.3.0.tar.gz", hash = "sha256:7343008c2228e89def7d4ce29ab98ee98822bf5db69018c09c90088929f7c104", size = 10051, upload-time = "2026-09-07T14:40:27.876Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f3/ba/df6e8e1045aebc4778d19b8a3a9bc1808adb1619ba94ca354d9ba17d86c3/aiolimiter-1.2.1-py3-none-any.whl", hash = "sha256:d3f249e9059a20badcb56b61601a83556133655c11d1eb3dd3e04ff069e5f3c7", size = 6711, upload-time = "2024-12-08T15:31:49.874Z" },
+    { url = "https://files.pythonhosted.org/packages/56/d8/9237b1d29e561bd37ffe9487ea1a4551d2df2902d9b79a6ea6b18e4fcc73/aiolimiter-1.3.0-py3-none-any.whl", hash = "sha256:c0c16c377049fb2e40cc3373770e29c063de32aa25d84e5db168c854da6462b7", size = 6955, upload-time = "2026-09-07T14:40:26.753Z" },
 ]
 
 [[package]]
@@ -1652,9 +1652,9 @@ tests = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiolimiter", marker = "extra == 'all'", specifier = ">=1.1,<1.3" },
-    { name = "aiolimiter", marker = "extra == 'ext'", specifier = ">=1.1,<1.3" },
-    { name = "aiolimiter", marker = "extra == 'rate-limiter'", specifier = ">=1.1,<1.3" },
+    { name = "aiolimiter", marker = "extra == 'all'", specifier = ">=1.3,<1.4" },
+    { name = "aiolimiter", marker = "extra == 'ext'", specifier = ">=1.3,<1.4" },
+    { name = "aiolimiter", marker = "extra == 'rate-limiter'", specifier = ">=1.3,<1.4" },
     { name = "apscheduler", marker = "extra == 'all'", specifier = ">=3.10.4,<3.12.0" },
     { name = "apscheduler", marker = "extra == 'ext'", specifier = ">=3.10.4,<3.12.0" },
     { name = "apscheduler", marker = "extra == 'job-queue'", specifier = ">=3.10.4,<3.12.0" },
