@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from collections.abc import Sequence
+import dataclasses
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -28,7 +28,13 @@ from telegram._utils.types import JSONDict
 
 
 @tg_dataclass()
-class PassportElementError(TelegramObject):
+class _BasePassportElementError(TelegramObject):
+    source: str = tg_field(compare=True)
+    type: str = tg_field(compare=True)
+
+
+@dataclasses.dataclass(frozen=True, slots=False, repr=False, eq=False, match_args=False)
+class PassportElementError(_BasePassportElementError):
     """Baseclass for the PassportElementError* classes.
 
     This object represents an error in the Telegram Passport element which was submitted that
@@ -49,22 +55,24 @@ class PassportElementError(TelegramObject):
 
     """
 
-    # Required
-    source: str = tg_field(compare=True)
-    type: str = tg_field(compare=True)
     # tags: deprecated NEXT.VERSION
-    # Include in initalizer for next relase
-    message: str = tg_field(init=False)
+    # Use automatic slots and __init__
+    # We currently define explicit slots instead of dataclass fields
+    # to allow subclasses to control `message` parameter ordering
 
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__
+    __slots__ = ("message",)
+
     def __init__(
-        self, source: str, type: str, message: str, *, api_kwargs: JSONDict | None = None
+        self,
+        source: str,
+        type: str,
+        message: str,
+        *,
+        api_kwargs: JSONDict | None = None,
     ) -> None:
-        object.__setattr__(self, "source", str(source))
-        object.__setattr__(self, "type", str(type))
+        super().__init__(source, type, api_kwargs=api_kwargs)
+
         object.__setattr__(self, "message", str(message))
-        TelegramObject.__init__(self, api_kwargs=api_kwargs)
 
 
 @tg_dataclass()
@@ -76,6 +84,10 @@ class PassportElementErrorDataField(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`field_name`, :attr:`data_hash` and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
@@ -102,22 +114,7 @@ class PassportElementErrorDataField(PassportElementError):
     data_hash: str = tg_field(compare=True)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self,
-        type: str,
-        field_name: str,
-        data_hash: str,
-        message: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        PassportElementError.__init__(self, "data", type, message, api_kwargs=api_kwargs)
-        object.__setattr__(self, "field_name", field_name)
-        object.__setattr__(self, "data_hash", data_hash)
+    message: str = tg_field(compare=True)
 
 
 @tg_dataclass()
@@ -129,6 +126,10 @@ class PassportElementErrorFile(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -152,15 +153,7 @@ class PassportElementErrorFile(PassportElementError):
     file_hash: str = tg_field(compare=True)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ) -> None:
-        PassportElementError.__init__(self, "file", type, message, api_kwargs=api_kwargs)
-        object.__setattr__(self, "file_hash", file_hash)
+    message: str = tg_field(compare=True)
 
 
 @tg_dataclass()
@@ -172,6 +165,10 @@ class PassportElementErrorFiles(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -198,23 +195,10 @@ class PassportElementErrorFiles(PassportElementError):
     # Attribute only (init=False)
     source: str = tg_field(compare=True, init=False, default="files")
     # Required
-    file_hashes: tuple[str, ...] = tg_field(compare=True)
+    file_hashes: tuple[str, ...] = tg_field(compare=True, converter=parse_sequence_arg)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self,
-        type: str,
-        file_hashes: Sequence[str],
-        message: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        PassportElementError.__init__(self, "files", type, message, api_kwargs=api_kwargs)
-        object.__setattr__(self, "file_hashes", parse_sequence_arg(file_hashes))
+    message: str = tg_field(compare=True)
 
 
 @tg_dataclass()
@@ -226,6 +210,10 @@ class PassportElementErrorFrontSide(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -249,15 +237,7 @@ class PassportElementErrorFrontSide(PassportElementError):
     file_hash: str = tg_field(compare=True)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ) -> None:
-        PassportElementError.__init__(self, "front_side", type, message, api_kwargs=api_kwargs)
-        object.__setattr__(self, "file_hash", file_hash)
+    message: str = tg_field(compare=True)
 
 
 @tg_dataclass()
@@ -269,6 +249,10 @@ class PassportElementErrorReverseSide(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -292,15 +276,7 @@ class PassportElementErrorReverseSide(PassportElementError):
     file_hash: str = tg_field(compare=True)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ) -> None:
-        PassportElementError.__init__(self, "reverse_side", type, message, api_kwargs=api_kwargs)
-        object.__setattr__(self, "file_hash", file_hash)
+    message: str = tg_field(compare=True)
 
 
 @tg_dataclass()
@@ -312,6 +288,10 @@ class PassportElementErrorSelfie(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -333,15 +313,7 @@ class PassportElementErrorSelfie(PassportElementError):
     file_hash: str = tg_field(compare=True)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ) -> None:
-        PassportElementError.__init__(self, "selfie", type, message, api_kwargs=api_kwargs)
-        object.__setattr__(self, "file_hash", file_hash)
+    message: str = tg_field(compare=True)
 
 
 @tg_dataclass()
@@ -353,6 +325,10 @@ class PassportElementErrorTranslationFile(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -378,17 +354,7 @@ class PassportElementErrorTranslationFile(PassportElementError):
     file_hash: str = tg_field(compare=True)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ) -> None:
-        PassportElementError.__init__(
-            self, "translation_file", type, message, api_kwargs=api_kwargs
-        )
-        object.__setattr__(self, "file_hash", file_hash)
+    message: str = tg_field(compare=True)
 
 
 @tg_dataclass()
@@ -400,6 +366,10 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -428,25 +398,10 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     # Attribute only (init=False)
     source: str = tg_field(compare=True, init=False, default="translation_files")
     # Required
-    file_hashes: tuple[str, ...] = tg_field(compare=True)
+    file_hashes: tuple[str, ...] = tg_field(compare=True, converter=parse_sequence_arg)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self,
-        type: str,
-        file_hashes: Sequence[str],
-        message: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        PassportElementError.__init__(
-            self, "translation_files", type, message, api_kwargs=api_kwargs
-        )
-        object.__setattr__(self, "file_hashes", parse_sequence_arg(file_hashes))
+    message: str = tg_field(compare=True)
 
 
 @tg_dataclass()
@@ -458,6 +413,10 @@ class PassportElementErrorUnspecified(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`element_hash`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
@@ -477,12 +436,4 @@ class PassportElementErrorUnspecified(PassportElementError):
     element_hash: str = tg_field(compare=True)
     # tags: deprecated NEXT.VERSION
     # Remove for next relase
-    message: str = tg_field(compare=True, init=False)
-
-    # tags: deprecated NEXT.VERSION
-    # Remove manual __init__, present here to preserve ordering
-    def __init__(
-        self, type: str, element_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ) -> None:
-        PassportElementError.__init__(self, "unspecified", type, message, api_kwargs=api_kwargs)
-        object.__setattr__(self, "element_hash", element_hash)
+    message: str = tg_field(compare=True)
