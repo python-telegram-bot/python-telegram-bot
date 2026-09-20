@@ -5176,10 +5176,9 @@ class TestBotWithRequest:
         bot_profile_photos = await bot.get_user_profile_photos(bot.id)
         assert bot_profile_photos.total_count == 1
 
-    @pytest.mark.skip(reason="We lost access to TestUser so we can't set the channel to the user")
     async def test_get_user_personal_chat_messages(self, bot):
         # id is of the Test User
-        messages = await bot.get_user_personal_chat_messages(user_id=675666224, limit=2)
+        messages = await bot.get_user_personal_chat_messages(user_id=8967035616, limit=2)
         assert isinstance(messages, tuple)
         assert len(messages) == 2
 
