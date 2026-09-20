@@ -3971,7 +3971,7 @@ class TestBotWithRequest:
     async def test_get_chat_member(self, bot, channel_id, chat_id):
         chat_member = await bot.get_chat_member(channel_id, chat_id)
 
-        assert chat_member.status == "creator"
+        assert chat_member.status == "administrator"
         assert chat_member.user.first_name == "PTB"
         assert chat_member.user.last_name == "Test user"
 
@@ -4044,6 +4044,7 @@ class TestBotWithRequest:
         assert protected.has_protected_content is val
 
     @xfail
+    @pytest.mark.skip(reason="We need to rotate the BOTS variable with new bots")
     async def test_set_game_score_and_high_scores(self, bot, chat_id):
         # First, test setting a score.
         game_short_name = "test_game"
